@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { apiKeyValidator } from '../utils/apiKeyValidator';
 
 // Data source configurations - Updated for Vite environment variables
 const DATA_SOURCES = {
@@ -39,12 +40,17 @@ class DataFetchingService {
   }
 
   isDemoMode() {
+    // Check if we're forcing demo mode
+    if (import.meta.env.VITE_FORCE_DEMO_MODE === 'true') {
+      return true;
+    }
+
     // Check if we're using demo API keys
     const hasValidKeys = (
-      import.meta.env.VITE_ALPHA_VANTAGE_API_KEY && 
+      import.meta.env.VITE_ALPHA_VANTAGE_API_KEY &&
       import.meta.env.VITE_ALPHA_VANTAGE_API_KEY !== 'demo'
     ) || (
-      import.meta.env.VITE_FMP_API_KEY && 
+      import.meta.env.VITE_FMP_API_KEY &&
       import.meta.env.VITE_FMP_API_KEY !== 'demo'
     );
     return !hasValidKeys;
@@ -577,15 +583,26 @@ class DataFetchingService {
   }
 
   // Add method to check API status
-  getApiStatus() {
+  async getApiStatus() {
+    const validationResults = await apiKeyValidator.validateAllKeys();
+
     return {
       demoMode: this.demoMode,
       cacheSize: this.cache.size,
+      validation: validationResults,
       availableKeys: {
         alphaVantage: !!(import.meta.env.VITE_ALPHA_VANTAGE_API_KEY && import.meta.env.VITE_ALPHA_VANTAGE_API_KEY !== 'demo'),
         fmp: !!(import.meta.env.VITE_FMP_API_KEY && import.meta.env.VITE_FMP_API_KEY !== 'demo'),
-      }
+        quandl: !!(import.meta.env.VITE_QUANDL_API_KEY && import.meta.env.VITE_QUANDL_API_KEY !== 'demo'),
+        fred: !!(import.meta.env.VITE_FRED_API_KEY && import.meta.env.VITE_FRED_API_KEY !== 'demo'),
+      },
+      recommendations: validationResults.recommendations
     };
+  }
+
+  // Add method to validate API keys on demand
+  async validateApiKeys() {
+    return await apiKeyValidator.validateAllKeys();
   }
 }
 

@@ -32,22 +32,59 @@ A comprehensive financial modeling and analysis platform with real-time data int
 - Node.js 18+ and npm
 - API keys for data sources (see API Keys section)
 
-### Setup
+### 🚀 Automated Setup (Recommended)
+
+**One-line installer for Linux/macOS:**
+```bash
+curl -sSL https://raw.githubusercontent.com/Bwillia13x/financeanalyst_pro/main/setup.sh | bash
+```
+
+**One-line installer for Windows (PowerShell):**
+```powershell
+iwr -useb https://raw.githubusercontent.com/Bwillia13x/financeanalyst_pro/main/setup.ps1 | iex
+```
+
+**Cross-platform Python installer:**
+```bash
+curl -sSL https://raw.githubusercontent.com/Bwillia13x/financeanalyst_pro/main/setup.py | python3
+```
+
+The automated scripts will:
+- ✅ Check system requirements
+- ✅ Clone the repository
+- ✅ Install dependencies
+- ✅ Set up environment
+- ✅ Run tests (optional)
+- ✅ Start the development server
+
+### Manual Setup
 ```bash
 # Clone the repository
-git clone <repository-url>
-cd financeanalyst-pro
+git clone https://github.com/Bwillia13x/financeanalyst_pro.git
+cd financeanalyst_pro
 
 # Install dependencies
 npm install
 
-# Copy environment file and add your API keys
+# Copy environment file and add your API keys (optional - works in demo mode)
 cp .env.example .env
-# Edit .env with your API keys
+# Edit .env with your API keys for live data
 
 # Start development server
 npm start
 ```
+
+The application will be available at `http://localhost:4028`
+
+### Quick Start (Demo Mode)
+You can start using the application immediately without any API keys:
+```bash
+npm install
+npm start
+```
+The app will run in demo mode with realistic mock data for all financial calculations.
+
+📖 **For detailed setup instructions, see [SETUP.md](SETUP.md)**
 
 ## 🔑 API Keys
 
@@ -55,19 +92,19 @@ npm start
 
 1. **Alpha Vantage** (Free: 5 requests/min, 500/day)
    - Get key: https://www.alphavantage.co/support/#api-key
-   - Add to `.env`: `REACT_APP_ALPHA_VANTAGE_API_KEY=your_key_here`
+   - Add to `.env`: `VITE_ALPHA_VANTAGE_API_KEY=your_key_here`
 
 2. **Financial Modeling Prep** (Free: 250 requests/day)
    - Get key: https://financialmodelingprep.com/developer/docs
-   - Add to `.env`: `REACT_APP_FMP_API_KEY=your_key_here`
+   - Add to `.env`: `VITE_FMP_API_KEY=your_key_here`
 
 3. **Quandl/NASDAQ Data Link** (Free: 50 requests/day)
    - Get key: https://data.nasdaq.com/sign-up
-   - Add to `.env`: `REACT_APP_QUANDL_API_KEY=your_key_here`
+   - Add to `.env`: `VITE_QUANDL_API_KEY=your_key_here`
 
 4. **FRED (Federal Reserve)** (Free: 120 requests/min)
    - Get key: https://fred.stlouisfed.org/docs/api/api_key.html
-   - Add to `.env`: `REACT_APP_FRED_API_KEY=your_key_here`
+   - Add to `.env`: `VITE_FRED_API_KEY=your_key_here`
 
 ### Demo Mode
 The application works in demo mode with limited functionality if no API keys are provided.
@@ -181,17 +218,106 @@ src/
 
 ### Available Scripts
 ```bash
-npm start      # Start development server
-npm build      # Build for production
-npm serve      # Preview production build
+npm start         # Start development server
+npm build         # Build for production
+npm serve         # Preview production build
+npm test          # Run tests
+npm test:ui       # Run tests with UI
+npm test:coverage # Run tests with coverage report
 ```
 
 ### Environment Variables
 ```bash
-REACT_APP_ENV=development
-REACT_APP_DEBUG=true
-REACT_APP_CACHE_ENABLED=true
-REACT_APP_RATE_LIMITING_ENABLED=false
+VITE_APP_ENV=development
+VITE_DEBUG=true
+VITE_CACHE_ENABLED=true
+VITE_RATE_LIMITING_ENABLED=false
+```
+
+## 🚀 Deployment
+
+### Production Build
+```bash
+# Build for production
+npm run build
+
+# The build files will be in the 'build' directory
+# Serve the build directory with any static file server
+npm run serve
+```
+
+### Deploy to Vercel (Recommended)
+```bash
+# Install Vercel CLI
+npm i -g vercel
+
+# Deploy
+vercel
+
+# Set environment variables in Vercel dashboard
+# VITE_ALPHA_VANTAGE_API_KEY=your_key
+# VITE_FMP_API_KEY=your_key
+# etc.
+```
+
+### Deploy to Netlify
+```bash
+# Build the project
+npm run build
+
+# Deploy the 'build' directory to Netlify
+# Or connect your GitHub repo to Netlify for automatic deployments
+```
+
+### Deploy to GitHub Pages
+```bash
+# Install gh-pages
+npm install --save-dev gh-pages
+
+# Add to package.json scripts:
+# "deploy": "gh-pages -d build"
+
+# Build and deploy
+npm run build
+npm run deploy
+```
+
+### Environment Variables for Production
+Set these environment variables in your deployment platform:
+- `VITE_ALPHA_VANTAGE_API_KEY`
+- `VITE_FMP_API_KEY`
+- `VITE_QUANDL_API_KEY`
+- `VITE_FRED_API_KEY`
+
+**Note**: The app works perfectly in demo mode without any API keys.
+
+## 🧪 Testing
+
+### Running Tests
+```bash
+# Run all tests
+npm test
+
+# Run tests with UI
+npm run test:ui
+
+# Run tests with coverage
+npm run test:coverage
+
+# Run specific test file
+npm test -- src/utils/__tests__/dataTransformation.test.js
+```
+
+### Test Structure
+```
+src/
+├── test/
+│   ├── setup.js              # Test configuration
+│   └── __tests__/
+│       └── basic.test.js      # Basic infrastructure tests
+├── utils/__tests__/           # Utility function tests
+├── components/__tests__/      # Component tests
+└── services/__tests__/        # Service tests
 ```
 
 ## 📈 Roadmap
@@ -226,11 +352,51 @@ REACT_APP_RATE_LIMITING_ENABLED=false
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
+## 🔧 Troubleshooting
+
+### Common Issues
+
+#### "API key validation failed"
+- Check that your API keys are correctly set in the `.env` file
+- Ensure you're using `VITE_` prefixes for environment variables
+- Run `validate` command in the terminal to check API key status
+- The app works in demo mode without API keys
+
+#### "Module not found" errors
+```bash
+# Clear node_modules and reinstall
+rm -rf node_modules package-lock.json
+npm install
+```
+
+#### Build fails
+```bash
+# Check Node.js version (requires 18+)
+node --version
+
+# Clear cache and rebuild
+npm run build --clean
+```
+
+#### Tests not running
+```bash
+# Install test dependencies
+npm install --save-dev vitest @vitest/ui jsdom
+
+# Run tests
+npm test
+```
+
+### Performance Tips
+- Enable caching in production: `VITE_CACHE_ENABLED=true`
+- Use rate limiting for API calls: `VITE_RATE_LIMITING_ENABLED=true`
+- Monitor API usage to avoid quota limits
+
 ## 🆘 Support
 
-- Documentation: [Wiki](link-to-wiki)
-- Issues: [GitHub Issues](link-to-issues)
-- Discussions: [GitHub Discussions](link-to-discussions)
+- Documentation: [GitHub Wiki](https://github.com/Bwillia13x/financeanalyst_pro/wiki)
+- Issues: [GitHub Issues](https://github.com/Bwillia13x/financeanalyst_pro/issues)
+- Discussions: [GitHub Discussions](https://github.com/Bwillia13x/financeanalyst_pro/discussions)
 
 ## ⚠️ Disclaimer
 

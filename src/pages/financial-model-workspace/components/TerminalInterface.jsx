@@ -164,7 +164,41 @@ const TerminalInterface = ({ onCommandExecute, calculationResults }) => {
     if (cmd === 'help') {
       return {
         type: 'system',
-        content: `Available Commands:\n\nReal-Time Data Functions:\n• DCF(AAPL) - Discounted Cash Flow with live data\n• LBO(TSLA) - Leveraged Buyout analysis\n• COMP(MSFT) - Comparable company analysis\n• FETCH(GOOGL) - Get comprehensive company data\n• PROFILE(AMZN) - Company profile and metrics\n• MARKET(NFLX) - Real-time market data\n• PEERS(META) - Peer company analysis\n• SEC(AAPL, 10-K) - SEC filings data\n\nClassic Financial Functions:\n• NPV([cf1,cf2,cf3], 0.10) - Net Present Value\n• IRR([cf1,cf2,cf3]) - Internal Rate of Return\n• WACC(0.12, 0.05, 0.25, 0.3) - Cost of Capital\n\nAnalysis Tools:\n• SENSITIVITY(AAPL, wacc, [0.08,0.12]) - Sensitivity analysis\n• MONTE_CARLO(AAPL, 1000) - Monte Carlo simulation\n\nUtility Commands:\n• clear - Clear terminal\n• export excel/pdf - Export current model\n• save model - Save current work\n• status - Show API status\n• cache clear - Clear data cache\n\nExample: DCF(AAPL) - Runs full DCF with live Apple data\n\n🚨 Note: Currently running in demo mode. Configure API keys for live data.`
+        content: `Available Commands:
+
+📊 Real-Time Data Functions:
+• DCF(AAPL) - Discounted Cash Flow with live data
+• LBO(TSLA) - Leveraged Buyout analysis
+• COMP(MSFT) - Comparable company analysis
+• FETCH(GOOGL) - Get comprehensive company data
+• PROFILE(AMZN) - Company profile and metrics
+• MARKET(NFLX) - Real-time market data
+• PEERS(META) - Peer company analysis
+• SEC(AAPL, 10-K) - SEC filings data
+
+🧮 Classic Financial Functions:
+• NPV([cf1,cf2,cf3], 0.10) - Net Present Value
+• IRR([cf1,cf2,cf3]) - Internal Rate of Return
+• WACC(0.12, 0.05, 0.25, 0.3) - Cost of Capital
+
+🔬 Analysis Tools:
+• SENSITIVITY(AAPL, wacc, [0.08,0.12]) - Sensitivity analysis
+• MONTE_CARLO(AAPL, 1000) - Monte Carlo simulation
+
+🛠️ Utility Commands:
+• clear - Clear terminal
+• status - Show system and API status
+• validate - Validate API keys
+• cache clear - Clear data cache
+• export excel/pdf - Export current model
+• save model - Save current work
+
+💡 Examples:
+• DCF(AAPL) - Runs full DCF with live Apple data
+• validate - Check your API key configuration
+• status - See current system status
+
+${dataFetchingService.demoMode ? '🚨 Note: Currently running in demo mode. Use "validate" to check API keys.' : '✅ Live data mode active'}`
       };
     }
 
@@ -174,11 +208,90 @@ const TerminalInterface = ({ onCommandExecute, calculationResults }) => {
     }
 
     if (cmd === 'status') {
-      const apiStatus = dataFetchingService.getApiStatus();
-      return {
-        type: 'info',
-        content: `System Status:\n\n📊 Data Sources: ${apiStatus.demoMode ? 'Demo Mode (Mock Data)' : 'Live APIs Connected'}\n🔄 Cache: ${apiStatus.cacheSize} entries\n⏱️ Rate Limits: ${apiStatus.demoMode ? 'Disabled (Demo)' : 'Active'}\n🌐 Network: Connected\n💾 Cache TTL: 15min-24hrs depending on data type\n\n🔑 API Keys Status:\n• Alpha Vantage: ${apiStatus.availableKeys.alphaVantage ? '✅ Configured' : '❌ Missing'}\n• FMP: ${apiStatus.availableKeys.fmp ? '✅ Configured' : '❌ Missing'}\n\n${apiStatus.demoMode ? '⚠️  Demo Mode: Add API keys to .env for live data' : '✅ Live data mode active'}\n\nLast Updated: ${new Date().toLocaleTimeString()}`
-      };
+      try {
+        const apiStatus = await dataFetchingService.getApiStatus();
+        const validation = apiStatus.validation;
+
+        let statusContent = `System Status:
+
+📊 Data Sources: ${apiStatus.demoMode ? 'Demo Mode (Mock Data)' : 'Live APIs Connected'}
+🔄 Cache: ${apiStatus.cacheSize} entries
+⏱️ Rate Limits: ${apiStatus.demoMode ? 'Disabled (Demo)' : 'Active'}
+🌐 Network: Connected
+💾 Cache TTL: 15min-24hrs depending on data type
+🎯 Overall API Status: ${validation.overall.toUpperCase()}
+
+🔑 API Key Validation:`;
+
+        // Add status for each service
+        Object.entries(validation.services).forEach(([service, result]) => {
+          const statusIcon = result.status === 'valid' ? '✅' :
+                           result.status === 'missing' ? '❌' :
+                           result.status === 'invalid' ? '🚫' :
+                           result.status === 'rate_limited' ? '⚠️' : '❓';
+          statusContent += `\n• ${service}: ${statusIcon} ${result.message}`;
+        });
+
+        if (validation.recommendations.length > 0) {
+          statusContent += '\n\n💡 Recommendations:';
+          validation.recommendations.forEach(rec => {
+            statusContent += `\n• ${rec}`;
+          });
+        }
+
+        statusContent += `\n\nLast Updated: ${new Date().toLocaleTimeString()}`;
+
+        return {
+          type: 'info',
+          content: statusContent
+        };
+      } catch (error) {
+        return {
+          type: 'error',
+          content: `Error checking system status: ${error.message}`
+        };
+      }
+    }
+
+    if (cmd === 'validate') {
+      try {
+        const validation = await dataFetchingService.validateApiKeys();
+
+        let content = `🔍 API Key Validation Results:
+
+Overall Status: ${validation.overall.toUpperCase()}
+
+Service Details:`;
+
+        Object.entries(validation.services).forEach(([service, result]) => {
+          const statusIcon = result.status === 'valid' ? '✅' :
+                           result.status === 'missing' ? '❌' :
+                           result.status === 'invalid' ? '🚫' :
+                           result.status === 'rate_limited' ? '⚠️' :
+                           result.status === 'network_error' ? '🌐' : '❓';
+          content += `\n• ${service}: ${statusIcon} ${result.message}`;
+        });
+
+        if (validation.recommendations.length > 0) {
+          content += '\n\n💡 Recommendations:';
+          validation.recommendations.forEach(rec => {
+            content += `\n• ${rec}`;
+          });
+        }
+
+        content += `\n\nValidation completed at: ${validation.timestamp.toLocaleTimeString()}`;
+
+        return {
+          type: validation.overall === 'complete' ? 'success' :
+                validation.overall === 'demo' ? 'warning' : 'info',
+          content: content
+        };
+      } catch (error) {
+        return {
+          type: 'error',
+          content: `Validation failed: ${error.message}`
+        };
+      }
     }
 
     if (cmd === 'cache clear') {
