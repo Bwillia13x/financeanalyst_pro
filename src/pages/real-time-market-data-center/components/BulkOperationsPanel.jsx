@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 import Input from '../../../components/ui/Input';
@@ -41,7 +42,7 @@ const BulkOperationsPanel = ({ selectedSymbols, onBulkExport, onBulkAlert, onBul
   return (
     <div className="bg-card border border-border rounded-lg shadow-elevation-1">
       {/* Header */}
-      <div 
+      <div
         className="flex items-center justify-between p-4 cursor-pointer"
         onClick={() => setIsExpanded(!isExpanded)}
       >
@@ -56,10 +57,10 @@ const BulkOperationsPanel = ({ selectedSymbols, onBulkExport, onBulkAlert, onBul
             </p>
           </div>
         </div>
-        <Icon 
-          name={isExpanded ? 'ChevronUp' : 'ChevronDown'} 
-          size={20} 
-          className="text-muted-foreground" 
+        <Icon
+          name={isExpanded ? 'ChevronUp' : 'ChevronDown'}
+          size={20}
+          className="text-muted-foreground"
         />
       </div>
 
@@ -70,7 +71,7 @@ const BulkOperationsPanel = ({ selectedSymbols, onBulkExport, onBulkAlert, onBul
           <div className="p-4 border-b border-border">
             <h4 className="text-sm font-medium text-foreground mb-2">Selected Symbols:</h4>
             <div className="flex flex-wrap gap-2">
-              {selectedSymbols.slice(0, 10).map((symbol) => (
+              {selectedSymbols.slice(0, 10).map(symbol => (
                 <span
                   key={symbol}
                   className="px-2 py-1 bg-muted text-muted-foreground text-xs rounded"
@@ -94,7 +95,7 @@ const BulkOperationsPanel = ({ selectedSymbols, onBulkExport, onBulkAlert, onBul
               <div className="flex items-center space-x-2">
                 <select
                   value={exportFormat}
-                  onChange={(e) => setExportFormat(e.target.value)}
+                  onChange={e => setExportFormat(e.target.value)}
                   className="px-3 py-2 border border-border rounded-lg text-sm bg-input text-foreground"
                 >
                   <option value="csv">CSV Format</option>
@@ -102,12 +103,7 @@ const BulkOperationsPanel = ({ selectedSymbols, onBulkExport, onBulkAlert, onBul
                   <option value="json">JSON Format</option>
                   <option value="pdf">PDF Report</option>
                 </select>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  iconName="Download"
-                  onClick={handleBulkExport}
-                >
+                <Button variant="outline" size="sm" iconName="Download" onClick={handleBulkExport}>
                   Export Data
                 </Button>
               </div>
@@ -121,7 +117,7 @@ const BulkOperationsPanel = ({ selectedSymbols, onBulkExport, onBulkAlert, onBul
                   type="number"
                   placeholder="Threshold %"
                   value={alertThreshold}
-                  onChange={(e) => setAlertThreshold(e.target.value)}
+                  onChange={e => setAlertThreshold(e.target.value)}
                   className="flex-1"
                 />
                 <Button
@@ -142,7 +138,7 @@ const BulkOperationsPanel = ({ selectedSymbols, onBulkExport, onBulkAlert, onBul
               <div className="flex items-center space-x-2">
                 <select
                   value={historicalPeriod}
-                  onChange={(e) => setHistoricalPeriod(e.target.value)}
+                  onChange={e => setHistoricalPeriod(e.target.value)}
                   className="px-3 py-2 border border-border rounded-lg text-sm bg-input text-foreground"
                 >
                   <option value="1d">1 Day</option>

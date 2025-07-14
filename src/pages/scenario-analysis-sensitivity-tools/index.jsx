@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import Header from '../../components/ui/Header';
-import ScenarioConfigPanel from './components/ScenarioConfigPanel';
-import SimulationControlBar from './components/SimulationControlBar';
-import ResultsVisualizationPanel from './components/ResultsVisualizationPanel';
-import StatisticalSummaryTable from './components/StatisticalSummaryTable';
+
 import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
+import Header from '../../components/ui/Header';
+
+import ResultsVisualizationPanel from './components/ResultsVisualizationPanel';
+import ScenarioConfigPanel from './components/ScenarioConfigPanel';
+import SimulationControlBar from './components/SimulationControlBar';
+import StatisticalSummaryTable from './components/StatisticalSummaryTable';
 
 const ScenarioAnalysisSensitivityTools = () => {
   const [isSimulating, setIsSimulating] = useState(false);
@@ -20,7 +22,7 @@ const ScenarioAnalysisSensitivityTools = () => {
   });
 
   // Simulate Monte Carlo calculation with Web Workers
-  const runSimulation = async (params) => {
+  const runSimulation = async params => {
     setIsSimulating(true);
     setSimulationProgress(0);
     setSimulationResults(null);
@@ -40,7 +42,7 @@ const ScenarioAnalysisSensitivityTools = () => {
     setTimeout(() => {
       clearInterval(progressInterval);
       setSimulationProgress(100);
-      
+
       // Mock results
       const mockResults = {
         summary: {
@@ -56,7 +58,7 @@ const ScenarioAnalysisSensitivityTools = () => {
         completedAt: new Date(),
         parameters: params
       };
-      
+
       setSimulationResults(mockResults);
       setIsSimulating(false);
     }, 8000);
@@ -67,7 +69,7 @@ const ScenarioAnalysisSensitivityTools = () => {
     setSimulationProgress(0);
   };
 
-  const handleScenarioUpdate = (updatedScenarios) => {
+  const handleScenarioUpdate = updatedScenarios => {
     setScenarios(updatedScenarios);
   };
 
@@ -88,7 +90,7 @@ const ScenarioAnalysisSensitivityTools = () => {
     return () => clearInterval(syncInterval);
   }, []);
 
-  const formatTimeAgo = (date) => {
+  const formatTimeAgo = date => {
     const seconds = Math.floor((new Date() - date) / 1000);
     if (seconds < 60) return `${seconds}s ago`;
     const minutes = Math.floor(seconds / 60);
@@ -100,7 +102,7 @@ const ScenarioAnalysisSensitivityTools = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      
+
       <div className="pt-[60px] h-screen flex flex-col">
         {/* Simulation Control Bar */}
         <SimulationControlBar
@@ -115,7 +117,9 @@ const ScenarioAnalysisSensitivityTools = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-6">
               <div className="flex items-center space-x-2">
-                <div className={`w-2 h-2 rounded-full ${modelSyncStatus.connected ? 'bg-success' : 'bg-error'}`} />
+                <div
+                  className={`w-2 h-2 rounded-full ${modelSyncStatus.connected ? 'bg-success' : 'bg-error'}`}
+                />
                 <span className="text-sm text-muted-foreground">
                   Base Model: {modelSyncStatus.baseModel}
                 </span>
@@ -131,30 +135,15 @@ const ScenarioAnalysisSensitivityTools = () => {
                 <span className="text-sm text-muted-foreground">3 collaborators active</span>
               </div>
             </div>
-            
+
             <div className="flex items-center space-x-4">
-              <Button
-                variant="ghost"
-                size="sm"
-                iconName="Sync"
-                disabled={isSimulating}
-              >
+              <Button variant="ghost" size="sm" iconName="Sync" disabled={isSimulating}>
                 Sync Now
               </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                iconName="History"
-                disabled={isSimulating}
-              >
+              <Button variant="ghost" size="sm" iconName="History" disabled={isSimulating}>
                 Version History
               </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                iconName="Share2"
-                disabled={isSimulating}
-              >
+              <Button variant="ghost" size="sm" iconName="Share2" disabled={isSimulating}>
                 Share Analysis
               </Button>
             </div>
@@ -177,7 +166,7 @@ const ScenarioAnalysisSensitivityTools = () => {
             <div className="bg-card border-b border-border p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-1">
-                  {rightPanelViews.map((view) => (
+                  {rightPanelViews.map(view => (
                     <button
                       key={view.id}
                       onClick={() => setRightPanelView(view.id)}
@@ -200,18 +189,8 @@ const ScenarioAnalysisSensitivityTools = () => {
                       Completed: {simulationResults.completedAt.toLocaleTimeString()}
                     </div>
                   )}
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    iconName="Maximize2"
-                    title="Fullscreen view"
-                  />
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    iconName="Settings"
-                    title="Display settings"
-                  />
+                  <Button variant="ghost" size="sm" iconName="Maximize2" title="Fullscreen view" />
+                  <Button variant="ghost" size="sm" iconName="Settings" title="Display settings" />
                 </div>
               </div>
             </div>
@@ -244,7 +223,7 @@ const ScenarioAnalysisSensitivityTools = () => {
                 <span>Iterations: {simulationResults.summary.iterations.toLocaleString()}</span>
               )}
             </div>
-            
+
             <div className="flex items-center space-x-4">
               <span>© {new Date().getFullYear()} FinanceAnalyst Pro</span>
               <span>•</span>

@@ -1,5 +1,19 @@
 import React, { useState } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ScatterChart, Scatter, Line, Area, AreaChart } from 'recharts';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  ScatterChart,
+  Scatter,
+  Line,
+  Area,
+  AreaChart
+} from 'recharts';
+
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 import Select from '../../../components/ui/Select';
@@ -21,7 +35,7 @@ const ResultsVisualizationPanel = ({ simulationResults, isSimulating }) => {
       iterations: 10000
     },
     distribution: Array.from({ length: 50 }, (_, i) => ({
-      value: 1500 + (i * 60),
+      value: 1500 + i * 60,
       frequency: Math.max(0, Math.round(200 * Math.exp(-Math.pow((i - 25) / 10, 2))))
     })),
     tornado: [
@@ -78,35 +92,28 @@ const ResultsVisualizationPanel = ({ simulationResults, isSimulating }) => {
           <Button variant="ghost" size="sm" iconName="RotateCcw" />
         </div>
       </div>
-      
+
       <div className="h-80">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={results.distribution}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
-            <XAxis 
-              dataKey="value" 
+            <XAxis
+              dataKey="value"
               stroke="var(--color-muted-foreground)"
               fontSize={12}
-              tickFormatter={(value) => `$${(value / 1000).toFixed(1)}B`}
+              tickFormatter={value => `$${(value / 1000).toFixed(1)}B`}
             />
-            <YAxis 
-              stroke="var(--color-muted-foreground)"
-              fontSize={12}
-            />
-            <Tooltip 
+            <YAxis stroke="var(--color-muted-foreground)" fontSize={12} />
+            <Tooltip
               formatter={(value, name) => [`${value} simulations`, 'Frequency']}
-              labelFormatter={(value) => `Value: $${(value / 1000).toFixed(1)}B`}
+              labelFormatter={value => `Value: $${(value / 1000).toFixed(1)}B`}
               contentStyle={{
                 backgroundColor: 'var(--color-popover)',
                 border: '1px solid var(--color-border)',
                 borderRadius: '8px'
               }}
             />
-            <Bar 
-              dataKey="frequency" 
-              fill="var(--color-primary)" 
-              radius={[2, 2, 0, 0]}
-            />
+            <Bar dataKey="frequency" fill="var(--color-primary)" radius={[2, 2, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>
@@ -127,29 +134,25 @@ const ResultsVisualizationPanel = ({ simulationResults, isSimulating }) => {
           className="w-40"
         />
       </div>
-      
+
       <div className="h-80">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart 
-            data={results.tornado}
-            layout="horizontal"
-            margin={{ left: 100 }}
-          >
+          <BarChart data={results.tornado} layout="horizontal" margin={{ left: 100 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
-            <XAxis 
+            <XAxis
               type="number"
               stroke="var(--color-muted-foreground)"
               fontSize={12}
-              tickFormatter={(value) => `$${Math.abs(value).toFixed(0)}M`}
+              tickFormatter={value => `$${Math.abs(value).toFixed(0)}M`}
             />
-            <YAxis 
+            <YAxis
               type="category"
               dataKey="variable"
               stroke="var(--color-muted-foreground)"
               fontSize={12}
               width={90}
             />
-            <Tooltip 
+            <Tooltip
               formatter={(value, name) => [`$${Math.abs(value).toFixed(1)}M`, 'Impact']}
               contentStyle={{
                 backgroundColor: 'var(--color-popover)',
@@ -157,9 +160,11 @@ const ResultsVisualizationPanel = ({ simulationResults, isSimulating }) => {
                 borderRadius: '8px'
               }}
             />
-            <Bar 
-              dataKey="impact" 
-              fill={(entry) => entry.direction === 'positive' ? 'var(--color-success)' : 'var(--color-error)'}
+            <Bar
+              dataKey="impact"
+              fill={entry =>
+                entry.direction === 'positive' ? 'var(--color-success)' : 'var(--color-error)'
+              }
               radius={[0, 2, 2, 0]}
             />
           </BarChart>
@@ -192,26 +197,28 @@ const ResultsVisualizationPanel = ({ simulationResults, isSimulating }) => {
           />
         </div>
       </div>
-      
+
       <div className="h-80">
         <ResponsiveContainer width="100%" height="100%">
           <ScatterChart data={results.scatter}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
-            <XAxis 
+            <XAxis
               dataKey="revenueGrowth"
               stroke="var(--color-muted-foreground)"
               fontSize={12}
-              tickFormatter={(value) => `${(value * 100).toFixed(0)}%`}
+              tickFormatter={value => `${(value * 100).toFixed(0)}%`}
             />
-            <YAxis 
+            <YAxis
               dataKey="enterpriseValue"
               stroke="var(--color-muted-foreground)"
               fontSize={12}
-              tickFormatter={(value) => `$${(value / 1000).toFixed(1)}B`}
+              tickFormatter={value => `$${(value / 1000).toFixed(1)}B`}
             />
-            <Tooltip 
+            <Tooltip
               formatter={(value, name) => [
-                name === 'revenueGrowth' ? `${(value * 100).toFixed(1)}%` : `$${(value / 1000).toFixed(1)}B`,
+                name === 'revenueGrowth'
+                  ? `${(value * 100).toFixed(1)}%`
+                  : `$${(value / 1000).toFixed(1)}B`,
                 name === 'revenueGrowth' ? 'Revenue Growth' : 'Enterprise Value'
               ]}
               contentStyle={{
@@ -220,11 +227,7 @@ const ResultsVisualizationPanel = ({ simulationResults, isSimulating }) => {
                 borderRadius: '8px'
               }}
             />
-            <Scatter 
-              dataKey="enterpriseValue" 
-              fill="var(--color-secondary)"
-              fillOpacity={0.6}
-            />
+            <Scatter dataKey="enterpriseValue" fill="var(--color-secondary)" fillOpacity={0.6} />
           </ScatterChart>
         </ResponsiveContainer>
       </div>
@@ -240,49 +243,44 @@ const ResultsVisualizationPanel = ({ simulationResults, isSimulating }) => {
           <span>Convergence achieved at 8,500 iterations</span>
         </div>
       </div>
-      
+
       <div className="h-80">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={results.timeSeries}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
-            <XAxis 
+            <XAxis
               dataKey="iteration"
               stroke="var(--color-muted-foreground)"
               fontSize={12}
-              tickFormatter={(value) => `${(value / 1000).toFixed(0)}K`}
+              tickFormatter={value => `${(value / 1000).toFixed(0)}K`}
             />
-            <YAxis 
+            <YAxis
               stroke="var(--color-muted-foreground)"
               fontSize={12}
-              tickFormatter={(value) => `$${(value / 1000).toFixed(1)}B`}
+              tickFormatter={value => `$${(value / 1000).toFixed(1)}B`}
             />
-            <Tooltip 
+            <Tooltip
               formatter={(value, name) => [`$${(value / 1000).toFixed(2)}B`, name]}
-              labelFormatter={(value) => `Iteration: ${value.toLocaleString()}`}
+              labelFormatter={value => `Iteration: ${value.toLocaleString()}`}
               contentStyle={{
                 backgroundColor: 'var(--color-popover)',
                 border: '1px solid var(--color-border)',
                 borderRadius: '8px'
               }}
             />
-            <Area 
-              dataKey="confidence95" 
-              stroke="var(--color-primary)" 
+            <Area
+              dataKey="confidence95"
+              stroke="var(--color-primary)"
               fill="var(--color-primary)"
               fillOpacity={0.1}
             />
-            <Area 
-              dataKey="confidence5" 
-              stroke="var(--color-primary)" 
+            <Area
+              dataKey="confidence5"
+              stroke="var(--color-primary)"
               fill="var(--color-background)"
               fillOpacity={1}
             />
-            <Line 
-              dataKey="mean" 
-              stroke="var(--color-primary)" 
-              strokeWidth={2}
-              dot={false}
-            />
+            <Line dataKey="mean" stroke="var(--color-primary)" strokeWidth={2} dot={false} />
           </AreaChart>
         </ResponsiveContainer>
       </div>
@@ -310,11 +308,7 @@ const ResultsVisualizationPanel = ({ simulationResults, isSimulating }) => {
               className="w-32"
               disabled={isSimulating}
             />
-            <Button
-              variant="outline"
-              iconName="Download"
-              disabled={isSimulating}
-            >
+            <Button variant="outline" iconName="Download" disabled={isSimulating}>
               Export
             </Button>
           </div>
@@ -324,13 +318,14 @@ const ResultsVisualizationPanel = ({ simulationResults, isSimulating }) => {
       {/* Chart Type Selector */}
       <div className="border-b border-border">
         <div className="flex">
-          {chartTypes.map((chart) => (
+          {chartTypes.map(chart => (
             <button
               key={chart.value}
               onClick={() => setActiveChart(chart.value)}
               className={`flex items-center space-x-2 px-6 py-3 text-sm font-medium transition-smooth ${
                 activeChart === chart.value
-                  ? 'border-b-2 border-primary text-primary' :'text-muted-foreground hover:text-foreground'
+                  ? 'border-b-2 border-primary text-primary'
+                  : 'text-muted-foreground hover:text-foreground'
               }`}
               disabled={isSimulating}
             >
@@ -391,7 +386,8 @@ const ResultsVisualizationPanel = ({ simulationResults, isSimulating }) => {
               <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
               <div className="text-lg font-medium text-foreground">Running Simulation...</div>
               <div className="text-sm text-muted-foreground">
-                Calculating Monte Carlo scenarios with {results.summary.iterations.toLocaleString()} iterations
+                Calculating Monte Carlo scenarios with {results.summary.iterations.toLocaleString()}{' '}
+                iterations
               </div>
             </div>
           </div>

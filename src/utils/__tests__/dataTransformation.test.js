@@ -1,5 +1,6 @@
 // Tests for data transformation utilities
 import { describe, it, expect } from 'vitest';
+
 import {
   formatCurrency,
   formatPercentage,
@@ -74,7 +75,8 @@ describe('calculateNPV', () => {
     const cashFlows = [1000, 1100, 1200, 1300];
     const discountRate = 0.1;
     const npv = calculateNPV(cashFlows, discountRate);
-    expect(npv).toBeCloseTo(3486.85, 2);
+    // Correct calculation: 1000/1.1 + 1100/1.21 + 1200/1.331 + 1300/1.4641 = 3607.68
+    expect(npv).toBeCloseTo(3607.68, 2);
   });
 
   it('should handle empty cash flows', () => {
@@ -98,12 +100,13 @@ describe('calculateIRR', () => {
 describe('calculateWACC', () => {
   it('should calculate WACC correctly', () => {
     const wacc = calculateWACC(0.12, 0.05, 0.25, 0.3);
-    expect(wacc).toBeCloseTo(0.0955, 4); // ~9.55%
+    // Correct calculation: (0.12 * 0.7) + (0.05 * 0.3 * 0.75) = 0.084 + 0.01125 = 0.09525
+    expect(wacc).toBeCloseTo(0.09525, 4);
   });
 
   it('should handle edge cases', () => {
     expect(calculateWACC(0, 0, 0, 0)).toBe(0);
-    expect(calculateWACC(0.1, 0.05, 0.25, 1)).toBe(0.0375); // 100% debt
+    expect(calculateWACC(0.1, 0.05, 0.25, 1)).toBeCloseTo(0.0375, 4); // 100% debt
   });
 });
 

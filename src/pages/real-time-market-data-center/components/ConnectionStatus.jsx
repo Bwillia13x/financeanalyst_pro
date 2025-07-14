@@ -1,40 +1,50 @@
-import React from 'react';
+
 import Icon from '../../../components/AppIcon';
 
 const ConnectionStatus = ({ connectionHealth, lastUpdate }) => {
-  const getStatusColor = (status) => {
+  const getStatusColor = status => {
     switch (status) {
-      case 'excellent': return 'text-success';
-      case 'good': return 'text-primary';
-      case 'warning': return 'text-warning';
-      case 'error': return 'text-error';
-      default: return 'text-muted-foreground';
+      case 'excellent':
+        return 'text-success';
+      case 'good':
+        return 'text-primary';
+      case 'warning':
+        return 'text-warning';
+      case 'error':
+        return 'text-error';
+      default:
+        return 'text-muted-foreground';
     }
   };
 
-  const getStatusIcon = (status) => {
+  const getStatusIcon = status => {
     switch (status) {
-      case 'excellent': return 'Wifi';
-      case 'good': return 'Wifi';
-      case 'warning': return 'WifiOff';
-      case 'error': return 'AlertTriangle';
-      default: return 'Wifi';
+      case 'excellent':
+        return 'Wifi';
+      case 'good':
+        return 'Wifi';
+      case 'warning':
+        return 'WifiOff';
+      case 'error':
+        return 'AlertTriangle';
+      default:
+        return 'Wifi';
     }
   };
 
   return (
     <div className="flex items-center space-x-4">
       <div className="flex items-center space-x-2">
-        <Icon 
-          name={getStatusIcon(connectionHealth.overall)} 
-          size={16} 
-          className={getStatusColor(connectionHealth.overall)} 
+        <Icon
+          name={getStatusIcon(connectionHealth.overall)}
+          size={16}
+          className={getStatusColor(connectionHealth.overall)}
         />
         <span className="text-sm font-medium text-foreground">
           Connection: {connectionHealth.overall}
         </span>
       </div>
-      
+
       <div className="flex items-center space-x-2 text-sm text-muted-foreground">
         <Icon name="Clock" size={14} />
         <span>Last update: {lastUpdate}</span>
@@ -45,8 +55,11 @@ const ConnectionStatus = ({ connectionHealth, lastUpdate }) => {
           <div
             key={source}
             className={`w-3 h-3 rounded-full ${
-              status === 'connected' ? 'bg-success' :
-              status === 'warning' ? 'bg-warning' : 'bg-error'
+              status === 'connected'
+                ? 'bg-success'
+                : status === 'warning'
+                  ? 'bg-warning'
+                  : 'bg-error'
             }`}
             title={`${source}: ${status}`}
           />

@@ -1,6 +1,7 @@
 // Tests for AppIcon component
-import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import { describe, it, expect } from 'vitest';
+
 import Icon from '../AppIcon';
 
 describe('AppIcon', () => {
@@ -51,7 +52,7 @@ describe('AppIcon', () => {
 
   it('should pass through additional props', () => {
     render(<Icon name="Home" data-testid="test-icon" />);
-    
+
     const iconElement = screen.getByTestId('test-icon');
     expect(iconElement).toBeInTheDocument();
   });

@@ -166,7 +166,7 @@ export const FINANCIAL_DEFAULTS = {
     holdingPeriod: 5,
     debtMultiple: 5,
     managementFeeRate: 0.02, // 2%
-    carriedInterestRate: 0.20, // 20%
+    carriedInterestRate: 0.2, // 20%
     exitMultiple: null // Will use peer average
   },
   comparable: {
@@ -179,7 +179,7 @@ export const FINANCIAL_DEFAULTS = {
 // Environment-specific configurations
 export const getEnvironmentConfig = () => {
   const env = import.meta.env.MODE || 'development'; // Fixed for Vite
-  
+
   const configs = {
     development: {
       debug: true,
@@ -205,7 +205,7 @@ export const getEnvironmentConfig = () => {
 };
 
 // Helper function to get API key for a service
-export const getApiKey = (service) => {
+export const getApiKey = service => {
   const keyMap = {
     ALPHA_VANTAGE: import.meta.env.VITE_ALPHA_VANTAGE_API_KEY, // Fixed for Vite
     FMP: import.meta.env.VITE_FMP_API_KEY, // Fixed for Vite
@@ -220,7 +220,7 @@ export const getApiKey = (service) => {
 export const buildHeaders = (service, customHeaders = {}) => {
   const baseHeaders = {
     'Content-Type': 'application/json',
-    'Accept': 'application/json'
+    Accept: 'application/json'
   };
 
   const serviceHeaders = {

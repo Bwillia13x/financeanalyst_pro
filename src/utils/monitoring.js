@@ -1,0 +1,398 @@
+/**
+ * Production Monitoring and Analytics Utilities
+ * Handles error tracking, performance monitoring, and user analytics
+ */
+
+class MonitoringService {
+  constructor() {
+    this.isProduction = import.meta.env.VITE_APP_ENV === 'production';
+    this.enableAnalytics = import.meta.env.VITE_ENABLE_ANALYTICS === 'true';
+    this.enableErrorReporting = import.meta.env.VITE_ENABLE_ERROR_REPORTING === 'true';
+    this.enablePerformanceMonitoring = import.meta.env.VITE_PERFORMANCE_MONITORING === 'true';
+
+    this.initializeMonitoring();
+  }
+
+  /**
+   * Initialize all monitoring services
+   */
+  initializeMonitoring() {
+    if (this.enableErrorReporting) {
+      this.initializeSentry();
+    }
+
+    if (this.enableAnalytics) {
+      this.initializeGoogleAnalytics();
+      this.initializeHotjar();
+    }
+
+    if (this.enablePerformanceMonitoring) {
+      this.initializePerformanceMonitoring();
+    }
+
+    this.setupGlobalErrorHandlers();
+  }
+
+  /**
+   * Initialize Sentry for error tracking
+   */
+  initializeSentry() {
+    const sentryDsn = import.meta.env.VITE_SENTRY_DSN;
+    if (!sentryDsn) return;
+
+    // Dynamically import Sentry to avoid bundle bloat
+    import('@sentry/browser')
+      .then(({ init, configureScope }) => {
+        init({
+          dsn: sentryDsn,
+          environment: import.meta.env.VITE_APP_ENV,
+          release: import.meta.env.VITE_APP_VERSION,
+          integrations: [
+            // Add performance monitoring
+            new BrowserTracing()
+          ],
+          tracesSampleRate: this.isProduction ? 0.1 : 1.0,
+          beforeSend: event => {
+            // Filter out non-critical errors in production
+            if (this.isProduction && event.level === 'warning') {
+              return null;
+            }
+            return event;
+          }
+        });
+
+        configureScope(scope => {
+          scope.setTag('component', 'financeanalyst-pro');
+          scope.setContext('app', {
+            version: import.meta.env.VITE_APP_VERSION,
+            environment: import.meta.env.VITE_APP_ENV
+          });
+        });
+      })
+      .catch(console.warn);
+  }
+
+  /**
+   * Initialize Google Analytics
+   */
+  initializeGoogleAnalytics() {
+    const gaTrackingId = import.meta.env.VITE_GA_TRACKING_ID;
+    if (!gaTrackingId) return;
+
+    // Load Google Analytics script
+    const script = document.createElement('script');
+    script.async = true;
+    script.src = `https://www.googletagmanager.com/gtag/js?id=${gaTrackingId}`;
+    document.head.appendChild(script);
+
+    // Initialize gtag
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+    window.gtag = gtag;
+
+    gtag('js', new Date());
+    gtag('config', gaTrackingId, {
+      page_title: document.title,
+      page_location: window.location.href
+    });
+  }
+
+  /**
+   * Initialize Hotjar for user behavior analytics
+   */
+  initializeHotjar() {
+    const hotjarId = import.meta.env.VITE_HOTJAR_ID;
+    if (!hotjarId) return;
+
+    (function (h, o, t, j, a, r) {
+      h.hj =
+        h.hj ||
+        function () {
+          (h.hj.q = h.hj.q || []).push(arguments);
+        };
+      h._hjSettings = { hjid: hotjarId, hjsv: 6 };
+      a = o.getElementsByTagName('head')[0];
+      r = o.createElement('script');
+      r.async = 1;
+      r.src = t + h._hjSettings.hjid + j + h._hjSettings.hjsv;
+      a.appendChild(r);
+    })(window, document, 'https://static.hotjar.com/c/hotjar-', '.js?sv=');
+  }
+
+  /**
+   * Initialize performance monitoring
+   */
+  initializePerformanceMonitoring() {
+    // Core Web Vitals monitoring
+    this.monitorCoreWebVitals();
+
+    // Custom performance metrics
+    this.monitorCustomMetrics();
+
+    // Resource loading monitoring
+    this.monitorResourceLoading();
+  }
+
+  /**
+   * Monitor Core Web Vitals
+   */
+  monitorCoreWebVitals() {
+    // Dynamically import web-vitals library
+    import('web-vitals')
+      .then(({ getCLS, getFID, getFCP, getLCP, getTTFB }) => {
+        getCLS(this.sendToAnalytics.bind(this));
+        getFID(this.sendToAnalytics.bind(this));
+        getFCP(this.sendToAnalytics.bind(this));
+        getLCP(this.sendToAnalytics.bind(this));
+        getTTFB(this.sendToAnalytics.bind(this));
+      })
+      .catch(console.warn);
+  }
+
+  /**
+   * Monitor custom performance metrics
+   */
+  monitorCustomMetrics() {
+    // Monitor API response times
+    this.monitorApiPerformance();
+
+    // Monitor component render times
+    this.monitorComponentPerformance();
+
+    // Monitor memory usage
+    this.monitorMemoryUsage();
+  }
+
+  /**
+   * Monitor API performance
+   */
+  monitorApiPerformance() {
+    const originalFetch = window.fetch;
+    window.fetch = async (...args) => {
+      const startTime = performance.now();
+      try {
+        const response = await originalFetch(...args);
+        const endTime = performance.now();
+
+        this.trackEvent('api_performance', {
+          url: args[0],
+          duration: endTime - startTime,
+          status: response.status,
+          success: response.ok
+        });
+
+        return response;
+      } catch (error) {
+        const endTime = performance.now();
+
+        this.trackEvent('api_error', {
+          url: args[0],
+          duration: endTime - startTime,
+          error: error.message
+        });
+
+        throw error;
+      }
+    };
+  }
+
+  /**
+   * Monitor component performance
+   */
+  monitorComponentPerformance() {
+    // Use Performance Observer to monitor long tasks
+    if ('PerformanceObserver' in window) {
+      const observer = new PerformanceObserver(list => {
+        for (const entry of list.getEntries()) {
+          if (entry.duration > 50) {
+            // Tasks longer than 50ms
+            this.trackEvent('long_task', {
+              duration: entry.duration,
+              startTime: entry.startTime
+            });
+          }
+        }
+      });
+
+      observer.observe({ entryTypes: ['longtask'] });
+    }
+  }
+
+  /**
+   * Monitor memory usage
+   */
+  monitorMemoryUsage() {
+    if ('memory' in performance) {
+      setInterval(() => {
+        const memory = performance.memory;
+        this.trackEvent('memory_usage', {
+          usedJSHeapSize: memory.usedJSHeapSize,
+          totalJSHeapSize: memory.totalJSHeapSize,
+          jsHeapSizeLimit: memory.jsHeapSizeLimit
+        });
+      }, 60000); // Every minute
+    }
+  }
+
+  /**
+   * Monitor resource loading
+   */
+  monitorResourceLoading() {
+    if ('PerformanceObserver' in window) {
+      const observer = new PerformanceObserver(list => {
+        for (const entry of list.getEntries()) {
+          if (entry.transferSize > 1000000) {
+            // Resources larger than 1MB
+            this.trackEvent('large_resource', {
+              name: entry.name,
+              size: entry.transferSize,
+              duration: entry.duration
+            });
+          }
+        }
+      });
+
+      observer.observe({ entryTypes: ['resource'] });
+    }
+  }
+
+  /**
+   * Setup global error handlers
+   */
+  setupGlobalErrorHandlers() {
+    // Unhandled promise rejections
+    window.addEventListener('unhandledrejection', event => {
+      this.trackError(event.reason, 'unhandled_promise_rejection');
+    });
+
+    // Global JavaScript errors
+    window.addEventListener('error', event => {
+      this.trackError(event.error, 'javascript_error', {
+        filename: event.filename,
+        lineno: event.lineno,
+        colno: event.colno
+      });
+    });
+
+    // Resource loading errors
+    window.addEventListener(
+      'error',
+      event => {
+        if (event.target !== window) {
+          this.trackError(
+            new Error(`Resource failed to load: ${event.target.src || event.target.href}`),
+            'resource_error'
+          );
+        }
+      },
+      true
+    );
+  }
+
+  /**
+   * Track custom events
+   */
+  trackEvent(eventName, properties = {}) {
+    if (!this.enableAnalytics) return;
+
+    // Send to Google Analytics
+    if (window.gtag) {
+      window.gtag('event', eventName, properties);
+    }
+
+    // Send to custom analytics endpoint
+    this.sendToCustomAnalytics(eventName, properties);
+  }
+
+  /**
+   * Track errors
+   */
+  trackError(error, category = 'error', additionalData = {}) {
+    if (!this.enableErrorReporting) return;
+
+    console.error(`[${category}]`, error, additionalData);
+
+    // Send to Sentry if available
+    if (window.Sentry) {
+      window.Sentry.captureException(error, {
+        tags: { category },
+        extra: additionalData
+      });
+    }
+
+    // Track as event
+    this.trackEvent('error_occurred', {
+      category,
+      message: error.message,
+      stack: error.stack,
+      ...additionalData
+    });
+  }
+
+  /**
+   * Send metrics to analytics
+   */
+  sendToAnalytics(metric) {
+    this.trackEvent('web_vital', {
+      name: metric.name,
+      value: metric.value,
+      rating: metric.rating
+    });
+  }
+
+  /**
+   * Send to custom analytics endpoint
+   */
+  sendToCustomAnalytics(eventName, properties) {
+    if (!this.isProduction) return;
+
+    // Send to your custom analytics endpoint
+    fetch('/api/analytics', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        event: eventName,
+        properties: {
+          ...properties,
+          timestamp: new Date().toISOString(),
+          userAgent: navigator.userAgent,
+          url: window.location.href
+        }
+      })
+    }).catch(() => {
+      // Silently fail for analytics
+    });
+  }
+
+  /**
+   * Track page views
+   */
+  trackPageView(pageName, additionalData = {}) {
+    this.trackEvent('page_view', {
+      page: pageName,
+      title: document.title,
+      url: window.location.href,
+      ...additionalData
+    });
+  }
+
+  /**
+   * Track user interactions
+   */
+  trackUserInteraction(action, element, additionalData = {}) {
+    this.trackEvent('user_interaction', {
+      action,
+      element,
+      ...additionalData
+    });
+  }
+}
+
+// Create singleton instance
+const monitoring = new MonitoringService();
+
+export default monitoring;

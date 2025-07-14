@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import Header from '../../components/ui/Header';
+
 import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
-import DataSourceToggle from './components/DataSourceToggle';
+import Header from '../../components/ui/Header';
+
+import BulkOperationsPanel from './components/BulkOperationsPanel';
 import ConnectionStatus from './components/ConnectionStatus';
+import DataSourceToggle from './components/DataSourceToggle';
 import MarketDataWidget from './components/MarketDataWidget';
 import SymbolSearch from './components/SymbolSearch';
 import WatchlistPanel from './components/WatchlistPanel';
-import BulkOperationsPanel from './components/BulkOperationsPanel';
 
 const RealTimeMarketDataCenter = () => {
   const [dataSources, setDataSources] = useState([
@@ -34,12 +36,12 @@ const RealTimeMarketDataCenter = () => {
       change: 2.15,
       changePercent: 1.19,
       valueType: 'currency',
-      dayHigh: 184.30,
+      dayHigh: 184.3,
       dayLow: 180.15,
       volume: 52847392,
       source: 'Bloomberg',
       lastUpdate: new Date(Date.now() - 2000),
-      sparklineData: [180.25, 181.15, 180.95, 182.10, 181.85, 182.52]
+      sparklineData: [180.25, 181.15, 180.95, 182.1, 181.85, 182.52]
     },
     {
       id: 'widget-2',
@@ -49,27 +51,27 @@ const RealTimeMarketDataCenter = () => {
       change: -1.25,
       changePercent: -0.33,
       valueType: 'currency',
-      dayHigh: 381.20,
-      dayLow: 377.50,
+      dayHigh: 381.2,
+      dayLow: 377.5,
       volume: 28394751,
       source: 'FactSet',
       lastUpdate: new Date(Date.now() - 1500),
-      sparklineData: [380.15, 379.85, 378.95, 379.40, 378.20, 378.85]
+      sparklineData: [380.15, 379.85, 378.95, 379.4, 378.2, 378.85]
     },
     {
       id: 'widget-3',
       symbol: 'GOOGL',
       name: 'Alphabet Inc.',
       currentValue: 2847.35,
-      change: 15.80,
+      change: 15.8,
       changePercent: 0.56,
       valueType: 'currency',
-      dayHigh: 2855.00,
+      dayHigh: 2855.0,
       dayLow: 2830.15,
       volume: 1847392,
       source: 'Bloomberg',
       lastUpdate: new Date(Date.now() - 3000),
-      sparklineData: [2835.25, 2841.15, 2838.95, 2845.10, 2843.85, 2847.35]
+      sparklineData: [2835.25, 2841.15, 2838.95, 2845.1, 2843.85, 2847.35]
     },
     {
       id: 'widget-4',
@@ -80,18 +82,42 @@ const RealTimeMarketDataCenter = () => {
       changePercent: 0.59,
       valueType: 'percentage',
       dayHigh: 4.295,
-      dayLow: 4.260,
+      dayLow: 4.26,
       volume: null,
       source: 'Refinitiv',
       lastUpdate: new Date(Date.now() - 5000),
-      sparklineData: [4.260, 4.270, 4.275, 4.280, 4.285, 4.285]
+      sparklineData: [4.26, 4.27, 4.275, 4.28, 4.285, 4.285]
     }
   ]);
 
   const [watchlist, setWatchlist] = useState([
-    { symbol: 'AAPL', name: 'Apple Inc.', exchange: 'NASDAQ', sector: 'Technology', price: 182.52, change: 2.15, changePercent: 1.19 },
-    { symbol: 'MSFT', name: 'Microsoft Corporation', exchange: 'NASDAQ', sector: 'Technology', price: 378.85, change: -1.25, changePercent: -0.33 },
-    { symbol: 'TSLA', name: 'Tesla Inc.', exchange: 'NASDAQ', sector: 'Consumer Discretionary', price: 248.42, change: 5.67, changePercent: 2.34 }
+    {
+      symbol: 'AAPL',
+      name: 'Apple Inc.',
+      exchange: 'NASDAQ',
+      sector: 'Technology',
+      price: 182.52,
+      change: 2.15,
+      changePercent: 1.19
+    },
+    {
+      symbol: 'MSFT',
+      name: 'Microsoft Corporation',
+      exchange: 'NASDAQ',
+      sector: 'Technology',
+      price: 378.85,
+      change: -1.25,
+      changePercent: -0.33
+    },
+    {
+      symbol: 'TSLA',
+      name: 'Tesla Inc.',
+      exchange: 'NASDAQ',
+      sector: 'Consumer Discretionary',
+      price: 248.42,
+      change: 5.67,
+      changePercent: 2.34
+    }
   ]);
 
   const [selectedSymbols, setSelectedSymbols] = useState([]);
@@ -104,7 +130,7 @@ const RealTimeMarketDataCenter = () => {
     if (!isAutoRefresh) return;
 
     const interval = setInterval(() => {
-      setWidgets(prevWidgets => 
+      setWidgets(prevWidgets =>
         prevWidgets.map(widget => ({
           ...widget,
           currentValue: widget.currentValue + (Math.random() - 0.5) * 2,
@@ -123,17 +149,15 @@ const RealTimeMarketDataCenter = () => {
     return () => clearInterval(interval);
   }, [refreshInterval, isAutoRefresh]);
 
-  const handleDataSourceToggle = (sourceId) => {
-    setDataSources(prev => 
-      prev.map(source => 
-        source.id === sourceId 
-          ? { ...source, enabled: !source.enabled }
-          : source
+  const handleDataSourceToggle = sourceId => {
+    setDataSources(prev =>
+      prev.map(source =>
+        source.id === sourceId ? { ...source, enabled: !source.enabled } : source
       )
     );
   };
 
-  const handleSymbolSelect = (symbol) => {
+  const handleSymbolSelect = symbol => {
     const newWidget = {
       id: `widget-${Date.now()}`,
       symbol: symbol.symbol,
@@ -152,40 +176,43 @@ const RealTimeMarketDataCenter = () => {
     setWidgets(prev => [...prev, newWidget]);
   };
 
-  const handleAddToWatchlist = (symbol) => {
+  const handleAddToWatchlist = symbol => {
     if (!watchlist.some(item => item.symbol === symbol.symbol)) {
-      setWatchlist(prev => [...prev, {
-        ...symbol,
-        price: Math.random() * 1000 + 50,
-        change: (Math.random() - 0.5) * 10,
-        changePercent: (Math.random() - 0.5) * 5
-      }]);
+      setWatchlist(prev => [
+        ...prev,
+        {
+          ...symbol,
+          price: Math.random() * 1000 + 50,
+          change: (Math.random() - 0.5) * 10,
+          changePercent: (Math.random() - 0.5) * 5
+        }
+      ]);
     }
   };
 
-  const handleRemoveFromWatchlist = (symbol) => {
+  const handleRemoveFromWatchlist = symbol => {
     setWatchlist(prev => prev.filter(item => item.symbol !== symbol));
   };
 
-  const handleWidgetResize = (widgetId) => {
+  const handleWidgetResize = widgetId => {
     console.log('Resize widget:', widgetId);
   };
 
-  const handleWidgetRemove = (widgetId) => {
+  const handleWidgetRemove = widgetId => {
     setWidgets(prev => prev.filter(widget => widget.id !== widgetId));
   };
 
-  const handleBulkExport = (config) => {
+  const handleBulkExport = config => {
     console.log('Bulk export:', config);
     alert(`Exporting ${config.symbols.length} symbols in ${config.format.toUpperCase()} format`);
   };
 
-  const handleBulkAlert = (config) => {
+  const handleBulkAlert = config => {
     console.log('Bulk alert setup:', config);
     alert(`Setting ${config.threshold}% alerts for ${config.symbols.length} symbols`);
   };
 
-  const handleBulkHistorical = (config) => {
+  const handleBulkHistorical = config => {
     console.log('Bulk historical data:', config);
     alert(`Fetching ${config.period} historical data for ${config.symbols.length} symbols`);
   };
@@ -195,7 +222,7 @@ const RealTimeMarketDataCenter = () => {
     // Trigger data refresh
   };
 
-  const handleKeyboardShortcut = (e) => {
+  const handleKeyboardShortcut = e => {
     if (e.ctrlKey && e.key === 'f') {
       e.preventDefault();
       document.querySelector('input[placeholder*="Search symbols"]')?.focus();
@@ -210,17 +237,14 @@ const RealTimeMarketDataCenter = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      
+
       <div className="pt-[60px]">
         {/* Top Toolbar */}
         <div className="bg-card border-b border-border p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-6">
-              <DataSourceToggle 
-                dataSources={dataSources}
-                onToggle={handleDataSourceToggle}
-              />
-              
+              <DataSourceToggle dataSources={dataSources} onToggle={handleDataSourceToggle} />
+
               <div className="flex items-center space-x-2">
                 <Button
                   variant="outline"
@@ -242,10 +266,7 @@ const RealTimeMarketDataCenter = () => {
               </div>
             </div>
 
-            <ConnectionStatus 
-              connectionHealth={connectionHealth}
-              lastUpdate={lastUpdate}
-            />
+            <ConnectionStatus connectionHealth={connectionHealth} lastUpdate={lastUpdate} />
           </div>
         </div>
 
@@ -304,7 +325,7 @@ const RealTimeMarketDataCenter = () => {
 
               {/* Widgets Grid */}
               <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-                {widgets.map((widget) => (
+                {widgets.map(widget => (
                   <MarketDataWidget
                     key={widget.id}
                     widget={widget}
@@ -318,9 +339,7 @@ const RealTimeMarketDataCenter = () => {
               {widgets.length === 0 && (
                 <div className="text-center py-12">
                   <Icon name="BarChart3" size={48} className="mx-auto mb-4 text-muted-foreground" />
-                  <h3 className="text-lg font-semibold text-foreground mb-2">
-                    No Data Widgets
-                  </h3>
+                  <h3 className="text-lg font-semibold text-foreground mb-2">No Data Widgets</h3>
                   <p className="text-muted-foreground mb-4">
                     Search and add symbols to start monitoring market data
                   </p>

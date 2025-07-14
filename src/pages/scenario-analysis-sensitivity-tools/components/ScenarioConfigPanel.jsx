@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 import Input from '../../../components/ui/Input';
@@ -9,7 +10,7 @@ const ScenarioConfigPanel = ({ onScenarioUpdate, isSimulating }) => {
   const [scenarios, setScenarios] = useState([
     {
       id: 1,
-      name: "Base Case",
+      name: 'Base Case',
       probability: 0.4,
       variables: {
         revenueGrowth: 0.15,
@@ -20,7 +21,7 @@ const ScenarioConfigPanel = ({ onScenarioUpdate, isSimulating }) => {
     },
     {
       id: 2,
-      name: "Bull Case",
+      name: 'Bull Case',
       probability: 0.3,
       variables: {
         revenueGrowth: 0.25,
@@ -31,7 +32,7 @@ const ScenarioConfigPanel = ({ onScenarioUpdate, isSimulating }) => {
     },
     {
       id: 3,
-      name: "Bear Case",
+      name: 'Bear Case',
       probability: 0.3,
       variables: {
         revenueGrowth: 0.05,
@@ -79,8 +80,8 @@ const ScenarioConfigPanel = ({ onScenarioUpdate, isSimulating }) => {
       }
     };
     setSelectedScenario(updatedScenario);
-    
-    const updatedScenarios = scenarios.map(s => 
+
+    const updatedScenarios = scenarios.map(s =>
       s.id === selectedScenario.id ? updatedScenario : s
     );
     setScenarios(updatedScenarios);
@@ -113,15 +114,16 @@ const ScenarioConfigPanel = ({ onScenarioUpdate, isSimulating }) => {
             Add Scenario
           </Button>
         </div>
-        
+
         <div className="grid grid-cols-3 gap-2">
-          {scenarios.map((scenario) => (
+          {scenarios.map(scenario => (
             <button
               key={scenario.id}
               onClick={() => setSelectedScenario(scenario)}
               className={`p-3 rounded-lg border text-left transition-smooth ${
                 selectedScenario.id === scenario.id
-                  ? 'border-primary bg-primary/5 text-primary' :'border-border hover:border-primary/50'
+                  ? 'border-primary bg-primary/5 text-primary'
+                  : 'border-border hover:border-primary/50'
               }`}
               disabled={isSimulating}
             >
@@ -143,7 +145,7 @@ const ScenarioConfigPanel = ({ onScenarioUpdate, isSimulating }) => {
               label="Revenue Growth Rate"
               type="number"
               value={selectedScenario.variables.revenueGrowth}
-              onChange={(e) => handleVariableChange('revenueGrowth', e.target.value)}
+              onChange={e => handleVariableChange('revenueGrowth', e.target.value)}
               placeholder="0.15"
               disabled={isSimulating}
               description="Annual revenue growth rate"
@@ -152,7 +154,7 @@ const ScenarioConfigPanel = ({ onScenarioUpdate, isSimulating }) => {
               label="Margin Expansion"
               type="number"
               value={selectedScenario.variables.marginExpansion}
-              onChange={(e) => handleVariableChange('marginExpansion', e.target.value)}
+              onChange={e => handleVariableChange('marginExpansion', e.target.value)}
               placeholder="0.02"
               disabled={isSimulating}
               description="EBITDA margin improvement"
@@ -163,7 +165,7 @@ const ScenarioConfigPanel = ({ onScenarioUpdate, isSimulating }) => {
               label="CapEx Ratio"
               type="number"
               value={selectedScenario.variables.capexRatio}
-              onChange={(e) => handleVariableChange('capexRatio', e.target.value)}
+              onChange={e => handleVariableChange('capexRatio', e.target.value)}
               placeholder="0.08"
               disabled={isSimulating}
               description="CapEx as % of revenue"
@@ -172,7 +174,7 @@ const ScenarioConfigPanel = ({ onScenarioUpdate, isSimulating }) => {
               label="Terminal Growth Rate"
               type="number"
               value={selectedScenario.variables.terminalGrowth}
-              onChange={(e) => handleVariableChange('terminalGrowth', e.target.value)}
+              onChange={e => handleVariableChange('terminalGrowth', e.target.value)}
               placeholder="0.025"
               disabled={isSimulating}
               description="Long-term growth rate"
@@ -185,14 +187,17 @@ const ScenarioConfigPanel = ({ onScenarioUpdate, isSimulating }) => {
       <div className="space-y-4">
         <h4 className="font-medium text-foreground">Probability Weights</h4>
         <div className="space-y-2">
-          {scenarios.map((scenario) => (
-            <div key={scenario.id} className="flex items-center justify-between p-3 bg-muted rounded-lg">
+          {scenarios.map(scenario => (
+            <div
+              key={scenario.id}
+              className="flex items-center justify-between p-3 bg-muted rounded-lg"
+            >
               <span className="font-medium text-sm">{scenario.name}</span>
               <div className="flex items-center space-x-2">
                 <Input
                   type="number"
                   value={scenario.probability}
-                  onChange={(e) => {
+                  onChange={e => {
                     const updatedScenarios = scenarios.map(s =>
                       s.id === scenario.id ? { ...s, probability: parseFloat(e.target.value) } : s
                     );
@@ -213,14 +218,14 @@ const ScenarioConfigPanel = ({ onScenarioUpdate, isSimulating }) => {
   const renderDistributionsTab = () => (
     <div className="space-y-6">
       <h3 className="text-lg font-semibold text-foreground">Distribution Parameters</h3>
-      
+
       <div className="space-y-4">
-        {Object.keys(selectedScenario.variables).map((variable) => (
+        {Object.keys(selectedScenario.variables).map(variable => (
           <div key={variable} className="p-4 border border-border rounded-lg space-y-3">
             <h4 className="font-medium text-foreground capitalize">
               {variable.replace(/([A-Z])/g, ' $1').trim()}
             </h4>
-            
+
             <div className="grid grid-cols-2 gap-4">
               <Select
                 label="Distribution Type"
@@ -237,26 +242,16 @@ const ScenarioConfigPanel = ({ onScenarioUpdate, isSimulating }) => {
                 description="Volatility parameter"
               />
             </div>
-            
+
             <div className="grid grid-cols-3 gap-4">
-              <Input
-                label="Min Value"
-                type="number"
-                placeholder="-0.1"
-                disabled={isSimulating}
-              />
+              <Input label="Min Value" type="number" placeholder="-0.1" disabled={isSimulating} />
               <Input
                 label="Most Likely"
                 type="number"
                 value={selectedScenario.variables[variable]}
                 disabled={isSimulating}
               />
-              <Input
-                label="Max Value"
-                type="number"
-                placeholder="0.5"
-                disabled={isSimulating}
-              />
+              <Input label="Max Value" type="number" placeholder="0.5" disabled={isSimulating} />
             </div>
           </div>
         ))}
@@ -267,10 +262,13 @@ const ScenarioConfigPanel = ({ onScenarioUpdate, isSimulating }) => {
   const renderCorrelationsTab = () => (
     <div className="space-y-6">
       <h3 className="text-lg font-semibold text-foreground">Variable Correlations</h3>
-      
+
       <div className="space-y-4">
         {correlationMatrix.map((correlation, index) => (
-          <div key={index} className="flex items-center justify-between p-4 border border-border rounded-lg">
+          <div
+            key={index}
+            className="flex items-center justify-between p-4 border border-border rounded-lg"
+          >
             <div className="flex-1">
               <div className="font-medium text-sm">{correlation.var1}</div>
               <div className="text-xs text-muted-foreground">vs {correlation.var2}</div>
@@ -279,7 +277,7 @@ const ScenarioConfigPanel = ({ onScenarioUpdate, isSimulating }) => {
               <Input
                 type="number"
                 value={correlation.correlation}
-                onChange={(e) => {
+                onChange={e => {
                   const updatedMatrix = correlationMatrix.map((c, i) =>
                     i === index ? { ...c, correlation: parseFloat(e.target.value) } : c
                   );
@@ -291,21 +289,21 @@ const ScenarioConfigPanel = ({ onScenarioUpdate, isSimulating }) => {
                 max="1"
                 step="0.01"
               />
-              <div className={`w-3 h-3 rounded-full ${
-                correlation.correlation > 0.5 ? 'bg-success' :
-                correlation.correlation < -0.5 ? 'bg-error' : 'bg-warning'
-              }`} />
+              <div
+                className={`w-3 h-3 rounded-full ${
+                  correlation.correlation > 0.5
+                    ? 'bg-success'
+                    : correlation.correlation < -0.5
+                      ? 'bg-error'
+                      : 'bg-warning'
+                }`}
+              />
             </div>
           </div>
         ))}
       </div>
-      
-      <Button
-        variant="outline"
-        iconName="Plus"
-        disabled={isSimulating}
-        className="w-full"
-      >
+
+      <Button variant="outline" iconName="Plus" disabled={isSimulating} className="w-full">
         Add Correlation Pair
       </Button>
     </div>
@@ -314,7 +312,7 @@ const ScenarioConfigPanel = ({ onScenarioUpdate, isSimulating }) => {
   const renderTemplatesTab = () => (
     <div className="space-y-6">
       <h3 className="text-lg font-semibold text-foreground">Scenario Templates</h3>
-      
+
       <Select
         label="Load Template"
         options={variableTemplates}
@@ -323,34 +321,27 @@ const ScenarioConfigPanel = ({ onScenarioUpdate, isSimulating }) => {
         disabled={isSimulating}
         description="Pre-configured variable sets for common analyses"
       />
-      
+
       <div className="space-y-4">
         <h4 className="font-medium text-foreground">Template Actions</h4>
         <div className="grid grid-cols-2 gap-4">
-          <Button
-            variant="outline"
-            iconName="Download"
-            disabled={isSimulating}
-            className="w-full"
-          >
+          <Button variant="outline" iconName="Download" disabled={isSimulating} className="w-full">
             Import from Excel
           </Button>
-          <Button
-            variant="outline"
-            iconName="Upload"
-            disabled={isSimulating}
-            className="w-full"
-          >
+          <Button variant="outline" iconName="Upload" disabled={isSimulating} className="w-full">
             Export Template
           </Button>
         </div>
       </div>
-      
+
       <div className="space-y-4">
         <h4 className="font-medium text-foreground">Saved Templates</h4>
         <div className="space-y-2">
           {['Tech Company DCF', 'REIT Analysis', 'Energy Sector Model'].map((template, index) => (
-            <div key={index} className="flex items-center justify-between p-3 border border-border rounded-lg">
+            <div
+              key={index}
+              className="flex items-center justify-between p-3 border border-border rounded-lg"
+            >
               <div>
                 <div className="font-medium text-sm">{template}</div>
                 <div className="text-xs text-muted-foreground">Last modified: 2 days ago</div>
@@ -384,13 +375,14 @@ const ScenarioConfigPanel = ({ onScenarioUpdate, isSimulating }) => {
       {/* Tabs */}
       <div className="border-b border-border">
         <div className="flex">
-          {tabs.map((tab) => (
+          {tabs.map(tab => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center space-x-2 px-4 py-3 text-sm font-medium transition-smooth ${
                 activeTab === tab.id
-                  ? 'border-b-2 border-primary text-primary' :'text-muted-foreground hover:text-foreground'
+                  ? 'border-b-2 border-primary text-primary'
+                  : 'text-muted-foreground hover:text-foreground'
               }`}
               disabled={isSimulating}
             >

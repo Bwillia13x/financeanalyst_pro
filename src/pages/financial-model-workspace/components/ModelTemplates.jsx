@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 
@@ -15,12 +16,18 @@ const ModelTemplates = ({ onTemplateSelect, onTemplateCreate }) => {
         {
           id: 'dcf_standard',
           name: 'DCF - Standard',
-          description: 'Traditional discounted cash flow model with 5-year projections and terminal value',
+          description:
+            'Traditional discounted cash flow model with 5-year projections and terminal value',
           complexity: 'Intermediate',
           timeToComplete: '45 min',
           lastUsed: '2024-07-10',
           popularity: 95,
-          features: ['5-year projections', 'Terminal value', 'Sensitivity analysis', 'WACC calculation']
+          features: [
+            '5-year projections',
+            'Terminal value',
+            'Sensitivity analysis',
+            'WACC calculation'
+          ]
         },
         {
           id: 'dcf_tech',
@@ -40,7 +47,12 @@ const ModelTemplates = ({ onTemplateSelect, onTemplateCreate }) => {
           timeToComplete: '90 min',
           lastUsed: '2024-07-05',
           popularity: 73,
-          features: ['Segment analysis', 'Multiple approaches', 'Holding company discount', 'Synergy modeling']
+          features: [
+            'Segment analysis',
+            'Multiple approaches',
+            'Holding company discount',
+            'Synergy modeling'
+          ]
         }
       ]
     },
@@ -66,7 +78,12 @@ const ModelTemplates = ({ onTemplateSelect, onTemplateCreate }) => {
           timeToComplete: '100 min',
           lastUsed: '2024-07-06',
           popularity: 68,
-          features: ['Growth capital', 'Minority stake', 'Management incentives', 'Expansion modeling']
+          features: [
+            'Growth capital',
+            'Minority stake',
+            'Management incentives',
+            'Expansion modeling'
+          ]
         }
       ]
     },
@@ -82,7 +99,12 @@ const ModelTemplates = ({ onTemplateSelect, onTemplateCreate }) => {
           timeToComplete: '30 min',
           lastUsed: '2024-07-11',
           popularity: 98,
-          features: ['Multiple analysis', 'Statistical metrics', 'Peer screening', 'Premium/discount analysis']
+          features: [
+            'Multiple analysis',
+            'Statistical metrics',
+            'Peer screening',
+            'Premium/discount analysis'
+          ]
         },
         {
           id: 'transaction_comps',
@@ -92,7 +114,12 @@ const ModelTemplates = ({ onTemplateSelect, onTemplateCreate }) => {
           timeToComplete: '45 min',
           lastUsed: '2024-07-07',
           popularity: 82,
-          features: ['M&A multiples', 'Control premiums', 'Synergy analysis', 'Transaction screening']
+          features: [
+            'M&A multiples',
+            'Control premiums',
+            'Synergy analysis',
+            'Transaction screening'
+          ]
         }
       ]
     },
@@ -103,12 +130,18 @@ const ModelTemplates = ({ onTemplateSelect, onTemplateCreate }) => {
         {
           id: 'merger_model',
           name: 'Merger Model',
-          description: 'Comprehensive merger analysis with accretion/dilution and pro forma statements',
+          description:
+            'Comprehensive merger analysis with accretion/dilution and pro forma statements',
           complexity: 'Expert',
           timeToComplete: '180 min',
           lastUsed: '2024-07-04',
           popularity: 76,
-          features: ['Accretion/dilution', 'Pro forma statements', 'Synergy modeling', 'Financing structure']
+          features: [
+            'Accretion/dilution',
+            'Pro forma statements',
+            'Synergy modeling',
+            'Financing structure'
+          ]
         },
         {
           id: 'acquisition_model',
@@ -130,27 +163,33 @@ const ModelTemplates = ({ onTemplateSelect, onTemplateCreate }) => {
     { id: 'lbo_standard', name: 'LBO - Standard', lastUsed: '2024-07-10 16:45' }
   ];
 
-  const getComplexityColor = (complexity) => {
+  const getComplexityColor = complexity => {
     switch (complexity) {
-      case 'Beginner': return 'text-success bg-success/10';
-      case 'Intermediate': return 'text-warning bg-warning/10';
-      case 'Advanced': return 'text-accent bg-accent/10';
-      case 'Expert': return 'text-destructive bg-destructive/10';
-      default: return 'text-muted-foreground bg-muted';
+      case 'Beginner':
+        return 'text-success bg-success/10';
+      case 'Intermediate':
+        return 'text-warning bg-warning/10';
+      case 'Advanced':
+        return 'text-accent bg-accent/10';
+      case 'Expert':
+        return 'text-destructive bg-destructive/10';
+      default:
+        return 'text-muted-foreground bg-muted';
     }
   };
 
   const filteredTemplates = () => {
     const templates = templateCategories[selectedCategory]?.templates || [];
     if (!searchTerm) return templates;
-    
-    return templates.filter(template =>
-      template.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      template.description.toLowerCase().includes(searchTerm.toLowerCase())
+
+    return templates.filter(
+      template =>
+        template.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        template.description.toLowerCase().includes(searchTerm.toLowerCase())
     );
   };
 
-  const handleTemplateSelect = (template) => {
+  const handleTemplateSelect = template => {
     if (onTemplateSelect) {
       onTemplateSelect(template);
     }
@@ -177,11 +216,15 @@ const ModelTemplates = ({ onTemplateSelect, onTemplateCreate }) => {
       {/* Search */}
       <div className="p-4 border-b border-border">
         <div className="relative">
-          <Icon name="Search" size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
+          <Icon
+            name="Search"
+            size={16}
+            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground"
+          />
           <input
             type="text"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={e => setSearchTerm(e.target.value)}
             placeholder="Search templates..."
             className="w-full pl-10 pr-4 py-2 bg-input border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
           />
@@ -216,7 +259,7 @@ const ModelTemplates = ({ onTemplateSelect, onTemplateCreate }) => {
               <span>Recently Used</span>
             </h4>
             <div className="grid grid-cols-1 gap-2">
-              {recentTemplates.map((template) => (
+              {recentTemplates.map(template => (
                 <div
                   key={template.id}
                   className="flex items-center justify-between p-3 bg-muted rounded-lg hover:bg-muted/80 transition-smooth cursor-pointer"
@@ -235,7 +278,7 @@ const ModelTemplates = ({ onTemplateSelect, onTemplateCreate }) => {
 
         {/* Template Cards */}
         <div className="space-y-4">
-          {filteredTemplates().map((template) => (
+          {filteredTemplates().map(template => (
             <div
               key={template.id}
               className="p-4 bg-background border border-border rounded-lg hover:border-primary/50 transition-smooth cursor-pointer group"
@@ -247,7 +290,9 @@ const ModelTemplates = ({ onTemplateSelect, onTemplateCreate }) => {
                     <h5 className="font-semibold text-foreground group-hover:text-primary transition-colors">
                       {template.name}
                     </h5>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getComplexityColor(template.complexity)}`}>
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs font-medium ${getComplexityColor(template.complexity)}`}
+                    >
                       {template.complexity}
                     </span>
                   </div>
@@ -258,7 +303,11 @@ const ModelTemplates = ({ onTemplateSelect, onTemplateCreate }) => {
                     <Icon name="Star" size={12} />
                     <span>{template.popularity}%</span>
                   </div>
-                  <Icon name="ChevronRight" size={16} className="text-muted-foreground group-hover:text-primary transition-colors" />
+                  <Icon
+                    name="ChevronRight"
+                    size={16}
+                    className="text-muted-foreground group-hover:text-primary transition-colors"
+                  />
                 </div>
               </div>
 
@@ -294,7 +343,9 @@ const ModelTemplates = ({ onTemplateSelect, onTemplateCreate }) => {
             <Icon name="FileX" size={48} className="text-muted-foreground mx-auto mb-4" />
             <h4 className="text-lg font-medium text-foreground mb-2">No templates found</h4>
             <p className="text-muted-foreground">
-              {searchTerm ? 'Try adjusting your search terms' : 'No templates available in this category'}
+              {searchTerm
+                ? 'Try adjusting your search terms'
+                : 'No templates available in this category'}
             </p>
           </div>
         )}
@@ -315,7 +366,9 @@ const ModelTemplates = ({ onTemplateSelect, onTemplateCreate }) => {
             </div>
             <div className="p-4 space-y-4">
               <div>
-                <label className="text-sm font-medium text-foreground mb-2 block">Template Name</label>
+                <label className="text-sm font-medium text-foreground mb-2 block">
+                  Template Name
+                </label>
                 <input
                   type="text"
                   placeholder="Enter template name..."
@@ -323,7 +376,9 @@ const ModelTemplates = ({ onTemplateSelect, onTemplateCreate }) => {
                 />
               </div>
               <div>
-                <label className="text-sm font-medium text-foreground mb-2 block">Description</label>
+                <label className="text-sm font-medium text-foreground mb-2 block">
+                  Description
+                </label>
                 <textarea
                   placeholder="Describe your template..."
                   rows={3}
@@ -341,11 +396,7 @@ const ModelTemplates = ({ onTemplateSelect, onTemplateCreate }) => {
               </div>
             </div>
             <div className="flex items-center justify-end space-x-2 p-4 border-t border-border">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowCreateModal(false)}
-              >
+              <Button variant="outline" size="sm" onClick={() => setShowCreateModal(false)}>
                 Cancel
               </Button>
               <Button

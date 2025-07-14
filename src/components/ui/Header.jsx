@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+
 import Icon from '../AppIcon';
+
 import Button from './Button';
 
 const Header = () => {
@@ -78,15 +80,16 @@ const Header = () => {
 
         {/* Navigation Tabs */}
         <nav className="flex items-center ml-8 space-x-1">
-          {navigationTabs.map((tab) => (
+          {navigationTabs.map(tab => (
             <Link
               key={tab.id}
               to={tab.path}
               className={`
                 relative px-6 py-3 text-sm font-medium transition-smooth rounded-lg
-                ${location.pathname === tab.path
-                  ? 'bg-primary text-primary-foreground'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                ${
+                  location.pathname === tab.path
+                    ? 'bg-primary text-primary-foreground'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted'
                 }
               `}
               title={tab.tooltip}
@@ -102,7 +105,9 @@ const Header = () => {
         {/* Model State Indicator */}
         <div className="flex items-center ml-6 px-3 py-1 bg-muted rounded-lg">
           <div className="flex items-center space-x-2">
-            <div className={`w-2 h-2 rounded-full ${modelState.saved ? 'bg-success' : 'bg-warning'}`} />
+            <div
+              className={`w-2 h-2 rounded-full ${modelState.saved ? 'bg-success' : 'bg-warning'}`}
+            />
             <span className="text-sm font-mono text-muted-foreground">{modelState.name}</span>
             <span className="text-xs text-muted-foreground">v{modelState.version}</span>
           </div>
@@ -112,19 +117,22 @@ const Header = () => {
         <div className="flex items-center ml-auto space-x-4">
           {/* Data Sync Status */}
           <div className="flex items-center space-x-2 px-3 py-1 bg-muted rounded-lg">
-            <div className={`w-2 h-2 rounded-full ${
-              dataSyncStatus.status === 'connected' ? 'bg-success' : 
-              dataSyncStatus.status === 'warning' ? 'bg-warning' : 'bg-error'
-            }`} />
-            <span className="text-xs text-muted-foreground">
-              Data: {dataSyncStatus.lastUpdate}
-            </span>
+            <div
+              className={`w-2 h-2 rounded-full ${
+                dataSyncStatus.status === 'connected'
+                  ? 'bg-success'
+                  : dataSyncStatus.status === 'warning'
+                    ? 'bg-warning'
+                    : 'bg-error'
+              }`}
+            />
+            <span className="text-xs text-muted-foreground">Data: {dataSyncStatus.lastUpdate}</span>
             <Icon name="Wifi" size={14} className="text-muted-foreground" />
           </div>
 
           {/* Quick Actions */}
           <div className="flex items-center space-x-1">
-            {quickActions.map((action) => (
+            {quickActions.map(action => (
               <Button
                 key={action.id}
                 variant="ghost"

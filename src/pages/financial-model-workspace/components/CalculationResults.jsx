@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 
@@ -22,8 +23,8 @@ const CalculationResults = ({ results, onExport }) => {
       { year: 2028, revenue: 1830, ebitda: 457.6, fcf: 274.6, pv: 180.3 }
     ],
     sensitivity: {
-      wacc: [0.08, 0.09, 0.10, 0.11, 0.12],
-      growth: [0.015, 0.020, 0.025, 0.030, 0.035],
+      wacc: [0.08, 0.09, 0.1, 0.11, 0.12],
+      growth: [0.015, 0.02, 0.025, 0.03, 0.035],
       matrix: [
         [145.2, 138.7, 132.8, 127.4, 122.5],
         [152.1, 144.9, 138.2, 132.1, 126.4],
@@ -33,7 +34,7 @@ const CalculationResults = ({ results, onExport }) => {
       ]
     },
     scenarios: [
-      { name: 'Base Case', probability: 0.60, sharePrice: 127.38, irr: 0.156 },
+      { name: 'Base Case', probability: 0.6, sharePrice: 127.38, irr: 0.156 },
       { name: 'Bull Case', probability: 0.25, sharePrice: 145.67, irr: 0.189 },
       { name: 'Bear Case', probability: 0.15, sharePrice: 98.42, irr: 0.087 }
     ],
@@ -53,7 +54,7 @@ const CalculationResults = ({ results, onExport }) => {
     { id: 'multiples', label: 'Multiples', icon: 'Layers' }
   ];
 
-  const toggleSection = (section) => {
+  const toggleSection = section => {
     const newExpanded = new Set(expandedSections);
     if (newExpanded.has(section)) {
       newExpanded.delete(section);
@@ -138,7 +139,7 @@ const CalculationResults = ({ results, onExport }) => {
           </span>
         </div>
         <div className="w-full bg-muted rounded-full h-2">
-          <div 
+          <div
             className="bg-success h-2 rounded-full transition-all duration-300"
             style={{ width: `${mockResults.summary.confidence * 100}%` }}
           />
@@ -167,10 +168,14 @@ const CalculationResults = ({ results, onExport }) => {
             {mockResults.cashFlows.map((cf, index) => (
               <tr key={index} className="border-b border-border/50">
                 <td className="py-3 text-foreground font-medium">{cf.year}</td>
-                <td className="py-3 text-right text-foreground">{formatCurrency(cf.revenue, 0)}M</td>
+                <td className="py-3 text-right text-foreground">
+                  {formatCurrency(cf.revenue, 0)}M
+                </td>
                 <td className="py-3 text-right text-foreground">{formatCurrency(cf.ebitda, 1)}M</td>
                 <td className="py-3 text-right text-foreground">{formatCurrency(cf.fcf, 1)}M</td>
-                <td className="py-3 text-right text-success font-medium">{formatCurrency(cf.pv, 1)}M</td>
+                <td className="py-3 text-right text-success font-medium">
+                  {formatCurrency(cf.pv, 1)}M
+                </td>
               </tr>
             ))}
           </tbody>
@@ -192,7 +197,9 @@ const CalculationResults = ({ results, onExport }) => {
   const renderSensitivity = () => (
     <div className="space-y-4">
       <div className="text-center">
-        <h4 className="text-sm font-medium text-foreground mb-2">Share Price Sensitivity Analysis</h4>
+        <h4 className="text-sm font-medium text-foreground mb-2">
+          Share Price Sensitivity Analysis
+        </h4>
         <p className="text-xs text-muted-foreground">WACC vs Terminal Growth Rate</p>
       </div>
 
@@ -213,10 +220,12 @@ const CalculationResults = ({ results, onExport }) => {
               <tr key={rowIndex} className="border-t border-border/50">
                 <td className="p-2 text-muted-foreground font-medium">{formatPercent(wacc)}</td>
                 {mockResults.sensitivity.matrix[rowIndex].map((value, colIndex) => (
-                  <td 
-                    key={colIndex} 
+                  <td
+                    key={colIndex}
                     className={`p-2 text-center font-medium ${
-                      Math.abs(value - 127.38) < 5 ? 'bg-primary/20 text-primary' : 'text-foreground'
+                      Math.abs(value - 127.38) < 5
+                        ? 'bg-primary/20 text-primary'
+                        : 'text-foreground'
                     }`}
                   >
                     {formatCurrency(value)}
@@ -245,13 +254,11 @@ const CalculationResults = ({ results, onExport }) => {
               <div className="text-lg font-bold text-foreground">
                 {formatCurrency(scenario.sharePrice)}
               </div>
-              <div className="text-sm text-muted-foreground">
-                {formatPercent(scenario.irr)} IRR
-              </div>
+              <div className="text-sm text-muted-foreground">{formatPercent(scenario.irr)} IRR</div>
             </div>
           </div>
           <div className="w-full bg-background rounded-full h-1">
-            <div 
+            <div
               className="bg-primary h-1 rounded-full"
               style={{ width: `${scenario.probability * 100}%` }}
             />
@@ -270,7 +277,9 @@ const CalculationResults = ({ results, onExport }) => {
               <th className="text-left py-2 text-muted-foreground font-medium">Multiple</th>
               <th className="text-right py-2 text-muted-foreground font-medium">Current</th>
               <th className="text-right py-2 text-muted-foreground font-medium">Peer Avg</th>
-              <th className="text-right py-2 text-muted-foreground font-medium">Premium/Discount</th>
+              <th className="text-right py-2 text-muted-foreground font-medium">
+                Premium/Discount
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -279,10 +288,13 @@ const CalculationResults = ({ results, onExport }) => {
                 <td className="py-3 text-foreground font-medium">{multiple.metric}</td>
                 <td className="py-3 text-right text-foreground">{multiple.current}x</td>
                 <td className="py-3 text-right text-foreground">{multiple.peer_avg}x</td>
-                <td className={`py-3 text-right font-medium ${
-                  multiple.premium > 0 ? 'text-success' : 'text-destructive'
-                }`}>
-                  {multiple.premium > 0 ? '+' : ''}{multiple.premium.toFixed(1)}%
+                <td
+                  className={`py-3 text-right font-medium ${
+                    multiple.premium > 0 ? 'text-success' : 'text-destructive'
+                  }`}
+                >
+                  {multiple.premium > 0 ? '+' : ''}
+                  {multiple.premium.toFixed(1)}%
                 </td>
               </tr>
             ))}
@@ -294,12 +306,18 @@ const CalculationResults = ({ results, onExport }) => {
 
   const renderTabContent = () => {
     switch (activeTab) {
-      case 'summary': return renderSummary();
-      case 'cashflows': return renderCashFlows();
-      case 'sensitivity': return renderSensitivity();
-      case 'scenarios': return renderScenarios();
-      case 'multiples': return renderMultiples();
-      default: return renderSummary();
+      case 'summary':
+        return renderSummary();
+      case 'cashflows':
+        return renderCashFlows();
+      case 'sensitivity':
+        return renderSensitivity();
+      case 'scenarios':
+        return renderScenarios();
+      case 'multiples':
+        return renderMultiples();
+      default:
+        return renderSummary();
     }
   };
 
@@ -320,11 +338,7 @@ const CalculationResults = ({ results, onExport }) => {
           >
             Export
           </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            iconName="Share2"
-          >
+          <Button variant="outline" size="sm" iconName="Share2">
             Share
           </Button>
         </div>
@@ -332,7 +346,7 @@ const CalculationResults = ({ results, onExport }) => {
 
       {/* Tabs */}
       <div className="flex border-b border-border overflow-x-auto">
-        {tabs.map((tab) => (
+        {tabs.map(tab => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
@@ -349,9 +363,7 @@ const CalculationResults = ({ results, onExport }) => {
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto p-4">
-        {renderTabContent()}
-      </div>
+      <div className="flex-1 overflow-y-auto p-4">{renderTabContent()}</div>
 
       {/* Footer */}
       <div className="p-4 border-t border-border bg-muted/50">

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 
@@ -9,12 +10,12 @@ const WatchlistPanel = ({ watchlist, onRemoveFromWatchlist, onSelectSymbol }) =>
   const sortedWatchlist = [...watchlist].sort((a, b) => {
     let aValue = a[sortBy];
     let bValue = b[sortBy];
-    
+
     if (typeof aValue === 'string') {
       aValue = aValue.toLowerCase();
       bValue = bValue.toLowerCase();
     }
-    
+
     if (sortOrder === 'asc') {
       return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
     } else {
@@ -22,7 +23,7 @@ const WatchlistPanel = ({ watchlist, onRemoveFromWatchlist, onSelectSymbol }) =>
     }
   });
 
-  const handleSort = (field) => {
+  const handleSort = field => {
     if (sortBy === field) {
       setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
     } else {
@@ -31,7 +32,7 @@ const WatchlistPanel = ({ watchlist, onRemoveFromWatchlist, onSelectSymbol }) =>
     }
   };
 
-  const getChangeColor = (change) => {
+  const getChangeColor = change => {
     if (change > 0) return 'text-success';
     if (change < 0) return 'text-error';
     return 'text-muted-foreground';
@@ -55,10 +56,13 @@ const WatchlistPanel = ({ watchlist, onRemoveFromWatchlist, onSelectSymbol }) =>
         <div className="flex items-center justify-between">
           <h3 className="font-semibold text-foreground">Watchlist</h3>
           <div className="flex items-center space-x-2">
-            <span className="text-sm text-muted-foreground">
-              {watchlist.length} symbols
-            </span>
-            <Button variant="ghost" size="sm" iconName="MoreVertical" />
+            <span className="text-sm text-muted-foreground">{watchlist.length} symbols</span>
+            <Button
+              variant="ghost"
+              size="sm"
+              iconName="MoreVertical"
+              aria-label="Watchlist options"
+            />
           </div>
         </div>
       </div>
@@ -67,24 +71,22 @@ const WatchlistPanel = ({ watchlist, onRemoveFromWatchlist, onSelectSymbol }) =>
       <div className="p-3 border-b border-border bg-muted/30">
         <div className="flex items-center space-x-2 text-xs">
           <span className="text-muted-foreground">Sort by:</span>
-          {['symbol', 'name', 'price', 'change'].map((field) => (
+          {['symbol', 'name', 'price', 'change'].map(field => (
             <button
               key={field}
               onClick={() => handleSort(field)}
               className={`
                 flex items-center space-x-1 px-2 py-1 rounded transition-smooth
-                ${sortBy === field 
-                  ? 'bg-primary text-primary-foreground' 
-                  : 'text-muted-foreground hover:text-foreground'
+                ${
+                  sortBy === field
+                    ? 'bg-primary text-primary-foreground'
+                    : 'text-muted-foreground hover:text-foreground'
                 }
               `}
             >
               <span className="capitalize">{field}</span>
               {sortBy === field && (
-                <Icon 
-                  name={sortOrder === 'asc' ? 'ChevronUp' : 'ChevronDown'} 
-                  size={12} 
-                />
+                <Icon name={sortOrder === 'asc' ? 'ChevronUp' : 'ChevronDown'} size={12} />
               )}
             </button>
           ))}
@@ -102,7 +104,7 @@ const WatchlistPanel = ({ watchlist, onRemoveFromWatchlist, onSelectSymbol }) =>
             </p>
           </div>
         ) : (
-          sortedWatchlist.map((item) => (
+          sortedWatchlist.map(item => (
             <div
               key={item.symbol}
               className="flex items-center justify-between p-3 border-b border-border last:border-b-0 hover:bg-muted/50 cursor-pointer transition-smooth"
@@ -115,23 +117,23 @@ const WatchlistPanel = ({ watchlist, onRemoveFromWatchlist, onSelectSymbol }) =>
                     {item.exchange}
                   </span>
                 </div>
-                <div className="text-sm text-muted-foreground truncate">
-                  {item.name}
-                </div>
+                <div className="text-sm text-muted-foreground truncate">{item.name}</div>
               </div>
-              
+
               <div className="text-right mr-3">
                 <div className="font-semibold text-foreground">
                   {formatValue(item.price || 150.25, 'currency')}
                 </div>
                 <div className={`text-sm ${getChangeColor(item.change || 2.15)}`}>
-                  {item.change > 0 ? '+' : ''}{formatValue(Math.abs(item.change || 2.15), 'currency')}
-                  ({item.changePercent > 0 ? '+' : ''}{(item.changePercent || 1.45).toFixed(2)}%)
+                  {item.change > 0 ? '+' : ''}
+                  {formatValue(Math.abs(item.change || 2.15), 'currency')}(
+                  {item.changePercent > 0 ? '+' : ''}
+                  {(item.changePercent || 1.45).toFixed(2)}%)
                 </div>
               </div>
 
               <button
-                onClick={(e) => {
+                onClick={e => {
                   e.stopPropagation();
                   onRemoveFromWatchlist(item.symbol);
                 }}

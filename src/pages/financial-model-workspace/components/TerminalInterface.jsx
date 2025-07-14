@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
+
 import Icon from '../../../components/AppIcon';
 import { dataFetchingService } from '../../../services/dataFetching';
-import { 
-  calculateDCFValuation, 
-  calculateLBOReturns, 
+import {
+  calculateDCFValuation,
+  calculateLBOReturns,
   calculateComparableMetrics,
   formatCurrency,
   formatPercentage,
@@ -12,8 +13,19 @@ import {
 
 const TerminalInterface = ({ onCommandExecute, calculationResults }) => {
   const [commands, setCommands] = useState([
-    { id: 1, type: 'system', content: 'FinanceAnalyst Pro Terminal v2.3.1 - Ready for financial modeling', timestamp: new Date() },
-    { id: 2, type: 'system', content: 'Type "help" for available commands or start with DCF(AAPL), LBO(TSLA), or COMP(MSFT)', timestamp: new Date() }
+    {
+      id: 1,
+      type: 'system',
+      content: 'FinanceAnalyst Pro Terminal v2.3.1 - Ready for financial modeling',
+      timestamp: new Date()
+    },
+    {
+      id: 2,
+      type: 'system',
+      content:
+        'Type "help" for available commands or start with DCF(AAPL), LBO(TSLA), or COMP(MSFT)',
+      timestamp: new Date()
+    }
   ]);
   const [currentInput, setCurrentInput] = useState('');
   const [suggestions, setSuggestions] = useState([]);
@@ -25,7 +37,7 @@ const TerminalInterface = ({ onCommandExecute, calculationResults }) => {
 
   const financialFunctions = [
     'DCF(ticker) - Discounted Cash Flow with real data',
-    'LBO(ticker) - Leveraged Buyout analysis with real data', 
+    'LBO(ticker) - Leveraged Buyout analysis with real data',
     'COMP(ticker) - Comparable company analysis',
     'FETCH(ticker) - Get comprehensive company data',
     'PROFILE(ticker) - Company profile and metrics',
@@ -34,7 +46,7 @@ const TerminalInterface = ({ onCommandExecute, calculationResults }) => {
     'PEERS(ticker) - Peer company analysis',
     'SEC(ticker, filing_type) - SEC filings data',
     'NPV(cash_flows, discount_rate)',
-    'IRR(cash_flows)', 
+    'IRR(cash_flows)',
     'WACC(cost_equity, cost_debt, tax_rate, debt_ratio)',
     'CAPM(risk_free, beta, market_return)',
     'SENSITIVITY(ticker, variable, range)',
@@ -53,7 +65,7 @@ const TerminalInterface = ({ onCommandExecute, calculationResults }) => {
     'clear',
     'history',
     'export excel',
-    'export pdf', 
+    'export pdf',
     'save model',
     'load template',
     'set currency USD',
@@ -78,13 +90,13 @@ const TerminalInterface = ({ onCommandExecute, calculationResults }) => {
     }
   }, []);
 
-  const handleInputChange = (e) => {
+  const handleInputChange = e => {
     const value = e.target.value;
     setCurrentInput(value);
 
     if (value.length > 0) {
       const allSuggestions = [...financialFunctions, ...sampleCommands];
-      const filtered = allSuggestions.filter(item => 
+      const filtered = allSuggestions.filter(item =>
         item.toLowerCase().includes(value.toLowerCase())
       );
       setSuggestions(filtered.slice(0, 8));
@@ -95,7 +107,7 @@ const TerminalInterface = ({ onCommandExecute, calculationResults }) => {
     }
   };
 
-  const handleKeyDown = (e) => {
+  const handleKeyDown = e => {
     if (e.key === 'Enter') {
       e.preventDefault();
       executeCommand();
@@ -131,7 +143,7 @@ const TerminalInterface = ({ onCommandExecute, calculationResults }) => {
 
     try {
       const response = await processCommand(currentInput);
-      
+
       const responseCommand = {
         id: commands.length + 2,
         type: response.type,
@@ -158,7 +170,7 @@ const TerminalInterface = ({ onCommandExecute, calculationResults }) => {
     }
   };
 
-  const processCommand = async (command) => {
+  const processCommand = async command => {
     const cmd = command.toLowerCase().trim();
 
     if (cmd === 'help') {
@@ -225,10 +237,16 @@ ${dataFetchingService.demoMode ? '🚨 Note: Currently running in demo mode. Use
 
         // Add status for each service
         Object.entries(validation.services).forEach(([service, result]) => {
-          const statusIcon = result.status === 'valid' ? '✅' :
-                           result.status === 'missing' ? '❌' :
-                           result.status === 'invalid' ? '🚫' :
-                           result.status === 'rate_limited' ? '⚠️' : '❓';
+          const statusIcon =
+            result.status === 'valid'
+              ? '✅'
+              : result.status === 'missing'
+                ? '❌'
+                : result.status === 'invalid'
+                  ? '🚫'
+                  : result.status === 'rate_limited'
+                    ? '⚠️'
+                    : '❓';
           statusContent += `\n• ${service}: ${statusIcon} ${result.message}`;
         });
 
@@ -264,11 +282,18 @@ Overall Status: ${validation.overall.toUpperCase()}
 Service Details:`;
 
         Object.entries(validation.services).forEach(([service, result]) => {
-          const statusIcon = result.status === 'valid' ? '✅' :
-                           result.status === 'missing' ? '❌' :
-                           result.status === 'invalid' ? '🚫' :
-                           result.status === 'rate_limited' ? '⚠️' :
-                           result.status === 'network_error' ? '🌐' : '❓';
+          const statusIcon =
+            result.status === 'valid'
+              ? '✅'
+              : result.status === 'missing'
+                ? '❌'
+                : result.status === 'invalid'
+                  ? '🚫'
+                  : result.status === 'rate_limited'
+                    ? '⚠️'
+                    : result.status === 'network_error'
+                      ? '🌐'
+                      : '❓';
           content += `\n• ${service}: ${statusIcon} ${result.message}`;
         });
 
@@ -282,9 +307,13 @@ Service Details:`;
         content += `\n\nValidation completed at: ${validation.timestamp.toLocaleTimeString()}`;
 
         return {
-          type: validation.overall === 'complete' ? 'success' :
-                validation.overall === 'demo' ? 'warning' : 'info',
-          content: content
+          type:
+            validation.overall === 'complete'
+              ? 'success'
+              : validation.overall === 'demo'
+                ? 'warning'
+                : 'info',
+          content
         };
       } catch (error) {
         return {
@@ -303,7 +332,7 @@ Service Details:`;
     // DCF with real data
     if (cmd.match(/^dcf\s*\(\s*([A-Z]{1,5})\s*\)$/i)) {
       const ticker = cmd.match(/^dcf\s*\(\s*([A-Z]{1,5})\s*\)$/i)[1].toUpperCase();
-      
+
       const loadingCommand = {
         id: commands.length + 2,
         type: 'info',
@@ -315,12 +344,13 @@ Service Details:`;
       try {
         const dcfInputs = await dataFetchingService.fetchDCFInputs(ticker);
         const dcfResult = calculateDCFValuation(dcfInputs);
-        
-        const upside = ((dcfResult.pricePerShare - dcfInputs.currentPrice) / dcfInputs.currentPrice) * 100;
-        
+
+        const upside =
+          ((dcfResult.pricePerShare - dcfInputs.currentPrice) / dcfInputs.currentPrice) * 100;
+
         return {
           type: 'success',
-          content: `DCF Analysis Complete for ${dcfInputs.companyName} (${ticker})\n\n📈 VALUATION RESULTS:\n• Current Price: ${formatCurrency(dcfInputs.currentPrice)}\n• DCF Fair Value: ${formatCurrency(dcfResult.pricePerShare)}\n• Upside/(Downside): ${formatPercentage(upside/100)}\n\n💰 VALUE BREAKDOWN:\n• Enterprise Value: ${formatCurrency(dcfResult.enterpriseValue, 'USD', true)}\n• Equity Value: ${formatCurrency(dcfResult.equityValue, 'USD', true)}\n• PV of Cash Flows: ${formatCurrency(dcfResult.pvOfCashFlows, 'USD', true)}\n• PV of Terminal Value: ${formatCurrency(dcfResult.pvOfTerminalValue, 'USD', true)}\n\n🔢 KEY ASSUMPTIONS:\n• Revenue Growth: ${formatPercentage(dcfInputs.revenueGrowthRate)}\n• FCF Margin: ${formatPercentage(dcfInputs.fcfMargin)}\n• WACC: ${formatPercentage(dcfInputs.wacc)}\n• Terminal Growth: ${formatPercentage(dcfInputs.terminalGrowthRate)}\n• Beta: ${formatNumber(dcfInputs.beta, 2)}\n\n📊 Current Metrics:\n• Market Cap: ${formatCurrency(dcfInputs.marketCap, 'USD', true)}\n• P/E Ratio: ${formatNumber(dcfInputs.peRatio, 1)}x\n• Net Debt: ${formatCurrency(dcfInputs.totalDebt - dcfInputs.cash, 'USD', true)}\n\n${dataFetchingService.demoMode ? '⚠️  Demo data used - results are illustrative only' : '✅ Analysis based on live market data'}`,
+          content: `DCF Analysis Complete for ${dcfInputs.companyName} (${ticker})\n\n📈 VALUATION RESULTS:\n• Current Price: ${formatCurrency(dcfInputs.currentPrice)}\n• DCF Fair Value: ${formatCurrency(dcfResult.pricePerShare)}\n• Upside/(Downside): ${formatPercentage(upside / 100)}\n\n💰 VALUE BREAKDOWN:\n• Enterprise Value: ${formatCurrency(dcfResult.enterpriseValue, 'USD', true)}\n• Equity Value: ${formatCurrency(dcfResult.equityValue, 'USD', true)}\n• PV of Cash Flows: ${formatCurrency(dcfResult.pvOfCashFlows, 'USD', true)}\n• PV of Terminal Value: ${formatCurrency(dcfResult.pvOfTerminalValue, 'USD', true)}\n\n🔢 KEY ASSUMPTIONS:\n• Revenue Growth: ${formatPercentage(dcfInputs.revenueGrowthRate)}\n• FCF Margin: ${formatPercentage(dcfInputs.fcfMargin)}\n• WACC: ${formatPercentage(dcfInputs.wacc)}\n• Terminal Growth: ${formatPercentage(dcfInputs.terminalGrowthRate)}\n• Beta: ${formatNumber(dcfInputs.beta, 2)}\n\n📊 Current Metrics:\n• Market Cap: ${formatCurrency(dcfInputs.marketCap, 'USD', true)}\n• P/E Ratio: ${formatNumber(dcfInputs.peRatio, 1)}x\n• Net Debt: ${formatCurrency(dcfInputs.totalDebt - dcfInputs.cash, 'USD', true)}\n\n${dataFetchingService.demoMode ? '⚠️  Demo data used - results are illustrative only' : '✅ Analysis based on live market data'}`,
           data: { dcfInputs, dcfResult, analysis: 'dcf' }
         };
       } catch (error) {
@@ -334,7 +364,7 @@ Service Details:`;
     // LBO with real data
     if (cmd.match(/^lbo\s*\(\s*([A-Z]{1,5})\s*\)$/i)) {
       const ticker = cmd.match(/^lbo\s*\(\s*([A-Z]{1,5})\s*\)$/i)[1].toUpperCase();
-      
+
       const loadingCommand = {
         id: commands.length + 2,
         type: 'info',
@@ -345,7 +375,7 @@ Service Details:`;
 
       try {
         const lboInputs = await dataFetchingService.fetchLBOInputs(ticker);
-        
+
         // Calculate multiple scenarios
         const scenarios = [
           { name: 'Conservative', exitMultiple: lboInputs.avgPeerMultiple * 0.9, debtMultiple: 4 },
@@ -367,7 +397,7 @@ Service Details:`;
         });
 
         const baseCase = results[1];
-        
+
         return {
           type: 'success',
           content: `LBO Analysis Complete for ${lboInputs.companyName} (${ticker})\n\n🎯 BASE CASE SCENARIO:\n• Purchase Price: ${formatCurrency(lboInputs.suggestedPurchasePrice, 'USD', true)}\n• Equity Investment: ${formatCurrency(baseCase.equityInvestment, 'USD', true)}\n• Total Debt: ${formatCurrency(baseCase.totalDebt, 'USD', true)}\n• 5-Year IRR: ${formatPercentage(baseCase.irr)}\n• Money Multiple: ${formatNumber(baseCase.moic, 1)}x\n\n📊 TRANSACTION METRICS:\n• Current EV/EBITDA: ${formatNumber(lboInputs.evEbitdaMultiple, 1)}x\n• Purchase Multiple: ${formatNumber(lboInputs.suggestedPurchasePrice / lboInputs.ebitda, 1)}x\n• Debt/EBITDA: ${formatNumber(baseCase.totalDebt / lboInputs.ebitda, 1)}x\n• Current Debt/EBITDA: ${formatNumber(lboInputs.debtToEbitda, 1)}x\n\n💼 SCENARIO ANALYSIS:\n• Conservative IRR: ${formatPercentage(results[0].irr)} (${formatNumber(results[0].moic, 1)}x)\n• Base Case IRR: ${formatPercentage(results[1].irr)} (${formatNumber(results[1].moic, 1)}x)\n• Aggressive IRR: ${formatPercentage(results[2].irr)} (${formatNumber(results[2].moic, 1)}x)\n\n⚠️  KEY RISKS:\n• Interest Coverage: ${formatNumber(lboInputs.interestCoverage, 1)}x\n• Max Debt Capacity: ${formatCurrency(lboInputs.maxDebtCapacity, 'USD', true)}\n• Current Market Cap: ${formatCurrency(lboInputs.marketCap, 'USD', true)}\n\n${dataFetchingService.demoMode ? '⚠️  Demo data used - results are illustrative only' : '✅ Analysis based on live market data'}`,
@@ -384,7 +414,7 @@ Service Details:`;
     // Comparable company analysis
     if (cmd.match(/^comp\s*\(\s*([A-Z]{1,5})\s*\)$/i)) {
       const ticker = cmd.match(/^comp\s*\(\s*([A-Z]{1,5})\s*\)$/i)[1].toUpperCase();
-      
+
       const loadingCommand = {
         id: commands.length + 2,
         type: 'info',
@@ -410,10 +440,15 @@ Service Details:`;
         };
 
         const compAnalysis = calculateComparableMetrics(companyData, peers);
-        
+
         return {
           type: 'success',
-          content: `Comparable Company Analysis for ${profile.companyName} (${ticker})\n\n🏢 PEER GROUP (${peers.length} companies):\n${peers.slice(0, 5).map(peer => `• ${peer.symbol}: ${peer.name}`).join('\n')}\n\n📊 VALUATION MULTIPLES vs PEERS:\n• P/E Ratio: ${formatNumber(companyData.peRatio, 1)}x (Median: ${formatNumber(compAnalysis.peerStatistics.peRatio.median, 1)}x)\n• EV/EBITDA: ${formatNumber(companyData.evToEbitda, 1)}x (Median: ${formatNumber(compAnalysis.peerStatistics.evToEbitda.median, 1)}x)\n• Price/Book: ${formatNumber(companyData.priceToBook, 1)}x (Median: ${formatNumber(compAnalysis.peerStatistics.priceToBook.median, 1)}x)\n• Debt/Equity: ${formatNumber(companyData.debtToEquity, 1)}x (Median: ${formatNumber(compAnalysis.peerStatistics.debtToEquity.median, 1)}x)\n\n📈 RELATIVE VALUATION:\n• P/E vs Peers: ${formatPercentage((compAnalysis.relativeValuation.peRatioRelative - 1))} ${compAnalysis.relativeValuation.peRatioRelative > 1 ? 'premium' : 'discount'}\n• EV/EBITDA vs Peers: ${formatPercentage((compAnalysis.relativeValuation.evEbitdaRelative - 1))} ${compAnalysis.relativeValuation.evEbitdaRelative > 1 ? 'premium' : 'discount'}\n• Market Cap Percentile: ${formatPercentage(compAnalysis.relativeValuation.marketCapPercentile)}\n\n💰 PEER STATISTICS:\n• P/E Range: ${formatNumber(compAnalysis.peerStatistics.peRatio.min, 1)}x - ${formatNumber(compAnalysis.peerStatistics.peRatio.max, 1)}x\n• EV/EBITDA Range: ${formatNumber(compAnalysis.peerStatistics.evToEbitda.min, 1)}x - ${formatNumber(compAnalysis.peerStatistics.evToEbitda.max, 1)}x\n• Average Market Cap: ${formatCurrency(compAnalysis.peerStatistics.marketCap.mean, 'USD', true)}\n\n${dataFetchingService.demoMode ? '⚠️  Demo data used - results are illustrative only' : '✅ Analysis based on live market data'}`,
+          content: `Comparable Company Analysis for ${profile.companyName} (${ticker})\n\n🏢 PEER GROUP (${peers.length} companies):\n${peers
+            .slice(0, 5)
+            .map(peer => `• ${peer.symbol}: ${peer.name}`)
+            .join(
+              '\n'
+            )}\n\n📊 VALUATION MULTIPLES vs PEERS:\n• P/E Ratio: ${formatNumber(companyData.peRatio, 1)}x (Median: ${formatNumber(compAnalysis.peerStatistics.peRatio.median, 1)}x)\n• EV/EBITDA: ${formatNumber(companyData.evToEbitda, 1)}x (Median: ${formatNumber(compAnalysis.peerStatistics.evToEbitda.median, 1)}x)\n• Price/Book: ${formatNumber(companyData.priceToBook, 1)}x (Median: ${formatNumber(compAnalysis.peerStatistics.priceToBook.median, 1)}x)\n• Debt/Equity: ${formatNumber(companyData.debtToEquity, 1)}x (Median: ${formatNumber(compAnalysis.peerStatistics.debtToEquity.median, 1)}x)\n\n📈 RELATIVE VALUATION:\n• P/E vs Peers: ${formatPercentage(compAnalysis.relativeValuation.peRatioRelative - 1)} ${compAnalysis.relativeValuation.peRatioRelative > 1 ? 'premium' : 'discount'}\n• EV/EBITDA vs Peers: ${formatPercentage(compAnalysis.relativeValuation.evEbitdaRelative - 1)} ${compAnalysis.relativeValuation.evEbitdaRelative > 1 ? 'premium' : 'discount'}\n• Market Cap Percentile: ${formatPercentage(compAnalysis.relativeValuation.marketCapPercentile)}\n\n💰 PEER STATISTICS:\n• P/E Range: ${formatNumber(compAnalysis.peerStatistics.peRatio.min, 1)}x - ${formatNumber(compAnalysis.peerStatistics.peRatio.max, 1)}x\n• EV/EBITDA Range: ${formatNumber(compAnalysis.peerStatistics.evToEbitda.min, 1)}x - ${formatNumber(compAnalysis.peerStatistics.evToEbitda.max, 1)}x\n• Average Market Cap: ${formatCurrency(compAnalysis.peerStatistics.marketCap.mean, 'USD', true)}\n\n${dataFetchingService.demoMode ? '⚠️  Demo data used - results are illustrative only' : '✅ Analysis based on live market data'}`,
           data: { companyData, peers, compAnalysis, analysis: 'comparable' }
         };
       } catch (error) {
@@ -427,11 +462,11 @@ Service Details:`;
     // Fetch comprehensive company data
     if (cmd.match(/^fetch\s*\(\s*([A-Z]{1,5})\s*\)$/i)) {
       const ticker = cmd.match(/^fetch\s*\(\s*([A-Z]{1,5})\s*\)$/i)[1].toUpperCase();
-      
+
       try {
         const profile = await dataFetchingService.fetchCompanyProfile(ticker);
         const marketData = await dataFetchingService.fetchMarketData(ticker);
-        
+
         return {
           type: 'success',
           content: `Company Data for ${profile.companyName} (${ticker})\n\n💼 PROFILE:\n• Sector: ${profile.sector}\n• Industry: ${profile.industry}\n• Employees: ${formatNumber(profile.fullTimeEmployees, 0)}\n• Founded: ${profile.ipoDate}\n\n📊 MARKET DATA:\n• Current Price: ${formatCurrency(marketData.currentPrice)}\n• Market Cap: ${formatCurrency(profile.mktCap, 'USD', true)}\n• 52W Range: ${profile.range} \n• Volume: ${formatNumber(marketData.volume, 0, true)}\n• Beta: ${formatNumber(profile.beta, 2)}\n\n📈 VALUATION:\n• P/E Ratio: ${formatNumber(profile.pe, 1)}x\n• P/B Ratio: ${formatNumber(profile.pb, 1)}x\n• EV/EBITDA: ${formatNumber(profile.enterpriseValueOverEBITDA, 1)}x\n• Debt/Equity: ${formatNumber(profile.debtToEquity, 1)}x\n\n💰 PROFITABILITY:\n• Revenue TTM: ${formatCurrency(profile.revenueTTM, 'USD', true)}\n• Gross Margin: ${formatPercentage(profile.grossProfitMargin)}\n• Net Margin: ${formatPercentage(profile.netProfitMargin)}\n• ROE: ${formatPercentage(profile.returnOnEquityTTM)}\n• ROA: ${formatPercentage(profile.returnOnAssetsTTM)}\n\n${dataFetchingService.demoMode ? '⚠️  Demo data used - results are illustrative only' : '✅ Data based on live market feeds'}`,
@@ -450,7 +485,7 @@ Service Details:`;
       const match = cmd.match(/^npv\s*\(\s*\[([^\]]+)\]\s*,\s*([\d.]+)\s*\)$/i);
       const cashFlows = match[1].split(',').map(cf => parseFloat(cf.trim()));
       const discountRate = parseFloat(match[2]);
-      
+
       let npv = 0;
       const pvBreakdown = cashFlows.map((cf, index) => {
         const pv = cf / Math.pow(1 + discountRate, index + 1);
@@ -485,7 +520,7 @@ Service Details:`;
     };
   };
 
-  const selectSuggestion = (suggestion) => {
+  const selectSuggestion = suggestion => {
     setCurrentInput(suggestion);
     setShowSuggestions(false);
     inputRef.current?.focus();
@@ -501,18 +536,20 @@ Service Details:`;
           <span className="text-xs text-blue-400">• Live Data Enabled</span>
         </div>
         <div className="flex items-center space-x-2">
-          <div className={`w-2 h-2 rounded-full ${isLoading ? 'bg-yellow-400 animate-pulse' : 'bg-green-400'}`} />
+          <div
+            className={`w-2 h-2 rounded-full ${isLoading ? 'bg-yellow-400 animate-pulse' : 'bg-green-400'}`}
+          />
           <span className="text-xs text-gray-400">{isLoading ? 'Processing...' : 'Connected'}</span>
         </div>
       </div>
 
       {/* Terminal Content */}
-      <div 
+      <div
         ref={terminalRef}
         className="flex-1 overflow-y-auto p-4 space-y-2"
         onClick={() => inputRef.current?.focus()}
       >
-        {commands.map((command) => (
+        {commands.map(command => (
           <div key={command.id} className="space-y-1">
             <div className="flex items-start space-x-2">
               {command.type === 'user' && (
@@ -538,7 +575,8 @@ Service Details:`;
                 {command.data && (
                   <div className="mt-2 p-2 bg-gray-800 rounded border border-gray-700">
                     <div className="text-xs text-gray-400">
-                      Real-time calculation data available • Analysis: {command.data.analysis || 'financial'}
+                      Real-time calculation data available • Analysis:{' '}
+                      {command.data.analysis || 'financial'}
                     </div>
                   </div>
                 )}
@@ -570,7 +608,7 @@ Service Details:`;
               autoComplete="off"
               disabled={isLoading}
             />
-            
+
             {/* Suggestions Dropdown */}
             {showSuggestions && (
               <div className="absolute top-full left-0 right-0 mt-1 bg-gray-800 border border-gray-600 rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
@@ -578,8 +616,9 @@ Service Details:`;
                   <div
                     key={index}
                     className={`px-3 py-2 cursor-pointer text-sm ${
-                      index === selectedSuggestion 
-                        ? 'bg-gray-700 text-green-300' : 'text-gray-300 hover:bg-gray-700'
+                      index === selectedSuggestion
+                        ? 'bg-gray-700 text-green-300'
+                        : 'text-gray-300 hover:bg-gray-700'
                     }`}
                     onClick={() => selectSuggestion(suggestion)}
                   >

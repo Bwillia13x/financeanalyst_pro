@@ -39,7 +39,7 @@ export class ApiKeyValidator {
 
     try {
       const [alphaVantage, fmp, quandl, fred] = await Promise.allSettled(validationPromises);
-      
+
       results.services = {
         alphaVantage: this.processValidationResult(alphaVantage),
         fmp: this.processValidationResult(fmp),
@@ -48,16 +48,27 @@ export class ApiKeyValidator {
       };
 
       // Determine overall status
-      const validServices = Object.values(results.services).filter(s => s.status === 'valid').length;
+      const validServices = Object.values(results.services).filter(
+        s => s.status === 'valid'
+      ).length;
+      const configuredServices = Object.values(results.services).filter(
+        s => s.status !== 'missing'
+      ).length;
       const totalServices = Object.keys(results.services).length;
 
       if (validServices === 0) {
         results.overall = 'demo';
-        results.recommendations.push('No valid API keys found. Running in demo mode with mock data.');
-        results.recommendations.push('Add at least one API key (Alpha Vantage or FMP recommended) for live data.');
-      } else if (validServices < totalServices) {
+        results.recommendations.push(
+          'No valid API keys found. Running in demo mode with mock data.'
+        );
+        results.recommendations.push(
+          'Add at least one API key (Alpha Vantage or FMP recommended) for live data.'
+        );
+      } else if (validServices < configuredServices || configuredServices < totalServices) {
         results.overall = 'partial';
-        results.recommendations.push(`${validServices}/${totalServices} API keys are valid. Some features may use demo data.`);
+        results.recommendations.push(
+          `${validServices}/${configuredServices} configured API keys are valid. Some features may use demo data.`
+        );
       } else {
         results.overall = 'complete';
         results.recommendations.push('All API keys are valid. Full functionality available.');
@@ -65,7 +76,6 @@ export class ApiKeyValidator {
 
       this.lastValidation = results;
       return results;
-
     } catch (error) {
       results.overall = 'error';
       results.error = error.message;
@@ -105,8 +115,13 @@ export class ApiKeyValidator {
       }
 
       return { status: 'unknown', message: 'Unexpected response format' };
-
     } catch (error) {
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        return { status: 'invalid', message: 'Invalid API key' };
+      }
+      if (error.response?.status === 429) {
+        return { status: 'rate_limited', message: 'API key valid but rate limited' };
+      }
       if (error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED') {
         return { status: 'network_error', message: 'Network connection failed' };
       }
@@ -123,7 +138,7 @@ export class ApiKeyValidator {
     }
 
     try {
-      const response = await axios.get(`https://financialmodelingprep.com/api/v3/profile/AAPL`, {
+      const response = await axios.get('https://financialmodelingprep.com/api/v3/profile/AAPL', {
         params: { apikey: apiKey },
         timeout: 10000
       });
@@ -137,7 +152,6 @@ export class ApiKeyValidator {
       }
 
       return { status: 'unknown', message: 'Unexpected response format' };
-
     } catch (error) {
       if (error.response?.status === 401) {
         return { status: 'invalid', message: 'Invalid API key' };
@@ -175,7 +189,6 @@ export class ApiKeyValidator {
       }
 
       return { status: 'unknown', message: 'Unexpected response format' };
-
     } catch (error) {
       if (error.response?.status === 401) {
         return { status: 'invalid', message: 'Invalid API key' };
@@ -217,7 +230,6 @@ export class ApiKeyValidator {
       }
 
       return { status: 'unknown', message: 'Unexpected response format' };
-
     } catch (error) {
       if (error.response?.status === 400) {
         return { status: 'invalid', message: 'Invalid API key' };
@@ -250,7 +262,12 @@ export class ApiKeyValidator {
     if (!this.lastValidation) {
       return { status: 'unknown', message: 'Validation not run yet' };
     }
-    return this.lastValidation.services[serviceName] || { status: 'unknown', message: 'Service not found' };
+    return (
+      this.lastValidation.services[serviceName] || {
+        status: 'unknown',
+        message: 'Service not found'
+      }
+    );
   }
 
   /**

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 
@@ -17,12 +18,12 @@ const AuditTrail = ({ calculations, errors, warnings }) => {
         formula: 'NPV(FCFF_2024:2028, WACC)',
         result: 2547.5,
         inputs: {
-          'FCFF_2024': 187.5,
-          'FCFF_2025': 206.3,
-          'FCFF_2026': 226.9,
-          'FCFF_2027': 249.6,
-          'FCFF_2028': 274.6,
-          'WACC': 0.098
+          FCFF_2024: 187.5,
+          FCFF_2025: 206.3,
+          FCFF_2026: 226.9,
+          FCFF_2027: 249.6,
+          FCFF_2028: 274.6,
+          WACC: 0.098
         },
         executionTime: 0.045,
         status: 'success'
@@ -35,10 +36,10 @@ const AuditTrail = ({ calculations, errors, warnings }) => {
         formula: 'WACC(cost_equity, cost_debt, tax_rate, debt_ratio)',
         result: 0.098,
         inputs: {
-          'cost_equity': 0.123,
-          'cost_debt': 0.045,
-          'tax_rate': 0.25,
-          'debt_ratio': 0.4
+          cost_equity: 0.123,
+          cost_debt: 0.045,
+          tax_rate: 0.25,
+          debt_ratio: 0.4
         },
         executionTime: 0.012,
         status: 'success'
@@ -51,9 +52,9 @@ const AuditTrail = ({ calculations, errors, warnings }) => {
         formula: 'TERMINAL_VALUE(FCF_final, terminal_growth, WACC)',
         result: 1247.3,
         inputs: {
-          'FCF_final': 274.6,
-          'terminal_growth': 0.025,
-          'WACC': 0.098
+          FCF_final: 274.6,
+          terminal_growth: 0.025,
+          WACC: 0.098
         },
         executionTime: 0.008,
         status: 'success'
@@ -125,13 +126,28 @@ const AuditTrail = ({ calculations, errors, warnings }) => {
   };
 
   const tabs = [
-    { id: 'calculations', label: 'Calculations', icon: 'Calculator', count: mockAuditData.calculations.length },
+    {
+      id: 'calculations',
+      label: 'Calculations',
+      icon: 'Calculator',
+      count: mockAuditData.calculations.length
+    },
     { id: 'errors', label: 'Errors', icon: 'XCircle', count: mockAuditData.errors.length },
-    { id: 'warnings', label: 'Warnings', icon: 'AlertTriangle', count: mockAuditData.warnings.length },
-    { id: 'validations', label: 'Validations', icon: 'CheckCircle', count: mockAuditData.validations.length }
+    {
+      id: 'warnings',
+      label: 'Warnings',
+      icon: 'AlertTriangle',
+      count: mockAuditData.warnings.length
+    },
+    {
+      id: 'validations',
+      label: 'Validations',
+      icon: 'CheckCircle',
+      count: mockAuditData.validations.length
+    }
   ];
 
-  const toggleExpanded = (id) => {
+  const toggleExpanded = id => {
     const newExpanded = new Set(expandedItems);
     if (newExpanded.has(id)) {
       newExpanded.delete(id);
@@ -141,26 +157,35 @@ const AuditTrail = ({ calculations, errors, warnings }) => {
     setExpandedItems(newExpanded);
   };
 
-  const getStatusIcon = (status) => {
+  const getStatusIcon = status => {
     switch (status) {
-      case 'success': return { icon: 'CheckCircle', color: 'text-success' };
-      case 'error': return { icon: 'XCircle', color: 'text-destructive' };
-      case 'warning': return { icon: 'AlertTriangle', color: 'text-warning' };
-      case 'passed': return { icon: 'CheckCircle', color: 'text-success' };
-      default: return { icon: 'Info', color: 'text-muted-foreground' };
+      case 'success':
+        return { icon: 'CheckCircle', color: 'text-success' };
+      case 'error':
+        return { icon: 'XCircle', color: 'text-destructive' };
+      case 'warning':
+        return { icon: 'AlertTriangle', color: 'text-warning' };
+      case 'passed':
+        return { icon: 'CheckCircle', color: 'text-success' };
+      default:
+        return { icon: 'Info', color: 'text-muted-foreground' };
     }
   };
 
-  const getSeverityColor = (severity) => {
+  const getSeverityColor = severity => {
     switch (severity) {
-      case 'high': return 'text-destructive bg-destructive/10';
-      case 'medium': return 'text-warning bg-warning/10';
-      case 'low': return 'text-muted-foreground bg-muted';
-      default: return 'text-muted-foreground bg-muted';
+      case 'high':
+        return 'text-destructive bg-destructive/10';
+      case 'medium':
+        return 'text-warning bg-warning/10';
+      case 'low':
+        return 'text-muted-foreground bg-muted';
+      default:
+        return 'text-muted-foreground bg-muted';
     }
   };
 
-  const formatExecutionTime = (time) => {
+  const formatExecutionTime = time => {
     if (time < 0.001) return '<1ms';
     if (time < 1) return `${(time * 1000).toFixed(0)}ms`;
     return `${time.toFixed(2)}s`;
@@ -168,14 +193,16 @@ const AuditTrail = ({ calculations, errors, warnings }) => {
 
   const renderCalculations = () => (
     <div className="space-y-3">
-      {mockAuditData.calculations.map((calc) => (
+      {mockAuditData.calculations.map(calc => (
         <div key={calc.id} className="p-4 bg-background border border-border rounded-lg">
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <div className="flex items-center space-x-2 mb-2">
                 <Icon name="Calculator" size={16} className="text-primary" />
                 <span className="font-medium text-foreground">{calc.operation}</span>
-                <span className={`px-2 py-1 rounded-full text-xs ${getStatusIcon(calc.status).color} bg-current/10`}>
+                <span
+                  className={`px-2 py-1 rounded-full text-xs ${getStatusIcon(calc.status).color} bg-current/10`}
+                >
                   {calc.status}
                 </span>
               </div>
@@ -191,11 +218,11 @@ const AuditTrail = ({ calculations, errors, warnings }) => {
             <Button
               variant="ghost"
               size="sm"
-              iconName={expandedItems.has(calc.id) ? "ChevronUp" : "ChevronDown"}
+              iconName={expandedItems.has(calc.id) ? 'ChevronUp' : 'ChevronDown'}
               onClick={() => toggleExpanded(calc.id)}
             />
           </div>
-          
+
           {expandedItems.has(calc.id) && (
             <div className="mt-4 pt-4 border-t border-border">
               <h5 className="text-sm font-medium text-foreground mb-2">Input Values</h5>
@@ -218,14 +245,16 @@ const AuditTrail = ({ calculations, errors, warnings }) => {
 
   const renderErrors = () => (
     <div className="space-y-3">
-      {mockAuditData.errors.map((error) => (
+      {mockAuditData.errors.map(error => (
         <div key={error.id} className="p-4 bg-background border border-destructive/20 rounded-lg">
           <div className="flex items-start space-x-3">
             <Icon name="XCircle" size={16} className="text-destructive mt-0.5" />
             <div className="flex-1">
               <div className="flex items-center space-x-2 mb-2">
                 <span className="font-medium text-foreground">{error.message}</span>
-                <span className={`px-2 py-1 rounded-full text-xs ${getSeverityColor(error.severity)}`}>
+                <span
+                  className={`px-2 py-1 rounded-full text-xs ${getSeverityColor(error.severity)}`}
+                >
                   {error.severity}
                 </span>
                 {error.resolved && (
@@ -237,9 +266,7 @@ const AuditTrail = ({ calculations, errors, warnings }) => {
               <code className="text-sm bg-muted px-2 py-1 rounded font-mono text-foreground block mb-2">
                 {error.formula}
               </code>
-              <div className="text-sm text-muted-foreground mb-2">
-                Location: {error.location}
-              </div>
+              <div className="text-sm text-muted-foreground mb-2">Location: {error.location}</div>
               <div className="text-sm text-foreground bg-muted/50 p-2 rounded">
                 <strong>Suggestion:</strong> {error.suggestion}
               </div>
@@ -255,14 +282,16 @@ const AuditTrail = ({ calculations, errors, warnings }) => {
 
   const renderWarnings = () => (
     <div className="space-y-3">
-      {mockAuditData.warnings.map((warning) => (
+      {mockAuditData.warnings.map(warning => (
         <div key={warning.id} className="p-4 bg-background border border-warning/20 rounded-lg">
           <div className="flex items-start space-x-3">
             <Icon name="AlertTriangle" size={16} className="text-warning mt-0.5" />
             <div className="flex-1">
               <div className="flex items-center space-x-2 mb-2">
                 <span className="font-medium text-foreground">{warning.message}</span>
-                <span className={`px-2 py-1 rounded-full text-xs ${getSeverityColor(warning.severity)}`}>
+                <span
+                  className={`px-2 py-1 rounded-full text-xs ${getSeverityColor(warning.severity)}`}
+                >
                   {warning.severity}
                 </span>
                 {warning.acknowledged && (
@@ -274,9 +303,7 @@ const AuditTrail = ({ calculations, errors, warnings }) => {
               <code className="text-sm bg-muted px-2 py-1 rounded font-mono text-foreground block mb-2">
                 {warning.formula}
               </code>
-              <div className="text-sm text-muted-foreground mb-2">
-                Location: {warning.location}
-              </div>
+              <div className="text-sm text-muted-foreground mb-2">Location: {warning.location}</div>
               <div className="text-sm text-foreground bg-muted/50 p-2 rounded">
                 <strong>Suggestion:</strong> {warning.suggestion}
               </div>
@@ -299,24 +326,24 @@ const AuditTrail = ({ calculations, errors, warnings }) => {
 
   const renderValidations = () => (
     <div className="space-y-3">
-      {mockAuditData.validations.map((validation) => (
+      {mockAuditData.validations.map(validation => (
         <div key={validation.id} className="p-4 bg-background border border-border rounded-lg">
           <div className="flex items-start space-x-3">
-            <Icon 
-              name={getStatusIcon(validation.status).icon} 
-              size={16} 
-              className={`${getStatusIcon(validation.status).color} mt-0.5`} 
+            <Icon
+              name={getStatusIcon(validation.status).icon}
+              size={16}
+              className={`${getStatusIcon(validation.status).color} mt-0.5`}
             />
             <div className="flex-1">
               <div className="flex items-center space-x-2 mb-2">
                 <span className="font-medium text-foreground">{validation.check}</span>
-                <span className={`px-2 py-1 rounded-full text-xs ${getStatusIcon(validation.status).color} bg-current/10`}>
+                <span
+                  className={`px-2 py-1 rounded-full text-xs ${getStatusIcon(validation.status).color} bg-current/10`}
+                >
                   {validation.status}
                 </span>
               </div>
-              <div className="text-sm text-muted-foreground mb-2">
-                {validation.details}
-              </div>
+              <div className="text-sm text-muted-foreground mb-2">{validation.details}</div>
               <div className="text-xs text-muted-foreground">
                 {validation.timestamp.toLocaleString()}
               </div>
@@ -329,11 +356,16 @@ const AuditTrail = ({ calculations, errors, warnings }) => {
 
   const renderTabContent = () => {
     switch (activeTab) {
-      case 'calculations': return renderCalculations();
-      case 'errors': return renderErrors();
-      case 'warnings': return renderWarnings();
-      case 'validations': return renderValidations();
-      default: return renderCalculations();
+      case 'calculations':
+        return renderCalculations();
+      case 'errors':
+        return renderErrors();
+      case 'warnings':
+        return renderWarnings();
+      case 'validations':
+        return renderValidations();
+      default:
+        return renderCalculations();
     }
   };
 
@@ -357,7 +389,7 @@ const AuditTrail = ({ calculations, errors, warnings }) => {
 
       {/* Tabs */}
       <div className="flex border-b border-border overflow-x-auto">
-        {tabs.map((tab) => (
+        {tabs.map(tab => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
@@ -370,18 +402,14 @@ const AuditTrail = ({ calculations, errors, warnings }) => {
             <Icon name={tab.icon} size={16} />
             <span>{tab.label}</span>
             {tab.count > 0 && (
-              <span className="px-2 py-1 bg-current/20 rounded-full text-xs">
-                {tab.count}
-              </span>
+              <span className="px-2 py-1 bg-current/20 rounded-full text-xs">{tab.count}</span>
             )}
           </button>
         ))}
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto p-4">
-        {renderTabContent()}
-      </div>
+      <div className="flex-1 overflow-y-auto p-4">{renderTabContent()}</div>
 
       {/* Footer */}
       <div className="p-4 border-t border-border bg-muted/50">

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 import Input from '../../../components/ui/Input';
@@ -29,7 +30,7 @@ const SimulationControlBar = ({ onRunSimulation, isSimulating, progress, onStopS
   ];
 
   const confidenceOptions = [
-    { value: 0.90, label: '90% Confidence' },
+    { value: 0.9, label: '90% Confidence' },
     { value: 0.95, label: '95% Confidence' },
     { value: 0.99, label: '99% Confidence' }
   ];
@@ -52,23 +53,23 @@ const SimulationControlBar = ({ onRunSimulation, isSimulating, progress, onStopS
             <Select
               options={iterationOptions}
               value={simulationParams.iterations}
-              onChange={(value) => setSimulationParams(prev => ({ ...prev, iterations: value }))}
+              onChange={value => setSimulationParams(prev => ({ ...prev, iterations: value }))}
               disabled={isSimulating}
               className="w-48"
             />
-            
+
             <Select
               options={methodOptions}
               value={simulationParams.method}
-              onChange={(value) => setSimulationParams(prev => ({ ...prev, method: value }))}
+              onChange={value => setSimulationParams(prev => ({ ...prev, method: value }))}
               disabled={isSimulating}
               className="w-56"
             />
-            
+
             <Select
               options={confidenceOptions}
               value={simulationParams.confidenceLevel}
-              onChange={(value) => setSimulationParams(prev => ({ ...prev, confidenceLevel: value }))}
+              onChange={value => setSimulationParams(prev => ({ ...prev, confidenceLevel: value }))}
               disabled={isSimulating}
               className="w-40"
             />
@@ -78,7 +79,9 @@ const SimulationControlBar = ({ onRunSimulation, isSimulating, progress, onStopS
             <Input
               type="number"
               value={simulationParams.randomSeed}
-              onChange={(e) => setSimulationParams(prev => ({ ...prev, randomSeed: parseInt(e.target.value) }))}
+              onChange={e =>
+                setSimulationParams(prev => ({ ...prev, randomSeed: parseInt(e.target.value) }))
+              }
               disabled={isSimulating}
               className="w-24"
               placeholder="Seed"
@@ -87,7 +90,12 @@ const SimulationControlBar = ({ onRunSimulation, isSimulating, progress, onStopS
               variant="ghost"
               size="sm"
               iconName="Shuffle"
-              onClick={() => setSimulationParams(prev => ({ ...prev, randomSeed: Math.floor(Math.random() * 100000) }))}
+              onClick={() =>
+                setSimulationParams(prev => ({
+                  ...prev,
+                  randomSeed: Math.floor(Math.random() * 100000)
+                }))
+              }
               disabled={isSimulating}
               title="Generate random seed"
             />
@@ -99,7 +107,7 @@ const SimulationControlBar = ({ onRunSimulation, isSimulating, progress, onStopS
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
               <div className="w-32 h-2 bg-muted rounded-full overflow-hidden">
-                <div 
+                <div
                   className="h-full bg-primary transition-all duration-300"
                   style={{ width: `${progress}%` }}
                 />
@@ -108,15 +116,13 @@ const SimulationControlBar = ({ onRunSimulation, isSimulating, progress, onStopS
                 {progress.toFixed(1)}%
               </span>
             </div>
-            
+
             <div className="text-sm text-muted-foreground">
               <span className="font-mono">
                 {Math.floor((progress / 100) * simulationParams.iterations).toLocaleString()}
               </span>
               <span className="mx-1">/</span>
-              <span className="font-mono">
-                {simulationParams.iterations.toLocaleString()}
-              </span>
+              <span className="font-mono">{simulationParams.iterations.toLocaleString()}</span>
             </div>
           </div>
         )}
@@ -124,43 +130,35 @@ const SimulationControlBar = ({ onRunSimulation, isSimulating, progress, onStopS
         {/* Right Section - Controls */}
         <div className="flex items-center space-x-4">
           {!isSimulating && (
-            <div className="text-sm text-muted-foreground">
-              Est. time: {getEstimatedTime()}
-            </div>
+            <div className="text-sm text-muted-foreground">Est. time: {getEstimatedTime()}</div>
           )}
-          
+
           <div className="flex items-center space-x-2">
             {isSimulating ? (
-              <Button
-                variant="destructive"
-                iconName="Square"
-                onClick={onStopSimulation}
-              >
+              <Button variant="destructive" iconName="Square" onClick={onStopSimulation}>
                 Stop Simulation
               </Button>
             ) : (
-              <Button
-                variant="default"
-                iconName="Play"
-                onClick={handleRunSimulation}
-              >
+              <Button variant="default" iconName="Play" onClick={handleRunSimulation}>
                 Run Simulation
               </Button>
             )}
-            
+
             <Button
               variant="outline"
               iconName="RotateCcw"
               disabled={isSimulating}
               title="Reset parameters"
-              onClick={() => setSimulationParams({
-                iterations: 10000,
-                confidenceLevel: 0.95,
-                randomSeed: 12345,
-                method: 'monte_carlo'
-              })}
+              onClick={() =>
+                setSimulationParams({
+                  iterations: 10000,
+                  confidenceLevel: 0.95,
+                  randomSeed: 12345,
+                  method: 'monte_carlo'
+                })
+              }
             />
-            
+
             <Button
               variant="outline"
               iconName="Settings"
@@ -187,30 +185,15 @@ const SimulationControlBar = ({ onRunSimulation, isSimulating, progress, onStopS
             <span>Last run: 2 min ago</span>
           </div>
         </div>
-        
+
         <div className="flex items-center space-x-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            iconName="Download"
-            disabled={isSimulating}
-          >
+          <Button variant="ghost" size="sm" iconName="Download" disabled={isSimulating}>
             Export Config
           </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            iconName="Upload"
-            disabled={isSimulating}
-          >
+          <Button variant="ghost" size="sm" iconName="Upload" disabled={isSimulating}>
             Import Config
           </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            iconName="History"
-            disabled={isSimulating}
-          >
+          <Button variant="ghost" size="sm" iconName="History" disabled={isSimulating}>
             Run History
           </Button>
         </div>

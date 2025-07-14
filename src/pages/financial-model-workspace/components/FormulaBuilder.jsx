@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 
@@ -15,33 +16,85 @@ const FormulaBuilder = ({ onFormulaCreate, variables }) => {
       name: 'Valuation',
       icon: 'TrendingUp',
       functions: [
-        { name: 'DCF', syntax: 'DCF(fcf_array, discount_rate, terminal_growth)', description: 'Discounted Cash Flow valuation' },
-        { name: 'NPV', syntax: 'NPV(cash_flows, discount_rate)', description: 'Net Present Value calculation' },
+        {
+          name: 'DCF',
+          syntax: 'DCF(fcf_array, discount_rate, terminal_growth)',
+          description: 'Discounted Cash Flow valuation'
+        },
+        {
+          name: 'NPV',
+          syntax: 'NPV(cash_flows, discount_rate)',
+          description: 'Net Present Value calculation'
+        },
         { name: 'IRR', syntax: 'IRR(cash_flows)', description: 'Internal Rate of Return' },
-        { name: 'TERMINAL_VALUE', syntax: 'TERMINAL_VALUE(final_fcf, growth_rate, discount_rate)', description: 'Terminal value calculation' },
-        { name: 'WACC', syntax: 'WACC(cost_equity, cost_debt, tax_rate, debt_ratio)', description: 'Weighted Average Cost of Capital' }
+        {
+          name: 'TERMINAL_VALUE',
+          syntax: 'TERMINAL_VALUE(final_fcf, growth_rate, discount_rate)',
+          description: 'Terminal value calculation'
+        },
+        {
+          name: 'WACC',
+          syntax: 'WACC(cost_equity, cost_debt, tax_rate, debt_ratio)',
+          description: 'Weighted Average Cost of Capital'
+        }
       ]
     },
     financial: {
       name: 'Financial Ratios',
       icon: 'Calculator',
       functions: [
-        { name: 'ROE', syntax: 'ROE(net_income, shareholders_equity)', description: 'Return on Equity' },
+        {
+          name: 'ROE',
+          syntax: 'ROE(net_income, shareholders_equity)',
+          description: 'Return on Equity'
+        },
         { name: 'ROA', syntax: 'ROA(net_income, total_assets)', description: 'Return on Assets' },
-        { name: 'DEBT_TO_EQUITY', syntax: 'DEBT_TO_EQUITY(total_debt, total_equity)', description: 'Debt to Equity ratio' },
-        { name: 'CURRENT_RATIO', syntax: 'CURRENT_RATIO(current_assets, current_liabilities)', description: 'Current ratio calculation' },
-        { name: 'QUICK_RATIO', syntax: 'QUICK_RATIO(quick_assets, current_liabilities)', description: 'Quick ratio calculation' }
+        {
+          name: 'DEBT_TO_EQUITY',
+          syntax: 'DEBT_TO_EQUITY(total_debt, total_equity)',
+          description: 'Debt to Equity ratio'
+        },
+        {
+          name: 'CURRENT_RATIO',
+          syntax: 'CURRENT_RATIO(current_assets, current_liabilities)',
+          description: 'Current ratio calculation'
+        },
+        {
+          name: 'QUICK_RATIO',
+          syntax: 'QUICK_RATIO(quick_assets, current_liabilities)',
+          description: 'Quick ratio calculation'
+        }
       ]
     },
     statistical: {
       name: 'Statistical',
       icon: 'BarChart3',
       functions: [
-        { name: 'CORRELATION', syntax: 'CORRELATION(dataset1, dataset2)', description: 'Correlation coefficient' },
-        { name: 'REGRESSION', syntax: 'REGRESSION(dependent_var, independent_var)', description: 'Linear regression analysis' },
-        { name: 'VOLATILITY', syntax: 'VOLATILITY(returns, period)', description: 'Historical volatility' },
-        { name: 'BETA', syntax: 'BETA(stock_returns, market_returns)', description: 'Beta coefficient calculation' },
-        { name: 'SHARPE_RATIO', syntax: 'SHARPE_RATIO(returns, risk_free_rate)', description: 'Risk-adjusted return metric' }
+        {
+          name: 'CORRELATION',
+          syntax: 'CORRELATION(dataset1, dataset2)',
+          description: 'Correlation coefficient'
+        },
+        {
+          name: 'REGRESSION',
+          syntax: 'REGRESSION(dependent_var, independent_var)',
+          description: 'Linear regression analysis'
+        },
+        {
+          name: 'VOLATILITY',
+          syntax: 'VOLATILITY(returns, period)',
+          description: 'Historical volatility'
+        },
+        {
+          name: 'BETA',
+          syntax: 'BETA(stock_returns, market_returns)',
+          description: 'Beta coefficient calculation'
+        },
+        {
+          name: 'SHARPE_RATIO',
+          syntax: 'SHARPE_RATIO(returns, risk_free_rate)',
+          description: 'Risk-adjusted return metric'
+        }
       ]
     },
     mathematical: {
@@ -52,15 +105,31 @@ const FormulaBuilder = ({ onFormulaCreate, variables }) => {
         { name: 'AVERAGE', syntax: 'AVERAGE(range)', description: 'Average of values' },
         { name: 'MEDIAN', syntax: 'MEDIAN(range)', description: 'Median value' },
         { name: 'STDEV', syntax: 'STDEV(range)', description: 'Standard deviation' },
-        { name: 'PERCENTILE', syntax: 'PERCENTILE(range, percentile)', description: 'Percentile calculation' }
+        {
+          name: 'PERCENTILE',
+          syntax: 'PERCENTILE(range, percentile)',
+          description: 'Percentile calculation'
+        }
       ]
     }
   };
 
   const savedFormulas = [
-    { name: 'Custom_DCF_Tech', formula: 'DCF(FCFF_PROJECTIONS, WACC(0.12, 0.04, 0.25, 0.3), 0.025)', category: 'Custom' },
-    { name: 'LBO_Returns', formula: 'IRR([INITIAL_INVESTMENT * -1, EXIT_VALUE])', category: 'Custom' },
-    { name: 'Comp_Multiple', formula: 'AVERAGE(PEER_EV_REVENUE) * TARGET_REVENUE', category: 'Custom' }
+    {
+      name: 'Custom_DCF_Tech',
+      formula: 'DCF(FCFF_PROJECTIONS, WACC(0.12, 0.04, 0.25, 0.3), 0.025)',
+      category: 'Custom'
+    },
+    {
+      name: 'LBO_Returns',
+      formula: 'IRR([INITIAL_INVESTMENT * -1, EXIT_VALUE])',
+      category: 'Custom'
+    },
+    {
+      name: 'Comp_Multiple',
+      formula: 'AVERAGE(PEER_EV_REVENUE) * TARGET_REVENUE',
+      category: 'Custom'
+    }
   ];
 
   const handleDragStart = (e, func) => {
@@ -68,12 +137,12 @@ const FormulaBuilder = ({ onFormulaCreate, variables }) => {
     e.dataTransfer.effectAllowed = 'copy';
   };
 
-  const handleDragOver = (e) => {
+  const handleDragOver = e => {
     e.preventDefault();
     e.dataTransfer.dropEffect = 'copy';
   };
 
-  const handleDrop = (e) => {
+  const handleDrop = e => {
     e.preventDefault();
     if (draggedFunction) {
       const newFormula = currentFormula + (currentFormula ? ' + ' : '') + draggedFunction.syntax;
@@ -82,7 +151,7 @@ const FormulaBuilder = ({ onFormulaCreate, variables }) => {
     }
   };
 
-  const addFunction = (func) => {
+  const addFunction = func => {
     const newFormula = currentFormula + (currentFormula ? ' + ' : '') + func.syntax;
     setCurrentFormula(newFormula);
   };
@@ -159,13 +228,17 @@ const FormulaBuilder = ({ onFormulaCreate, variables }) => {
             <div
               key={index}
               draggable
-              onDragStart={(e) => handleDragStart(e, func)}
+              onDragStart={e => handleDragStart(e, func)}
               className="p-3 bg-muted rounded-lg border border-border cursor-move hover:bg-muted/80 transition-smooth group"
             >
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center space-x-2">
-                    <Icon name="Move" size={14} className="text-muted-foreground group-hover:text-foreground" />
+                    <Icon
+                      name="Move"
+                      size={14}
+                      className="text-muted-foreground group-hover:text-foreground"
+                    />
                     <span className="font-medium text-foreground">{func.name}</span>
                   </div>
                   <p className="text-sm text-muted-foreground mt-1">{func.description}</p>
@@ -222,14 +295,16 @@ const FormulaBuilder = ({ onFormulaCreate, variables }) => {
               <input
                 type="text"
                 value={formulaName}
-                onChange={(e) => setFormulaName(e.target.value)}
+                onChange={e => setFormulaName(e.target.value)}
                 placeholder="Enter formula name..."
                 className="w-full px-3 py-2 bg-input border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
               />
             </div>
 
             <div>
-              <label className="text-sm font-medium text-foreground mb-2 block">Formula Expression</label>
+              <label className="text-sm font-medium text-foreground mb-2 block">
+                Formula Expression
+              </label>
               <div
                 ref={dropZoneRef}
                 onDragOver={handleDragOver}
@@ -238,7 +313,7 @@ const FormulaBuilder = ({ onFormulaCreate, variables }) => {
               >
                 <textarea
                   value={currentFormula}
-                  onChange={(e) => setCurrentFormula(e.target.value)}
+                  onChange={e => setCurrentFormula(e.target.value)}
                   placeholder="Drag functions here or type formula manually..."
                   className="w-full h-20 bg-transparent text-foreground placeholder-muted-foreground resize-none outline-none font-mono text-sm"
                 />
@@ -264,21 +339,11 @@ const FormulaBuilder = ({ onFormulaCreate, variables }) => {
             </div>
 
             <div className="flex items-center justify-between">
-              <Button
-                variant="outline"
-                size="sm"
-                iconName="Trash2"
-                onClick={clearFormula}
-              >
+              <Button variant="outline" size="sm" iconName="Trash2" onClick={clearFormula}>
                 Clear
               </Button>
               <div className="flex items-center space-x-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  iconName="Eye"
-                  disabled={!validateFormula()}
-                >
+                <Button variant="outline" size="sm" iconName="Eye" disabled={!validateFormula()}>
                   Preview
                 </Button>
                 <Button

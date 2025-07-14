@@ -1,14 +1,14 @@
-import React from 'react';
+
 import Icon from '../../../components/AppIcon';
 
 const MarketDataWidget = ({ widget, onResize, onRemove }) => {
-  const getChangeColor = (change) => {
+  const getChangeColor = change => {
     if (change > 0) return 'text-success';
     if (change < 0) return 'text-error';
     return 'text-muted-foreground';
   };
 
-  const getChangeIcon = (change) => {
+  const getChangeIcon = change => {
     if (change > 0) return 'TrendingUp';
     if (change < 0) return 'TrendingDown';
     return 'Minus';
@@ -27,11 +27,11 @@ const MarketDataWidget = ({ widget, onResize, onRemove }) => {
     }
   };
 
-  const getFreshnessColor = (timestamp) => {
+  const getFreshnessColor = timestamp => {
     const now = new Date();
     const updateTime = new Date(timestamp);
     const diffSeconds = (now - updateTime) / 1000;
-    
+
     if (diffSeconds < 5) return 'bg-success';
     if (diffSeconds < 30) return 'bg-warning';
     return 'bg-error';
@@ -44,7 +44,7 @@ const MarketDataWidget = ({ widget, onResize, onRemove }) => {
         <div className="flex items-center space-x-2">
           <h3 className="font-semibold text-foreground">{widget.symbol}</h3>
           <span className="text-sm text-muted-foreground">{widget.name}</span>
-          <div 
+          <div
             className={`w-2 h-2 rounded-full ${getFreshnessColor(widget.lastUpdate)}`}
             title={`Last updated: ${new Date(widget.lastUpdate).toLocaleTimeString()}`}
           />
@@ -75,7 +75,10 @@ const MarketDataWidget = ({ widget, onResize, onRemove }) => {
         <div className={`flex items-center space-x-1 text-sm ${getChangeColor(widget.change)}`}>
           <Icon name={getChangeIcon(widget.change)} size={14} />
           <span>{formatValue(Math.abs(widget.change), widget.valueType)}</span>
-          <span>({widget.changePercent > 0 ? '+' : ''}{widget.changePercent.toFixed(2)}%)</span>
+          <span>
+            ({widget.changePercent > 0 ? '+' : ''}
+            {widget.changePercent.toFixed(2)}%)
+          </span>
         </div>
       </div>
 

@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import Header from '../../components/ui/Header';
-import TerminalInterface from './components/TerminalInterface';
-import FormulaBuilder from './components/FormulaBuilder';
-import CalculationResults from './components/CalculationResults';
-import ModelTemplates from './components/ModelTemplates';
-import VariableInputs from './components/VariableInputs';
-import AuditTrail from './components/AuditTrail';
+
 import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
+import Header from '../../components/ui/Header';
+
+import AuditTrail from './components/AuditTrail';
+import CalculationResults from './components/CalculationResults';
+import FormulaBuilder from './components/FormulaBuilder';
+import ModelTemplates from './components/ModelTemplates';
+import TerminalInterface from './components/TerminalInterface';
+import VariableInputs from './components/VariableInputs';
 
 const FinancialModelWorkspace = () => {
   const [activeLayout, setActiveLayout] = useState('dual-pane');
@@ -43,9 +45,27 @@ const FinancialModelWorkspace = () => {
   ];
 
   const collaborators = [
-    { id: 1, name: 'Sarah Chen', role: 'Senior Analyst', status: 'active', avatar: 'https://randomuser.me/api/portraits/women/1.jpg' },
-    { id: 2, name: 'Michael Rodriguez', role: 'VP Finance', status: 'viewing', avatar: 'https://randomuser.me/api/portraits/men/2.jpg' },
-    { id: 3, name: 'Emily Johnson', role: 'Junior Analyst', status: 'idle', avatar: 'https://randomuser.me/api/portraits/women/3.jpg' }
+    {
+      id: 1,
+      name: 'Sarah Chen',
+      role: 'Senior Analyst',
+      status: 'active',
+      avatar: 'https://randomuser.me/api/portraits/women/1.jpg'
+    },
+    {
+      id: 2,
+      name: 'Michael Rodriguez',
+      role: 'VP Finance',
+      status: 'viewing',
+      avatar: 'https://randomuser.me/api/portraits/men/2.jpg'
+    },
+    {
+      id: 3,
+      name: 'Emily Johnson',
+      role: 'Junior Analyst',
+      status: 'idle',
+      avatar: 'https://randomuser.me/api/portraits/women/3.jpg'
+    }
   ];
 
   useEffect(() => {
@@ -65,13 +85,13 @@ const FinancialModelWorkspace = () => {
 
   const handleCommandExecute = (command, response) => {
     setModelState(prev => ({ ...prev, saved: false }));
-    
+
     if (response.data) {
       setCalculationResults(response.data);
     }
   };
 
-  const handleTemplateSelect = (template) => {
+  const handleTemplateSelect = template => {
     setModelState(prev => ({
       ...prev,
       name: `${template.name}_${new Date().toISOString().split('T')[0]}`,
@@ -85,7 +105,7 @@ const FinancialModelWorkspace = () => {
     setModelState(prev => ({ ...prev, saved: false }));
   };
 
-  const handleExport = (format) => {
+  const handleExport = format => {
     // Export functionality
     console.log(`Exporting model in ${format} format`);
   };
@@ -125,7 +145,7 @@ const FinancialModelWorkspace = () => {
       case 'formula-builder':
         return (
           <FormulaBuilder
-            onFormulaCreate={(formula) => console.log('Formula created:', formula)}
+            onFormulaCreate={formula => console.log('Formula created:', formula)}
             variables={[]}
           />
         );
@@ -144,12 +164,7 @@ const FinancialModelWorkspace = () => {
   const renderRightPanel = () => {
     switch (rightPanelContent) {
       case 'results':
-        return (
-          <CalculationResults
-            results={calculationResults}
-            onExport={handleExport}
-          />
-        );
+        return <CalculationResults results={calculationResults} onExport={handleExport} />;
       case 'variables':
         return (
           <VariableInputs
@@ -158,13 +173,7 @@ const FinancialModelWorkspace = () => {
           />
         );
       case 'audit':
-        return (
-          <AuditTrail
-            calculations={[]}
-            errors={[]}
-            warnings={[]}
-          />
-        );
+        return <AuditTrail calculations={[]} errors={[]} warnings={[]} />;
       default:
         return <CalculationResults results={calculationResults} onExport={handleExport} />;
     }
@@ -173,14 +182,14 @@ const FinancialModelWorkspace = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      
+
       <div className="pt-[60px] h-screen flex flex-col">
         {/* Workspace Toolbar */}
         <div className="flex items-center justify-between p-4 bg-card border-b border-border">
           <div className="flex items-center space-x-4">
             {/* Layout Controls */}
             <div className="flex items-center space-x-1 bg-muted rounded-lg p-1">
-              {layoutOptions.map((layout) => (
+              {layoutOptions.map(layout => (
                 <button
                   key={layout.id}
                   onClick={() => setActiveLayout(layout.id)}
@@ -199,30 +208,40 @@ const FinancialModelWorkspace = () => {
 
             {/* Panel Controls */}
             <div className="flex items-center space-x-2">
+              <label htmlFor="left-panel-select" className="sr-only">
+                Left Panel Content
+              </label>
               <select
+                id="left-panel-select"
                 value={leftPanelContent}
-                onChange={(e) => setLeftPanelContent(e.target.value)}
+                onChange={e => setLeftPanelContent(e.target.value)}
                 className="px-3 py-2 bg-input border border-border rounded-lg text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring"
               >
-                {leftPanelOptions.map((option) => (
+                {leftPanelOptions.map(option => (
                   <option key={option.id} value={option.id}>
                     {option.label}
                   </option>
                 ))}
               </select>
-              
+
               {activeLayout !== 'full-screen' && (
-                <select
-                  value={rightPanelContent}
-                  onChange={(e) => setRightPanelContent(e.target.value)}
-                  className="px-3 py-2 bg-input border border-border rounded-lg text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-                >
-                  {rightPanelOptions.map((option) => (
-                    <option key={option.id} value={option.id}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
+                <>
+                  <label htmlFor="right-panel-select" className="sr-only">
+                    Right Panel Content
+                  </label>
+                  <select
+                    id="right-panel-select"
+                    value={rightPanelContent}
+                    onChange={e => setRightPanelContent(e.target.value)}
+                    className="px-3 py-2 bg-input border border-border rounded-lg text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                  >
+                    {rightPanelOptions.map(option => (
+                      <option key={option.id} value={option.id}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </>
               )}
             </div>
           </div>
@@ -230,7 +249,9 @@ const FinancialModelWorkspace = () => {
           <div className="flex items-center space-x-4">
             {/* Model Status */}
             <div className="flex items-center space-x-2 px-3 py-2 bg-muted rounded-lg">
-              <div className={`w-2 h-2 rounded-full ${modelState.saved ? 'bg-success' : 'bg-warning'}`} />
+              <div
+                className={`w-2 h-2 rounded-full ${modelState.saved ? 'bg-success' : 'bg-warning'}`}
+              />
               <span className="text-sm font-medium text-foreground">{modelState.name}</span>
               {!modelState.saved && (
                 <span className="text-xs text-muted-foreground">Unsaved changes</span>
@@ -248,7 +269,7 @@ const FinancialModelWorkspace = () => {
               >
                 Save
               </Button>
-              
+
               <Button
                 variant="outline"
                 size="sm"
@@ -308,11 +329,11 @@ const FinancialModelWorkspace = () => {
                 onClick={() => setIsCollaborationOpen(false)}
               />
             </div>
-            
+
             <div className="p-4">
               <h4 className="text-sm font-medium text-foreground mb-3">Active Collaborators</h4>
               <div className="space-y-3">
-                {collaborators.map((collaborator) => (
+                {collaborators.map(collaborator => (
                   <div key={collaborator.id} className="flex items-center space-x-3">
                     <img
                       src={collaborator.avatar}
@@ -323,14 +344,19 @@ const FinancialModelWorkspace = () => {
                       <p className="text-sm font-medium text-foreground">{collaborator.name}</p>
                       <p className="text-xs text-muted-foreground">{collaborator.role}</p>
                     </div>
-                    <div className={`w-2 h-2 rounded-full ${
-                      collaborator.status === 'active' ? 'bg-success' :
-                      collaborator.status === 'viewing' ? 'bg-warning' : 'bg-muted-foreground'
-                    }`} />
+                    <div
+                      className={`w-2 h-2 rounded-full ${
+                        collaborator.status === 'active'
+                          ? 'bg-success'
+                          : collaborator.status === 'viewing'
+                            ? 'bg-warning'
+                            : 'bg-muted-foreground'
+                      }`}
+                    />
                   </div>
                 ))}
               </div>
-              
+
               <div className="mt-6">
                 <Button variant="outline" size="sm" iconName="UserPlus" fullWidth>
                   Invite Collaborator

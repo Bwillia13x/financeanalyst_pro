@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+
 import Icon from '../../../components/AppIcon';
 import Input from '../../../components/ui/Input';
 
@@ -14,7 +15,12 @@ const SymbolSearch = ({ onSymbolSelect, watchlist, onAddToWatchlist }) => {
     { symbol: 'AAPL', name: 'Apple Inc.', exchange: 'NASDAQ', sector: 'Technology' },
     { symbol: 'MSFT', name: 'Microsoft Corporation', exchange: 'NASDAQ', sector: 'Technology' },
     { symbol: 'GOOGL', name: 'Alphabet Inc.', exchange: 'NASDAQ', sector: 'Technology' },
-    { symbol: 'AMZN', name: 'Amazon.com Inc.', exchange: 'NASDAQ', sector: 'Consumer Discretionary' },
+    {
+      symbol: 'AMZN',
+      name: 'Amazon.com Inc.',
+      exchange: 'NASDAQ',
+      sector: 'Consumer Discretionary'
+    },
     { symbol: 'TSLA', name: 'Tesla Inc.', exchange: 'NASDAQ', sector: 'Consumer Discretionary' },
     { symbol: 'META', name: 'Meta Platforms Inc.', exchange: 'NASDAQ', sector: 'Technology' },
     { symbol: 'NVDA', name: 'NVIDIA Corporation', exchange: 'NASDAQ', sector: 'Technology' },
@@ -25,10 +31,13 @@ const SymbolSearch = ({ onSymbolSelect, watchlist, onAddToWatchlist }) => {
 
   useEffect(() => {
     if (searchTerm.length > 0) {
-      const filtered = symbolDatabase.filter(item =>
-        item.symbol.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.name.toLowerCase().includes(searchTerm.toLowerCase())
-      ).slice(0, 8);
+      const filtered = symbolDatabase
+        .filter(
+          item =>
+            item.symbol.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            item.name.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+        .slice(0, 8);
       setSuggestions(filtered);
       setIsOpen(true);
       setSelectedIndex(-1);
@@ -38,19 +47,17 @@ const SymbolSearch = ({ onSymbolSelect, watchlist, onAddToWatchlist }) => {
     }
   }, [searchTerm]);
 
-  const handleKeyDown = (e) => {
+  const handleKeyDown = e => {
     if (!isOpen) return;
 
     switch (e.key) {
       case 'ArrowDown':
         e.preventDefault();
-        setSelectedIndex(prev => 
-          prev < suggestions.length - 1 ? prev + 1 : prev
-        );
+        setSelectedIndex(prev => (prev < suggestions.length - 1 ? prev + 1 : prev));
         break;
       case 'ArrowUp':
         e.preventDefault();
-        setSelectedIndex(prev => prev > 0 ? prev - 1 : -1);
+        setSelectedIndex(prev => (prev > 0 ? prev - 1 : -1));
         break;
       case 'Enter':
         e.preventDefault();
@@ -65,14 +72,14 @@ const SymbolSearch = ({ onSymbolSelect, watchlist, onAddToWatchlist }) => {
     }
   };
 
-  const handleSymbolSelect = (symbol) => {
+  const handleSymbolSelect = symbol => {
     onSymbolSelect(symbol);
     setSearchTerm('');
     setIsOpen(false);
     setSelectedIndex(-1);
   };
 
-  const isInWatchlist = (symbol) => {
+  const isInWatchlist = symbol => {
     return watchlist.some(item => item.symbol === symbol);
   };
 
@@ -83,14 +90,14 @@ const SymbolSearch = ({ onSymbolSelect, watchlist, onAddToWatchlist }) => {
           type="text"
           placeholder="Search symbols (e.g., AAPL, Apple)..."
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={e => setSearchTerm(e.target.value)}
           onKeyDown={handleKeyDown}
           className="pl-10 pr-4"
         />
-        <Icon 
-          name="Search" 
-          size={18} 
-          className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" 
+        <Icon
+          name="Search"
+          size={18}
+          className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground"
         />
       </div>
 
@@ -119,7 +126,7 @@ const SymbolSearch = ({ onSymbolSelect, watchlist, onAddToWatchlist }) => {
               <div className="flex items-center space-x-2">
                 {!isInWatchlist(item.symbol) && (
                   <button
-                    onClick={(e) => {
+                    onClick={e => {
                       e.stopPropagation();
                       onAddToWatchlist(item);
                     }}

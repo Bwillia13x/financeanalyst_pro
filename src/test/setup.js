@@ -27,8 +27,8 @@ vi.mock('axios', () => ({
     get: vi.fn(() => Promise.resolve({ data: {} })),
     post: vi.fn(() => Promise.resolve({ data: {} })),
     put: vi.fn(() => Promise.resolve({ data: {} })),
-    delete: vi.fn(() => Promise.resolve({ data: {} })),
-  },
+    delete: vi.fn(() => Promise.resolve({ data: {} }))
+  }
 }));
 
 // Mock window.matchMedia
@@ -42,22 +42,22 @@ Object.defineProperty(window, 'matchMedia', {
     removeListener: vi.fn(), // deprecated
     addEventListener: vi.fn(),
     removeEventListener: vi.fn(),
-    dispatchEvent: vi.fn(),
-  })),
+    dispatchEvent: vi.fn()
+  }))
 });
 
 // Mock IntersectionObserver
 global.IntersectionObserver = vi.fn().mockImplementation(() => ({
   observe: vi.fn(),
   unobserve: vi.fn(),
-  disconnect: vi.fn(),
+  disconnect: vi.fn()
 }));
 
 // Mock ResizeObserver
 global.ResizeObserver = vi.fn().mockImplementation(() => ({
   observe: vi.fn(),
   unobserve: vi.fn(),
-  disconnect: vi.fn(),
+  disconnect: vi.fn()
 }));
 
 // Mock console methods to reduce noise in tests
@@ -65,7 +65,7 @@ global.console = {
   ...console,
   warn: vi.fn(),
   error: vi.fn(),
-  log: vi.fn(),
+  log: vi.fn()
 };
 
 // Setup cleanup after each test
