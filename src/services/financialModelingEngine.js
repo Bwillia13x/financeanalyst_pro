@@ -1,0 +1,441 @@
+import { apiLogger } from '../utils/apiLogger.js';
+
+/**
+ * Advanced Financial Modeling Engine
+ * Provides comprehensive DCF, LBO, and valuation modeling capabilities
+ */
+class FinancialModelingEngine {
+  constructor() {
+    this.modelCache = new Map();
+    this.assumptions = this.getDefaultAssumptions();
+  }
+
+  /**
+   * Get default financial modeling assumptions
+   */
+  getDefaultAssumptions() {
+    return {
+      dcf: {
+        projectionYears: 5,
+        terminalGrowthRate: 0.025,
+        riskFreeRate: 0.045,
+        marketPremium: 0.065,
+        taxRate: 0.21,
+        capexAsPercentOfRevenue: 0.03,
+        nwcAsPercentOfRevenue: 0.05,
+        depreciationAsPercentOfRevenue: 0.025
+      },
+      lbo: {
+        holdingPeriod: 5,
+        debtMultiples: { senior: 4.0, subordinated: 1.5, total: 5.5 },
+        interestRates: { senior: 0.055, subordinated: 0.095 },
+        managementFeeRate: 0.02,
+        carriedInterestRate: 0.2,
+        ebitdaGrowthRate: 0.05,
+        debtPaydownRate: 0.5
+      },
+      monte_carlo: {
+        iterations: 10000,
+        confidenceIntervals: [0.05, 0.25, 0.5, 0.75, 0.95],
+        correlationMatrix: null
+      }
+    };
+  }
+
+  /**
+   * Build comprehensive DCF model with multiple scenarios
+   * @param {Object} inputs - DCF model inputs
+   * @param {Object} scenarios - Different scenario assumptions
+   * @returns {Object} Complete DCF analysis
+   */
+  buildDCFModel(inputs, scenarios = {}) {
+    const {
+      symbol,
+      companyName,
+      currentRevenue,
+      historicalGrowthRates = [],
+      margins = {},
+      balanceSheetData = {},
+      marketData = {},
+      assumptions = {}
+    } = inputs;
+
+    // Merge with default assumptions
+    const modelAssumptions = { ...this.assumptions.dcf, ...assumptions };
+
+    // Build base case scenario
+    const baseCase = this.calculateDCFScenario(inputs, modelAssumptions, 'Base Case');
+
+    // Build additional scenarios
+    const scenarioResults = {};
+    
+    // Bull case: Higher growth, lower discount rate
+    if (scenarios.bull !== false) {
+      const bullAssumptions = {
+        ...modelAssumptions,
+        revenueGrowthRate: (modelAssumptions.revenueGrowthRate || 0.1) * 1.3,
+        terminalGrowthRate: Math.min(modelAssumptions.terminalGrowthRate * 1.2, 0.04),
+        wacc: (modelAssumptions.wacc || 0.1) * 0.9
+      };
+      scenarioResults.bull = this.calculateDCFScenario(inputs, bullAssumptions, 'Bull Case');
+    }
+
+    // Bear case: Lower growth, higher discount rate
+    if (scenarios.bear !== false) {
+      const bearAssumptions = {
+        ...modelAssumptions,
+        revenueGrowthRate: (modelAssumptions.revenueGrowthRate || 0.1) * 0.7,
+        terminalGrowthRate: Math.max(modelAssumptions.terminalGrowthRate * 0.8, 0.015),
+        wacc: (modelAssumptions.wacc || 0.1) * 1.1
+      };
+      scenarioResults.bear = this.calculateDCFScenario(inputs, bearAssumptions, 'Bear Case');
+    }
+
+    // Calculate sensitivity analysis
+    const sensitivityAnalysis = this.performDCFSensitivityAnalysis(inputs, modelAssumptions);
+
+    return {
+      symbol,
+      companyName,
+      modelType: 'DCF',
+      timestamp: new Date().toISOString(),
+      baseCase,
+      scenarios: scenarioResults,
+      sensitivityAnalysis,
+      assumptions: modelAssumptions,
+      summary: this.generateDCFSummary(baseCase, scenarioResults, inputs.currentPrice)
+    };
+  }
+
+  /**
+   * Calculate DCF for a specific scenario
+   * @param {Object} inputs - Model inputs
+   * @param {Object} assumptions - Scenario assumptions
+   * @param {string} scenarioName - Name of the scenario
+   * @returns {Object} DCF calculation results
+   */
+  calculateDCFScenario(inputs, assumptions, scenarioName) {
+    const {
+      currentRevenue,
+      currentPrice,
+      sharesOutstanding,
+      totalDebt = 0,
+      cash = 0
+    } = inputs;
+
+    // Project revenues
+    const revenueProjections = this.projectRevenues(
+      currentRevenue,
+      assumptions.revenueGrowthRate || 0.1,
+      assumptions.projectionYears
+    );
+
+    // Project operating metrics
+    const operatingProjections = this.projectOperatingMetrics(
+      revenueProjections,
+      assumptions
+    );
+
+    // Calculate free cash flows
+    const fcfProjections = this.calculateFreeCashFlows(
+      operatingProjections,
+      assumptions
+    );
+
+    // Calculate terminal value
+    const terminalValue = this.calculateTerminalValue(
+      fcfProjections[fcfProjections.length - 1],
+      assumptions.terminalGrowthRate,
+      assumptions.wacc
+    );
+
+    // Calculate present values
+    const pvOfCashFlows = this.calculatePresentValue(fcfProjections, assumptions.wacc);
+    const pvOfTerminalValue = this.calculatePresentValue([terminalValue], assumptions.wacc, assumptions.projectionYears);
+
+    // Calculate enterprise and equity values
+    const enterpriseValue = pvOfCashFlows + pvOfTerminalValue;
+    const equityValue = enterpriseValue - totalDebt + cash;
+    const pricePerShare = equityValue / sharesOutstanding;
+
+    // Calculate valuation metrics
+    const upside = currentPrice ? ((pricePerShare - currentPrice) / currentPrice) * 100 : null;
+
+    return {
+      scenarioName,
+      revenueProjections,
+      operatingProjections,
+      fcfProjections,
+      terminalValue,
+      pvOfCashFlows,
+      pvOfTerminalValue,
+      enterpriseValue,
+      equityValue,
+      pricePerShare,
+      currentPrice,
+      upside,
+      wacc: assumptions.wacc,
+      terminalGrowthRate: assumptions.terminalGrowthRate,
+      impliedMultiples: this.calculateImpliedMultiples(enterpriseValue, operatingProjections)
+    };
+  }
+
+  /**
+   * Project revenue growth over multiple years
+   * @param {number} baseRevenue - Starting revenue
+   * @param {number|Array} growthRates - Growth rate(s)
+   * @param {number} years - Number of years to project
+   * @returns {Array} Revenue projections
+   */
+  projectRevenues(baseRevenue, growthRates, years) {
+    const projections = [];
+    let currentRevenue = baseRevenue;
+
+    for (let i = 0; i < years; i++) {
+      const growthRate = Array.isArray(growthRates) 
+        ? growthRates[i] || growthRates[growthRates.length - 1]
+        : growthRates * Math.pow(0.95, i); // Declining growth rate
+
+      currentRevenue *= (1 + growthRate);
+      projections.push({
+        year: i + 1,
+        revenue: currentRevenue,
+        growthRate: growthRate
+      });
+    }
+
+    return projections;
+  }
+
+  /**
+   * Project operating metrics (EBITDA, margins, etc.)
+   * @param {Array} revenueProjections - Revenue projections
+   * @param {Object} assumptions - Model assumptions
+   * @returns {Array} Operating projections
+   */
+  projectOperatingMetrics(revenueProjections, assumptions) {
+    return revenueProjections.map((projection, index) => {
+      const ebitdaMargin = assumptions.ebitdaMargin || 0.2;
+      const ebitda = projection.revenue * ebitdaMargin;
+      const depreciation = projection.revenue * assumptions.depreciationAsPercentOfRevenue;
+      const ebit = ebitda - depreciation;
+      const taxes = ebit * assumptions.taxRate;
+      const nopat = ebit - taxes;
+
+      return {
+        ...projection,
+        ebitda,
+        ebitdaMargin,
+        depreciation,
+        ebit,
+        taxes,
+        nopat
+      };
+    });
+  }
+
+  /**
+   * Calculate free cash flows
+   * @param {Array} operatingProjections - Operating projections
+   * @param {Object} assumptions - Model assumptions
+   * @returns {Array} Free cash flow projections
+   */
+  calculateFreeCashFlows(operatingProjections, assumptions) {
+    return operatingProjections.map((projection, index) => {
+      const capex = projection.revenue * assumptions.capexAsPercentOfRevenue;
+      const nwcChange = index === 0 
+        ? projection.revenue * assumptions.nwcAsPercentOfRevenue
+        : (projection.revenue - operatingProjections[index - 1].revenue) * assumptions.nwcAsPercentOfRevenue;
+
+      const fcf = projection.nopat + projection.depreciation - capex - nwcChange;
+
+      return fcf;
+    });
+  }
+
+  /**
+   * Calculate terminal value using Gordon Growth Model
+   * @param {number} finalFCF - Final year free cash flow
+   * @param {number} terminalGrowthRate - Terminal growth rate
+   * @param {number} discountRate - Discount rate (WACC)
+   * @returns {number} Terminal value
+   */
+  calculateTerminalValue(finalFCF, terminalGrowthRate, discountRate) {
+    if (discountRate <= terminalGrowthRate) {
+      throw new Error('Discount rate must be greater than terminal growth rate');
+    }
+    return (finalFCF * (1 + terminalGrowthRate)) / (discountRate - terminalGrowthRate);
+  }
+
+  /**
+   * Calculate present value of cash flows
+   * @param {Array} cashFlows - Array of cash flows
+   * @param {number} discountRate - Discount rate
+   * @param {number} startYear - Starting year for discounting
+   * @returns {number} Present value
+   */
+  calculatePresentValue(cashFlows, discountRate, startYear = 0) {
+    return cashFlows.reduce((pv, cf, index) => {
+      const year = startYear + index + 1;
+      return pv + cf / Math.pow(1 + discountRate, year);
+    }, 0);
+  }
+
+  /**
+   * Calculate implied valuation multiples
+   * @param {number} enterpriseValue - Enterprise value
+   * @param {Array} operatingProjections - Operating projections
+   * @returns {Object} Implied multiples
+   */
+  calculateImpliedMultiples(enterpriseValue, operatingProjections) {
+    const currentYearEbitda = operatingProjections[0]?.ebitda || 0;
+    const nextYearEbitda = operatingProjections[1]?.ebitda || 0;
+
+    return {
+      evToCurrentEbitda: currentYearEbitda ? enterpriseValue / currentYearEbitda : null,
+      evToForwardEbitda: nextYearEbitda ? enterpriseValue / nextYearEbitda : null
+    };
+  }
+
+  /**
+   * Perform sensitivity analysis on key variables
+   * @param {Object} inputs - Model inputs
+   * @param {Object} baseAssumptions - Base case assumptions
+   * @returns {Object} Sensitivity analysis results
+   */
+  performDCFSensitivityAnalysis(inputs, baseAssumptions) {
+    const sensitivityVars = {
+      revenueGrowthRate: [-0.02, -0.01, 0, 0.01, 0.02],
+      wacc: [-0.005, -0.0025, 0, 0.0025, 0.005],
+      terminalGrowthRate: [-0.005, -0.0025, 0, 0.0025, 0.005],
+      ebitdaMargin: [-0.02, -0.01, 0, 0.01, 0.02]
+    };
+
+    const results = {};
+
+    Object.entries(sensitivityVars).forEach(([variable, variations]) => {
+      results[variable] = variations.map(variation => {
+        const adjustedAssumptions = {
+          ...baseAssumptions,
+          [variable]: (baseAssumptions[variable] || 0) + variation
+        };
+
+        try {
+          const scenario = this.calculateDCFScenario(inputs, adjustedAssumptions, `${variable}_${variation}`);
+          return {
+            variation,
+            pricePerShare: scenario.pricePerShare,
+            upside: scenario.upside
+          };
+        } catch (error) {
+          return {
+            variation,
+            pricePerShare: null,
+            upside: null,
+            error: error.message
+          };
+        }
+      });
+    });
+
+    return results;
+  }
+
+  /**
+   * Generate DCF model summary
+   * @param {Object} baseCase - Base case results
+   * @param {Object} scenarios - Scenario results
+   * @param {number} currentPrice - Current stock price
+   * @returns {Object} Model summary
+   */
+  generateDCFSummary(baseCase, scenarios, currentPrice) {
+    const allScenarios = [baseCase, ...Object.values(scenarios)];
+    const pricesPerShare = allScenarios.map(s => s.pricePerShare).filter(p => p !== null);
+
+    return {
+      priceRange: {
+        min: Math.min(...pricesPerShare),
+        max: Math.max(...pricesPerShare),
+        average: pricesPerShare.reduce((sum, p) => sum + p, 0) / pricesPerShare.length
+      },
+      recommendation: this.generateRecommendation(baseCase, currentPrice),
+      keyMetrics: {
+        baseCase: {
+          pricePerShare: baseCase.pricePerShare,
+          upside: baseCase.upside,
+          enterpriseValue: baseCase.enterpriseValue
+        },
+        currentPrice,
+        impliedReturn: baseCase.upside
+      }
+    };
+  }
+
+  /**
+   * Generate investment recommendation
+   * @param {Object} baseCase - Base case DCF results
+   * @param {number} currentPrice - Current stock price
+   * @returns {Object} Investment recommendation
+   */
+  generateRecommendation(baseCase, currentPrice) {
+    if (!currentPrice || !baseCase.pricePerShare) {
+      return { rating: 'INSUFFICIENT_DATA', confidence: 0 };
+    }
+
+    const upside = baseCase.upside;
+    let rating, confidence;
+
+    if (upside > 20) {
+      rating = 'STRONG_BUY';
+      confidence = Math.min(95, 70 + (upside - 20) * 1.25);
+    } else if (upside > 10) {
+      rating = 'BUY';
+      confidence = Math.min(85, 60 + (upside - 10) * 2);
+    } else if (upside > -10) {
+      rating = 'HOLD';
+      confidence = Math.min(75, 50 + Math.abs(upside) * 2.5);
+    } else if (upside > -20) {
+      rating = 'SELL';
+      confidence = Math.min(85, 60 + Math.abs(upside + 10) * 2);
+    } else {
+      rating = 'STRONG_SELL';
+      confidence = Math.min(95, 70 + Math.abs(upside + 20) * 1.25);
+    }
+
+    return {
+      rating,
+      confidence: Math.round(confidence),
+      upside,
+      reasoning: this.generateRecommendationReasoning(rating, upside)
+    };
+  }
+
+  /**
+   * Generate reasoning for investment recommendation
+   * @param {string} rating - Investment rating
+   * @param {number} upside - Upside percentage
+   * @returns {string} Recommendation reasoning
+   */
+  generateRecommendationReasoning(rating, upside) {
+    const upsideAbs = Math.abs(upside);
+    
+    switch (rating) {
+      case 'STRONG_BUY':
+        return `Strong upside potential of ${upside.toFixed(1)}% suggests significant undervaluation based on DCF analysis.`;
+      case 'BUY':
+        return `Moderate upside of ${upside.toFixed(1)}% indicates the stock is undervalued relative to intrinsic value.`;
+      case 'HOLD':
+        return `Fair valuation with ${upside >= 0 ? 'limited upside' : 'modest downside'} of ${upsideAbs.toFixed(1)}%.`;
+      case 'SELL':
+        return `Downside risk of ${upsideAbs.toFixed(1)}% suggests the stock is overvalued based on fundamental analysis.`;
+      case 'STRONG_SELL':
+        return `Significant downside of ${upsideAbs.toFixed(1)}% indicates substantial overvaluation.`;
+      default:
+        return 'Insufficient data for reliable recommendation.';
+    }
+  }
+}
+
+// Export singleton instance
+export const financialModelingEngine = new FinancialModelingEngine();
+export default FinancialModelingEngine;

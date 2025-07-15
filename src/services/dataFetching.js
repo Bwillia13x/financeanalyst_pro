@@ -2,6 +2,9 @@ import axios from 'axios';
 
 import { apiKeyValidator } from '../utils/apiKeyValidator.js';
 import { apiLogger } from '../utils/apiLogger.js';
+import { financialModelingEngine } from './financialModelingEngine.js';
+import { lboModelingEngine } from './lboModelingEngine.js';
+import { monteCarloEngine } from './monteCarloEngine.js';
 
 // Data source configurations - Updated for Vite environment variables
 const DATA_SOURCES = {
@@ -1050,6 +1053,155 @@ class DataFetchingService {
   // Add method to validate API keys on demand
   async validateApiKeys() {
     return await apiKeyValidator.validateAllKeys();
+  }
+
+  /**
+   * Build comprehensive DCF model with advanced scenarios
+   * @param {string} symbol - Stock symbol
+   * @param {Object} assumptions - Custom assumptions
+   * @param {Object} scenarios - Scenario options
+   * @returns {Promise<Object>} Complete DCF analysis
+   */
+  async buildAdvancedDCFModel(symbol, assumptions = {}, scenarios = {}) {
+    try {
+      // Fetch comprehensive company data
+      const [profile, financials, marketData] = await Promise.all([
+        this.fetchCompanyProfile(symbol),
+        this.fetchFinancialStatements(symbol, 'income-statement'),
+        this.fetchMarketData(symbol)
+      ]);
+
+      // Prepare DCF inputs
+      const dcfInputs = {
+        symbol,
+        companyName: profile.companyName || symbol,
+        currentRevenue: financials.revenue || 0,
+        currentPrice: marketData.price || 0,
+        sharesOutstanding: profile.sharesOutstanding || 0,
+        totalDebt: profile.totalDebt || 0,
+        cash: profile.cash || 0,
+        historicalGrowthRates: this.calculateHistoricalGrowthRates(financials),
+        margins: {
+          ebitdaMargin: (financials.ebitda || 0) / (financials.revenue || 1)
+        },
+        balanceSheetData: financials,
+        marketData,
+        assumptions: {
+          ...assumptions,
+          wacc: assumptions.wacc || this.calculateWACC(profile, marketData),
+          revenueGrowthRate: assumptions.revenueGrowthRate || this.estimateGrowthRate(financials)
+        }
+      };
+
+      // Build comprehensive DCF model
+      const dcfModel = financialModelingEngine.buildDCFModel(dcfInputs, scenarios);
+
+      apiLogger.log('INFO', `Advanced DCF model built for ${symbol}`, {
+        baseCase: dcfModel.baseCase.pricePerShare,
+        scenarios: Object.keys(dcfModel.scenarios).length
+      });
+
+      return dcfModel;
+
+    } catch (error) {
+      apiLogger.log('ERROR', `Failed to build DCF model for ${symbol}`, { error: error.message });
+      throw new Error(`DCF modeling failed: ${error.message}`);
+    }
+  }
+
+  /**
+   * Build comprehensive LBO model
+   * @param {string} symbol - Stock symbol
+   * @param {Object} transactionInputs - Transaction parameters
+   * @param {Object} assumptions - Custom assumptions
+   * @param {Object} scenarios - Scenario options
+   * @returns {Promise<Object>} Complete LBO analysis
+   */
+  async buildAdvancedLBOModel(symbol, transactionInputs, assumptions = {}, scenarios = {}) {
+    try {
+      // Fetch comprehensive company data
+      const [profile, financials, marketData, peerData] = await Promise.all([
+        this.fetchCompanyProfile(symbol),
+        this.fetchFinancialStatements(symbol, 'income-statement'),
+        this.fetchMarketData(symbol),
+        this.fetchPeerComparison(symbol)
+      ]);
+
+      // Prepare LBO inputs
+      const lboInputs = {
+        symbol,
+        companyName: profile.companyName || symbol,
+        purchasePrice: transactionInputs.purchasePrice || marketData.marketCap,
+        ebitda: financials.ebitda || 0,
+        revenue: financials.revenue || 0,
+        marketData,
+        peerData,
+        assumptions: {
+          ...assumptions,
+          exit: {
+            ...assumptions.exit,
+            exitMultiple: assumptions.exit?.exitMultiple || this.calculatePeerAverageMultiple(peerData)
+          }
+        }
+      };
+
+      // Build comprehensive LBO model
+      const lboModel = lboModelingEngine.buildLBOModel(lboInputs, scenarios);
+
+      apiLogger.log('INFO', `Advanced LBO model built for ${symbol}`, {
+        baseCase: lboModel.baseCase.returnsAnalysis.irr,
+        scenarios: Object.keys(lboModel.scenarios).length
+      });
+
+      return lboModel;
+
+    } catch (error) {
+      apiLogger.log('ERROR', `Failed to build LBO model for ${symbol}`, { error: error.message });
+      throw new Error(`LBO modeling failed: ${error.message}`);
+    }
+  }
+
+  /**
+   * Calculate historical growth rates from financial data
+   * @param {Object} financials - Financial statements data
+   * @returns {Array} Historical growth rates
+   */
+  calculateHistoricalGrowthRates(financials) {
+    // This would analyze historical financial data to calculate growth rates
+    // Simplified implementation for now
+    return [0.15, 0.12, 0.10, 0.08, 0.06]; // Example declining growth rates
+  }
+
+  /**
+   * Estimate growth rate based on historical data
+   * @param {Object} financials - Financial statements data
+   * @returns {number} Estimated growth rate
+   */
+  estimateGrowthRate(financials) {
+    // Simplified growth rate estimation
+    // In practice, this would analyze multiple years of data
+    return 0.10; // 10% default growth rate
+  }
+
+  /**
+   * Calculate peer average multiple
+   * @param {Object} peerData - Peer comparison data
+   * @returns {number} Average peer multiple
+   */
+  calculatePeerAverageMultiple(peerData) {
+    if (!peerData || !peerData.peers) {
+      return 10; // Default multiple
+    }
+
+    const multiples = peerData.peers
+      .map(peer => peer.evToEbitda)
+      .filter(multiple => multiple && multiple > 0);
+
+    if (multiples.length === 0) {
+      return 10;
+    }
+
+    return multiples.reduce((sum, multiple) => sum + multiple, 0) / multiples.length;
   }
 }
 

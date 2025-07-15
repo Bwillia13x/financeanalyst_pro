@@ -10,22 +10,34 @@ import DataSourceToggle from './components/DataSourceToggle';
 import MarketDataWidget from './components/MarketDataWidget';
 import SymbolSearch from './components/SymbolSearch';
 import WatchlistPanel from './components/WatchlistPanel';
+import ApiStatusPanel from './components/ApiStatusPanel';
+
+// Import real data services
+import { realTimeDataService } from '../../services/realTimeDataService';
+import { enhancedApiService } from '../../services/enhancedApiService';
+import { dataValidationService } from '../../services/dataValidationService';
 
 const RealTimeMarketDataCenter = () => {
   const [dataSources, setDataSources] = useState([
-    { id: 'bloomberg', name: 'Bloomberg', enabled: true, status: 'connected', latency: 12 },
-    { id: 'factset', name: 'FactSet', enabled: true, status: 'connected', latency: 18 },
-    { id: 'refinitiv', name: 'Refinitiv', enabled: false, status: 'warning', latency: 45 }
+    { id: 'yahoo', name: 'Yahoo Finance', enabled: true, status: 'connected', latency: 12, requiresKey: false },
+    { id: 'alpha_vantage', name: 'Alpha Vantage', enabled: false, status: 'disconnected', latency: 25, requiresKey: true },
+    { id: 'fmp', name: 'Financial Modeling Prep', enabled: false, status: 'disconnected', latency: 18, requiresKey: true },
+    { id: 'sec_edgar', name: 'SEC EDGAR', enabled: true, status: 'connected', latency: 45, requiresKey: false }
   ]);
 
   const [connectionHealth, setConnectionHealth] = useState({
-    overall: 'excellent',
+    overall: 'good',
     sources: {
-      bloomberg: 'connected',
-      factset: 'connected',
-      refinitiv: 'warning'
+      yahoo: 'connected',
+      alpha_vantage: 'disconnected',
+      fmp: 'disconnected',
+      sec_edgar: 'connected'
     }
   });
+
+  const [realDataEnabled, setRealDataEnabled] = useState(false);
+  const [apiHealthStatus, setApiHealthStatus] = useState({});
+  const [dataQuality, setDataQuality] = useState({});
 
   const [widgets, setWidgets] = useState([
     {
@@ -125,29 +137,113 @@ const RealTimeMarketDataCenter = () => {
   const [refreshInterval, setRefreshInterval] = useState(5000);
   const [isAutoRefresh, setIsAutoRefresh] = useState(true);
 
-  // Simulate real-time updates
+  // Initialize real data services and check API health
+  useEffect(() => {
+    const initializeRealData = async () => {
+      try {
+        // Check API health status
+        const healthStatus = enhancedApiService.getSourceHealthStatus();
+        setApiHealthStatus(healthStatus);
+
+        // Update data sources based on API availability
+        setDataSources(prevSources =>
+          prevSources.map(source => {
+            const health = healthStatus[source.id.toUpperCase()];
+            if (health) {
+              return {
+                ...source,
+                enabled: health.hasValidApiKey || !health.requiresApiKey,
+                status: health.hasValidApiKey || !health.requiresApiKey ? 'connected' : 'disconnected'
+              };
+            }
+            return source;
+          })
+        );
+
+        // Enable real data if we have at least one working API
+        const hasWorkingApi = Object.values(healthStatus).some(
+          health => health.hasValidApiKey || !health.requiresApiKey
+        );
+        setRealDataEnabled(hasWorkingApi);
+
+      } catch (error) {
+        console.error('Failed to initialize real data services:', error);
+      }
+    };
+
+    initializeRealData();
+  }, []);
+
+  // Real-time updates with actual data or simulation
   useEffect(() => {
     if (!isAutoRefresh) return;
 
-    const interval = setInterval(() => {
-      setWidgets(prevWidgets =>
-        prevWidgets.map(widget => ({
-          ...widget,
-          currentValue: widget.currentValue + (Math.random() - 0.5) * 2,
-          change: (Math.random() - 0.5) * 5,
-          changePercent: (Math.random() - 0.5) * 2,
-          lastUpdate: new Date(),
-          sparklineData: [
-            ...widget.sparklineData.slice(1),
-            widget.currentValue + (Math.random() - 0.5) * 2
-          ]
-        }))
-      );
+    const interval = setInterval(async () => {
+      if (realDataEnabled) {
+        // Fetch real data for each widget
+        const updatedWidgets = await Promise.all(
+          widgets.map(async (widget) => {
+            try {
+              const marketData = await enhancedApiService.fetchRealTimeMarketData(widget.symbol);
+              const validation = dataValidationService.validateData(marketData, 'marketData');
+
+              return {
+                ...widget,
+                currentValue: marketData.currentPrice,
+                change: marketData.change,
+                changePercent: marketData.changePercent,
+                dayHigh: marketData.dayHigh,
+                dayLow: marketData.dayLow,
+                volume: marketData.volume,
+                lastUpdate: new Date(),
+                source: marketData.source,
+                dataQuality: validation.qualityScore,
+                sparklineData: [
+                  ...widget.sparklineData.slice(1),
+                  marketData.currentPrice
+                ]
+              };
+            } catch (error) {
+              console.warn(`Failed to fetch real data for ${widget.symbol}, using simulation:`, error);
+              // Fallback to simulation
+              return {
+                ...widget,
+                currentValue: widget.currentValue + (Math.random() - 0.5) * 2,
+                change: (Math.random() - 0.5) * 5,
+                changePercent: (Math.random() - 0.5) * 2,
+                lastUpdate: new Date(),
+                source: 'Simulation',
+                sparklineData: [
+                  ...widget.sparklineData.slice(1),
+                  widget.currentValue + (Math.random() - 0.5) * 2
+                ]
+              };
+            }
+          })
+        );
+        setWidgets(updatedWidgets);
+      } else {
+        // Fallback to simulation
+        setWidgets(prevWidgets =>
+          prevWidgets.map(widget => ({
+            ...widget,
+            currentValue: widget.currentValue + (Math.random() - 0.5) * 2,
+            change: (Math.random() - 0.5) * 5,
+            changePercent: (Math.random() - 0.5) * 2,
+            lastUpdate: new Date(),
+            source: 'Simulation',
+            sparklineData: [
+              ...widget.sparklineData.slice(1),
+              widget.currentValue + (Math.random() - 0.5) * 2
+            ]
+          }))
+        );
+      }
       setLastUpdate('Just now');
     }, refreshInterval);
 
     return () => clearInterval(interval);
-  }, [refreshInterval, isAutoRefresh]);
+  }, [refreshInterval, isAutoRefresh, realDataEnabled, widgets]);
 
   const handleDataSourceToggle = sourceId => {
     setDataSources(prev =>
@@ -157,23 +253,67 @@ const RealTimeMarketDataCenter = () => {
     );
   };
 
-  const handleSymbolSelect = symbol => {
-    const newWidget = {
-      id: `widget-${Date.now()}`,
-      symbol: symbol.symbol,
-      name: symbol.name,
-      currentValue: Math.random() * 1000 + 50,
-      change: (Math.random() - 0.5) * 10,
-      changePercent: (Math.random() - 0.5) * 5,
-      valueType: 'currency',
-      dayHigh: Math.random() * 1000 + 60,
-      dayLow: Math.random() * 1000 + 40,
-      volume: Math.floor(Math.random() * 100000000),
-      source: 'Bloomberg',
-      lastUpdate: new Date(),
-      sparklineData: Array.from({ length: 6 }, () => Math.random() * 1000 + 50)
-    };
-    setWidgets(prev => [...prev, newWidget]);
+  const handleSymbolSelect = async (symbol) => {
+    try {
+      let marketData;
+      let source = 'Simulation';
+      let dataQuality = 75;
+
+      if (realDataEnabled) {
+        try {
+          marketData = await enhancedApiService.fetchRealTimeMarketData(symbol.symbol);
+          const validation = dataValidationService.validateData(marketData, 'marketData');
+          source = marketData.source;
+          dataQuality = validation.qualityScore;
+        } catch (error) {
+          console.warn(`Failed to fetch real data for ${symbol.symbol}, using simulation:`, error);
+          marketData = null;
+        }
+      }
+
+      const newWidget = {
+        id: `widget-${Date.now()}`,
+        symbol: symbol.symbol,
+        name: symbol.name,
+        currentValue: marketData?.currentPrice || Math.random() * 1000 + 50,
+        change: marketData?.change || (Math.random() - 0.5) * 10,
+        changePercent: marketData?.changePercent || (Math.random() - 0.5) * 5,
+        valueType: 'currency',
+        dayHigh: marketData?.dayHigh || Math.random() * 1000 + 60,
+        dayLow: marketData?.dayLow || Math.random() * 1000 + 40,
+        volume: marketData?.volume || Math.floor(Math.random() * 100000000),
+        source,
+        dataQuality,
+        lastUpdate: new Date(),
+        sparklineData: Array.from({ length: 6 }, () =>
+          marketData?.currentPrice || Math.random() * 1000 + 50
+        )
+      };
+
+      setWidgets(prev => [...prev, newWidget]);
+
+      // Subscribe to real-time updates for this symbol
+      if (realDataEnabled) {
+        realTimeDataService.subscribe(symbol.symbol, 'marketData', (data) => {
+          setWidgets(prevWidgets =>
+            prevWidgets.map(widget =>
+              widget.symbol === symbol.symbol
+                ? {
+                    ...widget,
+                    currentValue: data.currentPrice,
+                    change: data.change,
+                    changePercent: data.changePercent,
+                    lastUpdate: new Date(data.timestamp),
+                    source: data.source
+                  }
+                : widget
+            )
+          );
+        });
+      }
+    } catch (error) {
+      console.error('Error adding symbol:', error);
+    }
   };
 
   const handleAddToWatchlist = symbol => {
@@ -304,6 +444,14 @@ const RealTimeMarketDataCenter = () => {
                 onBulkExport={handleBulkExport}
                 onBulkAlert={handleBulkAlert}
                 onBulkHistorical={handleBulkHistorical}
+              />
+
+              {/* API Status & Data Quality */}
+              <ApiStatusPanel
+                apiHealthStatus={apiHealthStatus}
+                realDataEnabled={realDataEnabled}
+                dataSources={dataSources}
+                dataQuality={dataQuality}
               />
             </div>
 
