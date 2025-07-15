@@ -1,5 +1,5 @@
-import Icon from 'components/AppIcon';
-import Button from 'components/ui/Button';
+import Icon from '../components/AppIcon.jsx';
+import Button from '../components/ui/Button.jsx';
 import { useNavigate } from 'react-router-dom';
 
 const NotFound = () => {

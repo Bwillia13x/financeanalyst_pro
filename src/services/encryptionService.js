@@ -4,6 +4,7 @@
  */
 
 import { apiLogger } from '../utils/apiLogger.js';
+import { cryptoUtils } from '../utils/cryptoUtils.js';
 
 // Encryption configuration
 const ENCRYPTION_CONFIG = {
@@ -56,7 +57,11 @@ class EncryptionService {
    * Check if Web Crypto API is supported
    */
   checkCryptoSupport() {
-    return !!(window.crypto && window.crypto.subtle);
+    try {
+      return !!cryptoUtils.subtle;
+    } catch (e) {
+      return false;
+    }
   }
 
   /**
@@ -84,14 +89,14 @@ class EncryptionService {
    */
   async deriveKeyFromPassword(password, salt = null) {
     if (!salt) {
-      salt = window.crypto.getRandomValues(new Uint8Array(ENCRYPTION_CONFIG.saltLength));
+      salt = cryptoUtils.getRandomValues(new Uint8Array(ENCRYPTION_CONFIG.saltLength));
     }
 
     const encoder = new TextEncoder();
     const passwordBuffer = encoder.encode(password);
 
     // Import password as key material
-    const keyMaterial = await window.crypto.subtle.importKey(
+    const keyMaterial = await cryptoUtils.subtle.importKey(
       'raw',
       passwordBuffer,
       { name: 'PBKDF2' },
@@ -100,7 +105,7 @@ class EncryptionService {
     );
 
     // Derive actual encryption key
-    const key = await window.crypto.subtle.deriveKey(
+    const key = await cryptoUtils.subtle.deriveKey(
       {
         name: 'PBKDF2',
         salt: salt,
@@ -127,7 +132,7 @@ class EncryptionService {
       throw new Error('Encryption not supported');
     }
 
-    return await window.crypto.subtle.generateKey(
+    return await cryptoUtils.subtle.generateKey(
       {
         name: ENCRYPTION_CONFIG.algorithm,
         length: ENCRYPTION_CONFIG.keyLength
@@ -157,10 +162,10 @@ class EncryptionService {
       const dataBuffer = encoder.encode(dataString);
 
       // Generate random IV
-      const iv = window.crypto.getRandomValues(new Uint8Array(ENCRYPTION_CONFIG.ivLength));
+      const iv = cryptoUtils.getRandomValues(new Uint8Array(ENCRYPTION_CONFIG.ivLength));
 
       // Encrypt data
-      const encryptedBuffer = await window.crypto.subtle.encrypt(
+      const encryptedBuffer = await cryptoUtils.subtle.encrypt(
         {
           name: ENCRYPTION_CONFIG.algorithm,
           iv: iv
@@ -211,7 +216,7 @@ class EncryptionService {
       const data = encryptedBuffer.slice(ENCRYPTION_CONFIG.ivLength);
 
       // Decrypt data
-      const decryptedBuffer = await window.crypto.subtle.decrypt(
+      const decryptedBuffer = await cryptoUtils.subtle.decrypt(
         {
           name: ENCRYPTION_CONFIG.algorithm,
           iv: iv
@@ -398,7 +403,7 @@ class EncryptionService {
       const dataString = typeof data === 'string' ? data : JSON.stringify(data);
       const dataBuffer = encoder.encode(dataString);
 
-      const hashBuffer = await window.crypto.subtle.digest('SHA-256', dataBuffer);
+      const hashBuffer = await cryptoUtils.subtle.digest('SHA-256', dataBuffer);
       const hashArray = new Uint8Array(hashBuffer);
       
       return btoa(String.fromCharCode(...hashArray));
@@ -430,7 +435,7 @@ class EncryptionService {
     } else if (data instanceof ArrayBuffer || data instanceof Uint8Array) {
       // Overwrite buffer with random data
       const view = new Uint8Array(data);
-      window.crypto.getRandomValues(view);
+      cryptoUtils.getRandomValues(view);
     }
   }
 
@@ -447,7 +452,7 @@ class EncryptionService {
       throw new Error('No key to export');
     }
 
-    const exported = await window.crypto.subtle.exportKey('raw', exportKey);
+    const exported = await cryptoUtils.subtle.exportKey('raw', exportKey);
     return btoa(String.fromCharCode(...new Uint8Array(exported)));
   }
 
@@ -461,7 +466,7 @@ class EncryptionService {
 
     const keyBuffer = Uint8Array.from(atob(keyData), c => c.charCodeAt(0));
     
-    return await window.crypto.subtle.importKey(
+    return await cryptoUtils.subtle.importKey(
       'raw',
       keyBuffer,
       {

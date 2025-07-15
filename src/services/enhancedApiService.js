@@ -1,7 +1,30 @@
-import axios from 'axios';
 import { API_CONFIG, DATA_SOURCE_PRIORITY } from './apiConfig.js';
 import { apiLogger } from '../utils/apiLogger.js';
 import { dataFetchingService } from './dataFetching.js';
+
+class RateLimiter {
+  constructor(requestsPerInterval, interval) {
+    this.requestsPerInterval = requestsPerInterval;
+    this.interval = interval;
+    this.requestTimestamps = [];
+  }
+
+  async acquire() {
+    const now = Date.now();
+
+    this.requestTimestamps = this.requestTimestamps.filter(
+      (timestamp) => now - timestamp < this.interval
+    );
+
+    if (this.requestTimestamps.length >= this.requestsPerInterval) {
+      const timeToWait = this.interval - (now - this.requestTimestamps[0]);
+      await new Promise(resolve => setTimeout(resolve, timeToWait));
+      return this.acquire();
+    }
+
+    this.requestTimestamps.push(now);
+  }
+}
 
 /**
  * Enhanced API service with intelligent data source selection and fallbacks
@@ -13,9 +36,12 @@ class EnhancedApiService {
     this.sourceHealth = new Map();
     this.lastRequests = new Map();
     this.apiKeys = this.loadApiKeys();
+    this.cache = new Map();
+    this.rateLimitInfo = { remaining: null, reset: null };
     
     // Initialize source health tracking
     this.initializeSourceHealth();
+    this.rateLimiters.set('default', new RateLimiter(5, 1000));
   }
 
   /**
@@ -154,8 +180,7 @@ class EnhancedApiService {
    * @returns {Promise<Object>} Raw data from Yahoo Finance
    */
   async fetchFromYahooFinance(symbol, options = {}) {
-    const config = API_CONFIG.YAHOO_FINANCE;
-    const url = `${config.baseURL}/${symbol}`;
+    const url = `/v8/finance/chart/${symbol}`;
     
     const params = {
       range: options.range || '1d',
@@ -164,19 +189,27 @@ class EnhancedApiService {
       events: 'div,splits'
     };
 
-    const response = await axios.get(url, {
-      params,
-      timeout: 10000,
+    const fullUrl = new URL(url, 'http://localhost:3000');
+    fullUrl.search = new URLSearchParams(params).toString();
+
+    const response = await fetch(fullUrl.pathname + fullUrl.search, {
+      signal: AbortSignal.timeout(10000),
       headers: {
         'User-Agent': 'FinanceAnalyst-Pro/1.0'
       }
     });
 
-    if (!response.data?.chart?.result?.[0]) {
+    if (!response.ok) {
+      throw new Error(`Yahoo Finance API request failed with status ${response.status}`);
+    }
+
+    const responseData = await response.json();
+
+    if (!responseData?.chart?.result?.[0]) {
       throw new Error(`No data found for symbol: ${symbol}`);
     }
 
-    return response.data.chart.result[0];
+    return responseData.chart.result[0];
   }
 
   /**
@@ -200,21 +233,29 @@ class EnhancedApiService {
       ...options.params
     };
 
-    const response = await axios.get(config.baseURL, {
-      params,
-      timeout: 15000
+    const fullUrl = new URL(config.baseURL);
+    fullUrl.search = new URLSearchParams(params).toString();
+
+    const response = await fetch(fullUrl, {
+      signal: AbortSignal.timeout(15000)
     });
 
+    if (!response.ok) {
+      throw new Error(`Alpha Vantage API request failed with status ${response.status}`);
+    }
+
+    const responseData = await response.json();
+
     // Check for API errors
-    if (response.data['Error Message']) {
-      throw new Error(`Alpha Vantage error: ${response.data['Error Message']}`);
+    if (responseData['Error Message']) {
+      throw new Error(`Alpha Vantage error: ${responseData['Error Message']}`);
     }
 
-    if (response.data['Note']) {
-      throw new Error(`Alpha Vantage rate limit: ${response.data['Note']}`);
+    if (responseData['Note']) {
+      throw new Error(`Alpha Vantage rate limit: ${responseData['Note']}`);
     }
 
-    return response.data;
+    return responseData;
   }
 
   /**
@@ -392,6 +433,254 @@ class EnhancedApiService {
       }
     });
     return Array.from(sources);
+  }
+
+  // Additional API methods expected by tests
+
+  /**
+   * Configuration properties
+   */
+  baseUrl = 'https://api.example.com';
+  defaultHeaders = {};
+  timeout = 10000;
+  authToken = null;
+  cacheTTL = 300000; // 5 minutes
+  requestInterceptors = [];
+  responseInterceptors = [];
+  metrics = {
+    totalRequests: 0,
+    successfulRequests: 0,
+    failedRequests: 0,
+    avgResponseTime: 0
+  };
+
+  /**
+   * Make a generic API request
+   * @param {string} url - Request URL
+   * @param {Object} options - Request options
+   * @returns {Promise<Object>} Response data
+   */
+  async request(url, options = {}) {
+    const startTime = Date.now();
+    this.metrics.totalRequests++;
+
+    const limiter = this.rateLimiters.get('default');
+    await limiter.acquire();
+
+    const fullUrl = url.startsWith('http') ? url : `${this.baseUrl}${url}`;
+
+    const cacheKey = fullUrl;
+    if (this.cache.has(cacheKey)) {
+      const cached = this.cache.get(cacheKey);
+      if (Date.now() - cached.timestamp < this.cacheTTL) {
+        this.metrics.successfulRequests++;
+        return cached.data;
+      }
+    }
+
+    try {
+      let config = {
+        method: 'GET',
+        headers: { ...this.defaultHeaders },
+        ...options,
+      };
+
+      if (this.authToken) {
+        config.headers.Authorization = `Bearer ${this.authToken}`;
+      }
+
+      for (const interceptor of this.requestInterceptors) {
+        config = await interceptor(config);
+      }
+      
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), this.timeout);
+      config.signal = controller.signal;
+
+      const response = await fetch(fullUrl, config);
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        const errorData = await response.text();
+        throw new Error(`HTTP error! status: ${response.status}, body: ${errorData}`);
+      }
+
+      this.rateLimitInfo.remaining = parseInt(response.headers.get('X-RateLimit-Remaining'), 10);
+      this.rateLimitInfo.reset = parseInt(response.headers.get('X-RateLimit-Reset'), 10);
+      
+      let responseData = await response.json();
+
+      for (const interceptor of this.responseInterceptors) {
+        responseData = await interceptor(responseData, response);
+      }
+
+      this.cache.set(cacheKey, { data: responseData, timestamp: Date.now() });
+
+      const responseTime = Date.now() - startTime;
+      this.metrics.successfulRequests++;
+      this.metrics.avgResponseTime = (this.metrics.avgResponseTime + responseTime) / 2;
+
+      return responseData;
+    } catch (error) {
+      this.metrics.failedRequests++;
+      throw error;
+    }
+  }
+
+  /**
+   * Set authentication token
+   * @param {string} token - Auth token
+   */
+  setAuthToken(token) {
+    this.authToken = token;
+  }
+
+  /**
+   * Set cache TTL
+   * @param {number} ttl - Time to live in milliseconds
+   */
+  setCacheTTL(ttl) {
+    this.cacheTTL = ttl;
+  }
+
+  /**
+   * Batch multiple requests
+   * @param {Array} requests - Array of request configs or URLs
+   * @returns {Promise<Array>} Array of responses
+   */
+  async batchRequests(requests) {
+    const promises = requests.map(req => {
+      if (typeof req === 'string') {
+        return this.request(req);
+      }
+      return this.request(req.url, req.options);
+    });
+
+    const results = await Promise.allSettled(promises);
+
+    return results.map(result => {
+      if (result.status === 'fulfilled') {
+        return result.value;
+      }
+      return result.reason;
+    });
+  }
+
+  /**
+   * Add request interceptor
+   * @param {Function} interceptor - Interceptor function
+   */
+  addRequestInterceptor(interceptor) {
+    this.requestInterceptors.push(interceptor);
+  }
+
+  /**
+   * Add response interceptor
+   * @param {Function} interceptor - Interceptor function
+   */
+  addResponseInterceptor(interceptor) {
+    this.responseInterceptors.push(interceptor);
+  }
+
+  /**
+   * Make request with retry logic
+   * @param {string} url - Request URL
+   * @param {Object} options - Request options
+   * @param {number} retries - Number of retries
+   * @returns {Promise<Object>} Response data
+   */
+  async requestWithRetry(url, options = {}, retries = 3) {
+    let lastError;
+    
+    for (let i = 0; i <= retries; i++) {
+      try {
+        return await this.request(url, options);
+      } catch (error) {
+        lastError = error;
+        if (i < retries) {
+          const delay = Math.pow(2, i) * 100; // Exponential backoff
+          await new Promise(resolve => setTimeout(resolve, delay));
+        }
+      }
+    }
+    
+    throw lastError;
+  }
+
+  /**
+   * Set base URL
+   * @param {string} url - Base URL
+   */
+  setBaseUrl(url) {
+    this.baseUrl = url;
+  }
+
+  /**
+   * Get base URL
+   * @returns {string} Base URL
+   */
+  getBaseUrl() {
+    return this.baseUrl;
+  }
+
+  /**
+   * Set default headers
+   * @param {Object} headers - Default headers
+   */
+  setDefaultHeaders(headers) {
+    this.defaultHeaders = { ...headers };
+  }
+
+  /**
+   * Get default headers
+   * @returns {Object} Default headers
+   */
+  getDefaultHeaders() {
+    return { ...this.defaultHeaders };
+  }
+
+  /**
+   * Set timeout
+   * @param {number} timeout - Timeout in milliseconds
+   */
+  setTimeout(timeout) {
+    this.timeout = timeout;
+  }
+
+  /**
+   * Get timeout
+   * @returns {number} Timeout in milliseconds
+   */
+  getTimeout() {
+    return this.timeout;
+  }
+
+  /**
+   * Get metrics
+   * @returns {Object} Request metrics
+   */
+  getMetrics() {
+    return { ...this.metrics };
+  }
+
+  /**
+   * Reset metrics
+   */
+  resetMetrics() {
+    this.metrics = {
+      totalRequests: 0,
+      successfulRequests: 0,
+      failedRequests: 0,
+      avgResponseTime: 0
+    };
+  }
+
+  getRateLimitInfo() {
+    return this.rateLimitInfo;
+  }
+
+  clearCache() {
+    this.cache.clear();
   }
 }
 

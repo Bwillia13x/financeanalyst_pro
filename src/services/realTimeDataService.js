@@ -68,6 +68,7 @@ class RealTimeDataService {
         if (subscribers.size === 0) {
           const [symbol, dataType] = key.split('_');
           this.stopStream(symbol, dataType);
+          this.subscribers.delete(key); // Remove the key if no subscribers are left
         }
         
         apiLogger.log('INFO', `Unsubscribed from ${key}`, {
