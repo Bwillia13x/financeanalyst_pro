@@ -45,6 +45,53 @@ class DataValidationService {
           pb: { min: 0, max: 100 },
           beta: { min: -5, max: 5 }
         }
+      },
+      dcfModel: {
+        required: ['cashFlows', 'discountRate'],
+        numeric: ['discountRate', 'terminalGrowthRate', 'years'],
+        custom: (data) => {
+          const errors = [];
+          if (!Array.isArray(data.cashFlows) || data.cashFlows.length === 0) {
+            errors.push('Cash flows must be a non-empty array');
+          }
+          if (data.discountRate < 0) {
+            errors.push('Discount rate must be non-negative');
+          }
+          return { errors, warnings: [] };
+        }
+      },
+      lboModel: {
+        required: ['purchasePrice', 'debtFinancing', 'equityFinancing'],
+        numeric: ['purchasePrice', 'debtFinancing', 'equityFinancing', 'exitMultiple', 'holdingPeriod'],
+        custom: (data) => {
+          const errors = [];
+          const warnings = [];
+          if (data.debtFinancing && data.equityFinancing && data.purchasePrice) {
+            const total = data.debtFinancing + data.equityFinancing;
+            if (Math.abs(total - data.purchasePrice) > 0.01) {
+              errors.push('Debt + Equity must equal purchase price');
+            }
+            const debtRatio = data.debtFinancing / data.purchasePrice;
+            if (debtRatio > 0.9) {
+              warnings.push('High leverage ratio detected');
+            }
+          }
+          return { errors, warnings };
+        }
+      },
+      stockData: {
+        required: ['symbol', 'price'],
+        numeric: ['price', 'volume', 'change', 'changePercent'],
+        custom: (data) => {
+          const errors = [];
+          if (!data.symbol || typeof data.symbol !== 'string' || data.symbol.trim() === '') {
+            errors.push('Symbol is required and must be a non-empty string');
+          }
+          if (typeof data.price !== 'number' || data.price < 0) {
+            errors.push('Price must be a positive number');
+          }
+          return { errors, warnings: [] };
+        }
       }
     };
   }
@@ -56,13 +103,14 @@ class DataValidationService {
    * @returns {Object} Validation result
    */
   validateData(data, dataType) {
-    const rules = this.validationRules[dataType];
-    if (!rules) {
-      return { isValid: false, errors: [`Unknown data type: ${dataType}`] };
-    }
+    try {
+      const rules = this.validationRules[dataType];
+      if (!rules) {
+        return { isValid: false, errors: [`Unknown data type: ${dataType}`] };
+      }
 
-    const errors = [];
-    const warnings = [];
+      const errors = [];
+      const warnings = [];
 
     // Check required fields
     for (const field of rules.required || []) {
@@ -101,6 +149,13 @@ class DataValidationService {
     errors.push(...businessValidation.errors);
     warnings.push(...businessValidation.warnings);
 
+    // Custom validation function
+    if (rules.custom) {
+      const customValidation = rules.custom(data);
+      errors.push(...(customValidation.errors || []));
+      warnings.push(...(customValidation.warnings || []));
+    }
+
     const isValid = errors.length === 0;
 
     // Log validation results
@@ -116,6 +171,9 @@ class DataValidationService {
       warnings,
       qualityScore: this.calculateQualityScore(errors, warnings)
     };
+    } catch (error) {
+      return { isValid: false, errors: ['An unexpected error occurred during validation.'], warnings: [] };
+    }
   }
 
   /**
@@ -368,6 +426,101 @@ class DataValidationService {
     if (ageMinutes < 240) return 70;
     if (ageMinutes < 1440) return 60;
     return 40;
+  }
+
+
+  /**
+   * Sanitize input string
+   * @param {any} input - Input to sanitize
+   * @returns {string} Sanitized string
+   */
+  sanitizeInput(input) {
+    if (input === null || input === undefined) {
+      return '';
+    }
+
+    const str = String(input);
+    return str
+      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+      .replace(/<[^>]*>/g, '')
+      .replace(/javascript:/gi, '')
+      .replace(/on\w+\s*=/gi, '');
+  }
+
+  /**
+   * Check if number is in range
+   * @param {number} value - Value to check
+   * @param {number} min - Minimum value
+   * @param {number} max - Maximum value
+   * @returns {boolean} True if in range
+   */
+  isInRange(value, min, max) {
+    return typeof value === 'number' && value >= min && value <= max;
+  }
+
+  /**
+   * Check if value is valid percentage (0-1)
+   * @param {number} value - Value to check
+   * @returns {boolean} True if valid percentage
+   */
+  isValidPercentage(value) {
+    return typeof value === 'number' && value >= 0 && value <= 1;
+  }
+
+  /**
+   * Check if value is a valid number
+   * @param {any} value - Value to check
+   * @returns {boolean} True if valid number
+   */
+  isValidNumber(value) {
+    return typeof value === 'number' && !isNaN(value) && isFinite(value);
+  }
+
+  /**
+   * Check if value is a valid array
+   * @param {any} value - Value to check
+   * @returns {boolean} True if valid array
+   */
+  isValidArray(value) {
+    return Array.isArray(value);
+  }
+
+  /**
+   * Check if value is a valid object
+   * @param {any} value - Value to check
+   * @returns {boolean} True if valid object
+   */
+  isValidObject(value) {
+    return value !== null && typeof value === 'object' && !Array.isArray(value);
+  }
+
+  /**
+   * Validate financial ratios
+   * @param {Object} ratios - Financial ratios to validate
+   * @returns {Object} Validation result
+   */
+  validateFinancialRatios(ratios) {
+    const errors = [];
+    const warnings = [];
+
+    // Check for concerning ratios
+    if (ratios.currentRatio < 1.0) {
+      warnings.push('Current ratio below 1.0 indicates potential liquidity issues');
+    }
+
+    if (ratios.debtToEquity > 2.0) {
+      warnings.push('High debt-to-equity ratio indicates high leverage');
+    }
+
+    if (ratios.returnOnEquity < 0) {
+      warnings.push('Negative return on equity indicates poor performance');
+    }
+
+    return {
+      isValid: errors.length === 0,
+      errors,
+      warnings
+    };
   }
 }
 
