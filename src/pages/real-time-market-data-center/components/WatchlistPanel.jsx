@@ -78,10 +78,10 @@ const WatchlistPanel = ({ watchlist, onRemoveFromWatchlist, onSelectSymbol }) =>
               className={`
                 flex items-center space-x-1 px-2 py-1 rounded transition-smooth
                 ${
-                  sortBy === field
-                    ? 'bg-primary text-primary-foreground'
-                    : 'text-muted-foreground hover:text-foreground'
-                }
+            sortBy === field
+              ? 'bg-primary text-primary-foreground'
+              : 'text-muted-foreground hover:text-foreground'
+            }
               `}
             >
               <span className="capitalize">{field}</span>

@@ -1,4 +1,4 @@
-import { apiLogger } from '../utils/apiLogger.js';
+// import { apiLogger } from '../utils/apiLogger.js';
 
 /**
  * Advanced LBO (Leveraged Buyout) Modeling Engine
@@ -61,9 +61,9 @@ class LBOModelingEngine {
       companyName,
       purchasePrice,
       ebitda,
-      revenue,
-      marketData = {},
-      peerData = {},
+      _revenue,
+      _marketData = {},
+      _peerData = {},
       assumptions = {}
     } = inputs;
 
@@ -284,7 +284,7 @@ class LBOModelingEngine {
 
       const ebitdaMargin = currentEbitda / currentRevenue;
       const capex = currentRevenue * operatingAssumptions.capexAsPercentOfRevenue;
-      const nwcChange = year === 1 
+      const nwcChange = year === 1
         ? currentRevenue * operatingAssumptions.nwcAsPercentOfRevenue
         : (currentRevenue - projections[year - 2].revenue) * operatingAssumptions.nwcAsPercentOfRevenue;
 
@@ -321,7 +321,7 @@ class LBOModelingEngine {
 
     for (let year = 1; year <= years; year++) {
       const projection = operatingProjections[year - 1];
-      
+
       // Calculate interest expense
       const seniorInterest = seniorDebtBalance * debtAssumptions.seniorInterestRate;
       const subordinatedInterest = subordinatedDebtBalance * debtAssumptions.subordinatedInterestRate;
@@ -329,7 +329,7 @@ class LBOModelingEngine {
 
       // Calculate available cash for debt paydown
       const cashAvailableForDebt = projection.unleveredFCF - totalInterest;
-      
+
       // Mandatory amortization
       const mandatoryPaydown = Math.min(
         seniorDebtBalance * debtAssumptions.mandatoryPaydown,
@@ -388,7 +388,7 @@ class LBOModelingEngine {
   calculateEquityCashFlows(operatingProjections, debtSchedule, assumptions) {
     return operatingProjections.map((projection, index) => {
       const debt = debtSchedule[index];
-      const managementFees = assumptions.fees.managementFeeRate * 
+      const managementFees = assumptions.fees.managementFeeRate *
         (assumptions.transaction.sponsorEquity || 0);
 
       const cashFlowToEquity = debt.excessCash - managementFees;
@@ -415,7 +415,7 @@ class LBOModelingEngine {
   calculateExitAnalysis(finalYearProjection, finalYearDebt, transactionStructure, assumptions) {
     const exitMultiple = assumptions.exit.exitMultiple || 10;
     const exitEbitda = finalYearProjection.ebitda;
-    
+
     const enterpriseValue = exitEbitda * exitMultiple;
     const totalDebtAtExit = finalYearDebt.endingBalance.total;
     const grossProceeds = enterpriseValue - totalDebtAtExit;
@@ -596,8 +596,8 @@ class LBOModelingEngine {
 
     Object.entries(sensitivityVars).forEach(([variable, variations]) => {
       results[variable] = variations.map(variation => {
-        let adjustedAssumptions = { ...baseAssumptions };
-        
+        const adjustedAssumptions = { ...baseAssumptions };
+
         if (variable === 'ebitdaGrowthRate') {
           adjustedAssumptions.operating.ebitdaGrowthRate += variation;
         } else if (variable === 'exitMultiple') {
@@ -674,7 +674,7 @@ class LBOModelingEngine {
     if (irr > 0.2) {
       highlights.push(`Strong projected IRR of ${(irr * 100).toFixed(1)}%`);
     }
-    
+
     if (moic > 2.5) {
       highlights.push(`Attractive multiple of ${moic.toFixed(1)}x invested capital`);
     }

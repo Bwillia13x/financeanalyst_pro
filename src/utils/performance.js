@@ -1,3 +1,4 @@
+import React from 'react';
 /**
  * Performance monitoring and optimization utilities
  */
@@ -31,7 +32,10 @@ export class PerformanceMonitor {
     const metric = this.metrics.get(name);
 
     if (!metric) {
-      console.warn(`No start time found for metric: ${name}`);
+      if (!import.meta.env.PROD) {
+        // eslint-disable-next-line no-console
+        console.warn(`No start time found for metric: ${name}`);
+      }
       return null;
     }
 
@@ -150,7 +154,10 @@ export class PerformanceMonitor {
 
   // Report metric to console and external services
   reportMetric(name, value) {
-    console.log(`Performance Metric - ${name}: ${value.toFixed(2)}ms`);
+    if (!import.meta.env.PROD) {
+      // eslint-disable-next-line no-console
+      console.log(`Performance Metric - ${name}: ${value.toFixed(2)}ms`);
+    }
 
     // Send to analytics service in production
     if (import.meta.env.PROD && import.meta.env.VITE_ANALYTICS_ENDPOINT) {
@@ -174,7 +181,10 @@ export class PerformanceMonitor {
         })
       });
     } catch (error) {
-      console.warn('Failed to send performance metric:', error);
+      if (!import.meta.env.PROD) {
+        // eslint-disable-next-line no-console
+        console.warn('Failed to send performance metric:', error);
+      }
     }
   }
 
@@ -225,7 +235,7 @@ export const getBundleInfo = () => {
 // React component performance wrapper
 export const withPerformanceMonitoring = (WrappedComponent, componentName) => {
   return function PerformanceMonitoredComponent(props) {
-    const monitor = new PerformanceMonitor();
+    const monitor = React.useMemo(() => new PerformanceMonitor(), []);
 
     React.useEffect(() => {
       monitor.startTiming(`${componentName}-mount`);
@@ -235,12 +245,15 @@ export const withPerformanceMonitoring = (WrappedComponent, componentName) => {
         const metric = monitor.getMetric(`${componentName}-mount`);
         if (metric && metric.duration > 100) {
           // Warn if mount takes > 100ms
-          console.warn(
-            `Slow component mount: ${componentName} took ${metric.duration.toFixed(2)}ms`
-          );
+          if (!import.meta.env.PROD) {
+            // eslint-disable-next-line no-console
+            console.warn(
+              `Slow component mount: ${componentName} took ${metric.duration.toFixed(2)}ms`
+            );
+          }
         }
       };
-    }, []);
+    }, [monitor]);
 
     return React.createElement(WrappedComponent, props);
   };
@@ -264,7 +277,7 @@ export const debounce = (func, wait, immediate = false) => {
 // Throttle utility for performance
 export const throttle = (func, limit) => {
   let inThrottle;
-  return function (...args) {
+  return function(...args) {
     if (!inThrottle) {
       func.apply(this, args);
       inThrottle = true;
@@ -283,8 +296,12 @@ if (typeof window !== 'undefined') {
   // Log performance info on page load
   window.addEventListener('load', () => {
     setTimeout(() => {
-      console.log('Memory Usage:', getMemoryUsage());
-      console.log('Bundle Info:', getBundleInfo());
+      if (!import.meta.env.PROD) {
+        // eslint-disable-next-line no-console
+        console.log('Memory Usage:', getMemoryUsage());
+        // eslint-disable-next-line no-console
+        console.log('Bundle Info:', getBundleInfo());
+      }
     }, 1000);
   });
 }

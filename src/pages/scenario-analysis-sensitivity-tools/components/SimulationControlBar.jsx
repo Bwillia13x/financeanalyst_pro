@@ -187,13 +187,22 @@ const SimulationControlBar = ({ onRunSimulation, isSimulating, progress, onStopS
         </div>
 
         <div className="flex items-center space-x-4">
-          <Button variant="ghost" size="sm" iconName="Download" disabled={isSimulating}>
+          <Button
+            variant="ghost" size="sm" iconName="Download"
+            disabled={isSimulating}
+          >
             Export Config
           </Button>
-          <Button variant="ghost" size="sm" iconName="Upload" disabled={isSimulating}>
+          <Button
+            variant="ghost" size="sm" iconName="Upload"
+            disabled={isSimulating}
+          >
             Import Config
           </Button>
-          <Button variant="ghost" size="sm" iconName="History" disabled={isSimulating}>
+          <Button
+            variant="ghost" size="sm" iconName="History"
+            disabled={isSimulating}
+          >
             Run History
           </Button>
         </div>

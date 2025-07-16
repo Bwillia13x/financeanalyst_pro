@@ -244,14 +244,20 @@ const ScenarioConfigPanel = ({ onScenarioUpdate, isSimulating }) => {
             </div>
 
             <div className="grid grid-cols-3 gap-4">
-              <Input label="Min Value" type="number" placeholder="-0.1" disabled={isSimulating} />
+              <Input
+                label="Min Value" type="number" placeholder="-0.1"
+                disabled={isSimulating}
+              />
               <Input
                 label="Most Likely"
                 type="number"
                 value={selectedScenario.variables[variable]}
                 disabled={isSimulating}
               />
-              <Input label="Max Value" type="number" placeholder="0.5" disabled={isSimulating} />
+              <Input
+                label="Max Value" type="number" placeholder="0.5"
+                disabled={isSimulating}
+              />
             </div>
           </div>
         ))}
@@ -303,7 +309,10 @@ const ScenarioConfigPanel = ({ onScenarioUpdate, isSimulating }) => {
         ))}
       </div>
 
-      <Button variant="outline" iconName="Plus" disabled={isSimulating} className="w-full">
+      <Button
+        variant="outline" iconName="Plus" disabled={isSimulating}
+        className="w-full"
+      >
         Add Correlation Pair
       </Button>
     </div>
@@ -325,10 +334,16 @@ const ScenarioConfigPanel = ({ onScenarioUpdate, isSimulating }) => {
       <div className="space-y-4">
         <h4 className="font-medium text-foreground">Template Actions</h4>
         <div className="grid grid-cols-2 gap-4">
-          <Button variant="outline" iconName="Download" disabled={isSimulating} className="w-full">
+          <Button
+            variant="outline" iconName="Download" disabled={isSimulating}
+            className="w-full"
+          >
             Import from Excel
           </Button>
-          <Button variant="outline" iconName="Upload" disabled={isSimulating} className="w-full">
+          <Button
+            variant="outline" iconName="Upload" disabled={isSimulating}
+            className="w-full"
+          >
             Export Template
           </Button>
         </div>
@@ -347,8 +362,14 @@ const ScenarioConfigPanel = ({ onScenarioUpdate, isSimulating }) => {
                 <div className="text-xs text-muted-foreground">Last modified: 2 days ago</div>
               </div>
               <div className="flex items-center space-x-2">
-                <Button variant="ghost" size="sm" iconName="Eye" disabled={isSimulating} />
-                <Button variant="ghost" size="sm" iconName="Download" disabled={isSimulating} />
+                <Button
+                  variant="ghost" size="sm" iconName="Eye"
+                  disabled={isSimulating}
+                />
+                <Button
+                  variant="ghost" size="sm" iconName="Download"
+                  disabled={isSimulating}
+                />
               </div>
             </div>
           ))}

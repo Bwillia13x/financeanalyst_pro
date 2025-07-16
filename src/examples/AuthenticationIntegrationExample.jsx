@@ -3,13 +3,12 @@
  * Demonstrates complete authentication system integration with financial modeling
  */
 
-import React, { useState, useEffect } from 'react';
-import { 
-  Shield, 
-  User, 
-  Lock, 
-  Key, 
-  Database, 
+import {
+  Shield,
+  User,
+  Lock,
+  Key,
+  Database,
   Settings,
   LogOut,
   Eye,
@@ -18,19 +17,21 @@ import {
   AlertCircle,
   Users
 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+
 import LoginForm from '../components/auth/LoginForm.jsx';
 import ProtectedRoute, { useAuth, PermissionGate } from '../components/auth/ProtectedRoute.jsx';
 import UserProfile from '../components/auth/UserProfile.jsx';
 import { authService, USER_ROLES, PERMISSIONS } from '../services/authService.js';
-import { userContextService } from '../services/userContextService.js';
 import { encryptionService } from '../services/encryptionService.js';
+import { userContextService } from '../services/userContextService.js';
 
 const AuthenticationIntegrationExample = () => {
   const [currentView, setCurrentView] = useState('login');
   const [showProfile, setShowProfile] = useState(false);
   const [contextStats, setContextStats] = useState(null);
   const [encryptionStatus, setEncryptionStatus] = useState(null);
-  
+
   const { user, isAuthenticated, hasPermission, hasRole, logout } = useAuth();
 
   useEffect(() => {
@@ -42,11 +43,11 @@ const AuthenticationIntegrationExample = () => {
     }
   }, [isAuthenticated]);
 
-  const loadContextData = async () => {
+  const loadContextData = async() => {
     try {
       const stats = await userContextService.getContextStats();
       setContextStats(stats);
-      
+
       const encStatus = encryptionService.getStatus();
       setEncryptionStatus(encStatus);
     } catch (error) {
@@ -59,7 +60,7 @@ const AuthenticationIntegrationExample = () => {
     setCurrentView('dashboard');
   };
 
-  const handleLogout = async () => {
+  const handleLogout = async() => {
     await logout();
     setCurrentView('login');
     setShowProfile(false);
@@ -68,7 +69,7 @@ const AuthenticationIntegrationExample = () => {
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <LoginForm 
+        <LoginForm
           onLoginSuccess={handleLoginSuccess}
           onSwitchToRegister={() => alert('Registration will be implemented in production')}
         />
@@ -88,7 +89,7 @@ const AuthenticationIntegrationExample = () => {
                 Finance Analyst Pro - Authenticated
               </h1>
             </div>
-            
+
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
                 <div className="h-8 w-8 bg-blue-600 rounded-full flex items-center justify-center">
@@ -99,14 +100,14 @@ const AuthenticationIntegrationExample = () => {
                   <div className="text-gray-500">{user?.role}</div>
                 </div>
               </div>
-              
+
               <button
                 onClick={() => setShowProfile(true)}
                 className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
               >
                 <Settings className="h-5 w-5" />
               </button>
-              
+
               <button
                 onClick={handleLogout}
                 className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
@@ -127,7 +128,7 @@ const AuthenticationIntegrationExample = () => {
               <Shield className="h-5 w-5 mr-2 text-green-600" />
               Authentication Status
             </h2>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                 <div className="flex items-center">
@@ -138,7 +139,7 @@ const AuthenticationIntegrationExample = () => {
                   Session active and secure
                 </div>
               </div>
-              
+
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <div className="flex items-center">
                   <User className="h-5 w-5 text-blue-600 mr-2" />
@@ -148,7 +149,7 @@ const AuthenticationIntegrationExample = () => {
                   {authService.getUserPermissions().length} permissions
                 </div>
               </div>
-              
+
               <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
                 <div className="flex items-center">
                   <Database className="h-5 w-5 text-purple-600 mr-2" />
@@ -166,7 +167,7 @@ const AuthenticationIntegrationExample = () => {
             <h2 className="text-lg font-medium text-gray-900 mb-4">
               Role-Based Access Control Demo
             </h2>
-            
+
             <div className="space-y-4">
               {/* Admin Only Features */}
               <PermissionGate requiredRoles={[USER_ROLES.ADMIN]}>
@@ -223,8 +224,8 @@ const AuthenticationIntegrationExample = () => {
                     Create New Model
                   </button>
                 </PermissionGate>
-                
-                <PermissionGate 
+
+                <PermissionGate
                   requiredPermissions={[PERMISSIONS.WRITE_MODELS]}
                   fallback={
                     <button className="w-full bg-gray-300 text-gray-500 py-2 px-4 rounded-lg cursor-not-allowed">
@@ -246,7 +247,7 @@ const AuthenticationIntegrationExample = () => {
               <h2 className="text-lg font-medium text-gray-900 mb-4">
                 User Context & Data Isolation
               </h2>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <h3 className="font-medium text-gray-900 mb-2">User Context</h3>
@@ -269,7 +270,7 @@ const AuthenticationIntegrationExample = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 <div>
                   <h3 className="font-medium text-gray-900 mb-2">Data Isolation</h3>
                   <div className="bg-gray-50 rounded-lg p-4 space-y-2 text-sm">
@@ -296,7 +297,7 @@ const AuthenticationIntegrationExample = () => {
               <h2 className="text-lg font-medium text-gray-900 mb-4">
                 Security Features
               </h2>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="bg-gray-50 rounded-lg p-4">
                   <h3 className="font-medium text-gray-900 mb-2 flex items-center">
@@ -320,7 +321,7 @@ const AuthenticationIntegrationExample = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="bg-gray-50 rounded-lg p-4">
                   <h3 className="font-medium text-gray-900 mb-2 flex items-center">
                     <Shield className="h-4 w-4 mr-2" />
@@ -345,7 +346,7 @@ const AuthenticationIntegrationExample = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="bg-gray-50 rounded-lg p-4">
                   <h3 className="font-medium text-gray-900 mb-2 flex items-center">
                     <Users className="h-4 w-4 mr-2" />
@@ -379,7 +380,7 @@ const AuthenticationIntegrationExample = () => {
             <h2 className="text-lg font-medium text-gray-900 mb-4">
               Demo Actions
             </h2>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <button
                 onClick={() => setShowProfile(true)}
@@ -388,7 +389,7 @@ const AuthenticationIntegrationExample = () => {
                 <User className="h-4 w-4 mr-2" />
                 View Profile
               </button>
-              
+
               <PermissionGate requiredPermissions={[PERMISSIONS.WRITE_MODELS]}>
                 <button
                   onClick={() => alert('Model creation would be implemented here')}
@@ -398,7 +399,7 @@ const AuthenticationIntegrationExample = () => {
                   Create Model
                 </button>
               </PermissionGate>
-              
+
               <PermissionGate requiredPermissions={[PERMISSIONS.EXPORT_DATA]}>
                 <button
                   onClick={() => alert('Data export would be implemented here')}
@@ -408,7 +409,7 @@ const AuthenticationIntegrationExample = () => {
                   Export Data
                 </button>
               </PermissionGate>
-              
+
               <button
                 onClick={handleLogout}
                 className="flex items-center justify-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"

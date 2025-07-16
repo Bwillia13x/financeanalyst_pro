@@ -104,7 +104,7 @@ describe('API Logger', () => {
     });
 
     it('should sanitize sensitive parameters', () => {
-      const requestId = logger.logApiRequest('FMP', '/profile/AAPL', {
+      const _requestId = logger.logApiRequest('FMP', '/profile/AAPL', {
         ticker: 'AAPL',
         apikey: 'secret123',
         api_key: 'secret456',

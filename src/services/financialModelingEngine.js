@@ -1,4 +1,4 @@
-import { apiLogger } from '../utils/apiLogger.js';
+// import { apiLogger } from '../utils/apiLogger.js';
 
 /**
  * Advanced Financial Modeling Engine
@@ -52,11 +52,11 @@ class FinancialModelingEngine {
     const {
       symbol,
       companyName,
-      currentRevenue,
-      historicalGrowthRates = [],
-      margins = {},
-      balanceSheetData = {},
-      marketData = {},
+      _currentRevenue,
+      _historicalGrowthRates = [],
+      _margins = {},
+      _balanceSheetData = {},
+      _marketData = {},
       assumptions = {}
     } = inputs;
 
@@ -68,7 +68,7 @@ class FinancialModelingEngine {
 
     // Build additional scenarios
     const scenarioResults = {};
-    
+
     // Bull case: Higher growth, lower discount rate
     if (scenarios.bull !== false) {
       const bullAssumptions = {
@@ -192,7 +192,7 @@ class FinancialModelingEngine {
     let currentRevenue = baseRevenue;
 
     for (let i = 0; i < years; i++) {
-      const growthRate = Array.isArray(growthRates) 
+      const growthRate = Array.isArray(growthRates)
         ? growthRates[i] || growthRates[growthRates.length - 1]
         : growthRates * Math.pow(0.95, i); // Declining growth rate
 
@@ -200,7 +200,7 @@ class FinancialModelingEngine {
       projections.push({
         year: i + 1,
         revenue: currentRevenue,
-        growthRate: growthRate
+        growthRate
       });
     }
 
@@ -214,7 +214,7 @@ class FinancialModelingEngine {
    * @returns {Array} Operating projections
    */
   projectOperatingMetrics(revenueProjections, assumptions) {
-    return revenueProjections.map((projection, index) => {
+    return revenueProjections.map((projection, _index) => {
       const ebitdaMargin = assumptions.ebitdaMargin || 0.2;
       const ebitda = projection.revenue * ebitdaMargin;
       const depreciation = projection.revenue * assumptions.depreciationAsPercentOfRevenue;
@@ -243,7 +243,7 @@ class FinancialModelingEngine {
   calculateFreeCashFlows(operatingProjections, assumptions) {
     return operatingProjections.map((projection, index) => {
       const capex = projection.revenue * assumptions.capexAsPercentOfRevenue;
-      const nwcChange = index === 0 
+      const nwcChange = index === 0
         ? projection.revenue * assumptions.nwcAsPercentOfRevenue
         : (projection.revenue - operatingProjections[index - 1].revenue) * assumptions.nwcAsPercentOfRevenue;
 
@@ -418,7 +418,7 @@ class FinancialModelingEngine {
    */
   generateRecommendationReasoning(rating, upside) {
     const upsideAbs = Math.abs(upside);
-    
+
     switch (rating) {
       case 'STRONG_BUY':
         return `Strong upside potential of ${upside.toFixed(1)}% suggests significant undervaluation based on DCF analysis.`;

@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 import Icon from './AppIcon';
@@ -226,6 +227,11 @@ class EnhancedErrorBoundary extends React.Component {
     return this.props.children;
   }
 }
+
+EnhancedErrorBoundary.propTypes = {
+  fallback: PropTypes.func,
+  children: PropTypes.node.isRequired
+};
 
 // Higher-order component for wrapping components with error boundaries
 export const withErrorBoundary = (Component, fallback = null) => {

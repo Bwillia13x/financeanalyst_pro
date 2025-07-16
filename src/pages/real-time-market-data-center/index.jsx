@@ -3,19 +3,19 @@ import React, { useState, useEffect } from 'react';
 import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
 import Header from '../../components/ui/Header';
+import { dataValidationService } from '../../services/dataValidationService';
+import { enhancedApiService } from '../../services/enhancedApiService';
+import { realTimeDataService } from '../../services/realTimeDataService';
 
+import ApiStatusPanel from './components/ApiStatusPanel';
 import BulkOperationsPanel from './components/BulkOperationsPanel';
 import ConnectionStatus from './components/ConnectionStatus';
 import DataSourceToggle from './components/DataSourceToggle';
 import MarketDataWidget from './components/MarketDataWidget';
 import SymbolSearch from './components/SymbolSearch';
 import WatchlistPanel from './components/WatchlistPanel';
-import ApiStatusPanel from './components/ApiStatusPanel';
 
 // Import real data services
-import { realTimeDataService } from '../../services/realTimeDataService';
-import { enhancedApiService } from '../../services/enhancedApiService';
-import { dataValidationService } from '../../services/dataValidationService';
 
 const RealTimeMarketDataCenter = () => {
   const [dataSources, setDataSources] = useState([
@@ -139,7 +139,7 @@ const RealTimeMarketDataCenter = () => {
 
   // Initialize real data services and check API health
   useEffect(() => {
-    const initializeRealData = async () => {
+    const initializeRealData = async() => {
       try {
         // Check API health status
         const healthStatus = enhancedApiService.getSourceHealthStatus();
@@ -178,11 +178,11 @@ const RealTimeMarketDataCenter = () => {
   useEffect(() => {
     if (!isAutoRefresh) return;
 
-    const interval = setInterval(async () => {
+    const interval = setInterval(async() => {
       if (realDataEnabled) {
         // Fetch real data for each widget
         const updatedWidgets = await Promise.all(
-          widgets.map(async (widget) => {
+          widgets.map(async(widget) => {
             try {
               const marketData = await enhancedApiService.fetchRealTimeMarketData(widget.symbol);
               const validation = dataValidationService.validateData(marketData, 'marketData');
@@ -253,7 +253,7 @@ const RealTimeMarketDataCenter = () => {
     );
   };
 
-  const handleSymbolSelect = async (symbol) => {
+  const handleSymbolSelect = async(symbol) => {
     try {
       let marketData;
       let source = 'Simulation';
@@ -299,13 +299,13 @@ const RealTimeMarketDataCenter = () => {
             prevWidgets.map(widget =>
               widget.symbol === symbol.symbol
                 ? {
-                    ...widget,
-                    currentValue: data.currentPrice,
-                    change: data.change,
-                    changePercent: data.changePercent,
-                    lastUpdate: new Date(data.timestamp),
-                    source: data.source
-                  }
+                  ...widget,
+                  currentValue: data.currentPrice,
+                  change: data.change,
+                  changePercent: data.changePercent,
+                  lastUpdate: new Date(data.timestamp),
+                  source: data.source
+                }
                 : widget
             )
           );

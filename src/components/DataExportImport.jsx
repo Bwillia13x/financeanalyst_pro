@@ -3,17 +3,19 @@
  * Provides UI for exporting and importing financial data
  */
 
-import React, { useState } from 'react';
-import { 
-  Download, 
-  Upload, 
-  FileText, 
-  Database, 
-  AlertCircle, 
+import {
+  Download,
+  Upload,
+  FileText,
+  Database,
+  AlertCircle,
   CheckCircle,
   Loader2,
   Info
 } from 'lucide-react';
+import PropTypes from 'prop-types';
+import React, { useState } from 'react';
+
 import { financialDataStorage } from '../services/financialDataStorage.js';
 import { apiLogger } from '../utils/apiLogger.js';
 
@@ -30,7 +32,7 @@ const DataExportImport = ({ onClose }) => {
     loadStats();
   }, []);
 
-  const loadStats = async () => {
+  const loadStats = async() => {
     try {
       const storageStats = await financialDataStorage.getFinancialDataStats();
       setStats(storageStats);
@@ -39,18 +41,18 @@ const DataExportImport = ({ onClose }) => {
     }
   };
 
-  const handleExport = async () => {
+  const handleExport = async() => {
     setIsExporting(true);
     setExportStatus(null);
 
     try {
       const exportData = await financialDataStorage.exportAllData();
-      
+
       // Create downloadable file
       const blob = new Blob([JSON.stringify(exportData, null, 2)], {
         type: 'application/json'
       });
-      
+
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
@@ -89,7 +91,7 @@ const DataExportImport = ({ onClose }) => {
     }
   };
 
-  const handleImport = async (event) => {
+  const handleImport = async(event) => {
     const file = event.target.files[0];
     if (!file) return;
 
@@ -106,7 +108,7 @@ const DataExportImport = ({ onClose }) => {
       }
 
       const importCount = await financialDataStorage.importData(importData);
-      
+
       setImportStatus({
         type: 'success',
         message: 'Data imported successfully',
@@ -228,11 +230,13 @@ const DataExportImport = ({ onClose }) => {
               </button>
 
               {exportStatus && (
-                <div className={`border rounded-lg p-4 ${
-                  exportStatus.type === 'success' 
-                    ? 'bg-green-50 border-green-200' 
-                    : 'bg-red-50 border-red-200'
-                }`}>
+                <div
+                  className={`border rounded-lg p-4 ${
+                    exportStatus.type === 'success'
+                      ? 'bg-green-50 border-green-200'
+                      : 'bg-red-50 border-red-200'
+                  }`}
+                >
                   <div className="flex items-start">
                     {exportStatus.type === 'success' ? (
                       <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 mr-3" />
@@ -240,9 +244,11 @@ const DataExportImport = ({ onClose }) => {
                       <AlertCircle className="w-5 h-5 text-red-600 mt-0.5 mr-3" />
                     )}
                     <div>
-                      <h4 className={`font-medium ${
-                        exportStatus.type === 'success' ? 'text-green-900' : 'text-red-900'
-                      }`}>
+                      <h4
+                        className={`font-medium ${
+                          exportStatus.type === 'success' ? 'text-green-900' : 'text-red-900'
+                        }`}
+                      >
                         {exportStatus.message}
                       </h4>
                       {exportStatus.type === 'success' && exportStatus.details && (
@@ -307,11 +313,13 @@ const DataExportImport = ({ onClose }) => {
               )}
 
               {importStatus && (
-                <div className={`border rounded-lg p-4 ${
-                  importStatus.type === 'success' 
-                    ? 'bg-green-50 border-green-200' 
-                    : 'bg-red-50 border-red-200'
-                }`}>
+                <div
+                  className={`border rounded-lg p-4 ${
+                    importStatus.type === 'success'
+                      ? 'bg-green-50 border-green-200'
+                      : 'bg-red-50 border-red-200'
+                  }`}
+                >
                   <div className="flex items-start">
                     {importStatus.type === 'success' ? (
                       <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 mr-3" />
@@ -319,9 +327,11 @@ const DataExportImport = ({ onClose }) => {
                       <AlertCircle className="w-5 h-5 text-red-600 mt-0.5 mr-3" />
                     )}
                     <div>
-                      <h4 className={`font-medium ${
-                        importStatus.type === 'success' ? 'text-green-900' : 'text-red-900'
-                      }`}>
+                      <h4
+                        className={`font-medium ${
+                          importStatus.type === 'success' ? 'text-green-900' : 'text-red-900'
+                        }`}
+                      >
                         {importStatus.message}
                       </h4>
                       {importStatus.type === 'success' && importStatus.details && (
@@ -343,7 +353,7 @@ const DataExportImport = ({ onClose }) => {
           {activeTab === 'stats' && (
             <div className="space-y-4">
               <h3 className="text-lg font-medium text-gray-900">Storage Statistics</h3>
-              
+
               {stats ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="bg-gray-50 rounded-lg p-4">
@@ -402,6 +412,10 @@ const DataExportImport = ({ onClose }) => {
       </div>
     </div>
   );
+};
+
+DataExportImport.propTypes = {
+  onClose: PropTypes.func.isRequired
 };
 
 export default DataExportImport;

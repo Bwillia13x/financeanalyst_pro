@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+// import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import axios from 'axios';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
@@ -22,7 +22,20 @@ describe('Error Handling & Edge Cases', () => {
       VITE_FORCE_DEMO_MODE: 'false'
     };
 
-    service = new DataFetchingService(mockEnv);
+    // Configure minimal retry and circuit breaker settings for testing
+    const retryConfig = {
+      maxRetries: 0, // No retries for faster tests
+      baseDelay: 10,
+      maxDelay: 100
+    };
+
+    const circuitBreakerConfig = {
+      failureThreshold: 1,
+      recoveryTimeout: 100,
+      halfOpenMaxCalls: 1
+    };
+
+    service = new DataFetchingService(mockEnv, null, retryConfig, circuitBreakerConfig);
     vi.clearAllMocks();
   });
 
@@ -31,9 +44,7 @@ describe('Error Handling & Edge Cases', () => {
   });
 
   describe('Network Error Handling', () => {
-    it('should handle network timeouts gracefully', async () => {
-      vi.useFakeTimers();
-
+    it('should handle network timeouts gracefully', async() => {
       // Force service out of demo mode
       service.demoMode = false;
 
@@ -42,19 +53,12 @@ describe('Error Handling & Edge Cases', () => {
         message: 'timeout of 10000ms exceeded'
       });
 
-      const promise = service.fetchCompanyProfile('AAPL');
-      await vi.runAllTimersAsync();
-
-      await expect(promise).rejects.toThrow(
+      await expect(service.fetchCompanyProfile('AAPL')).rejects.toThrow(
         'Failed to fetch company profile'
       );
-
-      vi.useRealTimers();
     });
 
-    it('should handle DNS resolution failures', async () => {
-      vi.useFakeTimers();
-
+    it('should handle DNS resolution failures', async() => {
       // Force service out of demo mode
       service.demoMode = false;
 
@@ -63,19 +67,12 @@ describe('Error Handling & Edge Cases', () => {
         message: 'getaddrinfo ENOTFOUND api.example.com'
       });
 
-      const promise = service.fetchCompanyProfile('AAPL');
-      await vi.runAllTimersAsync();
-
-      await expect(promise).rejects.toThrow(
+      await expect(service.fetchCompanyProfile('AAPL')).rejects.toThrow(
         'Failed to fetch company profile'
       );
-
-      vi.useRealTimers();
     });
 
-    it('should handle connection refused errors', async () => {
-      vi.useFakeTimers();
-
+    it('should handle connection refused errors', async() => {
       // Force service out of demo mode
       service.demoMode = false;
 
@@ -84,19 +81,14 @@ describe('Error Handling & Edge Cases', () => {
         message: 'connect ECONNREFUSED 127.0.0.1:80'
       });
 
-      const promise = service.fetchCompanyProfile('AAPL');
-      await vi.runAllTimersAsync();
-
-      await expect(promise).rejects.toThrow(
+      await expect(service.fetchCompanyProfile('AAPL')).rejects.toThrow(
         'Failed to fetch company profile'
       );
-
-      vi.useRealTimers();
     });
   });
 
   describe('API Error Responses', () => {
-    it('should handle 401 Unauthorized errors', async () => {
+    it('should handle 401 Unauthorized errors', async() => {
       mockAxios.get.mockRejectedValue({
         response: { status: 401, data: { error: 'Invalid API key' } }
       });
@@ -107,7 +99,7 @@ describe('Error Handling & Edge Cases', () => {
       expect(result.symbol).toBe('AAPL');
     });
 
-    it('should handle 403 Forbidden errors', async () => {
+    it('should handle 403 Forbidden errors', async() => {
       mockAxios.get.mockRejectedValue({
         response: { status: 403, data: { error: 'Access denied' } }
       });
@@ -118,7 +110,7 @@ describe('Error Handling & Edge Cases', () => {
       expect(result.symbol).toBe('AAPL');
     });
 
-    it('should handle 404 Not Found errors', async () => {
+    it('should handle 404 Not Found errors', async() => {
       mockAxios.get.mockRejectedValue({
         response: { status: 404, data: { error: 'Symbol not found' } }
       });
@@ -128,9 +120,7 @@ describe('Error Handling & Edge Cases', () => {
       );
     });
 
-    it('should handle 429 Rate Limit errors', async () => {
-      vi.useFakeTimers();
-
+    it('should handle 429 Rate Limit errors', async() => {
       // Force service out of demo mode
       service.demoMode = false;
 
@@ -142,19 +132,12 @@ describe('Error Handling & Edge Cases', () => {
         }
       });
 
-      const promise = service.fetchCompanyProfile('AAPL');
-      await vi.runAllTimersAsync();
-
-      await expect(promise).rejects.toThrow(
+      await expect(service.fetchCompanyProfile('AAPL')).rejects.toThrow(
         'Failed to fetch company profile'
       );
-
-      vi.useRealTimers();
     });
 
-    it('should handle 500 Internal Server errors', async () => {
-      vi.useFakeTimers();
-
+    it('should handle 500 Internal Server errors', async() => {
       // Force service out of demo mode
       service.demoMode = false;
 
@@ -162,19 +145,14 @@ describe('Error Handling & Edge Cases', () => {
         response: { status: 500, data: { error: 'Internal server error' } }
       });
 
-      const promise = service.fetchCompanyProfile('AAPL');
-      await vi.runAllTimersAsync();
-
-      await expect(promise).rejects.toThrow(
+      await expect(service.fetchCompanyProfile('AAPL')).rejects.toThrow(
         'Failed to fetch company profile'
       );
-
-      vi.useRealTimers();
     });
   });
 
   describe('Data Validation Edge Cases', () => {
-    it('should handle empty API responses', async () => {
+    it('should handle empty API responses', async() => {
       mockAxios.get.mockResolvedValue({ data: [] });
 
       await expect(service.fetchCompanyProfile('AAPL')).rejects.toThrow(
@@ -182,7 +160,7 @@ describe('Error Handling & Edge Cases', () => {
       );
     });
 
-    it('should handle null API responses', async () => {
+    it('should handle null API responses', async() => {
       mockAxios.get.mockResolvedValue({ data: null });
 
       await expect(service.fetchCompanyProfile('AAPL')).rejects.toThrow(
@@ -190,7 +168,7 @@ describe('Error Handling & Edge Cases', () => {
       );
     });
 
-    it('should handle malformed JSON responses', async () => {
+    it('should handle malformed JSON responses', async() => {
       mockAxios.get.mockResolvedValue({ data: 'invalid json' });
 
       await expect(service.fetchCompanyProfile('AAPL')).rejects.toThrow(
@@ -198,7 +176,7 @@ describe('Error Handling & Edge Cases', () => {
       );
     });
 
-    it('should handle missing required fields', async () => {
+    it('should handle missing required fields', async() => {
       mockAxios.get.mockResolvedValue({
         data: [
           {
@@ -214,7 +192,7 @@ describe('Error Handling & Edge Cases', () => {
   });
 
   describe('Input Validation', () => {
-    it('should handle invalid ticker symbols', async () => {
+    it('should handle invalid ticker symbols', async() => {
       const invalidTickers = ['', null, undefined, 123, {}, []];
 
       for (const ticker of invalidTickers) {
@@ -223,13 +201,13 @@ describe('Error Handling & Edge Cases', () => {
       }
     });
 
-    it('should handle extremely long ticker symbols', async () => {
+    it('should handle extremely long ticker symbols', async() => {
       const longTicker = 'A'.repeat(1000);
       const isValid = await service.validateTicker(longTicker);
       expect(isValid).toBe(false);
     });
 
-    it('should handle special characters in ticker symbols', async () => {
+    it('should handle special characters in ticker symbols', async() => {
       const specialTickers = ['AAPL!', 'AAPL@', 'AAPL#', 'AAPL$', 'AAPL%'];
 
       for (const ticker of specialTickers) {
@@ -240,7 +218,7 @@ describe('Error Handling & Edge Cases', () => {
   });
 
   describe('Rate Limiting Edge Cases', () => {
-    it('should handle rapid successive requests', async () => {
+    it('should handle rapid successive requests', async() => {
       // Create a service with custom rate limits for testing
       const mockEnv = {
         VITE_ALPHA_VANTAGE_API_KEY: 'test_alpha_key',
@@ -309,7 +287,7 @@ describe('Error Handling & Edge Cases', () => {
   });
 
   describe('API Key Validation Edge Cases', () => {
-    it('should handle missing environment variables', async () => {
+    it('should handle missing environment variables', async() => {
       // Mock empty environment
       vi.stubGlobal('import.meta', {
         env: {}
@@ -326,7 +304,7 @@ describe('Error Handling & Edge Cases', () => {
       expect(serviceStatuses.every(s => s !== 'valid')).toBe(true);
     });
 
-    it('should handle malformed API keys', async () => {
+    it('should handle malformed API keys', async() => {
       vi.stubGlobal('import.meta', {
         env: {
           VITE_ALPHA_VANTAGE_API_KEY: 'invalid_key_format_123!@#'
@@ -343,7 +321,7 @@ describe('Error Handling & Edge Cases', () => {
   });
 
   describe('Concurrent Request Handling', () => {
-    it('should handle concurrent requests to same endpoint', async () => {
+    it('should handle concurrent requests to same endpoint', async() => {
       mockAxios.get.mockResolvedValue({
         data: [{ symbol: 'AAPL', companyName: 'Apple Inc.' }]
       });

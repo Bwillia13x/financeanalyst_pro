@@ -126,7 +126,7 @@ const TerminalInterface = ({ onCommandExecute, calculationResults }) => {
     }
   };
 
-  const executeCommand = async () => {
+  const executeCommand = async() => {
     if (!currentInput.trim()) return;
 
     const newCommand = {

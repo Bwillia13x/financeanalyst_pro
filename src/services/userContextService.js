@@ -3,10 +3,11 @@
  * Provides user-specific data isolation and workspace management
  */
 
-import { authService } from './authService.js';
-import { storageService } from './storageService.js';
-import { encryptionService } from './encryptionService.js';
 import { apiLogger } from '../utils/apiLogger.js';
+
+import { authService } from './authService.js';
+import { encryptionService } from './encryptionService.js';
+import { storageService } from './storageService.js';
 
 // Context configuration
 const CONTEXT_CONFIG = {
@@ -43,7 +44,7 @@ class UserContextService {
     this.activeWorkspace = null;
     this.contextListeners = new Set();
     this.dataCache = new Map();
-    
+
     this.initialize();
   }
 
@@ -110,9 +111,9 @@ class UserContextService {
     this.currentContext = null;
     this.activeWorkspace = null;
     this.dataCache.clear();
-    
+
     this.notifyContextListeners('context_cleared', null);
-    
+
     apiLogger.log('INFO', 'User context cleared');
   }
 
@@ -163,7 +164,7 @@ class UserContextService {
       }
 
       const key = this.getUserKey(type, identifier);
-      
+
       // Add user context metadata
       const contextualData = {
         ...data,
@@ -216,14 +217,14 @@ class UserContextService {
       }
 
       const key = this.getUserKey(type, identifier);
-      
+
       // Check cache first
       if (this.dataCache.has(key) && !options.skipCache) {
         return this.dataCache.get(key);
       }
 
       const storedData = await storageService.getItem(type, key);
-      
+
       if (!storedData) {
         return null;
       }
@@ -274,7 +275,7 @@ class UserContextService {
       }
 
       const key = this.getSharedKey(type, identifier, sharingLevel);
-      
+
       const sharedData = {
         ...data,
         _sharing: {
@@ -363,7 +364,7 @@ class UserContextService {
 
       const allItems = storageService.listItems(type);
       const userPrefix = `${CONTEXT_CONFIG.userPrefix}${this.currentContext.userId}_${type}_`;
-      
+
       return allItems
         .filter(key => key.startsWith(userPrefix))
         .map(key => key.replace(userPrefix, ''));
@@ -384,7 +385,7 @@ class UserContextService {
 
       const allItems = storageService.listItems(type);
       const sharedPrefix = `${CONTEXT_CONFIG.sharedPrefix}${sharingLevel}_${type}_`;
-      
+
       return allItems
         .filter(key => key.startsWith(sharedPrefix))
         .map(key => key.replace(sharedPrefix, ''));
@@ -443,7 +444,7 @@ class UserContextService {
       };
 
       await storageService.setItem('workspace', workspace.id, workspace);
-      
+
       apiLogger.log('INFO', 'Workspace created', {
         workspaceId: workspace.id,
         type: workspace.type,
@@ -476,7 +477,7 @@ class UserContextService {
     if (!this.currentContext) return false;
 
     const permissions = this.currentContext.permissions;
-    
+
     switch (sharingLevel) {
       case SHARING_LEVELS.PUBLIC:
         return permissions.includes('SYSTEM_CONFIG');
@@ -498,7 +499,7 @@ class UserContextService {
     if (!this.currentContext) return false;
 
     const permissions = this.currentContext.permissions;
-    
+
     switch (sharingLevel) {
       case SHARING_LEVELS.PUBLIC:
         return true;
@@ -527,7 +528,7 @@ class UserContextService {
    */
   addContextListener(callback) {
     this.contextListeners.add(callback);
-    
+
     return () => {
       this.contextListeners.delete(callback);
     };
@@ -567,7 +568,7 @@ class UserContextService {
       // Count user data items by type
       const allItems = await storageService.getStorageStats();
       const userPrefix = `${CONTEXT_CONFIG.userPrefix}${this.currentContext.userId}_`;
-      
+
       for (const [type, count] of Object.entries(allItems.typeStats)) {
         if (type.startsWith(userPrefix)) {
           const dataType = type.replace(userPrefix, '').split('_')[0];

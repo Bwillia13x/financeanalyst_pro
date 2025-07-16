@@ -3,6 +3,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+
 import { storageService } from '../storageService.js';
 
 // Mock localStorage
@@ -55,35 +56,35 @@ describe('StorageService', () => {
   });
 
   describe('Basic Storage Operations', () => {
-    it('should store and retrieve data', async () => {
+    it('should store and retrieve data', async() => {
       const testData = { test: 'value', number: 42 };
-      
+
       await storageService.setItem('test', 'item1', testData);
       const retrieved = await storageService.getItem('test', 'item1');
-      
+
       expect(retrieved).toEqual(testData);
     });
 
-    it('should return null for non-existent items', async () => {
+    it('should return null for non-existent items', async() => {
       const result = await storageService.getItem('test', 'nonexistent');
       expect(result).toBeNull();
     });
 
-    it('should remove items', async () => {
+    it('should remove items', async() => {
       const testData = { test: 'value' };
-      
+
       await storageService.setItem('test', 'item1', testData);
       expect(await storageService.getItem('test', 'item1')).toEqual(testData);
-      
+
       storageService.removeItem('test', 'item1');
       expect(await storageService.getItem('test', 'item1')).toBeNull();
     });
 
-    it('should list items of a specific type', async () => {
+    it('should list items of a specific type', async() => {
       await storageService.setItem('test', 'item1', { data: 1 });
       await storageService.setItem('test', 'item2', { data: 2 });
       await storageService.setItem('other', 'item3', { data: 3 });
-      
+
       const testItems = storageService.listItems('test');
       expect(testItems).toHaveLength(2);
       expect(testItems).toContain('item1');
@@ -92,7 +93,7 @@ describe('StorageService', () => {
   });
 
   describe('Data Validation', () => {
-    it('should validate DCF model data', async () => {
+    it('should validate DCF model data', async() => {
       const validDCFData = {
         symbol: 'AAPL',
         assumptions: { growthRate: 0.05 },
@@ -105,7 +106,7 @@ describe('StorageService', () => {
         .resolves.toBe(true);
     });
 
-    it('should reject invalid DCF model data', async () => {
+    it('should reject invalid DCF model data', async() => {
       const invalidDCFData = {
         symbol: 'AAPL',
         // Missing required fields: assumptions, projections, valuation
@@ -116,7 +117,7 @@ describe('StorageService', () => {
         .rejects.toThrow('Missing required field');
     });
 
-    it('should validate LBO model data', async () => {
+    it('should validate LBO model data', async() => {
       const validLBOData = {
         symbol: 'AAPL',
         transaction: { purchasePrice: 1000 },
@@ -129,7 +130,7 @@ describe('StorageService', () => {
         .resolves.toBe(true);
     });
 
-    it('should validate Monte Carlo results data', async () => {
+    it('should validate Monte Carlo results data', async() => {
       const validMCData = {
         modelType: 'DCF',
         iterations: 10000,
@@ -144,7 +145,7 @@ describe('StorageService', () => {
   });
 
   describe('Compression', () => {
-    it('should handle compression for large data', async () => {
+    it('should handle compression for large data', async() => {
       const largeData = {
         symbol: 'AAPL',
         assumptions: {},
@@ -157,15 +158,15 @@ describe('StorageService', () => {
 
       await storageService.setItem('dcfModel', 'AAPL', largeData);
       const retrieved = await storageService.getItem('dcfModel', 'AAPL');
-      
+
       expect(retrieved).toEqual(largeData);
     });
 
-    it('should not compress small data', async () => {
+    it('should not compress small data', async() => {
       const smallData = { test: 'small' };
-      
+
       await storageService.setItem('test', 'small', smallData);
-      
+
       // Check that data was stored (compression details are internal)
       const retrieved = await storageService.getItem('test', 'small');
       expect(retrieved).toEqual(smallData);
@@ -173,13 +174,13 @@ describe('StorageService', () => {
   });
 
   describe('Storage Statistics', () => {
-    it('should provide storage statistics', async () => {
+    it('should provide storage statistics', async() => {
       await storageService.setItem('test', 'item1', { data: 'test1' });
       await storageService.setItem('test', 'item2', { data: 'test2' });
       await storageService.setItem('other', 'item3', { data: 'test3' });
-      
+
       const stats = await storageService.getStorageStats();
-      
+
       expect(stats).toHaveProperty('totalSize');
       expect(stats).toHaveProperty('itemCount');
       expect(stats).toHaveProperty('typeStats');
@@ -188,9 +189,9 @@ describe('StorageService', () => {
       expect(stats.typeStats.other).toBe(1);
     });
 
-    it('should provide quota information', async () => {
+    it('should provide quota information', async() => {
       const quota = await storageService.getQuotaInfo();
-      
+
       expect(quota).toHaveProperty('quota');
       expect(quota).toHaveProperty('usage');
       expect(quota.quota).toBe(50 * 1024 * 1024);
@@ -199,10 +200,10 @@ describe('StorageService', () => {
   });
 
   describe('Cleanup Operations', () => {
-    it('should clean up old data', async () => {
+    it('should clean up old data', async() => {
       // Create old data by mocking timestamp
       const oldTimestamp = Date.now() - (35 * 24 * 60 * 60 * 1000); // 35 days ago
-      
+
       // Mock the stored data to appear old
       const oldData = {
         version: '1.0.0',
@@ -218,12 +219,12 @@ describe('StorageService', () => {
       };
 
       localStorageMock.setItem('financeanalyst_test_old', JSON.stringify(compressedOldData));
-      
+
       // Add recent data
       await storageService.setItem('test', 'recent', { test: 'recent' });
-      
+
       const cleanedCount = await storageService.performCleanup();
-      
+
       expect(cleanedCount).toBe(1);
       expect(await storageService.getItem('test', 'old')).toBeNull();
       expect(await storageService.getItem('test', 'recent')).toEqual({ test: 'recent' });
@@ -234,9 +235,9 @@ describe('StorageService', () => {
       localStorageMock.setItem('financeanalyst_test_item1', 'data1');
       localStorageMock.setItem('financeanalyst_test_item2', 'data2');
       localStorageMock.setItem('other_app_data', 'should_remain');
-      
+
       const result = storageService.clearAll();
-      
+
       expect(result).toBe(true);
       expect(localStorageMock.getItem('financeanalyst_test_item1')).toBeNull();
       expect(localStorageMock.getItem('financeanalyst_test_item2')).toBeNull();
@@ -245,7 +246,7 @@ describe('StorageService', () => {
   });
 
   describe('Error Handling', () => {
-    it('should handle storage unavailability', async () => {
+    it('should handle storage unavailability', async() => {
       // Mock localStorage to throw error for this test only
       const originalSetItem = localStorageMock.setItem;
       localStorageMock.setItem.mockImplementationOnce(() => {
@@ -259,7 +260,7 @@ describe('StorageService', () => {
       localStorageMock.setItem = originalSetItem;
     });
 
-    it('should handle corrupted data gracefully', async () => {
+    it('should handle corrupted data gracefully', async() => {
       // Store corrupted data directly
       localStorageMock.store['financeanalyst_test_corrupted'] = 'invalid json';
 
@@ -267,14 +268,14 @@ describe('StorageService', () => {
       expect(result).toBeNull();
     });
 
-    it('should handle unknown schema types', async () => {
+    it('should handle unknown schema types', async() => {
       await expect(storageService.setItem('unknownType', 'item', { data: 'test' }))
         .resolves.toBe(true); // Should succeed for unknown types
     });
   });
 
   describe('Version Management', () => {
-    it('should handle version mismatches', async () => {
+    it('should handle version mismatches', async() => {
       // Store data with old version directly in mock store
       const oldVersionData = {
         version: '0.9.0', // Old version

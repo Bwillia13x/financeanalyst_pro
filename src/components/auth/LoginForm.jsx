@@ -3,17 +3,19 @@
  * Provides user authentication interface with comprehensive security features
  */
 
-import React, { useState, useEffect } from 'react';
-import { 
-  Eye, 
-  EyeOff, 
-  Lock, 
-  Mail, 
-  AlertCircle, 
+import {
+  Eye,
+  EyeOff,
+  Lock,
+  Mail,
+  AlertCircle,
   CheckCircle,
   Loader2,
   Shield
 } from 'lucide-react';
+import PropTypes from 'prop-types';
+import { useState, useEffect } from 'react';
+
 import { authService } from '../../services/authService.js';
 import { apiLogger } from '../../utils/apiLogger.js';
 
@@ -65,9 +67,9 @@ const LoginForm = ({ onLoginSuccess, onSwitchToRegister }) => {
     return Object.keys(errors).length === 0;
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
@@ -83,11 +85,11 @@ const LoginForm = ({ onLoginSuccess, onSwitchToRegister }) => {
       );
 
       if (result.success) {
-        apiLogger.log('INFO', 'Login successful', { 
+        apiLogger.log('INFO', 'Login successful', {
           email: formData.email,
-          role: result.user.role 
+          role: result.user.role
         });
-        
+
         if (onLoginSuccess) {
           onLoginSuccess(result.user);
         }
@@ -95,8 +97,8 @@ const LoginForm = ({ onLoginSuccess, onSwitchToRegister }) => {
     } catch (error) {
       setError(error.message);
       setLoginAttempts(prev => prev + 1);
-      
-      apiLogger.log('ERROR', 'Login failed', { 
+
+      apiLogger.log('ERROR', 'Login failed', {
         email: formData.email,
         error: error.message,
         attempts: loginAttempts + 1
@@ -152,7 +154,7 @@ const LoginForm = ({ onLoginSuccess, onSwitchToRegister }) => {
               {showDemoCredentials ? 'Hide' : 'Show'} Demo Accounts
             </button>
           </div>
-          
+
           {showDemoCredentials && (
             <div className="mt-3 space-y-2">
               {demoAccounts.map((account, index) => (
@@ -340,6 +342,11 @@ const LoginForm = ({ onLoginSuccess, onSwitchToRegister }) => {
       </div>
     </div>
   );
+};
+
+LoginForm.propTypes = {
+  onLoginSuccess: PropTypes.func.isRequired,
+  onSwitchToRegister: PropTypes.func.isRequired
 };
 
 export default LoginForm;

@@ -3,14 +3,13 @@
  * Provides user profile management and preferences
  */
 
-import React, { useState, useEffect } from 'react';
-import { 
-  User, 
-  Settings, 
-  Shield, 
-  Bell, 
-  Moon, 
-  Sun, 
+import {
+  User,
+  Settings,
+  Shield,
+  Bell,
+  Moon,
+  Sun,
   Save,
   LogOut,
   Key,
@@ -19,8 +18,11 @@ import {
   AlertCircle,
   CheckCircle
 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+
 import { authService, USER_ROLES } from '../../services/authService.js';
 import { financialDataStorage } from '../../services/financialDataStorage.js';
+
 import { useAuth } from './ProtectedRoute.jsx';
 
 const UserProfile = ({ onClose }) => {
@@ -35,10 +37,10 @@ const UserProfile = ({ onClose }) => {
     loadUserData();
   }, []);
 
-  const loadUserData = async () => {
+  const loadUserData = async() => {
     try {
       setIsLoading(true);
-      
+
       // Load user preferences
       const userPrefs = await financialDataStorage.getUserPreferences();
       setPreferences(userPrefs || {
@@ -69,18 +71,18 @@ const UserProfile = ({ onClose }) => {
     }
   };
 
-  const handleSavePreferences = async () => {
+  const handleSavePreferences = async() => {
     try {
       setIsLoading(true);
       setSaveStatus(null);
-      
+
       await financialDataStorage.saveUserPreferences(preferences);
-      
+
       setSaveStatus({
         type: 'success',
         message: 'Preferences saved successfully'
       });
-      
+
       setTimeout(() => setSaveStatus(null), 3000);
     } catch (error) {
       setSaveStatus({
@@ -92,7 +94,7 @@ const UserProfile = ({ onClose }) => {
     }
   };
 
-  const handleLogout = async () => {
+  const handleLogout = async() => {
     if (window.confirm('Are you sure you want to sign out?')) {
       await logout();
     }
@@ -103,12 +105,12 @@ const UserProfile = ({ onClose }) => {
       const newPrefs = { ...prev };
       const keys = path.split('.');
       let current = newPrefs;
-      
+
       for (let i = 0; i < keys.length - 1; i++) {
         if (!current[keys[i]]) current[keys[i]] = {};
         current = current[keys[i]];
       }
-      
+
       current[keys[keys.length - 1]] = value;
       return newPrefs;
     });
@@ -135,7 +137,7 @@ const UserProfile = ({ onClose }) => {
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div className="bg-white rounded-lg p-6">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto" />
           <p className="mt-2 text-gray-600">Loading profile...</p>
         </div>
       </div>
@@ -247,8 +249,8 @@ const UserProfile = ({ onClose }) => {
                   <button
                     onClick={() => updatePreference('theme', 'light')}
                     className={`flex items-center px-4 py-2 rounded-lg border ${
-                      preferences.theme === 'light' 
-                        ? 'border-blue-500 bg-blue-50 text-blue-700' 
+                      preferences.theme === 'light'
+                        ? 'border-blue-500 bg-blue-50 text-blue-700'
                         : 'border-gray-300 hover:bg-gray-50'
                     }`}
                   >
@@ -258,8 +260,8 @@ const UserProfile = ({ onClose }) => {
                   <button
                     onClick={() => updatePreference('theme', 'dark')}
                     className={`flex items-center px-4 py-2 rounded-lg border ${
-                      preferences.theme === 'dark' 
-                        ? 'border-blue-500 bg-blue-50 text-blue-700' 
+                      preferences.theme === 'dark'
+                        ? 'border-blue-500 bg-blue-50 text-blue-700'
                         : 'border-gray-300 hover:bg-gray-50'
                     }`}
                   >
@@ -305,7 +307,7 @@ const UserProfile = ({ onClose }) => {
                     />
                     <span className="ml-2 text-sm text-gray-700">Auto-save models</span>
                   </label>
-                  
+
                   <div className="flex items-center space-x-4">
                     <label className="text-sm text-gray-700">Default Currency:</label>
                     <select
@@ -332,9 +334,11 @@ const UserProfile = ({ onClose }) => {
               </button>
 
               {saveStatus && (
-                <div className={`flex items-center p-3 rounded-lg ${
-                  saveStatus.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
-                }`}>
+                <div
+                  className={`flex items-center p-3 rounded-lg ${
+                    saveStatus.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
+                  }`}
+                >
                   {saveStatus.type === 'success' ? (
                     <CheckCircle className="w-4 h-4 mr-2" />
                   ) : (
@@ -354,7 +358,7 @@ const UserProfile = ({ onClose }) => {
                   <div>
                     <h4 className="font-medium text-amber-900">Demo Mode</h4>
                     <p className="text-sm text-amber-700 mt-1">
-                      Security features are simulated in demo mode. In production, this would include password changes, 
+                      Security features are simulated in demo mode. In production, this would include password changes,
                       two-factor authentication, and session management.
                     </p>
                   </div>
@@ -366,7 +370,7 @@ const UserProfile = ({ onClose }) => {
                   <Key className="w-4 h-4 mr-2" />
                   Change Password
                 </button>
-                
+
                 <button className="flex items-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
                   <Shield className="w-4 h-4 mr-2" />
                   Enable Two-Factor Authentication
@@ -392,13 +396,13 @@ const UserProfile = ({ onClose }) => {
                 <p className="text-sm text-gray-600 mb-4">
                   Export your data for backup or transfer to another account.
                 </p>
-                
+
                 <div className="flex space-x-4">
                   <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
                     <Download className="w-4 h-4 mr-2" />
                     Export Data
                   </button>
-                  
+
                   <button className="flex items-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
                     <Upload className="w-4 h-4 mr-2" />
                     Import Data

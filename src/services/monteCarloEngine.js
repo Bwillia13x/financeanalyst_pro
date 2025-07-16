@@ -147,7 +147,7 @@ class MonteCarloEngine {
 
         const scenarioInputs = this.createScenarioInputs(baseInputs, samples[i], distributions);
         const lboResult = this.calculateLBOScenario(scenarioInputs);
-        
+
         results.push({
           iteration: i + 1,
           irr: lboResult.irr,
@@ -214,16 +214,16 @@ class MonteCarloEngine {
     // Apply correlation if matrix is provided
     if (correlationMatrix && correlationMatrix.length === numVars) {
       const choleskyMatrix = this.choleskyDecomposition(correlationMatrix);
-      
+
       for (let i = 0; i < iterations; i++) {
         const correlatedSample = {};
         const independentValues = variables.map(v => independentSamples[i][v]);
         const correlatedValues = this.applyCorrelation(independentValues, choleskyMatrix);
-        
+
         variables.forEach((variable, index) => {
           correlatedSample[variable] = correlatedValues[index];
         });
-        
+
         samples.push(correlatedSample);
       }
     } else {
@@ -244,20 +244,21 @@ class MonteCarloEngine {
     switch (type) {
       case 'normal':
         return this.normalRandom(parameters.mean, parameters.stdDev);
-      
-      case 'lognormal':
+
+      case 'lognormal': {
         const normalSample = this.normalRandom(parameters.mu, parameters.sigma);
         return Math.exp(normalSample);
-      
+      }
+
       case 'uniform':
         return parameters.min + Math.random() * (parameters.max - parameters.min);
-      
+
       case 'triangular':
         return this.triangularRandom(parameters.min, parameters.mode, parameters.max);
-      
+
       case 'beta':
         return this.betaRandom(parameters.alpha, parameters.beta);
-      
+
       default:
         throw new Error(`Unsupported distribution type: ${type}`);
     }
@@ -280,7 +281,7 @@ class MonteCarloEngine {
     const u2 = Math.random();
     const z0 = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
     const z1 = Math.sqrt(-2 * Math.log(u1)) * Math.sin(2 * Math.PI * u2);
-    
+
     this.spareNormal = z1;
     return z0 * stdDev + mean;
   }
@@ -295,7 +296,7 @@ class MonteCarloEngine {
   triangularRandom(min, mode, max) {
     const u = Math.random();
     const c = (mode - min) / (max - min);
-    
+
     if (u < c) {
       return min + Math.sqrt(u * (max - min) * (mode - min));
     } else {
@@ -323,23 +324,24 @@ class MonteCarloEngine {
   gammaRandom(shape) {
     // Marsaglia and Tsang's method for shape >= 1
     if (shape >= 1) {
-      const d = shape - 1/3;
+      const d = shape - 1 / 3;
       const c = 1 / Math.sqrt(9 * d);
-      
+
+      // eslint-disable-next-line no-constant-condition
       while (true) {
         let x, v;
         do {
           x = this.normalRandom();
           v = 1 + c * x;
         } while (v <= 0);
-        
+
         v = v * v * v;
         const u = Math.random();
-        
+
         if (u < 1 - 0.0331 * x * x * x * x) {
           return d * v;
         }
-        
+
         if (Math.log(u) < 0.5 * x * x + d * (1 - v + Math.log(v))) {
           return d * v;
         }
@@ -411,7 +413,7 @@ class MonteCarloEngine {
 
     Object.entries(samples).forEach(([variable, sample]) => {
       const distribution = distributions[variable];
-      
+
       if (distribution.applyTo) {
         // Apply sample to specific input field
         scenarioInputs[distribution.applyTo] = sample;
@@ -522,7 +524,7 @@ class MonteCarloEngine {
 
     metrics.forEach(metric => {
       const values = results.map(r => r[metric]).filter(v => v !== null && !isNaN(v)).sort((a, b) => a - b);
-      
+
       if (values.length === 0) return;
 
       const mean = values.reduce((sum, v) => sum + v, 0) / values.length;

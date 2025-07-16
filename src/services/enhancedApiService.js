@@ -1,6 +1,8 @@
 import axios from 'axios';
-import { API_CONFIG, DATA_SOURCE_PRIORITY } from './apiConfig.js';
+
 import { apiLogger } from '../utils/apiLogger.js';
+
+import { API_CONFIG, DATA_SOURCE_PRIORITY } from './apiConfig.js';
 import { dataFetchingService } from './dataFetching.js';
 
 /**
@@ -13,7 +15,7 @@ class EnhancedApiService {
     this.sourceHealth = new Map();
     this.lastRequests = new Map();
     this.apiKeys = this.loadApiKeys();
-    
+
     // Initialize source health tracking
     this.initializeSourceHealth();
   }
@@ -33,10 +35,10 @@ class EnhancedApiService {
     const availableKeys = Object.entries(keys)
       .filter(([_, value]) => value && value !== 'demo')
       .map(([key, _]) => key);
-    
-    apiLogger.log('INFO', 'API keys loaded', { 
+
+    apiLogger.log('INFO', 'API keys loaded', {
       availableKeys,
-      totalKeys: availableKeys.length 
+      totalKeys: availableKeys.length
     });
 
     return keys;
@@ -47,7 +49,7 @@ class EnhancedApiService {
    */
   initializeSourceHealth() {
     const sources = ['ALPHA_VANTAGE', 'FMP', 'YAHOO_FINANCE', 'SEC_EDGAR', 'QUANDL', 'FRED'];
-    
+
     sources.forEach(source => {
       this.sourceHealth.set(source, {
         status: 'unknown',
@@ -78,10 +80,10 @@ class EnhancedApiService {
    */
   getBestSource(dataType) {
     const priorityList = DATA_SOURCE_PRIORITY[dataType] || [];
-    
+
     for (const source of priorityList) {
       const health = this.sourceHealth.get(source);
-      
+
       // Check if source is healthy and has valid API key (if required)
       if (health && health.status !== 'error') {
         if (this.requiresApiKey(source)) {
@@ -93,7 +95,7 @@ class EnhancedApiService {
         }
       }
     }
-    
+
     // Fallback to first available source
     return priorityList[0] || 'YAHOO_FINANCE';
   }
@@ -115,10 +117,10 @@ class EnhancedApiService {
    */
   async fetchRealTimeMarketData(symbol, options = {}) {
     const source = this.getBestSource('marketData');
-    
+
     try {
       let data;
-      
+
       switch (source) {
         case 'YAHOO_FINANCE':
           data = await this.fetchFromYahooFinance(symbol, options);
@@ -129,20 +131,20 @@ class EnhancedApiService {
         default:
           throw new Error(`Unsupported source for market data: ${source}`);
       }
-      
+
       this.updateSourceHealth(source, true, Date.now());
       return this.normalizeMarketData(data, source);
-      
+
     } catch (error) {
       this.updateSourceHealth(source, false, Date.now(), error);
-      
+
       // Try fallback source
       const fallbackSources = DATA_SOURCE_PRIORITY.marketData.filter(s => s !== source);
       if (fallbackSources.length > 0) {
         apiLogger.log('WARN', `Primary source ${source} failed, trying fallback`, { error: error.message });
         return this.fetchRealTimeMarketData(symbol, { ...options, excludeSource: source });
       }
-      
+
       throw error;
     }
   }
@@ -156,7 +158,7 @@ class EnhancedApiService {
   async fetchFromYahooFinance(symbol, options = {}) {
     const config = API_CONFIG.YAHOO_FINANCE;
     const url = `${config.baseURL}/${symbol}`;
-    
+
     const params = {
       range: options.range || '1d',
       interval: options.interval || '1m',
@@ -186,14 +188,16 @@ class EnhancedApiService {
    * @param {Object} options - Request options
    * @returns {Promise<Object>} Raw data from Alpha Vantage
    */
+  // eslint-disable-next-line camelcase
   async fetchFromAlphaVantage(symbol, function_name, options = {}) {
     if (!this.hasValidApiKey('ALPHA_VANTAGE')) {
       throw new Error('Alpha Vantage API key not available');
     }
 
     const config = API_CONFIG.ALPHA_VANTAGE;
-    
+
     const params = {
+      // eslint-disable-next-line camelcase
       function: function_name,
       symbol,
       apikey: this.apiKeys.ALPHA_VANTAGE,
@@ -234,7 +238,7 @@ class EnhancedApiService {
       { key: 'peers', method: 'fetchPeerComparison' }
     ];
 
-    const promises = dataTypes.map(async ({ key, method }) => {
+    const promises = dataTypes.map(async({ key, method }) => {
       try {
         if (method === 'fetchFinancialStatements') {
           results[key] = await dataFetchingService[method](symbol, 'income-statement');

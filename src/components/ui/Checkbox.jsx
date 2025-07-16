@@ -109,7 +109,10 @@ const CheckboxGroup = React.forwardRef(
     ref
   ) => {
     return (
-      <fieldset ref={ref} disabled={disabled} className={cn('space-y-3', className)} {...props}>
+      <fieldset
+        ref={ref} disabled={disabled} className={cn('space-y-3', className)}
+        {...props}
+      >
         {label && (
           <legend
             className={cn('text-sm font-medium', error ? 'text-destructive' : 'text-foreground')}

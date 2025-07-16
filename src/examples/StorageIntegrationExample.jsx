@@ -3,10 +3,11 @@
  * Demonstrates how to integrate the new storage services with financial modeling components
  */
 
-import React, { useState, useEffect } from 'react';
 import { Save, FolderOpen, Download, Upload, Database } from 'lucide-react';
-import { useDCFStorage, useUserPreferences, useStorageStats } from '../hooks/useFinancialStorage.js';
+import React, { useState, useEffect } from 'react';
+
 import DataExportImport from '../components/DataExportImport.jsx';
+import { useDCFStorage, useUserPreferences, useStorageStats } from '../hooks/useFinancialStorage.js';
 
 const StorageIntegrationExample = () => {
   const [showDataManager, setShowDataManager] = useState(false);
@@ -46,7 +47,7 @@ const StorageIntegrationExample = () => {
     }
   }, [modelData, preferences?.autoSave]);
 
-  const handleSaveModel = async () => {
+  const handleSaveModel = async() => {
     const success = await saveModel(modelData.symbol, {
       ...modelData,
       metadata: {
@@ -62,7 +63,7 @@ const StorageIntegrationExample = () => {
     }
   };
 
-  const handleLoadModel = async (symbol) => {
+  const handleLoadModel = async(symbol) => {
     const model = await getModel(symbol);
     if (model) {
       setModelData(model);
@@ -70,7 +71,7 @@ const StorageIntegrationExample = () => {
     }
   };
 
-  const handleDeleteModel = async (symbol) => {
+  const handleDeleteModel = async(symbol) => {
     if (window.confirm(`Are you sure you want to delete the model for ${symbol}?`)) {
       const success = await deleteModel(symbol);
       if (success && selectedModel === symbol) {
@@ -135,7 +136,7 @@ const StorageIntegrationExample = () => {
               <FolderOpen className="w-4 h-4 mr-2" />
               Saved Models
             </h3>
-            
+
             {loading ? (
               <div className="text-sm text-gray-500">Loading models...</div>
             ) : error ? (
@@ -185,7 +186,7 @@ const StorageIntegrationExample = () => {
           {/* Model Input Panel */}
           <div className="bg-gray-50 rounded-lg p-4">
             <h3 className="font-semibold text-gray-900 mb-4">DCF Model Inputs</h3>
-            
+
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -251,7 +252,7 @@ const StorageIntegrationExample = () => {
           {/* Results Panel */}
           <div className="bg-gray-50 rounded-lg p-4">
             <h3 className="font-semibold text-gray-900 mb-4">Valuation Results</h3>
-            
+
             <div className="space-y-3">
               <div className="bg-white rounded p-3">
                 <div className="text-sm text-gray-600">Intrinsic Value</div>
@@ -269,9 +270,11 @@ const StorageIntegrationExample = () => {
 
               <div className="bg-white rounded p-3">
                 <div className="text-sm text-gray-600">Upside/Downside</div>
-                <div className={`text-lg font-semibold ${
-                  modelData.valuation.upside > 0 ? 'text-green-600' : 'text-red-600'
-                }`}>
+                <div
+                  className={`text-lg font-semibold ${
+                    modelData.valuation.upside > 0 ? 'text-green-600' : 'text-red-600'
+                  }`}
+                >
                   {(modelData.valuation.upside * 100).toFixed(1)}%
                 </div>
               </div>

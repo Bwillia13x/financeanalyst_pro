@@ -339,11 +339,17 @@ const FormulaBuilder = ({ onFormulaCreate, variables }) => {
             </div>
 
             <div className="flex items-center justify-between">
-              <Button variant="outline" size="sm" iconName="Trash2" onClick={clearFormula}>
+              <Button
+                variant="outline" size="sm" iconName="Trash2"
+                onClick={clearFormula}
+              >
                 Clear
               </Button>
               <div className="flex items-center space-x-2">
-                <Button variant="outline" size="sm" iconName="Eye" disabled={!validateFormula()}>
+                <Button
+                  variant="outline" size="sm" iconName="Eye"
+                  disabled={!validateFormula()}
+                >
                   Preview
                 </Button>
                 <Button

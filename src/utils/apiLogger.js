@@ -128,11 +128,11 @@ class ApiLogger {
         duration,
         error: error
           ? {
-              message: error.message,
-              code: error.code,
-              status: error.response?.status,
-              statusText: error.response?.statusText
-            }
+            message: error.message,
+            code: error.code,
+            status: error.response?.status,
+            statusText: error.response?.statusText
+          }
           : null,
         success: false
       });
@@ -389,6 +389,11 @@ class ApiLogger {
   }
 
   outputToConsole(logEntry) {
+    // Skip console output in production
+    if (import.meta.env.PROD) {
+      return;
+    }
+
     const { level, message, metadata } = logEntry;
     const timestamp = new Date(logEntry.timestamp).toLocaleTimeString();
 
@@ -403,6 +408,7 @@ class ApiLogger {
     const reset = '\x1b[0m';
     const color = colors[level] || colors.INFO;
 
+    // eslint-disable-next-line no-console
     console.log(
       `${color}[${timestamp}] ${level}:${reset} ${message}`,
       Object.keys(metadata).length > 0 ? metadata : ''

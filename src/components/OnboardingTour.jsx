@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
+import { useState, useEffect } from 'react';
 
 import Icon from './AppIcon';
 import Button from './ui/Button';
@@ -289,6 +290,11 @@ const OnboardingTour = ({ onComplete, onSkip }) => {
       </motion.div>
     </>
   );
+};
+
+OnboardingTour.propTypes = {
+  onComplete: PropTypes.func,
+  onSkip: PropTypes.func
 };
 
 // Hook to manage onboarding state

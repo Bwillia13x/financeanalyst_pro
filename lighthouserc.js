@@ -32,27 +32,27 @@ module.exports = {
         'categories:accessibility': ['error', { minScore: 0.95 }],
         'categories:best-practices': ['error', { minScore: 0.90 }],
         'categories:seo': ['error', { minScore: 0.90 }],
-        
+
         // Core Web Vitals
         'first-contentful-paint': ['error', { maxNumericValue: 2000 }],
         'largest-contentful-paint': ['error', { maxNumericValue: 2500 }],
         'cumulative-layout-shift': ['error', { maxNumericValue: 0.1 }],
         'total-blocking-time': ['error', { maxNumericValue: 300 }],
-        
+
         // Resource optimization
         'unused-javascript': ['warn', { maxNumericValue: 100000 }],
         'unused-css-rules': ['warn', { maxNumericValue: 50000 }],
         'render-blocking-resources': ['warn', { maxNumericValue: 500 }],
-        
+
         // Image optimization
         'modern-image-formats': 'error',
         'efficient-animated-content': 'error',
         'uses-optimized-images': 'warn',
-        
+
         // Caching and compression
         'uses-long-cache-ttl': 'warn',
         'uses-text-compression': 'error',
-        
+
         // Bundle size
         'total-byte-weight': ['warn', { maxNumericValue: 1600000 }], // 1.6MB
         'dom-size': ['warn', { maxNumericValue: 1500 }]
