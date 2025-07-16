@@ -6,25 +6,29 @@ import {
 } from '../encryptionService.js';
 import { cryptoUtils } from '../../utils/cryptoUtils.js';
 
-vi.mock('../../utils/cryptoUtils.js', () => ({
-  cryptoUtils: {
-    getRandomValues: vi.fn((arr) => {
-      for (let i = 0; i < arr.length; i++) {
-        arr[i] = Math.floor(Math.random() * 256);
-      }
-      return arr;
-    }),
-    subtle: {
-      importKey: vi.fn(),
-      deriveKey: vi.fn(),
-      generateKey: vi.fn(),
-      encrypt: vi.fn(),
-      decrypt: vi.fn(),
-      digest: vi.fn(),
-      exportKey: vi.fn()
+// Mock window.crypto
+const mockCrypto = {
+  getRandomValues: vi.fn((arr) => {
+    for (let i = 0; i < arr.length; i++) {
+      arr[i] = Math.floor(Math.random() * 256);
     }
+    return arr;
+  }),
+  subtle: {
+    importKey: vi.fn(),
+    deriveKey: vi.fn(),
+    generateKey: vi.fn(),
+    encrypt: vi.fn(),
+    decrypt: vi.fn(),
+    digest: vi.fn(),
+    exportKey: vi.fn()
   }
-}));
+};
+
+Object.defineProperty(window, 'crypto', {
+  value: mockCrypto,
+  writable: true
+});
 
 // Mock btoa and atob
 global.btoa = vi.fn((str) => Buffer.from(str, 'binary').toString('base64'));
@@ -96,8 +100,8 @@ describe('EncryptionService', () => {
       const mockKeyMaterial = 'mock-key-material';
       const mockDerivedKey = 'mock-derived-key';
       
-      cryptoUtils.subtle.importKey.mockResolvedValue(mockKeyMaterial);
-      cryptoUtils.subtle.deriveKey.mockResolvedValue(mockDerivedKey);
+      mockCrypto.subtle.importKey.mockResolvedValue(mockKeyMaterial);
+      mockCrypto.subtle.deriveKey.mockResolvedValue(mockDerivedKey);
       
       const result = await encryptionService.deriveKeyFromPassword('password', mockSalt);
       
@@ -106,7 +110,7 @@ describe('EncryptionService', () => {
         salt: mockSalt
       });
       
-      expect(cryptoUtils.subtle.importKey).toHaveBeenCalledWith(
+      expect(mockCrypto.subtle.importKey).toHaveBeenCalledWith(
         'raw',
         expect.any(Uint8Array),
         { name: 'PBKDF2' },
@@ -119,8 +123,8 @@ describe('EncryptionService', () => {
       const mockKeyMaterial = 'mock-key-material';
       const mockDerivedKey = 'mock-derived-key';
       
-      cryptoUtils.subtle.importKey.mockResolvedValue(mockKeyMaterial);
-      cryptoUtils.subtle.deriveKey.mockResolvedValue(mockDerivedKey);
+      mockCrypto.subtle.importKey.mockResolvedValue(mockKeyMaterial);
+      mockCrypto.subtle.deriveKey.mockResolvedValue(mockDerivedKey);
       
       const result = await encryptionService.deriveKeyFromPassword('password');
       

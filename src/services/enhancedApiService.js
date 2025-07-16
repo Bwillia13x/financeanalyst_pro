@@ -15,6 +15,23 @@ class EnhancedApiService {
     this.sourceHealth = new Map();
     this.lastRequests = new Map();
     this.apiKeys = this.loadApiKeys();
+    this.cache = new Map();
+    this.metrics = {
+      totalRequests: 0,
+      successfulRequests: 0,
+      failedRequests: 0,
+      avgResponseTime: 0
+    };
+    this.requestInterceptors = [];
+    this.responseInterceptors = [];
+    this.authToken = null;
+    this.baseUrl = 'https://api.example.com';
+    this.defaultHeaders = {};
+    this.timeout = 10000;
+    this.rateLimitInfo = {
+      remaining: 100,
+      reset: Date.now() + 3600000
+    };
 
     // Initialize source health tracking
     this.initializeSourceHealth();
@@ -396,6 +413,177 @@ class EnhancedApiService {
       }
     });
     return Array.from(sources);
+  }
+
+  // Cache management
+  clearCache() {
+    // Implementation for cache clearing
+    this.cache = new Map();
+  }
+
+  // Metrics management
+  resetMetrics() {
+    this.metrics = {
+      totalRequests: 0,
+      successfulRequests: 0,
+      failedRequests: 0,
+      avgResponseTime: 0
+    };
+  }
+
+  // Basic request method
+  async request(endpoint, options = {}) {
+    const baseUrl = this.getBaseUrl();
+    const url = `${baseUrl}${endpoint}`;
+    
+    const config = {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        ...this.getDefaultHeaders(),
+        ...options.headers
+      },
+      ...options
+    };
+
+    // Add auth token if available
+    if (this.authToken) {
+      config.headers.Authorization = `Bearer ${this.authToken}`;
+    }
+
+    // Apply request interceptors
+    for (const interceptor of this.requestInterceptors) {
+      Object.assign(config, interceptor(config));
+    }
+
+    const startTime = Date.now();
+    
+    try {
+      const response = await fetch(url, config);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`);
+      }
+
+      let data = await response.json();
+
+      // Apply response interceptors
+      for (const interceptor of this.responseInterceptors) {
+        data = interceptor(data);
+      }
+
+      this.updateMetrics(true, Date.now() - startTime);
+      return data;
+    } catch (error) {
+      this.updateMetrics(false, Date.now() - startTime);
+      throw error;
+    }
+  }
+
+  // Auth token management
+  setAuthToken(token) {
+    this.authToken = token;
+  }
+
+  // Interceptors
+  addRequestInterceptor(interceptor) {
+    this.requestInterceptors.push(interceptor);
+  }
+
+  addResponseInterceptor(interceptor) {
+    this.responseInterceptors.push(interceptor);
+  }
+
+  // Retry mechanism
+  async requestWithRetry(endpoint, options = {}, maxRetries = 3) {
+    let lastError;
+    
+    for (let i = 0; i < maxRetries; i++) {
+      try {
+        return await this.request(endpoint, options);
+      } catch (error) {
+        lastError = error;
+        if (i < maxRetries - 1) {
+          await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
+        }
+      }
+    }
+    
+    throw lastError;
+  }
+
+  // Configuration methods
+  setBaseUrl(url) {
+    this.baseUrl = url;
+  }
+
+  getBaseUrl() {
+    return this.baseUrl || 'https://api.example.com';
+  }
+
+  setDefaultHeaders(headers) {
+    this.defaultHeaders = headers;
+  }
+
+  getDefaultHeaders() {
+    return this.defaultHeaders || {};
+  }
+
+  setTimeout(timeout) {
+    this.timeout = timeout;
+  }
+
+  getTimeout() {
+    return this.timeout || 10000;
+  }
+
+  // Metrics
+  getMetrics() {
+    return this.metrics || {
+      totalRequests: 0,
+      successfulRequests: 0,
+      failedRequests: 0,
+      avgResponseTime: 0
+    };
+  }
+
+  updateMetrics(success, responseTime) {
+    if (!this.metrics) {
+      this.metrics = {
+        totalRequests: 0,
+        successfulRequests: 0,
+        failedRequests: 0,
+        avgResponseTime: 0
+      };
+    }
+
+    this.metrics.totalRequests++;
+    if (success) {
+      this.metrics.successfulRequests++;
+    } else {
+      this.metrics.failedRequests++;
+    }
+
+    this.metrics.avgResponseTime = 
+      (this.metrics.avgResponseTime + responseTime) / 2;
+  }
+
+  // Rate limiting
+  getRateLimitInfo() {
+    return this.rateLimitInfo || {
+      remaining: 100,
+      reset: Date.now() + 3600000
+    };
+  }
+
+  // Batch requests
+  async batchRequests(endpoints) {
+    const promises = endpoints.map(endpoint => 
+      this.request(endpoint).catch(error => error)
+    );
+    
+    return Promise.all(promises);
   }
 }
 
