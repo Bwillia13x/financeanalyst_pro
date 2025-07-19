@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+
 import monitoring from '../monitoring.js';
 
 // Mock Sentry import
@@ -121,7 +122,7 @@ describe.skip('MonitoringService', () => {
   describe('Google Analytics Integration', () => {
     it('should initialize Google Analytics with correct tracking ID', () => {
       monitoring.initializeGoogleAnalytics();
-      
+
       expect(mockDocument.createElement).toHaveBeenCalledWith('script');
       expect(mockDocument.head.appendChild).toHaveBeenCalled();
       expect(mockWindow.dataLayer).toBeDefined();
@@ -130,12 +131,12 @@ describe.skip('MonitoringService', () => {
     it('should not initialize GA without tracking ID', () => {
       const originalEnv = import.meta.env.VITE_GA_TRACKING_ID;
       import.meta.env.VITE_GA_TRACKING_ID = '';
-      
+
       const createElementSpy = vi.spyOn(mockDocument, 'createElement');
       monitoring.initializeGoogleAnalytics();
-      
+
       expect(createElementSpy).not.toHaveBeenCalled();
-      
+
       import.meta.env.VITE_GA_TRACKING_ID = originalEnv;
     });
   });
@@ -144,9 +145,9 @@ describe.skip('MonitoringService', () => {
     it('should track errors with Sentry when available', () => {
       const testError = new Error('Test error');
       const additionalData = { context: 'test' };
-      
+
       monitoring.trackError(testError, 'test_error', additionalData);
-      
+
       expect(mockSentry.captureException).toHaveBeenCalledWith(testError, {
         tags: { category: 'test_error' },
         extra: additionalData
@@ -155,9 +156,9 @@ describe.skip('MonitoringService', () => {
 
     it('should log errors to console', () => {
       const testError = new Error('Test error');
-      
+
       monitoring.trackError(testError, 'test_error');
-      
+
       expect(console.error).toHaveBeenCalledWith(
         '[test_error]',
         testError,
@@ -168,12 +169,12 @@ describe.skip('MonitoringService', () => {
     it('should not track errors when error reporting is disabled', () => {
       const originalSetting = monitoring.enableErrorReporting;
       monitoring.enableErrorReporting = false;
-      
+
       const testError = new Error('Test error');
       monitoring.trackError(testError);
-      
+
       expect(mockSentry.captureException).not.toHaveBeenCalled();
-      
+
       monitoring.enableErrorReporting = originalSetting;
     });
   });
@@ -182,21 +183,21 @@ describe.skip('MonitoringService', () => {
     it('should track events with Google Analytics', () => {
       const eventName = 'test_event';
       const properties = { value: 123 };
-      
+
       monitoring.trackEvent(eventName, properties);
-      
+
       expect(mockGtag).toHaveBeenCalledWith('event', eventName, properties);
     });
 
     it('should send events to custom analytics endpoint', () => {
       const originalProduction = monitoring.isProduction;
       monitoring.isProduction = true;
-      
+
       const eventName = 'test_event';
       const properties = { value: 123 };
-      
+
       monitoring.trackEvent(eventName, properties);
-      
+
       expect(global.fetch).toHaveBeenCalledWith('/api/analytics', {
         method: 'POST',
         headers: {
@@ -204,18 +205,18 @@ describe.skip('MonitoringService', () => {
         },
         body: expect.stringContaining(eventName)
       });
-      
+
       monitoring.isProduction = originalProduction;
     });
 
     it('should not track events when analytics is disabled', () => {
       const originalSetting = monitoring.enableAnalytics;
       monitoring.enableAnalytics = false;
-      
+
       monitoring.trackEvent('test_event');
-      
+
       expect(mockGtag).not.toHaveBeenCalled();
-      
+
       monitoring.enableAnalytics = originalSetting;
     });
   });
@@ -224,9 +225,9 @@ describe.skip('MonitoringService', () => {
     it('should track page views with correct data', () => {
       const pageName = 'test-page';
       const additionalData = { section: 'dashboard' };
-      
+
       monitoring.trackPageView(pageName, additionalData);
-      
+
       expect(mockGtag).toHaveBeenCalledWith('event', 'page_view', {
         page: pageName,
         title: mockDocument.title,
@@ -241,9 +242,9 @@ describe.skip('MonitoringService', () => {
       const action = 'click';
       const element = 'button';
       const additionalData = { buttonId: 'submit' };
-      
+
       monitoring.trackUserInteraction(action, element, additionalData);
-      
+
       expect(mockGtag).toHaveBeenCalledWith('event', 'user_interaction', {
         action,
         element,
@@ -255,9 +256,9 @@ describe.skip('MonitoringService', () => {
   describe('Performance Monitoring', () => {
     it('should monitor memory usage when available', () => {
       const setIntervalSpy = vi.spyOn(global, 'setInterval');
-      
+
       monitoring.monitorMemoryUsage();
-      
+
       expect(setIntervalSpy).toHaveBeenCalledWith(
         expect.any(Function),
         60000
@@ -266,9 +267,9 @@ describe.skip('MonitoringService', () => {
 
     it('should monitor API performance', () => {
       const originalFetch = global.fetch;
-      
+
       monitoring.monitorApiPerformance();
-      
+
       // Verify that fetch has been wrapped
       expect(global.fetch).not.toBe(originalFetch);
     });
@@ -279,9 +280,9 @@ describe.skip('MonitoringService', () => {
         value: 0.1,
         rating: 'good'
       };
-      
+
       monitoring.sendToAnalytics(mockMetric);
-      
+
       expect(mockGtag).toHaveBeenCalledWith('event', 'web_vital', {
         name: 'CLS',
         value: 0.1,
@@ -294,12 +295,12 @@ describe.skip('MonitoringService', () => {
     it('should send data to custom analytics endpoint in production', () => {
       const originalProduction = monitoring.isProduction;
       monitoring.isProduction = true;
-      
+
       const eventName = 'custom_event';
       const properties = { customProp: 'value' };
-      
+
       monitoring.sendToCustomAnalytics(eventName, properties);
-      
+
       expect(global.fetch).toHaveBeenCalledWith('/api/analytics', {
         method: 'POST',
         headers: {
@@ -307,27 +308,27 @@ describe.skip('MonitoringService', () => {
         },
         body: expect.stringContaining(eventName)
       });
-      
+
       monitoring.isProduction = originalProduction;
     });
 
     it('should not send to custom analytics in non-production', () => {
       monitoring.sendToCustomAnalytics('test_event', {});
-      
+
       expect(global.fetch).not.toHaveBeenCalled();
     });
 
-    it('should handle analytics endpoint failures gracefully', async () => {
+    it('should handle analytics endpoint failures gracefully', async() => {
       const originalProduction = monitoring.isProduction;
       monitoring.isProduction = true;
-      
+
       global.fetch.mockRejectedValue(new Error('Network error'));
-      
+
       // Should not throw
       expect(() => {
         monitoring.sendToCustomAnalytics('test_event', {});
       }).not.toThrow();
-      
+
       monitoring.isProduction = originalProduction;
     });
   });
@@ -338,9 +339,9 @@ describe.skip('MonitoringService', () => {
         observe: vi.fn()
       };
       mockPerformanceObserver.mockReturnValue(mockObserver);
-      
+
       monitoring.monitorResourceLoading();
-      
+
       expect(mockPerformanceObserver).toHaveBeenCalled();
       expect(mockObserver.observe).toHaveBeenCalledWith({
         entryTypes: ['resource']
@@ -354,16 +355,16 @@ describe.skip('MonitoringService', () => {
       mockWindow.addEventListener.mockImplementation((event, handler) => {
         errorHandlers[event] = handler;
       });
-      
+
       monitoring.setupGlobalErrorHandlers();
-      
+
       const mockRejectionEvent = {
         reason: new Error('Unhandled promise rejection')
       };
-      
+
       const trackErrorSpy = vi.spyOn(monitoring, 'trackError');
       errorHandlers['unhandledrejection'](mockRejectionEvent);
-      
+
       expect(trackErrorSpy).toHaveBeenCalledWith(
         mockRejectionEvent.reason,
         'unhandled_promise_rejection'
@@ -375,19 +376,19 @@ describe.skip('MonitoringService', () => {
       mockWindow.addEventListener.mockImplementation((event, handler) => {
         errorHandlers[event] = handler;
       });
-      
+
       monitoring.setupGlobalErrorHandlers();
-      
+
       const mockErrorEvent = {
         error: new Error('JavaScript error'),
         filename: 'test.js',
         lineno: 10,
         colno: 5
       };
-      
+
       const trackErrorSpy = vi.spyOn(monitoring, 'trackError');
       errorHandlers['error'](mockErrorEvent);
-      
+
       expect(trackErrorSpy).toHaveBeenCalledWith(
         mockErrorEvent.error,
         'javascript_error',
@@ -403,27 +404,27 @@ describe.skip('MonitoringService', () => {
   describe('Hotjar Integration', () => {
     it('should initialize Hotjar with correct ID', () => {
       const originalHj = global.window.hj;
-      
+
       monitoring.initializeHotjar();
-      
+
       expect(global.window.hj).toBeDefined();
       expect(global.window._hjSettings).toEqual({
         hjid: '12345',
         hjsv: 6
       });
-      
+
       global.window.hj = originalHj;
     });
 
     it('should not initialize Hotjar without ID', () => {
       const originalEnv = import.meta.env.VITE_HOTJAR_ID;
       import.meta.env.VITE_HOTJAR_ID = '';
-      
+
       const originalHj = global.window.hj;
       monitoring.initializeHotjar();
-      
+
       expect(global.window.hj).toBe(originalHj);
-      
+
       import.meta.env.VITE_HOTJAR_ID = originalEnv;
     });
   });
@@ -434,9 +435,9 @@ describe.skip('MonitoringService', () => {
         observe: vi.fn()
       };
       mockPerformanceObserver.mockReturnValue(mockObserver);
-      
+
       monitoring.monitorComponentPerformance();
-      
+
       expect(mockPerformanceObserver).toHaveBeenCalled();
       expect(mockObserver.observe).toHaveBeenCalledWith({
         entryTypes: ['measure']

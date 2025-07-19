@@ -2,6 +2,7 @@ import axios from 'axios';
 
 import { apiKeyValidator } from '../utils/apiKeyValidator.js';
 import { apiLogger } from '../utils/apiLogger.js';
+
 import { financialModelingEngine } from './financialModelingEngine.js';
 import { lboModelingEngine } from './lboModelingEngine.js';
 import { monteCarloEngine } from './monteCarloEngine.js';
@@ -519,8 +520,8 @@ class DataFetchingService {
       return mockData;
     }
 
-    return this.circuitBreakers.FMP.execute(async () => {
-      return this.retryManager.executeWithRetry(async () => {
+    return this.circuitBreakers.FMP.execute(async() => {
+      return this.retryManager.executeWithRetry(async() => {
         await this.checkRateLimit('FMP');
 
         // Log API request start
@@ -593,7 +594,7 @@ class DataFetchingService {
     }
 
     return this.retryManager
-      .executeWithRetry(async () => {
+      .executeWithRetry(async() => {
         await this.checkRateLimit('FMP');
 
         const response = await axios.get(`${DATA_SOURCES.FMP.baseURL}/${statement}/${ticker}`, {
@@ -640,7 +641,7 @@ class DataFetchingService {
     }
 
     try {
-      return await this.retryManager.executeWithRetry(async () => {
+      return await this.retryManager.executeWithRetry(async() => {
         // Try Yahoo Finance first (no API key required)
         const response = await axios.get(`${DATA_SOURCES.YAHOO_FINANCE.baseURL}/${ticker}`, {
           params: { range, interval: '1d' },
@@ -680,7 +681,7 @@ class DataFetchingService {
     }
 
     try {
-      return await this.retryManager.executeWithRetry(async () => {
+      return await this.retryManager.executeWithRetry(async() => {
         await this.checkRateLimit('ALPHA_VANTAGE');
 
         const response = await axios.get(DATA_SOURCES.ALPHA_VANTAGE.baseURL, {

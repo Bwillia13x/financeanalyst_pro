@@ -15,6 +15,6 @@ export const cryptoUtils = {
     encrypt: (...args) => getCrypto().subtle.encrypt(...args),
     decrypt: (...args) => getCrypto().subtle.decrypt(...args),
     exportKey: (...args) => getCrypto().subtle.exportKey(...args),
-    digest: (...args) => getCrypto().subtle.digest(...args),
-  },
+    digest: (...args) => getCrypto().subtle.digest(...args)
+  }
 };

@@ -3,8 +3,9 @@
  * Specialized storage utilities for financial models and market data
  */
 
-import { storageService } from './storageService.js';
 import { apiLogger } from '../utils/apiLogger.js';
+
+import { storageService } from './storageService.js';
 
 /**
  * Financial Data Storage Manager
@@ -34,7 +35,7 @@ class FinancialDataStorage {
       };
 
       await this.storage.setItem('dcfModel', symbol.toUpperCase(), dcfData);
-      
+
       apiLogger.log('INFO', 'DCF model saved', { symbol, valuation: dcfData.valuation.intrinsicValue });
       return true;
     } catch (error) {
@@ -84,11 +85,11 @@ class FinancialDataStorage {
       };
 
       await this.storage.setItem('lboModel', symbol.toUpperCase(), lboData);
-      
-      apiLogger.log('INFO', 'LBO model saved', { 
-        symbol, 
+
+      apiLogger.log('INFO', 'LBO model saved', {
+        symbol,
         irr: lboData.returns.irr,
-        moic: lboData.returns.moic 
+        moic: lboData.returns.moic
       });
       return true;
     } catch (error) {
@@ -138,11 +139,11 @@ class FinancialDataStorage {
       };
 
       await this.storage.setItem('monteCarloResults', modelId, mcData);
-      
-      apiLogger.log('INFO', 'Monte Carlo results saved', { 
-        modelId, 
+
+      apiLogger.log('INFO', 'Monte Carlo results saved', {
+        modelId,
         iterations: mcData.iterations,
-        mean: mcData.statistics.mean 
+        mean: mcData.statistics.mean
       });
       return true;
     } catch (error) {
@@ -186,11 +187,11 @@ class FinancialDataStorage {
       };
 
       await this.storage.setItem('marketData', symbol.toUpperCase(), data);
-      
-      apiLogger.log('DEBUG', 'Market data cached', { 
-        symbol, 
+
+      apiLogger.log('DEBUG', 'Market data cached', {
+        symbol,
         source: data.source,
-        ttlMinutes 
+        ttlMinutes
       });
       return true;
     } catch (error) {
@@ -202,7 +203,7 @@ class FinancialDataStorage {
   async getMarketData(symbol) {
     try {
       const data = await this.storage.getItem('marketData', symbol.toUpperCase());
-      
+
       if (data && data.expiresAt > Date.now()) {
         apiLogger.log('DEBUG', 'Market data cache hit', { symbol });
         return data.data;
@@ -211,7 +212,7 @@ class FinancialDataStorage {
         await this.deleteMarketData(symbol);
         apiLogger.log('DEBUG', 'Market data cache expired', { symbol });
       }
-      
+
       return null;
     } catch (error) {
       apiLogger.log('ERROR', 'Failed to retrieve market data', { symbol, error: error.message });
@@ -240,7 +241,7 @@ class FinancialDataStorage {
       };
 
       await this.storage.setItem('userPreferences', 'default', prefData);
-      
+
       apiLogger.log('INFO', 'User preferences saved', { theme: prefData.theme });
       return true;
     } catch (error) {
@@ -278,7 +279,7 @@ class FinancialDataStorage {
       };
 
       await this.storage.setItem('watchlist', name, watchlistData);
-      
+
       apiLogger.log('INFO', 'Watchlist saved', { name, symbolCount: symbols.length });
       return true;
     } catch (error) {
@@ -424,7 +425,7 @@ class FinancialDataStorage {
    */
   async getFinancialDataStats() {
     const stats = await this.storage.getStorageStats();
-    
+
     return {
       ...stats,
       financialData: {

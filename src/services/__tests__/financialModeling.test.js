@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
+
 import { financialModelingEngine } from '../financialModelingEngine.js';
 import { lboModelingEngine } from '../lboModelingEngine.js';
 import { monteCarloEngine } from '../monteCarloEngine.js';
@@ -267,7 +268,7 @@ describe('Financial Modeling Engine', () => {
     it('should generate triangular random variables', () => {
       const min = 0, mode = 0.5, max = 1;
       const samples = [];
-      
+
       for (let i = 0; i < 1000; i++) {
         const sample = monteCarloEngine.triangularRandom(min, mode, max);
         samples.push(sample);
@@ -309,7 +310,7 @@ describe('Financial Modeling Engine', () => {
 
     it('should calculate percentiles correctly', () => {
       const sortedValues = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-      
+
       expect(monteCarloEngine.percentile(sortedValues, 0.5)).toBe(5.5); // Median
       expect(monteCarloEngine.percentile(sortedValues, 0.25)).toBe(3.25); // 25th percentile
       expect(monteCarloEngine.percentile(sortedValues, 0.75)).toBe(7.75); // 75th percentile

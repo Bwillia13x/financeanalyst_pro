@@ -1,5 +1,6 @@
-import { API_CONFIG, DATA_SOURCE_PRIORITY } from './apiConfig.js';
 import { apiLogger } from '../utils/apiLogger.js';
+
+import { API_CONFIG, DATA_SOURCE_PRIORITY } from './apiConfig.js';
 import { dataFetchingService } from './dataFetching.js';
 
 class RateLimiter {
@@ -38,7 +39,7 @@ class EnhancedApiService {
     this.apiKeys = this.loadApiKeys();
     this.cache = new Map();
     this.rateLimitInfo = { remaining: null, reset: null };
-    
+
     // Initialize source health tracking
     this.initializeSourceHealth();
     this.rateLimiters.set('default', new RateLimiter(5, 1000));
@@ -59,10 +60,10 @@ class EnhancedApiService {
     const availableKeys = Object.entries(keys)
       .filter(([_, value]) => value && value !== 'demo')
       .map(([key, _]) => key);
-    
-    apiLogger.log('INFO', 'API keys loaded', { 
+
+    apiLogger.log('INFO', 'API keys loaded', {
       availableKeys,
-      totalKeys: availableKeys.length 
+      totalKeys: availableKeys.length
     });
 
     return keys;
@@ -73,7 +74,7 @@ class EnhancedApiService {
    */
   initializeSourceHealth() {
     const sources = ['ALPHA_VANTAGE', 'FMP', 'YAHOO_FINANCE', 'SEC_EDGAR', 'QUANDL', 'FRED'];
-    
+
     sources.forEach(source => {
       this.sourceHealth.set(source, {
         status: 'unknown',
@@ -104,10 +105,10 @@ class EnhancedApiService {
    */
   getBestSource(dataType) {
     const priorityList = DATA_SOURCE_PRIORITY[dataType] || [];
-    
+
     for (const source of priorityList) {
       const health = this.sourceHealth.get(source);
-      
+
       // Check if source is healthy and has valid API key (if required)
       if (health && health.status !== 'error') {
         if (this.requiresApiKey(source)) {
@@ -119,7 +120,7 @@ class EnhancedApiService {
         }
       }
     }
-    
+
     // Fallback to first available source
     return priorityList[0] || 'YAHOO_FINANCE';
   }
@@ -141,10 +142,10 @@ class EnhancedApiService {
    */
   async fetchRealTimeMarketData(symbol, options = {}) {
     const source = this.getBestSource('marketData');
-    
+
     try {
       let data;
-      
+
       switch (source) {
         case 'YAHOO_FINANCE':
           data = await this.fetchFromYahooFinance(symbol, options);
@@ -155,20 +156,20 @@ class EnhancedApiService {
         default:
           throw new Error(`Unsupported source for market data: ${source}`);
       }
-      
+
       this.updateSourceHealth(source, true, Date.now());
       return this.normalizeMarketData(data, source);
-      
+
     } catch (error) {
       this.updateSourceHealth(source, false, Date.now(), error);
-      
+
       // Try fallback source
       const fallbackSources = DATA_SOURCE_PRIORITY.marketData.filter(s => s !== source);
       if (fallbackSources.length > 0) {
         apiLogger.log('WARN', `Primary source ${source} failed, trying fallback`, { error: error.message });
         return this.fetchRealTimeMarketData(symbol, { ...options, excludeSource: source });
       }
-      
+
       throw error;
     }
   }
@@ -181,7 +182,7 @@ class EnhancedApiService {
    */
   async fetchFromYahooFinance(symbol, options = {}) {
     const url = `/v8/finance/chart/${symbol}`;
-    
+
     const params = {
       range: options.range || '1d',
       interval: options.interval || '1m',
@@ -225,7 +226,7 @@ class EnhancedApiService {
     }
 
     const config = API_CONFIG.ALPHA_VANTAGE;
-    
+
     const params = {
       function: function_name,
       symbol,
@@ -275,7 +276,7 @@ class EnhancedApiService {
       { key: 'peers', method: 'fetchPeerComparison' }
     ];
 
-    const promises = dataTypes.map(async ({ key, method }) => {
+    const promises = dataTypes.map(async({ key, method }) => {
       try {
         if (method === 'fetchFinancialStatements') {
           results[key] = await dataFetchingService[method](symbol, 'income-statement');
@@ -482,7 +483,7 @@ class EnhancedApiService {
       let config = {
         method: 'GET',
         headers: { ...this.defaultHeaders },
-        ...options,
+        ...options
       };
 
       if (this.authToken) {
@@ -492,7 +493,7 @@ class EnhancedApiService {
       for (const interceptor of this.requestInterceptors) {
         config = await interceptor(config);
       }
-      
+
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), this.timeout);
       config.signal = controller.signal;
@@ -507,7 +508,7 @@ class EnhancedApiService {
 
       this.rateLimitInfo.remaining = parseInt(response.headers.get('X-RateLimit-Remaining'), 10);
       this.rateLimitInfo.reset = parseInt(response.headers.get('X-RateLimit-Reset'), 10);
-      
+
       let responseData = await response.json();
 
       for (const interceptor of this.responseInterceptors) {
@@ -591,7 +592,7 @@ class EnhancedApiService {
    */
   async requestWithRetry(url, options = {}, retries = 3) {
     let lastError;
-    
+
     for (let i = 0; i <= retries; i++) {
       try {
         return await this.request(url, options);
@@ -603,7 +604,7 @@ class EnhancedApiService {
         }
       }
     }
-    
+
     throw lastError;
   }
 

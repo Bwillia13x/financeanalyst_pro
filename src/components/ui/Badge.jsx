@@ -1,5 +1,6 @@
-import React from "react";
-import { cn } from "../../utils/cn";
+import React from 'react';
+
+import { cn } from '../../utils/cn';
 
 /**
  * Minimal Badge component used only for tests / non-critical UI.
@@ -8,17 +9,17 @@ import { cn } from "../../utils/cn";
 const Badge = React.forwardRef(
   (
     {
-      className = "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-muted text-foreground",
-      variant = "default", // 'default' | 'outline'
+      className = 'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-muted text-foreground',
+      variant = 'default', // 'default' | 'outline'
       children,
       ...props
     },
     ref
   ) => {
     const variantClass =
-      variant === "outline"
-        ? "border border-input bg-transparent"
-        : "bg-primary text-primary-foreground";
+      variant === 'outline'
+        ? 'border border-input bg-transparent'
+        : 'bg-primary text-primary-foreground';
 
     return (
       <span ref={ref} className={cn(className, variantClass)} {...props}>
@@ -27,7 +28,7 @@ const Badge = React.forwardRef(
     );
   }
 );
-Badge.displayName = "Badge";
+Badge.displayName = 'Badge';
 
 export { Badge };
 export default Badge;

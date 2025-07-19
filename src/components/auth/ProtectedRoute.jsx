@@ -3,15 +3,16 @@
  * Provides route protection and role-based access control
  */
 
-import React, { useEffect, useState } from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
 import { Shield, AlertCircle, Loader2 } from 'lucide-react';
-import { authService, USER_ROLES, PERMISSIONS } from '../../services/authService.js';
+import { useEffect, useState } from 'react';
+import { Navigate, useLocation } from 'react-router-dom';
+
+import { authService } from '../../services/authService.js';
 import { apiLogger } from '../../utils/apiLogger.js';
 
-const ProtectedRoute = ({ 
-  children, 
-  requiredRoles = [], 
+const ProtectedRoute = ({
+  children,
+  requiredRoles = [],
   requiredPermissions = [],
   fallbackComponent = null,
   redirectTo = '/login'
@@ -24,7 +25,7 @@ const ProtectedRoute = ({
 
   useEffect(() => {
     checkAuthentication();
-    
+
     // Listen for auth changes
     const unsubscribe = authService.addAuthListener((event, userData) => {
       if (event === 'login' || event === 'session_restored') {
@@ -41,14 +42,14 @@ const ProtectedRoute = ({
     return unsubscribe;
   }, [requiredRoles, requiredPermissions]);
 
-  const checkAuthentication = async () => {
+  const checkAuthentication = async() => {
     try {
       const authenticated = authService.isAuthenticated();
       const currentUser = authService.getCurrentUser();
-      
+
       setIsAuthenticated(authenticated);
       setUser(currentUser);
-      
+
       if (authenticated && currentUser) {
         checkAccess(currentUser);
       } else {
@@ -70,7 +71,7 @@ const ProtectedRoute = ({
     }
 
     // Check role requirements
-    const hasRequiredRole = requiredRoles.length === 0 || 
+    const hasRequiredRole = requiredRoles.length === 0 ||
       requiredRoles.some(role => authService.hasRole(role));
 
     // Check permission requirements
@@ -107,10 +108,10 @@ const ProtectedRoute = ({
   // Not authenticated - redirect to login
   if (!isAuthenticated) {
     return (
-      <Navigate 
-        to={redirectTo} 
-        state={{ from: location.pathname }} 
-        replace 
+      <Navigate
+        to={redirectTo}
+        state={{ from: location.pathname }}
+        replace
       />
     );
   }
@@ -140,13 +141,13 @@ const AccessDenied = ({ user, requiredRoles, requiredPermissions }) => {
         <div className="mx-auto h-16 w-16 bg-red-100 rounded-full flex items-center justify-center mb-6">
           <Shield className="h-8 w-8 text-red-600" />
         </div>
-        
+
         <h2 className="text-2xl font-bold text-gray-900 mb-4">
           Access Denied
         </h2>
-        
+
         <p className="text-gray-600 mb-6">
-          You don't have permission to access this resource.
+          You don&apos;t have permission to access this resource.
         </p>
 
         <div className="bg-gray-50 rounded-lg p-4 mb-6 text-left">
@@ -185,7 +186,7 @@ const AccessDenied = ({ user, requiredRoles, requiredPermissions }) => {
           >
             Go Back
           </button>
-          
+
           <button
             onClick={() => window.location.href = '/dashboard'}
             className="w-full bg-gray-200 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-300 transition-colors"
@@ -250,18 +251,18 @@ export const useAuth = () => {
 /**
  * Permission-based conditional rendering component
  */
-export const PermissionGate = ({ 
-  children, 
-  requiredPermissions = [], 
+export const PermissionGate = ({
+  children,
+  requiredPermissions = [],
   requiredRoles = [],
   fallback = null,
-  requireAll = true 
+  requireAll = true
 }) => {
   const { hasPermission, hasRole } = useAuth();
 
   // Check permissions
-  const permissionCheck = requiredPermissions.length === 0 || 
-    (requireAll 
+  const permissionCheck = requiredPermissions.length === 0 ||
+    (requireAll
       ? requiredPermissions.every(permission => hasPermission(permission))
       : requiredPermissions.some(permission => hasPermission(permission))
     );

@@ -112,65 +112,65 @@ class DataValidationService {
       const errors = [];
       const warnings = [];
 
-    // Check required fields
-    for (const field of rules.required || []) {
-      if (data[field] === undefined || data[field] === null) {
-        errors.push(`Missing required field: ${field}`);
+      // Check required fields
+      for (const field of rules.required || []) {
+        if (data[field] === undefined || data[field] === null) {
+          errors.push(`Missing required field: ${field}`);
+        }
       }
-    }
 
-    // Validate numeric fields
-    for (const field of rules.numeric || []) {
-      if (data[field] !== undefined && data[field] !== null) {
-        const value = parseFloat(data[field]);
-        if (isNaN(value)) {
-          errors.push(`Field ${field} must be numeric, got: ${data[field]}`);
-        } else {
+      // Validate numeric fields
+      for (const field of rules.numeric || []) {
+        if (data[field] !== undefined && data[field] !== null) {
+          const value = parseFloat(data[field]);
+          if (isNaN(value)) {
+            errors.push(`Field ${field} must be numeric, got: ${data[field]}`);
+          } else {
           // Check ranges
-          const range = rules.ranges?.[field];
-          if (range) {
-            if (value < range.min || value > range.max) {
-              warnings.push(`Field ${field} value ${value} outside expected range [${range.min}, ${range.max}]`);
+            const range = rules.ranges?.[field];
+            if (range) {
+              if (value < range.min || value > range.max) {
+                warnings.push(`Field ${field} value ${value} outside expected range [${range.min}, ${range.max}]`);
+              }
             }
           }
         }
       }
-    }
 
-    // Validate formats
-    for (const [field, pattern] of Object.entries(rules.formats || {})) {
-      if (data[field] && !pattern.test(data[field])) {
-        errors.push(`Field ${field} format invalid: ${data[field]}`);
+      // Validate formats
+      for (const [field, pattern] of Object.entries(rules.formats || {})) {
+        if (data[field] && !pattern.test(data[field])) {
+          errors.push(`Field ${field} format invalid: ${data[field]}`);
+        }
       }
-    }
 
-    // Additional business logic validations
-    const businessValidation = this.validateBusinessLogic(data, dataType);
-    errors.push(...businessValidation.errors);
-    warnings.push(...businessValidation.warnings);
+      // Additional business logic validations
+      const businessValidation = this.validateBusinessLogic(data, dataType);
+      errors.push(...businessValidation.errors);
+      warnings.push(...businessValidation.warnings);
 
-    // Custom validation function
-    if (rules.custom) {
-      const customValidation = rules.custom(data);
-      errors.push(...(customValidation.errors || []));
-      warnings.push(...(customValidation.warnings || []));
-    }
+      // Custom validation function
+      if (rules.custom) {
+        const customValidation = rules.custom(data);
+        errors.push(...(customValidation.errors || []));
+        warnings.push(...(customValidation.warnings || []));
+      }
 
-    const isValid = errors.length === 0;
-    
-    // Log validation results
-    if (!isValid) {
-      apiLogger.log('ERROR', `Data validation failed for ${dataType}`, { errors, warnings });
-    } else if (warnings.length > 0) {
-      apiLogger.log('WARN', `Data validation warnings for ${dataType}`, { warnings });
-    }
+      const isValid = errors.length === 0;
 
-    return {
-      isValid,
-      errors,
-      warnings,
-      qualityScore: this.calculateQualityScore(errors, warnings)
-    };
+      // Log validation results
+      if (!isValid) {
+        apiLogger.log('ERROR', `Data validation failed for ${dataType}`, { errors, warnings });
+      } else if (warnings.length > 0) {
+        apiLogger.log('WARN', `Data validation warnings for ${dataType}`, { warnings });
+      }
+
+      return {
+        isValid,
+        errors,
+        warnings,
+        qualityScore: this.calculateQualityScore(errors, warnings)
+      };
     } catch (error) {
       return { isValid: false, errors: ['An unexpected error occurred during validation.'], warnings: [] };
     }
@@ -192,11 +192,11 @@ class DataValidationService {
         if (data.currentPrice && data.previousClose) {
           const calculatedChange = data.currentPrice - data.previousClose;
           const calculatedChangePercent = (calculatedChange / data.previousClose) * 100;
-          
+
           if (data.change && Math.abs(data.change - calculatedChange) > 0.01) {
             warnings.push(`Price change inconsistency: reported ${data.change}, calculated ${calculatedChange.toFixed(2)}`);
           }
-          
+
           if (data.changePercent && Math.abs(data.changePercent - calculatedChangePercent) > 0.1) {
             warnings.push(`Change percent inconsistency: reported ${data.changePercent}%, calculated ${calculatedChangePercent.toFixed(2)}%`);
           }
@@ -239,7 +239,7 @@ class DataValidationService {
         if (data.pe && (data.pe < 0 || data.pe > 500)) {
           warnings.push(`Unusual P/E ratio: ${data.pe}`);
         }
-        
+
         if (data.pb && (data.pb < 0 || data.pb > 50)) {
           warnings.push(`Unusual P/B ratio: ${data.pb}`);
         }
@@ -259,7 +259,7 @@ class DataValidationService {
     if (errors.length > 0) {
       return Math.max(0, 50 - (errors.length * 10));
     }
-    
+
     return Math.max(70, 100 - (warnings.length * 5));
   }
 
@@ -369,7 +369,7 @@ class DataValidationService {
    */
   getValidationSummary(data, dataType) {
     const validation = this.validateData(data, dataType);
-    
+
     return {
       dataType,
       timestamp: new Date().toISOString(),
@@ -400,7 +400,7 @@ class DataValidationService {
     ];
 
     const uniqueFields = [...new Set(allFields)];
-    const presentFields = uniqueFields.filter(field => 
+    const presentFields = uniqueFields.filter(field =>
       data[field] !== undefined && data[field] !== null && data[field] !== ''
     );
 

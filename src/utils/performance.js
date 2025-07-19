@@ -264,7 +264,7 @@ export const debounce = (func, wait, immediate = false) => {
 // Throttle utility for performance
 export const throttle = (func, limit) => {
   let inThrottle;
-  return function (...args) {
+  return function(...args) {
     if (!inThrottle) {
       func.apply(this, args);
       inThrottle = true;

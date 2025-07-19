@@ -31,7 +31,7 @@ describe('DataFetchingService', () => {
   });
 
   describe('Rate Limiting', () => {
-    it('should enforce rate limits', async () => {
+    it('should enforce rate limits', async() => {
       // Create a service with custom rate limits for testing
       const mockEnv = {
         VITE_ALPHA_VANTAGE_API_KEY: 'test_alpha_key',
@@ -64,7 +64,7 @@ describe('DataFetchingService', () => {
   });
 
   describe('Error Handling', () => {
-    it('should handle API errors gracefully', async () => {
+    it('should handle API errors gracefully', async() => {
       mockAxios.get.mockRejectedValue({
         response: { status: 401 },
         message: 'Unauthorized'
@@ -76,7 +76,7 @@ describe('DataFetchingService', () => {
       expect(result.symbol).toBe('AAPL');
     });
 
-    it('should handle network errors', async () => {
+    it('should handle network errors', async() => {
       mockAxios.get.mockRejectedValue(new Error('Network Error'));
 
       await expect(service.fetchCompanyProfile('INVALID')).rejects.toThrow(
@@ -86,7 +86,7 @@ describe('DataFetchingService', () => {
   });
 
   describe('Caching', () => {
-    it('should cache successful responses', async () => {
+    it('should cache successful responses', async() => {
       const mockData = [{ symbol: 'AAPL', companyName: 'Apple Inc.' }];
       mockAxios.get.mockResolvedValue({ data: mockData });
 
@@ -114,7 +114,7 @@ describe('DataFetchingService', () => {
       expect(demoService.demoMode).toBe(false);
     });
 
-    it('should generate mock data in demo mode', async () => {
+    it('should generate mock data in demo mode', async() => {
       // Force demo mode
       const mockEnv = {
         VITE_ALPHA_VANTAGE_API_KEY: 'demo',
@@ -132,7 +132,7 @@ describe('DataFetchingService', () => {
   });
 
   describe('Data Validation', () => {
-    it('should validate ticker symbols', async () => {
+    it('should validate ticker symbols', async() => {
       mockAxios.get.mockResolvedValue({
         data: [{ symbol: 'AAPL', companyName: 'Apple Inc.' }]
       });
@@ -141,7 +141,7 @@ describe('DataFetchingService', () => {
       expect(isValid).toBe(true);
     });
 
-    it('should reject invalid ticker symbols', async () => {
+    it('should reject invalid ticker symbols', async() => {
       mockAxios.get.mockRejectedValue(new Error('Not found'));
 
       const isValid = await service.validateTicker('INVALID');
@@ -150,7 +150,7 @@ describe('DataFetchingService', () => {
   });
 
   describe('Financial Data Fetching', () => {
-    it('should fetch financial statements', async () => {
+    it('should fetch financial statements', async() => {
       const mockFinancials = [{ date: '2023-12-31', revenue: 1000000, netIncome: 100000 }];
 
       mockAxios.get.mockResolvedValue({ data: mockFinancials });
@@ -159,7 +159,7 @@ describe('DataFetchingService', () => {
       expect(result).toEqual(mockFinancials);
     });
 
-    it('should fetch market data', async () => {
+    it('should fetch market data', async() => {
       const mockMarketData = {
         chart: {
           result: [

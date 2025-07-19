@@ -56,13 +56,13 @@ describe('Accessibility Tests', () => {
   });
 
   describe('Component Accessibility', () => {
-    it('Button component should be accessible', async () => {
+    it('Button component should be accessible', async() => {
       const { container } = render(<Button>Click me</Button>);
       const results = await axe(container);
       expect(results).toHaveNoViolations();
     });
 
-    it('Button with icon should have proper accessibility', async () => {
+    it('Button with icon should have proper accessibility', async() => {
       const { container } = render(
         <Button iconName="Home">
           <span className="sr-only">Go to home page</span>
@@ -72,15 +72,18 @@ describe('Accessibility Tests', () => {
       expect(results).toHaveNoViolations();
     });
 
-    it('Input component should be accessible', async () => {
+    it('Input component should be accessible', async() => {
       const { container } = render(
-        <Input label="Email Address" type="email" required description="Enter your email address" />
+        <Input
+          label="Email Address" type="email" required
+          description="Enter your email address"
+        />
       );
       const results = await axe(container);
       expect(results).toHaveNoViolations();
     });
 
-    it('Input with error should be accessible', async () => {
+    it('Input with error should be accessible', async() => {
       const { container } = render(
         <Input
           label="Email Address"
@@ -93,7 +96,7 @@ describe('Accessibility Tests', () => {
       expect(results).toHaveNoViolations();
     });
 
-    it('Header navigation should be accessible', async () => {
+    it('Header navigation should be accessible', async() => {
       const { container } = renderWithRouter(<Header />);
       const results = await axe(container);
       expect(results).toHaveNoViolations();
@@ -101,7 +104,7 @@ describe('Accessibility Tests', () => {
   });
 
   describe('Page Accessibility', () => {
-    it('Financial Model Workspace should be accessible', async () => {
+    it('Financial Model Workspace should be accessible', async() => {
       const { container } = renderWithRouter(<FinancialModelWorkspace />);
 
       // Wait for component to render - look for the workspace navigation link instead
@@ -111,7 +114,7 @@ describe('Accessibility Tests', () => {
       expect(results).toHaveNoViolations();
     }, 10000);
 
-    it('Real-Time Market Data Center should be accessible', async () => {
+    it('Real-Time Market Data Center should be accessible', async() => {
       const { container } = renderWithRouter(<RealTimeMarketDataCenter />);
 
       // Wait for component to render - look for the specific heading instead of ambiguous text

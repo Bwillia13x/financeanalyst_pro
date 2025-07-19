@@ -87,10 +87,10 @@ const Header = () => {
               className={`
                 relative px-6 py-3 text-sm font-medium transition-smooth rounded-lg
                 ${
-                  location.pathname === tab.path
-                    ? 'bg-primary text-primary-foreground'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-                }
+            location.pathname === tab.path
+              ? 'bg-primary text-primary-foreground'
+              : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+            }
               `}
               title={tab.tooltip}
             >

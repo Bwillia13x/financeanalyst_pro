@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+
 import { dataValidationService } from '../dataValidationService.js';
 
 // Mock dependencies
@@ -17,7 +18,7 @@ describe('DataValidationService', () => {
     it('should validate basic financial data structure using the new service', () => {
       const validData = {
         revenue: 1000000,
-        netIncome: 200000,
+        netIncome: 200000
       };
 
       const result = dataValidationService.validateData(validData, 'financialStatements');
@@ -28,7 +29,7 @@ describe('DataValidationService', () => {
     it('should reject invalid financial data types using the new service', () => {
       const invalidData = {
         revenue: 'not-a-number',
-        netIncome: null,
+        netIncome: null
       };
 
       const result = dataValidationService.validateData(invalidData, 'financialStatements');
@@ -163,7 +164,7 @@ describe('DataValidationService', () => {
     it('should sanitize string inputs', () => {
       const maliciousInput = '<script>alert("xss")</script>';
       const sanitized = dataValidationService.sanitizeInput(maliciousInput);
-      
+
       expect(sanitized).not.toContain('<script>');
       expect(sanitized).not.toContain('alert');
     });
@@ -176,7 +177,7 @@ describe('DataValidationService', () => {
     it('should preserve safe strings', () => {
       const safeInput = 'Apple Inc. Revenue Analysis 2024';
       const sanitized = dataValidationService.sanitizeInput(safeInput);
-      
+
       expect(sanitized).toBe(safeInput);
     });
   });
@@ -248,7 +249,9 @@ describe('DataValidationService', () => {
   describe('Error Handling', () => {
     it('should handle validation errors gracefully', () => {
       const corruptData = {
-        revenue: { toString: () => { throw new Error('Corrupt data'); } }
+        revenue: { toString: () => {
+          throw new Error('Corrupt data');
+        } }
       };
 
       expect(() => {

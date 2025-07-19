@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { realTimeDataService } from '../realTimeDataService.js';
+
 import { dataFetchingService } from '../dataFetching.js';
+import { realTimeDataService } from '../realTimeDataService.js';
 
 // Mock dependencies
 vi.mock('../utils/apiLogger.js', () => ({
@@ -32,12 +33,12 @@ describe('RealTimeDataService', () => {
   });
 
   describe('Subscription Management', () => {
-    it('should subscribe to real-time data and start polling', async () => {
+    it('should subscribe to real-time data and start polling', async() => {
       const callback = vi.fn();
       dataFetchingService.fetchMarketData.mockResolvedValue({ price: 150 });
 
       const subscriptionId = realTimeDataService.subscribe('AAPL', 'marketData', callback);
-      
+
       expect(subscriptionId).toContain('AAPL_marketData');
       expect(realTimeDataService.getActiveSubscriptions()).toHaveLength(1);
 
@@ -55,11 +56,11 @@ describe('RealTimeDataService', () => {
     it('should unsubscribe from real-time data and stop polling', () => {
       const callback = vi.fn();
       const subscriptionId = realTimeDataService.subscribe('AAPL', 'marketData', callback);
-      
+
       realTimeDataService.unsubscribe(subscriptionId);
-      
+
       expect(realTimeDataService.getActiveSubscriptions()).toHaveLength(0);
-      
+
       // Reset mock to clear the initial fetch call
       vi.clearAllMocks();
 
@@ -68,7 +69,7 @@ describe('RealTimeDataService', () => {
       expect(dataFetchingService.fetchMarketData).not.toHaveBeenCalled();
     });
 
-    it('should handle multiple subscribers for the same symbol and data type', async () => {
+    it('should handle multiple subscribers for the same symbol and data type', async() => {
       const callback1 = vi.fn();
       const callback2 = vi.fn();
       dataFetchingService.fetchMarketData.mockResolvedValue({ price: 155 });
@@ -79,7 +80,7 @@ describe('RealTimeDataService', () => {
 
       realTimeDataService.subscribe('AAPL', 'marketData', callback1);
       realTimeDataService.subscribe('AAPL', 'marketData', callback2);
-      
+
       const activeSubscriptions = realTimeDataService.getActiveSubscriptions();
       expect(activeSubscriptions).toHaveLength(1);
       expect(activeSubscriptions[0].subscriberCount).toBe(2);
@@ -92,10 +93,10 @@ describe('RealTimeDataService', () => {
   });
 
   describe('Data Fetching and Broadcasting', () => {
-    it('should fetch and broadcast market data', async () => {
+    it('should fetch and broadcast market data', async() => {
       const callback = vi.fn();
       dataFetchingService.fetchMarketData.mockResolvedValue({ currentPrice: 160 });
-      
+
       realTimeDataService.subscribe('TSLA', 'marketData', callback);
       await vi.advanceTimersByTimeAsync(5000);
 
@@ -107,7 +108,7 @@ describe('RealTimeDataService', () => {
       }));
     });
 
-    it('should fetch and broadcast quotes', async () => {
+    it('should fetch and broadcast quotes', async() => {
       const callback = vi.fn();
       dataFetchingService.fetchCompanyProfile.mockResolvedValue({ companyName: 'Tesla Inc.' });
 
@@ -122,7 +123,7 @@ describe('RealTimeDataService', () => {
       }));
     });
 
-    it('should handle data fetching errors gracefully', async () => {
+    it('should handle data fetching errors gracefully', async() => {
       const callback = vi.fn();
       const error = new Error('API limit reached');
       dataFetchingService.fetchMarketData.mockRejectedValue(error);
@@ -136,10 +137,10 @@ describe('RealTimeDataService', () => {
   });
 
   describe('Connection Status', () => {
-    it('should report connection status for active streams', async () => {
+    it('should report connection status for active streams', async() => {
       dataFetchingService.fetchMarketData.mockResolvedValue({ price: 200 });
       realTimeDataService.subscribe('MSFT', 'marketData', vi.fn());
-      
+
       await vi.advanceTimersByTimeAsync(100); // Let the initial fetch complete
 
       const status = realTimeDataService.getConnectionStatus();

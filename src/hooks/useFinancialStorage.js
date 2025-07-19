@@ -4,6 +4,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+
 import { financialDataStorage } from '../services/financialDataStorage.js';
 import { apiLogger } from '../utils/apiLogger.js';
 
@@ -15,13 +16,13 @@ export const useDCFStorage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const loadModels = useCallback(async () => {
+  const loadModels = useCallback(async() => {
     setLoading(true);
     setError(null);
     try {
       const modelIds = await financialDataStorage.listDCFModels();
       const modelData = await Promise.all(
-        modelIds.map(async (id) => {
+        modelIds.map(async(id) => {
           const data = await financialDataStorage.getDCFModel(id);
           return { id, ...data };
         })
@@ -35,7 +36,7 @@ export const useDCFStorage = () => {
     }
   }, []);
 
-  const saveModel = useCallback(async (symbol, modelData) => {
+  const saveModel = useCallback(async(symbol, modelData) => {
     try {
       await financialDataStorage.saveDCFModel(symbol, modelData);
       await loadModels(); // Refresh the list
@@ -46,7 +47,7 @@ export const useDCFStorage = () => {
     }
   }, [loadModels]);
 
-  const deleteModel = useCallback(async (symbol) => {
+  const deleteModel = useCallback(async(symbol) => {
     try {
       await financialDataStorage.deleteDCFModel(symbol);
       await loadModels(); // Refresh the list
@@ -57,7 +58,7 @@ export const useDCFStorage = () => {
     }
   }, [loadModels]);
 
-  const getModel = useCallback(async (symbol) => {
+  const getModel = useCallback(async(symbol) => {
     try {
       return await financialDataStorage.getDCFModel(symbol);
     } catch (err) {
@@ -89,13 +90,13 @@ export const useLBOStorage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const loadModels = useCallback(async () => {
+  const loadModels = useCallback(async() => {
     setLoading(true);
     setError(null);
     try {
       const modelIds = await financialDataStorage.listLBOModels();
       const modelData = await Promise.all(
-        modelIds.map(async (id) => {
+        modelIds.map(async(id) => {
           const data = await financialDataStorage.getLBOModel(id);
           return { id, ...data };
         })
@@ -109,7 +110,7 @@ export const useLBOStorage = () => {
     }
   }, []);
 
-  const saveModel = useCallback(async (symbol, modelData) => {
+  const saveModel = useCallback(async(symbol, modelData) => {
     try {
       await financialDataStorage.saveLBOModel(symbol, modelData);
       await loadModels(); // Refresh the list
@@ -120,7 +121,7 @@ export const useLBOStorage = () => {
     }
   }, [loadModels]);
 
-  const deleteModel = useCallback(async (symbol) => {
+  const deleteModel = useCallback(async(symbol) => {
     try {
       await financialDataStorage.deleteLBOModel(symbol);
       await loadModels(); // Refresh the list
@@ -131,7 +132,7 @@ export const useLBOStorage = () => {
     }
   }, [loadModels]);
 
-  const getModel = useCallback(async (symbol) => {
+  const getModel = useCallback(async(symbol) => {
     try {
       return await financialDataStorage.getLBOModel(symbol);
     } catch (err) {
@@ -163,13 +164,13 @@ export const useWatchlistStorage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const loadWatchlists = useCallback(async () => {
+  const loadWatchlists = useCallback(async() => {
     setLoading(true);
     setError(null);
     try {
       const watchlistNames = await financialDataStorage.listWatchlists();
       const watchlistData = await Promise.all(
-        watchlistNames.map(async (name) => {
+        watchlistNames.map(async(name) => {
           const data = await financialDataStorage.getWatchlist(name);
           return data;
         })
@@ -183,7 +184,7 @@ export const useWatchlistStorage = () => {
     }
   }, []);
 
-  const saveWatchlist = useCallback(async (name, symbols) => {
+  const saveWatchlist = useCallback(async(name, symbols) => {
     try {
       await financialDataStorage.saveWatchlist(name, symbols);
       await loadWatchlists(); // Refresh the list
@@ -194,7 +195,7 @@ export const useWatchlistStorage = () => {
     }
   }, [loadWatchlists]);
 
-  const deleteWatchlist = useCallback(async (name) => {
+  const deleteWatchlist = useCallback(async(name) => {
     try {
       await financialDataStorage.deleteWatchlist(name);
       await loadWatchlists(); // Refresh the list
@@ -205,7 +206,7 @@ export const useWatchlistStorage = () => {
     }
   }, [loadWatchlists]);
 
-  const getWatchlist = useCallback(async (name) => {
+  const getWatchlist = useCallback(async(name) => {
     try {
       return await financialDataStorage.getWatchlist(name);
     } catch (err) {
@@ -237,7 +238,7 @@ export const useUserPreferences = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const loadPreferences = useCallback(async () => {
+  const loadPreferences = useCallback(async() => {
     setLoading(true);
     setError(null);
     try {
@@ -256,7 +257,7 @@ export const useUserPreferences = () => {
     }
   }, []);
 
-  const savePreferences = useCallback(async (newPreferences) => {
+  const savePreferences = useCallback(async(newPreferences) => {
     try {
       await financialDataStorage.saveUserPreferences(newPreferences);
       setPreferences(newPreferences);
@@ -267,9 +268,9 @@ export const useUserPreferences = () => {
     }
   }, []);
 
-  const updatePreference = useCallback(async (key, value) => {
+  const updatePreference = useCallback(async(key, value) => {
     if (!preferences) return false;
-    
+
     const updated = { ...preferences, [key]: value };
     return await savePreferences(updated);
   }, [preferences, savePreferences]);
@@ -295,7 +296,7 @@ export const useMarketDataCache = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const getCachedData = useCallback(async (symbol) => {
+  const getCachedData = useCallback(async(symbol) => {
     setLoading(true);
     setError(null);
     try {
@@ -309,7 +310,7 @@ export const useMarketDataCache = () => {
     }
   }, []);
 
-  const cacheData = useCallback(async (symbol, data, ttlMinutes = 15) => {
+  const cacheData = useCallback(async(symbol, data, ttlMinutes = 15) => {
     try {
       await financialDataStorage.saveMarketData(symbol, data, ttlMinutes);
       return true;
@@ -319,7 +320,7 @@ export const useMarketDataCache = () => {
     }
   }, []);
 
-  const clearExpiredCache = useCallback(async () => {
+  const clearExpiredCache = useCallback(async() => {
     try {
       const cleanedCount = await financialDataStorage.cleanupExpiredMarketData();
       apiLogger.log('INFO', 'Market data cache cleaned', { cleanedCount });
@@ -347,7 +348,7 @@ export const useStorageStats = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const loadStats = useCallback(async () => {
+  const loadStats = useCallback(async() => {
     setLoading(true);
     setError(null);
     try {
@@ -361,7 +362,7 @@ export const useStorageStats = () => {
     }
   }, []);
 
-  const exportData = useCallback(async () => {
+  const exportData = useCallback(async() => {
     try {
       return await financialDataStorage.exportAllData();
     } catch (err) {
@@ -370,7 +371,7 @@ export const useStorageStats = () => {
     }
   }, []);
 
-  const importData = useCallback(async (importData) => {
+  const importData = useCallback(async(importData) => {
     try {
       const importCount = await financialDataStorage.importData(importData);
       await loadStats(); // Refresh stats after import

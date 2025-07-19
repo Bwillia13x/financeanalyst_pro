@@ -137,13 +137,22 @@ const ScenarioAnalysisSensitivityTools = () => {
             </div>
 
             <div className="flex items-center space-x-4">
-              <Button variant="ghost" size="sm" iconName="Sync" disabled={isSimulating}>
+              <Button
+                variant="ghost" size="sm" iconName="Sync"
+                disabled={isSimulating}
+              >
                 Sync Now
               </Button>
-              <Button variant="ghost" size="sm" iconName="History" disabled={isSimulating}>
+              <Button
+                variant="ghost" size="sm" iconName="History"
+                disabled={isSimulating}
+              >
                 Version History
               </Button>
-              <Button variant="ghost" size="sm" iconName="Share2" disabled={isSimulating}>
+              <Button
+                variant="ghost" size="sm" iconName="Share2"
+                disabled={isSimulating}
+              >
                 Share Analysis
               </Button>
             </div>
@@ -189,8 +198,14 @@ const ScenarioAnalysisSensitivityTools = () => {
                       Completed: {simulationResults.completedAt.toLocaleTimeString()}
                     </div>
                   )}
-                  <Button variant="ghost" size="sm" iconName="Maximize2" title="Fullscreen view" />
-                  <Button variant="ghost" size="sm" iconName="Settings" title="Display settings" />
+                  <Button
+                    variant="ghost" size="sm" iconName="Maximize2"
+                    title="Fullscreen view"
+                  />
+                  <Button
+                    variant="ghost" size="sm" iconName="Settings"
+                    title="Display settings"
+                  />
                 </div>
               </div>
             </div>

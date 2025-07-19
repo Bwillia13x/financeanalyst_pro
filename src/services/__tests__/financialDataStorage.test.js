@@ -3,6 +3,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+
 import { financialDataStorage } from '../financialDataStorage.js';
 
 // Mock the storage service
@@ -24,7 +25,7 @@ describe('FinancialDataStorage', () => {
   });
 
   describe('DCF Model Storage', () => {
-    it('should save DCF model data', async () => {
+    it('should save DCF model data', async() => {
       const symbol = 'AAPL';
       const modelData = {
         assumptions: { growthRate: 0.05, discountRate: 0.1 },
@@ -57,7 +58,7 @@ describe('FinancialDataStorage', () => {
       );
     });
 
-    it('should retrieve DCF model data', async () => {
+    it('should retrieve DCF model data', async() => {
       const symbol = 'AAPL';
       const mockData = {
         symbol: 'AAPL',
@@ -74,7 +75,7 @@ describe('FinancialDataStorage', () => {
       expect(storageService.getItem).toHaveBeenCalledWith('dcfModel', 'AAPL');
     });
 
-    it('should list DCF models', async () => {
+    it('should list DCF models', async() => {
       const mockSymbols = ['AAPL', 'GOOGL', 'MSFT'];
       storageService.listItems.mockReturnValue(mockSymbols);
 
@@ -84,7 +85,7 @@ describe('FinancialDataStorage', () => {
       expect(storageService.listItems).toHaveBeenCalledWith('dcfModel');
     });
 
-    it('should delete DCF model', async () => {
+    it('should delete DCF model', async() => {
       const symbol = 'AAPL';
       storageService.removeItem.mockReturnValue(true);
 
@@ -96,7 +97,7 @@ describe('FinancialDataStorage', () => {
   });
 
   describe('LBO Model Storage', () => {
-    it('should save LBO model data', async () => {
+    it('should save LBO model data', async() => {
       const symbol = 'AAPL';
       const modelData = {
         transaction: { purchasePrice: 1000, purchaseMultiple: 10 },
@@ -129,7 +130,7 @@ describe('FinancialDataStorage', () => {
       );
     });
 
-    it('should retrieve LBO model data', async () => {
+    it('should retrieve LBO model data', async() => {
       const symbol = 'AAPL';
       const mockData = {
         symbol: 'AAPL',
@@ -148,7 +149,7 @@ describe('FinancialDataStorage', () => {
   });
 
   describe('Monte Carlo Results Storage', () => {
-    it('should save Monte Carlo results', async () => {
+    it('should save Monte Carlo results', async() => {
       const modelId = 'dcf_aapl_20241201';
       const resultsData = {
         modelType: 'DCF',
@@ -183,7 +184,7 @@ describe('FinancialDataStorage', () => {
       );
     });
 
-    it('should retrieve Monte Carlo results', async () => {
+    it('should retrieve Monte Carlo results', async() => {
       const modelId = 'dcf_aapl_20241201';
       const mockData = {
         modelType: 'DCF',
@@ -202,7 +203,7 @@ describe('FinancialDataStorage', () => {
   });
 
   describe('Market Data Storage with TTL', () => {
-    it('should save market data with TTL', async () => {
+    it('should save market data with TTL', async() => {
       const symbol = 'AAPL';
       const marketData = {
         currentPrice: 150,
@@ -229,7 +230,7 @@ describe('FinancialDataStorage', () => {
       );
     });
 
-    it('should retrieve valid market data', async () => {
+    it('should retrieve valid market data', async() => {
       const symbol = 'AAPL';
       const mockData = {
         symbol: 'AAPL',
@@ -247,7 +248,7 @@ describe('FinancialDataStorage', () => {
       expect(storageService.getItem).toHaveBeenCalledWith('marketData', 'AAPL');
     });
 
-    it('should return null for expired market data', async () => {
+    it('should return null for expired market data', async() => {
       const symbol = 'AAPL';
       const mockData = {
         symbol: 'AAPL',
@@ -268,7 +269,7 @@ describe('FinancialDataStorage', () => {
   });
 
   describe('User Preferences Storage', () => {
-    it('should save user preferences', async () => {
+    it('should save user preferences', async() => {
       const preferences = {
         theme: 'dark',
         layout: { sidebar: 'collapsed' },
@@ -297,7 +298,7 @@ describe('FinancialDataStorage', () => {
       );
     });
 
-    it('should retrieve user preferences', async () => {
+    it('should retrieve user preferences', async() => {
       const mockPreferences = {
         theme: 'dark',
         layout: { sidebar: 'collapsed' },
@@ -314,7 +315,7 @@ describe('FinancialDataStorage', () => {
   });
 
   describe('Watchlist Storage', () => {
-    it('should save watchlist', async () => {
+    it('should save watchlist', async() => {
       const name = 'Tech Stocks';
       const symbols = ['AAPL', 'GOOGL', 'MSFT'];
 
@@ -338,7 +339,7 @@ describe('FinancialDataStorage', () => {
       );
     });
 
-    it('should retrieve watchlist', async () => {
+    it('should retrieve watchlist', async() => {
       const name = 'Tech Stocks';
       const mockWatchlist = {
         name,
@@ -356,7 +357,7 @@ describe('FinancialDataStorage', () => {
   });
 
   describe('Data Export/Import', () => {
-    it('should export all financial data', async () => {
+    it('should export all financial data', async() => {
       // Mock list methods
       storageService.listItems
         .mockReturnValueOnce(['AAPL', 'GOOGL']) // DCF models
@@ -390,7 +391,7 @@ describe('FinancialDataStorage', () => {
       expect(Object.keys(exportData.data.watchlists)).toHaveLength(1);
     });
 
-    it('should import financial data', async () => {
+    it('should import financial data', async() => {
       const importData = {
         timestamp: Date.now(),
         version: '1.0',
@@ -421,7 +422,7 @@ describe('FinancialDataStorage', () => {
   });
 
   describe('Statistics and Cleanup', () => {
-    it('should get financial data statistics', async () => {
+    it('should get financial data statistics', async() => {
       const mockStats = {
         totalSize: 1024,
         itemCount: 10,
@@ -447,7 +448,7 @@ describe('FinancialDataStorage', () => {
       });
     });
 
-    it('should cleanup expired market data', async () => {
+    it('should cleanup expired market data', async() => {
       const expiredData = {
         symbol: 'AAPL',
         data: { currentPrice: 150 },

@@ -42,11 +42,11 @@ const Select = React.forwardRef(
     const filteredOptions =
       searchable && searchTerm
         ? options.filter(
-            option =>
-              option.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          option =>
+            option.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
               (option.value &&
                 option.value.toString().toLowerCase().includes(searchTerm.toLowerCase()))
-          )
+        )
         : options;
 
     // Get selected option(s) for display
@@ -161,7 +161,10 @@ const Select = React.forwardRef(
               )}
 
               {clearable && hasValue && !loading && (
-                <Button variant="ghost" size="icon" className="h-4 w-4" onClick={handleClear}>
+                <Button
+                  variant="ghost" size="icon" className="h-4 w-4"
+                  onClick={handleClear}
+                >
                   <X className="h-3 w-3" />
                 </Button>
               )}

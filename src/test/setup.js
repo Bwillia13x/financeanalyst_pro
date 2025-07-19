@@ -34,6 +34,8 @@ Object.defineProperty(import.meta, 'env', {
   writable: true
 });
 
+import { vi, afterEach } from 'vitest';
+
 // Mock fetch for API calls
 global.fetch = vi.fn();
 

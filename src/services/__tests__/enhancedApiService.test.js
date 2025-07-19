@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+
 import { enhancedApiService } from '../enhancedApiService.js';
 
 // Mock dependencies
@@ -36,7 +37,7 @@ describe('EnhancedApiService', () => {
   });
 
   describe('API Request Management', () => {
-    it('should make basic API requests', async () => {
+    it('should make basic API requests', async() => {
       const mockResponse = { data: 'test' };
       global.fetch.mockResolvedValue({
         ok: true,
@@ -49,13 +50,13 @@ describe('EnhancedApiService', () => {
       expect(global.fetch).toHaveBeenCalledWith('https://api.example.com/test-endpoint', expect.any(Object));
     });
 
-    it('should handle API request failures', async () => {
+    it('should handle API request failures', async() => {
       global.fetch.mockRejectedValue(new Error('Network error'));
 
       await expect(enhancedApiService.request('/test-endpoint')).rejects.toThrow('Network error');
     });
 
-    it('should add authentication headers when available', async () => {
+    it('should add authentication headers when available', async() => {
       const mockToken = 'test-token';
       enhancedApiService.setAuthToken(mockToken);
 
@@ -67,7 +68,7 @@ describe('EnhancedApiService', () => {
 
       await enhancedApiService.request('/test-endpoint');
 
-      expect(global.fetch).toHaveBeenCalledWith('https://api.example.com/test-endpoint', 
+      expect(global.fetch).toHaveBeenCalledWith('https://api.example.com/test-endpoint',
         expect.objectContaining({
           headers: expect.objectContaining({
             'Authorization': `Bearer ${mockToken}`
@@ -78,12 +79,12 @@ describe('EnhancedApiService', () => {
   });
 
   describe('Rate Limiting', () => {
-    it('should respect rate limits', async () => {
+    it('should respect rate limits', async() => {
       const startTime = Date.now();
-      
-      global.fetch.mockImplementation(() => 
-        new Promise(resolve => 
-          setTimeout(() => 
+
+      global.fetch.mockImplementation(() =>
+        new Promise(resolve =>
+          setTimeout(() =>
             resolve({
               ok: true,
               json: () => Promise.resolve({}),
@@ -92,17 +93,17 @@ describe('EnhancedApiService', () => {
         )
       );
 
-      const promises = Array(5).fill().map(() => 
+      const promises = Array(5).fill().map(() =>
         enhancedApiService.request('/test-endpoint')
       );
 
       await Promise.all(promises);
-      
+
       const endTime = Date.now();
       expect(endTime - startTime).toBeGreaterThan(40);
     });
 
-    it('should handle rate limit headers', async () => {
+    it('should handle rate limit headers', async() => {
       const resetTime = String(Date.now() + 60000);
       global.fetch.mockResolvedValue({
         ok: true,
@@ -114,7 +115,7 @@ describe('EnhancedApiService', () => {
       });
 
       await enhancedApiService.request('/test-endpoint');
-      
+
       const rateLimitInfo = enhancedApiService.getRateLimitInfo();
       expect(rateLimitInfo.remaining).toBe(10);
       expect(rateLimitInfo.reset).toBe(parseInt(resetTime, 10));
@@ -122,7 +123,7 @@ describe('EnhancedApiService', () => {
   });
 
   describe('Caching', () => {
-    it('should cache GET requests', async () => {
+    it('should cache GET requests', async() => {
       const mockResponse = { data: 'cached-data' };
       global.fetch.mockResolvedValue({
         ok: true,
@@ -136,7 +137,7 @@ describe('EnhancedApiService', () => {
       expect(global.fetch).toHaveBeenCalledTimes(1);
     });
 
-    it('should respect cache TTL', async () => {
+    it('should respect cache TTL', async() => {
       const mockResponse = { data: 'test' };
       global.fetch.mockResolvedValue({
         ok: true,
@@ -147,15 +148,15 @@ describe('EnhancedApiService', () => {
       enhancedApiService.setCacheTTL(100);
 
       await enhancedApiService.request('/test-endpoint');
-      
+
       await new Promise(resolve => setTimeout(resolve, 150));
-      
+
       await enhancedApiService.request('/test-endpoint');
 
       expect(global.fetch).toHaveBeenCalledTimes(2);
     });
 
-    it('should clear cache when requested', async () => {
+    it('should clear cache when requested', async() => {
       global.fetch.mockResolvedValue({
         ok: true,
         json: () => Promise.resolve({}),
@@ -171,7 +172,7 @@ describe('EnhancedApiService', () => {
   });
 
   describe('Request Batching', () => {
-    it('should batch multiple requests', async () => {
+    it('should batch multiple requests', async() => {
       const mockResponses = [
         { data: 'response1' },
         { data: 'response2' },
@@ -194,14 +195,14 @@ describe('EnhancedApiService', () => {
       ];
 
       const results = await enhancedApiService.batchRequests(requests);
-      
+
       expect(results).toHaveLength(3);
       expect(results[0]).toEqual(mockResponses[0]);
       expect(results[1]).toEqual(mockResponses[1]);
       expect(results[2]).toEqual(mockResponses[2]);
     });
 
-    it('should handle batch request failures gracefully', async () => {
+    it('should handle batch request failures gracefully', async() => {
       global.fetch.mockImplementation((url) => {
         if (url.includes('fail')) {
           return Promise.reject(new Error('Request failed'));
@@ -224,7 +225,7 @@ describe('EnhancedApiService', () => {
   });
 
   describe('Request Interceptors', () => {
-    it('should apply request interceptors', async () => {
+    it('should apply request interceptors', async() => {
       const interceptor = vi.fn((config) => ({
         ...config,
         headers: { ...config.headers, 'X-Custom-Header': 'test-value' }
@@ -250,7 +251,7 @@ describe('EnhancedApiService', () => {
       );
     });
 
-    it('should apply response interceptors', async () => {
+    it('should apply response interceptors', async() => {
       const responseInterceptor = vi.fn((response) => ({
         ...response,
         intercepted: true
@@ -272,7 +273,7 @@ describe('EnhancedApiService', () => {
   });
 
   describe('Error Handling', () => {
-    it('should handle HTTP error status codes', async () => {
+    it('should handle HTTP error status codes', async() => {
       global.fetch.mockResolvedValue({
         ok: false,
         status: 404,
@@ -283,13 +284,13 @@ describe('EnhancedApiService', () => {
       await expect(enhancedApiService.request('/not-found')).rejects.toThrow('HTTP error! status: 404, body: Resource not found');
     });
 
-    it('should handle network errors', async () => {
+    it('should handle network errors', async() => {
       global.fetch.mockRejectedValue(new Error('Network error'));
 
       await expect(enhancedApiService.request('/test-endpoint')).rejects.toThrow('Network error');
     });
 
-    it('should retry failed requests', async () => {
+    it('should retry failed requests', async() => {
       const responseInterceptor = vi.fn((response) => ({
         ...response,
         intercepted: true
@@ -305,7 +306,7 @@ describe('EnhancedApiService', () => {
         });
 
       const result = await enhancedApiService.requestWithRetry('/test-endpoint', {}, 1);
-      
+
       expect(result).toEqual({ data: 'success', intercepted: true });
       expect(global.fetch).toHaveBeenCalledTimes(2);
     });
@@ -315,27 +316,27 @@ describe('EnhancedApiService', () => {
     it('should allow setting base URL', () => {
       const baseUrl = 'https://api.new-example.com';
       enhancedApiService.setBaseUrl(baseUrl);
-      
+
       expect(enhancedApiService.getBaseUrl()).toBe(baseUrl);
     });
 
     it('should allow setting default headers', () => {
       const headers = { 'X-API-Version': '1.0' };
       enhancedApiService.setDefaultHeaders(headers);
-      
+
       expect(enhancedApiService.getDefaultHeaders()).toEqual(headers);
     });
 
     it('should allow setting timeout', () => {
       const timeout = 5000;
       enhancedApiService.setTimeout(timeout);
-      
+
       expect(enhancedApiService.getTimeout()).toBe(timeout);
     });
   });
 
   describe('Metrics and Monitoring', () => {
-    it('should track request metrics', async () => {
+    it('should track request metrics', async() => {
       global.fetch.mockResolvedValue({
         ok: true,
         json: () => Promise.resolve({}),
@@ -343,13 +344,13 @@ describe('EnhancedApiService', () => {
       });
 
       await enhancedApiService.request('/test-endpoint');
-      
+
       const metrics = enhancedApiService.getMetrics();
       expect(metrics.totalRequests).toBe(1);
       expect(metrics.successfulRequests).toBe(1);
     });
 
-    it('should track error metrics', async () => {
+    it('should track error metrics', async() => {
       global.fetch.mockRejectedValue(new Error('Network error'));
 
       try {
@@ -357,12 +358,12 @@ describe('EnhancedApiService', () => {
       } catch (error) {
         // Expected to fail
       }
-      
+
       const metrics = enhancedApiService.getMetrics();
       expect(metrics.failedRequests).toBe(1);
     });
 
-it('should reset metrics when requested', async () => {
+    it('should reset metrics when requested', async() => {
       global.fetch.mockResolvedValue({
         ok: true,
         json: () => Promise.resolve({}),
@@ -371,7 +372,7 @@ it('should reset metrics when requested', async () => {
 
       await enhancedApiService.request('/test-endpoint');
       enhancedApiService.resetMetrics();
-      
+
       const metrics = enhancedApiService.getMetrics();
       expect(metrics.totalRequests).toBe(0);
     });

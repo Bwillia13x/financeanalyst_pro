@@ -47,7 +47,7 @@ class EncryptionService {
     this.isSupported = this.checkCryptoSupport();
     this.masterKey = null;
     this.keyCache = new Map();
-    
+
     if (!this.isSupported) {
       apiLogger.log('WARN', 'Web Crypto API not supported - encryption disabled');
     }
@@ -75,7 +75,7 @@ class EncryptionService {
     try {
       // Derive master key from password
       this.masterKey = await this.deriveKeyFromPassword(password);
-      
+
       apiLogger.log('INFO', 'Encryption service initialized');
       return true;
     } catch (error) {
@@ -108,7 +108,7 @@ class EncryptionService {
     const key = await cryptoUtils.subtle.deriveKey(
       {
         name: 'PBKDF2',
-        salt: salt,
+        salt,
         iterations: ENCRYPTION_CONFIG.iterations,
         hash: 'SHA-256'
       },
@@ -168,7 +168,7 @@ class EncryptionService {
       const encryptedBuffer = await cryptoUtils.subtle.encrypt(
         {
           name: ENCRYPTION_CONFIG.algorithm,
-          iv: iv
+          iv
         },
         encryptionKey,
         dataBuffer
@@ -219,7 +219,7 @@ class EncryptionService {
       const decryptedBuffer = await cryptoUtils.subtle.decrypt(
         {
           name: ENCRYPTION_CONFIG.algorithm,
-          iv: iv
+          iv
         },
         decryptionKey,
         data
@@ -247,14 +247,14 @@ class EncryptionService {
   classifyData(data, context = {}) {
     // Simple classification rules - in production this would be more sophisticated
     const dataString = JSON.stringify(data).toLowerCase();
-    
+
     // Check for restricted patterns
     const restrictedPatterns = [
       'ssn', 'social security', 'tax id', 'ein',
       'bank account', 'routing number', 'credit card',
       'password', 'secret', 'private key'
     ];
-    
+
     if (restrictedPatterns.some(pattern => dataString.includes(pattern))) {
       return DATA_CLASSIFICATION.RESTRICTED;
     }
@@ -265,7 +265,7 @@ class EncryptionService {
       'valuation', 'acquisition', 'merger',
       'proprietary', 'confidential'
     ];
-    
+
     if (confidentialPatterns.some(pattern => dataString.includes(pattern))) {
       return DATA_CLASSIFICATION.CONFIDENTIAL;
     }
@@ -287,8 +287,8 @@ class EncryptionService {
     }
 
     const dataClass = classification || this.classifyData(data);
-    
-    return dataClass === DATA_CLASSIFICATION.CONFIDENTIAL || 
+
+    return dataClass === DATA_CLASSIFICATION.CONFIDENTIAL ||
            dataClass === DATA_CLASSIFICATION.RESTRICTED;
   }
 
@@ -302,7 +302,7 @@ class EncryptionService {
 
     const dataClass = classification || this.classifyData(data);
     const encryptionRules = ENCRYPTION_RULES[dataClass];
-    
+
     if (!encryptionRules) {
       return { encrypted: false, data };
     }
@@ -405,7 +405,7 @@ class EncryptionService {
 
       const hashBuffer = await cryptoUtils.subtle.digest('SHA-256', dataBuffer);
       const hashArray = new Uint8Array(hashBuffer);
-      
+
       return btoa(String.fromCharCode(...hashArray));
     } catch (error) {
       apiLogger.log('ERROR', 'Hash generation failed', { error: error.message });
@@ -465,7 +465,7 @@ class EncryptionService {
     }
 
     const keyBuffer = Uint8Array.from(atob(keyData), c => c.charCodeAt(0));
-    
+
     return await cryptoUtils.subtle.importKey(
       'raw',
       keyBuffer,

@@ -358,7 +358,10 @@ const FinancialModelWorkspace = () => {
               </div>
 
               <div className="mt-6">
-                <Button variant="outline" size="sm" iconName="UserPlus" fullWidth>
+                <Button
+                  variant="outline" size="sm" iconName="UserPlus"
+                  fullWidth
+                >
                   Invite Collaborator
                 </Button>
               </div>

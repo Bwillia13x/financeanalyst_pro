@@ -135,7 +135,7 @@ class StorageService {
     try {
       const estimate = await navigator.storage.estimate();
       const usageRatio = estimate.usage / estimate.quota;
-      
+
       if (usageRatio > STORAGE_CONFIG.quotaManagement.cleanupThreshold) {
         apiLogger.log('WARN', 'Storage quota threshold exceeded', {
           usage: estimate.usage,
@@ -190,8 +190,8 @@ class StorageService {
    */
   async compressData(data) {
     const jsonString = JSON.stringify(data);
-    
-    if (!STORAGE_CONFIG.compression.enabled || 
+
+    if (!STORAGE_CONFIG.compression.enabled ||
         jsonString.length < STORAGE_CONFIG.compression.threshold ||
         !this.compressionAvailable) {
       return { data: jsonString, compressed: false };
@@ -261,7 +261,7 @@ class StorageService {
 
       // Compress if needed
       const { data: processedData, compressed } = await this.compressData(storageObject);
-      
+
       // Add compression flag
       const finalObject = {
         compressed,
@@ -301,17 +301,17 @@ class StorageService {
     try {
       const key = this.generateKey(type, identifier);
       const stored = localStorage.getItem(key);
-      
+
       if (!stored) {
         return null;
       }
 
       const parsedStored = JSON.parse(stored);
       const decompressedData = await this.decompressData(
-        parsedStored.data, 
+        parsedStored.data,
         parsedStored.compressed
       );
-      
+
       const storageObject = JSON.parse(decompressedData);
 
       // Check version compatibility
@@ -352,7 +352,7 @@ class StorageService {
     try {
       const key = this.generateKey(type, identifier);
       localStorage.removeItem(key);
-      
+
       apiLogger.log('DEBUG', 'Data removed successfully', { key, type, identifier });
       return true;
     } catch (error) {
@@ -401,7 +401,7 @@ class StorageService {
           const stored = localStorage.getItem(key);
           const parsedStored = JSON.parse(stored);
           const decompressedData = await this.decompressData(
-            parsedStored.data, 
+            parsedStored.data,
             parsedStored.compressed
           );
           const storageObject = JSON.parse(decompressedData);
@@ -487,7 +487,7 @@ class StorageService {
     }
 
     keys.forEach(key => localStorage.removeItem(key));
-    
+
     apiLogger.log('INFO', 'All application data cleared', { clearedCount: keys.length });
     return true;
   }

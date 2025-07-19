@@ -106,10 +106,10 @@ class MonitoringService {
     const hotjarId = import.meta.env.VITE_HOTJAR_ID;
     if (!hotjarId) return;
 
-    (function (h, o, t, j, a, r) {
+    (function(h, o, t, j, a, r) {
       h.hj =
         h.hj ||
-        function () {
+        function() {
           (h.hj.q = h.hj.q || []).push(arguments);
         };
       h._hjSettings = { hjid: hotjarId, hjsv: 6 };
@@ -170,7 +170,7 @@ class MonitoringService {
    */
   monitorApiPerformance() {
     const originalFetch = window.fetch;
-    window.fetch = async (...args) => {
+    window.fetch = async(...args) => {
       const startTime = performance.now();
       try {
         const response = await originalFetch(...args);

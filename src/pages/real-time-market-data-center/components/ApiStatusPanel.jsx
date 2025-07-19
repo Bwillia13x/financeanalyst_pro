@@ -1,15 +1,16 @@
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/Card';
-import { Badge } from '../../../components/ui/Badge';
-import { Progress } from '../../../components/ui/Progress';
-import { Alert, AlertDescription } from '../../../components/ui/Alert';
 import { CheckCircle, XCircle, AlertTriangle, Key, Wifi } from 'lucide-react';
+import React from 'react';
 
-const ApiStatusPanel = ({ 
-  apiHealthStatus = {}, 
-  realDataEnabled = false, 
+import { Alert, AlertDescription } from '../../../components/ui/Alert';
+import { Badge } from '../../../components/ui/Badge';
+import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/Card';
+import { Progress } from '../../../components/ui/Progress';
+
+const ApiStatusPanel = ({
+  apiHealthStatus = {},
+  realDataEnabled = false,
   dataSources = [],
-  dataQuality = {} 
+  dataQuality = {}
 }) => {
   const getStatusIcon = (status) => {
     switch (status) {
@@ -90,8 +91,8 @@ const ApiStatusPanel = ({
                   )}
                 </div>
                 <div className="flex items-center gap-2">
-                  <Badge 
-                    variant="outline" 
+                  <Badge
+                    variant="outline"
                     className={`text-xs ${getStatusColor(source.status)}`}
                   >
                     {source.status}

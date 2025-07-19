@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+
 import { cn } from '../cn.js';
 
 describe('cn utility function', () => {
@@ -65,7 +66,7 @@ describe('cn utility function', () => {
       const isActive = true;
       const isDisabled = false;
       const variant = 'primary';
-      
+
       const result = cn(
         'btn',
         `btn-${variant}`,
@@ -74,7 +75,7 @@ describe('cn utility function', () => {
           'btn-disabled': isDisabled
         }
       );
-      
+
       expect(result).toBe('btn btn-primary btn-active');
     });
 
@@ -87,7 +88,7 @@ describe('cn utility function', () => {
           'opacity-50': false
         }
       );
-      
+
       expect(result).toBe('px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white');
     });
   });
@@ -114,7 +115,7 @@ describe('cn utility function', () => {
     it('should handle large number of classes efficiently', () => {
       const classes = Array.from({ length: 100 }, (_, i) => `class-${i}`);
       const result = cn(...classes);
-      
+
       expect(result.split(' ')).toHaveLength(100);
       expect(result).toContain('class-0');
       expect(result).toContain('class-99');
@@ -125,7 +126,7 @@ describe('cn utility function', () => {
         'level1',
         ['level2', ['level3', ['level4', 'level5']]]
       ];
-      
+
       const result = cn(deepArray);
       expect(result).toBe('level1 level2 level3 level4 level5');
     });
