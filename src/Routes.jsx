@@ -11,6 +11,9 @@ const RealTimeMarketDataCenter = lazy(() => import('./pages/real-time-market-dat
 const ScenarioAnalysisSensitivityTools = lazy(
   () => import('./pages/scenario-analysis-sensitivity-tools')
 );
+const ValuationTool = lazy(() => import('./components/ValuationTool/ValuationTool'));
+const ValuationToolDocs = lazy(() => import('./components/ValuationTool/ValuationToolDocs'));
+const ValuationToolDemo = lazy(() => import('./pages/valuation-tool-demo'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 const Routes = () => {
@@ -28,6 +31,9 @@ const Routes = () => {
               path="/scenario-analysis-sensitivity-tools"
               element={<ScenarioAnalysisSensitivityTools />}
             />
+            <Route path="/valuation-tool" element={<ValuationTool />} />
+            <Route path="/valuation-tool/docs" element={<ValuationToolDocs />} />
+            <Route path="/valuation-tool/demo" element={<ValuationToolDemo />} />
             <Route path="*" element={<NotFound />} />
           </RouterRoutes>
         </Suspense>
