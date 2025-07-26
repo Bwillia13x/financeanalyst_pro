@@ -92,6 +92,7 @@ const FinancialModelWorkspace = () => {
                 variant={activeLayout === 'single-pane' ? 'primary' : 'ghost'}
                 size="sm"
                 onClick={() => setActiveLayout('single-pane')}
+                aria-label="Single-pane layout"
               >
                 <Icon name="Square" className="w-4 h-4" />
               </Button>
@@ -99,6 +100,7 @@ const FinancialModelWorkspace = () => {
                 variant={activeLayout === 'dual-pane' ? 'primary' : 'ghost'}
                 size="sm"
                 onClick={() => setActiveLayout('dual-pane')}
+                aria-label="Dual-pane layout"
               >
                 <Icon name="Columns" className="w-4 h-4" />
               </Button>
@@ -110,6 +112,7 @@ const FinancialModelWorkspace = () => {
                 value={leftPanelContent}
                 onChange={(e) => setLeftPanelContent(e.target.value)}
                 className="bg-gray-700 border border-gray-600 rounded px-2 py-1 text-sm"
+                aria-label="Select left panel content"
               >
                 <option value="terminal">Terminal</option>
                 <option value="variables">Variables</option>
@@ -122,6 +125,7 @@ const FinancialModelWorkspace = () => {
                   value={rightPanelContent}
                   onChange={(e) => setRightPanelContent(e.target.value)}
                   className="bg-gray-700 border border-gray-600 rounded px-2 py-1 text-sm"
+                  aria-label="Select right panel content"
                 >
                   <option value="results">Results</option>
                   <option value="audit">Audit Trail</option>

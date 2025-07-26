@@ -6,53 +6,28 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { PersistenceManager } from '../PersistenceManager';
 
-// Mock browser APIs
-Object.defineProperty(window, 'localStorage', {
-  value: {
-    getItem: vi.fn(),
-    setItem: vi.fn(),
-    removeItem: vi.fn(),
-    clear: vi.fn(),
-    key: vi.fn(),
-    length: 0
-  },
-  writable: true
-});
-
-Object.defineProperty(window, 'indexedDB', {
-  value: {
-    open: vi.fn(),
-    deleteDatabase: vi.fn(),
-    databases: vi.fn().mockResolvedValue([])
-  },
-  writable: true
-});
-
-// Mock crypto API
-Object.defineProperty(window, 'crypto', {
-  value: {
-    subtle: {
-      generateKey: vi.fn(),
-      importKey: vi.fn(),
-      exportKey: vi.fn(),
-      encrypt: vi.fn(),
-      decrypt: vi.fn(),
-      digest: vi.fn()
-    },
-    getRandomValues: vi.fn((arr) => {
-      for (let i = 0; i < arr.length; i++) {
-        arr[i] = Math.floor(Math.random() * 256);
-      }
-      return arr;
-    })
-  },
-  writable: true
-});
-
 // Mock dependencies
-vi.mock('../LocalStorageService', () => ({
-  LocalStorageService: vi.fn().mockImplementation(() => {
-    const mockInstance = {
+vi.mock('../LocalStorageService');
+vi.mock('../IndexedDBService');
+vi.mock('../SessionManager');
+vi.mock('../DataMigrationService');
+
+describe('PersistenceManager', () => {
+  let persistenceManager;
+
+  beforeEach(() => {
+    Object.defineProperty(window, 'indexedDB', {
+      value: {
+        open: vi.fn(),
+        deleteDatabase: vi.fn(),
+        databases: vi.fn().mockResolvedValue([])
+      },
+      writable: true,
+      configurable: true
+    });
+    vi.clearAllMocks();
+    persistenceManager = new PersistenceManager();
+    persistenceManager.localStorage = {
       initialize: vi.fn().mockResolvedValue({ success: true }),
       store: vi.fn().mockResolvedValue({ success: true }),
       retrieve: vi.fn().mockResolvedValue({ data: 'test' }),
@@ -60,15 +35,9 @@ vi.mock('../LocalStorageService', () => ({
       clear: vi.fn().mockResolvedValue(true),
       getStats: vi.fn().mockResolvedValue({ used: 1000, available: true }),
       exportAll: vi.fn().mockResolvedValue({}),
-      importData: vi.fn().mockResolvedValue({ imported: 1 })
+      importData: vi.fn().mockResolvedValue({ imported: 1 }),
     };
-    return mockInstance;
-  })
-}));
-
-vi.mock('../IndexedDBService', () => ({
-  IndexedDBService: vi.fn().mockImplementation(() => {
-    const mockInstance = {
+    persistenceManager.indexedDB = {
       initialize: vi.fn().mockResolvedValue({ success: true }),
       store: vi.fn().mockResolvedValue({ success: true }),
       retrieve: vi.fn().mockResolvedValue({ data: 'test' }),
@@ -76,44 +45,21 @@ vi.mock('../IndexedDBService', () => ({
       clear: vi.fn().mockResolvedValue(true),
       getStats: vi.fn().mockResolvedValue({ used: 2000, available: true }),
       exportAll: vi.fn().mockResolvedValue({}),
-      importData: vi.fn().mockResolvedValue({ imported: 1 })
+      importData: vi.fn().mockResolvedValue({ imported: 1 }),
     };
-    return mockInstance;
-  })
-}));
-
-vi.mock('../SessionManager', () => ({
-  SessionManager: vi.fn().mockImplementation(() => {
-    const mockInstance = {
-      initialize: vi.fn().mockResolvedValue({ success: true })
+    persistenceManager.sessionManager = {
+      initialize: vi.fn().mockResolvedValue({ success: true }),
     };
-    return mockInstance;
-  })
-}));
-
-vi.mock('../DataMigrationService', () => ({
-  DataMigrationService: vi.fn().mockImplementation(() => {
-    const mockInstance = {
-      checkAndMigrate: vi.fn().mockResolvedValue({ success: true })
+    persistenceManager.migrationService = {
+      checkAndMigrate: vi.fn().mockResolvedValue({ success: true }),
     };
-    return mockInstance;
-  })
-}));
-
-// Mock navigator.storage
-Object.defineProperty(navigator, 'storage', {
-  value: {
-    estimate: vi.fn().mockResolvedValue({ quota: 1000000, usage: 50000 })
-  },
-  writable: true
-});
-
-describe('PersistenceManager', () => {
-  let persistenceManager;
-
-  beforeEach(() => {
-    persistenceManager = new PersistenceManager();
-    vi.clearAllMocks();
+    Object.defineProperty(navigator, 'storage', {
+      value: {
+        estimate: vi.fn().mockResolvedValue({ quota: 1000000, usage: 50000 })
+      },
+      writable: true,
+      configurable: true
+    });
   });
 
   afterEach(() => {
@@ -130,10 +76,8 @@ describe('PersistenceManager', () => {
     });
 
     it('should handle initialization failure', async () => {
-      const newPersistenceManager = new PersistenceManager();
-      newPersistenceManager.localStorage.initialize = vi.fn().mockRejectedValue(new Error('Init failed'));
-
-      await expect(newPersistenceManager.initialize()).rejects.toThrow('Persistence initialization failed');
+      persistenceManager.localStorage.initialize.mockRejectedValue(new Error('Init failed'));
+      await expect(persistenceManager.initialize()).rejects.toThrow('Persistence initialization failed');
     });
 
     it('should not reinitialize if already initialized', async () => {
@@ -452,7 +396,9 @@ describe('PersistenceManager', () => {
 
       // Export data
       const exportResult = await persistenceManager.exportData();
-      expect(exportResult.success).toBe(true);
+      expect(exportResult.data.localStorage).toEqual({});
+      expect(exportResult.data.indexedDB).toEqual({});
+      expect(exportResult.size).toBeGreaterThan(0);
 
       // Remove data
       await persistenceManager.remove('watchlists');

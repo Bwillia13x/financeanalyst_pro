@@ -1,0 +1,34 @@
+services:
+  - type: web
+    name: financeanalyst-pro-backend
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: FRONTEND_URL
+        value: https://financeanalyst-pro.netlify.app
+      - key: RATE_LIMIT_REQUESTS
+        value: 150
+      - key: CACHE_TTL_MARKET_DATA
+        value: 300
+      - key: CACHE_TTL_FINANCIAL_DATA
+        value: 10800
+      - key: CACHE_TTL_COMPANY_DATA
+        value: 43200
+      - key: DEMO_MODE
+        value: false
+      - key: LOG_LEVEL
+        value: info
+      # API Keys - these need to be set in Render dashboard
+      - key: ALPHA_VANTAGE_API_KEY
+        sync: false  # Set manually in Render dashboard
+      - key: FMP_API_KEY
+        sync: false
+      - key: QUANDL_API_KEY
+        sync: false
+      - key: FRED_API_KEY
+        sync: false
