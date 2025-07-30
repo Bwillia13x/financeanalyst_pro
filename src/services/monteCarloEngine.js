@@ -848,7 +848,7 @@ class MonteCarloEngine {
     ];
     
     let j = 0;
-    const ser = 1.000000000190015;
+    let ser = 1.000000000190015;
     let xx = x;
     let y = xx = x;
     let tmp = x + 5.5;
