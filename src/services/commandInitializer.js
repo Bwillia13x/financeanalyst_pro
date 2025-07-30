@@ -13,6 +13,7 @@ import { automationCommands } from './commands/automationCommands';
 import { dataCommands } from './commands/dataCommands';
 import { systemCommands } from './commands/systemCommands';
 import { persistenceCommands } from './commands/persistenceCommands';
+import { privateAnalysisCommands } from './commands/privateAnalysisCommands';
 
 /**
  * Initialize all commands in the registry
@@ -63,6 +64,55 @@ export function initializeCommands() {
     tags: ['data', 'profile', 'metrics'],
     parameterSchema: {
       required: ['ticker'],
+      optional: []
+    }
+  });
+
+  // Register Private Analysis Commands
+  commandRegistry.register('PRIVATE_DCF', privateAnalysisCommands.PRIVATE_DCF, {
+    category: 'CORE',
+    description: 'DCF valuation using private company financial data',
+    usage: 'PRIVATE_DCF()',
+    examples: ['PRIVATE_DCF()'],
+    tags: ['private', 'dcf', 'valuation', 'analysis'],
+    parameterSchema: {
+      required: [],
+      optional: ['discountRate', 'terminalGrowthRate', 'taxRate']
+    }
+  });
+
+  commandRegistry.register('PRIVATE_RATIOS', privateAnalysisCommands.PRIVATE_RATIOS, {
+    category: 'CORE',
+    description: 'Financial ratios analysis for private company data',
+    usage: 'PRIVATE_RATIOS()',
+    examples: ['PRIVATE_RATIOS()'],
+    tags: ['private', 'ratios', 'analysis', 'margins'],
+    parameterSchema: {
+      required: [],
+      optional: []
+    }
+  });
+
+  commandRegistry.register('PRIVATE_SUMMARY', privateAnalysisCommands.PRIVATE_SUMMARY, {
+    category: 'CORE',
+    description: 'Comprehensive financial summary of private company',
+    usage: 'PRIVATE_SUMMARY()',
+    examples: ['PRIVATE_SUMMARY()'],
+    tags: ['private', 'summary', 'overview', 'financial'],
+    parameterSchema: {
+      required: [],
+      optional: []
+    }
+  });
+
+  commandRegistry.register('PRIVATE_LOAD', privateAnalysisCommands.PRIVATE_LOAD, {
+    category: 'DATA',
+    description: 'Load and verify private company financial data',
+    usage: 'PRIVATE_LOAD()',
+    examples: ['PRIVATE_LOAD()'],
+    tags: ['private', 'data', 'load', 'verification'],
+    parameterSchema: {
+      required: [],
       optional: []
     }
   });
@@ -489,19 +539,70 @@ export function initializeCommands() {
     execute: async (parsedCommand, context, processor) => {
       const [category] = parsedCommand.parameters;
       
+      // Show ALL commands in detail
+      if (category && category.toLowerCase() === 'all') {
+        const allCommands = commandRegistry.getAllCommands();
+        const categories = commandRegistry.getAllCategories();
+        
+        let content = `📚 COMPREHENSIVE COMMAND REFERENCE\n`;
+        content += `FinanceAnalyst Pro Terminal v2.4.0 - Complete Command Suite\n`;
+        content += `═════════════════════════════════════════════════════════════\n\n`;
+        
+        // Group commands by category
+        categories.forEach(cat => {
+          const categoryCommands = commandRegistry.getCommandsByCategory(cat.key);
+          if (categoryCommands.length > 0) {
+            content += `${cat.icon} ${cat.name.toUpperCase()} COMMANDS (${categoryCommands.length})\n`;
+            content += `${cat.description}\n`;
+            content += '─'.repeat(50) + '\n';
+            
+            categoryCommands.forEach(cmd => {
+              content += `\n• ${cmd.usage}\n`;
+              content += `  ${cmd.description}\n`;
+              if (cmd.examples && cmd.examples.length > 0) {
+                content += `  Examples: ${cmd.examples.join(', ')}\n`;
+              }
+              if (cmd.tags && cmd.tags.length > 0) {
+                content += `  Tags: ${cmd.tags.join(', ')}\n`;
+              }
+            });
+            content += '\n';
+          }
+        });
+        
+        content += `\n📊 SUMMARY: ${allCommands.length} total commands across ${categories.length} categories\n`;
+        content += `\n💡 TIP: Use HELP(category) for specific category details\n`;
+        content += `💡 TIP: Use HELP() for quick overview and featured commands`;
+        
+        return {
+          type: 'system',
+          content
+        };
+      }
+      
       if (category) {
         // Show commands for specific category
         const categoryCommands = commandRegistry.getCommandsByCategory(category.toUpperCase());
         if (categoryCommands.length === 0) {
           return {
             type: 'error',
-            content: `Unknown category: ${category}. Use HELP() to see all categories.`
+            content: `Unknown category: ${category}. Use HELP() to see all categories or HELP(ALL) for complete command list.`
           };
         }
 
-        const content = `Commands in ${category.toUpperCase()} category:\n\n${categoryCommands.map(cmd => 
-          `• ${cmd.usage} - ${cmd.description}`
-        ).join('\n')}\n\nUse HELP() to see all categories.`;
+        let content = `📋 ${category.toUpperCase()} COMMANDS (${categoryCommands.length})\n`;
+        content += '═'.repeat(40) + '\n\n';
+        
+        categoryCommands.forEach(cmd => {
+          content += `• ${cmd.usage}\n`;
+          content += `  ${cmd.description}\n`;
+          if (cmd.examples && cmd.examples.length > 0) {
+            content += `  Examples: ${cmd.examples.join(', ')}\n`;
+          }
+          content += '\n';
+        });
+        
+        content += `Use HELP() for overview or HELP(ALL) for all commands.`;
 
         return {
           type: 'system',
@@ -509,39 +610,14 @@ export function initializeCommands() {
         };
       }
 
-      // Show all categories and featured commands
+      // Show all categories and featured commands (default view)
       const categories = commandRegistry.getAllCategories();
       const stats = commandRegistry.getCommandStats();
+      const totalCommands = Object.values(stats).reduce((sum, cat) => sum + cat.count, 0);
 
-      const content = `FinanceAnalyst Pro Terminal v2.4.0 - Enhanced Command Suite
-
-📊 COMMAND CATEGORIES:
-${categories.map(cat => 
+      const content = `🚀 FinanceAnalyst Pro Terminal v2.4.0 - Enhanced Command Suite\n\n📊 COMMAND CATEGORIES:\n${categories.map(cat => 
   `${cat.icon} ${cat.name} (${stats[cat.key]?.count || 0} commands)\n   ${cat.description}`
-).join('\n\n')}
-
-🚀 FEATURED COMMANDS:
-• DCF(AAPL) - Discounted Cash Flow with live data
-• LBO(TSLA) - Leveraged Buyout analysis  
-• PORTFOLIO([AAPL,MSFT], [0.5,0.5]) - Portfolio analysis
-• RISK_METRICS(GOOGL) - Comprehensive risk analysis
-• CORRELATION_MATRIX([AAPL,MSFT,GOOGL]) - Cross-asset correlations
-
-💡 USAGE TIPS:
-• Use HELP(category) to see commands in a specific category
-• Commands support both function style: COMMAND(param) and space style: COMMAND param
-• Use TAB for auto-completion and arrow keys for command history
-• Type STATUS() to check API connectivity and system health
-
-🚀 ENHANCED FEATURES:
-• Watchlists: Create and track custom stock lists
-• Alerts: Set price and metric notifications
-• Batch Analysis: Analyze multiple stocks simultaneously
-• ESG Scoring: Environmental, social, governance analysis
-• Technical Analysis: RSI, MACD, support/resistance
-• Advanced Valuation: DDM, residual income, asset-based models
-
-${categories.length} categories • ${Object.values(stats).reduce((sum, cat) => sum + cat.count, 0)} total commands available`;
+).join('\n\n')}\n\n⭐ FEATURED COMMANDS:\n• DCF(AAPL) - Discounted Cash Flow with live data\n• LBO(TSLA) - Leveraged Buyout analysis\n• PORTFOLIO([AAPL,MSFT], [0.5,0.5]) - Portfolio analysis\n• RISK_METRICS(GOOGL) - Comprehensive risk analysis\n• CORRELATION_MATRIX([AAPL,MSFT,GOOGL]) - Cross-asset correlations\n• PRIVATE_DCF() - Private company DCF valuation\n• PRIVATE_RATIOS() - Private company financial ratios\n• PRIVATE_SUMMARY() - Private company analysis summary\n\n🔧 PRIVATE ANALYSIS COMMANDS:\n• PRIVATE_LOAD() - Load private company data\n• PRIVATE_DCF() - DCF valuation for private companies\n• PRIVATE_RATIOS() - Calculate private company ratios\n• PRIVATE_SUMMARY() - Generate private company summary\n\n💡 HELP COMMANDS:\n• HELP() - Show this overview (current)\n• HELP(category) - Show commands for specific category\n• HELP(ALL) - Show complete list of ALL ${totalCommands} commands\n\n📋 AVAILABLE CATEGORIES:\n${categories.map(cat => `• ${cat.key}`).join(' • ')}\n\n🚀 ENHANCED FEATURES:\n• Watchlists: Create and track custom stock lists\n• Alerts: Set price and metric notifications\n• Batch Analysis: Analyze multiple stocks simultaneously\n• ESG Scoring: Environmental, social, governance analysis\n• Technical Analysis: RSI, MACD, support/resistance\n• Advanced Valuation: DDM, residual income, asset-based models\n• Private Company Analysis: Full financial modeling suite\n\n📊 ${categories.length} categories • ${totalCommands} total commands available\n\n💡 Pro Tip: Use HELP(ALL) to see every single command with examples!`;
 
       return {
         type: 'system',
@@ -556,7 +632,7 @@ ${categories.length} categories • ${Object.values(stats).reduce((sum, cat) => 
     category: 'UTILITY',
     description: 'Show available commands and usage information',
     usage: 'HELP(category)',
-    examples: ['HELP()', 'HELP(PORTFOLIO)', 'HELP(CORE)'],
+    examples: ['HELP()', 'HELP(PORTFOLIO)', 'HELP(CORE)', 'HELP(ALL)'],
     tags: ['help', 'documentation', 'commands']
   });
 

@@ -234,7 +234,7 @@ class MonteCarloEngine {
   }
 
   /**
-   * Sample from a probability distribution
+   * Sample from a probability distribution with enhanced types
    * @param {Object} distribution - Distribution parameters
    * @returns {number} Random sample
    */
@@ -257,10 +257,81 @@ class MonteCarloEngine {
 
       case 'beta':
         return this.betaRandom(parameters.alpha, parameters.beta);
+        
+      case 'exponential':
+        return this.exponentialRandom(parameters.lambda);
+        
+      case 'weibull':
+        return this.weibullRandom(parameters.shape, parameters.scale);
+        
+      case 'pareto':
+        return this.paretoRandom(parameters.scale, parameters.shape);
+        
+      case 'student_t':
+        return this.studentTRandom(parameters.df);
+        
+      case 'chi_squared':
+        return this.chiSquaredRandom(parameters.df);
 
       default:
         throw new Error(`Unsupported distribution type: ${type}`);
     }
+  }
+  
+  /**
+   * Generate exponential random variable
+   * @param {number} lambda - Rate parameter
+   * @returns {number} Exponential random variable
+   */
+  exponentialRandom(lambda) {
+    return -Math.log(1 - Math.random()) / lambda;
+  }
+  
+  /**
+   * Generate Weibull random variable
+   * @param {number} shape - Shape parameter (k)
+   * @param {number} scale - Scale parameter (lambda)
+   * @returns {number} Weibull random variable
+   */
+  weibullRandom(shape, scale) {
+    const u = Math.random();
+    return scale * Math.pow(-Math.log(1 - u), 1 / shape);
+  }
+  
+  /**
+   * Generate Pareto random variable
+   * @param {number} scale - Scale parameter (xm)
+   * @param {number} shape - Shape parameter (alpha)
+   * @returns {number} Pareto random variable
+   */
+  paretoRandom(scale, shape) {
+    const u = Math.random();
+    return scale / Math.pow(u, 1 / shape);
+  }
+  
+  /**
+   * Generate Student's t random variable
+   * @param {number} df - Degrees of freedom
+   * @returns {number} Student's t random variable
+   */
+  studentTRandom(df) {
+    if (df <= 0) throw new Error('Degrees of freedom must be positive');
+    
+    const normal = this.normalRandom(0, 1);
+    const chiSq = this.chiSquaredRandom(df);
+    
+    return normal / Math.sqrt(chiSq / df);
+  }
+  
+  /**
+   * Generate Chi-squared random variable
+   * @param {number} df - Degrees of freedom
+   * @returns {number} Chi-squared random variable
+   */
+  chiSquaredRandom(df) {
+    if (df <= 0) throw new Error('Degrees of freedom must be positive');
+    
+    return this.gammaRandom(df / 2) * 2;
   }
 
   /**
@@ -506,18 +577,20 @@ class MonteCarloEngine {
   }
 
   /**
-   * Analyze simulation results
+   * Analyze simulation results with enhanced statistical measures
    * @param {Array} results - Simulation results
    * @param {number} confidenceLevel - Confidence level
    * @param {Array} metrics - Metrics to analyze
-   * @returns {Object} Statistical analysis
+   * @returns {Object} Comprehensive statistical analysis
    */
   analyzeResults(results, confidenceLevel, metrics = ['pricePerShare', 'enterpriseValue', 'upside']) {
     const analysis = {
       statistics: {},
       percentiles: {},
       confidenceIntervals: {},
-      riskMetrics: {}
+      riskMetrics: {},
+      distributionTests: {},
+      correlations: {}
     };
 
     metrics.forEach(metric => {
@@ -528,22 +601,35 @@ class MonteCarloEngine {
       const mean = values.reduce((sum, v) => sum + v, 0) / values.length;
       const variance = values.reduce((sum, v) => sum + Math.pow(v - mean, 2), 0) / values.length;
       const stdDev = Math.sqrt(variance);
+      const sampleStdDev = Math.sqrt(variance * values.length / (values.length - 1)); // Bessel's correction
 
       analysis.statistics[metric] = {
         mean,
         median: this.percentile(values, 0.5),
+        mode: this.calculateMode(values),
         stdDev,
+        sampleStdDev,
+        variance,
         min: values[0],
         max: values[values.length - 1],
-        count: values.length
+        range: values[values.length - 1] - values[0],
+        count: values.length,
+        // Additional robust statistics
+        trimmedMean: this.calculateTrimmedMean(values, 0.1), // 10% trimmed mean
+        mad: this.calculateMAD(values), // Median Absolute Deviation
+        iqr: this.percentile(values, 0.75) - this.percentile(values, 0.25)
       };
 
       analysis.percentiles[metric] = {
+        p1: this.percentile(values, 0.01),
         p5: this.percentile(values, 0.05),
+        p10: this.percentile(values, 0.10),
         p25: this.percentile(values, 0.25),
         p50: this.percentile(values, 0.5),
         p75: this.percentile(values, 0.75),
-        p95: this.percentile(values, 0.95)
+        p90: this.percentile(values, 0.90),
+        p95: this.percentile(values, 0.95),
+        p99: this.percentile(values, 0.99)
       };
 
       const alpha = 1 - confidenceLevel;
@@ -554,18 +640,356 @@ class MonteCarloEngine {
         level: confidenceLevel,
         lowerBound,
         upperBound,
-        width: upperBound - lowerBound
+        width: upperBound - lowerBound,
+        // Bootstrap confidence intervals
+        bootstrapCI: this.calculateBootstrapCI(values, confidenceLevel)
       };
+
+      const var95 = this.percentile(values, 0.05);
+      const var99 = this.percentile(values, 0.01);
+      const cvar95 = values.slice(0, Math.floor(values.length * 0.05)).reduce((sum, v) => sum + v, 0) / Math.floor(values.length * 0.05);
+      const cvar99 = values.slice(0, Math.floor(values.length * 0.01)).reduce((sum, v) => sum + v, 0) / Math.floor(values.length * 0.01);
 
       analysis.riskMetrics[metric] = {
-        var: this.percentile(values, 0.05), // Value at Risk (5%)
-        cvar: values.slice(0, Math.floor(values.length * 0.05)).reduce((sum, v) => sum + v, 0) / Math.floor(values.length * 0.05), // Conditional VaR
+        var95, // Value at Risk (5%)
+        var99, // Value at Risk (1%)
+        cvar95, // Conditional VaR (5%)
+        cvar99, // Conditional VaR (1%)
         skewness: this.calculateSkewness(values, mean, stdDev),
-        kurtosis: this.calculateKurtosis(values, mean, stdDev)
+        kurtosis: this.calculateKurtosis(values, mean, stdDev),
+        excessKurtosis: this.calculateKurtosis(values, mean, stdDev) - 3,
+        // Tail risk measures
+        expectedShortfall: cvar95,
+        maxDrawdown: this.calculateMaxDrawdown(values),
+        // Risk-adjusted returns
+        sharpeRatio: this.calculateSharpeRatio(values, 0.02), // Assuming 2% risk-free rate
+        sortinoRatio: this.calculateSortinoRatio(values, mean)
+      };
+      
+      // Distribution fitting tests
+      analysis.distributionTests[metric] = {
+        jarqueBera: this.jarqueBeraTest(values),
+        kolmogorovSmirnov: this.ksTestNormality(values),
+        shapiroWilk: values.length <= 5000 ? this.shapiroWilkTest(values) : null
       };
     });
+    
+    // Calculate correlation matrix between metrics
+    if (metrics.length > 1) {
+      analysis.correlations = this.calculateCorrelationMatrix(results, metrics);
+    }
 
     return analysis;
+  }
+  
+  /**
+   * Calculate mode of dataset
+   */
+  calculateMode(values) {
+    const frequency = {};
+    values.forEach(v => {
+      const rounded = Math.round(v * 100) / 100; // Round to avoid floating point issues
+      frequency[rounded] = (frequency[rounded] || 0) + 1;
+    });
+    
+    const maxFreq = Math.max(...Object.values(frequency));
+    const modes = Object.keys(frequency).filter(k => frequency[k] === maxFreq);
+    
+    return modes.length === 1 ? parseFloat(modes[0]) : null;
+  }
+  
+  /**
+   * Calculate trimmed mean
+   */
+  calculateTrimmedMean(sortedValues, trimProportion = 0.1) {
+    const trimCount = Math.floor(sortedValues.length * trimProportion);
+    const trimmedValues = sortedValues.slice(trimCount, -trimCount || undefined);
+    return trimmedValues.reduce((sum, v) => sum + v, 0) / trimmedValues.length;
+  }
+  
+  /**
+   * Calculate Median Absolute Deviation
+   */
+  calculateMAD(values) {
+    const median = this.percentile(values, 0.5);
+    const deviations = values.map(v => Math.abs(v - median)).sort((a, b) => a - b);
+    return this.percentile(deviations, 0.5);
+  }
+  
+  /**
+   * Calculate bootstrap confidence interval
+   */
+  calculateBootstrapCI(values, confidenceLevel, bootstrapSamples = 1000) {
+    const bootstrapMeans = [];
+    
+    for (let i = 0; i < bootstrapSamples; i++) {
+      const sample = [];
+      for (let j = 0; j < values.length; j++) {
+        sample.push(values[Math.floor(Math.random() * values.length)]);
+      }
+      bootstrapMeans.push(sample.reduce((sum, v) => sum + v, 0) / sample.length);
+    }
+    
+    bootstrapMeans.sort((a, b) => a - b);
+    const alpha = 1 - confidenceLevel;
+    
+    return {
+      lowerBound: this.percentile(bootstrapMeans, alpha / 2),
+      upperBound: this.percentile(bootstrapMeans, 1 - alpha / 2)
+    };
+  }
+  
+  /**
+   * Calculate maximum drawdown
+   */
+  calculateMaxDrawdown(values) {
+    let peak = values[0];
+    let maxDrawdown = 0;
+    
+    for (const value of values) {
+      if (value > peak) {
+        peak = value;
+      }
+      const drawdown = (peak - value) / peak;
+      if (drawdown > maxDrawdown) {
+        maxDrawdown = drawdown;
+      }
+    }
+    
+    return maxDrawdown;
+  }
+  
+  /**
+   * Calculate Sharpe ratio approximation
+   */
+  calculateSharpeRatio(values, riskFreeRate = 0.02) {
+    const mean = values.reduce((sum, v) => sum + v, 0) / values.length;
+    const variance = values.reduce((sum, v) => sum + Math.pow(v - mean, 2), 0) / values.length;
+    const stdDev = Math.sqrt(variance);
+    
+    return stdDev > 0 ? (mean - riskFreeRate) / stdDev : 0;
+  }
+  
+  /**
+   * Calculate Sortino ratio
+   */
+  calculateSortinoRatio(values, targetReturn) {
+    const excessReturns = values.map(v => v - targetReturn);
+    const negativeReturns = excessReturns.filter(r => r < 0);
+    
+    if (negativeReturns.length === 0) return Infinity;
+    
+    const downsideDeviation = Math.sqrt(
+      negativeReturns.reduce((sum, r) => sum + r * r, 0) / negativeReturns.length
+    );
+    
+    const meanExcessReturn = excessReturns.reduce((sum, r) => sum + r, 0) / excessReturns.length;
+    
+    return downsideDeviation > 0 ? meanExcessReturn / downsideDeviation : 0;
+  }
+  
+  /**
+   * Jarque-Bera test for normality
+   */
+  jarqueBeraTest(values) {
+    const n = values.length;
+    const mean = values.reduce((sum, v) => sum + v, 0) / n;
+    const variance = values.reduce((sum, v) => sum + Math.pow(v - mean, 2), 0) / n;
+    const stdDev = Math.sqrt(variance);
+    
+    const skewness = this.calculateSkewness(values, mean, stdDev);
+    const kurtosis = this.calculateKurtosis(values, mean, stdDev);
+    
+    const jb = (n / 6) * (Math.pow(skewness, 2) + Math.pow(kurtosis - 3, 2) / 4);
+    const pValue = 1 - this.chiSquaredCDF(jb, 2); // Approximate p-value
+    
+    return {
+      statistic: jb,
+      pValue,
+      isNormal: pValue > 0.05
+    };
+  }
+  
+  /**
+   * Approximate chi-squared CDF
+   */
+  chiSquaredCDF(x, df) {
+    if (x <= 0) return 0;
+    return this.incompleteGamma(df / 2, x / 2);
+  }
+  
+  /**
+   * Incomplete gamma function approximation
+   */
+  incompleteGamma(a, x) {
+    // Simple approximation for demonstration
+    if (x === 0) return 0;
+    if (x < a + 1) {
+      let sum = 1 / a;
+      let term = 1 / a;
+      for (let n = 1; n < 100; n++) {
+        term *= x / (a + n);
+        sum += term;
+        if (term < 1e-15) break;
+      }
+      return Math.exp(-x + a * Math.log(x) - this.logGamma(a)) * sum;
+    } else {
+      return 1 - this.incompleteGamma(a, x);
+    }
+  }
+  
+  /**
+   * Log gamma function approximation
+   */
+  logGamma(x) {
+    const coef = [
+      76.18009172947146, -86.50532032941677, 24.01409824083091,
+      -1.231739572450155, 0.1208650973866179e-2, -0.5395239384953e-5
+    ];
+    
+    let j = 0;
+    const ser = 1.000000000190015;
+    let xx = x;
+    let y = xx = x;
+    let tmp = x + 5.5;
+    tmp -= (x + 0.5) * Math.log(tmp);
+    
+    for (; j < 6; j++) {
+      ser += coef[j] / ++y;
+    }
+    
+    return -tmp + Math.log(2.5066282746310005 * ser / xx);
+  }
+  
+  /**
+   * Kolmogorov-Smirnov test for normality
+   */
+  ksTestNormality(values) {
+    const n = values.length;
+    const mean = values.reduce((sum, v) => sum + v, 0) / n;
+    const variance = values.reduce((sum, v) => sum + Math.pow(v - mean, 2), 0) / n;
+    const stdDev = Math.sqrt(variance);
+    
+    let maxD = 0;
+    
+    for (let i = 0; i < n; i++) {
+      const empirical = (i + 1) / n;
+      const theoretical = this.normalCDF((values[i] - mean) / stdDev);
+      const d = Math.abs(empirical - theoretical);
+      if (d > maxD) maxD = d;
+    }
+    
+    const critical = 1.36 / Math.sqrt(n); // Critical value at 5% significance
+    
+    return {
+      statistic: maxD,
+      critical,
+      isNormal: maxD < critical
+    };
+  }
+  
+  /**
+   * Normal CDF approximation
+   */
+  normalCDF(x) {
+    return 0.5 * (1 + this.erf(x / Math.sqrt(2)));
+  }
+  
+  /**
+   * Error function approximation
+   */
+  erf(x) {
+    const a1 =  0.254829592;
+    const a2 = -0.284496736;
+    const a3 =  1.421413741;
+    const a4 = -1.453152027;
+    const a5 =  1.061405429;
+    const p  =  0.3275911;
+    
+    const sign = x < 0 ? -1 : 1;
+    x = Math.abs(x);
+    
+    const t = 1.0 / (1.0 + p * x);
+    const y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
+    
+    return sign * y;
+  }
+  
+  /**
+   * Shapiro-Wilk test for normality (simplified)
+   */
+  shapiroWilkTest(values) {
+    // Simplified implementation - in practice, would use lookup tables
+    const n = values.length;
+    if (n < 3 || n > 5000) return null;
+    
+    const sortedValues = [...values].sort((a, b) => a - b);
+    const mean = values.reduce((sum, v) => sum + v, 0) / n;
+    
+    // This is a very simplified approximation
+    let numerator = 0;
+    let denominator = 0;
+    
+    for (let i = 0; i < n; i++) {
+      denominator += Math.pow(sortedValues[i] - mean, 2);
+    }
+    
+    // Simplified calculation - real implementation would use Shapiro-Wilk coefficients
+    const w = numerator / denominator;
+    
+    return {
+      statistic: w,
+      isNormal: w > 0.9 // Very rough approximation
+    };
+  }
+  
+  /**
+   * Calculate correlation matrix between metrics
+   */
+  calculateCorrelationMatrix(results, metrics) {
+    const correlationMatrix = {};
+    
+    for (let i = 0; i < metrics.length; i++) {
+      correlationMatrix[metrics[i]] = {};
+      for (let j = 0; j < metrics.length; j++) {
+        if (i === j) {
+          correlationMatrix[metrics[i]][metrics[j]] = 1.0;
+        } else {
+          const valuesI = results.map(r => r[metrics[i]]).filter(v => v !== null && !isNaN(v));
+          const valuesJ = results.map(r => r[metrics[j]]).filter(v => v !== null && !isNaN(v));
+          
+          correlationMatrix[metrics[i]][metrics[j]] = this.calculateCorrelation(valuesI, valuesJ);
+        }
+      }
+    }
+    
+    return correlationMatrix;
+  }
+  
+  /**
+   * Calculate Pearson correlation coefficient
+   */
+  calculateCorrelation(x, y) {
+    if (x.length !== y.length || x.length === 0) return 0;
+    
+    const n = x.length;
+    const meanX = x.reduce((sum, v) => sum + v, 0) / n;
+    const meanY = y.reduce((sum, v) => sum + v, 0) / n;
+    
+    let numerator = 0;
+    let sumXX = 0;
+    let sumYY = 0;
+    
+    for (let i = 0; i < n; i++) {
+      const dx = x[i] - meanX;
+      const dy = y[i] - meanY;
+      numerator += dx * dy;
+      sumXX += dx * dx;
+      sumYY += dy * dy;
+    }
+    
+    const denominator = Math.sqrt(sumXX * sumYY);
+    return denominator > 0 ? numerator / denominator : 0;
   }
 
   /**

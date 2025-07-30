@@ -10,31 +10,58 @@ const ScenarioModeling = ({ data, modelInputs, onModelInputChange, calculateDCF,
   // Calculate DCF for each scenario
   const scenarioResults = useMemo(() => {
     return scenarios.map(scenario => {
-      // Apply scenario assumptions to base DCF calculation
-      const scenarioData = {
-        ...data,
-        statements: {
-          ...data.statements,
-          incomeStatement: {
-            ...data.statements.incomeStatement,
-            totalRevenue: data.statements.incomeStatement.totalRevenue?.map((revenue, index) => {
-              if (index === 0) return revenue; // Base year unchanged
-              // Apply revenue growth for projection years
-              const growthRate = 1 + (scenario.revenueGrowth / 100);
-              return revenue * Math.pow(growthRate, index);
-            }),
-            operatingIncome: data.statements.incomeStatement.operatingIncome?.map((income, index) => {
-              if (index === 0) return income; // Base year unchanged
-              // Apply margin improvement
-              const baseRevenue = data.statements.incomeStatement.totalRevenue?.[index] || 0;
-              const scenarioRevenue = baseRevenue * Math.pow(1 + (scenario.revenueGrowth / 100), index);
-              const baseMargin = income / baseRevenue;
-              const adjustedMargin = baseMargin + (scenario.marginImprovement / 100);
-              return scenarioRevenue * adjustedMargin;
-            })
+      try {
+        // Apply scenario assumptions to base DCF calculation
+        const incomeStatement = { ...data.statements.incomeStatement };
+        
+        // Apply revenue growth to revenue data (object format)
+        const baseRevenue = incomeStatement.totalRevenue || {};
+        const modifiedRevenue = {};
+        Object.keys(baseRevenue).forEach(periodIndex => {
+          const index = parseInt(periodIndex);
+          if (index === 0) {
+            modifiedRevenue[periodIndex] = baseRevenue[periodIndex]; // Base year unchanged
+          } else {
+            // Apply revenue growth for projection years
+            const growthRate = 1 + (scenario.revenueGrowth / 100);
+            modifiedRevenue[periodIndex] = baseRevenue[0] * Math.pow(growthRate, index);
           }
-        }
-      };
+        });
+        
+        // Apply margin improvement to operating income
+        const baseOperating = incomeStatement.operatingIncome || {};
+        const modifiedOperating = {};
+        Object.keys(baseOperating).forEach(periodIndex => {
+          const index = parseInt(periodIndex);
+          if (index === 0) {
+            modifiedOperating[periodIndex] = baseOperating[periodIndex]; // Base year unchanged
+          } else {
+            // Apply margin improvement
+            const baseRevenueValue = baseRevenue[periodIndex] || 0;
+            const scenarioRevenue = modifiedRevenue[periodIndex] || 0;
+            const baseIncome = baseOperating[periodIndex] || 0;
+            
+            if (baseRevenueValue > 0) {
+              const baseMargin = baseIncome / baseRevenueValue;
+              const adjustedMargin = baseMargin + (scenario.marginImprovement / 100);
+              modifiedOperating[periodIndex] = scenarioRevenue * adjustedMargin;
+            } else {
+              modifiedOperating[periodIndex] = baseIncome;
+            }
+          }
+        });
+        
+        const scenarioData = {
+          ...data,
+          statements: {
+            ...data.statements,
+            incomeStatement: {
+              ...incomeStatement,
+              totalRevenue: modifiedRevenue,
+              operatingIncome: modifiedOperating
+            }
+          }
+        };
 
       // Calculate DCF with scenario data
       const dcfResult = calculateDCF(scenarioData);
@@ -44,6 +71,15 @@ const ScenarioModeling = ({ data, modelInputs, onModelInputChange, calculateDCF,
         ...dcfResult,
         weightedValue: dcfResult.enterpriseValue * (scenario.probability / 100)
       };
+      } catch (error) {
+        console.error('Scenario calculation error:', error);
+        return {
+          ...scenario,
+          enterpriseValue: 0,
+          equityValue: 0,
+          weightedValue: 0
+        };
+      }
     });
   }, [scenarios, data, calculateDCF]);
 

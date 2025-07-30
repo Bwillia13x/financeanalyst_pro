@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { BarChart3, TrendingUp, AlertTriangle, Play, Square, Settings, Download, FileText } from 'lucide-react';
 import { ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ScatterChart, Scatter, Cell, AreaChart, Area } from 'recharts';
 import { monteCarloEngine } from '../../services/monteCarloEngine';
-import styles from './styles.module.css';
 
 const MonteCarloSimulation = ({ data, onDataChange }) => {
   const [activeTab, setActiveTab] = useState('setup');
@@ -182,32 +181,36 @@ const MonteCarloSimulation = ({ data, onDataChange }) => {
   ];
 
   return (
-    <div className={styles.container}>
-      <div className={styles.header}>
-        <div>
-          <h2 className={styles.title}>
-            ⚡ Monte Carlo Simulation
+    <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
+      <div className="mb-6">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+          <h2 className="text-2xl font-bold text-white mb-2 flex items-center">
+            <Zap className="inline-block mr-2" />
+            Monte Carlo Simulation
           </h2>
-          <p className={styles.subtitle}>
+          <p className="text-gray-400 text-sm">
             Advanced risk analysis using probabilistic modeling • Generate thousands of scenarios • Measure uncertainty
           </p>
-        </div>
+        </motion.div>
       </div>
 
-      <div className={styles.tabContainer}>
-        {tabs.map(tab => (
+      <div className="mb-6">
+        {['setup', 'run', 'results', 'analysis'].map((tab) => (
           <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`${styles.tabButton} ${activeTab === tab.id ? styles.active : ''}`}
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              activeTab === tab 
+                ? 'bg-blue-600 text-white' 
+                : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+            }`}
           >
-            <tab.icon size={16} />
-            {tab.label}
+            {tab.charAt(0).toUpperCase() + tab.slice(1)}
           </button>
         ))}
       </div>
 
-      <div className={styles.tabContent}>
+      <div className="mt-6">
         <AnimatePresence mode="wait">
           {activeTab === 'setup' && (
             <motion.div
@@ -217,14 +220,17 @@ const MonteCarloSimulation = ({ data, onDataChange }) => {
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
             >
-              <div className={styles.setupContainer}>
-                <div className={styles.settingsSection}>
-                  <h3>🎛️ Simulation Settings</h3>
-                  <div className={styles.settingsGrid}>
-                    <div className={styles.inputGroup}>
-                      <label>Iterations</label>
+              <div className="space-y-6">
+                <div className="bg-gray-700 rounded-lg p-4">
+                  <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
+                    🎛️ Simulation Settings
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="block text-sm font-medium text-gray-200">Iterations</label>
                       <input
                         type="number"
+                        className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                         value={simulationSettings.iterations}
                         onChange={(e) => setSimulationSettings(prev => ({
                           ...prev,
@@ -234,10 +240,12 @@ const MonteCarloSimulation = ({ data, onDataChange }) => {
                         max="100000"
                         step="1000"
                       />
+                      <small className="text-gray-400">Leave empty for random</small>
                     </div>
-                    <div className={styles.inputGroup}>
-                      <label>Confidence Level</label>
+                    <div className="space-y-2">
+                      <label className="block text-sm font-medium text-gray-200">Confidence Level</label>
                       <select
+                        className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                         value={simulationSettings.confidenceLevel}
                         onChange={(e) => setSimulationSettings(prev => ({
                           ...prev,
@@ -249,10 +257,11 @@ const MonteCarloSimulation = ({ data, onDataChange }) => {
                         <option value={0.99}>99%</option>
                       </select>
                     </div>
-                    <div className={styles.inputGroup}>
-                      <label>Random Seed (Optional)</label>
+                    <div className="space-y-2">
+                      <label className="block text-sm font-medium text-gray-200">Random Seed (Optional)</label>
                       <input
                         type="number"
+                        className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                         value={simulationSettings.randomSeed || ''}
                         onChange={(e) => setSimulationSettings(prev => ({
                           ...prev,
@@ -261,43 +270,47 @@ const MonteCarloSimulation = ({ data, onDataChange }) => {
                         placeholder="Leave empty for random"
                       />
                     </div>
-                    <div className={styles.inputGroup}>
-                      <label className={styles.checkboxLabel}>
+                    <div className="space-y-2">
+                      <label className="flex items-center space-x-2 text-gray-200">
                         <input
                           type="checkbox"
+                          className="w-4 h-4 text-blue-600 bg-gray-800 border-gray-600 rounded focus:ring-blue-500"
                           checked={simulationSettings.enableCorrelation}
                           onChange={(e) => setSimulationSettings(prev => ({
                             ...prev,
                             enableCorrelation: e.target.checked
                           }))}
                         />
-                        Enable Variable Correlation
+                        <span>Enable Variable Correlation</span>
                       </label>
                     </div>
                   </div>
                 </div>
 
-                <div className={styles.distributionsSection}>
-                  <h3>📊 Variable Distributions</h3>
-                  <div className={styles.distributionsGrid}>
+                <div className="bg-gray-700 rounded-lg p-4">
+                  <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
+                    📊 Variable Distributions
+                  </h3>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     {Object.entries(distributions).map(([variable, dist]) => (
-                      <div key={variable} className={styles.distributionCard}>
-                        <div className={styles.distributionHeader}>
-                          <label className={styles.checkboxLabel}>
+                      <div key={variable} className="bg-gray-800 border border-gray-600 rounded-lg p-4">
+                        <div className="flex items-center justify-between mb-3">
+                          <label className="flex items-center space-x-2 text-gray-200">
                             <input
                               type="checkbox"
                               checked={dist.enabled}
                               onChange={(e) => updateDistribution(variable, { enabled: e.target.checked })}
                             />
-                            <span className={styles.variableName}>{dist.name}</span>
+                            <span className="font-medium">{dist.name}</span>
                           </label>
                         </div>
                         
                         {dist.enabled && (
-                          <div className={styles.distributionControls}>
-                            <div className={styles.inputGroup}>
-                              <label>Distribution Type</label>
+                          <div className="space-y-3">
+                            <div className="space-y-2">
+                              <label className="block text-sm font-medium text-gray-200">Distribution Type</label>
                               <select
+                                className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 value={dist.type}
                                 onChange={(e) => {
                                   const newType = e.target.value;
@@ -328,13 +341,14 @@ const MonteCarloSimulation = ({ data, onDataChange }) => {
                               </select>
                             </div>
                             
-                            <div className={styles.parametersGrid}>
+                            <div className="grid grid-cols-2 gap-3">
                               {distributionTypes
                                 .find(t => t.value === dist.type)
                                 ?.parameters.map(param => (
-                                  <div key={param} className={styles.inputGroup}>
-                                    <label>{param.charAt(0).toUpperCase() + param.slice(1)}</label>
+                                  <div key={param} className="space-y-1">
+                                    <label className="block text-xs font-medium text-gray-300">{param.charAt(0).toUpperCase() + param.slice(1)}</label>
                                     <input
+                                      className="w-full px-2 py-1 bg-gray-700 border border-gray-600 rounded text-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
                                       type="number"
                                       value={dist.parameters[param] || ''}
                                       onChange={(e) => updateDistribution(variable, {
@@ -410,43 +424,43 @@ const MonteCarloSimulation = ({ data, onDataChange }) => {
               <div className={styles.runContainer}>
                 <div className={styles.runHeader}>
                   <h3>🚀 Simulation Control</h3>
-                  <div className={styles.runActions}>
+                  <div className="flex items-center space-x-2">
                     {!isRunning ? (
                       <button
                         onClick={runSimulation}
-                        className={`${styles.button} ${styles.primary}`}
+                        className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium flex items-center space-x-2 transition-colors"
                         disabled={Object.values(distributions).every(d => !d.enabled)}
                       >
                         <Play size={16} />
-                        Run Simulation
+                        <span>Run Simulation</span>
                       </button>
                     ) : (
                       <button
                         onClick={stopSimulation}
-                        className={`${styles.button} ${styles.secondary}`}
+                        className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium flex items-center space-x-2 transition-colors"
                       >
                         <Square size={16} />
-                        Stop Simulation
+                        <span>Stop Simulation</span>
                       </button>
                     )}
                   </div>
                 </div>
 
                 {isRunning && (
-                  <div className={styles.progressSection}>
-                    <div className={styles.progressBar}>
-                      <div 
-                        className={styles.progressFill}
+                  <div className="mt-4">
+                    <div className="w-full bg-gray-700 rounded-full h-2 mb-2">
+                      <div
+                        className="bg-blue-500 h-2 rounded-full transition-all duration-300"
                         style={{ width: `${progress}%` }}
                       />
                     </div>
-                    <div className={styles.progressText}>
+                    <div className="text-sm text-gray-400 text-center">
                       {progress.toFixed(1)}% Complete ({Math.floor(progress * simulationSettings.iterations / 100)} / {simulationSettings.iterations} iterations)
                     </div>
                   </div>
                 )}
 
-                <div className={styles.simulationPreview}>
+                <div className="bg-gray-800 rounded-lg p-4 mt-4">
                   <h4>📋 Simulation Preview</h4>
                   <div className={styles.previewGrid}>
                     <div className={styles.previewCard}>

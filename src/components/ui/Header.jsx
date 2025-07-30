@@ -27,6 +27,12 @@ const Header = () => {
       label: 'Analysis',
       path: '/scenario-analysis-sensitivity-tools',
       tooltip: 'Scenario modeling and Monte Carlo simulation tools with sensitivity analysis'
+    },
+    {
+      id: 'private-analysis',
+      label: 'Private Analysis',
+      path: '/private-analysis',
+      tooltip: 'Manual financial data input and sophisticated modeling with spreadsheet-style interface'
     }
   ];
 

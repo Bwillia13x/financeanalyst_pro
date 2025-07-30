@@ -14,6 +14,8 @@ const ScenarioAnalysisSensitivityTools = lazy(
 const ValuationTool = lazy(() => import('./components/ValuationTool/ValuationTool'));
 const ValuationToolDocs = lazy(() => import('./components/ValuationTool/ValuationToolDocs'));
 const ValuationToolDemo = lazy(() => import('./pages/valuation-tool-demo'));
+const PrivateAnalysis = lazy(() => import('./pages/PrivateAnalysis'));
+const FinancialInputsDemo = lazy(() => import('./components/FinancialInputsDemo'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 const Routes = () => {
@@ -34,6 +36,8 @@ const Routes = () => {
             <Route path="/valuation-tool" element={<ValuationTool />} />
             <Route path="/valuation-tool/docs" element={<ValuationToolDocs />} />
             <Route path="/valuation-tool/demo" element={<ValuationToolDemo />} />
+            <Route path="/private-analysis" element={<PrivateAnalysis />} />
+            <Route path="/financial-inputs-demo" element={<FinancialInputsDemo />} />
             <Route path="*" element={<NotFound />} />
           </RouterRoutes>
         </Suspense>

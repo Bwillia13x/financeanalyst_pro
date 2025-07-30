@@ -75,83 +75,106 @@ const SensitivityAnalysis = ({ data, modelInputs, onModelInputChange, calculateD
       for (let i = 0; i < steps; i++) {
         const value = range.min + (stepSize * i);
         
-        // Create modified DCF inputs
-        const modifiedInputs = {
-          ...modelInputs,
-          dcf: {
-            ...modelInputs.dcf,
-            [variable]: variableDef.isPercentage ? value : value
-          }
+        // Create modified DCF inputs based on variable type
+        let modifiedData = { ...data };
+        let dcfInputs = {
+          ...modelInputs.dcf,
+          [variable]: variableDef.isPercentage ? value : value
         };
         
-        // Calculate valuation with modified input
-        let modifiedData = data;
+        // For revenue and margin variables, we need to simulate the impact
         if (variable === 'revenue' || variable === 'grossMargin') {
-          // For revenue and margin changes, modify the underlying data
+          // Create a copy of the income statement with modified values
+          const incomeStatement = { ...data.statements.incomeStatement };
+          
+          if (variable === 'revenue') {
+            // Apply revenue growth change across periods
+            const baseRevenue = incomeStatement.totalRevenue || {};
+            const modifiedRevenue = {};
+            
+            Object.keys(baseRevenue).forEach(periodIndex => {
+              const index = parseInt(periodIndex);
+              if (index === 0) {
+                modifiedRevenue[periodIndex] = baseRevenue[periodIndex];
+              } else {
+                const growthRate = 1 + (value / 100);
+                modifiedRevenue[periodIndex] = baseRevenue[0] * Math.pow(growthRate, index);
+              }
+            });
+            
+            incomeStatement.totalRevenue = modifiedRevenue;
+          }
+          
+          if (variable === 'grossMargin') {
+            // Apply margin change to operating income
+            const baseOperating = incomeStatement.operatingIncome || {};
+            const baseRevenue = incomeStatement.totalRevenue || {};
+            const modifiedOperating = {};
+            
+            Object.keys(baseOperating).forEach(periodIndex => {
+              const revenue = baseRevenue[periodIndex] || 0;
+              const originalIncome = baseOperating[periodIndex] || 0;
+              if (revenue > 0) {
+                const baseMargin = originalIncome / revenue;
+                const adjustedMargin = baseMargin + (value / 100);
+                modifiedOperating[periodIndex] = revenue * adjustedMargin;
+              } else {
+                modifiedOperating[periodIndex] = originalIncome;
+              }
+            });
+            
+            incomeStatement.operatingIncome = modifiedOperating;
+          }
+          
           modifiedData = {
             ...data,
             statements: {
               ...data.statements,
-              incomeStatement: {
-                ...data.statements.incomeStatement,
-                totalRevenue: data.statements.incomeStatement.totalRevenue?.map((revenue, index) => {
-                  if (index === 0) return revenue;
-                  if (variable === 'revenue') {
-                    const growthRate = 1 + (value / 100);
-                    return revenue * Math.pow(growthRate, index);
-                  }
-                  return revenue;
-                }),
-                operatingIncome: data.statements.incomeStatement.operatingIncome?.map((income, index) => {
-                  if (index === 0) return income;
-                  const baseRevenue = data.statements.incomeStatement.totalRevenue?.[index] || 0;
-                  let adjustedRevenue = baseRevenue;
-                  
-                  if (variable === 'revenue') {
-                    const growthRate = 1 + (value / 100);
-                    adjustedRevenue = baseRevenue * Math.pow(growthRate, index);
-                  }
-                  
-                  if (variable === 'grossMargin') {
-                    const baseMargin = income / baseRevenue;
-                    const adjustedMargin = baseMargin + (value / 100);
-                    return adjustedRevenue * adjustedMargin;
-                  }
-                  
-                  return (adjustedRevenue / baseRevenue) * income;
-                })
-              }
+              incomeStatement
             }
           };
         }
         
         // Use a temporary calculateDCF with modified inputs
         const tempCalculateDCF = () => {
-          const { discountRate, terminalGrowthRate, projectionYears, taxRate } = modifiedInputs.dcf;
-          const sourceData = modifiedData;
-          
-          let operatingIncomes = [];
-          sourceData.periods.forEach((_, index) => {
-            if (index > 0 && index <= projectionYears) {
-              operatingIncomes.push(sourceData.statements.incomeStatement.operatingIncome?.[index] || 0);
-            }
-          });
-          
-          if (operatingIncomes.length === 0) return { enterpriseValue: 0, equityValue: 0 };
+          try {
+            const dcfParams = {
+              discountRate: dcfInputs.discountRate || 10,
+              terminalGrowthRate: dcfInputs.terminalGrowthRate || 2.5,
+              projectionYears: dcfInputs.projectionYears || 5,
+              taxRate: dcfInputs.taxRate || 25
+            };
+            
+            const sourceData = modifiedData;
+            const operatingIncomeData = sourceData.statements.incomeStatement.operatingIncome || {};
+            
+            // Extract operating incomes from object structure
+            let operatingIncomes = [];
+            Object.keys(operatingIncomeData).forEach(periodKey => {
+              const index = parseInt(periodKey);
+              if (index >= 0) {
+                operatingIncomes.push(operatingIncomeData[periodKey] || 0);
+              }
+            });
+            
+            if (operatingIncomes.length === 0) return { enterpriseValue: 0, equityValue: 0 };
 
-          let presentValue = 0;
-          const discountFactor = 1 + (discountRate / 100);
+            let presentValue = 0;
+            const discountFactor = 1 + (dcfParams.discountRate / 100);
 
-          operatingIncomes.forEach((income, index) => {
-            const afterTaxIncome = income * (1 - taxRate / 100);
-            const pv = afterTaxIncome / Math.pow(discountFactor, index + 1);
-            presentValue += pv;
-          });
+            // Use available periods for projections
+            operatingIncomes.forEach((income, index) => {
+              if (index > 0 && index <= dcfParams.projectionYears) {
+                const afterTaxIncome = income * (1 - dcfParams.taxRate / 100);
+                const pv = afterTaxIncome / Math.pow(discountFactor, index);
+                presentValue += pv;
+              }
+            });
 
-          const lastYearIncome = operatingIncomes[operatingIncomes.length - 1] || 0;
-          const terminalCashFlow = lastYearIncome * (1 + terminalGrowthRate / 100) * (1 - taxRate / 100);
-          const terminalValue = terminalCashFlow / ((discountRate - terminalGrowthRate) / 100);
-          const presentTerminalValue = terminalValue / Math.pow(discountFactor, projectionYears);
+            const lastYearIncome = operatingIncomes[operatingIncomes.length - 1] || 0;
+            const terminalCashFlow = lastYearIncome * (1 + dcfParams.terminalGrowthRate / 100) * (1 - dcfParams.taxRate / 100);
+            const terminalValue = terminalCashFlow / ((dcfParams.discountRate - dcfParams.terminalGrowthRate) / 100);
+            const presentTerminalValue = terminalValue / Math.pow(discountFactor, dcfParams.projectionYears);
 
           const enterpriseValue = presentValue + presentTerminalValue;
           
@@ -162,6 +185,10 @@ const SensitivityAnalysis = ({ data, modelInputs, onModelInputChange, calculateD
             presentValueTerminal: presentTerminalValue,
             terminalValue
           };
+          } catch (error) {
+            console.error('DCF calculation error:', error);
+            return { enterpriseValue: 0, equityValue: 0 };
+          }
         };
         
         const result = tempCalculateDCF();

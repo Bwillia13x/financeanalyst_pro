@@ -6,9 +6,8 @@ import SensitivityAnalysis from './SensitivityAnalysis.jsx';
 import AdvancedDCF from './AdvancedDCF.jsx';
 import ComparableAnalysis from './ComparableAnalysis.jsx';
 import MonteCarloSimulation from './MonteCarloSimulation.jsx';
-import styles from './styles.module.css';
 
-const ModelingTools = ({ data, onDataChange }) => {
+const ModelingTools = ({ data, adjustedValues, onDataChange }) => {
   const [activeModel, setActiveModel] = useState('dcf');
   const [modelInputs, setModelInputs] = useState({
     dcf: {
@@ -80,10 +79,20 @@ const ModelingTools = ({ data, onDataChange }) => {
     };
 
     periods.forEach((_, index) => {
-      // Revenue metrics
-      const revenue = statements.totalRevenue?.[index] || 0;
-      const grossProfit = revenue - (statements.totalCOGS?.[index] || 0);
-      const operatingIncome = statements.operatingIncome?.[index] || 0;
+      // Revenue metrics - Use adjusted values for latest period when available
+      const isLatestPeriod = index === periods.length - 1;
+      const revenue = isLatestPeriod && adjustedValues?.totalRevenue 
+        ? adjustedValues.totalRevenue 
+        : statements.totalRevenue?.[index] || 0;
+      const totalCOGS = isLatestPeriod && adjustedValues?.totalCostOfGoodsSold 
+        ? adjustedValues.totalCostOfGoodsSold 
+        : statements.totalCostOfGoodsSold?.[index] || 0;
+      const grossProfit = isLatestPeriod && adjustedValues?.grossProfit 
+        ? adjustedValues.grossProfit 
+        : statements.grossProfit?.[index] || (revenue - totalCOGS);
+      const operatingIncome = isLatestPeriod && adjustedValues?.operatingIncome 
+        ? adjustedValues.operatingIncome 
+        : statements.operatingIncome?.[index] || 0;
       
       metrics.revenue.push(revenue);
       metrics.grossProfit.push(grossProfit);
@@ -190,51 +199,77 @@ const ModelingTools = ({ data, onDataChange }) => {
   };
 
   return (
-    <div className={styles.modelingContainer}>
-      <div className={styles.modelingHeader}>
-        <h2 className={styles.modelingTitle}>Financial Modeling Tools</h2>
-        <div className={styles.modelingDescription}>
-          Build sophisticated models from your spreadsheet data
+    <div className="h-full bg-gray-900 text-white p-6">
+      {/* Streamlined Model Selection */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h2 className="text-xl font-semibold text-white">Financial Modeling</h2>
+            <p className="text-gray-400 text-sm mt-1">Select a modeling approach to analyze your financial data</p>
+          </div>
+        </div>
+        
+        <div className="flex flex-wrap gap-2 mb-6">
+          {modelTypes.map((type) => {
+            const Icon = type.icon;
+            return (
+              <button
+                key={type.id}
+                onClick={() => setActiveModel(type.id)}
+                className={`${
+                  activeModel === type.id 
+                    ? 'bg-blue-600 text-white border-blue-500 shadow-lg' 
+                    : 'bg-gray-800 text-gray-300 border-gray-700 hover:bg-gray-700 hover:text-white hover:border-gray-600'
+                } flex items-center gap-3 px-4 py-3 rounded-lg border transition-all duration-200`}
+              >
+                <Icon size={18} className={activeModel === type.id ? 'text-white' : 'text-blue-400'} />
+                <span className="font-medium">{type.label}</span>
+              </button>
+            );
+          })}
+        </div>
+        
+        {/* Active Model Description */}
+        <div className="bg-gray-800 border border-gray-700 rounded-lg p-4">
+          <div className="flex items-center gap-3">
+            {React.createElement(modelTypes.find(t => t.id === activeModel)?.icon, { 
+              size: 20, 
+              className: "text-blue-400" 
+            })}
+            <div>
+              <h3 className="font-medium text-white">
+                {modelTypes.find(t => t.id === activeModel)?.label}
+              </h3>
+              <p className="text-gray-400 text-sm">
+                {modelTypes.find(t => t.id === activeModel)?.description}
+              </p>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Model Type Selection */}
-      <div className={styles.modelSelector}>
-        {modelTypes.map((model) => {
-          const Icon = model.icon;
-          return (
-            <motion.button
-              key={model.id}
-              onClick={() => setActiveModel(model.id)}
-              className={`${styles.modelButton} ${
-                activeModel === model.id ? styles.active : ''
-              }`}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <Icon size={24} className="mx-auto mb-2" />
-              <h3>{model.label}</h3>
-              <p>{model.description}</p>
-            </motion.button>
-          );
-        })}
-      </div>
-
       {/* Model Content */}
-      <div className={styles.modelContent}>
+      <div>
         {activeModel === 'dcf' && (
-          <AdvancedDCF
-            data={data}
-            modelInputs={modelInputs}
-            onModelInputChange={updateModelInput}
-            formatCurrency={formatCurrency}
-            formatPercent={formatPercent}
-          />
+          <div className="p-6">
+            <h3 className="text-xl font-semibold mb-4 flex items-center gap-2 text-white">
+              <DollarSign size={20} className="text-blue-400" />
+              DCF Valuation Model
+            </h3>
+            
+            <AdvancedDCF
+              data={data}
+              modelInputs={modelInputs}
+              onModelInputChange={updateModelInput}
+              formatCurrency={formatCurrency}
+              formatPercent={formatPercent}
+            />
+          </div>
         )}
 
         {activeModel === 'ratios' && (
           <div className="p-6">
-            <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
+            <h3 className="text-xl font-semibold mb-4 flex items-center gap-2 text-white">
               <BarChart3 size={20} />
               Financial Ratio Analysis
             </h3>
@@ -242,7 +277,7 @@ const ModelingTools = ({ data, onDataChange }) => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {/* Profitability Ratios */}
               <div>
-                <h4 className="font-semibold mb-3">Profitability Ratios</h4>
+                <h4 className="font-semibold mb-3 text-gray-200">Profitability Ratios</h4>
                 <div className="space-y-3">
                   {calculatedMetrics.margins.gross.map((margin, index) => (
                     <div key={index} className="flex justify-between">
@@ -261,7 +296,7 @@ const ModelingTools = ({ data, onDataChange }) => {
 
               {/* Growth Ratios */}
               <div>
-                <h4 className="font-semibold mb-3">Growth Rates</h4>
+                <h4 className="font-semibold mb-3 text-gray-200">Growth Rates</h4>
                 <div className="space-y-3">
                   {calculatedMetrics.growth.revenue.map((growth, index) => (
                     <div key={index} className="flex justify-between">
@@ -284,10 +319,10 @@ const ModelingTools = ({ data, onDataChange }) => {
 
               {/* Industry Comparison */}
               <div>
-                <h4 className="font-semibold mb-3">Industry Comparison</h4>
+                <h4 className="font-semibold mb-3 text-gray-200">Industry Comparison</h4>
                 <div className="space-y-3">
-                  <div className="p-3 bg-gray-50 rounded-lg">
-                    <div className="text-xs text-gray-600 uppercase tracking-wide">Industry Avg</div>
+                  <div className="p-3 bg-gray-700 rounded-lg">
+                    <div className="text-xs text-gray-400 uppercase tracking-wide">Industry Avg</div>
                     <div className="text-sm">Gross Margin: {formatPercent(modelInputs.ratios.industryAverages.grossMargin)}</div>
                     <div className="text-sm">Operating Margin: {formatPercent(modelInputs.ratios.industryAverages.operatingMargin)}</div>
                     <div className="text-sm">Net Margin: {formatPercent(modelInputs.ratios.industryAverages.netMargin)}</div>
@@ -300,7 +335,7 @@ const ModelingTools = ({ data, onDataChange }) => {
 
         {activeModel === 'sensitivity' && (
           <div className="p-6">
-            <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
+            <h3 className="text-xl font-semibold mb-4 flex items-center gap-2 text-white">
               <Activity size={20} />
               Sensitivity Analysis
             </h3>
@@ -318,7 +353,7 @@ const ModelingTools = ({ data, onDataChange }) => {
 
         {activeModel === 'scenario' && (
           <div className="p-6">
-            <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
+            <h3 className="text-xl font-semibold mb-4 flex items-center gap-2 text-white">
               <Target size={20} />
               Scenario Modeling
             </h3>

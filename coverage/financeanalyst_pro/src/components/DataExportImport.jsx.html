@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">1.85% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/324</span>
+                <span class='fraction'>6/324</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>1/1</span>
-            </div>
-        
-            
-            <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
-                <span class="quiet">Functions</span>
-                <span class='fraction'>1/1</span>
+                <span class='fraction'>0/0</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>0/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">1.85% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/324</span>
+                <span class='fraction'>6/324</span>
             </div>
         
             
@@ -484,7 +484,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -494,18 +494,18 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -894,13 +894,13 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
  * Data Export/Import Component
  * Provides UI for exporting and importing financial data
  */
 &nbsp;
-<span class="cstat-no" title="statement not covered" >import {</span>
+import {
   Download,
   Upload,
   FileText,
@@ -910,12 +910,12 @@
   Loader2,
   Info
 } from 'lucide-react';
-<span class="cstat-no" title="statement not covered" >import React, { useState } from 'react';</span>
+import React, { useState } from 'react';
 &nbsp;
-<span class="cstat-no" title="statement not covered" >import { financialDataStorage } from '../services/financialDataStorage.js';</span>
-<span class="cstat-no" title="statement not covered" >import { apiLogger } from '../utils/apiLogger.js';</span>
+import { financialDataStorage } from '../services/financialDataStorage.js';
+import { apiLogger } from '../utils/apiLogger.js';
 &nbsp;
-<span class="cstat-no" title="statement not covered" >const DataExportImport = ({ onClose }) =&gt; {</span>
+const DataExportImport = <span class="fstat-no" title="function not covered" >({ onClose }) =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >  const [activeTab, setActiveTab] = useState('export');</span>
 <span class="cstat-no" title="statement not covered" >  const [isExporting, setIsExporting] = useState(false);</span>
 <span class="cstat-no" title="statement not covered" >  const [isImporting, setIsImporting] = useState(false);</span>
@@ -1310,7 +1310,7 @@
   );
 <span class="cstat-no" title="statement not covered" >};</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >export default DataExportImport;</span>
+export default DataExportImport;
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -1318,7 +1318,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-07-24T20:13:22.112Z
+                at 2025-07-29T22:28:35.094Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

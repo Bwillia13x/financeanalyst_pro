@@ -5,6 +5,12 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   server: {
+    fs: {
+      allow: [
+        '/Users/benjaminwilliams/Desktop/financeanalyst_pro',
+        '/Users/benjaminwilliams/haven_test',
+      ],
+    },
     proxy: {
       '/v8/finance/chart': {
         target: 'https://query1.finance.yahoo.com',
