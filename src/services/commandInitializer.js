@@ -117,6 +117,211 @@ export function initializeCommands() {
     }
   });
 
+  commandRegistry.register('PRIVATE_MONTE_CARLO', privateAnalysisCommands.PRIVATE_MONTE_CARLO, {
+    category: 'ANALYTICS',
+    description: 'Monte Carlo simulation for private company valuation',
+    usage: 'PRIVATE_MONTE_CARLO()',
+    examples: ['PRIVATE_MONTE_CARLO()', 'PRIVATE_MONTE_CARLO(5000)'],
+    tags: ['private', 'monte-carlo', 'simulation', 'risk'],
+    parameterSchema: {
+      required: [],
+      optional: ['iterations']
+    }
+  });
+
+  commandRegistry.register('PRIVATE_SCENARIO', privateAnalysisCommands.PRIVATE_SCENARIO, {
+    category: 'ANALYTICS',
+    description: 'Scenario analysis for private company valuation',
+    usage: 'PRIVATE_SCENARIO()',
+    examples: ['PRIVATE_SCENARIO()'],
+    tags: ['private', 'scenario', 'analysis', 'valuation'],
+    parameterSchema: {
+      required: [],
+      optional: ['scenarios']
+    }
+  });
+
+  commandRegistry.register('PRIVATE_GROWTH', privateAnalysisCommands.PRIVATE_GROWTH, {
+    category: 'ANALYTICS',
+    description: 'Growth trend analysis for private company',
+    usage: 'PRIVATE_GROWTH()',
+    examples: ['PRIVATE_GROWTH()'],
+    tags: ['private', 'growth', 'trends', 'cagr'],
+    parameterSchema: {
+      required: [],
+      optional: []
+    }
+  });
+
+  commandRegistry.register('PRIVATE_RISK', privateAnalysisCommands.PRIVATE_RISK, {
+    category: 'ANALYTICS',
+    description: 'Risk assessment for private company',
+    usage: 'PRIVATE_RISK()',
+    examples: ['PRIVATE_RISK()'],
+    tags: ['private', 'risk', 'volatility', 'assessment'],
+    parameterSchema: {
+      required: [],
+      optional: []
+    }
+  });
+
+  commandRegistry.register('PRIVATE_VALIDATE', privateAnalysisCommands.PRIVATE_VALIDATE, {
+    category: 'DATA',
+    description: 'Validate private company financial data',
+    usage: 'PRIVATE_VALIDATE()',
+    examples: ['PRIVATE_VALIDATE()'],
+    tags: ['private', 'validation', 'data-quality', 'verification'],
+    parameterSchema: {
+      required: [],
+      optional: []
+    }
+  });
+
+  commandRegistry.register('PRIVATE_EXPORT', privateAnalysisCommands.PRIVATE_EXPORT, {
+    category: 'DATA',
+    description: 'Export private company analysis results',
+    usage: 'PRIVATE_EXPORT()',
+    examples: ['PRIVATE_EXPORT()', 'PRIVATE_EXPORT(csv)'],
+    tags: ['private', 'export', 'data', 'backup'],
+    parameterSchema: {
+      required: [],
+      optional: ['format']
+    }
+  });
+
+  // Register Advanced Private Analysis Commands
+  commandRegistry.register('PRIVATE_WATERFALL', privateAnalysisCommands.PRIVATE_WATERFALL, {
+    category: 'VALUATION',
+    description: 'DCF waterfall and value bridge analysis for private companies',
+    usage: 'PRIVATE_WATERFALL()',
+    examples: ['PRIVATE_WATERFALL()'],
+    tags: ['private', 'dcf', 'waterfall', 'analysis'],
+    parameterSchema: {
+      required: [],
+      optional: ['discountRate', 'terminalGrowthRate']
+    }
+  });
+
+  commandRegistry.register('PRIVATE_COMPS', privateAnalysisCommands.PRIVATE_COMPS, {
+    category: 'VALUATION',
+    description: 'Comparable company trading multiples analysis',
+    usage: 'PRIVATE_COMPS()',
+    examples: ['PRIVATE_COMPS()'],
+    tags: ['private', 'comparables', 'trading-multiples', 'peer-analysis'],
+    parameterSchema: {
+      required: [],
+      optional: ['sector', 'size']
+    }
+  });
+
+  commandRegistry.register('PRIVATE_LBO', privateAnalysisCommands.PRIVATE_LBO, {
+    category: 'VALUATION',
+    description: 'Leveraged buyout model and returns analysis',
+    usage: 'PRIVATE_LBO()',
+    examples: ['PRIVATE_LBO()'],
+    tags: ['private', 'lbo', 'leveraged-buyout', 'pe-analysis'],
+    parameterSchema: {
+      required: [],
+      optional: ['leverage', 'holdPeriod', 'exitMultiple']
+    }
+  });
+
+  commandRegistry.register('PRIVATE_QUALITY', privateAnalysisCommands.PRIVATE_QUALITY, {
+    category: 'ANALYTICS',
+    description: 'Business quality and investment grade assessment',
+    usage: 'PRIVATE_QUALITY()',
+    examples: ['PRIVATE_QUALITY()'],
+    tags: ['private', 'quality', 'investment-grade', 'assessment'],
+    parameterSchema: {
+      required: [],
+      optional: ['weights']
+    }
+  });
+
+  commandRegistry.register('PRIVATE_BENCHMARKS', privateAnalysisCommands.PRIVATE_BENCHMARKS, {
+    category: 'ANALYTICS',
+    description: 'Compare metrics against industry benchmarks',
+    usage: 'PRIVATE_BENCHMARKS()',
+    examples: ['PRIVATE_BENCHMARKS()'],
+    tags: ['private', 'benchmarks', 'industry', 'comparison'],
+    parameterSchema: {
+      required: [],
+      optional: ['industry']
+    }
+  });
+
+  commandRegistry.register('PRIVATE_CASHFLOW', privateAnalysisCommands.PRIVATE_CASHFLOW, {
+    category: 'ANALYTICS',
+    description: 'Analyze cash flow generation and quality',
+    usage: 'PRIVATE_CASHFLOW()',
+    examples: ['PRIVATE_CASHFLOW()'],
+    tags: ['private', 'cashflow', 'quality', 'analysis'],
+    parameterSchema: {
+      required: [],
+      optional: ['years']
+    }
+  });
+
+  commandRegistry.register('PRIVATE_MULTIPLES', privateAnalysisCommands.PRIVATE_MULTIPLES, {
+    category: 'VALUATION',
+    description: 'Valuation using industry multiples approach',
+    usage: 'PRIVATE_MULTIPLES()',
+    examples: ['PRIVATE_MULTIPLES()'],
+    tags: ['private', 'multiples', 'valuation', 'industry'],
+    parameterSchema: {
+      required: [],
+      optional: ['industry', 'size']
+    }
+  });
+
+  commandRegistry.register('PRIVATE_SENSITIVITY', privateAnalysisCommands.PRIVATE_SENSITIVITY, {
+    category: 'ANALYTICS',
+    description: 'Sensitivity analysis on key variables',
+    usage: 'PRIVATE_SENSITIVITY()',
+    examples: ['PRIVATE_SENSITIVITY()'],
+    tags: ['private', 'sensitivity', 'analysis', 'variables'],
+    parameterSchema: {
+      required: [],
+      optional: ['variables', 'ranges']
+    }
+  });
+
+  commandRegistry.register('PRIVATE_WORKFLOW', privateAnalysisCommands.PRIVATE_WORKFLOW, {
+    category: 'AUTOMATION',
+    description: 'Interactive analysis workflow with recommendations',
+    usage: 'PRIVATE_WORKFLOW()',
+    examples: ['PRIVATE_WORKFLOW()'],
+    tags: ['private', 'workflow', 'guidance', 'automation'],
+    parameterSchema: {
+      required: [],
+      optional: []
+    }
+  });
+
+  commandRegistry.register('PRIVATE_DASHBOARD', privateAnalysisCommands.PRIVATE_DASHBOARD, {
+    category: 'REPORTING',
+    description: 'Executive dashboard with key metrics summary',
+    usage: 'PRIVATE_DASHBOARD()',
+    examples: ['PRIVATE_DASHBOARD()'],
+    tags: ['private', 'dashboard', 'executive', 'summary'],
+    parameterSchema: {
+      required: [],
+      optional: ['period']
+    }
+  });
+
+  commandRegistry.register('PRIVATE', privateAnalysisCommands.PRIVATE, {
+    category: 'UTILITY',
+    description: 'Show all available Private Analysis commands (shortcut)',
+    usage: 'PRIVATE()',
+    examples: ['PRIVATE()', 'private'],
+    tags: ['private', 'help', 'commands', 'list'],
+    parameterSchema: {
+      required: [],
+      optional: []
+    }
+  });
+
   // Register Portfolio Commands
   commandRegistry.register('PORTFOLIO', portfolioCommands.PORTFOLIO, {
     category: 'PORTFOLIO',

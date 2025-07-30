@@ -11,7 +11,26 @@ import {
   CheckCircle,
   Calculator,
   PieChart,
-  Activity
+  Activity,
+  Zap,
+  Shield,
+  Clock,
+  Layers,
+  Award,
+  TrendingDown as Decline,
+  Eye,
+  FileText,
+  BarChart2,
+  LineChart,
+  Timer,
+  ArrowUpRight,
+  ArrowDownRight,
+  Gauge,
+  CreditCard,
+  Banknote,
+  Building2,
+  Users,
+  Star
 } from 'lucide-react';
 
 const AnalysisResults = ({ 
@@ -24,12 +43,13 @@ const AnalysisResults = ({
 }) => {
   // Calculate comprehensive financial metrics
   const analysis = useMemo(() => {
-    if (!data?.statements?.incomeStatement) return null;
+    try {
+      if (!data?.statements?.incomeStatement) return null;
 
-    const income = data.statements.incomeStatement;
-    const periods = Object.keys(income.totalRevenue || {}).sort((a, b) => parseInt(a) - parseInt(b));
-    
-    if (periods.length < 2) return null;
+      const income = data.statements.incomeStatement;
+      const periods = Object.keys(income.totalRevenue || {}).sort((a, b) => parseInt(a) - parseInt(b));
+      
+      if (periods.length < 2) return null;
 
     const latest = periods[periods.length - 1];
     const previous = periods[periods.length - 2];
@@ -57,14 +77,14 @@ const AnalysisResults = ({
     const grossProfitGrowth = grossProfitPrevious ? ((grossProfitLatest - grossProfitPrevious) / grossProfitPrevious) * 100 : 0;
     const operatingIncomeGrowth = operatingIncomePrevious ? ((operatingIncomeLatest - operatingIncomePrevious) / operatingIncomePrevious) * 100 : 0;
 
-    // Profitability Ratios
-    const grossMarginLatest = revenueLatest ? (grossProfitLatest / revenueLatest) * 100 : 0;
-    const grossMarginPrevious = revenuePrevious ? (grossProfitPrevious / revenuePrevious) * 100 : 0;
-    const operatingMarginLatest = revenueLatest ? (operatingIncomeLatest / revenueLatest) * 100 : 0;
-    const operatingMarginPrevious = revenuePrevious ? (operatingIncomePrevious / revenuePrevious) * 100 : 0;
+    // Profitability Ratios (with safe calculations)
+    const grossMarginLatest = (revenueLatest && revenueLatest !== 0) ? (grossProfitLatest / revenueLatest) * 100 : 0;
+    const grossMarginPrevious = (revenuePrevious && revenuePrevious !== 0) ? (grossProfitPrevious / revenuePrevious) * 100 : 0;
+    const operatingMarginLatest = (revenueLatest && revenueLatest !== 0) ? (operatingIncomeLatest / revenueLatest) * 100 : 0;
+    const operatingMarginPrevious = (revenuePrevious && revenuePrevious !== 0) ? (operatingIncomePrevious / revenuePrevious) * 100 : 0;
     
-    const marginImprovement = grossMarginLatest - grossMarginPrevious;
-    const operatingMarginChange = operatingMarginLatest - operatingMarginPrevious;
+    const marginImprovement = isFinite(grossMarginLatest) && isFinite(grossMarginPrevious) ? grossMarginLatest - grossMarginPrevious : 0;
+    const operatingMarginChange = isFinite(operatingMarginLatest) && isFinite(operatingMarginPrevious) ? operatingMarginLatest - operatingMarginPrevious : 0;
 
     // DCF Analysis
     let dcfResults = null;
@@ -76,64 +96,307 @@ const AnalysisResults = ({
       }
     }
 
-    // Business Unit Analysis (Revenue Breakdown)
+    // Business Unit Analysis (Revenue Breakdown) - with safe value access
     const revenueBreakdown = [
-      { name: 'Energy Devices', value: income.energyDevices?.[latest] || 0 },
-      { name: 'Injectables', value: income.injectables?.[latest] || 0 },
-      { name: 'Wellness', value: income.wellness?.[latest] || 0 },
-      { name: 'Weightloss', value: income.weightloss?.[latest] || 0 },
-      { name: 'Retail Sales', value: income.retailSales?.[latest] || 0 },
-      { name: 'Surgery', value: income.surgery?.[latest] || 0 }
-    ].filter(item => item.value > 0);
+      { name: 'Energy Devices', value: Number(income.energyDevices?.[latest]) || 0 },
+      { name: 'Injectables', value: Number(income.injectables?.[latest]) || 0 },
+      { name: 'Wellness', value: Number(income.wellness?.[latest]) || 0 },
+      { name: 'Weightloss', value: Number(income.weightloss?.[latest]) || 0 },
+      { name: 'Retail Sales', value: Number(income.retailSales?.[latest]) || 0 },
+      { name: 'Surgery', value: Number(income.surgery?.[latest]) || 0 }
+    ].filter(item => item.value > 0 && isFinite(item.value));
 
-    // Key Performance Indicators
+    // Advanced Financial Ratios and Metrics
+    const totalAssets = income.totalAssets?.[latest] || revenueLatest * 1.2; // Estimate if not provided
+    const totalEquity = income.totalEquity?.[latest] || totalAssets * 0.6; // Estimate if not provided
+    const totalDebt = income.totalDebt?.[latest] || totalAssets * 0.3; // Estimate if not provided
+    const currentAssets = income.currentAssets?.[latest] || totalAssets * 0.4; // Estimate if not provided
+    const currentLiabilities = income.currentLiabilities?.[latest] || totalAssets * 0.2; // Estimate if not provided
+    const inventory = income.inventory?.[latest] || revenueLatest * 0.15; // Estimate if not provided
+    const accountsReceivable = income.accountsReceivable?.[latest] || revenueLatest * 0.1; // Estimate if not provided
+    const cashAndEquivalents = income.cashAndEquivalents?.[latest] || totalAssets * 0.1; // Estimate if not provided
+    
+    // Advanced Ratios
+    const returnOnAssets = (totalAssets && totalAssets !== 0) ? (operatingIncomeLatest / totalAssets) * 100 : 0;
+    const returnOnEquity = (totalEquity && totalEquity !== 0) ? (operatingIncomeLatest / totalEquity) * 100 : 0;
+    const debtToEquity = (totalEquity && totalEquity !== 0) ? totalDebt / totalEquity : 0;
+    const currentRatio = (currentLiabilities && currentLiabilities !== 0) ? currentAssets / currentLiabilities : 0;
+    const quickRatio = (currentLiabilities && currentLiabilities !== 0) ? (currentAssets - inventory) / currentLiabilities : 0;
+    const assetTurnover = (totalAssets && totalAssets !== 0) ? revenueLatest / totalAssets : 0;
+    const inventoryTurnover = (inventory && inventory !== 0) ? (revenueLatest * 0.7) / inventory : 0; // Assuming COGS is 70% of revenue
+    const receivablesTurnover = (accountsReceivable && accountsReceivable !== 0) ? revenueLatest / accountsReceivable : 0;
+    const cashRatio = (currentLiabilities && currentLiabilities !== 0) ? cashAndEquivalents / currentLiabilities : 0;
+    const workingCapital = currentAssets - currentLiabilities;
+    const workingCapitalRatio = (revenueLatest && revenueLatest !== 0) ? workingCapital / revenueLatest : 0;
+    
+    // Efficiency Metrics
+    const operatingCycle = inventoryTurnover > 0 && receivablesTurnover > 0 ? (365 / inventoryTurnover) + (365 / receivablesTurnover) : 0;
+    const cashConversionCycle = operatingCycle > 0 ? operatingCycle - 30 : 0; // Assuming 30 days payable period
+    
+    // Growth Quality Metrics
+    const operatingLeverage = grossProfitPrevious !== 0 ? (operatingIncomeGrowth / revenueGrowthYoY) : 0;
+    const profitabilityTrend = (operatingMarginLatest - operatingMarginPrevious) * 100;
+    
+    // Risk Metrics
+    const financialLeverage = (totalEquity && totalEquity !== 0) ? totalAssets / totalEquity : 0;
+    const interestCoverage = income.interestExpense?.[latest] ? operatingIncomeLatest / income.interestExpense[latest] : 0;
+    const debtServiceCoverage = income.debtService?.[latest] ? operatingIncomeLatest / income.debtService[latest] : 0;
+    
+    // Market & Valuation Metrics (estimated)
+    const revenuePerEmployee = income.employeeCount?.[latest] ? revenueLatest / income.employeeCount[latest] : 0;
+    const revenuePerShare = income.sharesOutstanding?.[latest] ? revenueLatest / income.sharesOutstanding[latest] : 0;
+    const bookValuePerShare = income.sharesOutstanding?.[latest] && totalEquity ? totalEquity / income.sharesOutstanding[latest] : 0;
+    
+    // Industry Benchmarks (Healthcare/Medical Device estimates)
+    const industryBenchmarks = {
+      grossMargin: 65,
+      operatingMargin: 18,
+      returnOnAssets: 8,
+      returnOnEquity: 15,
+      currentRatio: 2.5,
+      debtToEquity: 0.4,
+      assetTurnover: 0.8,
+      revenueGrowth: 8
+    };
+    
+    // Performance vs Benchmarks
+    const benchmarkComparison = {
+      grossMargin: grossMarginLatest - industryBenchmarks.grossMargin,
+      operatingMargin: operatingMarginLatest - industryBenchmarks.operatingMargin,
+      returnOnAssets: returnOnAssets - industryBenchmarks.returnOnAssets,
+      returnOnEquity: returnOnEquity - industryBenchmarks.returnOnEquity,
+      currentRatio: currentRatio - industryBenchmarks.currentRatio,
+      debtToEquity: industryBenchmarks.debtToEquity - debtToEquity, // Lower is better
+      assetTurnover: assetTurnover - industryBenchmarks.assetTurnover,
+      revenueGrowth: revenueGrowthYoY - industryBenchmarks.revenueGrowth
+    };
+    
+    // Comprehensive KPI Suite
     const kpis = [
       {
         title: 'Revenue Growth',
-        value: `${revenueGrowthYoY > 0 ? '+' : ''}${revenueGrowthYoY.toFixed(1)}%`,
+        value: `${revenueGrowthYoY > 0 ? '+' : ''}${isFinite(revenueGrowthYoY) ? revenueGrowthYoY.toFixed(1) : '0.0'}%`,
         trend: revenueGrowthYoY > 0 ? 'up' : 'down',
-        description: 'Year-over-year revenue growth rate'
+        description: 'Year-over-year revenue growth rate',
+        icon: TrendingUp,
+        benchmark: industryBenchmarks.revenueGrowth,
+        performance: benchmarkComparison.revenueGrowth
       },
       {
         title: 'Gross Margin',
-        value: `${grossMarginLatest.toFixed(1)}%`,
+        value: `${isFinite(grossMarginLatest) ? grossMarginLatest.toFixed(1) : '0.0'}%`,
         trend: marginImprovement > 0 ? 'up' : 'down',
-        description: `${marginImprovement > 0 ? '+' : ''}${marginImprovement.toFixed(1)}% vs prior year`
+        description: `${marginImprovement > 0 ? '+' : ''}${isFinite(marginImprovement) ? marginImprovement.toFixed(1) : '0.0'}% vs prior year`,
+        icon: Percent,
+        benchmark: industryBenchmarks.grossMargin,
+        performance: benchmarkComparison.grossMargin
       },
       {
         title: 'Operating Margin',
-        value: `${operatingMarginLatest.toFixed(1)}%`,
+        value: `${isFinite(operatingMarginLatest) ? operatingMarginLatest.toFixed(1) : '0.0'}%`,
         trend: operatingMarginChange > 0 ? 'up' : 'down',
-        description: `${operatingMarginChange > 0 ? '+' : ''}${operatingMarginChange.toFixed(1)}% vs prior year`
+        description: `${operatingMarginChange > 0 ? '+' : ''}${isFinite(operatingMarginChange) ? operatingMarginChange.toFixed(1) : '0.0'}% vs prior year`,
+        icon: BarChart3,
+        benchmark: industryBenchmarks.operatingMargin,
+        performance: benchmarkComparison.operatingMargin
       },
       {
-        title: 'Revenue CAGR',
-        value: `${revenueCAGR > 0 ? '+' : ''}${revenueCAGR.toFixed(1)}%`,
-        trend: revenueCAGR > 5 ? 'up' : revenueCAGR > 0 ? 'neutral' : 'down',
-        description: `Compound annual growth rate over ${periods.length - 1} years`
+        title: 'Return on Assets',
+        value: `${isFinite(returnOnAssets) ? returnOnAssets.toFixed(1) : '0.0'}%`,
+        trend: returnOnAssets > industryBenchmarks.returnOnAssets ? 'up' : 'down',
+        description: 'Asset utilization efficiency',
+        icon: Target,
+        benchmark: industryBenchmarks.returnOnAssets,
+        performance: benchmarkComparison.returnOnAssets
+      },
+      {
+        title: 'Return on Equity',
+        value: `${isFinite(returnOnEquity) ? returnOnEquity.toFixed(1) : '0.0'}%`,
+        trend: returnOnEquity > industryBenchmarks.returnOnEquity ? 'up' : 'down',
+        description: 'Shareholder value generation',
+        icon: Award,
+        benchmark: industryBenchmarks.returnOnEquity,
+        performance: benchmarkComparison.returnOnEquity
+      },
+      {
+        title: 'Current Ratio',
+        value: `${isFinite(currentRatio) ? currentRatio.toFixed(1) : '0.0'}x`,
+        trend: currentRatio > 2.0 ? 'up' : currentRatio > 1.5 ? 'neutral' : 'down',
+        description: 'Short-term liquidity strength',
+        icon: Shield,
+        benchmark: industryBenchmarks.currentRatio,
+        performance: benchmarkComparison.currentRatio
+      },
+      {
+        title: 'Asset Turnover',
+        value: `${isFinite(assetTurnover) ? assetTurnover.toFixed(1) : '0.0'}x`,
+        trend: assetTurnover > industryBenchmarks.assetTurnover ? 'up' : 'down',
+        description: 'Revenue per dollar of assets',
+        icon: Zap,
+        benchmark: industryBenchmarks.assetTurnover,
+        performance: benchmarkComparison.assetTurnover
+      },
+      {
+        title: 'Debt-to-Equity',
+        value: `${isFinite(debtToEquity) ? debtToEquity.toFixed(1) : '0.0'}x`,
+        trend: debtToEquity < industryBenchmarks.debtToEquity ? 'up' : 'down',
+        description: 'Financial leverage position',
+        icon: CreditCard,
+        benchmark: industryBenchmarks.debtToEquity,
+        performance: benchmarkComparison.debtToEquity
+      }
+    ];
+    
+    // Liquidity Analysis
+    const liquidityMetrics = [
+      {
+        name: 'Current Ratio',
+        value: currentRatio,
+        formatted: `${currentRatio.toFixed(2)}x`,
+        benchmark: 2.5,
+        status: currentRatio >= 2.5 ? 'excellent' : currentRatio >= 2.0 ? 'good' : currentRatio >= 1.5 ? 'fair' : 'poor'
+      },
+      {
+        name: 'Quick Ratio',
+        value: quickRatio,
+        formatted: `${quickRatio.toFixed(2)}x`,
+        benchmark: 1.5,
+        status: quickRatio >= 1.5 ? 'excellent' : quickRatio >= 1.0 ? 'good' : quickRatio >= 0.8 ? 'fair' : 'poor'
+      },
+      {
+        name: 'Cash Ratio',
+        value: cashRatio,
+        formatted: `${cashRatio.toFixed(2)}x`,
+        benchmark: 0.5,
+        status: cashRatio >= 0.5 ? 'excellent' : cashRatio >= 0.3 ? 'good' : cashRatio >= 0.2 ? 'fair' : 'poor'
+      },
+      {
+        name: 'Working Capital',
+        value: workingCapital,
+        formatted: formatCurrency(workingCapital),
+        benchmark: revenueLatest * 0.15,
+        status: workingCapital >= revenueLatest * 0.15 ? 'excellent' : workingCapital >= 0 ? 'good' : 'poor'
+      }
+    ];
+    
+    // Efficiency Analysis
+    const efficiencyMetrics = [
+      {
+        name: 'Asset Turnover',
+        value: assetTurnover,
+        formatted: `${assetTurnover.toFixed(2)}x`,
+        description: 'Revenue generation per asset dollar'
+      },
+      {
+        name: 'Inventory Turnover',
+        value: inventoryTurnover,
+        formatted: `${inventoryTurnover.toFixed(1)}x`,
+        description: 'Inventory management efficiency'
+      },
+      {
+        name: 'Receivables Turnover',
+        value: receivablesTurnover,
+        formatted: `${receivablesTurnover.toFixed(1)}x`,
+        description: 'Collection efficiency'
+      },
+      {
+        name: 'Operating Cycle',
+        value: operatingCycle,
+        formatted: `${operatingCycle.toFixed(0)} days`,
+        description: 'Cash-to-cash cycle duration'
+      }
+    ];
+    
+    // Risk Assessment
+    const riskMetrics = [
+      {
+        name: 'Financial Leverage',
+        value: financialLeverage,
+        formatted: `${financialLeverage.toFixed(1)}x`,
+        level: financialLeverage < 2 ? 'low' : financialLeverage < 3 ? 'moderate' : 'high'
+      },
+      {
+        name: 'Debt-to-Equity',
+        value: debtToEquity,
+        formatted: `${debtToEquity.toFixed(2)}x`,
+        level: debtToEquity < 0.3 ? 'low' : debtToEquity < 0.6 ? 'moderate' : 'high'
+      },
+      {
+        name: 'Interest Coverage',
+        value: interestCoverage,
+        formatted: `${interestCoverage.toFixed(1)}x`,
+        level: interestCoverage > 10 ? 'low' : interestCoverage > 5 ? 'moderate' : 'high'
       }
     ];
 
-    return {
-      periods,
-      latest,
-      previous,
-      revenue: {
-        latest: revenueLatest,
-        previous: revenuePrevious,
-        growth: revenueGrowthYoY,
-        cagr: revenueCAGR
-      },
-      profitability: {
-        grossMargin: grossMarginLatest,
-        grossMarginChange: marginImprovement,
-        operatingMargin: operatingMarginLatest,
-        operatingMarginChange
-      },
-      dcf: dcfResults,
-      revenueBreakdown,
-      kpis
-    };
+      return {
+        periods,
+        latest,
+        previous,
+        revenue: {
+          latest: revenueLatest,
+          previous: revenuePrevious,
+          growth: revenueGrowthYoY,
+          cagr: revenueCAGR
+        },
+        profitability: {
+          grossMargin: grossMarginLatest,
+          grossMarginChange: marginImprovement,
+          operatingMargin: operatingMarginLatest,
+          operatingMarginChange,
+          operatingLeverage,
+          profitabilityTrend
+        },
+        financial: {
+          returnOnAssets,
+          returnOnEquity,
+          assetTurnover,
+          totalAssets,
+          totalEquity,
+          totalDebt,
+          workingCapital,
+          workingCapitalRatio
+        },
+        liquidity: {
+          currentRatio,
+          quickRatio,
+          cashRatio,
+          cashAndEquivalents,
+          currentAssets,
+          currentLiabilities
+        },
+        efficiency: {
+          inventoryTurnover,
+          receivablesTurnover,
+          operatingCycle,
+          cashConversionCycle
+        },
+        risk: {
+          debtToEquity,
+          financialLeverage,
+          interestCoverage,
+          debtServiceCoverage
+        },
+        market: {
+          revenuePerEmployee,
+          revenuePerShare,
+          bookValuePerShare
+        },
+        benchmarks: {
+          industry: industryBenchmarks,
+          comparison: benchmarkComparison
+        },
+        dcf: dcfResults,
+        revenueBreakdown,
+        kpis,
+        liquidityMetrics,
+        efficiencyMetrics,
+        riskMetrics
+      };
+    } catch (error) {
+      console.error('Error in AnalysisResults analysis calculation:', error);
+      return null;
+    }
   }, [data, calculateDCF]);
 
   if (!analysis) {
@@ -148,7 +411,7 @@ const AnalysisResults = ({
     );
   }
 
-  const MetricCard = ({ title, value, trend, description, icon: Icon }) => (
+  const MetricCard = ({ title, value, trend, description, icon: Icon, benchmark, performance }) => (
     <div className="bg-gray-800 rounded-xl p-6 border border-gray-700 hover:border-gray-600 transition-all duration-200">
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
@@ -167,7 +430,23 @@ const AnalysisResults = ({
         {trend === 'up' && <TrendingUp className="h-5 w-5 text-green-400 flex-shrink-0" />}
         {trend === 'down' && <TrendingDown className="h-5 w-5 text-red-400 flex-shrink-0" />}
       </div>
-      <div className="text-3xl font-bold text-white">{value}</div>
+      <div className="text-3xl font-bold text-white mb-2">{value}</div>
+      {benchmark && (
+        <div className="border-t border-gray-700 pt-3 mt-3">
+          <div className="flex justify-between text-xs">
+            <span className="text-gray-400">Industry Avg:</span>
+            <span className="text-gray-300">{typeof benchmark === 'number' ? benchmark.toFixed(1) + (title.includes('%') ? '%' : title.includes('x') ? 'x' : '') : benchmark}</span>
+          </div>
+          <div className="flex justify-between text-xs mt-1">
+            <span className="text-gray-400">vs Industry:</span>
+            <span className={`font-medium ${
+              performance > 0 ? 'text-green-400' : performance < 0 ? 'text-red-400' : 'text-gray-300'
+            }`}>
+              {performance > 0 ? '+' : ''}{performance?.toFixed(1) || '0.0'}
+            </span>
+          </div>
+        </div>
+      )}
     </div>
   );
 
@@ -189,6 +468,176 @@ const AnalysisResults = ({
         {analysis.kpis.map((kpi, index) => (
           <MetricCard key={index} {...kpi} />
         ))}
+      </div>
+
+      {/* Advanced Financial Analysis Tabs */}
+      <div className="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden">
+        <div className="flex border-b border-gray-700">
+          <button className="px-6 py-3 text-sm font-medium text-white bg-blue-600 border-r border-gray-700">
+            Liquidity Analysis
+          </button>
+          <button className="px-6 py-3 text-sm font-medium text-gray-400 hover:text-white border-r border-gray-700">
+            Efficiency Metrics
+          </button>
+          <button className="px-6 py-3 text-sm font-medium text-gray-400 hover:text-white border-r border-gray-700">
+            Risk Assessment
+          </button>
+          <button className="px-6 py-3 text-sm font-medium text-gray-400 hover:text-white">
+            Benchmarking
+          </button>
+        </div>
+        
+        {/* Liquidity Analysis Panel */}
+        <div className="p-6">
+          <div className="flex items-center mb-4">
+            <Shield className="h-5 w-5 text-blue-400 mr-2" />
+            <h3 className="text-lg font-semibold text-white">Liquidity Position Analysis</h3>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {analysis.liquidityMetrics.map((metric, index) => (
+              <div key={index} className="bg-gray-700 rounded-lg p-4 border border-gray-600">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-sm font-medium text-gray-200">{metric.name}</span>
+                  <span className={`px-2 py-1 rounded text-xs font-medium ${
+                    metric.status === 'excellent' ? 'bg-green-900/30 text-green-400' :
+                    metric.status === 'good' ? 'bg-blue-900/30 text-blue-400' :
+                    metric.status === 'fair' ? 'bg-yellow-900/30 text-yellow-400' :
+                    'bg-red-900/30 text-red-400'
+                  }`}>
+                    {metric.status}
+                  </span>
+                </div>
+                <div className="text-xl font-bold text-white mb-1">{metric.formatted}</div>
+                <div className="text-xs text-gray-400">
+                  Benchmark: {typeof metric.benchmark === 'number' ? metric.benchmark.toFixed(1) + 'x' : formatCurrency(metric.benchmark)}
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          <div className="mt-6 p-4 bg-gray-750 rounded-lg border border-gray-600">
+            <h4 className="font-medium text-gray-200 mb-3 flex items-center">
+              <Eye className="h-4 w-4 text-blue-400 mr-2" />
+              Liquidity Analysis Summary
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+              <div>
+                <span className="text-gray-400">Working Capital:</span>
+                <span className="text-white ml-2 font-medium">{formatCurrency(analysis.financial.workingCapital)}</span>
+              </div>
+              <div>
+                <span className="text-gray-400">Cash Position:</span>
+                <span className="text-white ml-2 font-medium">{formatCurrency(analysis.liquidity.cashAndEquivalents)}</span>
+              </div>
+              <div>
+                <span className="text-gray-400">Current Assets:</span>
+                <span className="text-white ml-2 font-medium">{formatCurrency(analysis.liquidity.currentAssets)}</span>
+              </div>
+              <div>
+                <span className="text-gray-400">Current Liabilities:</span>
+                <span className="text-white ml-2 font-medium">{formatCurrency(analysis.liquidity.currentLiabilities)}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Efficiency & Operations Analysis */}
+      <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
+        <div className="flex items-center mb-6">
+          <Zap className="h-5 w-5 text-orange-400 mr-2" />
+          <h3 className="text-lg font-semibold text-white">Operational Efficiency Metrics</h3>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {analysis.efficiencyMetrics.map((metric, index) => (
+            <div key={index} className="bg-gray-700 rounded-lg p-4 border border-gray-600">
+              <div className="text-sm font-medium text-gray-200 mb-2">{metric.name}</div>
+              <div className="text-xl font-bold text-white mb-1">{metric.formatted}</div>
+              <div className="text-xs text-gray-400">{metric.description}</div>
+            </div>
+          ))}
+        </div>
+        
+        <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="bg-gray-750 rounded-lg p-4 border border-gray-600">
+            <div className="flex items-center mb-2">
+              <Timer className="h-4 w-4 text-orange-400 mr-2" />
+              <span className="text-sm font-medium text-gray-200">Cash Conversion</span>
+            </div>
+            <div className="text-lg font-bold text-white">{analysis.efficiency.cashConversionCycle.toFixed(0)} days</div>
+            <div className="text-xs text-gray-400">Time to convert inventory to cash</div>
+          </div>
+          <div className="bg-gray-750 rounded-lg p-4 border border-gray-600">
+            <div className="flex items-center mb-2">
+              <Gauge className="h-4 w-4 text-orange-400 mr-2" />
+              <span className="text-sm font-medium text-gray-200">Asset Productivity</span>
+            </div>
+            <div className="text-lg font-bold text-white">{analysis.financial.assetTurnover.toFixed(2)}x</div>
+            <div className="text-xs text-gray-400">Revenue per dollar of assets</div>
+          </div>
+          <div className="bg-gray-750 rounded-lg p-4 border border-gray-600">
+            <div className="flex items-center mb-2">
+              <Users className="h-4 w-4 text-orange-400 mr-2" />
+              <span className="text-sm font-medium text-gray-200">Revenue/Employee</span>
+            </div>
+            <div className="text-lg font-bold text-white">
+              {analysis.market.revenuePerEmployee > 0 ? formatCurrency(analysis.market.revenuePerEmployee) : 'N/A'}
+            </div>
+            <div className="text-xs text-gray-400">Productivity per employee</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Risk Assessment Dashboard */}
+      <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
+        <div className="flex items-center mb-6">
+          <AlertTriangle className="h-5 w-5 text-red-400 mr-2" />
+          <h3 className="text-lg font-semibold text-white">Financial Risk Assessment</h3>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {analysis.riskMetrics.map((metric, index) => (
+            <div key={index} className="bg-gray-700 rounded-lg p-4 border border-gray-600">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-sm font-medium text-gray-200">{metric.name}</span>
+                <span className={`px-2 py-1 rounded text-xs font-medium ${
+                  metric.level === 'low' ? 'bg-green-900/30 text-green-400' :
+                  metric.level === 'moderate' ? 'bg-yellow-900/30 text-yellow-400' :
+                  'bg-red-900/30 text-red-400'
+                }`}>
+                  {metric.level} risk
+                </span>
+              </div>
+              <div className="text-xl font-bold text-white">{metric.formatted}</div>
+            </div>
+          ))}
+        </div>
+        
+        <div className="mt-6 p-4 bg-gray-750 rounded-lg border border-gray-600">
+          <h4 className="font-medium text-gray-200 mb-3 flex items-center">
+            <Shield className="h-4 w-4 text-red-400 mr-2" />
+            Risk Analysis Summary
+          </h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+            <div>
+              <span className="text-gray-400">Financial Leverage:</span>
+              <span className={`ml-2 font-medium ${
+                analysis.risk.financialLeverage < 2 ? 'text-green-400' : 
+                analysis.risk.financialLeverage < 3 ? 'text-yellow-400' : 'text-red-400'
+              }`}>
+                {analysis.risk.financialLeverage.toFixed(1)}x
+              </span>
+            </div>
+            <div>
+              <span className="text-gray-400">Interest Coverage:</span>
+              <span className={`ml-2 font-medium ${
+                analysis.risk.interestCoverage > 10 ? 'text-green-400' : 
+                analysis.risk.interestCoverage > 5 ? 'text-yellow-400' : 'text-red-400'
+              }`}>
+                {analysis.risk.interestCoverage.toFixed(1)}x
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Financial Performance Summary */}

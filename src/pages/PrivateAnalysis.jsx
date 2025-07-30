@@ -21,6 +21,7 @@ import AnalysisResults from '../components/PrivateAnalysis/AnalysisResults';
 import WorkflowNavigation from '../components/PrivateAnalysis/WorkflowNavigation';
 import defaultFinancialData from '../data/defaultFinancialData';
 import { formatCurrency, formatPercentage } from '../utils/dataTransformation';
+import { calculateDCF } from '../utils/dcfCalculations';
 
 const PrivateAnalysis = () => {
   const [activeTab, setActiveTab] = useState('data');
@@ -56,55 +57,86 @@ const PrivateAnalysis = () => {
   const getDataCompleteness = () => {
     if (!financialData.statements) return 0;
     
-    const incomeFields = ['totalRevenue', 'totalCostOfGoodsSold', 'operatingIncome', 'netIncome'];
-    const balanceFields = ['totalAssets', 'totalLiabilities', 'totalEquity'];
-    const cashFlowFields = ['operatingCashFlow', 'investingCashFlow', 'financingCashFlow'];
-    
-    const allFields = [...incomeFields, ...balanceFields, ...cashFlowFields];
+    // Core required fields for basic analysis
+    const coreIncomeFields = ['totalRevenue', 'totalCostOfGoodsSold', 'operatingIncome', 'netIncome'];
+    const optionalBalanceFields = ['totalAssets', 'totalLiabilities', 'totalEquity'];
+    const optionalCashFlowFields = ['operatingCashFlow', 'investingCashFlow', 'financingCashFlow'];
     
     let completedFields = 0;
+    let totalWeightedFields = 0;
     
-    // Check income statement
-    incomeFields.forEach(field => {
+    // Check core income statement fields (weighted more heavily)
+    coreIncomeFields.forEach(field => {
+      totalWeightedFields += 3; // Weight core fields 3x
       if (financialData.statements.incomeStatement?.[field]?.[2] !== undefined) {
-        completedFields++;
+        completedFields += 3;
       }
     });
     
-    // Check balance sheet
-    balanceFields.forEach(field => {
+    // Check for any revenue line items to boost completeness
+    const revenueFields = ['energyDevices', 'injectables', 'wellness', 'weightloss', 'retailSales', 'surgery'];
+    let revenueItemsFound = 0;
+    revenueFields.forEach(field => {
+      if (financialData.statements.incomeStatement?.[field]?.[2] !== undefined) {
+        revenueItemsFound++;
+      }
+    });
+    
+    // Add bonus for detailed revenue breakdown
+    if (revenueItemsFound >= 3) {
+      completedFields += 2;
+      totalWeightedFields += 2;
+    }
+    
+    // Check optional balance sheet fields (lower weight)
+    optionalBalanceFields.forEach(field => {
+      totalWeightedFields += 1;
       if (financialData.statements.balanceSheet?.[field]?.[2] !== undefined) {
-        completedFields++;
+        completedFields += 1;
       }
     });
     
-    // Check cash flow statement
-    cashFlowFields.forEach(field => {
+    // Check optional cash flow statement fields (lower weight)
+    optionalCashFlowFields.forEach(field => {
+      totalWeightedFields += 1;
       if (financialData.statements.cashFlowStatement?.[field]?.[2] !== undefined) {
-        completedFields++;
+        completedFields += 1;
       }
     });
     
-    return Math.round((completedFields / allFields.length) * 100);
+    // Calculate completion percentage with minimum threshold for income statement
+    const completionPercentage = Math.round((completedFields / totalWeightedFields) * 100);
+    
+    // If we have core income statement data, ensure minimum 80% completion
+    const hasBasicIncomeData = financialData.statements.incomeStatement?.totalRevenue?.[2] !== undefined &&
+                              financialData.statements.incomeStatement?.operatingIncome?.[2] !== undefined;
+    
+    return hasBasicIncomeData ? Math.max(completionPercentage, 80) : completionPercentage;
   };
 
   // Calculate modeling progress based on configured models and assumptions
   const calculateModelingProgress = () => {
     let progress = 0;
     
-    // DCF Model completion
+    // DCF Model completion - give credit for having basic parameters
     if (modelInputs.dcf.discountRate && modelInputs.dcf.terminalGrowthRate) {
       progress += 40;
     }
     
+    // Additional credit for comprehensive financial data enabling modeling
+    const dataCompleteness = getDataCompleteness();
+    if (dataCompleteness >= 80) {
+      progress += 20; // Comprehensive data enables modeling
+    }
+    
     // Scenario analysis completion
     if (modelInputs.scenario.scenarios && modelInputs.scenario.scenarios.length > 0) {
-      progress += 30;
+      progress += 20;
     }
     
     // Adjusted values completion
     if (adjustedValues && Object.keys(adjustedValues).length > 0) {
-      progress += 30;
+      progress += 20;
     }
     
     return Math.min(progress, 100);
@@ -443,7 +475,7 @@ const PrivateAnalysis = () => {
                 data={financialData}
                 adjustedValues={adjustedValues}
                 modelInputs={modelInputs}
-                calculateDCF={null}
+                calculateDCF={(data) => calculateDCF(data, modelInputs)}
                 formatCurrency={formatCurrency}
                 formatPercentage={formatPercentage}
               />
