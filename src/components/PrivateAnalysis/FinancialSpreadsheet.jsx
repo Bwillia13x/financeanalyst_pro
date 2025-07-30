@@ -719,18 +719,19 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
                     {/* Enhanced Section Header */}
                     <tr className={`${section.headerBg || 'bg-slate-600'} border-b-2 border-slate-300`}>
                       <td colSpan={data.periods.length + 4} className="py-4 px-6">
-                        <button
-                          onClick={() => toggleSection(sectionKey)}
-                          className="flex items-center gap-3 text-white hover:text-slate-200 transition-colors w-full text-left group"
-                        >
-                          <div className="flex items-center justify-center w-6 h-6 rounded-full bg-white/20 group-hover:bg-white/30 transition-colors">
-                            {expandedSections[sectionKey] ? 
-                              <ChevronDown size={14} /> : 
-                              <ChevronRight size={14} />
-                            }
-                          </div>
-                          <span className="font-bold text-lg">{section.title}</span>
-                          <div className="flex-1" />
+                        <div className="flex items-center gap-3 text-white w-full text-left group">
+                          <button
+                            onClick={() => toggleSection(sectionKey)}
+                            className="flex items-center gap-3 text-white hover:text-slate-200 transition-colors flex-1"
+                          >
+                            <div className="flex items-center justify-center w-6 h-6 rounded-full bg-white/20 group-hover:bg-white/30 transition-colors">
+                              {expandedSections[sectionKey] ? 
+                                <ChevronDown size={14} /> : 
+                                <ChevronRight size={14} />
+                              }
+                            </div>
+                            <span className="font-bold text-lg">{section.title}</span>
+                          </button>
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
@@ -741,7 +742,7 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
                           >
                             <Plus size={16} />
                           </button>
-                        </button>
+                        </div>
                       </td>
                     </tr>
                     
