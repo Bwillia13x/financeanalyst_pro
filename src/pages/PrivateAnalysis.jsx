@@ -303,7 +303,7 @@ const PrivateAnalysis = () => {
       <Header />
       
       {/* Main Workspace Container */}
-      <div className="flex flex-col h-screen pt-16">
+      <div className="flex flex-col min-h-screen pt-16">
         
         {/* Enhanced Header Section */}
         <div className="bg-slate-800/80 backdrop-blur-sm border-b border-slate-700/50">
@@ -414,13 +414,13 @@ const PrivateAnalysis = () => {
         </AnimatePresence>
 
         {/* Main Content Area */}
-        <div className="flex-1 bg-slate-900 overflow-hidden">
+        <div className="flex-1 bg-slate-900 overflow-auto">
           <motion.div
             key={activeTab}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2, ease: 'easeOut' }}
-            className="h-full"
+            className="min-h-full"
           >
             {activeTab === 'spreadsheet' && (
               <FinancialSpreadsheet

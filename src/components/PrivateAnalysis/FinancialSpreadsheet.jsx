@@ -638,7 +638,7 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 pb-8">
       {/* Header Section */}
       <div className="bg-white border-b border-slate-200 shadow-sm">
         <div className="max-w-full mx-auto px-8 py-6">
@@ -677,7 +677,7 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
 
       {/* Main Content */}
       <div className="max-w-full mx-auto p-8">
-        <div className="bg-white rounded-xl border border-slate-200 shadow-lg overflow-hidden">
+        <div className="bg-white rounded-xl border border-slate-200 shadow-lg">
           <div className="overflow-x-auto">
             <table className="w-full">
               {/* Enhanced Table Header */}
