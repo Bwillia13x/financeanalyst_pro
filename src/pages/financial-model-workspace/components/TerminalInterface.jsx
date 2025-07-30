@@ -10,7 +10,7 @@ import {
   formatPercentage,
   formatNumber
 } from '../../../utils/dataTransformation';
-import { CommandProcessor } from '../../../services/commandProcessor';
+import { commandProcessor } from '../../../services/commandProcessor';
 import { commandRegistry } from '../../../services/commandRegistry';
 import { persistenceManager } from '../../../services/persistence/PersistenceManager';
 // Import command initializer to ensure commands are registered
@@ -39,7 +39,7 @@ const TerminalInterface = ({ onCommandExecute, calculationResults }) => {
   const [isLoading, setIsLoading] = useState(false);
   const terminalRef = useRef(null);
   const inputRef = useRef(null);
-  const commandProcessor = useRef(new CommandProcessor());
+  const commandProcessorRef = useRef(commandProcessor);
 
   // Get available commands from registry for suggestions
   const getAvailableCommands = () => {
@@ -148,7 +148,7 @@ const TerminalInterface = ({ onCommandExecute, calculationResults }) => {
         }
       };
 
-      const response = await commandProcessor.current.processCommand(currentInput, context);
+      const response = await commandProcessorRef.current.processCommand(currentInput, context);
 
       // Handle special actions
       if (response.action === 'clear') {
