@@ -4,6 +4,7 @@ import { Link, useLocation } from 'react-router-dom';
 import Icon from '../AppIcon';
 
 import Button from './Button';
+import SkipLink from './SkipLink';
 
 const Header = () => {
   const location = useLocation();
@@ -72,8 +73,10 @@ const Header = () => {
   const activeTab = getActiveTab();
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-[1000] bg-card border-b border-border h-[60px]">
-      <div className="flex items-center h-full px-6">
+    <>
+      <SkipLink />
+      <header className="fixed top-0 left-0 right-0 z-[1000] bg-card border-b border-border h-[60px]" role="banner">
+        <div className="flex items-center h-full px-6">
         {/* Logo */}
         <div className="flex items-center">
           <div className="flex items-center space-x-2">
@@ -85,7 +88,7 @@ const Header = () => {
         </div>
 
         {/* Navigation Tabs */}
-        <nav className="flex items-center ml-8 space-x-1">
+        <nav className="flex items-center ml-8 space-x-1" role="navigation" aria-label="Main navigation">
           {navigationTabs.map(tab => (
             <Link
               key={tab.id}
@@ -207,6 +210,7 @@ const Header = () => {
         </div>
       </div>
     </header>
+    </>
   );
 };
 

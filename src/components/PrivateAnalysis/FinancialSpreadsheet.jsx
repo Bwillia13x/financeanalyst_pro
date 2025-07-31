@@ -1,9 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Plus, ChevronDown, ChevronRight, Calculator, FileText, TrendingUp, Edit2 } from 'lucide-react';
 
+import { useFinancialAccessibility } from '../../hooks/useAccessibility';
+
 const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) => {
   const [activeStatement, setActiveStatement] = useState('incomeStatement');
   const [adjustedValues, setAdjustedValues] = useState({});
+  
+  // Add accessibility monitoring for financial spreadsheet
+  const { elementRef, testFinancialFeatures } = useFinancialAccessibility('spreadsheet');
   const [expandedSections, setExpandedSections] = useState({
     // Income Statement
     revenue: true,

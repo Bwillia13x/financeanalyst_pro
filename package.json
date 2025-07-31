@@ -22,7 +22,7 @@
     "papaparse": "^5.5.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-helmet": "^6.1.0",
+    "react-helmet-async": "^2.0.5",
     "react-hook-form": "^7.55.0",
     "react-redux": "^9.2.0",
     "react-router-dom": "6.0.2",
@@ -50,7 +50,13 @@
     "format:check": "prettier --check \"src/**/*.{js,jsx,css,md}\"",
     "type-check": "echo 'No TypeScript configured'",
     "lighthouse": "lhci autorun",
-    "analyze": "npm run build && npx vite-bundle-analyzer"
+    "lighthouse:ci": "lhci autorun --config lighthouse.config.js",
+    "analyze": "npm run build && npx vite-bundle-analyzer",
+    "budget:check": "node scripts/check-bundle-budget.cjs",
+    "perf:audit": "npm run build && npm run lighthouse:ci && npm run budget:check",
+    "perf:dev": "npm run build && npm run budget:check",
+    "staging:deploy": "node scripts/staging-deploy.cjs",
+    "staging:audit": "npm run build && npm run staging:deploy"
   },
   "eslintConfig": {
     "extends": [
@@ -85,6 +91,7 @@
     "@vitest/coverage-v8": "^3.2.4",
     "@vitest/ui": "^3.2.4",
     "autoprefixer": "10.4.2",
+    "axe-core": "^4.10.3",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-react": "^7.37.5",

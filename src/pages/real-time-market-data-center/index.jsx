@@ -3,6 +3,9 @@ import React, { useState, useEffect } from 'react';
 import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
 import Header from '../../components/ui/Header';
+import SEOHead from '../../components/SEO/SEOHead';
+import { useFinancialAccessibility } from '../../hooks/useAccessibility';
+import { trackFinancialComponentPerformance } from '../../utils/performanceMonitoring';
 import { dataValidationService } from '../../services/dataValidationService';
 import { enhancedApiService } from '../../services/enhancedApiService';
 import realTimeDataService from '../../services/realTimeDataService';
@@ -18,6 +21,9 @@ import WatchlistPanel from './components/WatchlistPanel';
 // Import real data services
 
 const RealTimeMarketDataCenter = () => {
+  // Add accessibility and performance monitoring
+  const { elementRef, testFinancialFeatures } = useFinancialAccessibility('market-data-center');
+
   const [dataSources, setDataSources] = useState([
     { id: 'yahoo', name: 'Yahoo Finance', enabled: true, status: 'connected', latency: 12, requiresKey: false },
     { id: 'alpha_vantage', name: 'Alpha Vantage', enabled: false, status: 'disconnected', latency: 25, requiresKey: true },

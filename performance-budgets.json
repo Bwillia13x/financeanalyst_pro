@@ -1,0 +1,113 @@
+{
+  "budgets": [
+    {
+      "path": "/*",
+      "timings": [
+        {
+          "metric": "first-contentful-paint",
+          "budget": 1800
+        },
+        {
+          "metric": "largest-contentful-paint", 
+          "budget": 2500
+        },
+        {
+          "metric": "speed-index",
+          "budget": 3400
+        },
+        {
+          "metric": "interactive",
+          "budget": 3800
+        },
+        {
+          "metric": "first-meaningful-paint",
+          "budget": 2000
+        }
+      ],
+      "resourceSizes": [
+        {
+          "resourceType": "script",
+          "budget": 1024
+        },
+        {
+          "resourceType": "stylesheet",
+          "budget": 100
+        },
+        {
+          "resourceType": "image",
+          "budget": 500
+        },
+        {
+          "resourceType": "media",
+          "budget": 200
+        },
+        {
+          "resourceType": "font",
+          "budget": 150
+        },
+        {
+          "resourceType": "document",
+          "budget": 50
+        },
+        {
+          "resourceType": "other",
+          "budget": 200
+        },
+        {
+          "resourceType": "total",
+          "budget": 2048
+        }
+      ],
+      "resourceCounts": [
+        {
+          "resourceType": "script",
+          "budget": 30
+        },
+        {
+          "resourceType": "stylesheet", 
+          "budget": 10
+        },
+        {
+          "resourceType": "image",
+          "budget": 25
+        },
+        {
+          "resourceType": "font",
+          "budget": 8
+        },
+        {
+          "resourceType": "total",
+          "budget": 100
+        }
+      ]
+    },
+    {
+      "path": "/private-analysis",
+      "comment": "Private analysis page has heavier charts, allow more JS",
+      "resourceSizes": [
+        {
+          "resourceType": "script",
+          "budget": 1536
+        },
+        {
+          "resourceType": "total",
+          "budget": 2560
+        }
+      ]
+    },
+    {
+      "path": "/valuation-tool",
+      "comment": "Valuation tool needs financial libraries",
+      "resourceSizes": [
+        {
+          "resourceType": "script",
+          "budget": 1280
+        },
+        {
+          "resourceType": "total",
+          "budget": 2304
+        }
+      ]
+    }
+  ]
+}

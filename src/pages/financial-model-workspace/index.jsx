@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
 import Header from '../../components/ui/Header';
+import SEOHead from '../../components/SEO/SEOHead';
 
 import AuditTrail from './components/AuditTrail';
 import CalculationResults from './components/CalculationResults';
@@ -67,10 +68,16 @@ const FinancialModelWorkspace = () => {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
+      <SEOHead
+        title="Financial Model Workspace | FinanceAnalyst Pro"
+        description="Professional financial modeling workspace with advanced DCF analysis, LBO tools, and real-time collaboration features for finance professionals."
+        canonical="/"
+        keywords="financial modeling, DCF analysis, LBO modeling, financial workspace, valuation tools, Excel alternative"
+      />
       <Header />
       
       {/* Main Workspace */}
-      <div className="flex flex-col h-screen pt-16">
+      <main id="main-content" className="flex flex-col h-screen pt-16" role="main">
         {/* Toolbar */}
         <div className="bg-gray-800 border-b border-gray-700 px-4 py-2 flex items-center justify-between">
           <div className="flex items-center space-x-4">
@@ -151,7 +158,7 @@ const FinancialModelWorkspace = () => {
             </div>
           )}
         </div>
-      </div>
+      </main>
     </div>
   );
 };

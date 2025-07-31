@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import Header from '../components/ui/Header';
 import Button from '../components/ui/Button';
+import SEOHead from '../components/SEO/SEOHead';
 import FinancialSpreadsheet from '../components/PrivateAnalysis/FinancialSpreadsheet';
 import ModelingTools from '../components/PrivateAnalysis/ModelingTools';
 import AnalysisResults from '../components/PrivateAnalysis/AnalysisResults';
@@ -296,9 +297,15 @@ const PrivateAnalysis = () => {
 
   return (
     <div className="min-h-screen bg-slate-900 relative">
+      <SEOHead
+        title="Private Analysis Suite | FinanceAnalyst Pro"
+        description="Comprehensive financial analysis platform with advanced modeling tools, scenario analysis, Monte Carlo simulation, and private equity workflows."
+        canonical="/private-analysis"
+        keywords="private analysis, financial modeling, scenario analysis, Monte Carlo simulation, LBO analysis, private equity tools"
+      />
       <Header />
       
-      <div className="container mx-auto px-4 py-8">
+      <main id="main-content" className="container mx-auto px-4 py-8" role="main">
         {/* Header Section */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
@@ -500,7 +507,7 @@ const PrivateAnalysis = () => {
           isVisible={insightsSidebarVisible}
           onToggle={toggleInsightsSidebar}
         />
-      </div>
+      </main>
     </div>
   );
 };

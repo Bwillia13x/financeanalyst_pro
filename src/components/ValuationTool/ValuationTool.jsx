@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Card } from '../ui/Card';
 import Button from '../ui/Button';
 import Icon from '../AppIcon';
+import SEOHead from '../SEO/SEOHead';
 import EnhancedDCFTool from './EnhancedDCFTool';
 import LivingModelDCF from './LivingModelDCF';
 import AnalysisCanvas from '../AnalysisCanvas/AnalysisCanvas';
@@ -23,6 +24,12 @@ const ValuationTool = () => {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white p-6">
+      <SEOHead
+        title="Valuation Tool | FinanceAnalyst Pro"
+        description="Professional DCF analysis, LBO modeling, and comparative valuation tools for investment professionals and analysts."
+        canonical="/valuation-tool"
+        keywords="valuation tool, DCF analysis, LBO model, comparable company analysis, investment valuation, financial analysis"
+      />
       <div className="max-w-6xl mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Valuation Tool</h1>
