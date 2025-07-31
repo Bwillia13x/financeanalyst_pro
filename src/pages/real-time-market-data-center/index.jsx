@@ -5,7 +5,7 @@ import Button from '../../components/ui/Button';
 import Header from '../../components/ui/Header';
 import { dataValidationService } from '../../services/dataValidationService';
 import { enhancedApiService } from '../../services/enhancedApiService';
-import { realTimeDataService } from '../../services/realTimeDataService';
+import realTimeDataService from '../../services/realTimeDataService';
 
 import ApiStatusPanel from './components/ApiStatusPanel';
 import BulkOperationsPanel from './components/BulkOperationsPanel';

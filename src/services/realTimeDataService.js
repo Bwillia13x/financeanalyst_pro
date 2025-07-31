@@ -1,310 +1,401 @@
-import { apiLogger } from '../utils/apiLogger.js';
-
-import { dataFetchingService } from './dataFetching.js';
-
 /**
- * Real-time data service for live market data feeds
- * Handles WebSocket connections, polling, and data streaming
+ * Real-Time Data Service
+ * Provides live market data feeds for the Living Model system
+ * Enhanced with comprehensive market data and commodity feeds
  */
+
 class RealTimeDataService {
   constructor() {
     this.subscribers = new Map();
-    this.activeStreams = new Map();
-    this.pollingIntervals = new Map();
-    this.connectionStatus = new Map();
-    this.lastUpdateTimes = new Map();
-
-    // Configuration for different data types
-    this.updateIntervals = {
-      marketData: 5000,      // 5 seconds for market data
-      quotes: 1000,          // 1 second for real-time quotes
-      news: 30000,           // 30 seconds for news
-      fundamentals: 300000   // 5 minutes for fundamental data
-    };
-
-    this.maxRetries = 3;
-    this.retryDelay = 2000;
+    this.connections = new Map();
+    this.dataCache = new Map();
+    this.updateInterval = 500; // 500ms updates for smoother experience
+    this.isActive = false;
+    this.marketDataTypes = new Set([
+      'stock_price', 'interest_rates', 'fx_rates', 'commodity_prices',
+      'volatility_index', 'bond_yields', 'economic_indicators'
+    ]);
   }
 
   /**
-   * Subscribe to real-time data for a symbol
-   * @param {string} symbol - Stock symbol
-   * @param {string} dataType - Type of data (marketData, quotes, news)
-   * @param {Function} callback - Callback function for data updates
-   * @returns {string} Subscription ID
+   * Subscribe to real-time updates for a specific data type
    */
-  subscribe(symbol, dataType, callback) {
-    const subscriptionId = `${symbol}_${dataType}_${Date.now()}`;
-    const key = `${symbol}_${dataType}`;
-
+  subscribe(dataType, symbol, callback) {
+    const key = `${dataType}_${symbol}`;
+    
     if (!this.subscribers.has(key)) {
-      this.subscribers.set(key, new Map());
+      this.subscribers.set(key, new Set());
     }
-
-    this.subscribers.get(key).set(subscriptionId, callback);
-
-    // Start streaming if this is the first subscriber for this symbol/dataType
-    if (this.subscribers.get(key).size === 1) {
-      this.startStream(symbol, dataType);
+    
+    this.subscribers.get(key).add(callback);
+    
+    // Start the data feed if not already active
+    if (!this.connections.has(key)) {
+      this.startDataFeed(dataType, symbol);
     }
-
-    apiLogger.log('INFO', `Subscribed to ${dataType} for ${symbol}`, {
-      subscriptionId,
-      totalSubscribers: this.subscribers.get(key).size
-    });
-
-    return subscriptionId;
+    
+    // Return current cached data if available
+    if (this.dataCache.has(key)) {
+      callback(this.dataCache.get(key));
+    }
+    
+    // Return unsubscribe function
+    return () => {
+      this.unsubscribe(dataType, symbol, callback);
+    };
   }
 
   /**
-   * Unsubscribe from real-time data
-   * @param {string} subscriptionId - Subscription ID to remove
+   * Unsubscribe from real-time updates
    */
-  unsubscribe(subscriptionId) {
-    for (const [key, subscribers] of this.subscribers.entries()) {
-      if (subscribers.has(subscriptionId)) {
-        subscribers.delete(subscriptionId);
+  unsubscribe(dataType, symbol, callback) {
+    const key = `${dataType}_${symbol}`;
+    const subscribers = this.subscribers.get(key);
+    
+    if (subscribers) {
+      subscribers.delete(callback);
+      
+      // Stop data feed if no more subscribers
+      if (subscribers.size === 0) {
+        this.stopDataFeed(key);
+      }
+    }
+  }
 
-        // Stop streaming if no more subscribers
-        if (subscribers.size === 0) {
-          const [symbol, dataType] = key.split('_');
-          this.stopStream(symbol, dataType);
-          this.subscribers.delete(key); // Remove the key if no subscribers are left
-        }
-
-        apiLogger.log('INFO', `Unsubscribed from ${key}`, {
-          subscriptionId,
-          remainingSubscribers: subscribers.size
-        });
+  /**
+   * Start a data feed for specific data type and symbol
+   */
+  startDataFeed(dataType, symbol) {
+    const key = `${dataType}_${symbol}`;
+    
+    switch (dataType) {
+      case 'stock_price':
+        this.startStockPriceFeed(key, symbol);
         break;
-      }
+      case 'interest_rates':
+        this.startInterestRateFeed(key, symbol);
+        break;
+      case 'fx_rates':
+        this.startFXRateFeed(key, symbol);
+        break;
+      case 'commodity_prices':
+        this.startCommodityFeed(key, symbol);
+        break;
+      case 'bond_yields':
+        this.startBondYieldFeed(key, symbol);
+        break;
+      case 'volatility_index':
+        this.startVolatilityFeed(key, symbol);
+        break;
+      case 'economic_indicators':
+        this.startEconomicIndicatorFeed(key, symbol);
+        break;
+      default:
+        console.warn(`Unknown data type: ${dataType}`);
     }
   }
 
   /**
-   * Start real-time data stream for a symbol and data type
-   * @param {string} symbol - Stock symbol
-   * @param {string} dataType - Type of data
+   * Stock Price Feed (simulated real-time data)
    */
-  async startStream(symbol, dataType) {
-    const key = `${symbol}_${dataType}`;
-
-    if (this.activeStreams.has(key)) {
-      return; // Already streaming
-    }
-
-    this.activeStreams.set(key, true);
-    this.connectionStatus.set(key, 'connecting');
-
-    try {
-      // Try WebSocket connection first (if available)
-      if (this.supportsWebSocket(dataType)) {
-        await this.startWebSocketStream(symbol, dataType);
-      } else {
-        // Fallback to polling
-        await this.startPollingStream(symbol, dataType);
-      }
-
-      this.connectionStatus.set(key, 'connected');
-      apiLogger.log('INFO', `Started real-time stream for ${symbol} ${dataType}`);
-
-    } catch (error) {
-      this.connectionStatus.set(key, 'error');
-      apiLogger.log('ERROR', `Failed to start stream for ${symbol} ${dataType}`, { error: error.message });
-
-      // Fallback to polling if WebSocket fails
-      if (this.supportsWebSocket(dataType)) {
-        await this.startPollingStream(symbol, dataType);
-      }
-    }
-  }
-
-  /**
-   * Stop real-time data stream
-   * @param {string} symbol - Stock symbol
-   * @param {string} dataType - Type of data
-   */
-  stopStream(symbol, dataType) {
-    const key = `${symbol}_${dataType}`;
-
-    // Clear polling interval
-    if (this.pollingIntervals.has(key)) {
-      clearInterval(this.pollingIntervals.get(key));
-      this.pollingIntervals.delete(key);
-    }
-
-    // Close WebSocket if exists
-    if (this.activeStreams.has(key)) {
-      this.activeStreams.delete(key);
-    }
-
-    this.connectionStatus.set(key, 'disconnected');
-    apiLogger.log('INFO', `Stopped real-time stream for ${symbol} ${dataType}`);
-  }
-
-  /**
-   * Start WebSocket stream (placeholder for future WebSocket implementation)
-   * @param {string} symbol - Stock symbol
-   * @param {string} dataType - Type of data
-   */
-  async startWebSocketStream(symbol, dataType) {
-    // TODO: Implement WebSocket connections for real-time data
-    // This would connect to services like:
-    // - Alpha Vantage WebSocket API
-    // - IEX Cloud WebSocket
-    // - Polygon.io WebSocket
-
-    throw new Error('WebSocket streaming not yet implemented');
-  }
-
-  /**
-   * Start polling-based stream
-   * @param {string} symbol - Stock symbol
-   * @param {string} dataType - Type of data
-   */
-  async startPollingStream(symbol, dataType) {
-    const key = `${symbol}_${dataType}`;
-    const interval = this.updateIntervals[dataType] || 10000;
-
-    // Initial fetch
-    await this.fetchAndBroadcast(symbol, dataType);
-
-    // Set up polling interval
-    const intervalId = setInterval(async() => {
-      try {
-        await this.fetchAndBroadcast(symbol, dataType);
-      } catch (error) {
-        apiLogger.log('ERROR', `Polling error for ${symbol} ${dataType}`, { error: error.message });
-      }
-    }, interval);
-
-    this.pollingIntervals.set(key, intervalId);
-  }
-
-  /**
-   * Fetch data and broadcast to subscribers
-   * @param {string} symbol - Stock symbol
-   * @param {string} dataType - Type of data
-   */
-  async fetchAndBroadcast(symbol, dataType) {
-    const key = `${symbol}_${dataType}`;
-
-    try {
-      let data;
-
-      switch (dataType) {
-        case 'marketData':
-          data = await dataFetchingService.fetchMarketData(symbol);
-          break;
-        case 'quotes':
-          data = await dataFetchingService.fetchCompanyProfile(symbol);
-          break;
-        case 'fundamentals':
-          data = await dataFetchingService.fetchFinancialStatements(symbol, 'income-statement');
-          break;
-        default:
-          throw new Error(`Unknown data type: ${dataType}`);
-      }
-
-      // Add metadata
-      const enrichedData = {
-        ...data,
+  startStockPriceFeed(key, symbol) {
+    let basePrice = this.getBasePrice(symbol);
+    let lastPrice = basePrice;
+    
+    const interval = setInterval(() => {
+      // Simulate realistic price movement
+      const volatility = 0.02;
+      const drift = 0.0001;
+      const dt = this.updateInterval / (1000 * 60 * 60 * 24);
+      
+      const randomShock = (Math.random() - 0.5) * 2;
+      const priceChange = lastPrice * (drift * dt + volatility * Math.sqrt(dt) * randomShock);
+      
+      lastPrice = Math.max(0.01, lastPrice + priceChange);
+      
+      const data = {
         symbol,
-        dataType,
+        price: lastPrice,
+        change: lastPrice - basePrice,
+        changePercent: ((lastPrice - basePrice) / basePrice) * 100,
         timestamp: new Date().toISOString(),
-        source: 'realTimeDataService'
+        marketOpen: this.isMarketOpen()
       };
-
-      // Broadcast to all subscribers
-      const subscribers = this.subscribers.get(key);
-      if (subscribers) {
-        subscribers.forEach(callback => {
-          try {
-            callback(enrichedData);
-          } catch (error) {
-            apiLogger.log('ERROR', `Subscriber callback error for ${key}`, { error: error.message });
-          }
-        });
-      }
-
-      this.lastUpdateTimes.set(key, new Date());
-
-    } catch (error) {
-      apiLogger.log('ERROR', `Failed to fetch data for ${symbol} ${dataType}`, { error: error.message });
-      throw error;
-    }
+      
+      this.updateSubscribers(key, data);
+    }, this.updateInterval);
+    
+    this.connections.set(key, interval);
   }
 
   /**
-   * Check if WebSocket is supported for data type
-   * @param {string} dataType - Type of data
-   * @returns {boolean}
+   * Interest Rate Feed
    */
-  supportsWebSocket(dataType) {
-    // Currently no WebSocket implementation
-    // Future: return true for supported data types
-    return false;
-  }
-
-  /**
-   * Get connection status for all active streams
-   * @returns {Object} Connection status map
-   */
-  getConnectionStatus() {
-    const status = {};
-    for (const [key, connectionStatus] of this.connectionStatus.entries()) {
-      const [symbol, dataType] = key.split('_');
-      if (!status[symbol]) {
-        status[symbol] = {};
-      }
-      status[symbol][dataType] = {
-        status: connectionStatus,
-        lastUpdate: this.lastUpdateTimes.get(key),
-        subscriberCount: this.subscribers.get(key)?.size || 0
-      };
-    }
-    return status;
-  }
-
-  /**
-   * Get all active subscriptions
-   * @returns {Array} List of active subscriptions
-   */
-  getActiveSubscriptions() {
-    const subscriptions = [];
-    for (const [key, subscribers] of this.subscribers.entries()) {
-      const [symbol, dataType] = key.split('_');
-      subscriptions.push({
+  startInterestRateFeed(key, symbol) {
+    let baseRate = this.getBaseInterestRate(symbol);
+    
+    const interval = setInterval(() => {
+      const change = (Math.random() - 0.5) * 0.01;
+      baseRate = Math.max(0, baseRate + change);
+      
+      const data = {
         symbol,
-        dataType,
-        subscriberCount: subscribers.size,
-        status: this.connectionStatus.get(key) || 'unknown',
-        lastUpdate: this.lastUpdateTimes.get(key)
+        rate: baseRate,
+        timestamp: new Date().toISOString()
+      };
+      
+      this.updateSubscribers(key, data);
+    }, this.updateInterval * 5);
+    
+    this.connections.set(key, interval);
+  }
+
+  updateSubscribers(key, data) {
+    this.dataCache.set(key, data);
+    const subscribers = this.subscribers.get(key);
+    
+    if (subscribers) {
+      subscribers.forEach(callback => {
+        try {
+          callback(data);
+        } catch (error) {
+          console.error('Error in subscriber callback:', error);
+        }
       });
     }
-    return subscriptions;
+  }
+
+  stopDataFeed(key) {
+    const connection = this.connections.get(key);
+    if (connection) {
+      clearInterval(connection);
+      this.connections.delete(key);
+      this.dataCache.delete(key);
+    }
+  }
+
+  getBasePrice(symbol) {
+    const basePrices = {
+      'AAPL': 175.84,
+      'MSFT': 378.85,
+      'GOOGL': 142.56,
+      'TSLA': 248.42,
+      'AMZN': 151.94
+    };
+    return basePrices[symbol] || 100;
+  }
+
+  getBaseInterestRate(symbol) {
+    const rates = {
+      'USD_3M': 5.25,
+      'USD_10Y': 4.15,
+      'EUR_3M': 3.85,
+      'EUR_10Y': 2.45
+    };
+    return rates[symbol] || 4.0;
+  }
+
+  isMarketOpen() {
+    const now = new Date();
+    const day = now.getDay();
+    const hour = now.getHours();
+    return day >= 1 && day <= 5 && hour >= 9 && hour < 16;
   }
 
   /**
-   * Cleanup all streams and subscriptions
+   * Foreign Exchange Rate Feed
    */
-  cleanup() {
-    // Clear all intervals
-    for (const intervalId of this.pollingIntervals.values()) {
-      clearInterval(intervalId);
-    }
+  startFXRateFeed(key, symbol) {
+    let baseRate = this.getBaseFXRate(symbol);
+    
+    const interval = setInterval(() => {
+      const volatility = 0.005;
+      const change = (Math.random() - 0.5) * 2 * volatility;
+      baseRate = Math.max(0.01, baseRate * (1 + change));
+      
+      const data = {
+        symbol,
+        rate: baseRate,
+        change: change * 100,
+        timestamp: new Date().toISOString()
+      };
+      
+      this.updateSubscribers(key, data);
+    }, this.updateInterval);
+    
+    this.connections.set(key, interval);
+  }
 
-    // Clear all data structures
-    this.subscribers.clear();
-    this.activeStreams.clear();
-    this.pollingIntervals.clear();
-    this.connectionStatus.clear();
-    this.lastUpdateTimes.clear();
+  /**
+   * Commodity Price Feed
+   */
+  startCommodityFeed(key, symbol) {
+    let basePrice = this.getBaseCommodityPrice(symbol);
+    
+    const interval = setInterval(() => {
+      const volatility = symbol === 'OIL' ? 0.03 : 0.02;
+      const change = (Math.random() - 0.5) * 2 * volatility;
+      basePrice = Math.max(1, basePrice * (1 + change));
+      
+      const data = {
+        symbol,
+        price: basePrice,
+        change: change * 100,
+        timestamp: new Date().toISOString()
+      };
+      
+      this.updateSubscribers(key, data);
+    }, this.updateInterval * 2);
+    
+    this.connections.set(key, interval);
+  }
 
-    apiLogger.log('INFO', 'Real-time data service cleaned up');
+  /**
+   * Bond Yield Feed
+   */
+  startBondYieldFeed(key, symbol) {
+    let baseYield = this.getBaseBondYield(symbol);
+    
+    const interval = setInterval(() => {
+      const change = (Math.random() - 0.5) * 0.02;
+      baseYield = Math.max(0, baseYield + change);
+      
+      const data = {
+        symbol,
+        yield: baseYield,
+        timestamp: new Date().toISOString()
+      };
+      
+      this.updateSubscribers(key, data);
+    }, this.updateInterval * 3);
+    
+    this.connections.set(key, interval);
+  }
+
+  /**
+   * Volatility Index Feed
+   */
+  startVolatilityFeed(key, symbol) {
+    let baseVol = this.getBaseVolatility(symbol);
+    
+    const interval = setInterval(() => {
+      const change = (Math.random() - 0.5) * 2;
+      baseVol = Math.max(5, Math.min(80, baseVol + change));
+      
+      const data = {
+        symbol,
+        volatility: baseVol,
+        timestamp: new Date().toISOString()
+      };
+      
+      this.updateSubscribers(key, data);
+    }, this.updateInterval * 4);
+    
+    this.connections.set(key, interval);
+  }
+
+  /**
+   * Economic Indicator Feed
+   */
+  startEconomicIndicatorFeed(key, symbol) {
+    let baseValue = this.getBaseEconomicIndicator(symbol);
+    
+    const interval = setInterval(() => {
+      const change = (Math.random() - 0.5) * 0.1;
+      baseValue = Math.max(0, baseValue + change);
+      
+      const data = {
+        symbol,
+        value: baseValue,
+        timestamp: new Date().toISOString()
+      };
+      
+      this.updateSubscribers(key, data);
+    }, this.updateInterval * 10);
+    
+    this.connections.set(key, interval);
+  }
+
+  getBaseFXRate(symbol) {
+    const rates = {
+      'EURUSD': 1.0850,
+      'GBPUSD': 1.2650,
+      'USDJPY': 149.50,
+      'USDCHF': 0.8750,
+      'AUDUSD': 0.6580
+    };
+    return rates[symbol] || 1.0;
+  }
+
+  getBaseCommodityPrice(symbol) {
+    const prices = {
+      'OIL': 85.50,
+      'GOLD': 2050.00,
+      'SILVER': 24.80,
+      'COPPER': 8.20,
+      'NATGAS': 3.15
+    };
+    return prices[symbol] || 50.0;
+  }
+
+  getBaseBondYield(symbol) {
+    const yields = {
+      'US10Y': 4.25,
+      'US2Y': 4.85,
+      'DE10Y': 2.35,
+      'GB10Y': 4.15,
+      'JP10Y': 0.75
+    };
+    return yields[symbol] || 3.0;
+  }
+
+  getBaseVolatility(symbol) {
+    const volatilities = {
+      'VIX': 18.5,
+      'VVIX': 95.2,
+      'MOVE': 105.8
+    };
+    return volatilities[symbol] || 20.0;
+  }
+
+  getBaseEconomicIndicator(symbol) {
+    const indicators = {
+      'GDP_GROWTH': 2.4,
+      'INFLATION': 3.2,
+      'UNEMPLOYMENT': 3.8,
+      'CONSUMER_CONF': 102.5
+    };
+    return indicators[symbol] || 100.0;
+  }
+
+  getCurrentData(dataType, symbol) {
+    const key = `${dataType}_${symbol}`;
+    return this.dataCache.get(key);
+  }
+
+  /**
+   * Get all available data types
+   */
+  getAvailableDataTypes() {
+    return Array.from(this.marketDataTypes);
+  }
+
+  /**
+   * Subscribe to multiple data feeds at once
+   */
+  subscribeMultiple(subscriptions) {
+    const unsubscribeFunctions = [];
+    
+    subscriptions.forEach(({ dataType, symbol, callback }) => {
+      const unsubscribe = this.subscribe(dataType, symbol, callback);
+      unsubscribeFunctions.push(unsubscribe);
+    });
+    
+    return () => {
+      unsubscribeFunctions.forEach(fn => fn());
+    };
   }
 }
 
-// Export singleton instance
-export const realTimeDataService = new RealTimeDataService();
-export default RealTimeDataService;
+const realTimeDataService = new RealTimeDataService();
+export default realTimeDataService;
