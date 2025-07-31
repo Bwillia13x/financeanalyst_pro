@@ -11,20 +11,37 @@ import {
   AlertCircle,
   CheckCircle,
   Loader2,
-  Info
+  Info,
+  FileSpreadsheet,
+  Bookmark,
+  Users,
+  Clock,
+  Eye,
+  Edit3,
+  Share,
+  Save
 } from 'lucide-react';
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 
 import { financialDataStorage } from '../services/financialDataStorage.js';
 import { apiLogger } from '../utils/apiLogger.js';
 
-const DataExportImport = ({ onClose }) => {
-  const [activeTab, setActiveTab] = useState('export');
+const DataExportImport = ({ data, onDataChange, savedAnalyses, onAnalysesChange }) => {
+  const [activeTab, setActiveTab] = useState('excel');
   const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const [exportStatus, setExportStatus] = useState(null);
   const [importStatus, setImportStatus] = useState(null);
   const [stats, setStats] = useState(null);
+  const [templates, setTemplates] = useState([
+    { id: 1, name: 'Standard 3-Statement Model', category: 'General', lastUsed: '2024-01-15', uses: 42 },
+    { id: 2, name: 'SaaS DCF Template', category: 'Technology', lastUsed: '2024-01-10', uses: 28 },
+    { id: 3, name: 'LBO Analysis Template', category: 'Private Equity', lastUsed: '2024-01-05', uses: 35 }
+  ]);
+  const [collaborators, setCollaborators] = useState([
+    { id: 1, name: 'John Smith', email: 'john@company.com', role: 'Analyst', lastActive: '2 min ago', avatar: 'JS' },
+    { id: 2, name: 'Sarah Johnson', email: 'sarah@company.com', role: 'VP', lastActive: '1 hour ago', avatar: 'SJ' }
+  ]);
 
   // Load storage statistics on component mount
   React.useEffect(() => {
@@ -157,45 +174,148 @@ const DataExportImport = ({ onClose }) => {
           </button>
         </div>
 
-        {/* Tabs */}
-        <div className="flex border-b">
-          <button
-            onClick={() => setActiveTab('export')}
-            className={`px-6 py-3 font-medium transition-colors ${
-              activeTab === 'export'
-                ? 'text-blue-600 border-b-2 border-blue-600'
-                : 'text-gray-500 hover:text-gray-700'
-            }`}
-          >
-            <Download className="w-4 h-4 inline mr-2" />
-            Export Data
-          </button>
-          <button
-            onClick={() => setActiveTab('import')}
-            className={`px-6 py-3 font-medium transition-colors ${
-              activeTab === 'import'
-                ? 'text-blue-600 border-b-2 border-blue-600'
-                : 'text-gray-500 hover:text-gray-700'
-            }`}
-          >
-            <Upload className="w-4 h-4 inline mr-2" />
-            Import Data
-          </button>
-          <button
-            onClick={() => setActiveTab('stats')}
-            className={`px-6 py-3 font-medium transition-colors ${
-              activeTab === 'stats'
-                ? 'text-blue-600 border-b-2 border-blue-600'
-                : 'text-gray-500 hover:text-gray-700'
-            }`}
-          >
-            <Database className="w-4 h-4 inline mr-2" />
-            Storage Stats
-          </button>
+        {/* Tab Navigation */}
+        <div className="border-b border-gray-200">
+          <nav className="-mb-px flex space-x-8">
+            {[
+              { id: 'excel', label: 'Excel Integration', icon: FileSpreadsheet },
+              { id: 'templates', label: 'Templates', icon: Bookmark },
+              { id: 'collaboration', label: 'Collaboration', icon: Users },
+              { id: 'export', label: 'Export', icon: Download },
+              { id: 'import', label: 'Import', icon: Upload },
+              { id: 'stats', label: 'Statistics', icon: Database }
+            ].map((tab) => {
+              const Icon = tab.icon;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`py-2 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${
+                    activeTab === tab.id
+                      ? 'border-blue-500 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  <Icon className="w-4 h-4" />
+                  <span>{tab.label}</span>
+                </button>
+              );
+            })}
+          </nav>
         </div>
 
         {/* Content */}
         <div className="p-6">
+          
+          {activeTab === 'excel' && (
+            <div className="space-y-4">
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="flex items-start">
+                  <Info className="w-5 h-5 text-blue-600 mt-0.5 mr-3" />
+                  <div>
+                    <h3 className="font-medium text-blue-900">Excel Integration</h3>
+                    <p className="text-sm text-blue-700 mt-1">
+                      Connect your Excel spreadsheets to FinanceAnalyst for seamless data synchronization.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <button
+                onClick={handleExport}
+                disabled={isExporting}
+                className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
+              >
+                {isExporting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Exporting...
+                  </>
+                ) : (
+                  <>
+                    <Download className="w-4 h-4 mr-2" />
+                    Export All Data
+                  </>
+                )}
+              </button>
+
+              {exportStatus && (
+                <div
+                  className={`border rounded-lg p-4 ${
+                    exportStatus.type === 'success'
+                      ? 'bg-green-50 border-green-200'
+                      : 'bg-red-50 border-red-200'
+                  }`}
+                >
+                  <div className="flex items-start">
+                    {exportStatus.type === 'success' ? (
+                      <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 mr-3" />
+                    ) : (
+                      <AlertCircle className="w-5 h-5 text-red-600 mt-0.5 mr-3" />
+                    )}
+                    <div>
+                      <h4
+                        className={`font-medium ${
+                          exportStatus.type === 'success' ? 'text-green-900' : 'text-red-900'
+                        }`}
+                      >
+                        {exportStatus.message}
+                      </h4>
+                      {exportStatus.type === 'success' && exportStatus.details && (
+                        <div className="text-sm text-green-700 mt-2">
+                          <p>Exported items:</p>
+                          <ul className="list-disc list-inside ml-4">
+                            <li>{exportStatus.details.dcfModels} DCF Models</li>
+                            <li>{exportStatus.details.lboModels} LBO Models</li>
+                            <li>{exportStatus.details.monteCarloResults} Monte Carlo Results</li>
+                            <li>{exportStatus.details.watchlists} Watchlists</li>
+                          </ul>
+                        </div>
+                      )}
+                      {exportStatus.type === 'error' && (
+                        <p className="text-sm text-red-700 mt-1">{exportStatus.details}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'templates' && (
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium text-gray-900">Templates</h3>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {templates.map((template) => (
+                  <div key={template.id} className="bg-gray-50 rounded-lg p-4">
+                    <h4 className="font-medium text-gray-900 mb-2">{template.name}</h4>
+                    <p className="text-sm text-gray-600">{template.category}</p>
+                    <p className="text-sm text-gray-600">Last used: {template.lastUsed}</p>
+                    <p className="text-sm text-gray-600">Uses: {template.uses}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'collaboration' && (
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium text-gray-900">Collaboration</h3>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {collaborators.map((collaborator) => (
+                  <div key={collaborator.id} className="bg-gray-50 rounded-lg p-4">
+                    <h4 className="font-medium text-gray-900 mb-2">{collaborator.name}</h4>
+                    <p className="text-sm text-gray-600">{collaborator.email}</p>
+                    <p className="text-sm text-gray-600">Role: {collaborator.role}</p>
+                    <p className="text-sm text-gray-600">Last active: {collaborator.lastActive}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {activeTab === 'export' && (
             <div className="space-y-4">
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
@@ -271,6 +391,7 @@ const DataExportImport = ({ onClose }) => {
             </div>
           )}
 
+          
           {activeTab === 'import' && (
             <div className="space-y-4">
               <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
@@ -349,6 +470,7 @@ const DataExportImport = ({ onClose }) => {
             </div>
           )}
 
+          
           {activeTab === 'stats' && (
             <div className="space-y-4">
               <h3 className="text-lg font-medium text-gray-900">Storage Statistics</h3>

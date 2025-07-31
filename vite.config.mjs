@@ -10,6 +10,7 @@ export default defineConfig({
         '/Users/benjaminwilliams/Desktop/financeanalyst_pro',
         '/Users/benjaminwilliams/haven_test',
         '/Users/benjaminwilliams/local_financepro/financeanalyst_pro',
+        '/Users/benjaminwilliams/financeanalyst_pro-1',
       ],
     },
     proxy: {
