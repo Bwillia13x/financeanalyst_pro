@@ -1,3 +1,4 @@
+import React from 'react';
 // Test setup file for Vitest
 // Capture and safely handle unhandled promise rejections that may occur in asynchronous
 // code under test (e.g., retry logic that continues after a test expectation).
@@ -47,6 +48,12 @@ vi.mock('axios', () => ({
     put: vi.fn(() => Promise.resolve({ data: {} })),
     delete: vi.fn(() => Promise.resolve({ data: {} }))
   }
+}));
+
+// Mock react-helmet-async to no-op in tests to avoid provider/context errors
+vi.mock('react-helmet-async', () => ({
+  Helmet: ({ children }) => children || null,
+  HelmetProvider: ({ children }) => children || null,
 }));
 
 // Mock window.matchMedia

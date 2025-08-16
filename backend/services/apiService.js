@@ -140,7 +140,7 @@ class ApiService {
 
       // Return demo data if in demo mode or API fails
       if (this.demoMode || !this.hasValidApiKey(service)) {
-        return this.generateDemoData(endpoint, params);
+        return this.generateDemoData(service, endpoint, params);
       }
 
       throw error;
@@ -254,12 +254,215 @@ class ApiService {
   /**
    * Generate demo data when APIs are unavailable
    */
-  generateDemoData(endpoint, params) {
-    console.warn(`Generating demo data for ${endpoint}`);
+  generateDemoData(service, endpoint, params) {
+    console.warn(`Generating demo data for service=${service}, endpoint=${endpoint}`);
 
-    // Basic demo data structure - customize based on endpoint
-    const demoData = {
-      symbol: params.symbol || 'DEMO',
+    const now = new Date();
+    const symbol = (params?.symbol || String(endpoint || '').split('/').pop() || 'DEMO').toUpperCase();
+
+    // Yahoo Finance demo shape
+    if (service === 'yahoo') {
+      const timestamps = Array.from({ length: 5 }, (_, i) => Math.floor((Date.now() - (4 - i) * 60_000) / 1000));
+      const base = 100 + Math.random() * 50;
+      const closes = timestamps.map((_, i) => Number((base + (i - 2) * (Math.random() * 0.8)).toFixed(2)));
+      const opens = closes.map(v => Number((v + (Math.random() - 0.5) * 0.6).toFixed(2)));
+      const highs = closes.map((v, i) => Number((Math.max(v, opens[i]) + Math.random()).toFixed(2)));
+      const lows = closes.map((v, i) => Number((Math.min(v, opens[i]) - Math.random()).toFixed(2)));
+      const volumes = timestamps.map(() => Math.floor(100000 + Math.random() * 900000));
+
+      return {
+        chart: {
+          result: [
+            {
+              meta: {
+                symbol,
+                currency: 'USD',
+                regularMarketPrice: closes[closes.length - 1],
+                previousClose: Number((closes[0] - (Math.random() * 2)).toFixed(2)),
+                regularMarketVolume: volumes[volumes.length - 1],
+                marketCap: 50000000000,
+                exchangeTimezoneName: 'America/New_York'
+              },
+              timestamp: timestamps,
+              indicators: {
+                quote: [
+                  {
+                    open: opens,
+                    high: highs,
+                    low: lows,
+                    close: closes,
+                    volume: volumes
+                  }
+                ]
+              }
+            }
+          ],
+          error: null
+        }
+      };
+    }
+
+    // Alpha Vantage demo shapes
+    if (service === 'alphaVantage') {
+      const fn = String(endpoint || '').toUpperCase();
+
+      if (fn === 'GLOBAL_QUOTE') {
+        const price = Number((100 + Math.random() * 50).toFixed(2));
+        const prev = Number((price - (Math.random() * 2)).toFixed(2));
+        const change = Number((price - prev).toFixed(2));
+        const changePct = ((change / prev) * 100).toFixed(2) + '%';
+        return {
+          'Global Quote': {
+            '01. symbol': symbol,
+            '05. price': String(price),
+            '08. previous close': String(prev),
+            '09. change': String(change),
+            '10. change percent': changePct,
+            '06. volume': String(Math.floor(100000 + Math.random() * 900000))
+          }
+        };
+      }
+
+      if (fn === 'TIME_SERIES_DAILY_ADJUSTED') {
+        const series = {};
+        for (let i = 0; i < 30; i++) {
+          const d = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+          const dateStr = d.toISOString().slice(0, 10);
+          const base = 100 + Math.random() * 50;
+          const open = Number((base + Math.random()).toFixed(2));
+          const close = Number((base + (Math.random() - 0.5) * 2).toFixed(2));
+          const high = Math.max(open, close) + Number((Math.random() * 1.5).toFixed(2));
+          const low = Math.min(open, close) - Number((Math.random() * 1.5).toFixed(2));
+          series[dateStr] = {
+            '1. open': String(open),
+            '2. high': String(high.toFixed ? high.toFixed(2) : high),
+            '3. low': String(low.toFixed ? low.toFixed(2) : low),
+            '4. close': String(close),
+            '6. volume': String(Math.floor(100000 + Math.random() * 900000))
+          };
+        }
+        return { 'Time Series (Daily)': series };
+      }
+
+      if (fn === 'TIME_SERIES_INTRADAY') {
+        const interval = params?.interval || '5min';
+        const key = `Time Series (${interval})`;
+        const series = {};
+        for (let i = 0; i < 5; i++) {
+          const t = new Date(now.getTime() - i * 5 * 60 * 1000).toISOString().slice(0, 19);
+          const base = 100 + Math.random() * 50;
+          const open = Number((base + Math.random()).toFixed(2));
+          const close = Number((base + (Math.random() - 0.5) * 2).toFixed(2));
+          const high = Math.max(open, close) + Number((Math.random() * 1.5).toFixed(2));
+          const low = Math.min(open, close) - Number((Math.random() * 1.5).toFixed(2));
+          series[t] = {
+            '1. open': String(open),
+            '2. high': String(high.toFixed ? high.toFixed(2) : high),
+            '3. low': String(low.toFixed ? low.toFixed(2) : low),
+            '4. close': String(close),
+            '5. volume': String(Math.floor(10000 + Math.random() * 90000))
+          };
+        }
+        return { [key]: series };
+      }
+
+      if (fn === 'OVERVIEW') {
+        return {
+          Symbol: symbol,
+          Name: `${symbol} Corp`,
+          Description: `${symbol} demo overview description`,
+          Industry: 'Software',
+          Sector: 'Technology',
+          Country: 'USA',
+          Exchange: 'NASDAQ',
+          Currency: 'USD',
+          MarketCapitalization: String(50000000000),
+          FullTimeEmployees: String(12000),
+          Beta: '1.10',
+          PERatio: '24.50',
+          PriceToBookRatio: '8.20',
+          PriceToSalesRatioTTM: '6.10',
+          DividendYield: '0.00',
+          ReturnOnEquityTTM: '18.5',
+          ReturnOnAssetsTTM: '9.2',
+          GrossProfitTTM: '2500000000',
+          OperatingMarginTTM: '22.1',
+          ProfitMargin: '18.0'
+        };
+      }
+
+      if (fn === 'EARNINGS') {
+        const q = [];
+        for (let i = 0; i < 8; i++) {
+          const d = new Date(now.getTime() - i * 90 * 24 * 60 * 60 * 1000);
+          q.push({
+            fiscalDateEnding: d.toISOString().slice(0, 10),
+            reportedDate: d.toISOString().slice(0, 10),
+            reportedEPS: (Math.random() * 2).toFixed(2),
+            estimatedEPS: (Math.random() * 2).toFixed(2),
+            surprise: (Math.random() * 0.5).toFixed(2),
+            surprisePercentage: (Math.random() * 10).toFixed(2)
+          });
+        }
+        const a = [];
+        for (let i = 0; i < 2; i++) {
+          const d = new Date(now.getTime() - i * 365 * 24 * 60 * 60 * 1000);
+          a.push({ fiscalDateEnding: d.toISOString().slice(0, 10), reportedEPS: (Math.random() * 5).toFixed(2) });
+        }
+        return { quarterlyEarnings: q, annualEarnings: a };
+      }
+    }
+
+    // FMP demo shapes
+    if (service === 'fmp') {
+      const path = String(endpoint || '');
+      if (path.startsWith('/profile/')) {
+        return [
+          {
+            symbol,
+            companyName: `${symbol} Corporation`,
+            description: `${symbol} demo company profile`,
+            industry: 'Software—Infrastructure',
+            sector: 'Technology',
+            country: 'USA',
+            city: 'San Francisco',
+            address: '123 Market St',
+            phone: '123-456-7890',
+            website: `https://www.${symbol.toLowerCase()}.com`,
+            exchangeShortName: 'NASDAQ',
+            currency: 'USD',
+            mktCap: 50000000000,
+            fullTimeEmployees: 12000,
+            ceo: 'Jane Doe',
+            ipoDate: '2015-06-15',
+            beta: 1.1,
+            pe: 24.5,
+            pb: 8.2,
+            ps: 6.1,
+            lastDiv: 0,
+            debtToEquity: 0.3,
+            roe: 18.5,
+            roa: 9.2,
+            grossProfitMargin: 65.1,
+            operatingProfitMargin: 22.1,
+            netProfitMargin: 18.0
+          }
+        ];
+      }
+      if (path.startsWith('/stock_peers')) {
+        const peers = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'NVDA'].filter(p => p !== symbol).slice(0, 4);
+        return [ { symbol, peersList: peers } ];
+      }
+      if (path.startsWith('/discounted-cash-flow/')) {
+        const price = Number((100 + Math.random() * 50).toFixed(2));
+        const dcf = Number((price * (0.95 + Math.random() * 0.1)).toFixed(2));
+        return [ { symbol, dcf: String(dcf), 'Stock Price': String(price), date: now.toISOString().slice(0, 10) } ];
+      }
+    }
+
+    // Generic fallback
+    return {
+      symbol,
       timestamp: new Date().toISOString(),
       data: {
         price: 100 + Math.random() * 50,
@@ -269,8 +472,6 @@ class ApiService {
       source: 'demo',
       note: 'This is demo data. Configure API keys for live data.'
     };
-
-    return demoData;
   }
 
   /**

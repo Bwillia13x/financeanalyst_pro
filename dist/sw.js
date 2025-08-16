@@ -114,6 +114,11 @@ async function handleRequest(request) {
   const url = new URL(request.url);
   
   try {
+    // Special handling for financial API calls
+    if (url.pathname.startsWith('/api/')) {
+      return await handleFinancialApiRequest(request);
+    }
+    
     // Network-first for API calls and dynamic data
     if (NETWORK_FIRST_PATTERNS.some(pattern => pattern.test(url.pathname))) {
       return await networkFirst(request);
@@ -137,6 +142,133 @@ async function handleRequest(request) {
     
     throw error;
   }
+}
+
+// Special handler for financial API requests with cache coordination
+async function handleFinancialApiRequest(request) {
+  const url = new URL(request.url);
+  const cacheKey = `api-${url.pathname}${url.search}`;
+  
+  // Check if this is sensitive data that shouldn't be cached
+  if (isSensitiveFinancialData(url.pathname)) {
+    console.log('[SW] Bypassing cache for sensitive financial data:', url.pathname);
+    return await fetch(request);
+  }
+  
+  // For market data, use short TTL cache
+  if (url.pathname.includes('/market/') || url.pathname.includes('/quote/')) {
+    return await handleMarketDataRequest(request, cacheKey);
+  }
+  
+  // For reference data, use long TTL cache
+  if (url.pathname.includes('/reference/') || url.pathname.includes('/symbols/')) {
+    return await handleReferenceDataRequest(request, cacheKey);
+  }
+  
+  // Default API handling
+  return await networkFirst(request);
+}
+
+// Handle market data with short TTL and stale-while-revalidate
+async function handleMarketDataRequest(request, cacheKey) {
+  const cache = await caches.open(DYNAMIC_CACHE);
+  const cachedResponse = await cache.match(request);
+  
+  // Check cache timestamp
+  if (cachedResponse) {
+    const cacheTime = cachedResponse.headers.get('sw-cache-time');
+    const age = Date.now() - parseInt(cacheTime || '0');
+    
+    // If less than 30 seconds old, return cached
+    if (age < 30000) {
+      console.log('[SW] Serving fresh market data from cache');
+      return cachedResponse;
+    }
+    
+    // If less than 2 minutes old, return stale but refresh in background
+    if (age < 120000) {
+      console.log('[SW] Serving stale market data, refreshing in background');
+      
+      // Refresh in background
+      fetch(request).then(async (response) => {
+        if (response.ok) {
+          const responseToCache = response.clone();
+          responseToCache.headers.set('sw-cache-time', Date.now().toString());
+          await cache.put(request, responseToCache);
+        }
+      }).catch(error => {
+        console.warn('[SW] Background market data refresh failed:', error);
+      });
+      
+      return cachedResponse;
+    }
+  }
+  
+  // Fetch fresh data
+  try {
+    const response = await fetch(request);
+    if (response.ok) {
+      const responseToCache = response.clone();
+      responseToCache.headers.set('sw-cache-time', Date.now().toString());
+      await cache.put(request, responseToCache);
+    }
+    return response;
+  } catch (error) {
+    // Return stale data if available
+    if (cachedResponse) {
+      console.log('[SW] Network failed, serving stale market data');
+      return cachedResponse;
+    }
+    throw error;
+  }
+}
+
+// Handle reference data with long TTL
+async function handleReferenceDataRequest(request, cacheKey) {
+  const cache = await caches.open(DYNAMIC_CACHE);
+  const cachedResponse = await cache.match(request);
+  
+  if (cachedResponse) {
+    const cacheTime = cachedResponse.headers.get('sw-cache-time');
+    const age = Date.now() - parseInt(cacheTime || '0');
+    
+    // Reference data is valid for 24 hours
+    if (age < 24 * 60 * 60 * 1000) {
+      console.log('[SW] Serving reference data from cache');
+      return cachedResponse;
+    }
+  }
+  
+  // Fetch fresh reference data
+  try {
+    const response = await fetch(request);
+    if (response.ok) {
+      const responseToCache = response.clone();
+      responseToCache.headers.set('sw-cache-time', Date.now().toString());
+      await cache.put(request, responseToCache);
+    }
+    return response;
+  } catch (error) {
+    if (cachedResponse) {
+      console.log('[SW] Network failed, serving stale reference data');
+      return cachedResponse;
+    }
+    throw error;
+  }
+}
+
+// Check if financial data is sensitive
+function isSensitiveFinancialData(pathname) {
+  const sensitivePatterns = [
+    '/api/user/',
+    '/api/private/',
+    '/api/portfolio/',
+    '/api/models/',
+    '/api/analysis/',
+    '/api/auth/'
+  ];
+  
+  return sensitivePatterns.some(pattern => pathname.includes(pattern));
 }
 
 // Network-first strategy

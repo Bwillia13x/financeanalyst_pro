@@ -1,0 +1,35 @@
+/* FinanceAnalyst Pro — Critical CSS (minimal, safe defaults)
+   This file is preloaded in index.html to avoid a 404 and provide
+   above-the-fold baseline styling without blocking rendering.
+   Keep this file lightweight; the full Tailwind bundle will load after. */
+
+/* Box sizing and font smoothing */
+* { box-sizing: border-box; }
+html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+
+/* Base document */
+html, body, #root { height: 100%; }
+body {
+  margin: 0;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu,
+    Cantarell, Noto Sans, Helvetica Neue, Arial, 'Apple Color Emoji',
+    'Segoe UI Emoji', 'Segoe UI Symbol';
+  color: #0f172a; /* slate-900 */
+  background-color: #ffffff;
+}
+
+/* Prefer light touch: basic link and heading styles */
+a { color: #2563eb; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+h1, h2, h3 { line-height: 1.2; margin: 0.5rem 0; }
+
+/* Root container placeholder to avoid layout shift */
+#root {
+  display: flex;
+  align-items: stretch;
+  min-height: 100vh;
+}
+
+/* Basic focus visibility for accessibility */
+:focus-visible { outline: 2px solid #3b82f6; outline-offset: 2px; }
