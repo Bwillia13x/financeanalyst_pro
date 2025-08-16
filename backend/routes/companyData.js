@@ -1,5 +1,7 @@
 import express from 'express';
+import rateLimit from 'express-rate-limit';
 import { param, query, validationResult } from 'express-validator';
+
 import apiService from '../services/apiService.js';
 
 const router = express.Router();
@@ -16,14 +18,37 @@ const validateRequest = (req, res, next) => {
   next();
 };
 
+// Route-level limiter for company data endpoints
+const companyLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: parseInt(process.env.RATE_LIMIT_COMPANY || '30'),
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many company data requests. Please slow down.' }
+});
+
+// Helper: map FMP DCF to response with robust stock price key handling
+export function mapFmpDcfResponse(dcf) {
+  const rawStockPrice = dcf['Stock Price'] ?? dcf.Stock_Price ?? dcf.stockPrice ?? null;
+  const stockPrice = rawStockPrice !== null && rawStockPrice !== undefined ? parseFloat(rawStockPrice) : null;
+  const dcfValue = dcf.dcf !== null && dcf.dcf !== undefined ? parseFloat(dcf.dcf) : null;
+  return {
+    symbol: dcf.symbol,
+    dcfValue,
+    stockPrice,
+    date: dcf.date
+  };
+}
+
 /**
  * GET /api/company-data/profile/:symbol
  * Get company profile and overview
  */
 router.get('/profile/:symbol',
-  param('symbol').isAlpha().isLength({ min: 1, max: 5 }).toUpperCase(),
+  param('symbol').matches(/^[A-Za-z0-9.-]{1,12}$/).toUpperCase(),
+  companyLimiter,
   validateRequest,
-  async (req, res) => {
+  async(req, res) => {
     try {
       const { symbol } = req.params;
 
@@ -39,7 +64,7 @@ router.get('/profile/:symbol',
 
         if (Array.isArray(fmpData) && fmpData.length > 0) {
           const profile = fmpData[0];
-          
+
           const response = {
             symbol: profile.symbol,
             companyName: profile.companyName,
@@ -53,31 +78,33 @@ router.get('/profile/:symbol',
             website: profile.website,
             exchange: profile.exchangeShortName,
             currency: profile.currency,
-            marketCap: profile.mktCap,
-            employees: profile.fullTimeEmployees,
+            marketCap: profile.mktCap != null ? parseInt(profile.mktCap) : null,
+            employees: profile.fullTimeEmployees != null ? parseInt(profile.fullTimeEmployees) : null,
             ceo: profile.ceo,
             founded: profile.ipoDate,
             metrics: {
-              beta: profile.beta,
-              peRatio: profile.pe,
-              priceToBook: profile.pb,
-              priceToSales: profile.ps,
-              dividendYield: profile.lastDiv,
-              debtToEquity: profile.debtToEquity,
-              returnOnEquity: profile.roe,
-              returnOnAssets: profile.roa,
-              grossMargin: profile.grossProfitMargin,
-              operatingMargin: profile.operatingProfitMargin,
-              netMargin: profile.netProfitMargin
+              beta: profile.beta != null ? parseFloat(profile.beta) : null,
+              peRatio: profile.pe != null ? parseFloat(profile.pe) : null,
+              priceToBook: profile.pb != null ? parseFloat(profile.pb) : null,
+              priceToSales: profile.ps != null ? parseFloat(profile.ps) : null,
+              dividendYield: profile.lastDiv != null ? parseFloat(profile.lastDiv) : null,
+              debtToEquity: profile.debtToEquity != null ? parseFloat(profile.debtToEquity) : null,
+              returnOnEquity: profile.roe != null ? parseFloat(profile.roe) : null,
+              returnOnAssets: profile.roa != null ? parseFloat(profile.roa) : null,
+              grossMargin: profile.grossProfitMargin != null ? parseFloat(profile.grossProfitMargin) : null,
+              operatingMargin: profile.operatingProfitMargin != null ? parseFloat(profile.operatingProfitMargin) : null,
+              netMargin: profile.netProfitMargin != null ? parseFloat(profile.netProfitMargin) : null
             },
             timestamp: new Date().toISOString(),
             source: 'fmp'
           };
 
+          // 24 hours cache
+          res.set('Cache-Control', 'public, max-age=86400, stale-while-revalidate=60');
           return res.json(response);
         }
       } catch (fmpError) {
-        console.log('FMP failed, trying Alpha Vantage...');
+        console.warn('FMP failed, trying Alpha Vantage...');
       }
 
       // Fallback to Alpha Vantage
@@ -117,6 +144,8 @@ router.get('/profile/:symbol',
           source: 'alpha_vantage'
         };
 
+        // 24 hours cache
+        res.set('Cache-Control', 'public, max-age=86400, stale-while-revalidate=60');
         return res.json(response);
       }
 
@@ -138,10 +167,11 @@ router.get('/profile/:symbol',
  * Get peer companies in the same industry
  */
 router.get('/peers/:symbol',
-  param('symbol').isAlpha().isLength({ min: 1, max: 5 }).toUpperCase(),
+  param('symbol').matches(/^[A-Za-z0-9.-]{1,12}$/).toUpperCase(),
   query('limit').optional().isInt({ min: 1, max: 20 }),
+  companyLimiter,
   validateRequest,
-  async (req, res) => {
+  async(req, res) => {
     try {
       const { symbol } = req.params;
       const { limit = 10 } = req.query;
@@ -157,7 +187,7 @@ router.get('/peers/:symbol',
       if (Array.isArray(fmpData) && fmpData.length > 0) {
         // Get detailed data for each peer
         const peerSymbols = fmpData[0].peersList.slice(0, parseInt(limit));
-        const peerPromises = peerSymbols.map(async (peerSymbol) => {
+        const peerPromises = peerSymbols.map(async(peerSymbol) => {
           try {
             const peerProfile = await apiService.makeApiRequest({
               service: 'fmp',
@@ -174,12 +204,12 @@ router.get('/peers/:symbol',
                 companyName: profile.companyName,
                 sector: profile.sector,
                 industry: profile.industry,
-                marketCap: profile.mktCap,
-                peRatio: profile.pe,
-                priceToBook: profile.pb,
-                debtToEquity: profile.debtToEquity,
-                returnOnEquity: profile.roe,
-                grossMargin: profile.grossProfitMargin
+                marketCap: profile.mktCap != null ? parseInt(profile.mktCap) : null,
+                peRatio: profile.pe != null ? parseFloat(profile.pe) : null,
+                priceToBook: profile.pb != null ? parseFloat(profile.pb) : null,
+                debtToEquity: profile.debtToEquity != null ? parseFloat(profile.debtToEquity) : null,
+                returnOnEquity: profile.roe != null ? parseFloat(profile.roe) : null,
+                grossMargin: profile.grossProfitMargin != null ? parseFloat(profile.grossProfitMargin) : null
               };
             }
           } catch (error) {
@@ -197,6 +227,8 @@ router.get('/peers/:symbol',
           source: 'fmp'
         };
 
+        // 24 hours cache
+        res.set('Cache-Control', 'public, max-age=86400, stale-while-revalidate=60');
         return res.json(response);
       }
 
@@ -218,9 +250,10 @@ router.get('/peers/:symbol',
  * Get discounted cash flow valuation
  */
 router.get('/dcf/:symbol',
-  param('symbol').isAlpha().isLength({ min: 1, max: 5 }).toUpperCase(),
+  param('symbol').matches(/^[A-Za-z0-9.-]{1,12}$/).toUpperCase(),
+  companyLimiter,
   validateRequest,
-  async (req, res) => {
+  async(req, res) => {
     try {
       const { symbol } = req.params;
 
@@ -234,16 +267,15 @@ router.get('/dcf/:symbol',
 
       if (Array.isArray(fmpData) && fmpData.length > 0) {
         const dcf = fmpData[0];
-        
+        const mapped = mapFmpDcfResponse(dcf);
         const response = {
-          symbol: dcf.symbol,
-          dcfValue: dcf.dcf,
-          stockPrice: dcf.Stock_Price,
-          date: dcf.date,
+          ...mapped,
           timestamp: new Date().toISOString(),
           source: 'fmp'
         };
 
+        // 6 hours cache
+        res.set('Cache-Control', 'public, max-age=21600, stale-while-revalidate=60');
         return res.json(response);
       }
 
@@ -265,10 +297,11 @@ router.get('/dcf/:symbol',
  * Get earnings data and estimates
  */
 router.get('/earnings/:symbol',
-  param('symbol').isAlpha().isLength({ min: 1, max: 5 }).toUpperCase(),
+  param('symbol').matches(/^[A-Za-z0-9.-]{1,12}$/).toUpperCase(),
   query('limit').optional().isInt({ min: 1, max: 20 }),
+  companyLimiter,
   validateRequest,
-  async (req, res) => {
+  async(req, res) => {
     try {
       const { symbol } = req.params;
       const { limit = 8 } = req.query;
@@ -305,6 +338,8 @@ router.get('/earnings/:symbol',
           source: 'alpha_vantage'
         };
 
+        // 6 hours cache
+        res.set('Cache-Control', 'public, max-age=21600, stale-while-revalidate=60');
         return res.json(response);
       }
 

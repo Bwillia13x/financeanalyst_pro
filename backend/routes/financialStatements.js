@@ -1,5 +1,7 @@
 import express from 'express';
+import rateLimit from 'express-rate-limit';
 import { param, query, validationResult } from 'express-validator';
+
 import apiService from '../services/apiService.js';
 
 const router = express.Router();
@@ -16,16 +18,26 @@ const validateRequest = (req, res, next) => {
   next();
 };
 
+// Route-level rate limiter for financial statements
+const statementsLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: parseInt(process.env.RATE_LIMIT_STATEMENTS || '30'),
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many financial statements requests. Please slow down.' }
+});
+
 /**
  * GET /api/financial-statements/income/:symbol
  * Get income statement for a symbol
  */
 router.get('/income/:symbol',
-  param('symbol').isAlpha().isLength({ min: 1, max: 5 }).toUpperCase(),
+  param('symbol').matches(/^[A-Za-z0-9.-]{1,12}$/).toUpperCase(),
   query('period').optional().isIn(['annual', 'quarter']),
   query('limit').optional().isInt({ min: 1, max: 10 }),
+  statementsLimiter,
   validateRequest,
-  async (req, res) => {
+  async(req, res) => {
     try {
       const { symbol } = req.params;
       const { period = 'annual', limit = 5 } = req.query;
@@ -63,6 +75,7 @@ router.get('/income/:symbol',
             weightedAverageShsOutDil: statement.weightedAverageShsOutDil
           }));
 
+          res.set('Cache-Control', 'public, max-age=21600, stale-while-revalidate=60');
           return res.json({
             symbol,
             statementType: 'income',
@@ -73,7 +86,7 @@ router.get('/income/:symbol',
           });
         }
       } catch (fmpError) {
-        console.log('FMP failed, trying Alpha Vantage...');
+        console.warn('FMP failed, trying Alpha Vantage...', fmpError?.message);
       }
 
       // Fallback to Alpha Vantage
@@ -100,6 +113,7 @@ router.get('/income/:symbol',
           netIncome: parseFloat(report.netIncome) || 0
         }));
 
+        res.set('Cache-Control', 'public, max-age=21600, stale-while-revalidate=60');
         return res.json({
           symbol,
           statementType: 'income',
@@ -128,51 +142,98 @@ router.get('/income/:symbol',
  * Get balance sheet for a symbol
  */
 router.get('/balance/:symbol',
-  param('symbol').isAlpha().isLength({ min: 1, max: 5 }).toUpperCase(),
+  param('symbol').matches(/^[A-Za-z0-9.-]{1,12}$/).toUpperCase(),
   query('period').optional().isIn(['annual', 'quarter']),
   query('limit').optional().isInt({ min: 1, max: 10 }),
+  statementsLimiter,
   validateRequest,
-  async (req, res) => {
+  async(req, res) => {
     try {
       const { symbol } = req.params;
       const { period = 'annual', limit = 5 } = req.query;
 
       // Try FMP first
-      const fmpData = await apiService.makeApiRequest({
-        service: 'fmp',
-        endpoint: '/balance-sheet-statement/' + symbol,
-        params: { period, limit },
+      try {
+        const fmpData = await apiService.makeApiRequest({
+          service: 'fmp',
+          endpoint: '/balance-sheet-statement/' + symbol,
+          params: { period, limit },
+          cacheType: 'financial',
+          cacheTtl: 21600
+        });
+
+        if (Array.isArray(fmpData) && fmpData.length > 0) {
+          const processedData = fmpData.map(statement => ({
+            symbol: statement.symbol,
+            date: statement.date,
+            period: statement.period,
+            totalAssets: statement.totalAssets,
+            totalCurrentAssets: statement.totalCurrentAssets,
+            cashAndCashEquivalents: statement.cashAndCashEquivalents,
+            inventory: statement.inventory,
+            totalNonCurrentAssets: statement.totalNonCurrentAssets,
+            propertyPlantEquipmentNet: statement.propertyPlantEquipmentNet,
+            totalLiabilities: statement.totalLiabilities,
+            totalCurrentLiabilities: statement.totalCurrentLiabilities,
+            totalNonCurrentLiabilities: statement.totalNonCurrentLiabilities,
+            totalDebt: statement.totalDebt,
+            totalEquity: statement.totalStockholdersEquity,
+            retainedEarnings: statement.retainedEarnings,
+            commonStock: statement.commonStock
+          }));
+
+          res.set('Cache-Control', 'public, max-age=21600, stale-while-revalidate=60');
+          return res.json({
+            symbol,
+            statementType: 'balance',
+            period,
+            data: processedData,
+            timestamp: new Date().toISOString(),
+            source: 'fmp'
+          });
+        }
+      } catch (fmpError) {
+        console.warn('FMP failed, trying Alpha Vantage...', fmpError?.message);
+      }
+
+      // Fallback to Alpha Vantage
+      const alphaData = await apiService.makeApiRequest({
+        service: 'alphaVantage',
+        endpoint: 'BALANCE_SHEET',
+        params: { symbol },
         cacheType: 'financial',
         cacheTtl: 21600
       });
 
-      if (Array.isArray(fmpData) && fmpData.length > 0) {
-        const processedData = fmpData.map(statement => ({
-          symbol: statement.symbol,
-          date: statement.date,
-          period: statement.period,
-          totalAssets: statement.totalAssets,
-          totalCurrentAssets: statement.totalCurrentAssets,
-          cashAndCashEquivalents: statement.cashAndCashEquivalents,
-          inventory: statement.inventory,
-          totalNonCurrentAssets: statement.totalNonCurrentAssets,
-          propertyPlantEquipmentNet: statement.propertyPlantEquipmentNet,
-          totalLiabilities: statement.totalLiabilities,
-          totalCurrentLiabilities: statement.totalCurrentLiabilities,
-          totalNonCurrentLiabilities: statement.totalNonCurrentLiabilities,
-          totalDebt: statement.totalDebt,
-          totalEquity: statement.totalStockholdersEquity,
-          retainedEarnings: statement.retainedEarnings,
-          commonStock: statement.commonStock
+      if (alphaData.annualReports || alphaData.quarterlyReports) {
+        const reports = period === 'annual' ? alphaData.annualReports : alphaData.quarterlyReports;
+        const processedData = reports.slice(0, parseInt(limit)).map(report => ({
+          symbol: alphaData.symbol,
+          date: report.fiscalDateEnding,
+          period: period === 'annual' ? 'FY' : 'Q',
+          totalAssets: parseFloat(report.totalAssets) || 0,
+          totalCurrentAssets: parseFloat(report.totalCurrentAssets) || 0,
+          cashAndCashEquivalents: parseFloat(report.cashAndCashEquivalentsAtCarryingValue || report.cashAndCashEquivalents) || 0,
+          inventory: parseFloat(report.inventory) || 0,
+          totalNonCurrentAssets: parseFloat(report.totalNonCurrentAssets) || 0,
+          propertyPlantEquipmentNet: parseFloat(report.propertyPlantEquipment) || 0,
+          totalLiabilities: parseFloat(report.totalLiabilities) || 0,
+          totalCurrentLiabilities: parseFloat(report.totalCurrentLiabilities) || 0,
+          totalNonCurrentLiabilities: parseFloat(report.totalNonCurrentLiabilities) || 0,
+          totalDebt: (parseFloat(report.shortTermDebt) || 0) + (parseFloat(report.longTermDebtNoncurrent) || 0),
+          totalEquity: parseFloat(report.totalShareholderEquity) || 0,
+          retainedEarnings: parseFloat(report.retainedEarnings) || 0,
+          commonStock: parseFloat(report.commonStock) || 0
         }));
 
+        res.set('Cache-Control', 'public, max-age=21600, stale-while-revalidate=60');
         return res.json({
           symbol,
           statementType: 'balance',
           period,
           data: processedData,
           timestamp: new Date().toISOString(),
-          source: 'fmp'
+          source: 'alpha_vantage'
         });
       }
 
@@ -194,52 +255,102 @@ router.get('/balance/:symbol',
  * Get cash flow statement for a symbol
  */
 router.get('/cash-flow/:symbol',
-  param('symbol').isAlpha().isLength({ min: 1, max: 5 }).toUpperCase(),
+  param('symbol').matches(/^[A-Za-z0-9.-]{1,12}$/).toUpperCase(),
   query('period').optional().isIn(['annual', 'quarter']),
   query('limit').optional().isInt({ min: 1, max: 10 }),
+  statementsLimiter,
   validateRequest,
-  async (req, res) => {
+  async(req, res) => {
     try {
       const { symbol } = req.params;
       const { period = 'annual', limit = 5 } = req.query;
 
-      const fmpData = await apiService.makeApiRequest({
-        service: 'fmp',
-        endpoint: '/cash-flow-statement/' + symbol,
-        params: { period, limit },
+      // Try FMP first
+      try {
+        const fmpData = await apiService.makeApiRequest({
+          service: 'fmp',
+          endpoint: '/cash-flow-statement/' + symbol,
+          params: { period, limit },
+          cacheType: 'financial',
+          cacheTtl: 21600
+        });
+
+        if (Array.isArray(fmpData) && fmpData.length > 0) {
+          const processedData = fmpData.map(statement => ({
+            symbol: statement.symbol,
+            date: statement.date,
+            period: statement.period,
+            operatingCashFlow: statement.operatingCashFlow,
+            netIncome: statement.netIncome,
+            depreciationAndAmortization: statement.depreciationAndAmortization,
+            deferredIncomeTax: statement.deferredIncomeTax,
+            stockBasedCompensation: statement.stockBasedCompensation,
+            changeInWorkingCapital: statement.changeInWorkingCapital,
+            investingCashFlow: statement.netCashUsedForInvestingActivites,
+            capitalExpenditure: statement.capitalExpenditure,
+            acquisitionsNet: statement.acquisitionsNet,
+            financingCashFlow: statement.netCashUsedProvidedByFinancingActivities,
+            debtRepayment: statement.debtRepayment,
+            commonStockIssued: statement.commonStockIssued,
+            commonStockRepurchased: statement.commonStockRepurchased,
+            dividendsPaid: statement.dividendsPaid,
+            freeCashFlow: statement.freeCashFlow
+          }));
+
+          res.set('Cache-Control', 'public, max-age=21600, stale-while-revalidate=60');
+          return res.json({
+            symbol,
+            statementType: 'cash-flow',
+            period,
+            data: processedData,
+            timestamp: new Date().toISOString(),
+            source: 'fmp'
+          });
+        }
+      } catch (fmpError) {
+        console.warn('FMP failed, trying Alpha Vantage...', fmpError?.message);
+      }
+
+      // Fallback to Alpha Vantage
+      const alphaData = await apiService.makeApiRequest({
+        service: 'alphaVantage',
+        endpoint: 'CASH_FLOW',
+        params: { symbol },
         cacheType: 'financial',
         cacheTtl: 21600
       });
 
-      if (Array.isArray(fmpData) && fmpData.length > 0) {
-        const processedData = fmpData.map(statement => ({
-          symbol: statement.symbol,
-          date: statement.date,
-          period: statement.period,
-          operatingCashFlow: statement.operatingCashFlow,
-          netIncome: statement.netIncome,
-          depreciationAndAmortization: statement.depreciationAndAmortization,
-          deferredIncomeTax: statement.deferredIncomeTax,
-          stockBasedCompensation: statement.stockBasedCompensation,
-          changeInWorkingCapital: statement.changeInWorkingCapital,
-          investingCashFlow: statement.netCashUsedForInvestingActivites,
-          capitalExpenditure: statement.capitalExpenditure,
-          acquisitionsNet: statement.acquisitionsNet,
-          financingCashFlow: statement.netCashUsedProvidedByFinancingActivities,
-          debtRepayment: statement.debtRepayment,
-          commonStockIssued: statement.commonStockIssued,
-          commonStockRepurchased: statement.commonStockRepurchased,
-          dividendsPaid: statement.dividendsPaid,
-          freeCashFlow: statement.freeCashFlow
+      if (alphaData.annualReports || alphaData.quarterlyReports) {
+        const reports = period === 'annual' ? alphaData.annualReports : alphaData.quarterlyReports;
+        const processedData = reports.slice(0, parseInt(limit)).map(report => ({
+          symbol: alphaData.symbol,
+          date: report.fiscalDateEnding,
+          period: period === 'annual' ? 'FY' : 'Q',
+          operatingCashFlow: parseFloat(report.operatingCashflow) || 0,
+          netIncome: parseFloat(report.netIncome) || 0,
+          depreciationAndAmortization: parseFloat(report.depreciationAndAmortization || report.depreciation) || 0,
+          deferredIncomeTax: parseFloat(report.deferredIncomeTax) || 0,
+          stockBasedCompensation: parseFloat(report.stockBasedCompensation) || 0,
+          changeInWorkingCapital: parseFloat(report.changeInWorkingCapital) || 0,
+          investingCashFlow: parseFloat(report.cashflowFromInvestment) || 0,
+          capitalExpenditure: parseFloat(report.capitalExpenditures) || 0,
+          acquisitionsNet: parseFloat(report.acquisitionsNet) || 0,
+          financingCashFlow: parseFloat(report.cashflowFromFinancing) || 0,
+          debtRepayment: parseFloat(report.debtRepayment) || 0,
+          commonStockIssued: parseFloat(report.commonStockIssued) || 0,
+          commonStockRepurchased: parseFloat(report.commonStockRepurchased) || 0,
+          dividendsPaid: parseFloat(report.dividendPayout) || 0,
+          freeCashFlow: (parseFloat(report.operatingCashflow) || 0) - (parseFloat(report.capitalExpenditures) || 0)
         }));
 
+        res.set('Cache-Control', 'public, max-age=21600, stale-while-revalidate=60');
         return res.json({
           symbol,
           statementType: 'cash-flow',
           period,
           data: processedData,
           timestamp: new Date().toISOString(),
-          source: 'fmp'
+          source: 'alpha_vantage'
         });
       }
 
@@ -261,11 +372,12 @@ router.get('/cash-flow/:symbol',
  * Get financial ratios for a symbol
  */
 router.get('/ratios/:symbol',
-  param('symbol').isAlpha().isLength({ min: 1, max: 5 }).toUpperCase(),
+  param('symbol').matches(/^[A-Za-z0-9.-]{1,12}$/).toUpperCase(),
   query('period').optional().isIn(['annual', 'quarter']),
   query('limit').optional().isInt({ min: 1, max: 10 }),
+  statementsLimiter,
   validateRequest,
-  async (req, res) => {
+  async(req, res) => {
     try {
       const { symbol } = req.params;
       const { period = 'annual', limit = 5 } = req.query;
@@ -310,6 +422,7 @@ router.get('/ratios/:symbol',
           enterpriseValueToEbitda: ratios.enterpriseValueOverEBITDA
         }));
 
+        res.set('Cache-Control', 'public, max-age=21600, stale-while-revalidate=60');
         return res.json({
           symbol,
           statementType: 'ratios',
@@ -318,6 +431,58 @@ router.get('/ratios/:symbol',
           timestamp: new Date().toISOString(),
           source: 'fmp'
         });
+      }
+
+      // Fallback to Alpha Vantage OVERVIEW for limited ratios snapshot
+      try {
+        const alphaOverview = await apiService.makeApiRequest({
+          service: 'alphaVantage',
+          endpoint: 'OVERVIEW',
+          params: { symbol },
+          cacheType: 'financial',
+          cacheTtl: 21600
+        });
+
+        if (alphaOverview.Symbol) {
+          const snapshot = {
+            symbol: alphaOverview.Symbol,
+            date: new Date().toISOString().slice(0, 10),
+            period: period === 'annual' ? 'FY' : 'Q',
+            // Map available overview fields
+            currentRatio: null,
+            quickRatio: null,
+            cashRatio: null,
+            debtToEquityRatio: alphaOverview.DEBTToEquityTTM ? parseFloat(alphaOverview.DEBTToEquityTTM) : null,
+            debtToAssetsRatio: null,
+            interestCoverageRatio: null,
+            returnOnAssets: alphaOverview.ReturnOnAssetsTTM != null ? parseFloat(alphaOverview.ReturnOnAssetsTTM) : null,
+            returnOnEquity: alphaOverview.ReturnOnEquityTTM != null ? parseFloat(alphaOverview.ReturnOnEquityTTM) : null,
+            returnOnCapitalEmployed: null,
+            grossProfitMargin: alphaOverview.GrossProfitMarginTTM != null ? parseFloat(alphaOverview.GrossProfitMarginTTM) : null,
+            operatingProfitMargin: alphaOverview.OperatingMarginTTM != null ? parseFloat(alphaOverview.OperatingMarginTTM) : null,
+            netProfitMargin: alphaOverview.ProfitMargin != null ? parseFloat(alphaOverview.ProfitMargin) : null,
+            assetTurnover: null,
+            inventoryTurnover: null,
+            receivablesTurnover: null,
+            priceToEarnings: alphaOverview.PERatio != null ? parseFloat(alphaOverview.PERatio) : null,
+            priceToBook: alphaOverview.PriceToBookRatio != null ? parseFloat(alphaOverview.PriceToBookRatio) : null,
+            priceToSales: alphaOverview.PriceToSalesRatioTTM != null ? parseFloat(alphaOverview.PriceToSalesRatioTTM) : null,
+            priceToFreeCashFlow: null,
+            enterpriseValueToEbitda: alphaOverview.EVToEBITDA != null ? parseFloat(alphaOverview.EVToEBITDA) : null
+          };
+
+          res.set('Cache-Control', 'public, max-age=21600, stale-while-revalidate=60');
+          return res.json({
+            symbol,
+            statementType: 'ratios',
+            period,
+            data: [snapshot],
+            timestamp: new Date().toISOString(),
+            source: 'alpha_vantage'
+          });
+        }
+      } catch (alphaError) {
+        console.warn('Alpha Vantage OVERVIEW fallback failed for ratios:', alphaError?.message);
       }
 
       throw new Error('No financial ratios data available');

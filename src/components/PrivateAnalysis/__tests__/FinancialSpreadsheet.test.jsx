@@ -52,4 +52,39 @@ describe('FinancialSpreadsheet', () => {
     fireEvent.click(screen.getByRole('button', { name: /Revenue/ }));
     expect(screen.queryByText('Energy Devices')).not.toBeInTheDocument();
   });
+
+  test('shows adjusted value seeded from latest period', () => {
+    const onAdjustedValuesChange = vi.fn();
+    render(
+      <FinancialSpreadsheet
+        data={mockData}
+        onDataChange={() => {}}
+        onAdjustedValuesChange={onAdjustedValuesChange}
+      />
+    );
+    const adjustedCell = screen.getByTestId('adjusted-cell-energyDevices');
+    expect(adjustedCell).toHaveTextContent('110.00');
+  });
+
+  test('allows editing adjusted value and calls onAdjustedValuesChange', () => {
+    const onAdjustedValuesChange = vi.fn();
+    render(
+      <FinancialSpreadsheet
+        data={mockData}
+        onDataChange={() => {}}
+        onAdjustedValuesChange={onAdjustedValuesChange}
+      />
+    );
+
+    // Open adjusted input
+    fireEvent.click(screen.getByTestId('adjusted-cell-energyDevices'));
+    const input = screen.getByTestId('adjusted-input-energyDevices');
+    fireEvent.change(input, { target: { value: '120' } });
+    fireEvent.blur(input);
+
+    // Called at least once (initial seeding), and last call should have updated value
+    expect(onAdjustedValuesChange).toHaveBeenCalled();
+    const lastCallArgs = onAdjustedValuesChange.mock.calls[onAdjustedValuesChange.mock.calls.length - 1][0];
+    expect(lastCallArgs.energyDevices).toBe(120);
+  });
 });

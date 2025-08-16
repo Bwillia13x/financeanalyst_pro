@@ -83,7 +83,7 @@ const Header = () => {
             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
               <Icon name="TrendingUp" size={20} color="white" />
             </div>
-            <span className="text-xl font-semibold text-foreground">FinanceAnalyst Pro</span>
+            <span className="text-xl font-semibold text-foreground">Valor-IVX</span>
           </div>
         </div>
 

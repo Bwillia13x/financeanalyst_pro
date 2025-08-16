@@ -28,4 +28,4 @@ initializePWA();
 initializePerformanceMonitoring();
 
 // Log initialization complete
-console.log('🚀 FinanceAnalyst Pro initialized with security nonce:', securityNonce);
+console.log('🚀 Valor-IVX initialized with security nonce:', securityNonce);

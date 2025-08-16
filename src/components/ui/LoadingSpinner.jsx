@@ -45,7 +45,7 @@ const LoadingSpinner = ({
 };
 
 // Full page loading spinner
-export const FullPageLoader = ({ text = 'Loading FinanceAnalyst Pro...' }) => {
+export const FullPageLoader = ({ text = 'Loading Valor-IVX...' }) => {
   return (
     <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center">
       <div className="bg-card border border-border rounded-lg p-8 shadow-elevation-2">

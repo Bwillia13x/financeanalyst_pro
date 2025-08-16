@@ -7,6 +7,16 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
   const [activeStatement, setActiveStatement] = useState('incomeStatement');
   const [adjustedValues, setAdjustedValues] = useState({});
   
+  // Normalize incoming data to a safe structure to prevent undefined access
+  const safeData = React.useMemo(() => ({
+    periods: Array.isArray(data?.periods) ? data.periods : [],
+    statements: {
+      incomeStatement: data?.statements?.incomeStatement || {},
+      balanceSheet: data?.statements?.balanceSheet || {},
+      cashFlow: data?.statements?.cashFlow || {}
+    }
+  }), [data]);
+  
   // Add accessibility monitoring for financial spreadsheet
   const { elementRef, testFinancialFeatures } = useFinancialAccessibility('spreadsheet');
   const [expandedSections, setExpandedSections] = useState({
@@ -35,24 +45,26 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
   const [cellValue, setCellValue] = useState('');
   const inputRef = useRef(null);
 
-  // Initialize adjusted values with 2024 data (period index 2)
+  // Initialize adjusted values from the active statement's latest period
   useEffect(() => {
-    if (data?.statements?.incomeStatement && Object.keys(adjustedValues).length === 0) {
-      const newAdjustedValues = {};
-      const incomeStatement = data.statements.incomeStatement;
-      
-      Object.keys(incomeStatement).forEach(key => {
-        if (incomeStatement[key] && incomeStatement[key][2] !== undefined) {
-          newAdjustedValues[key] = incomeStatement[key][2];
+    if (Object.keys(adjustedValues).length === 0) {
+      const statement = safeData?.statements?.[activeStatement];
+      if (statement) {
+        const newAdjustedValues = {};
+        const lastIndex = Math.max(0, (safeData?.periods?.length || 0) - 1);
+        Object.keys(statement).forEach((key) => {
+          const val = statement[key]?.[lastIndex];
+          if (val !== undefined) {
+            newAdjustedValues[key] = val;
+          }
+        });
+        setAdjustedValues(newAdjustedValues);
+        if (onAdjustedValuesChange) {
+          onAdjustedValuesChange(newAdjustedValues);
         }
-      });
-      
-      setAdjustedValues(newAdjustedValues);
-      if (onAdjustedValuesChange) {
-        onAdjustedValuesChange(newAdjustedValues);
       }
     }
-  }, [data, adjustedValues, onAdjustedValuesChange]);
+  }, [safeData, activeStatement, adjustedValues, onAdjustedValuesChange]);
 
   // Get current template based on active statement
   const getCurrentTemplate = () => {
@@ -335,6 +347,8 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
   };
 
   const currentTemplate = getCurrentTemplate();
+  // Resolve the data object for the currently active statement
+  const currentStatementData = safeData.statements[activeStatement] || {};
 
   const toggleSection = (section) => {
     setExpandedSections(prev => ({
@@ -350,7 +364,7 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
     if (isAdjusted) {
       currentValue = adjustedValues[rowKey] || '';
     } else {
-      currentValue = data.statements.incomeStatement[rowKey]?.[periodIndex] || '';
+      currentValue = currentStatementData[rowKey]?.[periodIndex] || '';
     }
     
     setCellValue(currentValue.toString());
@@ -359,7 +373,8 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
   const handleCellBlur = () => {
     if (editingCell) {
       const { rowKey, periodIndex, isAdjusted } = editingCell;
-      const newValue = parseFloat(cellValue) || 0;
+      const parsed = parseFloat(cellValue);
+      const newValue = isNaN(parsed) ? 0 : parsed;
       
       if (isAdjusted) {
         // Update adjusted values
@@ -374,10 +389,12 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
       } else {
         // Update original data
         const newData = { ...data };
-        if (!newData.statements.incomeStatement[rowKey]) {
-          newData.statements.incomeStatement[rowKey] = {};
-        }
-        newData.statements.incomeStatement[rowKey][periodIndex] = newValue;
+        // Safely deep-clone the path we are updating to avoid mutating upstream state
+        newData.statements = { ...(newData.statements || {}) };
+        const statementKey = activeStatement || 'incomeStatement';
+        newData.statements[statementKey] = { ...(newData.statements[statementKey] || {}) };
+        const existingRow = newData.statements[statementKey][rowKey] || {};
+        newData.statements[statementKey][rowKey] = { ...existingRow, [periodIndex]: newValue };
         onDataChange(newData);
       }
       
@@ -456,7 +473,7 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
     const newPeriodLabel = prompt('Enter period label (e.g., "Year 5"):');
     if (newPeriodLabel) {
       const newData = { ...data };
-      newData.periods = [...newData.periods, newPeriodLabel];
+      newData.periods = [...(newData.periods || []), newPeriodLabel];
       onDataChange(newData);
     }
   };
@@ -505,7 +522,7 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
         </td>
         
         {/* Period Columns */}
-        {data.periods.map((_, periodIndex) => (
+        {safeData.periods.map((_, periodIndex) => (
           <td key={periodIndex} className="px-4 py-4 text-right">
             {editingCell?.rowKey === key && editingCell?.periodIndex === periodIndex && !editingCell?.isAdjusted ? (
               <div className="relative">
@@ -552,7 +569,7 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
                 }`}
               >
                 <span className={formula ? 'text-blue-900' : 'text-slate-700'}>
-                  {formatNumber(data.statements.incomeStatement[key]?.[periodIndex]) || '—'}
+                  {formatNumber(currentStatementData[key]?.[periodIndex]) || '—'}
                 </span>
                 {!formula && (
                   <Edit2 size={12} className="ml-2 opacity-0 group-hover:opacity-40 text-slate-400 transition-opacity" />
@@ -565,11 +582,12 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
         {/* Adjusted Column */}
         <td className="px-4 py-4 text-right bg-gradient-to-r from-amber-50 to-yellow-50 border-l-2 border-amber-300">
           {editingCell?.rowKey === key && editingCell?.isAdjusted ? (
-            <div className="relative">
+            <div className="relative" data-testid={`adjusted-cell-${key}`}>
               <input
                 ref={inputRef}
                 type="text"
                 value={cellValue}
+                data-testid={`adjusted-input-${key}`}
                 onChange={(e) => {
                   const newValue = e.target.value;
                   if (validateNumericInput(newValue)) {
@@ -604,12 +622,13 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
               onClick={() => !formula && handleCellClick(key, null, true)}
               className={`px-3 py-2.5 rounded-lg font-mono text-sm transition-all duration-200 min-h-[40px] flex items-center justify-end ${
                 formula 
-                  ? 'bg-gradient-to-r from-amber-100 to-yellow-100 text-amber-800 font-semibold border border-amber-300 shadow-sm' 
-                  : 'hover:bg-amber-100 text-slate-800 cursor-pointer border border-transparent hover:border-amber-300 hover:shadow-sm'
+                  ? 'bg-gradient-to-r from-blue-50 to-blue-100 text-blue-800 font-semibold border border-blue-200 shadow-sm' 
+                  : 'hover:bg-slate-100 text-slate-800 cursor-pointer border border-transparent hover:border-slate-200 hover:shadow-sm group-hover:bg-slate-50'
               }`}
+              data-testid={`adjusted-cell-${key}`}
             >
               <span className={formula ? 'text-amber-900' : 'text-slate-700'}>
-                {formatNumber(adjustedValues[key] || 0) || '—'}
+                {formatNumber(adjustedValues[key]) || '—'}
               </span>
               {!formula && (
                 <Edit2 size={12} className="ml-2 opacity-0 group-hover:opacity-40 text-amber-500 transition-opacity" />
@@ -643,7 +662,7 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 pb-8">
+    <div ref={elementRef} role="main" className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 pb-8">
       {/* Header Section */}
       <div className="bg-white border-b border-slate-200 shadow-sm">
         <div className="max-w-full mx-auto px-8 py-6">
@@ -695,7 +714,7 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
                     </div>
                   </th>
                   <th className="w-20 px-4 py-4 text-center text-sm font-semibold">Units</th>
-                  {data.periods.map((period, index) => (
+                  {safeData.periods.map((period, index) => (
                     <th key={index} className="min-w-[140px] px-4 py-4 text-center text-sm font-semibold">
                       <div className="flex flex-col">
                         <span>{period}</span>
@@ -723,7 +742,7 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
                   <React.Fragment key={sectionKey}>
                     {/* Enhanced Section Header */}
                     <tr className={`${section.headerBg || 'bg-slate-600'} border-b-2 border-slate-300`}>
-                      <td colSpan={data.periods.length + 4} className="py-4 px-6">
+                      <td colSpan={safeData.periods.length + 4} className="py-4 px-6">
                         <div className="flex items-center gap-3 text-white w-full text-left group">
                           <button
                             onClick={() => toggleSection(sectionKey)}

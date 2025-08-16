@@ -1,20 +1,20 @@
-import express from 'express';
-import cors from 'cors';
-import helmet from 'helmet';
-import rateLimit from 'express-rate-limit';
 import compression from 'compression';
-import morgan from 'morgan';
+import cors from 'cors';
 import dotenv from 'dotenv';
+import express from 'express';
+import rateLimit from 'express-rate-limit';
+import helmet from 'helmet';
+import morgan from 'morgan';
 
-// Import route modules
-import marketDataRoutes from './routes/marketData.js';
-import financialStatementsRoutes from './routes/financialStatements.js';
+// Load environment variables ASAP
+dotenv.config();
+
+// Import route modules (internal)
 import companyDataRoutes from './routes/companyData.js';
 import economicDataRoutes from './routes/economicData.js';
+import financialStatementsRoutes from './routes/financialStatements.js';
 import healthRoutes from './routes/health.js';
-
-// Load environment variables
-dotenv.config();
+import marketDataRoutes from './routes/marketData.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -27,7 +27,7 @@ app.use(helmet({
       defaultSrc: ["'self'"],
       styleSrc: ["'self'", "'unsafe-inline'"],
       scriptSrc: ["'self'"],
-      imgSrc: ["'self'", "data:", "https:"],
+      imgSrc: ["'self'", 'data:', 'https:']
     }
   }
 }));
@@ -49,7 +49,7 @@ const limiter = rateLimit({
     retryAfter: '15 minutes'
   },
   standardHeaders: true,
-  legacyHeaders: false,
+  legacyHeaders: false
 });
 app.use('/api/', limiter);
 
@@ -99,12 +99,12 @@ app.use('*', (req, res) => {
 });
 
 // Global error handler
-app.use((error, req, res, next) => {
+app.use((error, req, res, _next) => {
   console.error('Global error handler:', error);
-  
+
   // Don't leak error details in production
   const isDevelopment = process.env.NODE_ENV !== 'production';
-  
+
   res.status(error.status || 500).json({
     error: isDevelopment ? error.message : 'Internal server error',
     ...(isDevelopment && { stack: error.stack }),
@@ -114,13 +114,13 @@ app.use((error, req, res, next) => {
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`🚀 FinanceAnalyst Pro Backend running on port ${PORT}`);
-  console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`🌐 CORS enabled for: ${process.env.FRONTEND_URL || 'http://localhost:3000'}`);
-  console.log(`⚡ Rate limit: ${process.env.RATE_LIMIT_REQUESTS || 100} requests per 15 minutes`);
-  
+  console.warn(`🚀 FinanceAnalyst Pro Backend running on port ${PORT}`);
+  console.warn(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.warn(`🌐 CORS enabled for: ${process.env.FRONTEND_URL || 'http://localhost:3000'}`);
+  console.warn(`⚡ Rate limit: ${process.env.RATE_LIMIT_REQUESTS || 100} requests per 15 minutes`);
+
   if (process.env.DEMO_MODE === 'true') {
-    console.log('🎭 Running in DEMO MODE - API keys not required');
+    console.warn('🎭 Running in DEMO MODE - API keys not required');
   }
 });
 

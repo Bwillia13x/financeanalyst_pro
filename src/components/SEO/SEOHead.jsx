@@ -1,7 +1,8 @@
+/* eslint-disable react/prop-types */
 import { Helmet } from 'react-helmet-async';
 
 const SEOHead = ({
-  title = 'FinanceAnalyst Pro',
+  title = 'Valor-IVX',
   description = 'Professional financial modeling and valuation platform for analysts, investors, and finance professionals.',
   canonical,
   image = '/assets/images/og-image.svg',
@@ -34,7 +35,7 @@ const SEOHead = ({
       <meta property="og:image" content={fullImage} />
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
-      <meta property="og:site_name" content="FinanceAnalyst Pro" />
+      <meta property="og:site_name" content="Valor-IVX" />
       <meta property="og:locale" content="en_US" />
 
       {/* Twitter Card */}
@@ -62,7 +63,7 @@ const SEOHead = ({
         {JSON.stringify({
           '@context': 'https://schema.org',
           '@type': 'WebApplication',
-          'name': 'FinanceAnalyst Pro',
+          'name': 'Valor-IVX',
           description,
           'url': siteUrl,
           'author': {

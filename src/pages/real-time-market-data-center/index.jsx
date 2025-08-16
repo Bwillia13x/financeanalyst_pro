@@ -4,6 +4,7 @@ import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
 import Header from '../../components/ui/Header';
 import SEOHead from '../../components/SEO/SEOHead';
+import Breadcrumbs from '../../components/ui/Breadcrumbs';
 import { useFinancialAccessibility } from '../../hooks/useAccessibility';
 import { trackFinancialComponentPerformance } from '../../utils/performanceMonitoring';
 import { dataValidationService } from '../../services/dataValidationService';
@@ -382,9 +383,19 @@ const RealTimeMarketDataCenter = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead
+        title="Real-Time Market Data Center | Valor-IVX"
+        description="Monitor real-time market data, track watchlists, and manage data sources across providers with alerts and exports."
+        canonical="/real-time-market-data-center"
+      />
       <Header />
 
       <div className="pt-[60px]">
+        {/* Breadcrumbs and accessible page heading */}
+        <div className="px-6 py-2 bg-background border-b border-border">
+          <h1 className="sr-only">Real-Time Market Data Center</h1>
+          <Breadcrumbs />
+        </div>
         {/* Top Toolbar */}
         <div className="bg-card border-b border-border p-4">
           <div className="flex items-center justify-between">

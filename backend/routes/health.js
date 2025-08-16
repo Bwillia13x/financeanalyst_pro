@@ -1,4 +1,5 @@
 import express from 'express';
+
 import apiService from '../services/apiService.js';
 import cacheService from '../services/cacheService.js';
 
@@ -8,7 +9,7 @@ const router = express.Router();
  * GET /api/health
  * General health check endpoint
  */
-router.get('/', async (req, res) => {
+router.get('/', async(req, res) => {
   try {
     const health = {
       status: 'healthy',
@@ -34,10 +35,10 @@ router.get('/', async (req, res) => {
  * GET /api/health/services
  * Check health of external API services
  */
-router.get('/services', async (req, res) => {
+router.get('/services', async(req, res) => {
   try {
     const serviceHealth = await apiService.healthCheck();
-    
+
     const overallStatus = Object.values(serviceHealth).every(
       service => service.status === 'available' || service.status === 'not_configured'
     ) ? 'healthy' : 'degraded';
@@ -64,7 +65,7 @@ router.get('/services', async (req, res) => {
 router.get('/cache', (req, res) => {
   try {
     const cacheStats = cacheService.getStats();
-    
+
     res.json({
       status: 'healthy',
       cache: cacheStats,
@@ -95,7 +96,7 @@ router.delete('/cache', (req, res) => {
 
     const { cacheType } = req.query;
     cacheService.clear(cacheType);
-    
+
     res.json({
       message: cacheType ? `${cacheType} cache cleared` : 'All caches cleared',
       timestamp: new Date().toISOString()

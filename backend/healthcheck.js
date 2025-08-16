@@ -8,7 +8,7 @@ const options = {
 };
 
 const request = http.request(options, (res) => {
-  console.log(`Health check status: ${res.statusCode}`);
+  console.warn(`Health check status: ${res.statusCode}`);
   if (res.statusCode === 200) {
     process.exit(0);
   } else {
@@ -17,7 +17,7 @@ const request = http.request(options, (res) => {
 });
 
 request.on('error', (err) => {
-  console.log(`Health check failed: ${err.message}`);
+  console.warn(`Health check failed: ${err.message}`);
   process.exit(1);
 });
 

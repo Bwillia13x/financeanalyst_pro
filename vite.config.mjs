@@ -34,19 +34,41 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: (id) => {
-          // React core libraries
-          if (id.includes('react') || id.includes('react-dom') || id.includes('react-router')) {
-            return 'react-vendor';
+          // React core libraries - critical path
+          if (id.includes('react') || id.includes('react-dom')) {
+            return 'react-core';
           }
           
-          // Heavy visualization libraries - only load when needed
+          // React router - can be loaded separately
+          if (id.includes('react-router')) {
+            return 'react-router';
+          }
+          
+          // Heavy financial calculation engines - lazy load
+          if (id.includes('src/services/financialModelingEngine') || 
+              id.includes('src/services/monteCarloEngine') ||
+              id.includes('src/services/lboModelingEngine')) {
+            return 'financial-engines';
+          }
+          
+          // Web workers - separate chunk
+          if (id.includes('src/workers/') || id.includes('src/services/workerManager')) {
+            return 'web-workers';
+          }
+          
+          // Heavy visualization libraries - only load when charts are needed
           if (id.includes('recharts') || id.includes('d3')) {
             return 'charts-vendor';
           }
           
-          // Animation and UI libraries
-          if (id.includes('framer-motion') || id.includes('lucide-react')) {
-            return 'ui-vendor';
+          // Animation libraries - load on demand
+          if (id.includes('framer-motion')) {
+            return 'animations';
+          }
+          
+          // Icon libraries - can be split
+          if (id.includes('lucide-react')) {
+            return 'icons';
           }
           
           // Data processing libraries
@@ -54,12 +76,12 @@ export default defineConfig({
             return 'data-vendor';
           }
           
-          // Utility libraries
+          // Utility libraries - small, can be grouped
           if (id.includes('clsx') || id.includes('tailwind-merge') || id.includes('class-variance-authority')) {
             return 'utils-vendor';
           }
           
-          // Helmet and SEO libraries
+          // SEO and meta libraries
           if (id.includes('helmet')) {
             return 'seo-vendor';
           }
@@ -69,9 +91,46 @@ export default defineConfig({
             return 'state-vendor';
           }
           
-          // Test and development libraries
+          // Private Analysis components - lazy load heavy financial components
+          if (id.includes('src/components/PrivateAnalysis/') && 
+              (id.includes('AdvancedDCF') || id.includes('AdvancedLBO') || 
+               id.includes('MonteCarloSimulation') || id.includes('EnhancedScenarioAnalysis'))) {
+            return 'private-analysis-heavy';
+          }
+          
+          // Standard Private Analysis components
+          if (id.includes('src/components/PrivateAnalysis/')) {
+            return 'private-analysis';
+          }
+          
+          // Valuation Tools - separate chunk for financial modeling
+          if (id.includes('src/components/ValuationTool/')) {
+            return 'valuation-tools';
+          }
+          
+          // UI Charts - lazy load
+          if (id.includes('src/components/ui/charts/')) {
+            return 'ui-charts';
+          }
+          
+          // Standard UI components
+          if (id.includes('src/components/ui/')) {
+            return 'ui-components';
+          }
+          
+          // Test and development libraries - exclude from production
           if (id.includes('vitest') || id.includes('testing-library')) {
             return 'test-vendor';
+          }
+          
+          // Authentication and security
+          if (id.includes('src/services/auth') || id.includes('src/services/encryption')) {
+            return 'security';
+          }
+          
+          // Persistence and storage
+          if (id.includes('src/services/persistence/')) {
+            return 'persistence';
           }
           
           // Node modules that aren't specifically chunked
@@ -82,15 +141,24 @@ export default defineConfig({
       }
     },
     sourcemap: true,
-    chunkSizeWarningLimit: 800,
+    chunkSizeWarningLimit: 500, // Reduced from 800 for better performance
     target: 'esnext',
     minify: 'terser',
     terserOptions: {
       compress: {
         drop_console: true,
-        drop_debugger: true
+        drop_debugger: true,
+        pure_funcs: ['console.log', 'console.info'], // Remove specific console calls
+        passes: 2 // Multiple passes for better compression
+      },
+      mangle: {
+        safari10: true // Better Safari compatibility
       }
-    }
+    },
+    // Enable more aggressive optimizations
+    cssCodeSplit: true,
+    assetsInlineLimit: 4096, // Inline smaller assets
+    reportCompressedSize: false // Faster builds
   },
   test: {
     environment: 'jsdom',

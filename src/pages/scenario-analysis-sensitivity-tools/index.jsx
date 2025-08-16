@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';
 import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
 import Header from '../../components/ui/Header';
+import SEOHead from '../../components/SEO/SEOHead';
+import Breadcrumbs from '../../components/ui/Breadcrumbs';
 
 import ResultsVisualizationPanel from './components/ResultsVisualizationPanel';
 import ScenarioConfigPanel from './components/ScenarioConfigPanel';
@@ -101,9 +103,19 @@ const ScenarioAnalysisSensitivityTools = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead
+        title="Scenario Analysis & Sensitivity Tools | Valor-IVX"
+        description="Run Monte Carlo simulations, sensitivity analysis, and visualize statistical outcomes for robust financial decision-making."
+        canonical="/scenario-analysis-sensitivity-tools"
+      />
       <Header />
 
       <div className="pt-[60px] h-screen flex flex-col">
+        {/* Breadcrumbs and accessible page heading */}
+        <div className="px-6 py-2 bg-background border-b border-border">
+          <h1 className="sr-only">Scenario Analysis & Sensitivity Tools</h1>
+          <Breadcrumbs />
+        </div>
         {/* Simulation Control Bar */}
         <SimulationControlBar
           onRunSimulation={runSimulation}
@@ -240,7 +252,7 @@ const ScenarioAnalysisSensitivityTools = () => {
             </div>
 
             <div className="flex items-center space-x-4">
-              <span>© {new Date().getFullYear()} FinanceAnalyst Pro</span>
+              <span>© {new Date().getFullYear()} Valor-IVX</span>
               <span>•</span>
               <span>SOX Compliant</span>
               <span>•</span>
