@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react';
+import React, { Suspense, useCallback } from 'react';
 
 import { useFinancialAccessibility } from '../../../hooks/useAccessibility';
 import LazyLoader from '../../LazyLoader';
@@ -25,45 +25,55 @@ const ChartLoadingFallback = ({ title = 'Chart', height = 320 }) => (
 
 // HOC for lazy loading charts with accessibility
 const withLazyChart = (ChartComponent, componentName, options = {}) => {
-  const LazyChartComponent = React.forwardRef((props, ref) => {
-    const {
-      priority = 'normal',
-      preloadDelay = 2000,
-      height = 320,
-      title = componentName,
-      ...chartProps
-    } = props;
+  const LazyChartComponent = React.memo(
+    React.forwardRef((props, ref) => {
+      const {
+        priority = 'normal',
+        preloadDelay = 2000,
+        height = 320,
+        title = componentName,
+        ...chartProps
+      } = props;
 
-    // Add accessibility monitoring
-    const { elementRef } = useFinancialAccessibility('chart');
+      // Add accessibility monitoring
+      const { elementRef } = useFinancialAccessibility('chart');
 
-    const fallback = <ChartLoadingFallback title={title} height={height} />;
+      const fallback = <ChartLoadingFallback title={title} height={height} />;
+      const trackedName = `chart-${componentName}`;
 
-    return (
-      <div
-        ref={(el) => {
-          elementRef(el);
-          if (ref) {
-            if (typeof ref === 'function') ref(el);
-            else ref.current = el;
+      const setRefs = useCallback(
+        el => {
+          if (elementRef) {
+            elementRef.current = el;
           }
-        }}
-      >
-        <LazyLoader
-          componentName={componentName}
-          priority={priority}
-          preloadDelay={preloadDelay}
-          fallback={fallback}
-          performanceTracking={true}
-          {...options}
-        >
-          <Suspense fallback={fallback}>
-            <ChartComponent {...chartProps} />
-          </Suspense>
-        </LazyLoader>
-      </div>
-    );
-  });
+
+          if (typeof ref === 'function') {
+            ref(el);
+          } else if (ref) {
+            ref.current = el;
+          }
+        },
+        [elementRef, ref]
+      );
+
+      return (
+        <div ref={setRefs}>
+          <LazyLoader
+            componentName={trackedName}
+            priority={priority}
+            preloadDelay={preloadDelay}
+            fallback={fallback}
+            performanceTracking={true}
+            {...options}
+          >
+            <Suspense fallback={fallback}>
+              <ChartComponent {...chartProps} />
+            </Suspense>
+          </LazyLoader>
+        </div>
+      );
+    })
+  );
 
   LazyChartComponent.displayName = `LazyChart(${componentName})`;
   return LazyChartComponent;
