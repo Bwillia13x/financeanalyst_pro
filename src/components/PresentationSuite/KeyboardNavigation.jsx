@@ -4,7 +4,6 @@
  * Professional analysts work faster with keyboard than mouse
  */
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Command,
@@ -23,6 +22,7 @@ import {
   BookOpen,
   HelpCircle
 } from 'lucide-react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 
 const KeyboardNavigation = ({ onNavigate, onExecuteCommand, children }) => {
   const [showCommandPalette, setShowCommandPalette] = useState(false);
@@ -223,7 +223,7 @@ const KeyboardNavigation = ({ onNavigate, onExecuteCommand, children }) => {
   return (
     <>
       {children}
-      
+
       {/* Command Palette */}
       <AnimatePresence>
         {showCommandPalette && (
@@ -274,9 +274,11 @@ const KeyboardNavigation = ({ onNavigate, onExecuteCommand, children }) => {
                         }}
                       >
                         <div className="flex items-center space-x-3">
-                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                            index === selectedIndex ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-600'
-                          }`}>
+                          <div
+                            className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                              index === selectedIndex ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-600'
+                            }`}
+                          >
                             <Command className="w-4 h-4" />
                           </div>
                           <div>

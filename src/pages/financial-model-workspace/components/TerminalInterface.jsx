@@ -1,7 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 
 import Icon from '../../../components/AppIcon';
+import { commandProcessor } from '../../../services/commandProcessor';
+import { commandRegistry } from '../../../services/commandRegistry';
 import { dataFetchingService } from '../../../services/dataFetching';
+import { persistenceManager } from '../../../services/persistence/PersistenceManager';
 import {
   calculateDCFValuation,
   calculateLBOReturns,
@@ -10,9 +13,6 @@ import {
   formatPercentage,
   formatNumber
 } from '../../../utils/dataTransformation';
-import { commandProcessor } from '../../../services/commandProcessor';
-import { commandRegistry } from '../../../services/commandRegistry';
-import { persistenceManager } from '../../../services/persistence/PersistenceManager';
 // Import command initializer to ensure commands are registered
 import '../../../services/commandInitializer';
 
@@ -63,7 +63,7 @@ const TerminalInterface = ({ onCommandExecute, calculationResults }) => {
     }
 
     // Initialize persistence layer
-    const initializePersistence = async () => {
+    const initializePersistence = async() => {
       try {
         await persistenceManager.initialize();
         console.log('✅ Persistence layer initialized in terminal');
@@ -83,13 +83,13 @@ const TerminalInterface = ({ onCommandExecute, calculationResults }) => {
       const availableCommands = getAvailableCommands();
       const suggestions = commandRegistry.getSuggestions(value);
       const commandSuggestions = suggestions.map(s => s.usage);
-      
+
       // Also include partial matches from available commands
       const partialMatches = availableCommands.filter(cmd =>
-        cmd.toLowerCase().includes(value.toLowerCase()) && 
+        cmd.toLowerCase().includes(value.toLowerCase()) &&
         !commandSuggestions.includes(cmd)
       );
-      
+
       const allSuggestions = [...commandSuggestions, ...partialMatches];
       setSuggestions(allSuggestions.slice(0, 8));
       setShowSuggestions(allSuggestions.length > 0);

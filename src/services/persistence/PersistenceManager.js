@@ -3,10 +3,10 @@
  * Manages multiple storage layers and provides unified API for data persistence
  */
 
-import { LocalStorageService } from './LocalStorageService';
-import { IndexedDBService } from './IndexedDBService';
-import { SessionManager } from './SessionManager';
 import { DataMigrationService } from './DataMigrationService';
+import { IndexedDBService } from './IndexedDBService';
+import { LocalStorageService } from './LocalStorageService';
+import { SessionManager } from './SessionManager';
 
 export class PersistenceManager {
   constructor() {
@@ -14,11 +14,11 @@ export class PersistenceManager {
     this.indexedDB = new IndexedDBService();
     this.sessionManager = new SessionManager();
     this.migrationService = new DataMigrationService();
-    
+
     this.isInitialized = false;
     this.storageQuota = null;
     this.listeners = new Map();
-    
+
     // Storage strategy configuration
     this.storageStrategy = {
       // Small, frequently accessed data -> localStorage
@@ -51,7 +51,7 @@ export class PersistenceManager {
     try {
       // Check storage availability
       await this.checkStorageAvailability();
-      
+
       // Initialize storage services
       await Promise.all([
         this.localStorage.initialize(),
@@ -66,8 +66,8 @@ export class PersistenceManager {
       await this.estimateStorageQuota();
 
       this.isInitialized = true;
-      console.log('✅ Persistence Manager initialized successfully');
-      
+      console.warn('✅ Persistence Manager initialized successfully');
+
       return {
         success: true,
         storageQuota: this.storageQuota,
@@ -104,7 +104,7 @@ export class PersistenceManager {
       };
 
       let result;
-      
+
       if (storage === 'localStorage') {
         result = await this.localStorage.store(key, data, { encrypt, ttl });
       } else if (storage === 'indexedDB') {
@@ -152,7 +152,7 @@ export class PersistenceManager {
       if (result && result.metadata && result.metadata.ttl) {
         const now = Date.now();
         const expiry = result.metadata.timestamp + result.metadata.ttl;
-        
+
         if (now > expiry) {
           await this.remove(key, { storage });
           return null;
@@ -276,7 +276,7 @@ export class PersistenceManager {
     const {
       format = 'json',
       includeMetadata = true,
-      compress = false
+      _compress = false
     } = options;
 
     try {
@@ -436,9 +436,9 @@ export class PersistenceManager {
   }
 
   validateImportData(data) {
-    return data && 
-           typeof data === 'object' && 
-           data.version && 
+    return data &&
+           typeof data === 'object' &&
+           data.version &&
            (data.localStorage || data.indexedDB);
   }
 

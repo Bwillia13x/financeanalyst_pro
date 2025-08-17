@@ -1,28 +1,28 @@
-import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  Calculator, 
-  BarChart3, 
-  Target, 
-  Maximize2, 
-  X, 
+import {
+  Calculator,
+  BarChart3,
+  Target,
+  Maximize2,
+  X,
   TrendingUp,
   DollarSign,
   Percent,
   Calendar
 } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
-const AnalysisModule = ({ 
-  moduleId, 
-  companyData, 
-  inputs, 
-  results, 
-  onInputChange, 
-  onFocus, 
+const AnalysisModule = ({
+  moduleId,
+  companyData,
+  inputs,
+  results,
+  onInputChange,
+  onFocus,
   onRemove,
   isCompact = false,
-  isFullscreen = false 
+  isFullscreen = false
 }) => {
   const [activeInputTab, setActiveInputTab] = useState('assumptions');
 
@@ -98,7 +98,7 @@ const AnalysisModule = ({
     // Generate chart data for visualization
     const chartData = useMemo(() => {
       if (!results?.freeCashFlows) return [];
-      
+
       return results.years.map((year, index) => ({
         year: `Y${year}`,
         fcf: results.freeCashFlows[index] / 1e6, // Convert to millions
@@ -181,16 +181,16 @@ const AnalysisModule = ({
             <div className="h-32">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={chartData}>
-                  <Line 
-                    type="monotone" 
-                    dataKey="fcf" 
-                    stroke="#3B82F6" 
+                  <Line
+                    type="monotone"
+                    dataKey="fcf"
+                    stroke="#3B82F6"
                     strokeWidth={2}
                     dot={false}
                   />
                   <XAxis dataKey="year" tick={{ fontSize: 10 }} />
                   <YAxis tick={{ fontSize: 10 }} />
-                  <Tooltip 
+                  <Tooltip
                     formatter={(value) => [`$${value.toFixed(0)}M`, 'FCF']}
                     labelStyle={{ color: '#374151' }}
                   />
@@ -208,7 +208,7 @@ const AnalysisModule = ({
         {/* Interactive Assumptions Panel */}
         <div className="bg-white rounded-2xl border border-gray-100 p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-6">Model Assumptions</h3>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-6">
               <InteractiveSlider
@@ -239,7 +239,7 @@ const AnalysisModule = ({
                 onChange={(value) => handleInputChange('discountRate', value / 100)}
               />
             </div>
-            
+
             <div className="space-y-6">
               <InteractiveSlider
                 label="Projection Years"
@@ -250,7 +250,7 @@ const AnalysisModule = ({
                 suffix=" years"
                 onChange={(value) => handleInputChange('projectionYears', value)}
               />
-              
+
               {/* Year 1 Quick Adjustments */}
               <div className="bg-gray-50 rounded-lg p-4">
                 <h4 className="font-medium text-gray-900 mb-3">Year 1 Assumptions</h4>
@@ -296,7 +296,7 @@ const AnalysisModule = ({
                       ${(results.enterpriseValue / 1e9).toFixed(1)}B
                     </span>
                   </div>
-                  
+
                   <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
                     <div className="flex items-center space-x-2">
                       <TrendingUp className="w-4 h-4 text-green-600" />
@@ -306,7 +306,7 @@ const AnalysisModule = ({
                       ${(results.equityValue / 1e9).toFixed(1)}B
                     </span>
                   </div>
-                  
+
                   <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
                     <div className="flex items-center space-x-2">
                       <Percent className="w-4 h-4 text-purple-600" />
@@ -330,30 +330,30 @@ const AnalysisModule = ({
                     <span>{inputs.projectionYears || 5} Year Model</span>
                   </div>
                 </div>
-                
+
                 <div className="h-64">
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={chartData}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                      <XAxis 
-                        dataKey="year" 
+                      <XAxis
+                        dataKey="year"
                         axisLine={false}
                         tickLine={false}
                         tick={{ fontSize: 12, fill: '#64748b' }}
                       />
-                      <YAxis 
+                      <YAxis
                         axisLine={false}
                         tickLine={false}
                         tick={{ fontSize: 12, fill: '#64748b' }}
                         tickFormatter={(value) => `$${value}M`}
                       />
-                      <Tooltip 
+                      <Tooltip
                         formatter={(value, name) => [
-                          `$${value.toFixed(0)}M`, 
+                          `$${value.toFixed(0)}M`,
                           name === 'fcf' ? 'Free Cash Flow' : 'Present Value'
                         ]}
                         labelStyle={{ color: '#374151' }}
-                        contentStyle={{ 
+                        contentStyle={{
                           backgroundColor: '#ffffff',
                           border: '1px solid #e5e7eb',
                           borderRadius: '8px'

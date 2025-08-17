@@ -1,5 +1,6 @@
 import React from 'react';
-import { 
+
+import {
   DCFWaterfall,
   RevenueBreakdown,
   TrendLine,
@@ -102,7 +103,7 @@ const ChartsDemo = () => {
       </div>
 
       {/* Metrics Dashboard */}
-      <MetricsDashboard 
+      <MetricsDashboard
         metrics={metricsData}
         title="Key Financial Metrics"
         columns={3}
@@ -111,20 +112,20 @@ const ChartsDemo = () => {
       {/* Chart Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* DCF Waterfall */}
-        <DCFWaterfall 
+        <DCFWaterfall
           data={dcfData}
           title="DCF Valuation Components"
           formatValue={(value) => `$${(value / 1000).toFixed(0)}M`}
         />
 
         {/* Revenue Breakdown */}
-        <RevenueBreakdown 
+        <RevenueBreakdown
           data={revenueData}
           title="FY2024 Revenue Breakdown"
         />
 
         {/* Trend Line */}
-        <TrendLine 
+        <TrendLine
           data={trendData}
           title="Revenue Growth Trend"
           dataKey="value"
@@ -132,7 +133,7 @@ const ChartsDemo = () => {
         />
 
         {/* Sensitivity Heatmap */}
-        <SensitivityHeatmap 
+        <SensitivityHeatmap
           data={sensitivityData}
           xAxisLabels={xAxisLabels}
           yAxisLabels={yAxisLabels}
@@ -146,12 +147,12 @@ const ChartsDemo = () => {
         <h2 className="text-xl font-semibold text-foreground mb-4">
           Component Usage Examples
         </h2>
-        
+
         <div className="space-y-4 text-sm">
           <div>
             <h3 className="font-medium text-foreground mb-2">DCF Waterfall Chart</h3>
             <pre className="bg-background p-3 rounded border text-xs overflow-x-auto">
-{`<DCFWaterfall 
+              {`<DCFWaterfall 
   data={dcfData}
   title="DCF Valuation Components"
   formatValue={(value) => \`$\${(value / 1000).toFixed(0)}M\`}
@@ -162,7 +163,7 @@ const ChartsDemo = () => {
           <div>
             <h3 className="font-medium text-foreground mb-2">Revenue Breakdown Pie Chart</h3>
             <pre className="bg-background p-3 rounded border text-xs overflow-x-auto">
-{`<RevenueBreakdown 
+              {`<RevenueBreakdown 
   data={revenueData}
   title="FY2024 Revenue Breakdown"
   formatValue={(value) => \`$\${(value / 1000000).toFixed(1)}M\`}
@@ -173,7 +174,7 @@ const ChartsDemo = () => {
           <div>
             <h3 className="font-medium text-foreground mb-2">Trend Line Chart</h3>
             <pre className="bg-background p-3 rounded border text-xs overflow-x-auto">
-{`<TrendLine 
+              {`<TrendLine 
   data={trendData}
   title="Revenue Growth Trend"
   dataKey="value"
@@ -186,7 +187,7 @@ const ChartsDemo = () => {
           <div>
             <h3 className="font-medium text-foreground mb-2">Sensitivity Analysis Heatmap</h3>
             <pre className="bg-background p-3 rounded border text-xs overflow-x-auto">
-{`<SensitivityHeatmap 
+              {`<SensitivityHeatmap 
   data={sensitivityMatrix}
   xAxisLabels={['-20%', '-10%', 'Base', '+10%', '+20%']}
   yAxisLabels={['Revenue', 'EBITDA', 'Terminal', 'WACC', 'Tax']}
@@ -198,7 +199,7 @@ const ChartsDemo = () => {
           <div>
             <h3 className="font-medium text-foreground mb-2">Metrics Dashboard</h3>
             <pre className="bg-background p-3 rounded border text-xs overflow-x-auto">
-{`<MetricsDashboard 
+              {`<MetricsDashboard 
   metrics={metricsData}
   title="Key Financial Metrics"
   columns={3}

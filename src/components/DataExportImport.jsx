@@ -206,7 +206,7 @@ const DataExportImport = ({ data, onDataChange, savedAnalyses, onAnalysesChange 
 
         {/* Content */}
         <div className="p-6">
-          
+
           {activeTab === 'excel' && (
             <div className="space-y-4">
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
@@ -391,7 +391,7 @@ const DataExportImport = ({ data, onDataChange, savedAnalyses, onAnalysesChange 
             </div>
           )}
 
-          
+
           {activeTab === 'import' && (
             <div className="space-y-4">
               <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
@@ -470,7 +470,7 @@ const DataExportImport = ({ data, onDataChange, savedAnalyses, onAnalysesChange 
             </div>
           )}
 
-          
+
           {activeTab === 'stats' && (
             <div className="space-y-4">
               <h3 className="text-lg font-medium text-gray-900">Storage Statistics</h3>

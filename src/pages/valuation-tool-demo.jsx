@@ -1,13 +1,13 @@
-import React from 'react';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
 import { Calculator, TrendingUp, BookOpen, ArrowRight, CheckCircle } from 'lucide-react';
+import React from 'react';
+import { Link } from 'react-router-dom';
 
 const ValuationToolDemo = () => {
   const exampleScenarios = [
     {
-      title: "Technology Startup",
-      description: "High-growth SaaS company with recurring revenue model",
+      title: 'Technology Startup',
+      description: 'High-growth SaaS company with recurring revenue model',
       dcf: {
         revenue: 2000000,
         growth: 0.25,
@@ -18,12 +18,12 @@ const ValuationToolDemo = () => {
         price: 15000000,
         equity: 0.35,
         exit: 12,
-        irr: "25-35%"
+        irr: '25-35%'
       }
     },
     {
-      title: "Manufacturing Company",
-      description: "Established manufacturer with stable cash flows",
+      title: 'Manufacturing Company',
+      description: 'Established manufacturer with stable cash flows',
       dcf: {
         revenue: 5000000,
         growth: 0.08,
@@ -34,12 +34,12 @@ const ValuationToolDemo = () => {
         price: 25000000,
         equity: 0.45,
         exit: 8,
-        irr: "15-20%"
+        irr: '15-20%'
       }
     },
     {
-      title: "Healthcare Services",
-      description: "Medical practice with predictable patient volumes",
+      title: 'Healthcare Services',
+      description: 'Medical practice with predictable patient volumes',
       dcf: {
         revenue: 3000000,
         growth: 0.10,
@@ -50,7 +50,7 @@ const ValuationToolDemo = () => {
         price: 18000000,
         equity: 0.40,
         exit: 10,
-        irr: "18-25%"
+        irr: '18-25%'
       }
     }
   ];
@@ -58,18 +58,18 @@ const ValuationToolDemo = () => {
   const features = [
     {
       icon: <Calculator className="w-6 h-6" />,
-      title: "DCF Analysis",
-      description: "Complete discounted cash flow modeling with terminal value calculations and sensitivity analysis"
+      title: 'DCF Analysis',
+      description: 'Complete discounted cash flow modeling with terminal value calculations and sensitivity analysis'
     },
     {
       icon: <TrendingUp className="w-6 h-6" />,
-      title: "LBO Modeling",
-      description: "Leveraged buyout analysis with IRR and MOIC calculations for private equity scenarios"
+      title: 'LBO Modeling',
+      description: 'Leveraged buyout analysis with IRR and MOIC calculations for private equity scenarios'
     },
     {
       icon: <CheckCircle className="w-6 h-6" />,
-      title: "Professional Results",
-      description: "Industry-standard calculations with detailed breakdowns and export capabilities"
+      title: 'Professional Results',
+      description: 'Industry-standard calculations with detailed breakdowns and export capabilities'
     }
   ];
 
@@ -86,7 +86,7 @@ const ValuationToolDemo = () => {
             Business Valuation Tool
           </h1>
           <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-            Professional-grade DCF and LBO analysis for privately held companies. 
+            Professional-grade DCF and LBO analysis for privately held companies.
             Built for investment professionals, private equity firms, and corporate finance teams.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -150,7 +150,7 @@ const ValuationToolDemo = () => {
                 <p className="text-gray-600 mb-4">
                   {scenario.description}
                 </p>
-                
+
                 <div className="space-y-3">
                   <div className="border-t pt-3">
                     <h4 className="font-semibold text-gray-900 mb-2">DCF Assumptions</h4>
@@ -173,7 +173,7 @@ const ValuationToolDemo = () => {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="border-t pt-3">
                     <h4 className="font-semibold text-gray-900 mb-2">LBO Assumptions</h4>
                     <div className="grid grid-cols-2 gap-2 text-sm">
@@ -210,7 +210,7 @@ const ValuationToolDemo = () => {
           <h2 className="text-3xl font-bold text-gray-900 text-center mb-8">
             Valuation Methodologies
           </h2>
-          
+
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div>
               <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
@@ -218,7 +218,7 @@ const ValuationToolDemo = () => {
                 Discounted Cash Flow (DCF)
               </h3>
               <p className="text-gray-600 mb-4">
-                DCF analysis estimates the value of a business based on its expected future cash flows, 
+                DCF analysis estimates the value of a business based on its expected future cash flows,
                 discounted back to present value using a risk-adjusted rate.
               </p>
               <ul className="space-y-2 text-gray-600">
@@ -240,14 +240,14 @@ const ValuationToolDemo = () => {
                 </li>
               </ul>
             </div>
-            
+
             <div>
               <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
                 <TrendingUp className="w-5 h-5 mr-2 text-green-600" />
                 Leveraged Buyout (LBO)
               </h3>
               <p className="text-gray-600 mb-4">
-                LBO analysis evaluates potential returns from acquiring a company using significant 
+                LBO analysis evaluates potential returns from acquiring a company using significant
                 debt financing and modeling the exit strategy.
               </p>
               <ul className="space-y-2 text-gray-600">

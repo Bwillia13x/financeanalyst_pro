@@ -1,5 +1,6 @@
-import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { Plus, Minus, ChevronDown, ChevronRight, Calculator, FileText, TrendingUp } from 'lucide-react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
+
 import styles from './styles.module.css';
 
 const FinancialSpreadsheet = ({ data, onDataChange }) => {
@@ -21,7 +22,7 @@ const FinancialSpreadsheet = ({ data, onDataChange }) => {
     investingActivities: true,
     financingActivities: true
   });
-  
+
   const [editingCell, setEditingCell] = useState(null);
   const [cellValue, setCellValue] = useState('');
   const inputRef = useRef(null);
@@ -274,13 +275,13 @@ const FinancialSpreadsheet = ({ data, onDataChange }) => {
     if (editingCell) {
       const { rowKey, periodIndex } = editingCell;
       const numericValue = parseFloat(cellValue) || 0;
-      
+
       const newData = { ...data };
       if (!newData.statements.incomeStatement[rowKey]) {
         newData.statements.incomeStatement[rowKey] = {};
       }
       newData.statements.incomeStatement[rowKey][periodIndex] = numericValue;
-      
+
       onDataChange(newData);
       setEditingCell(null);
       setCellValue('');
@@ -334,7 +335,7 @@ const FinancialSpreadsheet = ({ data, onDataChange }) => {
     const { key, label, level, formula, bold } = item;
     const indentClass = level === 1 ? 'pl-8' : level === 2 ? 'pl-12' : 'pl-4';
     const textWeight = bold ? 'font-bold' : level === 0 ? 'font-semibold' : 'font-normal';
-    
+
     return (
       <tr key={key} className={styles.tableRow}>
         <td className={`${styles.tableCell} ${indentClass} ${textWeight} ${level === 0 ? 'text-slate-800' : 'text-slate-600'}`}>
@@ -344,7 +345,7 @@ const FinancialSpreadsheet = ({ data, onDataChange }) => {
         <td className={`${styles.tableCell} text-center text-xs text-slate-500`}>
           $ 000s
         </td>
-        
+
         {data.periods.map((period, periodIndex) => (
           <td key={periodIndex} className={`${styles.tableCell} text-right`}>
             {editingCell?.rowKey === key && editingCell?.periodIndex === periodIndex ? (
@@ -369,7 +370,7 @@ const FinancialSpreadsheet = ({ data, onDataChange }) => {
             )}
           </td>
         ))}
-        
+
         <td className={styles.tableCell}>
           <div className="flex items-center gap-2">
             <span className="text-xs text-slate-500">
@@ -428,8 +429,8 @@ const FinancialSpreadsheet = ({ data, onDataChange }) => {
                         onClick={() => toggleSection(sectionKey)}
                         className="flex items-center gap-2 font-bold text-slate-800 hover:text-blue-600 transition-colors"
                       >
-                        {expandedSections[sectionKey] ? 
-                          <ChevronDown size={16} /> : 
+                        {expandedSections[sectionKey] ?
+                          <ChevronDown size={16} /> :
                           <ChevronRight size={16} />
                         }
                         {section.title}
@@ -445,9 +446,9 @@ const FinancialSpreadsheet = ({ data, onDataChange }) => {
                       </button>
                     </td>
                   </tr>
-                  
+
                   {/* Section Rows */}
-                  {expandedSections[sectionKey] && section.items.map(item => 
+                  {expandedSections[sectionKey] && section.items.map(item =>
                     renderRow(item, sectionKey)
                   )}
                 </React.Fragment>

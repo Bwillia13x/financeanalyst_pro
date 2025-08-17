@@ -21,7 +21,7 @@ export function registerSW() {
       if (isLocalhost) {
         checkValidServiceWorker(swUrl);
         navigator.serviceWorker.ready.then(() => {
-          console.log('PWA: Service Worker ready in development mode');
+          console.warn('PWA: Service Worker ready in development mode');
         });
       } else {
         registerValidSW(swUrl);
@@ -34,15 +34,15 @@ function registerValidSW(swUrl) {
   navigator.serviceWorker
     .register(swUrl)
     .then((registration) => {
-      console.log('PWA: Service Worker registered successfully:', registration);
-      
+      console.warn('PWA: Service Worker registered successfully:', registration);
+
       // Check for updates
       registration.addEventListener('updatefound', () => {
         const installingWorker = registration.installing;
         if (installingWorker == null) {
           return;
         }
-        
+
         installingWorker.addEventListener('statechange', () => {
           if (installingWorker.state === 'installed') {
             if (navigator.serviceWorker.controller) {
@@ -63,7 +63,7 @@ function registerValidSW(swUrl) {
 
 function checkValidServiceWorker(swUrl) {
   fetch(swUrl, {
-    headers: { 'Service-Worker': 'script' },
+    headers: { 'Service-Worker': 'script' }
   })
     .then((response) => {
       const contentType = response.headers.get('content-type');
@@ -108,7 +108,7 @@ function showUpdateAvailableNotification() {
       tag: 'app-update'
     });
   }
-  
+
   // Also show in-app notification
   showInAppNotification(
     'Update Available',
@@ -143,7 +143,7 @@ function showInAppNotification(title, message, type = 'info') {
     ${type === 'info' ? 'bg-blue-50 text-blue-800 border border-blue-200' : ''}
     transition-all duration-300 transform translate-x-full
   `;
-  
+
   notification.innerHTML = `
     <div class="flex items-start">
       <div class="flex-1">
@@ -155,14 +155,14 @@ function showInAppNotification(title, message, type = 'info') {
       </button>
     </div>
   `;
-  
+
   document.body.appendChild(notification);
-  
+
   // Animate in
   requestAnimationFrame(() => {
     notification.style.transform = 'translateX(0)';
   });
-  
+
   // Auto remove after 5 seconds
   setTimeout(() => {
     if (notification.parentElement) {
@@ -197,7 +197,7 @@ function showInstallPrompt() {
     fixed bottom-4 left-4 right-4 p-4 bg-blue-600 text-white rounded-lg shadow-lg
     flex items-center justify-between z-50 max-w-md mx-auto
   `;
-  
+
   installBanner.innerHTML = `
     <div class="flex-1">
       <h4 class="font-medium text-sm">Install FinanceAnalyst Pro</h4>
@@ -212,11 +212,11 @@ function showInstallPrompt() {
       </button>
     </div>
   `;
-  
+
   document.body.appendChild(installBanner);
-  
+
   // Handle install button click
-  installBanner.querySelector('#install-btn').addEventListener('click', async () => {
+  installBanner.querySelector('#install-btn').addEventListener('click', async() => {
     if (deferredPrompt) {
       deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
@@ -225,7 +225,7 @@ function showInstallPrompt() {
     }
     installBanner.remove();
   });
-  
+
   // Handle dismiss button click
   installBanner.querySelector('#dismiss-btn').addEventListener('click', () => {
     installBanner.remove();
@@ -241,7 +241,7 @@ window.addEventListener('appinstalled', () => {
     'FinanceAnalyst Pro has been installed successfully!',
     'success'
   );
-  deferredPromit = null;
+  deferredPrompt = null;
 });
 
 // Network status handling
@@ -249,7 +249,7 @@ export function setupNetworkHandling() {
   function updateOnlineStatus() {
     const isOnline = navigator.onLine;
     console.log('PWA: Network status:', isOnline ? 'online' : 'offline');
-    
+
     if (!isOnline) {
       showInAppNotification(
         'Connection Lost',
@@ -263,14 +263,14 @@ export function setupNetworkHandling() {
         'success'
       );
     }
-    
+
     // Update UI to reflect network status
     document.body.setAttribute('data-network-status', isOnline ? 'online' : 'offline');
   }
-  
+
   window.addEventListener('online', updateOnlineStatus);
   window.addEventListener('offline', updateOnlineStatus);
-  
+
   // Initial status
   updateOnlineStatus();
 }
@@ -280,6 +280,6 @@ export function initializePWA() {
   registerSW();
   setupNetworkHandling();
   requestNotificationPermission();
-  
+
   console.log('PWA: Initialization complete');
 }

@@ -13,7 +13,7 @@ class FinancialDataCache {
       encryptSensitiveData: true,
       ...options
     };
-    
+
     // Data type specific caching rules
     this.cachingRules = {
       // Market data - short TTL, high frequency updates
@@ -24,7 +24,7 @@ class FinancialDataCache {
         maxAge: 2 * 60 * 1000, // 2 minutes absolute max
         staleWhileRevalidate: true
       },
-      
+
       // Company financials - medium TTL, periodic updates
       'company-financials': {
         ttl: 15 * 60 * 1000, // 15 minutes
@@ -33,7 +33,7 @@ class FinancialDataCache {
         maxAge: 60 * 60 * 1000, // 1 hour absolute max
         staleWhileRevalidate: true
       },
-      
+
       // User models - longer TTL, user-specific
       'user-models': {
         ttl: 60 * 60 * 1000, // 1 hour
@@ -43,7 +43,7 @@ class FinancialDataCache {
         staleWhileRevalidate: false,
         requireAuth: true
       },
-      
+
       // Private analysis - very sensitive, session-based
       'private-analysis': {
         ttl: 30 * 60 * 1000, // 30 minutes
@@ -54,7 +54,7 @@ class FinancialDataCache {
         requireAuth: true,
         sessionOnly: true
       },
-      
+
       // Reference data - long TTL, rarely changes
       'reference-data': {
         ttl: 24 * 60 * 60 * 1000, // 24 hours
@@ -63,7 +63,7 @@ class FinancialDataCache {
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days absolute max
         staleWhileRevalidate: true
       },
-      
+
       // API responses - short TTL, varies by endpoint
       'api-response': {
         ttl: 5 * 60 * 1000, // 5 minutes
@@ -73,10 +73,10 @@ class FinancialDataCache {
         staleWhileRevalidate: true
       }
     };
-    
+
     // Initialize cleanup interval
     this.startCleanupInterval();
-    
+
     // Initialize storage quotas and monitoring
     this.initializeStorageMonitoring();
   }
@@ -123,12 +123,12 @@ class FinancialDataCache {
     if (isStale && rules.staleWhileRevalidate && fetchFallback) {
       // Return stale data immediately
       const staleData = await this.deserializeData(cachedItem, metadata);
-      
+
       // Fetch fresh data in background (don't await)
       this.fetchAndCache(key, fetchFallback, dataType).catch(error => {
         console.warn('Background refresh failed:', error);
       });
-      
+
       return staleData;
     }
 
@@ -155,7 +155,7 @@ class FinancialDataCache {
 
     // Serialize and potentially compress/encrypt data
     const serializedData = await this.serializeData(data, rules);
-    
+
     // Check storage quota
     if (!this.checkStorageQuota(serializedData)) {
       // Evict oldest items to make space
@@ -274,7 +274,7 @@ class FinancialDataCache {
     // In production, use Web Crypto API for proper encryption
     // For now, just base64 encode with simple obfuscation
     const key = this.getEncryptionKey();
-    const obfuscated = data.split('').map((char, i) => 
+    const obfuscated = data.split('').map((char, i) =>
       String.fromCharCode(char.charCodeAt(0) ^ key.charCodeAt(i % key.length))
     ).join('');
     return btoa(obfuscated);
@@ -284,7 +284,7 @@ class FinancialDataCache {
     // Reverse the simple obfuscation
     const key = this.getEncryptionKey();
     const deobfuscated = atob(encryptedData);
-    return deobfuscated.split('').map((char, i) => 
+    return deobfuscated.split('').map((char, i) =>
       String.fromCharCode(char.charCodeAt(0) ^ key.charCodeAt(i % key.length))
     ).join('');
   }
@@ -326,7 +326,7 @@ class FinancialDataCache {
     const currentSize = this.getCurrentCacheSize();
     const newDataSize = this.calculateSize(newData);
     const maxSize = this.options.maxSize * 1024 * 1024; // Convert to bytes
-    
+
     return (currentSize + newDataSize) <= maxSize;
   }
 
@@ -341,10 +341,10 @@ class FinancialDataCache {
   async evictOldestItems() {
     // Sort by last accessed time and remove oldest 20%
     const entries = Array.from(this.metadata.entries())
-      .sort(([,a], [,b]) => a.lastAccessed - b.lastAccessed);
-    
+      .sort(([, a], [, b]) => a.lastAccessed - b.lastAccessed);
+
     const toEvict = Math.ceil(entries.length * 0.2);
-    
+
     for (let i = 0; i < toEvict; i++) {
       const [key] = entries[i];
       this.delete(key);
@@ -355,8 +355,8 @@ class FinancialDataCache {
     if (this.cache.size > this.options.maxSize) {
       const toRemove = this.cache.size - this.options.maxSize;
       const entries = Array.from(this.metadata.entries())
-        .sort(([,a], [,b]) => a.lastAccessed - b.lastAccessed);
-      
+        .sort(([, a], [, b]) => a.lastAccessed - b.lastAccessed);
+
       for (let i = 0; i < toRemove; i++) {
         const [key] = entries[i];
         this.delete(key);
@@ -373,11 +373,11 @@ class FinancialDataCache {
 
   cleanupExpiredItems() {
     const now = Date.now();
-    
+
     for (const [key, metadata] of this.metadata.entries()) {
       const rules = this.cachingRules[metadata.dataType];
       const age = now - metadata.timestamp;
-      
+
       if (age > rules.maxAge) {
         this.delete(key);
       }
@@ -390,7 +390,7 @@ class FinancialDataCache {
       navigator.storage.estimate().then(estimate => {
         console.log('Storage quota:', estimate.quota);
         console.log('Storage usage:', estimate.usage);
-        
+
         if (estimate.usage && estimate.quota) {
           const usagePercent = (estimate.usage / estimate.quota) * 100;
           if (usagePercent > 80) {
@@ -444,26 +444,26 @@ const financialDataCache = new FinancialDataCache();
 export default financialDataCache;
 
 // Helper functions for common operations
-export const cacheMarketData = (symbol, data) => 
+export const cacheMarketData = (symbol, data) =>
   financialDataCache.set(`market-${symbol}`, data, 'market-data');
 
-export const getMarketData = (symbol, fetchFn) => 
-  financialDataCache.get(`market-${symbol}`, { 
-    dataType: 'market-data', 
-    fetchFallback: fetchFn 
+export const getMarketData = (symbol, fetchFn) =>
+  financialDataCache.get(`market-${symbol}`, {
+    dataType: 'market-data',
+    fetchFallback: fetchFn
   });
 
-export const cacheUserModel = (modelId, data) => 
+export const cacheUserModel = (modelId, data) =>
   financialDataCache.set(`model-${modelId}`, data, 'user-models');
 
-export const getUserModel = (modelId, fetchFn) => 
-  financialDataCache.get(`model-${modelId}`, { 
-    dataType: 'user-models', 
-    fetchFallback: fetchFn 
+export const getUserModel = (modelId, fetchFn) =>
+  financialDataCache.get(`model-${modelId}`, {
+    dataType: 'user-models',
+    fetchFallback: fetchFn
   });
 
-export const clearSensitiveData = () => 
-  financialDataCache.clear((key, metadata) => 
+export const clearSensitiveData = () =>
+  financialDataCache.clear((key, metadata) =>
     metadata.dataType === 'private-analysis' || metadata.dataType === 'user-models'
   );
 

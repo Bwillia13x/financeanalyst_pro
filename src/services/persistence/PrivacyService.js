@@ -24,7 +24,7 @@ export class PrivacyService {
       export_data: 30,
       session_data: 1
     };
-    
+
     /** @type {PrivacySettings} */
     this.privacySettings = {
       dataRetention: true,
@@ -369,7 +369,7 @@ export class PrivacyService {
    */
   async cleanupAnalyticsData() {
     const analyticsTypes = this.dataCategories.analytics;
-    
+
     for (const dataType of analyticsTypes) {
       try {
         await persistenceManager.remove(dataType);
@@ -474,7 +474,7 @@ export class PrivacyService {
 
       // Clear browser storage
       localStorage.clear();
-      
+
       // Clear IndexedDB
       if (window.indexedDB) {
         const databases = await indexedDB.databases();
@@ -529,7 +529,7 @@ export class PrivacyService {
    */
   scheduleCleanup() {
     // Run cleanup daily
-    setInterval(async () => {
+    setInterval(async() => {
       try {
         await this.cleanupExpiredData();
         console.warn('✅ Scheduled privacy cleanup completed');

@@ -2,6 +2,7 @@
  * IndexedDB Service
  * Manages IndexedDB operations for complex data storage with versioning and transactions
  */
+// @ts-check
 
 import { CompressionUtils } from '../utils/CompressionUtils';
 
@@ -12,7 +13,7 @@ export class IndexedDBService {
     this.db = null;
     this.isAvailable = false;
     this.compressionUtils = new CompressionUtils();
-    
+
     // Define object stores
     this.stores = {
       watchlists: {
@@ -93,16 +94,17 @@ export class IndexedDBService {
     try {
       this.db = await this.openDatabase();
       this.isAvailable = true;
-      console.log('✅ IndexedDB service initialized');
-      
+      console.warn('✅ IndexedDB service initialized');
+
       // Cleanup expired data
       await this.cleanupExpiredData();
-      
+
       return { success: true, available: true, version: this.dbVersion };
     } catch (error) {
       console.error('❌ Failed to initialize IndexedDB:', error);
       this.isAvailable = false;
-      return { success: false, available: false, error: error.message };
+      const message = error instanceof Error ? error.message : String(error);
+      return { success: false, available: false, error: message };
     }
   }
 
@@ -122,7 +124,8 @@ export class IndexedDBService {
       };
 
       request.onupgradeneeded = (event) => {
-        const db = event.target.result;
+        const target = /** @type {IDBOpenDBRequest} */ (event.target);
+        const db = target.result;
         this.createObjectStores(db);
       };
     });
@@ -154,7 +157,7 @@ export class IndexedDBService {
       }
     }
 
-    console.log('✅ IndexedDB object stores created');
+    console.warn('✅ IndexedDB object stores created');
   }
 
   /**
@@ -413,7 +416,8 @@ export class IndexedDBService {
       return stats;
     } catch (error) {
       console.error('Failed to get IndexedDB stats:', error);
-      return { available: false, error: error.message };
+      const message = error instanceof Error ? error.message : String(error);
+      return { available: false, error: message };
     }
   }
 
@@ -516,7 +520,8 @@ export class IndexedDBService {
       return { cleaned };
     } catch (error) {
       console.error('Failed to cleanup expired data:', error);
-      return { cleaned: 0, error: error.message };
+      const message = error instanceof Error ? error.message : String(error);
+      return { cleaned: 0, error: message };
     }
   }
 

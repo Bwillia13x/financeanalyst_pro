@@ -4,7 +4,6 @@
  * Visual explanations of model logic and data relationships
  */
 
-import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Zap,
@@ -18,12 +17,13 @@ import {
   Ripple,
   Activity
 } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
 
-const MeaningfulAnimations = ({ 
-  children, 
-  onAssumptionChange, 
-  modelData, 
-  dependencyMap 
+const MeaningfulAnimations = ({
+  children,
+  onAssumptionChange,
+  modelData,
+  dependencyMap
 }) => {
   const [changedAssumptions, setChangedAssumptions] = useState(new Set());
   const [affectedOutputs, setAffectedOutputs] = useState(new Set());
@@ -69,12 +69,12 @@ const MeaningfulAnimations = ({
   const FlowArrow = ({ fromId, toId, type = 'data', delay = 0 }) => {
     const fromRef = animationRefs.current.get(fromId);
     const toRef = animationRefs.current.get(toId);
-    
+
     if (!fromRef || !toRef) return null;
 
     const fromRect = fromRef.getBoundingClientRect();
     const toRect = toRef.getBoundingClientRect();
-    
+
     const startX = fromRect.right;
     const startY = fromRect.top + fromRect.height / 2;
     const endX = toRect.left;
@@ -106,7 +106,7 @@ const MeaningfulAnimations = ({
             />
           </marker>
         </defs>
-        
+
         <motion.path
           d={pathData}
           stroke={type === 'impact' ? '#10B981' : '#3B82F6'}
@@ -115,20 +115,20 @@ const MeaningfulAnimations = ({
           markerEnd={`url(#arrowhead-${type})`}
           initial={{ pathLength: 0 }}
           animate={{ pathLength: 1 }}
-          transition={{ duration: 1.5, ease: "easeInOut" }}
+          transition={{ duration: 1.5, ease: 'easeInOut' }}
         />
-        
+
         {/* Flowing particles */}
         <motion.circle
           r="3"
           fill={type === 'impact' ? '#10B981' : '#3B82F6'}
-          initial={{ offsetDistance: "0%" }}
-          animate={{ offsetDistance: "100%" }}
-          transition={{ 
-            duration: 2, 
-            repeat: Infinity, 
-            ease: "linear",
-            delay: delay + 0.5 
+          initial={{ offsetDistance: '0%' }}
+          animate={{ offsetDistance: '100%' }}
+          transition={{
+            duration: 2,
+            repeat: Infinity,
+            ease: 'linear',
+            delay: delay + 0.5
           }}
           style={{ offsetPath: `path('${pathData}')` }}
         />
@@ -140,10 +140,10 @@ const MeaningfulAnimations = ({
   const RippleEffect = ({ x, y, intensity = 1, type = 'assumption' }) => {
     const rippleVariants = {
       initial: { scale: 0, opacity: 0.8 },
-      animate: { 
-        scale: 3 * intensity, 
+      animate: {
+        scale: 3 * intensity,
         opacity: 0,
-        transition: { duration: 1.5, ease: "easeOut" }
+        transition: { duration: 1.5, ease: 'easeOut' }
       }
     };
 
@@ -191,14 +191,14 @@ const MeaningfulAnimations = ({
   };
 
   // Glow effect for highlighting changed elements
-  const GlowHighlight = ({ 
-    children, 
-    isHighlighted, 
+  const GlowHighlight = ({
+    children,
+    isHighlighted,
     type = 'assumption_change',
-    intensity = 1 
+    intensity = 1
   }) => {
     const config = animationTypes[type];
-    
+
     return (
       <motion.div
         animate={isHighlighted ? {
@@ -210,9 +210,9 @@ const MeaningfulAnimations = ({
           scale: 1,
           backgroundColor: 'transparent'
         }}
-        transition={{ 
+        transition={{
           duration: config.duration,
-          ease: "easeInOut"
+          ease: 'easeInOut'
         }}
         className="rounded-lg"
       >
@@ -222,15 +222,15 @@ const MeaningfulAnimations = ({
   };
 
   // Value change animation with direction indicators
-  const ValueChangeIndicator = ({ 
-    oldValue, 
-    newValue, 
+  const ValueChangeIndicator = ({
+    oldValue,
+    newValue,
     format = 'number',
-    isVisible = true 
+    isVisible = true
   }) => {
     const isIncrease = newValue > oldValue;
     const changePercent = oldValue !== 0 ? ((newValue - oldValue) / oldValue) * 100 : 0;
-    
+
     if (!isVisible || oldValue === newValue) return null;
 
     return (
@@ -239,8 +239,8 @@ const MeaningfulAnimations = ({
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.8, y: 10 }}
         className={`absolute -top-2 -right-2 px-2 py-1 rounded-full text-xs font-semibold ${
-          isIncrease 
-            ? 'bg-green-100 text-green-800 border border-green-200' 
+          isIncrease
+            ? 'bg-green-100 text-green-800 border border-green-200'
             : 'bg-red-100 text-red-800 border border-red-200'
         }`}
       >
@@ -281,10 +281,10 @@ const MeaningfulAnimations = ({
             <motion.div
               className="absolute inset-0 bg-blue-500 rounded-full"
               animate={{ scale: [1, 2, 1] }}
-              transition={{ 
-                duration: 1.5, 
+              transition={{
+                duration: 1.5,
                 repeat: Infinity,
-                delay: delay + index * 0.2 
+                delay: delay + index * 0.2
               }}
               style={{ opacity: 0.3 }}
             />
@@ -308,7 +308,7 @@ const MeaningfulAnimations = ({
         <div className="flex items-center space-x-3">
           <motion.div
             animate={{ rotate: 360 }}
-            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+            transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
           >
             <Activity className="w-5 h-5 text-blue-600" />
           </motion.div>
@@ -317,7 +317,7 @@ const MeaningfulAnimations = ({
             <div className="w-48 bg-gray-200 rounded-full h-2 mt-1">
               <motion.div
                 className="bg-blue-600 h-2 rounded-full"
-                initial={{ width: "0%" }}
+                initial={{ width: '0%' }}
                 animate={{ width: `${progress}%` }}
                 transition={{ duration: 0.5 }}
               />
@@ -339,7 +339,7 @@ const MeaningfulAnimations = ({
   const handleAssumptionChange = (assumptionId, oldValue, newValue, affectedIds = []) => {
     setChangedAssumptions(prev => new Set([...prev, assumptionId]));
     setAffectedOutputs(prev => new Set([...prev, ...affectedIds]));
-    
+
     // Clear highlights after animation
     setTimeout(() => {
       setChangedAssumptions(prev => {
@@ -380,11 +380,11 @@ const MeaningfulAnimations = ({
   return (
     <div className="relative">
       {enhancedChildren}
-      
+
       {/* Animation overlays */}
       <AnimatePresence>
         {isCalculating && (
-          <RecalculationIndicator 
+          <RecalculationIndicator
             isRecalculating={isCalculating}
             progress={75} // This would come from actual calculation progress
           />
@@ -447,21 +447,22 @@ const MeaningfulAnimations = ({
           z-index: 10;
           position: relative;
         }
-      `}</style>
+      `}
+      </style>
     </div>
   );
 };
 
 // Individual animation components for specific use cases
-export const AssumptionInput = ({ 
-  id, 
-  value, 
-  onChange, 
-  registerElement, 
+export const AssumptionInput = ({
+  id,
+  value,
+  onChange,
+  registerElement,
   handleAssumptionChange,
   changedAssumptions,
   GlowHighlight,
-  children 
+  children
 }) => {
   const [localValue, setLocalValue] = useState(value);
   const [previousValue, setPreviousValue] = useState(value);
@@ -480,20 +481,20 @@ export const AssumptionInput = ({
   const handleChange = (newValue) => {
     setPreviousValue(localValue);
     setLocalValue(newValue);
-    
+
     if (handleAssumptionChange) {
       // Simulate finding affected outputs (in real app, this would be calculated)
       const affectedOutputs = [`output_${id}_1`, `output_${id}_2`];
       handleAssumptionChange(id, localValue, newValue, affectedOutputs);
     }
-    
+
     if (onChange) {
       onChange(newValue);
     }
   };
 
   return (
-    <GlowHighlight 
+    <GlowHighlight
       isHighlighted={changedAssumptions?.has(id)}
       type="assumption_change"
     >
@@ -507,15 +508,15 @@ export const AssumptionInput = ({
   );
 };
 
-export const ModelOutput = ({ 
-  id, 
-  value, 
+export const ModelOutput = ({
+  id,
+  value,
   previousValue,
-  registerElement, 
+  registerElement,
   affectedOutputs,
   GlowHighlight,
   ValueChangeIndicator,
-  children 
+  children
 }) => {
   const outputRef = useRef(null);
 
@@ -526,7 +527,7 @@ export const ModelOutput = ({
   }, [id, registerElement]);
 
   return (
-    <GlowHighlight 
+    <GlowHighlight
       isHighlighted={affectedOutputs?.has(id)}
       type="output_impact"
     >

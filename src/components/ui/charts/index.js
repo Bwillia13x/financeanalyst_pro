@@ -1,11 +1,11 @@
+import DCFWaterfallBase from './DCFWaterfall';
 import { withLazyChart } from './LazyChartWrapper';
 
 // Import chart components
-import DCFWaterfallBase from './DCFWaterfall';
-import RevenueBreakdownBase from './RevenueBreakdown';
-import TrendLineBase from './TrendLine';
-import SensitivityHeatmapBase from './SensitivityHeatmap';
 import { MetricsDashboard as MetricsDashboardBase, MetricCard } from './MetricsDashboard';
+import RevenueBreakdownBase from './RevenueBreakdown';
+import SensitivityHeatmapBase from './SensitivityHeatmap';
+import TrendLineBase from './TrendLine';
 
 // Create lazy versions with optimized loading
 export const DCFWaterfall = withLazyChart(DCFWaterfallBase, 'dcf-waterfall', {

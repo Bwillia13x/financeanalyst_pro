@@ -1,15 +1,16 @@
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
+import React from 'react';
 import { vi } from 'vitest';
+
 import FinancialSpreadsheet from '../FinancialSpreadsheet';
 
 const mockData = {
   periods: ['Current Year', 'Year 1'],
   statements: {
     incomeStatement: {
-      energyDevices: { 0: 100, 1: 110 },
-    },
-  },
+      energyDevices: { 0: 100, 1: 110 }
+    }
+  }
 };
 
 describe('FinancialSpreadsheet', () => {
@@ -42,7 +43,7 @@ describe('FinancialSpreadsheet', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Add Period' }));
     expect(onDataChange).toHaveBeenCalledWith({
       ...mockData,
-      periods: ['Current Year', 'Year 1', 'Year 2'],
+      periods: ['Current Year', 'Year 1', 'Year 2']
     });
   });
 

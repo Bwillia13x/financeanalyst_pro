@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+
 import { trackFinancialComponentPerformance } from '../utils/performanceMonitoring';
 
 // Hook for lazy loading financial components with performance tracking
@@ -15,7 +16,7 @@ export function useLazyLoad(options = {}) {
   const [isVisible, setIsVisible] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   const [loadError, setLoadError] = useState(null);
-  
+
   const elementRef = useRef(null);
   const observerRef = useRef(null);
   const loadStartTime = useRef(null);
@@ -34,7 +35,7 @@ export function useLazyLoad(options = {}) {
         if (entry.isIntersecting) {
           loadStartTime.current = performance.now();
           setIsVisible(true);
-          
+
           // Disconnect observer after first intersection
           if (observerRef.current) {
             observerRef.current.unobserve(entry.target);
@@ -77,7 +78,7 @@ export function useLazyLoad(options = {}) {
 
     if (loadStartTime.current && performanceTracking) {
       const loadTime = performance.now() - loadStartTime.current;
-      
+
       trackFinancialComponentPerformance(componentName, {
         loadTime,
         priority,
@@ -91,7 +92,7 @@ export function useLazyLoad(options = {}) {
   // Handle load errors
   const markAsError = useCallback((error) => {
     setLoadError(error);
-    
+
     if (performanceTracking) {
       trackFinancialComponentPerformance(componentName, {
         loadError: error?.message || 'Unknown error',
@@ -109,7 +110,7 @@ export function useLazyLoad(options = {}) {
     setIsLoaded(false);
     setLoadError(null);
     loadStartTime.current = null;
-    
+
     // Reinitialize observer
     if (observerRef.current) {
       observerRef.current.disconnect();
@@ -152,10 +153,10 @@ export function usePreloadComponents() {
   useEffect(() => {
     if (preloadQueue.length === 0) return;
 
-    const processQueue = async () => {
+    const processQueue = async() => {
       // Sort by priority (critical > high > normal > low)
       const priorityOrder = { critical: 0, high: 1, normal: 2, low: 3 };
-      const sortedQueue = [...preloadQueue].sort((a, b) => 
+      const sortedQueue = [...preloadQueue].sort((a, b) =>
         priorityOrder[a.priority] - priorityOrder[b.priority]
       );
 
@@ -177,7 +178,7 @@ export function usePreloadComponents() {
           setPreloadedComponents(prev => new Set([...prev, componentName]));
         } catch (error) {
           console.error(`Failed to preload ${componentName}:`, error);
-          
+
           trackFinancialComponentPerformance(componentName, {
             preloadError: error.message,
             preloaded: false,

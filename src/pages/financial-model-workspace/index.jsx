@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 
 import Icon from '../../components/AppIcon';
+import SEOHead from '../../components/SEO/SEOHead';
 import Button from '../../components/ui/Button';
 import Header from '../../components/ui/Header';
-import SEOHead from '../../components/SEO/SEOHead';
 
 import AuditTrail from './components/AuditTrail';
 import CalculationResults from './components/CalculationResults';
@@ -75,7 +75,7 @@ const FinancialModelWorkspace = () => {
         keywords="financial modeling, DCF analysis, LBO modeling, financial workspace, valuation tools, Excel alternative"
       />
       <Header />
-      
+
       {/* Main Workspace */}
       <main id="main-content" className="flex flex-col h-screen pt-16" role="main">
         {/* Toolbar */}
@@ -84,9 +84,11 @@ const FinancialModelWorkspace = () => {
             <div className="flex items-center space-x-2">
               <Icon name="FileText" className="w-5 h-5 text-blue-400" />
               <span className="font-medium">{modelState.name}</span>
-              <span className={`text-xs px-2 py-1 rounded ${
-                modelState.saved ? 'bg-green-900 text-green-300' : 'bg-yellow-900 text-yellow-300'
-              }`}>
+              <span
+                className={`text-xs px-2 py-1 rounded ${
+                  modelState.saved ? 'bg-green-900 text-green-300' : 'bg-yellow-900 text-yellow-300'
+                }`}
+              >
                 {modelState.saved ? 'Saved' : 'Unsaved'}
               </span>
             </div>
@@ -126,7 +128,7 @@ const FinancialModelWorkspace = () => {
                 <option value="formulas">Formulas</option>
                 <option value="templates">Templates</option>
               </select>
-              
+
               {activeLayout === 'dual-pane' && (
                 <select
                   value={rightPanelContent}
@@ -145,9 +147,11 @@ const FinancialModelWorkspace = () => {
         {/* Content Area */}
         <div className="flex-1 flex overflow-hidden">
           {/* Left Panel */}
-          <div className={`${
-            activeLayout === 'dual-pane' ? 'w-1/2' : 'w-full'
-          } border-r border-gray-700 overflow-hidden`}>
+          <div
+            className={`${
+              activeLayout === 'dual-pane' ? 'w-1/2' : 'w-full'
+            } border-r border-gray-700 overflow-hidden`}
+          >
             {renderLeftPanel()}
           </div>
 

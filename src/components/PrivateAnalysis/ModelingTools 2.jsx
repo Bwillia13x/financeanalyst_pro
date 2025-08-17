@@ -1,9 +1,10 @@
-import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Target, BarChart3, Activity, DollarSign } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+
+import AdvancedDCF from './AdvancedDCF.jsx';
 import ScenarioModeling from './ScenarioModeling.jsx';
 import SensitivityAnalysis from './SensitivityAnalysis.jsx';
-import AdvancedDCF from './AdvancedDCF.jsx';
 import styles from './styles.module.css';
 
 const ModelingTools = ({ data, onDataChange }) => {
@@ -47,7 +48,7 @@ const ModelingTools = ({ data, onDataChange }) => {
   const calculatedMetrics = useMemo(() => {
     const statements = data.statements.incomeStatement;
     const periods = data.periods;
-    
+
     const metrics = {
       revenue: [],
       grossProfit: [],
@@ -68,20 +69,20 @@ const ModelingTools = ({ data, onDataChange }) => {
       const revenue = statements.totalRevenue?.[index] || 0;
       const grossProfit = revenue - (statements.totalCOGS?.[index] || 0);
       const operatingIncome = statements.operatingIncome?.[index] || 0;
-      
+
       metrics.revenue.push(revenue);
       metrics.grossProfit.push(grossProfit);
       metrics.operatingIncome.push(operatingIncome);
-      
+
       // Margin calculations
       metrics.margins.gross.push(revenue ? (grossProfit / revenue) * 100 : 0);
       metrics.margins.operating.push(revenue ? (operatingIncome / revenue) * 100 : 0);
-      
+
       // Growth calculations
       if (index > 0) {
         const prevRevenue = statements.totalRevenue?.[index - 1] || 0;
         const prevOperating = statements.operatingIncome?.[index - 1] || 0;
-        
+
         metrics.growth.revenue.push(prevRevenue ? ((revenue - prevRevenue) / prevRevenue) * 100 : 0);
         metrics.growth.operating.push(prevOperating ? ((operatingIncome - prevOperating) / prevOperating) * 100 : 0);
       }
@@ -94,7 +95,7 @@ const ModelingTools = ({ data, onDataChange }) => {
   const calculateDCF = (inputData = null) => {
     const { discountRate, terminalGrowthRate, projectionYears, taxRate } = modelInputs.dcf;
     const sourceData = inputData || data;
-    
+
     // Use either scenario data or calculated metrics
     let operatingIncomes;
     if (inputData) {
@@ -109,7 +110,7 @@ const ModelingTools = ({ data, onDataChange }) => {
       // For regular calculation, use calculated metrics
       operatingIncomes = calculatedMetrics.operatingIncome.slice(1, projectionYears + 1);
     }
-    
+
     if (operatingIncomes.length === 0) return { enterpriseValue: 0, equityValue: 0, sharePrice: 0 };
 
     let presentValue = 0;
@@ -129,7 +130,7 @@ const ModelingTools = ({ data, onDataChange }) => {
     const presentTerminalValue = terminalValue / Math.pow(discountFactor, projectionYears);
 
     const enterpriseValue = presentValue + presentTerminalValue;
-    
+
     return {
       enterpriseValue,
       equityValue: enterpriseValue, // Simplified - would subtract net debt
@@ -210,7 +211,7 @@ const ModelingTools = ({ data, onDataChange }) => {
               <DollarSign size={20} />
               DCF Valuation Model
             </h3>
-            
+
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Inputs */}
               <div>
@@ -228,7 +229,7 @@ const ModelingTools = ({ data, onDataChange }) => {
                       className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Terminal Growth Rate %
@@ -241,7 +242,7 @@ const ModelingTools = ({ data, onDataChange }) => {
                       className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Tax Rate %
@@ -254,7 +255,7 @@ const ModelingTools = ({ data, onDataChange }) => {
                       className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Projection Years
@@ -281,14 +282,14 @@ const ModelingTools = ({ data, onDataChange }) => {
                       {formatCurrency(dcfResults.enterpriseValue)}
                     </div>
                   </div>
-                  
+
                   <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
                     <div className="text-sm text-blue-600 font-medium">Equity Value</div>
                     <div className="text-2xl font-bold text-blue-800">
                       {formatCurrency(dcfResults.equityValue)}
                     </div>
                   </div>
-                  
+
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
                       <span>PV of Operations:</span>
@@ -315,7 +316,7 @@ const ModelingTools = ({ data, onDataChange }) => {
               <BarChart3 size={20} />
               Financial Ratio Analysis
             </h3>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {/* Profitability Ratios */}
               <div>
@@ -381,7 +382,7 @@ const ModelingTools = ({ data, onDataChange }) => {
               <Activity size={20} />
               Sensitivity Analysis
             </h3>
-            
+
             <SensitivityAnalysis
               data={data}
               modelInputs={modelInputs}
@@ -399,7 +400,7 @@ const ModelingTools = ({ data, onDataChange }) => {
               <Target size={20} />
               Scenario Modeling
             </h3>
-            
+
             <ScenarioModeling
               data={data}
               modelInputs={modelInputs}

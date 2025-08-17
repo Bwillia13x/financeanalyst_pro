@@ -1,13 +1,14 @@
-import React, { useState, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Building2, Calculator, TrendingUp, DollarSign, BarChart3, Target } from 'lucide-react';
+import React, { useState, useMemo, useCallback } from 'react';
+
 import { lboModelingEngine } from '../../services/lboModelingEngine.js';
 
 const AdvancedLBOTool = ({ data, onDataChange }) => {
   const [activeTab, setActiveTab] = useState('inputs');
   const [lboResults, setLBOResults] = useState(null);
   const [isCalculating, setIsCalculating] = useState(false);
-  
+
   const [lboInputs, setLBOInputs] = useState({
     symbol: 'COMPANY',
     companyName: 'Target Company',
@@ -35,7 +36,7 @@ const AdvancedLBOTool = ({ data, onDataChange }) => {
       style: 'currency',
       currency: 'USD',
       minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
+      maximumFractionDigits: 0
     }).format(value);
   }, []);
 
@@ -43,7 +44,7 @@ const AdvancedLBOTool = ({ data, onDataChange }) => {
     return `${(value * 100).toFixed(1)}%`;
   }, []);
 
-  const calculateLBO = useCallback(async () => {
+  const calculateLBO = useCallback(async() => {
     try {
       setIsCalculating(true);
       const modelInputs = {
@@ -74,10 +75,10 @@ const AdvancedLBOTool = ({ data, onDataChange }) => {
           }
         }
       };
-      
+
       const results = lboModelingEngine.buildLBOModel(modelInputs);
       setLBOResults(results);
-      
+
       if (onDataChange) {
         onDataChange({
           lboModel: { inputs: lboInputs, results, timestamp: new Date().toISOString() }
@@ -108,13 +109,13 @@ const AdvancedLBOTool = ({ data, onDataChange }) => {
             <p className="text-gray-600">Professional leveraged buyout analysis</p>
           </div>
         </div>
-        
+
         <motion.button
           onClick={calculateLBO}
           disabled={isCalculating}
           className={`px-6 py-2 rounded-lg font-medium flex items-center space-x-2 ${
-            isCalculating 
-              ? 'bg-gray-300 text-gray-500' 
+            isCalculating
+              ? 'bg-gray-300 text-gray-500'
               : 'bg-blue-600 hover:bg-blue-700 text-white'
           }`}
         >

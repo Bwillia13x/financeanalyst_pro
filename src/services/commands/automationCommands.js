@@ -3,14 +3,14 @@
  * Watchlists, alerts, batch analysis, and automated workflows
  */
 
-import { dataFetchingService } from '../dataFetching';
 import { formatCurrency, formatPercentage, formatNumber } from '../../utils/dataTransformation';
+import { dataFetchingService } from '../dataFetching';
 
 export const automationCommands = {
   WATCHLIST: {
-    execute: async (parsedCommand, context, processor) => {
+    execute: async(parsedCommand, context, processor) => {
       const [action, name, tickers] = parsedCommand.parameters;
-      
+
       if (!action) {
         return {
           type: 'error',
@@ -30,7 +30,7 @@ export const automationCommands = {
             };
           }
 
-          const content = `📋 Your Watchlists:\n\n${Object.entries(watchlists).map(([listName, data]) => 
+          const content = `📋 Your Watchlists:\n\n${Object.entries(watchlists).map(([listName, data]) =>
             `📊 ${listName} (${data.tickers.length} stocks)\n• Created: ${data.created}\n• Tickers: ${data.tickers.join(', ')}\n• Last Updated: ${data.lastUpdated || 'Never'}`
           ).join('\n\n')}\n\n💡 Commands:\n• WATCHLIST(view, "name") - View detailed watchlist\n• WATCHLIST(update, "name", [new_tickers]) - Update watchlist\n• WATCHLIST(delete, "name") - Delete watchlist\n• WATCHLIST(analyze, "name") - Analyze all stocks in watchlist`;
 
@@ -81,10 +81,10 @@ export const automationCommands = {
           }
 
           const watchlist = watchlists[name];
-          
+
           // Fetch current data for all tickers
           const stockData = await Promise.all(
-            watchlist.tickers.map(async (ticker) => {
+            watchlist.tickers.map(async(ticker) => {
               try {
                 const profile = await dataFetchingService.fetchCompanyProfile(ticker);
                 return {
@@ -113,7 +113,7 @@ export const automationCommands = {
           const totalValue = stockData.reduce((sum, stock) => sum + stock.marketCap, 0);
           const avgChange = stockData.reduce((sum, stock) => sum + stock.changePercent, 0) / stockData.length;
 
-          const content = `📊 Watchlist: ${name}\n\n📈 PERFORMANCE SUMMARY:\n• Total Market Cap: ${formatCurrency(totalValue, 'USD', true)}\n• Average Change: ${formatPercentage(avgChange / 100)} ${avgChange > 0 ? '📈' : '📉'}\n• Best Performer: ${stockData.reduce((best, stock) => stock.changePercent > best.changePercent ? stock : best).ticker} (${formatPercentage(Math.max(...stockData.map(s => s.changePercent)) / 100)})\n• Worst Performer: ${stockData.reduce((worst, stock) => stock.changePercent < worst.changePercent ? stock : worst).ticker} (${formatPercentage(Math.min(...stockData.map(s => s.changePercent)) / 100)})\n\n📋 HOLDINGS:\n${stockData.map(stock => 
+          const content = `📊 Watchlist: ${name}\n\n📈 PERFORMANCE SUMMARY:\n• Total Market Cap: ${formatCurrency(totalValue, 'USD', true)}\n• Average Change: ${formatPercentage(avgChange / 100)} ${avgChange > 0 ? '📈' : '📉'}\n• Best Performer: ${stockData.reduce((best, stock) => stock.changePercent > best.changePercent ? stock : best).ticker} (${formatPercentage(Math.max(...stockData.map(s => s.changePercent)) / 100)})\n• Worst Performer: ${stockData.reduce((worst, stock) => stock.changePercent < worst.changePercent ? stock : worst).ticker} (${formatPercentage(Math.min(...stockData.map(s => s.changePercent)) / 100)})\n\n📋 HOLDINGS:\n${stockData.map(stock =>
             `• ${stock.ticker}: ${formatCurrency(stock.price)} ${stock.changePercent > 0 ? '📈' : stock.changePercent < 0 ? '📉' : '➡️'} ${formatPercentage(stock.changePercent / 100)} (P/E: ${formatNumber(stock.pe, 1)}x)`
           ).join('\n')}\n\n💡 QUICK ACTIONS:\n• WATCHLIST(analyze, "${name}") - Run analysis on all stocks\n• DCF(ticker) - Detailed analysis of any stock\n• PORTFOLIO([${watchlist.tickers.join(',')}], [equal weights]) - Portfolio analysis`;
 
@@ -141,10 +141,10 @@ export const automationCommands = {
           }
 
           const watchlist = watchlists[name];
-          
+
           // Perform quick analysis on all stocks
           const analysisResults = await Promise.all(
-            watchlist.tickers.slice(0, 5).map(async (ticker) => { // Limit to 5 for demo
+            watchlist.tickers.slice(0, 5).map(async(ticker) => { // Limit to 5 for demo
               try {
                 const profile = await dataFetchingService.fetchCompanyProfile(ticker);
                 return {
@@ -166,7 +166,7 @@ export const automationCommands = {
             })
           );
 
-          const content = `🔍 Watchlist Analysis: ${name}\n\n📊 QUICK ANALYSIS RESULTS:\n${analysisResults.map(result => 
+          const content = `🔍 Watchlist Analysis: ${name}\n\n📊 QUICK ANALYSIS RESULTS:\n${analysisResults.map(result =>
             `• ${result.ticker} (${result.name}):\n  Price: ${formatCurrency(result.price)}, P/E: ${formatNumber(result.pe, 1)}x, P/B: ${formatNumber(result.pb, 1)}x\n  Beta: ${formatNumber(result.beta, 2)}, Assessment: ${result.recommendation} ${result.recommendation === 'Attractive' ? '🟢' : result.recommendation === 'Expensive' ? '🔴' : '🟡'}`
           ).join('\n\n')}\n\n🎯 SUMMARY:\n• Attractive Opportunities: ${analysisResults.filter(r => r.recommendation === 'Attractive').length}\n• Fair Value Stocks: ${analysisResults.filter(r => r.recommendation === 'Fair Value').length}\n• Expensive Stocks: ${analysisResults.filter(r => r.recommendation === 'Expensive').length}\n\n💡 NEXT STEPS:\n• Run DCF(ticker) for detailed valuation of attractive stocks\n• Use COMP(ticker) for relative valuation analysis\n• Consider PORTFOLIO analysis for optimal allocation\n\n${watchlist.tickers.length > 5 ? `⚠️ Showing first 5 stocks. Full watchlist has ${watchlist.tickers.length} stocks.` : ''}`;
 
@@ -200,9 +200,9 @@ export const automationCommands = {
   },
 
   ALERT: {
-    execute: async (parsedCommand, context, processor) => {
+    execute: async(parsedCommand, context, processor) => {
       const [ticker, condition, value] = parsedCommand.parameters;
-      
+
       if (!ticker || !condition || value === undefined) {
         return {
           type: 'error',
@@ -213,7 +213,7 @@ export const automationCommands = {
       try {
         if (ticker.toLowerCase() === 'list') {
           const alerts = processor.getVariable('alerts') || [];
-          
+
           if (alerts.length === 0) {
             return {
               type: 'info',
@@ -221,7 +221,7 @@ export const automationCommands = {
             };
           }
 
-          const content = `🚨 Active Alerts (${alerts.length}):\n\n${alerts.map((alert, index) => 
+          const content = `🚨 Active Alerts (${alerts.length}):\n\n${alerts.map((alert, index) =>
             `${index + 1}. ${alert.ticker}: ${alert.condition.replace('_', ' ')} ${alert.value}\n   Created: ${alert.created}\n   Status: ${alert.triggered ? '✅ Triggered' : '⏳ Monitoring'}`
           ).join('\n\n')}\n\n💡 Use ALERT(clear) to remove all alerts`;
 
@@ -320,9 +320,9 @@ export const automationCommands = {
   },
 
   BATCH_ANALYSIS: {
-    execute: async (parsedCommand, context, processor) => {
+    execute: async(parsedCommand, context, processor) => {
       const [tickers, analysisType = 'quick'] = parsedCommand.parameters;
-      
+
       if (!tickers || !Array.isArray(tickers)) {
         return {
           type: 'error',
@@ -339,10 +339,10 @@ export const automationCommands = {
         }
 
         const results = await Promise.all(
-          tickers.map(async (ticker) => {
+          tickers.map(async(ticker) => {
             try {
               const profile = await dataFetchingService.fetchCompanyProfile(ticker.toUpperCase());
-              
+
               // Quick analysis
               const score = (
                 (profile.pe < 20 ? 20 : profile.pe < 30 ? 10 : 0) +
@@ -385,7 +385,7 @@ export const automationCommands = {
         const strongBuys = results.filter(r => r.rating === 'Strong Buy').length;
         const buys = results.filter(r => r.rating === 'Buy').length;
 
-        const content = `📊 Batch Analysis Results (${tickers.length} stocks)\n\n🏆 TOP RANKED STOCKS:\n${results.slice(0, 5).map((stock, index) => 
+        const content = `📊 Batch Analysis Results (${tickers.length} stocks)\n\n🏆 TOP RANKED STOCKS:\n${results.slice(0, 5).map((stock, index) =>
           `${index + 1}. ${stock.ticker} (${stock.name})\n   Score: ${stock.score}/100, Rating: ${stock.rating} ${stock.rating.includes('Buy') ? '🟢' : stock.rating === 'Hold' ? '🟡' : '🔴'}\n   P/E: ${formatNumber(stock.pe, 1)}x, P/B: ${formatNumber(stock.pb, 1)}x, ROE: ${formatPercentage(stock.roe)}`
         ).join('\n\n')}\n\n📈 PORTFOLIO SUMMARY:\n• Average Score: ${formatNumber(avgScore, 1)}/100\n• Strong Buy: ${strongBuys} stocks\n• Buy: ${buys} stocks\n• Top Pick: ${topPick.ticker} (${topPick.score}/100)\n\n💰 VALUATION METRICS:\n• Average P/E: ${formatNumber(results.reduce((sum, r) => sum + (r.pe || 0), 0) / results.length, 1)}x\n• Average P/B: ${formatNumber(results.reduce((sum, r) => sum + (r.pb || 0), 0) / results.length, 1)}x\n• Average ROE: ${formatPercentage(results.reduce((sum, r) => sum + (r.roe || 0), 0) / results.length)}\n\n🎯 RECOMMENDATIONS:\n• Focus on top 3 ranked stocks for detailed analysis\n• Consider equal-weight portfolio of Buy-rated stocks\n• Use DCF(${topPick.ticker}) for detailed valuation of top pick\n• Monitor Hold-rated stocks for improvement\n\n💡 NEXT STEPS:\n• PORTFOLIO([${results.filter(r => r.rating.includes('Buy')).map(r => r.ticker).join(',')}], equal) - Portfolio analysis\n• DCF(${topPick.ticker}) - Detailed valuation of top pick\n• COMP(${topPick.ticker}) - Peer comparison`;
 

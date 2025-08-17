@@ -3,27 +3,27 @@
  * Comprehensive AI-powered financial analytics interface
  */
 
-import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  TrendingUp, TrendingDown, Brain, Target, AlertTriangle,
-  Activity, Zap, Eye, BarChart3, PieChart, LineChart,
-  CheckCircle, XCircle, Clock, Lightbulb, Shield
+  Brain, Target, AlertTriangle,
+  Eye, BarChart3,
+  CheckCircle, XCircle, Lightbulb, Shield
 } from 'lucide-react';
+import PropTypes from 'prop-types';
+import { useState, useEffect, useMemo } from 'react';
 
 import useAIAnalytics from '../../hooks/useAIAnalytics';
 import LazyLoader from '../LazyLoader/LazyLoader';
 import SEOHead from '../SEO/SEOHead';
 
-const AIAnalyticsDashboard = ({ 
-  data, 
+const AIAnalyticsDashboard = ({
+  data,
   symbol = 'Portfolio',
   riskTolerance = 'moderate',
   autoAnalyze = true,
   onInsightAction
 }) => {
   const [activeTab, setActiveTab] = useState('overview');
-  const [selectedInsight, setSelectedInsight] = useState(null);
 
   const {
     isLoading,
@@ -32,12 +32,10 @@ const AIAnalyticsDashboard = ({
     insights,
     patterns,
     predictions,
-    riskMetrics,
     recommendations,
     error,
     analyzeData,
     getFilteredInsights,
-    getHighPriorityRecommendations,
     getPatternSummary,
     getPredictionSummary,
     getRiskSummary,
@@ -64,15 +62,13 @@ const AIAnalyticsDashboard = ({
   const patternSummary = useMemo(() => getPatternSummary(), [getPatternSummary]);
   const predictionSummary = useMemo(() => getPredictionSummary(), [getPredictionSummary]);
   const riskSummary = useMemo(() => getRiskSummary(), [getRiskSummary]);
-  const highPriorityRecs = useMemo(() => getHighPriorityRecommendations(), [getHighPriorityRecommendations]);
 
-  const criticalInsights = useMemo(() => 
-    getFilteredInsights({ severity: 'high', minConfidence: 0.7 }), 
-    [getFilteredInsights]
+  const criticalInsights = useMemo(() =>
+    getFilteredInsights({ severity: 'high', minConfidence: 0.7 }),
+  [getFilteredInsights]
   );
 
   const handleInsightClick = (insight) => {
-    setSelectedInsight(insight);
     if (onInsightAction) {
       onInsightAction(insight);
     }
@@ -122,24 +118,24 @@ const AIAnalyticsDashboard = ({
         <div className="bg-white rounded-lg shadow-lg p-6">
           <div className="animate-pulse space-y-6">
             <div className="flex items-center space-x-3">
-              <div className="h-8 w-8 bg-gray-200 rounded-full"></div>
-              <div className="h-6 bg-gray-200 rounded w-48"></div>
+              <div className="h-8 w-8 bg-gray-200 rounded-full" />
+              <div className="h-6 bg-gray-200 rounded w-48" />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {[1, 2, 3].map((i) => (
                 <div key={i} className="bg-gray-50 p-4 rounded-lg">
-                  <div className="h-4 bg-gray-200 rounded w-24 mb-2"></div>
-                  <div className="h-8 bg-gray-200 rounded w-16"></div>
+                  <div className="h-4 bg-gray-200 rounded w-24 mb-2" />
+                  <div className="h-8 bg-gray-200 rounded w-16" />
                 </div>
               ))}
             </div>
-            <div className="h-64 bg-gray-100 rounded"></div>
+            <div className="h-64 bg-gray-100 rounded" />
           </div>
         </div>
       }
     >
       <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-        <SEOHead 
+        <SEOHead
           title={`AI Analytics Dashboard - ${symbol} | FinanceAnalyst Pro`}
           description="Advanced AI-powered financial analytics with pattern recognition, predictions, and intelligent insights"
         />
@@ -154,15 +150,15 @@ const AIAnalyticsDashboard = ({
                 <p className="text-blue-100">{symbol} - Intelligent Financial Analysis</p>
               </div>
             </div>
-            
+
             <div className="flex items-center space-x-4">
               {isLoading && (
                 <div className="flex items-center space-x-2">
-                  <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
+                  <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent" />
                   <span className="text-sm">Analyzing...</span>
                 </div>
               )}
-              
+
               {analysis && (
                 <div className="text-right">
                   <div className="text-sm text-blue-100">Confidence Score</div>
@@ -237,9 +233,17 @@ const AIAnalyticsDashboard = ({
                     </h3>
                     <div className="space-y-2">
                       {criticalInsights.slice(0, 3).map((insight, index) => (
-                        <div 
+                        <div
                           key={index}
+                          role="button"
+                          tabIndex={0}
                           onClick={() => handleInsightClick(insight)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault();
+                              handleInsightClick(insight);
+                            }
+                          }}
                           className="flex items-center justify-between p-3 bg-white rounded cursor-pointer hover:bg-gray-50"
                         >
                           <div className="flex items-center space-x-3">
@@ -346,6 +350,16 @@ const AIAnalyticsDashboard = ({
       </div>
     </LazyLoader>
   );
+};
+
+AIAnalyticsDashboard.propTypes = {
+  data: PropTypes.shape({
+    prices: PropTypes.arrayOf(PropTypes.number)
+  }),
+  symbol: PropTypes.string,
+  riskTolerance: PropTypes.string,
+  autoAnalyze: PropTypes.bool,
+  onInsightAction: PropTypes.func
 };
 
 export default AIAnalyticsDashboard;

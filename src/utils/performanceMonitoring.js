@@ -1,7 +1,7 @@
 // Real User Monitoring and Web Vitals Tracking
 
 // Web Vitals metrics tracking
-let webVitalsData = {
+const webVitalsData = {
   CLS: null,
   FID: null,
   FCP: null,
@@ -18,19 +18,19 @@ let performanceObserver;
 export function initializePerformanceMonitoring() {
   // Initialize Web Vitals tracking
   initializeWebVitals();
-  
+
   // Initialize custom performance tracking
   initializeCustomMetrics();
-  
+
   // Initialize navigation timing
   trackNavigationTiming();
-  
+
   // Initialize resource timing
   trackResourceTiming();
-  
+
   // Initialize user interactions
   trackUserInteractions();
-  
+
   console.log('Performance monitoring initialized');
 }
 
@@ -38,8 +38,8 @@ export function initializePerformanceMonitoring() {
 function initializeWebVitals() {
   // Cumulative Layout Shift (CLS)
   let clsValue = 0;
-  let clsEntries = [];
-  
+  const clsEntries = [];
+
   new PerformanceObserver((entryList) => {
     for (const entry of entryList.getEntries()) {
       if (!entry.hadRecentInput) {
@@ -58,7 +58,7 @@ function initializeWebVitals() {
         webVitalsData.FID = entry.processingStart - entry.startTime;
         reportWebVital('FID', webVitalsData.FID, [entry]);
       }
-      
+
       // Track INP for better user interaction measurement
       if (entry.interactionId) {
         const duration = entry.processingEnd - entry.startTime;
@@ -105,11 +105,11 @@ function initializeCustomMetrics() {
     'chart-rendering',
     'market-data-fetch'
   ];
-  
+
   criticalComponents.forEach(component => {
     performance.mark(`${component}-start`);
   });
-  
+
   // Track component rendering times
   window.trackComponentRender = (componentName, renderTime) => {
     performance.mark(`${componentName}-end`);
@@ -118,14 +118,14 @@ function initializeCustomMetrics() {
       `${componentName}-start`,
       `${componentName}-end`
     );
-    
+
     reportCustomMetric('component-render', {
       component: componentName,
       renderTime,
       timestamp: Date.now()
     });
   };
-  
+
   // Track financial calculation performance
   window.trackCalculationPerformance = (calculationType, duration, complexity) => {
     reportCustomMetric('financial-calculation', {
@@ -152,7 +152,7 @@ function trackNavigationTiming() {
           domProcessing: navigation.domComplete - navigation.domLoading,
           totalLoadTime: navigation.loadEventEnd - navigation.fetchStart
         };
-        
+
         reportNavigationTiming(timings);
       }
     }, 0);
@@ -164,11 +164,11 @@ function trackResourceTiming() {
   new PerformanceObserver((list) => {
     for (const entry of list.getEntries()) {
       // Track important resource types
-      if (entry.initiatorType === 'script' || 
-          entry.initiatorType === 'css' || 
+      if (entry.initiatorType === 'script' ||
+          entry.initiatorType === 'css' ||
           entry.initiatorType === 'img' ||
           entry.initiatorType === 'fetch') {
-        
+
         const resourceData = {
           name: entry.name,
           type: entry.initiatorType,
@@ -177,7 +177,7 @@ function trackResourceTiming() {
           cached: entry.transferSize === 0 && entry.encodedBodySize > 0,
           timestamp: Date.now()
         };
-        
+
         // Only report large resources or slow loads
         if (resourceData.size > 50000 || resourceData.duration > 1000) {
           reportResourceTiming(resourceData);
@@ -191,21 +191,21 @@ function trackResourceTiming() {
 function trackUserInteractions() {
   let interactionCount = 0;
   let totalInteractionTime = 0;
-  
+
   const interactionEvents = ['click', 'keydown', 'touchstart'];
-  
+
   interactionEvents.forEach(eventType => {
     document.addEventListener(eventType, (event) => {
       const startTime = performance.now();
-      
+
       // Track interaction delay
       requestAnimationFrame(() => {
         const endTime = performance.now();
         const interactionTime = endTime - startTime;
-        
+
         interactionCount++;
         totalInteractionTime += interactionTime;
-        
+
         // Report slow interactions
         if (interactionTime > 100) {
           reportSlowInteraction({
@@ -218,7 +218,7 @@ function trackUserInteractions() {
       });
     }, { passive: true });
   });
-  
+
   // Report interaction summary periodically
   setInterval(() => {
     if (interactionCount > 0) {
@@ -227,7 +227,7 @@ function trackUserInteractions() {
         averageTime: totalInteractionTime / interactionCount,
         timestamp: Date.now()
       });
-      
+
       // Reset counters
       interactionCount = 0;
       totalInteractionTime = 0;
@@ -249,7 +249,7 @@ function reportWebVital(name, value, entries) {
     userAgent: navigator.userAgent,
     connection: getConnectionInfo()
   };
-  
+
   console.log(`Web Vital - ${name}:`, value);
   sendToAnalytics('web-vital', data);
 }
@@ -261,7 +261,7 @@ function reportCustomMetric(type, data) {
     url: window.location.href,
     userAgent: navigator.userAgent
   };
-  
+
   console.log(`Custom Metric - ${type}:`, data);
   sendToAnalytics('custom-metric', metricData);
 }
@@ -274,7 +274,7 @@ function reportNavigationTiming(timings) {
     userAgent: navigator.userAgent,
     connection: getConnectionInfo()
   };
-  
+
   console.log('Navigation Timing:', timings);
   sendToAnalytics('navigation-timing', data);
 }
@@ -305,7 +305,7 @@ export function trackError(error, errorInfo) {
     componentStack: errorInfo?.componentStack,
     errorBoundary: errorInfo?.errorBoundary
   };
-  
+
   console.error('Application Error:', errorData);
   sendToAnalytics('error', errorData);
 }
@@ -319,9 +319,9 @@ export function checkPerformanceBudgets() {
     FCP: 1800,  // 1.8s
     TTFB: 800   // 800ms
   };
-  
+
   const violations = [];
-  
+
   Object.entries(budgets).forEach(([metric, budget]) => {
     const value = webVitalsData[metric];
     if (value !== null && value > budget) {
@@ -333,7 +333,7 @@ export function checkPerformanceBudgets() {
       });
     }
   });
-  
+
   if (violations.length > 0) {
     console.warn('Performance Budget Violations:', violations);
     sendToAnalytics('budget-violations', {
@@ -342,7 +342,7 @@ export function checkPerformanceBudgets() {
       url: window.location.href
     });
   }
-  
+
   return violations;
 }
 
@@ -361,7 +361,7 @@ function getConnectionInfo() {
 function sendToAnalytics(type, data) {
   // In production, send to your analytics service
   // For now, we'll store locally and batch send
-  
+
   try {
     const analyticsData = {
       type,
@@ -369,23 +369,23 @@ function sendToAnalytics(type, data) {
       sessionId: getSessionId(),
       userId: getUserId()
     };
-    
+
     // Store in localStorage for batching
     const existingData = JSON.parse(localStorage.getItem('analytics-queue') || '[]');
     existingData.push(analyticsData);
-    
+
     // Keep only last 100 entries to prevent storage overflow
     if (existingData.length > 100) {
       existingData.splice(0, existingData.length - 100);
     }
-    
+
     localStorage.setItem('analytics-queue', JSON.stringify(existingData));
-    
+
     // Send batch if queue is full or on interval
     if (existingData.length >= 10) {
       sendAnalyticsBatch();
     }
-    
+
   } catch (error) {
     console.error('Failed to queue analytics data:', error);
   }
@@ -395,10 +395,10 @@ function sendAnalyticsBatch() {
   try {
     const queuedData = JSON.parse(localStorage.getItem('analytics-queue') || '[]');
     if (queuedData.length === 0) return;
-    
+
     // In production, replace with your analytics endpoint
     console.log('Sending analytics batch:', queuedData.length, 'items');
-    
+
     // Simulate sending to analytics service
     if (window.gtag) {
       queuedData.forEach(item => {
@@ -407,10 +407,10 @@ function sendAnalyticsBatch() {
         });
       });
     }
-    
+
     // Clear queue after successful send
     localStorage.removeItem('analytics-queue');
-    
+
   } catch (error) {
     console.error('Failed to send analytics batch:', error);
   }
@@ -452,7 +452,7 @@ export function reportPerformanceMetric(type, data) {
     userAgent: navigator.userAgent,
     timestamp: Date.now()
   };
-  
+
   console.log(`Performance Metric - ${type}:`, data);
   sendToAnalytics('performance-metric', metricData);
 }
@@ -468,20 +468,20 @@ export function trackAccessibilityResults(results) {
     timestamp: Date.now(),
     userAgent: navigator.userAgent
   };
-  
+
   console.log('Accessibility Results:', accessibilityData);
   sendToAnalytics('accessibility-results', accessibilityData);
-  
+
   // Store accessibility history
   try {
     const history = JSON.parse(localStorage.getItem('accessibility-history') || '[]');
     history.push(accessibilityData);
-    
+
     // Keep only last 50 entries
     if (history.length > 50) {
       history.splice(0, history.length - 50);
     }
-    
+
     localStorage.setItem('accessibility-history', JSON.stringify(history));
   } catch (error) {
     console.error('Failed to store accessibility history:', error);
@@ -497,7 +497,7 @@ export function trackFinancialComponentPerformance(componentName, metrics) {
     timestamp: Date.now(),
     userAgent: navigator.userAgent
   };
-  
+
   console.log(`Financial Component Performance - ${componentName}:`, metrics);
   sendToAnalytics('financial-component-performance', performanceData);
 }
@@ -506,18 +506,18 @@ export function trackFinancialComponentPerformance(componentName, metrics) {
 export function getPerformanceDashboardData() {
   const accessibilityHistory = JSON.parse(localStorage.getItem('accessibility-history') || '[]');
   const analyticsQueue = JSON.parse(localStorage.getItem('analytics-queue') || '[]');
-  
+
   // Calculate trends
   const recentAccessibility = accessibilityHistory.slice(-10);
   const avgScore = recentAccessibility.reduce((sum, entry) => sum + entry.score, 0) / recentAccessibility.length || 0;
   const avgViolations = recentAccessibility.reduce((sum, entry) => sum + entry.violations, 0) / recentAccessibility.length || 0;
-  
+
   // Get performance metrics from queue
   const performanceMetrics = analyticsQueue
     .filter(item => item.type === 'performance-metric')
     .slice(-20)
     .map(item => item.data);
-  
+
   const webVitalMetrics = analyticsQueue
     .filter(item => item.type === 'web-vital')
     .slice(-10)
@@ -532,8 +532,8 @@ export function getPerformanceDashboardData() {
       averageViolations: Math.round(avgViolations),
       history: recentAccessibility,
       trends: {
-        scoreImproving: recentAccessibility.length >= 2 && 
-          recentAccessibility[recentAccessibility.length - 1].score > 
+        scoreImproving: recentAccessibility.length >= 2 &&
+          recentAccessibility[recentAccessibility.length - 1].score >
           recentAccessibility[recentAccessibility.length - 2].score
       }
     },

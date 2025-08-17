@@ -4,8 +4,8 @@ import { ErrorBoundaryProvider } from './components/ErrorBoundary';
 import PerformanceDashboard from './components/PerformanceDashboard';
 import SEOProvider from './components/SEO/SEOProvider';
 import { usePerformanceDashboard } from './hooks/usePerformanceDashboard';
-import { initializePerformanceMonitoring } from './utils/performanceMonitoring';
 import Routes from './Routes';
+import { initializePerformanceMonitoring } from './utils/performanceMonitoring';
 
 function App() {
   const { isVisible, hideDashboard } = usePerformanceDashboard();

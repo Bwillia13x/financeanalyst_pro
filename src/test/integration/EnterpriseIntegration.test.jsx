@@ -30,7 +30,7 @@ vi.mock('../../services/businessIntelligenceService');
 vi.mock('../../services/realTimeDataService');
 
 // Mock React Router hooks
-vi.mock('react-router-dom', async () => {
+vi.mock('react-router-dom', async() => {
   const actual = await vi.importActual('react-router-dom');
   return {
     ...actual,
@@ -198,7 +198,7 @@ const renderWithProviders = (ui, options = {}) => {
 describe('Enterprise Integration Tests', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    
+
     // Setup AI Analytics Service mocks
     aiAnalyticsService.initialize = vi.fn().mockResolvedValue(true);
     aiAnalyticsService.analyzeFinancialData = vi.fn().mockResolvedValue({
@@ -272,9 +272,9 @@ describe('Enterprise Integration Tests', () => {
   });
 
   describe('AI Analytics Integration', () => {
-    it('should initialize AI analytics and generate insights from financial data', async () => {
+    it('should initialize AI analytics and generate insights from financial data', async() => {
       renderWithProviders(
-        <AIAnalyticsDashboard 
+        <AIAnalyticsDashboard
           data={mockFinancialData}
           symbol="AAPL"
           riskTolerance="moderate"
@@ -304,7 +304,7 @@ describe('Enterprise Integration Tests', () => {
       }, { timeout: 5000 });
     });
 
-    it('should handle AI analytics errors gracefully', async () => {
+    it('should handle AI analytics errors gracefully', async() => {
       // Mock the hook to return an error state
       vi.doMock('../../hooks/useAIAnalytics', () => ({
         default: () => ({
@@ -318,7 +318,7 @@ describe('Enterprise Integration Tests', () => {
       }));
 
       renderWithProviders(
-        <AIAnalyticsDashboard 
+        <AIAnalyticsDashboard
           data={mockFinancialData}
           symbol="AAPL"
         />
@@ -329,9 +329,9 @@ describe('Enterprise Integration Tests', () => {
       });
     });
 
-    it('should trigger AI re-analysis when data changes', async () => {
+    it('should trigger AI re-analysis when data changes', async() => {
       const { rerender } = renderWithProviders(
-        <AIAnalyticsDashboard 
+        <AIAnalyticsDashboard
           data={mockFinancialData}
           symbol="AAPL"
         />
@@ -349,7 +349,7 @@ describe('Enterprise Integration Tests', () => {
 
       rerender(
         <TestWrapper>
-          <AIAnalyticsDashboard 
+          <AIAnalyticsDashboard
             data={updatedData}
             symbol="AAPL"
           />
@@ -363,7 +363,7 @@ describe('Enterprise Integration Tests', () => {
   });
 
   describe('Real-time Collaboration Integration', () => {
-    it('should initialize collaboration and join workspace', async () => {
+    it('should initialize collaboration and join workspace', async() => {
       renderWithProviders(
         <CollaborationDashboard
           userId="user123"
@@ -381,7 +381,7 @@ describe('Enterprise Integration Tests', () => {
       expect(screen.getByText(/Risk Modeling Team/i)).toBeInTheDocument();
     });
 
-    it('should handle workspace creation and joining', async () => {
+    it('should handle workspace creation and joining', async() => {
       renderWithProviders(
         <CollaborationDashboard
           userId="user123"
@@ -412,7 +412,7 @@ describe('Enterprise Integration Tests', () => {
       });
     });
 
-    it('should share models between workspace members', async () => {
+    it('should share models between workspace members', async() => {
       renderWithProviders(
         <CollaborationDashboard
           userId="user123"
@@ -439,9 +439,9 @@ describe('Enterprise Integration Tests', () => {
   });
 
   describe('Business Intelligence Integration', () => {
-    it('should initialize BI service and track user actions', async () => {
+    it('should initialize BI service and track user actions', async() => {
       render(
-        <BusinessIntelligenceDashboard 
+        <BusinessIntelligenceDashboard
           userId="user123"
           timeframe="30d"
         />
@@ -458,9 +458,9 @@ describe('Enterprise Integration Tests', () => {
       });
     });
 
-    it('should generate and display BI reports', async () => {
+    it('should generate and display BI reports', async() => {
       render(
-        <BusinessIntelligenceDashboard 
+        <BusinessIntelligenceDashboard
           userId="user123"
           timeframe="30d"
         />
@@ -478,12 +478,12 @@ describe('Enterprise Integration Tests', () => {
   });
 
   describe('End-to-End Workflow Integration', () => {
-    it('should complete full enterprise workflow: login → collaboration → AI analysis → BI tracking', async () => {
+    it('should complete full enterprise workflow: login → collaboration → AI analysis → BI tracking', async() => {
       const mockOnInsightAction = vi.fn();
 
       // Step 1: Render collaboration dashboard (simulates user login and workspace setup)
       const { rerender } = render(
-        <CollaborationDashboard 
+        <CollaborationDashboard
           userId="user123"
           userProfile={mockUserProfile}
           isVisible={true}
@@ -497,12 +497,12 @@ describe('Enterprise Integration Tests', () => {
       // Step 2: Add AI Analytics dashboard (simulates user opening analytics)
       rerender(
         <div>
-          <CollaborationDashboard 
+          <CollaborationDashboard
             userId="user123"
             userProfile={mockUserProfile}
             isVisible={true}
           />
-          <AIAnalyticsDashboard 
+          <AIAnalyticsDashboard
             data={mockFinancialData}
             symbol="AAPL"
             onInsightAction={mockOnInsightAction}
@@ -518,17 +518,17 @@ describe('Enterprise Integration Tests', () => {
       // Step 3: Add BI dashboard (simulates tracking and analytics)
       rerender(
         <div>
-          <CollaborationDashboard 
+          <CollaborationDashboard
             userId="user123"
             userProfile={mockUserProfile}
             isVisible={true}
           />
-          <AIAnalyticsDashboard 
+          <AIAnalyticsDashboard
             data={mockFinancialData}
             symbol="AAPL"
             onInsightAction={mockOnInsightAction}
           />
-          <BusinessIntelligenceDashboard 
+          <BusinessIntelligenceDashboard
             userId="user123"
             timeframe="30d"
           />
@@ -557,15 +557,15 @@ describe('Enterprise Integration Tests', () => {
       });
     });
 
-    it('should handle real-time data updates across all systems', async () => {
+    it('should handle real-time data updates across all systems', async() => {
       render(
         <div>
-          <AIAnalyticsDashboard 
+          <AIAnalyticsDashboard
             data={mockFinancialData}
             symbol="AAPL"
             autoAnalyze={true}
           />
-          <CollaborationDashboard 
+          <CollaborationDashboard
             userId="user123"
             userProfile={mockUserProfile}
             isVisible={true}
@@ -595,7 +595,7 @@ describe('Enterprise Integration Tests', () => {
         const messageHandler = mockWebSocket.addEventListener.mock.calls.find(
           call => call[0] === 'message'
         )?.[1];
-        
+
         if (messageHandler) {
           messageHandler({ data: JSON.stringify(wsMessage) });
         }
@@ -607,17 +607,17 @@ describe('Enterprise Integration Tests', () => {
       });
     });
 
-    it('should maintain state consistency across components during errors', async () => {
+    it('should maintain state consistency across components during errors', async() => {
       // Simulate AI service failure
       aiAnalyticsService.analyzeFinancialData.mockRejectedValueOnce(new Error('AI service down'));
 
       render(
         <div>
-          <AIAnalyticsDashboard 
+          <AIAnalyticsDashboard
             data={mockFinancialData}
             symbol="AAPL"
           />
-          <BusinessIntelligenceDashboard 
+          <BusinessIntelligenceDashboard
             userId="user123"
             timeframe="30d"
           />
@@ -640,22 +640,22 @@ describe('Enterprise Integration Tests', () => {
   });
 
   describe('Performance Integration', () => {
-    it('should handle concurrent loading of all enterprise features within performance budget', async () => {
+    it('should handle concurrent loading of all enterprise features within performance budget', async() => {
       const startTime = performance.now();
 
       render(
         <div>
-          <AIAnalyticsDashboard 
+          <AIAnalyticsDashboard
             data={mockFinancialData}
             symbol="AAPL"
             autoAnalyze={true}
           />
-          <CollaborationDashboard 
+          <CollaborationDashboard
             userId="user123"
             userProfile={mockUserProfile}
             isVisible={true}
           />
-          <BusinessIntelligenceDashboard 
+          <BusinessIntelligenceDashboard
             userId="user123"
             timeframe="30d"
           />
@@ -676,7 +676,7 @@ describe('Enterprise Integration Tests', () => {
       expect(loadTime).toBeLessThan(3000);
     });
 
-    it('should handle heavy data processing without UI blocking', async () => {
+    it('should handle heavy data processing without UI blocking', async() => {
       const heavyData = {
         ...mockFinancialData,
         prices: Array.from({ length: 1000 }, (_, i) => 100 + Math.random() * 100),
@@ -684,7 +684,7 @@ describe('Enterprise Integration Tests', () => {
       };
 
       render(
-        <AIAnalyticsDashboard 
+        <AIAnalyticsDashboard
           data={heavyData}
           symbol="AAPL"
           autoAnalyze={true}
@@ -706,7 +706,7 @@ describe('Enterprise Integration Tests', () => {
   });
 
   describe('Data Flow Integration', () => {
-    it('should propagate data changes through all systems correctly', async () => {
+    it('should propagate data changes through all systems correctly', async() => {
       let currentData = mockFinancialData;
       const onDataChange = vi.fn((newData) => {
         currentData = newData;
@@ -714,12 +714,12 @@ describe('Enterprise Integration Tests', () => {
 
       const { rerender } = render(
         <div>
-          <AIAnalyticsDashboard 
+          <AIAnalyticsDashboard
             data={currentData}
             symbol="AAPL"
             onInsightAction={onDataChange}
           />
-          <BusinessIntelligenceDashboard 
+          <BusinessIntelligenceDashboard
             userId="user123"
             timeframe="30d"
           />
@@ -742,12 +742,12 @@ describe('Enterprise Integration Tests', () => {
 
       rerender(
         <div>
-          <AIAnalyticsDashboard 
+          <AIAnalyticsDashboard
             data={updatedData}
             symbol="AAPL"
             onInsightAction={onDataChange}
           />
-          <BusinessIntelligenceDashboard 
+          <BusinessIntelligenceDashboard
             userId="user123"
             timeframe="30d"
           />
@@ -775,31 +775,31 @@ export const enterpriseTestUtils = {
   mockFinancialData,
   mockUserProfile,
   mockWebSocket,
-  
+
   setupMockServices: () => {
     aiAnalyticsService.initialize = vi.fn().mockResolvedValue(true);
     collaborationService.initialize = vi.fn().mockResolvedValue(true);
     businessIntelligenceService.initialize = vi.fn().mockResolvedValue(true);
     realTimeDataService.subscribe = vi.fn().mockResolvedValue(true);
   },
-  
+
   simulateRealTimeUpdate: (symbol, price) => {
     const wsMessage = {
       type: 'price_update',
       data: { symbol, price, timestamp: Date.now() }
     };
-    
+
     if (mockWebSocket.addEventListener.mock.calls.length > 0) {
       const messageHandler = mockWebSocket.addEventListener.mock.calls.find(
         call => call[0] === 'message'
       )?.[1];
-      
+
       if (messageHandler) {
         messageHandler({ data: JSON.stringify(wsMessage) });
       }
     }
   },
-  
+
   simulateCollaborativeAction: (workspaceId, action) => {
     return collaborationService.shareModel.mockResolvedValue({
       shareId: `share_${Date.now()}`,

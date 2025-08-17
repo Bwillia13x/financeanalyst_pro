@@ -1,9 +1,11 @@
+import { Calculator, TrendingUp, DollarSign } from 'lucide-react';
 import React, { useState } from 'react';
-import { 
-  FinancialInput, 
-  EditableCell, 
-  CurrencyInput, 
-  LoadingState, 
+
+import {
+  FinancialInput,
+  EditableCell,
+  CurrencyInput,
+  LoadingState,
   LoadingSkeleton,
   LoadingDots,
   ValidationFeedback,
@@ -11,7 +13,6 @@ import {
   ValidationSummary
 } from './ui';
 import { Card } from './ui/Card';
-import { Calculator, TrendingUp, DollarSign } from 'lucide-react';
 
 const FinancialInputsDemo = () => {
   const [values, setValues] = useState({
@@ -68,14 +69,14 @@ const FinancialInputsDemo = () => {
 
         {/* Main Demo Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          
+
           {/* Financial Input Component */}
           <Card className="p-6 space-y-6">
             <div className="flex items-center gap-3">
               <DollarSign className="w-5 h-5 text-emerald-600" />
               <h2 className="text-xl font-semibold text-slate-900">FinancialInput Component</h2>
             </div>
-            
+
             <div className="space-y-4">
               <FinancialInput
                 label="Annual Revenue"
@@ -94,7 +95,7 @@ const FinancialInputsDemo = () => {
                 onChange={handleValueChange('expenses')}
                 type="currency"
                 currency="USD"
-                error={values.expenses > values.revenue ? "Expenses cannot exceed revenue" : null}
+                error={values.expenses > values.revenue ? 'Expenses cannot exceed revenue' : null}
               />
 
               <FinancialInput
@@ -127,7 +128,7 @@ const FinancialInputsDemo = () => {
               <TrendingUp className="w-5 h-5 text-blue-600" />
               <h2 className="text-xl font-semibold text-slate-900">CurrencyInput Component</h2>
             </div>
-            
+
             <div className="space-y-4">
               <CurrencyInput
                 label="Market Valuation"
@@ -172,13 +173,13 @@ const FinancialInputsDemo = () => {
           {/* Editable Cells */}
           <Card className="p-6 space-y-6">
             <h2 className="text-xl font-semibold text-slate-900">EditableCell Component</h2>
-            
+
             <div className="space-y-4">
               <div className="grid grid-cols-3 gap-4 p-4 bg-slate-50 rounded-lg">
                 <div className="text-sm font-medium text-slate-600">Account</div>
                 <div className="text-sm font-medium text-slate-600">Current</div>
                 <div className="text-sm font-medium text-slate-600">Adjusted</div>
-                
+
                 <div className="text-sm text-slate-700">Revenue</div>
                 <EditableCell
                   value={values.editableValue}
@@ -194,7 +195,7 @@ const FinancialInputsDemo = () => {
                   type="currency"
                   variant="adjusted"
                 />
-                
+
                 <div className="text-sm text-slate-700">Growth Rate</div>
                 <EditableCell
                   value={15.5}
@@ -207,7 +208,7 @@ const FinancialInputsDemo = () => {
                   type="percentage"
                   variant="adjusted"
                 />
-                
+
                 <div className="text-sm text-slate-700">Calculated</div>
                 <EditableCell
                   value={values.editableValue * 0.25}
@@ -226,16 +227,16 @@ const FinancialInputsDemo = () => {
           {/* Loading States */}
           <Card className="p-6 space-y-6">
             <h2 className="text-xl font-semibold text-slate-900">Loading States</h2>
-            
+
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
-                <LoadingState 
-                  type="calculation" 
+                <LoadingState
+                  type="calculation"
                   message="Calculating DCF..."
                   size="default"
                 />
-                <LoadingState 
-                  type="financial" 
+                <LoadingState
+                  type="financial"
                   message="Processing data..."
                   size="default"
                   variant="subtle"
@@ -261,7 +262,7 @@ const FinancialInputsDemo = () => {
                   {isLoading.calculation ? 'Calculating...' : 'Run Calculation'}
                 </button>
                 {isLoading.calculation && (
-                  <LoadingState 
+                  <LoadingState
                     type="calculation"
                     message="Computing financial metrics..."
                     size="sm"
@@ -275,29 +276,29 @@ const FinancialInputsDemo = () => {
           {/* Validation Feedback */}
           <Card className="p-6 space-y-6 lg:col-span-2">
             <h2 className="text-xl font-semibold text-slate-900">Validation & Feedback</h2>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-4">
                 <h4 className="text-sm font-medium text-slate-700">Individual Validation Messages</h4>
-                
+
                 <ValidationFeedback
                   type="error"
                   message="Revenue cannot be negative"
                   size="default"
                 />
-                
+
                 <ValidationFeedback
                   type="warning"
                   message="Growth rate seems unusually high"
                   size="default"
                 />
-                
+
                 <ValidationFeedback
                   type="success"
                   message="All financial metrics are within expected ranges"
                   size="default"
                 />
-                
+
                 <ValidationFeedback
                   type="info"
                   message="Consider adjusting the discount rate based on market conditions"
@@ -307,7 +308,7 @@ const FinancialInputsDemo = () => {
 
               <div className="space-y-4">
                 <h4 className="text-sm font-medium text-slate-700">Field Validation</h4>
-                
+
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-slate-700">Test Validation</label>
                   <input
@@ -318,18 +319,18 @@ const FinancialInputsDemo = () => {
                   />
                   <FieldValidation
                     error={errors.length > 0 ? errors[0] : null}
-                    info={errors.length === 0 ? "Value is within acceptable range" : null}
+                    info={errors.length === 0 ? 'Value is within acceptable range' : null}
                   />
                 </div>
 
                 <ValidationSummary
                   errors={[
-                    "Operating expenses exceed revenue",
-                    "Growth rate must be between 0% and 100%"
+                    'Operating expenses exceed revenue',
+                    'Growth rate must be between 0% and 100%'
                   ]}
                   warnings={[
-                    "Margin seems low for this industry",
-                    "Consider reviewing the assumptions"
+                    'Margin seems low for this industry',
+                    'Consider reviewing the assumptions'
                   ]}
                   collapsible={true}
                 />
@@ -349,9 +350,10 @@ const FinancialInputsDemo = () => {
   onChange={setValue}
   currency="USD"
   label="Revenue"
-/>`}</code>
+/>`}
+              </code>
             </div>
-            
+
             <div className="p-4 bg-slate-50 rounded-lg">
               <h4 className="font-medium text-slate-700 mb-2">Editable Table Cell</h4>
               <code className="text-xs text-slate-600 block whitespace-pre">{`<EditableCell
@@ -359,16 +361,18 @@ const FinancialInputsDemo = () => {
   onChange={onChange}
   type="currency"
   variant="adjusted"
-/>`}</code>
+/>`}
+              </code>
             </div>
-            
+
             <div className="p-4 bg-slate-50 rounded-lg">
               <h4 className="font-medium text-slate-700 mb-2">Validation Feedback</h4>
               <code className="text-xs text-slate-600 block whitespace-pre">{`<FieldValidation
   error="Invalid input"
   warning="Check value"
   success="Valid input"
-/>`}</code>
+/>`}
+              </code>
             </div>
           </div>
         </Card>

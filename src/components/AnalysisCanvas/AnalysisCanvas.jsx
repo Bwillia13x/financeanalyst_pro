@@ -1,23 +1,25 @@
-import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Search, 
-  TrendingUp, 
-  BarChart3, 
-  Calculator, 
+import {
+  Search,
+  TrendingUp,
+  BarChart3,
+  Calculator,
   Target,
   ChevronRight,
   Minimize2,
   Maximize2
 } from 'lucide-react';
-import CompanySelector from './CompanySelector';
-import CompanyOverview from './CompanyOverview';
-import AnalysisModule from './AnalysisModule';
+import React, { useState, useEffect, useCallback } from 'react';
+
 import { calculateEnhancedDCF } from '../../utils/dcfCalculations';
+
+import AnalysisModule from './AnalysisModule';
+import CompanyOverview from './CompanyOverview';
+import CompanySelector from './CompanySelector';
 
 // Spring-based animation configuration for organic feel
 const springConfig = {
-  type: "spring",
+  type: 'spring',
   stiffness: 400,
   damping: 25
 };
@@ -79,15 +81,15 @@ const AnalysisCanvas = () => {
   ];
 
   // Handle company selection with intelligent data population
-  const handleCompanySelect = useCallback(async (company) => {
+  const handleCompanySelect = useCallback(async(company) => {
     setSelectedCompany(company);
     setCanvasMode('analysis');
-    
+
     // Populate with intelligent defaults based on company data
     if (company.financials?.revenue) {
       const latestRevenue = company.financials.revenue[company.financials.revenue.length - 1];
       const growthRates = calculateHistoricalGrowthRates(company.financials.revenue);
-      
+
       setAnalysisInputs(prev => ({
         ...prev,
         dcf: {
@@ -105,29 +107,29 @@ const AnalysisCanvas = () => {
   // Calculate historical growth rates for intelligent defaults
   const calculateHistoricalGrowthRates = (revenueData) => {
     if (!revenueData || revenueData.length < 2) return [];
-    
+
     const growthRates = [];
     for (let i = 1; i < revenueData.length; i++) {
-      const growth = ((revenueData[i] - revenueData[i-1]) / revenueData[i-1]) * 100;
+      const growth = ((revenueData[i] - revenueData[i - 1]) / revenueData[i - 1]) * 100;
       growthRates.push(growth);
     }
-    
+
     return growthRates;
   };
 
   // Generate intelligent defaults based on historical data and sector
   const generateIntelligentDefaults = (historicalGrowth, sector) => {
-    const avgGrowth = historicalGrowth.length > 0 
-      ? historicalGrowth.reduce((a, b) => a + b, 0) / historicalGrowth.length 
+    const avgGrowth = historicalGrowth.length > 0
+      ? historicalGrowth.reduce((a, b) => a + b, 0) / historicalGrowth.length
       : 10;
 
     const sectorDefaults = getSectorDefaults(sector);
-    
+
     const yearlyData = {};
     for (let year = 1; year <= 5; year++) {
       // Declining growth model
       const yearGrowth = Math.max(avgGrowth * (1 - (year - 1) * 0.1), sectorDefaults.terminalGrowth);
-      
+
       yearlyData[year] = {
         revenueGrowth: yearGrowth,
         ebitdaMargin: sectorDefaults.ebitdaMargin,
@@ -137,7 +139,7 @@ const AnalysisCanvas = () => {
         workingCapitalChange: sectorDefaults.workingCapitalChange
       };
     }
-    
+
     return yearlyData;
   };
 
@@ -375,7 +377,7 @@ const AnalysisCanvas = () => {
               className="space-y-8"
             >
               {/* Company Overview Section */}
-              <CompanyOverview 
+              <CompanyOverview
                 company={selectedCompany}
                 compact={activeModules.length > 0}
               />

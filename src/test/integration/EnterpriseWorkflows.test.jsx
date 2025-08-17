@@ -8,8 +8,8 @@ import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 
 // Import services directly for integration testing
 import aiAnalyticsService from '../../services/aiAnalyticsService';
-import collaborationService from '../../services/collaborationService';
 import businessIntelligenceService from '../../services/businessIntelligenceService';
+import collaborationService from '../../services/collaborationService';
 import realTimeDataService from '../../services/realTimeDataService';
 
 // Mock WebSocket for real-time features
@@ -55,7 +55,7 @@ describe('Enterprise Workflows Integration Tests', () => {
   });
 
   describe('AI Analytics Service Integration', () => {
-    it('should initialize and analyze financial data successfully', async () => {
+    it('should initialize and analyze financial data successfully', async() => {
       // Test AI Analytics service initialization and analysis
       await aiAnalyticsService.initialize();
       expect(aiAnalyticsService.isInitialized).toBe(true);
@@ -89,7 +89,7 @@ describe('Enterprise Workflows Integration Tests', () => {
       });
     });
 
-    it('should generate actionable recommendations', async () => {
+    it('should generate actionable recommendations', async() => {
       await aiAnalyticsService.initialize();
       const analysis = await aiAnalyticsService.analyzeFinancialData(mockFinancialData);
 
@@ -101,7 +101,7 @@ describe('Enterprise Workflows Integration Tests', () => {
       });
     });
 
-    it('should handle service health monitoring', async () => {
+    it('should handle service health monitoring', async() => {
       await aiAnalyticsService.initialize();
       const health = aiAnalyticsService.getServiceHealth();
 
@@ -114,7 +114,7 @@ describe('Enterprise Workflows Integration Tests', () => {
   });
 
   describe('Collaboration Service Integration', () => {
-    it('should initialize and manage workspace operations', async () => {
+    it('should initialize and manage workspace operations', async() => {
       await collaborationService.initialize(mockUserProfile.id, mockUserProfile);
       expect(collaborationService.isInitialized).toBe(true);
 
@@ -145,21 +145,21 @@ describe('Enterprise Workflows Integration Tests', () => {
       expect(shareResult.id).toBe('test-model-123');
     });
 
-    it('should handle real-time collaboration features', async () => {
+    it('should handle real-time collaboration features', async() => {
       await collaborationService.initialize(mockUserProfile.id, mockUserProfile);
-      
+
       const workspaceId = 'test-workspace';
-      
+
       // Test cursor updates (real-time presence)
       collaborationService.updateCursor(workspaceId, { x: 100, y: 200 });
-      
+
       // Verify the cursor update was processed (no direct return value)
       expect(collaborationService.isInitialized).toBe(true);
 
       // Test real-time messaging
       const message = collaborationService.sendMessage({
         type: 'comment',
-        workspaceId: workspaceId,
+        workspaceId,
         userId: mockUserProfile.id,
         content: 'Test integration message',
         timestamp: Date.now()
@@ -171,7 +171,7 @@ describe('Enterprise Workflows Integration Tests', () => {
   });
 
   describe('Business Intelligence Service Integration', () => {
-    it('should initialize and track user actions', async () => {
+    it('should initialize and track user actions', async() => {
       await businessIntelligenceService.initialize();
       expect(businessIntelligenceService.isInitialized).toBe(true);
 
@@ -203,7 +203,7 @@ describe('Enterprise Workflows Integration Tests', () => {
       expect(usageReport.metrics).toHaveProperty('averageSessionDuration');
     });
 
-    it('should generate performance and behavior reports', async () => {
+    it('should generate performance and behavior reports', async() => {
       await businessIntelligenceService.initialize();
 
       // Generate performance report
@@ -229,7 +229,7 @@ describe('Enterprise Workflows Integration Tests', () => {
   });
 
   describe('Real-time Data Service Integration', () => {
-    it('should handle real-time data subscriptions and updates', async () => {
+    it('should handle real-time data subscriptions and updates', async() => {
       // Test subscription to price updates
       const callback = vi.fn();
       const unsubscribe = realTimeDataService.subscribe('stock_price', 'AAPL', callback);
@@ -247,7 +247,7 @@ describe('Enterprise Workflows Integration Tests', () => {
 
       // Should have received at least one update
       expect(callback.mock.calls.length).toBeGreaterThan(initialCallCount);
-      
+
       // Verify data structure
       const lastCall = callback.mock.calls[callback.mock.calls.length - 1];
       expect(lastCall[0]).toHaveProperty('symbol');
@@ -257,7 +257,7 @@ describe('Enterprise Workflows Integration Tests', () => {
       // Test unsubscription
       unsubscribe();
       const callCountAfterUnsub = callback.mock.calls.length;
-      
+
       // Wait and verify no more calls
       await new Promise(resolve => setTimeout(resolve, 600));
       expect(callback.mock.calls.length).toBe(callCountAfterUnsub);
@@ -265,14 +265,14 @@ describe('Enterprise Workflows Integration Tests', () => {
   });
 
   describe('End-to-End Workflow Integration', () => {
-    it('should complete full enterprise workflow: AI analysis → Collaboration → BI tracking', async () => {
+    it('should complete full enterprise workflow: AI analysis → Collaboration → BI tracking', async() => {
       // Step 1: Initialize all services
       await Promise.all([
         aiAnalyticsService.initialize(),
         collaborationService.initialize(mockUserProfile.id, mockUserProfile),
         businessIntelligenceService.initialize()
       ]);
-      
+
       // Subscribe to real-time updates separately
       const unsubscribe = realTimeDataService.subscribe('stock_price', 'AAPL', vi.fn());
 
@@ -304,7 +304,7 @@ describe('Enterprise Workflows Integration Tests', () => {
         analysisId: analysis.timestamp,
         insights: analysis.insights.length
       });
-      
+
       businessIntelligenceService.trackFeatureUsage('Collaboration', 'model_shared', {
         userId: mockUserProfile.id,
         shareId: shareResult.id,
@@ -316,12 +316,12 @@ describe('Enterprise Workflows Integration Tests', () => {
 
       expect(workflowReport.metrics.totalSessions).toBeGreaterThanOrEqual(0);
       expect(workflowReport.metrics.uniqueUsers).toBeGreaterThanOrEqual(0);
-      
+
       // Clean up subscription
       unsubscribe();
     });
 
-    it('should handle data updates propagating across all systems', async () => {
+    it('should handle data updates propagating across all systems', async() => {
       // Initialize services
       await Promise.all([
         aiAnalyticsService.initialize(),
@@ -349,7 +349,7 @@ describe('Enterprise Workflows Integration Tests', () => {
       unsubscribe();
     });
 
-    it('should maintain service resilience during partial failures', async () => {
+    it('should maintain service resilience during partial failures', async() => {
       // Initialize services
       await aiAnalyticsService.initialize();
       await businessIntelligenceService.initialize();
@@ -372,7 +372,7 @@ describe('Enterprise Workflows Integration Tests', () => {
   });
 
   describe('Performance and Scalability Integration', () => {
-    it('should handle concurrent operations efficiently', async () => {
+    it('should handle concurrent operations efficiently', async() => {
       const startTime = Date.now();
 
       // Initialize all services concurrently
@@ -390,7 +390,7 @@ describe('Enterprise Workflows Integration Tests', () => {
           mockUserProfile.id,
           'concurrent_test',
           { metadata: 'performance_test' }
-        ),
+        )
       ]);
 
       const endTime = Date.now();
@@ -406,7 +406,7 @@ describe('Enterprise Workflows Integration Tests', () => {
       expect(totalTime).toBeLessThan(5000);
     });
 
-    it('should handle large datasets without performance degradation', async () => {
+    it('should handle large datasets without performance degradation', async() => {
       // Create large dataset
       const largeDataset = {
         ...mockFinancialData,

@@ -3,7 +3,6 @@
  * Provides comprehensive commenting, annotation, and review features for financial models
  */
 
-import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   MessageSquare,
@@ -32,6 +31,7 @@ import {
   Tag,
   PaperclipIcon
 } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
 
 const CommentingAnnotations = ({ modelData, currentUser, onDataChange }) => {
   const [comments, setComments] = useState([
@@ -123,11 +123,11 @@ const CommentingAnnotations = ({ modelData, currentUser, onDataChange }) => {
   const filteredComments = comments.filter(comment => {
     const matchesStatus = filterStatus === 'all' || comment.status === filterStatus;
     const matchesPriority = filterPriority === 'all' || comment.priority === filterPriority;
-    const matchesSearch = searchTerm === '' || 
+    const matchesSearch = searchTerm === '' ||
       comment.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
       comment.author.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       comment.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
-    
+
     return matchesStatus && matchesPriority && matchesSearch;
   });
 
@@ -158,7 +158,7 @@ const CommentingAnnotations = ({ modelData, currentUser, onDataChange }) => {
         pinned: false,
         attachments: []
       };
-      
+
       setComments(prev => [comment, ...prev]);
       setNewComment('');
       setShowCommentForm(false);
@@ -179,35 +179,35 @@ const CommentingAnnotations = ({ modelData, currentUser, onDataChange }) => {
         timestamp: new Date()
       };
 
-      setComments(prev => prev.map(comment => 
-        comment.id === commentId 
+      setComments(prev => prev.map(comment =>
+        comment.id === commentId
           ? { ...comment, replies: [...comment.replies, reply] }
           : comment
       ));
-      
+
       setReplyContent('');
       setReplyingTo(null);
     }
   };
 
   const handleResolveComment = (commentId) => {
-    setComments(prev => prev.map(comment => 
-      comment.id === commentId 
+    setComments(prev => prev.map(comment =>
+      comment.id === commentId
         ? { ...comment, resolved: !comment.resolved, status: comment.resolved ? 'open' : 'resolved' }
         : comment
     ));
   };
 
   const handleReaction = (commentId, reactionType) => {
-    setComments(prev => prev.map(comment => 
-      comment.id === commentId 
-        ? { 
-            ...comment, 
-            reactions: { 
-              ...comment.reactions, 
-              [reactionType]: comment.reactions[reactionType] + 1 
-            }
+    setComments(prev => prev.map(comment =>
+      comment.id === commentId
+        ? {
+          ...comment,
+          reactions: {
+            ...comment.reactions,
+            [reactionType]: comment.reactions[reactionType] + 1
           }
+        }
         : comment
     ));
   };
@@ -265,7 +265,7 @@ const CommentingAnnotations = ({ modelData, currentUser, onDataChange }) => {
                 <Plus className="w-4 h-4 mr-2" />
                 Add Comment
               </button>
-              
+
               <div className="flex items-center space-x-2">
                 <Filter className="w-4 h-4 text-gray-500" />
                 <select
@@ -277,7 +277,7 @@ const CommentingAnnotations = ({ modelData, currentUser, onDataChange }) => {
                   <option value="open">Open</option>
                   <option value="resolved">Resolved</option>
                 </select>
-                
+
                 <select
                   value={filterPriority}
                   onChange={(e) => setFilterPriority(e.target.value)}
@@ -290,7 +290,7 @@ const CommentingAnnotations = ({ modelData, currentUser, onDataChange }) => {
                 </select>
               </div>
             </div>
-            
+
             <div className="relative">
               <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
               <input
@@ -398,8 +398,8 @@ const CommentingAnnotations = ({ modelData, currentUser, onDataChange }) => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   className={`bg-gray-50 rounded-lg p-6 border-l-4 ${
-                    comment.pinned ? 'border-l-yellow-500 bg-yellow-50' : 
-                    comment.resolved ? 'border-l-green-500' : 'border-l-blue-500'
+                    comment.pinned ? 'border-l-yellow-500 bg-yellow-50' :
+                      comment.resolved ? 'border-l-green-500' : 'border-l-blue-500'
                   }`}
                 >
                   {/* Comment Header */}
@@ -421,7 +421,7 @@ const CommentingAnnotations = ({ modelData, currentUser, onDataChange }) => {
                         </div>
                       </div>
                     </div>
-                    
+
                     <div className="flex items-center space-x-2">
                       {getStatusIcon(comment.status, comment.resolved)}
                       <span className={`px-2 py-1 text-xs font-medium rounded-full ${getPriorityColor(comment.priority)}`}>
@@ -436,7 +436,7 @@ const CommentingAnnotations = ({ modelData, currentUser, onDataChange }) => {
                   {/* Comment Content */}
                   <div className="mb-4">
                     <p className="text-gray-900">{comment.content}</p>
-                    
+
                     {comment.tags.length > 0 && (
                       <div className="flex items-center space-x-2 mt-3">
                         <Tag className="w-4 h-4 text-gray-400" />
@@ -463,14 +463,14 @@ const CommentingAnnotations = ({ modelData, currentUser, onDataChange }) => {
                   {/* Comment Actions */}
                   <div className="flex items-center justify-between border-t border-gray-200 pt-4">
                     <div className="flex items-center space-x-4">
-                      <button 
+                      <button
                         onClick={() => handleReaction(comment.id, 'thumbsUp')}
                         className="flex items-center space-x-1 text-gray-600 hover:text-green-600"
                       >
                         <ThumbsUp className="w-4 h-4" />
                         <span className="text-sm">{comment.reactions.thumbsUp}</span>
                       </button>
-                      <button 
+                      <button
                         onClick={() => handleReaction(comment.id, 'helpful')}
                         className="flex items-center space-x-1 text-gray-600 hover:text-blue-600"
                       >
@@ -485,13 +485,13 @@ const CommentingAnnotations = ({ modelData, currentUser, onDataChange }) => {
                         <span className="text-sm">Reply</span>
                       </button>
                     </div>
-                    
+
                     <div className="flex items-center space-x-2">
                       <button
                         onClick={() => handleResolveComment(comment.id)}
                         className={`text-sm font-medium ${
-                          comment.resolved 
-                            ? 'text-gray-600 hover:text-gray-800' 
+                          comment.resolved
+                            ? 'text-gray-600 hover:text-gray-800'
                             : 'text-green-600 hover:text-green-800'
                         }`}
                       >

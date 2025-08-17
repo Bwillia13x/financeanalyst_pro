@@ -1,19 +1,20 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Cell, ReferenceLine } from 'recharts';
+
 import { cn } from '../../../utils/cn';
 import { Card, CardContent, CardHeader, CardTitle } from '../Card';
 
-const DCFWaterfall = ({ 
-  data = [], 
+const DCFWaterfall = ({
+  data = [],
   className,
-  title = "DCF Cash Flow Components",
+  title = 'DCF Cash Flow Components',
   formatValue = (value) => `$${(value / 1000000).toFixed(1)}M`
 }) => {
   // Calculate cumulative values for waterfall effect
   const processedData = data.reduce((acc, item, index) => {
     const prevTotal = index === 0 ? 0 : acc[index - 1].cumulative;
     const cumulative = prevTotal + item.value;
-    
+
     acc.push({
       ...item,
       cumulative,
@@ -21,7 +22,7 @@ const DCFWaterfall = ({
       isPositive: item.value >= 0,
       isTotal: item.type === 'total'
     });
-    
+
     return acc;
   }, []);
 
@@ -29,10 +30,10 @@ const DCFWaterfall = ({
     const { payload, x, y, width, height } = props;
     if (!payload) return null;
 
-    const barColor = payload.isTotal 
-      ? 'var(--color-primary)' 
-      : payload.isPositive 
-        ? 'var(--color-secondary)' 
+    const barColor = payload.isTotal
+      ? 'var(--color-primary)'
+      : payload.isPositive
+        ? 'var(--color-secondary)'
         : 'var(--color-destructive)';
 
     return (
@@ -51,7 +52,7 @@ const DCFWaterfall = ({
     if (!active || !payload || !payload.length) return null;
 
     const data = payload[0].payload;
-    
+
     return (
       <div className="bg-white border border-gray-200 rounded-md shadow-elevation-1 p-3 min-w-[160px]">
         <p className="font-medium text-sm text-foreground mb-1">{label}</p>
@@ -68,7 +69,7 @@ const DCFWaterfall = ({
   };
 
   return (
-    <Card className={cn("w-full", className)}>
+    <Card className={cn('w-full', className)}>
       <CardHeader className="pb-4">
         <CardTitle className="text-lg font-semibold text-foreground">{title}</CardTitle>
       </CardHeader>
@@ -79,7 +80,7 @@ const DCFWaterfall = ({
               data={processedData}
               margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
             >
-              <XAxis 
+              <XAxis
                 dataKey="name"
                 axisLine={false}
                 tickLine={false}
@@ -95,8 +96,8 @@ const DCFWaterfall = ({
                 tickFormatter={formatValue}
               />
               <ReferenceLine y={0} stroke="var(--color-border)" strokeWidth={1} />
-              <Bar 
-                dataKey="value" 
+              <Bar
+                dataKey="value"
                 shape={<CustomBar />}
                 radius={[2, 2, 0, 0]}
               />
@@ -104,19 +105,19 @@ const DCFWaterfall = ({
             </BarChart>
           </ResponsiveContainer>
         </div>
-        
+
         {/* Legend */}
         <div className="flex items-center justify-center gap-6 mt-4 pt-4 border-t border-gray-100">
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-sm bg-secondary"></div>
+            <div className="w-3 h-3 rounded-sm bg-secondary" />
             <span className="text-sm text-muted-foreground">Positive</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-sm bg-destructive"></div>
+            <div className="w-3 h-3 rounded-sm bg-destructive" />
             <span className="text-sm text-muted-foreground">Negative</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-sm bg-primary"></div>
+            <div className="w-3 h-3 rounded-sm bg-primary" />
             <span className="text-sm text-muted-foreground">Total</span>
           </div>
         </div>

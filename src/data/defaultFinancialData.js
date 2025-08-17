@@ -5,7 +5,7 @@
 
 const defaultFinancialData = {
   periods: ['Dec-22', 'Dec-23', 'Dec-24'],
-  
+
   // Enhanced medispa operational metrics for advanced analysis
   operationalMetrics: {
     squareFootage: 2500,
@@ -139,10 +139,10 @@ const defaultFinancialData = {
         adjustedOperatingIncome: 357.43,
         adjustedEbitda: 687.63, // Operating Income + Depreciation + Interest
         adjustmentRationale: [
-          "Marketing normalized to sustainable 10% of revenue",
-          "Owner compensation replaced with market-rate management",
-          "EBITDA calculation includes depreciation and interest add-backs",
-          "One-time gains excluded from operating performance"
+          'Marketing normalized to sustainable 10% of revenue',
+          'Owner compensation replaced with market-rate management',
+          'EBITDA calculation includes depreciation and interest add-backs',
+          'One-time gains excluded from operating performance'
         ]
       }
     }

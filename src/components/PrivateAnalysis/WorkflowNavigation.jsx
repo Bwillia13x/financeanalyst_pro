@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  Database, 
-  Calculator, 
-  BarChart3, 
-  CheckCircle, 
+import {
+  Database,
+  Calculator,
+  BarChart3,
+  CheckCircle,
   AlertTriangle,
   Clock,
   ChevronRight,
@@ -12,12 +11,13 @@ import {
   TrendingUp,
   FileSpreadsheet
 } from 'lucide-react';
+import React, { useState } from 'react';
 
-const WorkflowNavigation = ({ 
-  activeStep, 
-  onStepChange, 
-  dataCompleteness, 
-  modelingProgress, 
+const WorkflowNavigation = ({
+  activeStep,
+  onStepChange,
+  dataCompleteness,
+  modelingProgress,
   analysisProgress,
   validationErrors = {}
 }) => {
@@ -30,19 +30,19 @@ const WorkflowNavigation = ({
         if (dataCompleteness >= 80) return 'completed';
         if (dataCompleteness > 0) return 'in-progress';
         return 'pending';
-      
+
       case 'modeling':
         if (dataCompleteness < 50) return 'disabled';
         if (modelingProgress >= 80) return 'completed';
         if (modelingProgress > 0) return 'in-progress';
         return 'available';
-      
+
       case 'analysis':
         if (dataCompleteness < 80 || modelingProgress < 50) return 'disabled';
         if (analysisProgress >= 80) return 'completed';
         if (analysisProgress > 0) return 'in-progress';
         return 'available';
-      
+
       default:
         return 'pending';
     }
@@ -128,23 +128,23 @@ const WorkflowNavigation = ({
 
   const renderStatusIcon = (step, status, isActive) => {
     const Icon = step.icon;
-    
+
     if (status === 'completed') {
       return <CheckCircle size={20} className="text-emerald-400" />;
     }
-    
+
     if (status === 'disabled') {
       return <Icon size={20} className="text-slate-500" />;
     }
-    
+
     if (validationErrors[step.id]?.length > 0) {
       return <AlertTriangle size={20} className="text-amber-400" />;
     }
-    
+
     if (status === 'in-progress') {
       return <Clock size={20} className="text-blue-400" />;
     }
-    
+
     return <Icon size={20} className={isActive ? 'text-white' : getStatusColor(status)} />;
   };
 
@@ -153,7 +153,7 @@ const WorkflowNavigation = ({
     const circumference = 2 * Math.PI * radius;
     const strokeDasharray = circumference;
     const strokeDashoffset = circumference - (progress / 100) * circumference;
-    
+
     const getProgressColor = () => {
       if (progress >= 80) return '#10b981'; // emerald-500
       if (progress >= 50) return '#3b82f6'; // blue-500
@@ -241,7 +241,7 @@ const WorkflowNavigation = ({
             <p className="text-sm text-slate-400">Follow these steps to complete your analysis</p>
           </div>
         </div>
-        
+
         {/* Overall Progress */}
         <div className="flex items-center gap-4">
           <div className="text-right">
@@ -254,8 +254,8 @@ const WorkflowNavigation = ({
             <motion.div
               className="h-full bg-gradient-to-r from-blue-500 to-emerald-500"
               initial={{ width: 0 }}
-              animate={{ 
-                width: `${(dataCompleteness + modelingProgress + analysisProgress) / 3}%` 
+              animate={{
+                width: `${(dataCompleteness + modelingProgress + analysisProgress) / 3}%`
               }}
               transition={{ duration: 0.8, ease: 'easeOut' }}
             />
@@ -278,10 +278,10 @@ const WorkflowNavigation = ({
                 disabled={isDisabled}
                 className={`
                   w-full p-4 rounded-xl border transition-all duration-200 text-left relative overflow-hidden
-                  ${isActive 
-                    ? 'bg-blue-600 border-blue-500 shadow-lg shadow-blue-600/20' 
-                    : getStatusBg(status, false)
-                  }
+                  ${isActive
+              ? 'bg-blue-600 border-blue-500 shadow-lg shadow-blue-600/20'
+              : getStatusBg(status, false)
+            }
                   ${!isDisabled && !isActive ? 'hover:border-slate-500 hover:bg-slate-700/40' : ''}
                   ${isDisabled ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'}
                   ${hasErrors ? 'border-amber-400/40' : 'border-slate-600/30'}
@@ -292,22 +292,24 @@ const WorkflowNavigation = ({
                 {/* Step Number & Icon */}
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-3">
-                    <div className={`
+                    <div
+                      className={`
                       flex items-center justify-center w-10 h-10 rounded-lg transition-all
-                      ${isActive 
-                        ? 'bg-white/20' 
-                        : status === 'completed' 
-                        ? 'bg-emerald-500/20' 
-                        : 'bg-slate-600/30'
-                      }
-                    `}>
+                      ${isActive
+              ? 'bg-white/20'
+              : status === 'completed'
+                ? 'bg-emerald-500/20'
+                : 'bg-slate-600/30'
+            }
+                    `}
+                    >
                       {renderStatusIcon(step, status, isActive)}
                     </div>
                     <div className="text-xs font-medium text-slate-400">
                       Step {index + 1}
                     </div>
                   </div>
-                  
+
                   {step.progress > 0 && (
                     <div className="flex-shrink-0">
                       {renderProgressRing(step.progress, status)}
@@ -317,14 +319,18 @@ const WorkflowNavigation = ({
 
                 {/* Step Content */}
                 <div className="space-y-1">
-                  <h4 className={`font-semibold ${
-                    isActive ? 'text-white' : getStatusColor(status)
-                  }`}>
+                  <h4
+                    className={`font-semibold ${
+                      isActive ? 'text-white' : getStatusColor(status)
+                    }`}
+                  >
                     {step.title}
                   </h4>
-                  <p className={`text-sm ${
-                    isActive ? 'text-blue-100' : 'text-slate-400'
-                  }`}>
+                  <p
+                    className={`text-sm ${
+                      isActive ? 'text-blue-100' : 'text-slate-400'
+                    }`}
+                  >
                     {step.subtitle}
                   </p>
                 </div>
@@ -366,14 +372,14 @@ const WorkflowNavigation = ({
               {/* Connection Line */}
               {index < steps.length - 1 && (
                 <div className="absolute top-1/2 -right-2 transform -translate-y-1/2 z-10">
-                  <ChevronRight 
-                    size={16} 
+                  <ChevronRight
+                    size={16}
                     className={`
-                      ${getStepStatus(steps[index + 1].id) !== 'disabled' 
-                        ? 'text-slate-400' 
-                        : 'text-slate-600'
-                      }
-                    `} 
+                      ${getStepStatus(steps[index + 1].id) !== 'disabled'
+                  ? 'text-slate-400'
+                  : 'text-slate-600'
+                }
+                    `}
                   />
                 </div>
               )}
@@ -391,7 +397,7 @@ const WorkflowNavigation = ({
           </div>
           <div className="text-lg font-semibold text-white">{dataCompleteness}%</div>
         </div>
-        
+
         <div className="bg-slate-800/30 border border-slate-700/50 rounded-lg p-3">
           <div className="flex items-center gap-2 mb-1">
             <Calculator size={14} className="text-slate-400" />
@@ -399,7 +405,7 @@ const WorkflowNavigation = ({
           </div>
           <div className="text-lg font-semibold text-white">{Math.round(modelingProgress)}%</div>
         </div>
-        
+
         <div className="bg-slate-800/30 border border-slate-700/50 rounded-lg p-3">
           <div className="flex items-center gap-2 mb-1">
             <BarChart3 size={14} className="text-slate-400" />

@@ -1,6 +1,7 @@
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
+import React from 'react';
 import { vi } from 'vitest';
+
 import ModelingTools from '../ModelingTools';
 
 const mockData = {
@@ -9,9 +10,9 @@ const mockData = {
     incomeStatement: {
       totalRevenue: { 0: 1000, 1: 1100, 2: 1210 },
       totalCOGS: { 0: 400, 1: 440, 2: 484 },
-      operatingIncome: { 0: 200, 1: 220, 2: 242 },
-    },
-  },
+      operatingIncome: { 0: 200, 1: 220, 2: 242 }
+    }
+  }
 };
 
 describe('ModelingTools', () => {

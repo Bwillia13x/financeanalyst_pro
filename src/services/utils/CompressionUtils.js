@@ -64,7 +64,7 @@ export class CompressionUtils {
     // Read compressed data
     const chunks = [];
     let done = false;
-    
+
     while (!done) {
       const { value, done: readerDone } = await reader.read();
       done = readerDone;
@@ -77,7 +77,7 @@ export class CompressionUtils {
     const totalLength = chunks.reduce((sum, chunk) => sum + chunk.length, 0);
     const combined = new Uint8Array(totalLength);
     let offset = 0;
-    
+
     for (const chunk of chunks) {
       combined.set(chunk, offset);
       offset += chunk.length;
@@ -106,7 +106,7 @@ export class CompressionUtils {
     // Read decompressed data
     const chunks = [];
     let done = false;
-    
+
     while (!done) {
       const { value, done: readerDone } = await reader.read();
       done = readerDone;
@@ -119,7 +119,7 @@ export class CompressionUtils {
     const totalLength = chunks.reduce((sum, chunk) => sum + chunk.length, 0);
     const combined = new Uint8Array(totalLength);
     let offset = 0;
-    
+
     for (const chunk of chunks) {
       combined.set(chunk, offset);
       offset += chunk.length;
@@ -136,7 +136,7 @@ export class CompressionUtils {
     const dictionary = new Map();
     const result = [];
     let dictSize = 256;
-    
+
     // Initialize dictionary with single characters
     for (let i = 0; i < 256; i++) {
       dictionary.set(String.fromCharCode(i), i);
@@ -146,7 +146,7 @@ export class CompressionUtils {
     for (let i = 0; i < data.length; i++) {
       const char = data[i];
       const combined = current + char;
-      
+
       if (dictionary.has(combined)) {
         current = combined;
       } else {
@@ -155,7 +155,7 @@ export class CompressionUtils {
         current = char;
       }
     }
-    
+
     if (current) {
       result.push(dictionary.get(current));
     }
@@ -176,7 +176,7 @@ export class CompressionUtils {
 
     const dictionary = new Map();
     let dictSize = 256;
-    
+
     // Initialize dictionary
     for (let i = 0; i < 256; i++) {
       dictionary.set(i, String.fromCharCode(i));
@@ -189,7 +189,7 @@ export class CompressionUtils {
     for (let i = 1; i < compressed.length; i++) {
       const code = compressed[i];
       let current;
-      
+
       if (dictionary.has(code)) {
         current = dictionary.get(code);
       } else if (code === dictSize) {
@@ -197,7 +197,7 @@ export class CompressionUtils {
       } else {
         throw new Error('Invalid compressed data');
       }
-      
+
       result += current;
       dictionary.set(dictSize++, previous + current[0]);
       previous = current;
@@ -244,7 +244,7 @@ export class CompressionUtils {
       const originalSize = new Blob([data]).size;
       const compressed = await this.compress(data);
       const compressedSize = new Blob([compressed]).size;
-      
+
       return {
         originalSize,
         compressedSize,

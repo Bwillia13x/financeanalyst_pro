@@ -4,6 +4,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+
 import businessIntelligenceService from '../services/businessIntelligenceService';
 import { performanceMonitoring } from '../utils/performanceMonitoring';
 
@@ -18,22 +19,22 @@ export function useBusinessIntelligence(config = {}) {
   const [benchmarks, setBenchmarks] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  
+
   const initialized = useRef(false);
 
   // Initialize Business Intelligence service
   useEffect(() => {
     if (initialized.current) return;
 
-    const initializeService = async () => {
+    const initializeService = async() => {
       try {
         setIsLoading(true);
         setError(null);
-        
+
         await businessIntelligenceService.initialize(config);
         setIsInitialized(true);
         initialized.current = true;
-        
+
         // Track initialization success
         if (typeof performanceMonitoring !== 'undefined') {
           performanceMonitoring.trackCustomMetric('bi_hook_init_success', 1);
@@ -41,7 +42,7 @@ export function useBusinessIntelligence(config = {}) {
       } catch (err) {
         setError(err.message);
         console.error('Failed to initialize business intelligence:', err);
-        
+
         if (typeof performanceMonitoring !== 'undefined') {
           performanceMonitoring.trackCustomMetric('bi_hook_init_error', 1);
         }
@@ -83,11 +84,11 @@ export function useBusinessIntelligence(config = {}) {
     businessIntelligenceService.on('analyticsUpdate', handleAnalyticsUpdate);
 
     // Load initial data
-    const loadInitialData = async () => {
+    const loadInitialData = async() => {
       try {
         const currentAnalytics = businessIntelligenceService.getCurrentAnalytics();
         setAnalytics(currentAnalytics);
-        
+
         const actionableInsights = businessIntelligenceService.getActionableInsights();
         setInsights([{ insights: actionableInsights, timestamp: Date.now() }]);
       } catch (err) {
@@ -127,9 +128,9 @@ export function useBusinessIntelligence(config = {}) {
   }, [isInitialized]);
 
   // Generate report on demand
-  const generateReport = useCallback(async () => {
+  const generateReport = useCallback(async() => {
     if (!isInitialized) return null;
-    
+
     try {
       setIsLoading(true);
       const report = await businessIntelligenceService.generateAutomatedReports();
@@ -145,14 +146,14 @@ export function useBusinessIntelligence(config = {}) {
   // Get historical trends
   const getHistoricalTrends = useCallback((metric, period = '30d') => {
     if (!isInitialized) return [];
-    
+
     return businessIntelligenceService.getHistoricalTrends(metric, period);
   }, [isInitialized]);
 
   // Export data
   const exportData = useCallback((format = 'json', filters = {}) => {
     if (!isInitialized) return null;
-    
+
     return businessIntelligenceService.exportData(format, filters);
   }, [isInitialized]);
 
@@ -188,7 +189,7 @@ export function useUsageAnalytics() {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const loadUsageData = async () => {
+    const loadUsageData = async() => {
       setIsLoading(true);
       try {
         // Simulate loading usage analytics
@@ -247,7 +248,7 @@ export function usePerformanceAnalytics() {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const loadPerformanceData = async () => {
+    const loadPerformanceData = async() => {
       setIsLoading(true);
       try {
         // Simulate loading performance analytics
@@ -313,7 +314,7 @@ export function useMarketIntelligence() {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const loadMarketIntelligence = async () => {
+    const loadMarketIntelligence = async() => {
       setIsLoading(true);
       try {
         // Simulate loading market intelligence
@@ -388,7 +389,7 @@ export function useUserBehaviorAnalytics() {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const loadBehaviorData = async () => {
+    const loadBehaviorData = async() => {
       setIsLoading(true);
       try {
         // Simulate loading behavior analytics
@@ -465,7 +466,7 @@ export function useAutomatedInsights() {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const loadInsights = async () => {
+    const loadInsights = async() => {
       setIsLoading(true);
       try {
         // Simulate loading automated insights

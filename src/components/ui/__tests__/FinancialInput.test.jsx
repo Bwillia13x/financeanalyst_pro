@@ -1,6 +1,7 @@
-import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
+
 import FinancialInput from '../FinancialInput';
 
 describe('FinancialInput', () => {
@@ -20,39 +21,39 @@ describe('FinancialInput', () => {
     expect(screen.getByText('*')).toBeInTheDocument();
   });
 
-  it('formats currency values correctly', async () => {
+  it('formats currency values correctly', async() => {
     const mockOnChange = vi.fn();
     render(
-      <FinancialInput 
-        value={1234.56} 
+      <FinancialInput
+        value={1234.56}
         onChange={mockOnChange}
         type="currency"
         currency="USD"
       />
     );
-    
+
     const input = screen.getByRole('textbox');
     expect(input.value).toBe('$1,234.56');
   });
 
-  it('handles focus and blur correctly', async () => {
+  it('handles focus and blur correctly', async() => {
     const mockOnChange = vi.fn();
     render(
-      <FinancialInput 
+      <FinancialInput
         value={1000}
         onChange={mockOnChange}
         type="currency"
       />
     );
-    
+
     const input = screen.getByRole('textbox');
-    
+
     // Focus should show raw value
     fireEvent.focus(input);
     await waitFor(() => {
       expect(input.value).toBe('1000');
     });
-    
+
     // Blur should format value
     fireEvent.blur(input);
     await waitFor(() => {
@@ -60,21 +61,21 @@ describe('FinancialInput', () => {
     });
   });
 
-  it('validates negative values when not allowed', async () => {
+  it('validates negative values when not allowed', async() => {
     const mockOnValidation = vi.fn();
     render(
-      <FinancialInput 
+      <FinancialInput
         allowNegative={false}
         onValidation={mockOnValidation}
         value={-100}
       />
     );
-    
+
     const input = screen.getByRole('textbox');
     fireEvent.focus(input);
     fireEvent.change(input, { target: { value: '-100' } });
     fireEvent.blur(input);
-    
+
     await waitFor(() => {
       expect(mockOnValidation).toHaveBeenCalledWith(false, 'Negative values are not allowed');
     });
@@ -82,12 +83,12 @@ describe('FinancialInput', () => {
 
   it('handles percentage type correctly', () => {
     render(
-      <FinancialInput 
+      <FinancialInput
         value={25}
         type="percentage"
       />
     );
-    
+
     const input = screen.getByRole('textbox');
     expect(input.value).toBe('25.00%');
   });
@@ -103,40 +104,40 @@ describe('FinancialInput', () => {
     expect(input).toBeDisabled();
   });
 
-  it('calls onChange with parsed value', async () => {
+  it('calls onChange with parsed value', async() => {
     const mockOnChange = vi.fn();
     render(
-      <FinancialInput 
+      <FinancialInput
         onChange={mockOnChange}
         type="currency"
       />
     );
-    
+
     const input = screen.getByRole('textbox');
     fireEvent.focus(input);
     fireEvent.change(input, { target: { value: '1500' } });
     fireEvent.blur(input);
-    
+
     await waitFor(() => {
       expect(mockOnChange).toHaveBeenCalledWith(1500);
     });
   });
 
-  it('validates min and max values', async () => {
+  it('validates min and max values', async() => {
     const mockOnValidation = vi.fn();
     render(
-      <FinancialInput 
+      <FinancialInput
         min={0}
         max={1000}
         value={1500}
         onValidation={mockOnValidation}
       />
     );
-    
+
     const input = screen.getByRole('textbox');
     fireEvent.focus(input);
     fireEvent.blur(input);
-    
+
     await waitFor(() => {
       expect(mockOnValidation).toHaveBeenCalledWith(false, expect.stringContaining('must not exceed'));
     });

@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+
 import { accessibilityTester } from '../utils/accessibilityTesting';
 import { reportPerformanceMetric } from '../utils/performanceMonitoring';
 
@@ -23,7 +24,7 @@ export function useAccessibility(options = {}) {
   const intervalRef = useRef(null);
 
   // Run accessibility tests
-  const runTests = useCallback(async (element = null, testOptions = {}) => {
+  const runTests = useCallback(async(element = null, testOptions = {}) => {
     if (!enabled) return null;
 
     const targetElement = element || elementRef.current || document;
@@ -31,7 +32,7 @@ export function useAccessibility(options = {}) {
 
     try {
       const testResults = await accessibilityTester.runTests(targetElement, testOptions);
-      
+
       setResults(testResults);
       setViolations(testResults.violations || []);
       setScore(accessibilityTester.calculateAccessibilityScore());
@@ -62,13 +63,13 @@ export function useAccessibility(options = {}) {
   }, [enabled, componentType, onViolations, onSuccess]);
 
   // Test specific financial component
-  const testFinancialComponent = useCallback(async (selector, type = componentType) => {
+  const testFinancialComponent = useCallback(async(selector, type = componentType) => {
     if (!enabled) return null;
 
     setIsLoading(true);
     try {
       const testResults = await accessibilityTester.testFinancialComponent(selector, type);
-      
+
       setResults(testResults);
       setViolations(testResults.violations || []);
       setScore(accessibilityTester.calculateAccessibilityScore());
@@ -92,12 +93,12 @@ export function useAccessibility(options = {}) {
   }, [enabled, componentType]);
 
   // Test keyboard navigation
-  const testKeyboardNavigation = useCallback(async () => {
+  const testKeyboardNavigation = useCallback(async() => {
     if (!enabled) return null;
 
     try {
       const navResults = await accessibilityTester.testKeyboardNavigation();
-      
+
       reportPerformanceMetric('keyboard_navigation_test', {
         focusableElements: navResults.focusableElementsCount,
         tabOrderIssues: navResults.tabOrderIssues?.length || 0,
@@ -114,12 +115,12 @@ export function useAccessibility(options = {}) {
   }, [enabled]);
 
   // Test color contrast
-  const testColorContrast = useCallback(async () => {
+  const testColorContrast = useCallback(async() => {
     if (!enabled) return null;
 
     try {
       const contrastResults = await accessibilityTester.testColorContrast();
-      
+
       reportPerformanceMetric('color_contrast_test', {
         totalElements: contrastResults.totalElements,
         contrastIssues: contrastResults.contrastIssues?.length || 0,
@@ -135,12 +136,12 @@ export function useAccessibility(options = {}) {
   }, [enabled]);
 
   // Test form accessibility
-  const testFormAccessibility = useCallback(async () => {
+  const testFormAccessibility = useCallback(async() => {
     if (!enabled) return null;
 
     try {
       const formResults = await accessibilityTester.testFormAccessibility();
-      
+
       reportPerformanceMetric('form_accessibility_test', {
         totalForms: formResults.totalForms,
         formIssues: formResults.formIssues?.length || 0,
@@ -161,7 +162,7 @@ export function useAccessibility(options = {}) {
 
     try {
       const report = accessibilityTester.generateReport();
-      
+
       // Store report data for performance monitoring
       reportPerformanceMetric('accessibility_report_generated', {
         score: report.summary.score,
@@ -216,7 +217,7 @@ export function useAccessibility(options = {}) {
     score,
     isLoading,
     lastTestTime,
-    
+
     // Test functions
     runTests,
     testFinancialComponent,
@@ -224,7 +225,7 @@ export function useAccessibility(options = {}) {
     testColorContrast,
     testFormAccessibility,
     generateReport,
-    
+
     // Element ref for targeting tests
     elementRef
   };
@@ -236,15 +237,15 @@ export function useAppAccessibility() {
   const [recentViolations, setRecentViolations] = useState([]);
   const [testHistory, setTestHistory] = useState([]);
 
-  const runGlobalAccessibilityCheck = useCallback(async () => {
+  const runGlobalAccessibilityCheck = useCallback(async() => {
     try {
       // Run comprehensive tests on the entire document
       const results = await accessibilityTester.runTests(document);
       const score = accessibilityTester.calculateAccessibilityScore();
-      
+
       setGlobalScore(score);
       setRecentViolations(results.violations || []);
-      
+
       // Update test history
       const historyEntry = {
         timestamp: Date.now(),
@@ -252,9 +253,9 @@ export function useAppAccessibility() {
         violations: results.violations?.length || 0,
         url: window.location.pathname
       };
-      
+
       setTestHistory(prev => [...prev.slice(-9), historyEntry]); // Keep last 10 entries
-      
+
       // Report global metrics
       reportPerformanceMetric('global_accessibility_check', {
         score,
@@ -280,7 +281,7 @@ export function useAppAccessibility() {
 
     // Listen for navigation changes
     window.addEventListener('popstate', checkOnRouteChange);
-    
+
     // Run initial check
     checkOnRouteChange();
 
@@ -310,19 +311,19 @@ export function useFinancialAccessibility(componentType) {
   });
 
   // Enhanced testing for financial components
-  const testFinancialFeatures = useCallback(async () => {
+  const testFinancialFeatures = useCallback(async() => {
     const results = {};
 
     try {
       // Test keyboard navigation (critical for financial apps)
       results.keyboardNav = await accessibility.testKeyboardNavigation();
-      
+
       // Test color contrast (important for reading financial data)
       results.colorContrast = await accessibility.testColorContrast();
-      
+
       // Test forms if component contains them
       results.formAccessibility = await accessibility.testFormAccessibility();
-      
+
       // Generate comprehensive report
       results.report = accessibility.generateReport();
 
@@ -355,12 +356,12 @@ export function useAccessibilityMonitor(options = {}) {
     if (isMonitoring) return;
 
     setIsMonitoring(true);
-    
-    const monitor = async () => {
+
+    const monitor = async() => {
       try {
         const results = await accessibilityTester.runTests(document);
         const score = accessibilityTester.calculateAccessibilityScore();
-        
+
         // Check if score is below threshold
         if (score < threshold) {
           const alert = {
@@ -371,14 +372,14 @@ export function useAccessibilityMonitor(options = {}) {
             violations: results.violations?.length || 0,
             timestamp: Date.now()
           };
-          
+
           setAlerts(prev => [...prev, alert]);
-          
+
           if (alertOnViolations) {
             console.warn('Accessibility Alert:', alert.message);
           }
         }
-        
+
         // Check for critical violations
         const criticalViolations = results.violations?.filter(v => v.impact === 'critical') || [];
         if (criticalViolations.length > 0 && alertOnViolations) {
@@ -389,7 +390,7 @@ export function useAccessibilityMonitor(options = {}) {
             violations: criticalViolations,
             timestamp: Date.now()
           };
-          
+
           setAlerts(prev => [...prev, alert]);
           console.error('Critical Accessibility Violations:', criticalViolations);
         }
@@ -409,7 +410,7 @@ export function useAccessibilityMonitor(options = {}) {
 
     // Run initial check
     monitor();
-    
+
     // Set up interval
     intervalRef.current = setInterval(monitor, monitorInterval);
   }, [isMonitoring, threshold, alertOnViolations, monitorInterval]);

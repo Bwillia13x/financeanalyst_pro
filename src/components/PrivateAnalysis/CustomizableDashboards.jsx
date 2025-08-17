@@ -3,7 +3,6 @@
  * Provides drag-and-drop dashboard customization with widgets and analytics
  */
 
-import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard,
@@ -35,6 +34,7 @@ import {
   Zap,
   AlertTriangle
 } from 'lucide-react';
+import React, { useState, useCallback } from 'react';
 import {
   LineChart,
   Line,
@@ -262,12 +262,12 @@ const CustomizableDashboards = ({ modelData, onDataChange }) => {
                 <XAxis dataKey="year" />
                 <YAxis />
                 <Tooltip />
-                <Line 
-                  type="monotone" 
-                  dataKey="revenue" 
-                  stroke="#10B981" 
+                <Line
+                  type="monotone"
+                  dataKey="revenue"
+                  stroke="#10B981"
                   strokeWidth={2}
-                  strokeDasharray={(entry) => entry.projected ? "5 5" : "0"}
+                  strokeDasharray={(entry) => entry.projected ? '5 5' : '0'}
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -365,12 +365,12 @@ const CustomizableDashboards = ({ modelData, onDataChange }) => {
                   </option>
                 ))}
               </select>
-              
+
               <button
                 onClick={() => setIsEditing(!isEditing)}
                 className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center ${
-                  isEditing 
-                    ? 'bg-green-600 hover:bg-green-700 text-white' 
+                  isEditing
+                    ? 'bg-green-600 hover:bg-green-700 text-white'
                     : 'bg-gray-600 hover:bg-gray-700 text-white'
                 }`}
               >

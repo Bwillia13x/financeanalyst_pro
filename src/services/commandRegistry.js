@@ -115,7 +115,7 @@ export class CommandRegistry {
    */
   register(name, handler, metadata = {}) {
     const commandName = name.toUpperCase();
-    
+
     const commandInfo = {
       name: commandName,
       handler,
@@ -157,7 +157,7 @@ export class CommandRegistry {
    */
   getHandler(name) {
     const commandName = name.toUpperCase();
-    
+
     // Check direct command
     const command = this.commands.get(commandName);
     if (command) {
@@ -181,7 +181,7 @@ export class CommandRegistry {
    */
   getCommandInfo(name) {
     const commandName = name.toUpperCase();
-    
+
     // Check direct command
     const command = this.commands.get(commandName);
     if (command) {
@@ -323,7 +323,7 @@ export class CommandRegistry {
    */
   getCommandStats() {
     const stats = {};
-    
+
     for (const [categoryKey, category] of this.categories) {
       stats[categoryKey] = {
         name: category.name,

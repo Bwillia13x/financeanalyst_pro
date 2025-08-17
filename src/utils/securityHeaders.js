@@ -7,9 +7,9 @@ export function generateNonce() {
     window.crypto.getRandomValues(array);
     return btoa(String.fromCharCode.apply(null, array));
   }
-  
+
   // Fallback for server-side or older browsers
-  return Math.random().toString(36).substring(2, 15) + 
+  return Math.random().toString(36).substring(2, 15) +
          Math.random().toString(36).substring(2, 15);
 }
 
@@ -87,13 +87,13 @@ export class CSPPolicyBuilder {
         .filter(src => src !== "'unsafe-inline'")
         .concat([`'nonce-${nonce}'`]);
     }
-    
+
     if (this.policies['style-src']) {
       // Keep unsafe-inline for CSS-in-JS compatibility
       this.policies['style-src'] = this.policies['style-src']
         .concat([`'nonce-${nonce}'`]);
     }
-    
+
     return this;
   }
 
@@ -135,11 +135,11 @@ export const securityHeaders = {
   // Content Security Policy
   getCSP: (nonce = null) => {
     const builder = new CSPPolicyBuilder().setDefaults();
-    
+
     if (nonce) {
       builder.addNonce(nonce);
     }
-    
+
     // Add development-specific policies
     if (process.env.NODE_ENV === 'development') {
       builder
@@ -147,7 +147,7 @@ export const securityHeaders = {
         .addSource('connect-src', 'ws://localhost:*')
         .addSource('connect-src', 'http://localhost:*');
     }
-    
+
     return builder.build();
   },
 
@@ -218,31 +218,31 @@ export function applyCspNonce(nonce) {
 // Create secure headers for server responses
 export function createSecureHeaders(nonce = null) {
   const headers = {};
-  
+
   // CSP with nonce
   headers['Content-Security-Policy'] = securityHeaders.getCSP(nonce);
-  
+
   // Security headers
   headers['Strict-Transport-Security'] = securityHeaders.getHSTS();
   headers['X-Frame-Options'] = securityHeaders.getFrameOptions();
   headers['X-Content-Type-Options'] = securityHeaders.getContentTypeOptions();
   headers['Referrer-Policy'] = securityHeaders.getReferrerPolicy();
   headers['Permissions-Policy'] = securityHeaders.getPermissionsPolicy();
-  
+
   // Cross-Origin policies
   if (process.env.NODE_ENV === 'production') {
     headers['Cross-Origin-Embedder-Policy'] = securityHeaders.getCrossOriginEmbedderPolicy();
     headers['Cross-Origin-Opener-Policy'] = securityHeaders.getCrossOriginOpenerPolicy();
     headers['Cross-Origin-Resource-Policy'] = securityHeaders.getCrossOriginResourcePolicy();
   }
-  
+
   return headers;
 }
 
 // Validate CSP compliance
 export function validateCSPCompliance() {
   const violations = [];
-  
+
   if (typeof document === 'undefined') return violations;
 
   // Check for inline scripts without nonces
@@ -297,7 +297,7 @@ export function setupCSPReporting() {
     };
 
     console.warn('CSP Violation:', violation);
-    
+
     // In production, send to monitoring service
     if (process.env.NODE_ENV === 'production') {
       sendCSPViolation(violation);
@@ -321,28 +321,28 @@ function sendCSPViolation(violation) {
 // Initialize security measures
 export function initializeSecurity() {
   const nonce = getCurrentNonce();
-  
+
   // Apply nonce to existing elements
   applyCspNonce(nonce);
-  
+
   // Setup CSP violation reporting
   setupCSPReporting();
-  
+
   // Validate compliance
   const violations = validateCSPCompliance();
   if (violations.length > 0) {
     console.warn('CSP compliance issues found:', violations);
   }
-  
+
   // Setup periodic compliance checks
   setInterval(() => {
     const currentViolations = validateCSPCompliance();
     if (currentViolations.length > violations.length) {
-      console.warn('New CSP compliance issues detected:', 
+      console.warn('New CSP compliance issues detected:',
         currentViolations.slice(violations.length));
     }
   }, 30000); // Check every 30 seconds
-  
+
   console.log('Security measures initialized with nonce:', nonce);
   return nonce;
 }

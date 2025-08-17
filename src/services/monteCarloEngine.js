@@ -257,19 +257,19 @@ class MonteCarloEngine {
 
       case 'beta':
         return this.betaRandom(parameters.alpha, parameters.beta);
-        
+
       case 'exponential':
         return this.exponentialRandom(parameters.lambda);
-        
+
       case 'weibull':
         return this.weibullRandom(parameters.shape, parameters.scale);
-        
+
       case 'pareto':
         return this.paretoRandom(parameters.scale, parameters.shape);
-        
+
       case 'student_t':
         return this.studentTRandom(parameters.df);
-        
+
       case 'chi_squared':
         return this.chiSquaredRandom(parameters.df);
 
@@ -277,7 +277,7 @@ class MonteCarloEngine {
         throw new Error(`Unsupported distribution type: ${type}`);
     }
   }
-  
+
   /**
    * Generate exponential random variable
    * @param {number} lambda - Rate parameter
@@ -286,7 +286,7 @@ class MonteCarloEngine {
   exponentialRandom(lambda) {
     return -Math.log(1 - Math.random()) / lambda;
   }
-  
+
   /**
    * Generate Weibull random variable
    * @param {number} shape - Shape parameter (k)
@@ -297,7 +297,7 @@ class MonteCarloEngine {
     const u = Math.random();
     return scale * Math.pow(-Math.log(1 - u), 1 / shape);
   }
-  
+
   /**
    * Generate Pareto random variable
    * @param {number} scale - Scale parameter (xm)
@@ -308,7 +308,7 @@ class MonteCarloEngine {
     const u = Math.random();
     return scale / Math.pow(u, 1 / shape);
   }
-  
+
   /**
    * Generate Student's t random variable
    * @param {number} df - Degrees of freedom
@@ -316,13 +316,13 @@ class MonteCarloEngine {
    */
   studentTRandom(df) {
     if (df <= 0) throw new Error('Degrees of freedom must be positive');
-    
+
     const normal = this.normalRandom(0, 1);
     const chiSq = this.chiSquaredRandom(df);
-    
+
     return normal / Math.sqrt(chiSq / df);
   }
-  
+
   /**
    * Generate Chi-squared random variable
    * @param {number} df - Degrees of freedom
@@ -330,7 +330,7 @@ class MonteCarloEngine {
    */
   chiSquaredRandom(df) {
     if (df <= 0) throw new Error('Degrees of freedom must be positive');
-    
+
     return this.gammaRandom(df / 2) * 2;
   }
 
@@ -665,7 +665,7 @@ class MonteCarloEngine {
         sharpeRatio: this.calculateSharpeRatio(values, 0.02), // Assuming 2% risk-free rate
         sortinoRatio: this.calculateSortinoRatio(values, mean)
       };
-      
+
       // Distribution fitting tests
       analysis.distributionTests[metric] = {
         jarqueBera: this.jarqueBeraTest(values),
@@ -673,7 +673,7 @@ class MonteCarloEngine {
         shapiroWilk: values.length <= 5000 ? this.shapiroWilkTest(values) : null
       };
     });
-    
+
     // Calculate correlation matrix between metrics
     if (metrics.length > 1) {
       analysis.correlations = this.calculateCorrelationMatrix(results, metrics);
@@ -681,7 +681,7 @@ class MonteCarloEngine {
 
     return analysis;
   }
-  
+
   /**
    * Calculate mode of dataset
    */
@@ -691,13 +691,13 @@ class MonteCarloEngine {
       const rounded = Math.round(v * 100) / 100; // Round to avoid floating point issues
       frequency[rounded] = (frequency[rounded] || 0) + 1;
     });
-    
+
     const maxFreq = Math.max(...Object.values(frequency));
     const modes = Object.keys(frequency).filter(k => frequency[k] === maxFreq);
-    
+
     return modes.length === 1 ? parseFloat(modes[0]) : null;
   }
-  
+
   /**
    * Calculate trimmed mean
    */
@@ -706,7 +706,7 @@ class MonteCarloEngine {
     const trimmedValues = sortedValues.slice(trimCount, -trimCount || undefined);
     return trimmedValues.reduce((sum, v) => sum + v, 0) / trimmedValues.length;
   }
-  
+
   /**
    * Calculate Median Absolute Deviation
    */
@@ -715,13 +715,13 @@ class MonteCarloEngine {
     const deviations = values.map(v => Math.abs(v - median)).sort((a, b) => a - b);
     return this.percentile(deviations, 0.5);
   }
-  
+
   /**
    * Calculate bootstrap confidence interval
    */
   calculateBootstrapCI(values, confidenceLevel, bootstrapSamples = 1000) {
     const bootstrapMeans = [];
-    
+
     for (let i = 0; i < bootstrapSamples; i++) {
       const sample = [];
       for (let j = 0; j < values.length; j++) {
@@ -729,23 +729,23 @@ class MonteCarloEngine {
       }
       bootstrapMeans.push(sample.reduce((sum, v) => sum + v, 0) / sample.length);
     }
-    
+
     bootstrapMeans.sort((a, b) => a - b);
     const alpha = 1 - confidenceLevel;
-    
+
     return {
       lowerBound: this.percentile(bootstrapMeans, alpha / 2),
       upperBound: this.percentile(bootstrapMeans, 1 - alpha / 2)
     };
   }
-  
+
   /**
    * Calculate maximum drawdown
    */
   calculateMaxDrawdown(values) {
     let peak = values[0];
     let maxDrawdown = 0;
-    
+
     for (const value of values) {
       if (value > peak) {
         peak = value;
@@ -755,10 +755,10 @@ class MonteCarloEngine {
         maxDrawdown = drawdown;
       }
     }
-    
+
     return maxDrawdown;
   }
-  
+
   /**
    * Calculate Sharpe ratio approximation
    */
@@ -766,28 +766,28 @@ class MonteCarloEngine {
     const mean = values.reduce((sum, v) => sum + v, 0) / values.length;
     const variance = values.reduce((sum, v) => sum + Math.pow(v - mean, 2), 0) / values.length;
     const stdDev = Math.sqrt(variance);
-    
+
     return stdDev > 0 ? (mean - riskFreeRate) / stdDev : 0;
   }
-  
+
   /**
    * Calculate Sortino ratio
    */
   calculateSortinoRatio(values, targetReturn) {
     const excessReturns = values.map(v => v - targetReturn);
     const negativeReturns = excessReturns.filter(r => r < 0);
-    
+
     if (negativeReturns.length === 0) return Infinity;
-    
+
     const downsideDeviation = Math.sqrt(
       negativeReturns.reduce((sum, r) => sum + r * r, 0) / negativeReturns.length
     );
-    
+
     const meanExcessReturn = excessReturns.reduce((sum, r) => sum + r, 0) / excessReturns.length;
-    
+
     return downsideDeviation > 0 ? meanExcessReturn / downsideDeviation : 0;
   }
-  
+
   /**
    * Jarque-Bera test for normality
    */
@@ -796,20 +796,20 @@ class MonteCarloEngine {
     const mean = values.reduce((sum, v) => sum + v, 0) / n;
     const variance = values.reduce((sum, v) => sum + Math.pow(v - mean, 2), 0) / n;
     const stdDev = Math.sqrt(variance);
-    
+
     const skewness = this.calculateSkewness(values, mean, stdDev);
     const kurtosis = this.calculateKurtosis(values, mean, stdDev);
-    
+
     const jb = (n / 6) * (Math.pow(skewness, 2) + Math.pow(kurtosis - 3, 2) / 4);
     const pValue = 1 - this.chiSquaredCDF(jb, 2); // Approximate p-value
-    
+
     return {
       statistic: jb,
       pValue,
       isNormal: pValue > 0.05
     };
   }
-  
+
   /**
    * Approximate chi-squared CDF
    */
@@ -817,27 +817,51 @@ class MonteCarloEngine {
     if (x <= 0) return 0;
     return this.incompleteGamma(df / 2, x / 2);
   }
-  
+
   /**
    * Incomplete gamma function approximation
    */
   incompleteGamma(a, x) {
     // Simple approximation for demonstration
     if (x === 0) return 0;
+    if (x < 0) return 0;
+    if (a <= 0) return 0;
+
+    // Use series expansion for small x relative to a
     if (x < a + 1) {
       let sum = 1 / a;
       let term = 1 / a;
       for (let n = 1; n < 100; n++) {
         term *= x / (a + n);
         sum += term;
-        if (term < 1e-15) break;
+        if (Math.abs(term) < 1e-15) break;
       }
       return Math.exp(-x + a * Math.log(x) - this.logGamma(a)) * sum;
     } else {
-      return 1 - this.incompleteGamma(a, x);
+      // Use continued fraction for large x
+      let b = x + 1 - a;
+      let c = 1e30;
+      let d = 1 / b;
+      let h = d;
+
+      for (let i = 1; i <= 100; i++) {
+        const an = -i * (i - a);
+        b += 2;
+        d = an * d + b;
+        if (Math.abs(d) < 1e-30) d = 1e-30;
+        c = b + an / c;
+        if (Math.abs(c) < 1e-30) c = 1e-30;
+        d = 1 / d;
+        const del = d * c;
+        h *= del;
+        if (Math.abs(del - 1) < 1e-15) break;
+      }
+
+      const gammacf = Math.exp(-x + a * Math.log(x) - this.logGamma(a)) * h;
+      return 1 - gammacf;
     }
   }
-  
+
   /**
    * Log gamma function approximation
    */
@@ -846,21 +870,21 @@ class MonteCarloEngine {
       76.18009172947146, -86.50532032941677, 24.01409824083091,
       -1.231739572450155, 0.1208650973866179e-2, -0.5395239384953e-5
     ];
-    
+
     let j = 0;
     let ser = 1.000000000190015;
     let xx = x;
     let y = xx = x;
     let tmp = x + 5.5;
     tmp -= (x + 0.5) * Math.log(tmp);
-    
+
     for (; j < 6; j++) {
       ser += coef[j] / ++y;
     }
-    
+
     return -tmp + Math.log(2.5066282746310005 * ser / xx);
   }
-  
+
   /**
    * Kolmogorov-Smirnov test for normality
    */
@@ -869,32 +893,32 @@ class MonteCarloEngine {
     const mean = values.reduce((sum, v) => sum + v, 0) / n;
     const variance = values.reduce((sum, v) => sum + Math.pow(v - mean, 2), 0) / n;
     const stdDev = Math.sqrt(variance);
-    
+
     let maxD = 0;
-    
+
     for (let i = 0; i < n; i++) {
       const empirical = (i + 1) / n;
       const theoretical = this.normalCDF((values[i] - mean) / stdDev);
       const d = Math.abs(empirical - theoretical);
       if (d > maxD) maxD = d;
     }
-    
+
     const critical = 1.36 / Math.sqrt(n); // Critical value at 5% significance
-    
+
     return {
       statistic: maxD,
       critical,
       isNormal: maxD < critical
     };
   }
-  
+
   /**
    * Normal CDF approximation
    */
   normalCDF(x) {
     return 0.5 * (1 + this.erf(x / Math.sqrt(2)));
   }
-  
+
   /**
    * Error function approximation
    */
@@ -905,16 +929,16 @@ class MonteCarloEngine {
     const a4 = -1.453152027;
     const a5 =  1.061405429;
     const p  =  0.3275911;
-    
+
     const sign = x < 0 ? -1 : 1;
     x = Math.abs(x);
-    
+
     const t = 1.0 / (1.0 + p * x);
     const y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
-    
+
     return sign * y;
   }
-  
+
   /**
    * Shapiro-Wilk test for normality (simplified)
    */
@@ -922,33 +946,33 @@ class MonteCarloEngine {
     // Simplified implementation - in practice, would use lookup tables
     const n = values.length;
     if (n < 3 || n > 5000) return null;
-    
+
     const sortedValues = [...values].sort((a, b) => a - b);
     const mean = values.reduce((sum, v) => sum + v, 0) / n;
-    
+
     // This is a very simplified approximation
-    let numerator = 0;
+    const numerator = 0;
     let denominator = 0;
-    
+
     for (let i = 0; i < n; i++) {
       denominator += Math.pow(sortedValues[i] - mean, 2);
     }
-    
+
     // Simplified calculation - real implementation would use Shapiro-Wilk coefficients
     const w = numerator / denominator;
-    
+
     return {
       statistic: w,
       isNormal: w > 0.9 // Very rough approximation
     };
   }
-  
+
   /**
    * Calculate correlation matrix between metrics
    */
   calculateCorrelationMatrix(results, metrics) {
     const correlationMatrix = {};
-    
+
     for (let i = 0; i < metrics.length; i++) {
       correlationMatrix[metrics[i]] = {};
       for (let j = 0; j < metrics.length; j++) {
@@ -957,29 +981,29 @@ class MonteCarloEngine {
         } else {
           const valuesI = results.map(r => r[metrics[i]]).filter(v => v !== null && !isNaN(v));
           const valuesJ = results.map(r => r[metrics[j]]).filter(v => v !== null && !isNaN(v));
-          
+
           correlationMatrix[metrics[i]][metrics[j]] = this.calculateCorrelation(valuesI, valuesJ);
         }
       }
     }
-    
+
     return correlationMatrix;
   }
-  
+
   /**
    * Calculate Pearson correlation coefficient
    */
   calculateCorrelation(x, y) {
     if (x.length !== y.length || x.length === 0) return 0;
-    
+
     const n = x.length;
     const meanX = x.reduce((sum, v) => sum + v, 0) / n;
     const meanY = y.reduce((sum, v) => sum + v, 0) / n;
-    
+
     let numerator = 0;
     let sumXX = 0;
     let sumYY = 0;
-    
+
     for (let i = 0; i < n; i++) {
       const dx = x[i] - meanX;
       const dy = y[i] - meanY;
@@ -987,7 +1011,7 @@ class MonteCarloEngine {
       sumXX += dx * dx;
       sumYY += dy * dy;
     }
-    
+
     const denominator = Math.sqrt(sumXX * sumYY);
     return denominator > 0 ? numerator / denominator : 0;
   }

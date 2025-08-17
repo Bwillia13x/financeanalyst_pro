@@ -1,3 +1,4 @@
+// @ts-check
 /**
  * Data Migration Service
  * Handles data migrations between different versions and storage formats
@@ -8,7 +9,7 @@ export class DataMigrationService {
     this.currentVersion = '1.0.0';
     this.migrationKey = 'financeanalyst_migration_version';
     this.backupKey = 'financeanalyst_migration_backup';
-    
+
     // Define migration paths
     this.migrations = {
       '0.0.0': {
@@ -26,7 +27,7 @@ export class DataMigrationService {
   async checkAndMigrate() {
     try {
       const currentStoredVersion = localStorage.getItem(this.migrationKey);
-      
+
       if (!currentStoredVersion) {
         // First time setup - check for legacy data
         await this.performInitialMigration();
@@ -37,13 +38,14 @@ export class DataMigrationService {
 
       // Update stored version
       localStorage.setItem(this.migrationKey, this.currentVersion);
-      
-      console.log(`✅ Data migration complete - version ${this.currentVersion}`);
+
+      console.warn(`✅ Data migration complete - version ${this.currentVersion}`);
       return { success: true, version: this.currentVersion };
 
     } catch (error) {
-      console.error('❌ Data migration failed:', error);
-      return { success: false, error: error.message };
+      const message = error instanceof Error ? error.message : String(error);
+      console.error('❌ Data migration failed:', message);
+      return { success: false, error: message };
     }
   }
 
@@ -51,22 +53,22 @@ export class DataMigrationService {
    * Perform initial migration from legacy data
    */
   async performInitialMigration() {
-    console.log('🔄 Performing initial data migration...');
-    
+    console.warn('🔄 Performing initial data migration...');
+
     try {
       // Check for legacy data patterns
       const legacyData = await this.detectLegacyData();
-      
+
       if (Object.keys(legacyData).length > 0) {
         // Create backup before migration
         await this.createMigrationBackup(legacyData);
-        
+
         // Migrate legacy data to new format
         await this.migrateToV1_0_0(legacyData);
-        
-        console.log('✅ Legacy data migrated successfully');
+
+        console.warn('✅ Legacy data migrated successfully');
       } else {
-        console.log('ℹ️ No legacy data found - clean installation');
+        console.warn('ℹ️ No legacy data found - clean installation');
       }
 
     } catch (error) {
@@ -79,12 +81,12 @@ export class DataMigrationService {
    * Perform version-to-version migration
    */
   async performVersionMigration(fromVersion, toVersion) {
-    console.log(`🔄 Migrating data from ${fromVersion} to ${toVersion}...`);
-    
+    console.warn(`🔄 Migrating data from ${fromVersion} to ${toVersion}...`);
+
     try {
       // Find migration path
       const migrationPath = this.findMigrationPath(fromVersion, toVersion);
-      
+
       if (!migrationPath.length) {
         throw new Error(`No migration path found from ${fromVersion} to ${toVersion}`);
       }
@@ -95,15 +97,15 @@ export class DataMigrationService {
 
       // Execute migrations in sequence
       for (const migration of migrationPath) {
-        console.log(`🔄 Applying migration: ${migration.description}`);
+        console.warn(`🔄 Applying migration: ${migration.description}`);
         await migration.migrate();
       }
 
-      console.log('✅ Version migration completed successfully');
+      console.warn('✅ Version migration completed successfully');
 
     } catch (error) {
       console.error('Failed to perform version migration:', error);
-      
+
       // Attempt to restore from backup
       await this.restoreFromBackup();
       throw error;
@@ -115,7 +117,7 @@ export class DataMigrationService {
    */
   async detectLegacyData() {
     const legacyData = {};
-    
+
     try {
       // Check for old command processor data
       const oldVariables = localStorage.getItem('commandProcessor_variables');
@@ -143,14 +145,14 @@ export class DataMigrationService {
 
       // Check for any other financeanalyst_ prefixed items
       Object.keys(localStorage).forEach(key => {
-        if (key.startsWith('financeanalyst_') && 
-            !key.includes('migration') && 
-            !key.includes('session') && 
+        if (key.startsWith('financeanalyst_') &&
+            !key.includes('migration') &&
+            !key.includes('session') &&
             !key.includes('user') &&
             !key.includes('crypto_key')) {
           try {
             legacyData[key] = JSON.parse(localStorage.getItem(key));
-          } catch (e) {
+          } catch {
             legacyData[key] = localStorage.getItem(key);
           }
         }
@@ -170,7 +172,7 @@ export class DataMigrationService {
   async migrateToV1_0_0(legacyData = null) {
     try {
       const dataToMigrate = legacyData || await this.detectLegacyData();
-      
+
       // Migrate watchlists to new format
       if (dataToMigrate.watchlists) {
         const migratedWatchlists = this.migrateWatchlistsFormat(dataToMigrate.watchlists);
@@ -198,7 +200,7 @@ export class DataMigrationService {
       // Clean up old data
       await this.cleanupLegacyData(dataToMigrate);
 
-      console.log('✅ Migration to v1.0.0 completed');
+      console.warn('✅ Migration to v1.0.0 completed');
 
     } catch (error) {
       console.error('Failed to migrate to v1.0.0:', error);
@@ -211,7 +213,7 @@ export class DataMigrationService {
    */
   migrateWatchlistsFormat(oldWatchlists) {
     const migrated = {};
-    
+
     if (Array.isArray(oldWatchlists)) {
       // Old format was array, convert to object
       oldWatchlists.forEach((watchlist, index) => {
@@ -304,16 +306,16 @@ export class DataMigrationService {
 
       // Remove other legacy keys found in detection
       Object.keys(legacyData).forEach(key => {
-        if (key.startsWith('financeanalyst_') && 
-            !key.includes('migration') && 
-            !key.includes('session') && 
+        if (key.startsWith('financeanalyst_') &&
+            !key.includes('migration') &&
+            !key.includes('session') &&
             !key.includes('user') &&
             !key.includes('crypto_key')) {
           localStorage.removeItem(key);
         }
       });
 
-      console.log('✅ Legacy data cleanup completed');
+      console.warn('✅ Legacy data cleanup completed');
 
     } catch (error) {
       console.error('Failed to cleanup legacy data:', error);
@@ -333,7 +335,7 @@ export class DataMigrationService {
       };
 
       localStorage.setItem(this.backupKey, JSON.stringify(backup));
-      console.log(`✅ Migration backup created for version ${version}`);
+      console.warn(`✅ Migration backup created for version ${version}`);
 
     } catch (error) {
       console.error('Failed to create migration backup:', error);
@@ -352,7 +354,7 @@ export class DataMigrationService {
       }
 
       const backup = JSON.parse(backupData);
-      
+
       // Restore data based on backup version
       if (backup.version === 'legacy') {
         // Restore legacy format
@@ -361,7 +363,7 @@ export class DataMigrationService {
         });
       }
 
-      console.log('✅ Data restored from migration backup');
+      console.warn('✅ Data restored from migration backup');
       return true;
 
     } catch (error) {
@@ -375,12 +377,12 @@ export class DataMigrationService {
    */
   async exportCurrentData() {
     const data = {};
-    
+
     Object.keys(localStorage).forEach(key => {
       if (key.startsWith('financeanalyst_')) {
         try {
           data[key] = JSON.parse(localStorage.getItem(key));
-        } catch (e) {
+        } catch {
           data[key] = localStorage.getItem(key);
         }
       }
@@ -396,7 +398,7 @@ export class DataMigrationService {
     // For now, simple direct migration
     // In the future, this could handle complex migration chains
     const migration = this.migrations[fromVersion];
-    
+
     if (migration && migration.to === toVersion) {
       return [migration];
     }
@@ -410,7 +412,7 @@ export class DataMigrationService {
   getMigrationStatus() {
     const storedVersion = localStorage.getItem(this.migrationKey);
     const hasBackup = !!localStorage.getItem(this.backupKey);
-    
+
     return {
       currentVersion: this.currentVersion,
       storedVersion,
@@ -425,6 +427,6 @@ export class DataMigrationService {
    */
   clearBackup() {
     localStorage.removeItem(this.backupKey);
-    console.log('✅ Migration backup cleared');
+    console.warn('✅ Migration backup cleared');
   }
 }

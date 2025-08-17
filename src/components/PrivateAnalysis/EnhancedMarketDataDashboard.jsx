@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  TrendingUp, TrendingDown, Activity, Globe, Bell, 
+import {
+  TrendingUp, TrendingDown, Activity, Globe, Bell,
   Plus, Minus, RefreshCw, Settings, Download, Search,
   BarChart3, LineChart, PieChart, AlertCircle, CheckCircle
 } from 'lucide-react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { LineChart as RechartsLineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, BarChart, Bar } from 'recharts';
 
 const EnhancedMarketDataDashboard = ({ data, onDataChange }) => {
@@ -54,7 +54,7 @@ const EnhancedMarketDataDashboard = ({ data, onDataChange }) => {
       style: 'currency',
       currency: 'USD',
       minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
+      maximumFractionDigits: 2
     }).format(value);
   }, []);
 
@@ -89,14 +89,14 @@ const EnhancedMarketDataDashboard = ({ data, onDataChange }) => {
     return () => clearInterval(interval);
   }, []);
 
-  const addToWatchlist = useCallback(async () => {
+  const addToWatchlist = useCallback(async() => {
     if (!newSymbol.trim()) return;
-    
+
     setIsLoading(true);
     try {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
       const newItem = {
         symbol: newSymbol.toUpperCase(),
         name: `${newSymbol.toUpperCase()} Inc.`,
@@ -105,7 +105,7 @@ const EnhancedMarketDataDashboard = ({ data, onDataChange }) => {
         changePercent: (Math.random() - 0.5) * 5,
         category: 'stock'
       };
-      
+
       setWatchlist(prev => [...prev, newItem]);
       setNewSymbol('');
     } catch (error) {
@@ -150,7 +150,7 @@ const EnhancedMarketDataDashboard = ({ data, onDataChange }) => {
             <p className="text-gray-600">Real-time market insights & valuation integration</p>
           </div>
         </div>
-        
+
         <div className="flex space-x-3">
           <motion.button
             className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center space-x-2"
@@ -159,7 +159,7 @@ const EnhancedMarketDataDashboard = ({ data, onDataChange }) => {
             <RefreshCw size={16} />
             <span>Sync Data</span>
           </motion.button>
-          
+
           <motion.button
             className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg flex items-center space-x-2"
             whileHover={{ scale: 1.02 }}
@@ -326,12 +326,14 @@ const EnhancedMarketDataDashboard = ({ data, onDataChange }) => {
                         {formatPercent(item.changePercent)}
                       </td>
                       <td className="text-center py-3 px-4">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          item.category === 'index' ? 'bg-blue-100 text-blue-800' :
-                          item.category === 'stock' ? 'bg-green-100 text-green-800' :
-                          item.category === 'volatility' ? 'bg-red-100 text-red-800' :
-                          'bg-gray-100 text-gray-800'
-                        }`}>
+                        <span
+                          className={`px-2 py-1 rounded-full text-xs font-medium ${
+                            item.category === 'index' ? 'bg-blue-100 text-blue-800' :
+                              item.category === 'stock' ? 'bg-green-100 text-green-800' :
+                                item.category === 'volatility' ? 'bg-red-100 text-red-800' :
+                                  'bg-gray-100 text-gray-800'
+                          }`}
+                        >
                           {item.category}
                         </span>
                       </td>
@@ -365,9 +367,18 @@ const EnhancedMarketDataDashboard = ({ data, onDataChange }) => {
                   <XAxis dataKey="time" />
                   <YAxis />
                   <Tooltip />
-                  <Line type="monotone" dataKey="SPY" stroke="#3B82F6" strokeWidth={2} name="S&P 500" />
-                  <Line type="monotone" dataKey="QQQ" stroke="#10B981" strokeWidth={2} name="NASDAQ" />
-                  <Line type="monotone" dataKey="VIX" stroke="#EF4444" strokeWidth={2} name="VIX" />
+                  <Line
+                    type="monotone" dataKey="SPY" stroke="#3B82F6"
+                    strokeWidth={2} name="S&P 500"
+                  />
+                  <Line
+                    type="monotone" dataKey="QQQ" stroke="#10B981"
+                    strokeWidth={2} name="NASDAQ"
+                  />
+                  <Line
+                    type="monotone" dataKey="VIX" stroke="#EF4444"
+                    strokeWidth={2} name="VIX"
+                  />
                 </RechartsLineChart>
               </ResponsiveContainer>
             </div>
@@ -384,19 +395,21 @@ const EnhancedMarketDataDashboard = ({ data, onDataChange }) => {
                     <div className="text-sm text-gray-600">{corr.strength}</div>
                   </div>
                   <div className="flex items-center space-x-3">
-                    <div className={`text-lg font-bold ${
-                      Math.abs(corr.correlation) > 0.7 ? 'text-red-600' :
-                      Math.abs(corr.correlation) > 0.4 ? 'text-yellow-600' :
-                      'text-green-600'
-                    }`}>
+                    <div
+                      className={`text-lg font-bold ${
+                        Math.abs(corr.correlation) > 0.7 ? 'text-red-600' :
+                          Math.abs(corr.correlation) > 0.4 ? 'text-yellow-600' :
+                            'text-green-600'
+                      }`}
+                    >
                       {corr.correlation.toFixed(2)}
                     </div>
                     <div className="w-24 bg-gray-200 rounded-full h-2">
-                      <div 
+                      <div
                         className={`h-2 rounded-full ${
                           Math.abs(corr.correlation) > 0.7 ? 'bg-red-600' :
-                          Math.abs(corr.correlation) > 0.4 ? 'bg-yellow-600' :
-                          'bg-green-600'
+                            Math.abs(corr.correlation) > 0.4 ? 'bg-yellow-600' :
+                              'bg-green-600'
                         }`}
                         style={{ width: `${Math.abs(corr.correlation) * 100}%` }}
                       />
@@ -430,9 +443,11 @@ const EnhancedMarketDataDashboard = ({ data, onDataChange }) => {
                     </div>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      alert.active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                    }`}>
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        alert.active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                      }`}
+                    >
                       {alert.active ? 'Active' : 'Inactive'}
                     </span>
                     <button className="text-red-600 hover:text-red-800">

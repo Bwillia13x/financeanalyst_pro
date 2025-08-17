@@ -1,12 +1,15 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+
+import reactiveCalculationEngine from '../../services/reactiveCalculationEngine';
+import realTimeDataService from '../../services/realTimeDataService';
+import Icon from '../AppIcon';
+import Button from '../ui/Button';
 import { Card } from '../ui/Card';
 import Input from '../ui/Input';
 import Select from '../ui/Select';
-import Button from '../ui/Button';
-import Icon from '../AppIcon';
+
 import DynamicTimePeriodControl from './DynamicTimePeriodControl';
-import reactiveCalculationEngine from '../../services/reactiveCalculationEngine';
-import realTimeDataService from '../../services/realTimeDataService';
+
 
 const LivingModelDCF = ({ symbol, onBack }) => {
   const [modelId] = useState(`dcf_${Date.now()}`);
@@ -16,7 +19,7 @@ const LivingModelDCF = ({ symbol, onBack }) => {
   const [realTimeData, setRealTimeData] = useState({});
   const [lastUpdateTime, setLastUpdateTime] = useState(null);
   const modelRef = useRef(null);
-  
+
   // Model inputs with reactive updates
   const [inputs, setInputs] = useState({
     currentRevenue: 10000000000, // $10B
@@ -30,7 +33,7 @@ const LivingModelDCF = ({ symbol, onBack }) => {
       2: { revenueGrowth: 12, ebitdaMargin: 24, taxRate: 25, capexPercent: 4, daPercent: 3, workingCapitalChange: 2 },
       3: { revenueGrowth: 10, ebitdaMargin: 23, taxRate: 25, capexPercent: 3, daPercent: 3, workingCapitalChange: 1 },
       4: { revenueGrowth: 8, ebitdaMargin: 22, taxRate: 25, capexPercent: 3, daPercent: 3, workingCapitalChange: 1 },
-      5: { revenueGrowth: 6, ebitdaMargin: 21, taxRate: 25, capexPercent: 3, daPercent: 3, workingCapitalChange: 1 },
+      5: { revenueGrowth: 6, ebitdaMargin: 21, taxRate: 25, capexPercent: 3, daPercent: 3, workingCapitalChange: 1 }
     },
     balanceSheet: {
       cash: 100000000,
@@ -52,16 +55,16 @@ const LivingModelDCF = ({ symbol, onBack }) => {
         setIsLoading(false);
       }
     );
-    
+
     modelRef.current = model;
-    
+
     // Setup real-time data feeds if enabled
     if (inputs.trackRealTime && inputs.symbol) {
       model.addDependency('stock_price', inputs.symbol);
       model.addDependency('interest_rates', 'USD_10Y');
       model.addDependency('bond_yields', 'US10Y');
     }
-    
+
     return () => {
       if (modelRef.current) {
         modelRef.current.destroy();
@@ -102,17 +105,17 @@ const LivingModelDCF = ({ symbol, onBack }) => {
     if (modelRef.current) {
       modelRef.current.updateInput(path, value);
     }
-    
+
     setInputs(prev => {
       const updated = { ...prev };
       const keys = path.split('.');
       let current = updated;
-      
+
       for (let i = 0; i < keys.length - 1; i++) {
         if (!(keys[i] in current)) current[keys[i]] = {};
         current = current[keys[i]];
       }
-      
+
       current[keys[keys.length - 1]] = value;
       return updated;
     });
@@ -124,12 +127,12 @@ const LivingModelDCF = ({ symbol, onBack }) => {
 
   const handleProjectionYearsChange = useCallback((newYears) => {
     updateInput('projectionYears', newYears);
-    
+
     // Extend or trim yearly data
     setInputs(prev => {
       const updated = { ...prev };
       updated.projectionYears = newYears;
-      
+
       // Add new years with reasonable defaults
       for (let year = Object.keys(prev.yearlyData).length + 1; year <= newYears; year++) {
         if (!updated.yearlyData[year]) {
@@ -144,14 +147,14 @@ const LivingModelDCF = ({ symbol, onBack }) => {
           };
         }
       }
-      
+
       // Remove years beyond the new projection period
       Object.keys(updated.yearlyData).forEach(year => {
         if (parseInt(year) > newYears) {
           delete updated.yearlyData[year];
         }
       });
-      
+
       return updated;
     });
   }, [updateInput]);
@@ -159,7 +162,7 @@ const LivingModelDCF = ({ symbol, onBack }) => {
   const toggleRealTimeTracking = useCallback(() => {
     const newValue = !inputs.trackRealTime;
     updateInput('trackRealTime', newValue);
-    
+
     if (newValue && inputs.symbol && modelRef.current) {
       modelRef.current.addDependency('stock_price', inputs.symbol);
       modelRef.current.addDependency('interest_rates', 'USD_10Y');
@@ -183,7 +186,7 @@ const LivingModelDCF = ({ symbol, onBack }) => {
 
     return (
       <div className="flex items-center space-x-2 text-sm">
-        <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+        <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
         <span className="text-gray-300">
           {dataType === 'stock_price' && `$${data.price?.toFixed(2)}`}
           {dataType === 'interest_rates' && `${data.rate?.toFixed(2)}%`}
@@ -200,7 +203,7 @@ const LivingModelDCF = ({ symbol, onBack }) => {
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center space-x-4">
-            <Button 
+            <Button
               onClick={onBack}
               className="bg-gray-700 hover:bg-gray-600"
               size="sm"
@@ -220,18 +223,18 @@ const LivingModelDCF = ({ symbol, onBack }) => {
               </div>
             </div>
           </div>
-          
+
           {/* Real-time Toggle */}
           <div className="flex items-center space-x-4">
             <button
               onClick={toggleRealTimeTracking}
               className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
-                inputs.trackRealTime 
-                  ? 'bg-green-600 hover:bg-green-700 text-white' 
+                inputs.trackRealTime
+                  ? 'bg-green-600 hover:bg-green-700 text-white'
                   : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
               }`}
             >
-              <Icon name={inputs.trackRealTime ? "Zap" : "ZapOff"} className="w-4 h-4" />
+              <Icon name={inputs.trackRealTime ? 'Zap' : 'ZapOff'} className="w-4 h-4" />
               <span>Real-time: {inputs.trackRealTime ? 'ON' : 'OFF'}</span>
             </button>
           </div>
@@ -246,7 +249,7 @@ const LivingModelDCF = ({ symbol, onBack }) => {
                 <Icon name="Building" className="w-5 h-5 mr-2 text-blue-400" />
                 Company Basics
               </h3>
-              
+
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -260,7 +263,7 @@ const LivingModelDCF = ({ symbol, onBack }) => {
                   />
                   {inputs.trackRealTime && getRealTimeIndicator('stock_price', inputs.symbol)}
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">
                     Current Revenue
@@ -326,7 +329,7 @@ const LivingModelDCF = ({ symbol, onBack }) => {
                   <Icon name="Activity" className="w-5 h-5 mr-2 text-green-400" />
                   Live Market Data
                 </h3>
-                
+
                 <div className="space-y-3">
                   {getRealTimeIndicator('stock_price', inputs.symbol) && (
                     <div className="flex justify-between items-center">
@@ -334,14 +337,14 @@ const LivingModelDCF = ({ symbol, onBack }) => {
                       {getRealTimeIndicator('stock_price', inputs.symbol)}
                     </div>
                   )}
-                  
+
                   {getRealTimeIndicator('bond_yields', 'US10Y') && (
                     <div className="flex justify-between items-center">
                       <span className="text-gray-400">10Y Treasury:</span>
                       {getRealTimeIndicator('bond_yields', 'US10Y')}
                     </div>
                   )}
-                  
+
                   {getRealTimeIndicator('volatility_index', 'VIX') && (
                     <div className="flex justify-between items-center">
                       <span className="text-gray-400">VIX:</span>
@@ -360,12 +363,12 @@ const LivingModelDCF = ({ symbol, onBack }) => {
                 <Icon name="Calendar" className="w-5 h-5 mr-2 text-blue-400" />
                 Year-by-Year Projections
               </h3>
-              
+
               <div className="space-y-4 max-h-96 overflow-y-auto">
                 {Array.from({ length: inputs.projectionYears }, (_, i) => i + 1).map(year => (
                   <div key={year} className="border border-gray-700 rounded-lg p-4">
                     <h4 className="font-semibold text-blue-400 mb-3">Year {year}</h4>
-                    
+
                     <div className="grid grid-cols-2 gap-3">
                       <div>
                         <label className="block text-xs text-gray-400 mb-1">Rev Growth %</label>
@@ -377,7 +380,7 @@ const LivingModelDCF = ({ symbol, onBack }) => {
                           step="0.1"
                         />
                       </div>
-                      
+
                       <div>
                         <label className="block text-xs text-gray-400 mb-1">EBITDA Margin %</label>
                         <Input
@@ -388,7 +391,7 @@ const LivingModelDCF = ({ symbol, onBack }) => {
                           step="0.1"
                         />
                       </div>
-                      
+
                       <div>
                         <label className="block text-xs text-gray-400 mb-1">Tax Rate %</label>
                         <Input
@@ -399,7 +402,7 @@ const LivingModelDCF = ({ symbol, onBack }) => {
                           step="0.1"
                         />
                       </div>
-                      
+
                       <div>
                         <label className="block text-xs text-gray-400 mb-1">CapEx % Rev</label>
                         <Input
@@ -421,7 +424,7 @@ const LivingModelDCF = ({ symbol, onBack }) => {
           <div className="lg:col-span-1 space-y-6">
             {isLoading && (
               <div className="flex items-center justify-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
                 <span className="ml-2 text-gray-400">Calculating...</span>
               </div>
             )}
@@ -444,7 +447,7 @@ const LivingModelDCF = ({ symbol, onBack }) => {
                     <Icon name="TrendingUp" className="w-5 h-5 mr-2 text-green-400" />
                     Key Results
                   </h3>
-                  
+
                   <div className="space-y-4">
                     <div className="flex justify-between items-center">
                       <span className="text-gray-400">Enterprise Value:</span>
@@ -452,21 +455,21 @@ const LivingModelDCF = ({ symbol, onBack }) => {
                         {formatCurrency(result.enterpriseValue, 1)}
                       </span>
                     </div>
-                    
+
                     <div className="flex justify-between items-center">
                       <span className="text-gray-400">Equity Value:</span>
                       <span className="font-semibold text-lg text-green-400">
                         {formatCurrency(result.equityValue, 1)}
                       </span>
                     </div>
-                    
+
                     <div className="flex justify-between items-center border-t border-gray-700 pt-4">
                       <span className="text-gray-400">Share Price:</span>
                       <span className="font-bold text-xl text-yellow-400">
                         ${result.impliedSharePrice?.toFixed(2)}
                       </span>
                     </div>
-                    
+
                     <div className="flex justify-between items-center">
                       <span className="text-gray-400">Terminal Value:</span>
                       <span className="font-semibold">
@@ -482,7 +485,7 @@ const LivingModelDCF = ({ symbol, onBack }) => {
                     <Icon name="DollarSign" className="w-5 h-5 mr-2 text-blue-400" />
                     Cash Flow Summary
                   </h3>
-                  
+
                   <div className="space-y-2">
                     {result.years?.map((year, index) => (
                       <div key={year} className="flex justify-between items-center text-sm">
@@ -492,7 +495,7 @@ const LivingModelDCF = ({ symbol, onBack }) => {
                         </span>
                       </div>
                     ))}
-                    
+
                     <div className="border-t border-gray-700 pt-2 mt-3">
                       <div className="flex justify-between items-center text-sm font-semibold">
                         <span className="text-gray-300">PV of FCFs:</span>

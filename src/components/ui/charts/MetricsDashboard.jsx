@@ -1,16 +1,17 @@
-import React from 'react';
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import React from 'react';
+
 import { cn } from '../../../utils/cn';
 import { Card, CardContent, CardHeader, CardTitle } from '../Card';
 
-const MetricCard = ({ 
-  title, 
-  value, 
-  change, 
+const MetricCard = ({
+  title,
+  value,
+  change,
   format = 'number',
   prefix = '',
   suffix = '',
-  className 
+  className
 }) => {
   const formatValue = (val) => {
     if (format === 'currency') {
@@ -43,12 +44,12 @@ const MetricCard = ({
   const TrendIcon = getTrendIcon();
 
   return (
-    <Card className={cn("relative overflow-hidden", className)}>
+    <Card className={cn('relative overflow-hidden', className)}>
       <CardContent className="p-6">
         <div className="flex items-center justify-between mb-2">
           <p className="text-sm font-medium text-muted-foreground">{title}</p>
           {change !== undefined && (
-            <div className={cn("flex items-center gap-1", getTrendColor())}>
+            <div className={cn('flex items-center gap-1', getTrendColor())}>
               <TrendIcon className="h-4 w-4" />
               <span className="text-xs font-medium">
                 {Math.abs(change).toFixed(1)}%
@@ -73,10 +74,10 @@ const MetricCard = ({
   );
 };
 
-const MetricsDashboard = ({ 
-  metrics = [], 
+const MetricsDashboard = ({
+  metrics = [],
   className,
-  title = "Key Financial Metrics",
+  title = 'Key Financial Metrics',
   columns = 4
 }) => {
   const gridClasses = {
@@ -95,15 +96,15 @@ const MetricsDashboard = ({
     return groups;
   }, {});
 
-  const hasCategories = Object.keys(groupedMetrics).length > 1 || 
+  const hasCategories = Object.keys(groupedMetrics).length > 1 ||
     (Object.keys(groupedMetrics).length === 1 && !groupedMetrics.default);
 
   return (
-    <div className={cn("w-full space-y-6", className)}>
+    <div className={cn('w-full space-y-6', className)}>
       {title && (
         <div>
           <h2 className="text-xl font-semibold text-foreground mb-2">{title}</h2>
-          <div className="h-px bg-gradient-to-r from-border to-transparent"></div>
+          <div className="h-px bg-gradient-to-r from-border to-transparent" />
         </div>
       )}
 
@@ -114,10 +115,10 @@ const MetricsDashboard = ({
             {category !== 'default' && (
               <h3 className="text-lg font-medium text-foreground mb-4 flex items-center gap-2">
                 {category}
-                <div className="flex-1 h-px bg-muted"></div>
+                <div className="flex-1 h-px bg-muted" />
               </h3>
             )}
-            <div className={cn("grid gap-4", gridClasses[Math.min(columns, 6)])}>
+            <div className={cn('grid gap-4', gridClasses[Math.min(columns, 6)])}>
               {categoryMetrics.map((metric, index) => (
                 <MetricCard
                   key={`${category}-${index}`}
@@ -127,7 +128,7 @@ const MetricsDashboard = ({
                   format={metric.format}
                   prefix={metric.prefix}
                   suffix={metric.suffix}
-                  className={metric.highlight ? "ring-2 ring-secondary ring-opacity-20" : ""}
+                  className={metric.highlight ? 'ring-2 ring-secondary ring-opacity-20' : ''}
                 />
               ))}
             </div>
@@ -135,7 +136,7 @@ const MetricsDashboard = ({
         ))
       ) : (
         // Render without categories
-        <div className={cn("grid gap-4", gridClasses[Math.min(columns, 6)])}>
+        <div className={cn('grid gap-4', gridClasses[Math.min(columns, 6)])}>
           {metrics.map((metric, index) => (
             <MetricCard
               key={index}
@@ -145,7 +146,7 @@ const MetricsDashboard = ({
               format={metric.format}
               prefix={metric.prefix}
               suffix={metric.suffix}
-              className={metric.highlight ? "ring-2 ring-secondary ring-opacity-20" : ""}
+              className={metric.highlight ? 'ring-2 ring-secondary ring-opacity-20' : ''}
             />
           ))}
         </div>
@@ -154,7 +155,7 @@ const MetricsDashboard = ({
       {/* Summary footer if provided */}
       {metrics.some(m => m.isSummary) && (
         <div className="pt-4 border-t border-muted">
-          <div className={cn("grid gap-4", gridClasses[Math.min(columns, 6)])}>
+          <div className={cn('grid gap-4', gridClasses[Math.min(columns, 6)])}>
             {metrics
               .filter(m => m.isSummary)
               .map((metric, index) => (

@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { DollarSign, AlertCircle, TrendingUp, TrendingDown } from 'lucide-react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+
 import { cn } from '../../utils/cn';
 
 // Currency configurations
@@ -68,7 +69,7 @@ const CurrencyInput = React.forwardRef(({
   // Format currency value
   function formatCurrency(val, options = {}) {
     if (!val && val !== 0) return '';
-    
+
     const numValue = typeof val === 'string' ? parseFloat(val) : val;
     if (isNaN(numValue)) return '';
 
@@ -78,7 +79,7 @@ const CurrencyInput = React.forwardRef(({
     if (abbreviated && abbreviateDisplay && Math.abs(numValue) >= 1000) {
       const absValue = Math.abs(numValue);
       const sign = numValue < 0 ? '-' : '';
-      
+
       if (absValue >= 1000000000) {
         return `${sign}${currencyConfig.symbol}${(absValue / 1000000000).toFixed(1)}B`;
       } else if (absValue >= 1000000) {
@@ -91,9 +92,9 @@ const CurrencyInput = React.forwardRef(({
     try {
       return new Intl.NumberFormat(locale, {
         style: 'currency',
-        currency: currency,
+        currency,
         minimumFractionDigits: effectiveDecimals,
-        maximumFractionDigits: effectiveDecimals,
+        maximumFractionDigits: effectiveDecimals
       }).format(numValue);
     } catch (error) {
       // Fallback formatting
@@ -105,11 +106,11 @@ const CurrencyInput = React.forwardRef(({
   // Parse display value to number
   function parseCurrency(val) {
     if (!val) return 0;
-    
+
     // Handle abbreviated values
     const str = val.toString().toLowerCase();
     let multiplier = 1;
-    
+
     if (str.endsWith('k')) {
       multiplier = 1000;
     } else if (str.endsWith('m')) {
@@ -117,13 +118,13 @@ const CurrencyInput = React.forwardRef(({
     } else if (str.endsWith('b')) {
       multiplier = 1000000000;
     }
-    
+
     // Remove currency symbols, commas, spaces, and multiplier suffixes
     const cleanValue = val
       .toString()
       .replace(/[^\d.-]/g, '')
       .replace(/,/g, '');
-    
+
     const numValue = parseFloat(cleanValue) * multiplier;
     return isNaN(numValue) ? 0 : numValue;
   }
@@ -131,7 +132,7 @@ const CurrencyInput = React.forwardRef(({
   // Validate input
   const validateInput = (val) => {
     const numValue = typeof val === 'string' ? parseCurrency(val) : val;
-    
+
     let valid = true;
     let message = '';
 
@@ -151,7 +152,7 @@ const CurrencyInput = React.forwardRef(({
 
     setIsValid(valid);
     setValidationMessage(message);
-    
+
     if (onValidation) {
       onValidation(valid, message);
     }
@@ -162,10 +163,10 @@ const CurrencyInput = React.forwardRef(({
   // Calculate trend
   const getTrend = () => {
     if (!showTrend || previousValue === undefined) return null;
-    
+
     const current = typeof value === 'string' ? parseCurrency(value) : (value || 0);
     const previous = typeof previousValue === 'string' ? parseCurrency(previousValue) : (previousValue || 0);
-    
+
     if (current > previous) return 'up';
     if (current < previous) return 'down';
     return 'neutral';
@@ -186,7 +187,7 @@ const CurrencyInput = React.forwardRef(({
     // Show raw number for editing
     const rawValue = value ? value.toString() : '';
     setDisplayValue(rawValue);
-    
+
     // Select all text for easy replacement
     setTimeout(() => {
       if (componentRef.current) {
@@ -199,17 +200,17 @@ const CurrencyInput = React.forwardRef(({
   const handleBlur = (e) => {
     setIsFocused(false);
     const rawValue = parseCurrency(displayValue);
-    
+
     validateInput(rawValue);
-    
+
     // Format for display
     setDisplayValue(formatCurrency(rawValue, { abbreviated: abbreviateDisplay }));
-    
+
     // Call onChange with parsed value
     if (onChange) {
       onChange(rawValue);
     }
-    
+
     if (onBlur) {
       onBlur(e);
     }
@@ -218,12 +219,12 @@ const CurrencyInput = React.forwardRef(({
   // Handle input change
   const handleChange = (e) => {
     const newValue = e.target.value;
-    
+
     // Allow numbers, decimals, negative signs, and K/M/B suffixes
-    const regex = allowNegative 
-      ? /^-?\d*\.?\d*[kmb]?$/i 
+    const regex = allowNegative
+      ? /^-?\d*\.?\d*[kmb]?$/i
       : /^\d*\.?\d*[kmb]?$/i;
-    
+
     if (regex.test(newValue) || newValue === '') {
       setDisplayValue(newValue);
     }
@@ -304,26 +305,26 @@ const CurrencyInput = React.forwardRef(({
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
             'disabled:cursor-not-allowed disabled:opacity-50',
             'transition-all duration-200',
-            
+
             // Size
             sizeClasses[size],
-            
+
             // Variant
             variantClasses[variant],
-            
+
             // Financial styling
             'font-mono text-right',
-            
+
             // Padding adjustments
             showCurrency ? 'pl-16' : 'pl-4',
             'pr-4',
             trend && 'pr-8',
-            
+
             // States
             isFocused && 'ring-2 ring-ring ring-offset-2 border-ring',
             (error || !isValid) && 'border-destructive focus-visible:ring-destructive',
             loading && 'animate-pulse',
-            
+
             className
           )}
           {...props}

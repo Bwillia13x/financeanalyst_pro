@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { getPerformanceDashboardData, initializePerformanceMonitoring } from '../../utils/performanceMonitoring';
+
 import { useAccessibilityMonitor } from '../../hooks/useAccessibility';
+import { getPerformanceDashboardData, initializePerformanceMonitoring } from '../../utils/performanceMonitoring';
 
 const PerformanceDashboard = ({ isVisible = false, onClose }) => {
   const [dashboardData, setDashboardData] = useState(null);
@@ -45,7 +46,7 @@ const PerformanceDashboard = ({ isVisible = false, onClose }) => {
 
     // Initialize performance monitoring if not already done
     initializePerformanceMonitoring();
-    
+
     // Initial data fetch
     refreshData();
 
@@ -115,8 +116,8 @@ const PerformanceDashboard = ({ isVisible = false, onClose }) => {
             <button
               onClick={toggleMonitoring}
               className={`px-4 py-2 rounded-md text-sm font-medium ${
-                isMonitoring 
-                  ? 'bg-red-100 text-red-700 hover:bg-red-200' 
+                isMonitoring
+                  ? 'bg-red-100 text-red-700 hover:bg-red-200'
                   : 'bg-green-100 text-green-700 hover:bg-green-200'
               }`}
             >
@@ -133,8 +134,14 @@ const PerformanceDashboard = ({ isVisible = false, onClose }) => {
               className="text-gray-400 hover:text-gray-600"
             >
               <span className="sr-only">Close</span>
-              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <svg
+                className="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>
@@ -148,7 +155,7 @@ const PerformanceDashboard = ({ isVisible = false, onClose }) => {
               {Object.entries(webVitals).map(([metric, value]) => {
                 const status = getMetricStatus(metric, value);
                 const statusColor = getStatusColor(status);
-                
+
                 return (
                   <div key={metric} className="bg-white border border-gray-200 rounded-lg p-4">
                     <div className="flex items-center justify-between">
@@ -209,14 +216,14 @@ const PerformanceDashboard = ({ isVisible = false, onClose }) => {
                   )}
                 </div>
               </div>
-              
+
               <div className="bg-white border border-gray-200 rounded-lg p-4">
                 <h4 className="text-sm font-medium text-gray-600 mb-2">Average Violations</h4>
                 <span className="text-3xl font-bold text-gray-900">
                   {accessibility.averageViolations}
                 </span>
               </div>
-              
+
               <div className="bg-white border border-gray-200 rounded-lg p-4">
                 <h4 className="text-sm font-medium text-gray-600 mb-2">Average Score</h4>
                 <span className="text-3xl font-bold text-gray-900">
@@ -286,9 +293,9 @@ const PerformanceDashboard = ({ isVisible = false, onClose }) => {
                             {metric.component || metric.componentType || 'N/A'}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {metric.violations !== undefined ? `${metric.violations} violations` : 
-                             metric.score !== undefined ? `Score: ${metric.score}` :
-                             metric.duration !== undefined ? `${Math.round(metric.duration)}ms` : 'N/A'}
+                            {metric.violations !== undefined ? `${metric.violations} violations` :
+                              metric.score !== undefined ? `Score: ${metric.score}` :
+                                metric.duration !== undefined ? `${Math.round(metric.duration)}ms` : 'N/A'}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             {new Date(metric.timestamp).toLocaleTimeString()}
@@ -321,7 +328,7 @@ const PerformanceDashboard = ({ isVisible = false, onClose }) => {
                   <option value={300}>5 minutes</option>
                 </select>
               </div>
-              
+
               <div className="bg-white border border-gray-200 rounded-lg p-4">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Accessibility Alert Threshold

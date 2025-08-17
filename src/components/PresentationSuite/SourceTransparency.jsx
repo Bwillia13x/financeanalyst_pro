@@ -4,7 +4,6 @@
  * Provides unshakeable foundation of trust for all financial data
  */
 
-import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   FileText,
@@ -25,6 +24,7 @@ import {
   Hash,
   MapPin
 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 
 const SourceTransparency = ({ dataPoint, value, onClose }) => {
   const [activeTab, setActiveTab] = useState('source');
@@ -165,7 +165,7 @@ const SourceTransparency = ({ dataPoint, value, onClose }) => {
                 ×
               </button>
             </div>
-            
+
             {/* Verification Status */}
             <div className="mt-4 flex items-center space-x-4">
               <div className="flex items-center space-x-2">
@@ -233,7 +233,7 @@ const SourceTransparency = ({ dataPoint, value, onClose }) => {
                       </button>
                     </div>
                   </div>
-                  
+
                   <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
                     <div>
                       <span className="text-blue-700 font-medium">Filing Date:</span>
@@ -252,7 +252,7 @@ const SourceTransparency = ({ dataPoint, value, onClose }) => {
                       <p className="text-blue-900">{currentSource.source.page}</p>
                     </div>
                   </div>
-                  
+
                   <div className="mt-4 p-3 bg-white rounded border">
                     <span className="text-xs text-gray-600 font-medium">EXTRACTED TEXT:</span>
                     <p className="text-sm text-gray-900 mt-1 italic">"{currentSource.source.extractedText}"</p>
@@ -306,7 +306,7 @@ const SourceTransparency = ({ dataPoint, value, onClose }) => {
                   <h4 className="font-semibold text-gray-900 mb-3">Extraction Method</h4>
                   <p className="text-gray-700">{currentSource.methodology.extractionMethod}</p>
                 </div>
-                
+
                 <div>
                   <h4 className="font-semibold text-gray-900 mb-3">Validation Rules</h4>
                   <ul className="space-y-2">
@@ -318,7 +318,7 @@ const SourceTransparency = ({ dataPoint, value, onClose }) => {
                     ))}
                   </ul>
                 </div>
-                
+
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                     <h5 className="font-medium text-green-900">Data Quality</h5>

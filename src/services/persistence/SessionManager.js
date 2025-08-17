@@ -1,3 +1,4 @@
+// @ts-check
 /**
  * Session Manager
  * Manages user sessions, authentication state, and session persistence
@@ -5,18 +6,84 @@
 
 import { CryptoUtils } from '../utils/CryptoUtils';
 
+/**
+ * @typedef {Object} UserPrivacy
+ * @property {boolean} analytics
+ * @property {boolean} crashReporting
+ * @property {boolean} dataSharing
+ */
+/**
+ * @typedef {Object} Preferences
+ * @property {string} currency
+ * @property {number} precision
+ * @property {string} dateFormat
+ * @property {string} theme
+ * @property {boolean} notifications
+ * @property {boolean} autoSave
+ * @property {boolean} commandHistory
+ * @property {number} dataRetention
+ * @property {UserPrivacy} privacy
+ */
+/**
+ * @typedef {Object} Session
+ * @property {string} id
+ * @property {string} userId
+ * @property {number} created
+ * @property {number} lastActivity
+ * @property {number} expires
+ * @property {string} userAgent
+ * @property {string} platform
+ * @property {string} language
+ * @property {string} timezone
+ * @property {string} version
+ */
+/**
+ * @typedef {Object} User
+ * @property {string} id
+ * @property {string} name
+ * @property {string|null} [email]
+ * @property {number} created
+ * @property {number} lastLogin
+ * @property {number} loginCount
+ * @property {Preferences} preferences
+ */
+/**
+ * @typedef {Object} SessionExport
+ * @property {Session} session
+ * @property {User} user
+ * @property {Preferences} preferences
+ * @property {number} exportTimestamp
+ */
+/**
+ * @typedef {Object} SessionImport
+ * @property {Session} session
+ * @property {User} user
+ */
+/**
+ * @typedef {'sessionCreated'|'sessionLoaded'|'sessionDestroyed'|'preferencesUpdated'|'sessionImported'} SessionEvent
+ */
+/**
+ * @callback SessionEventCallback
+ * @param {SessionEvent} event
+ * @param {any} data
+ * @returns {void}
+ */
+
 export class SessionManager {
   constructor() {
     this.sessionKey = 'financeanalyst_session';
     this.userKey = 'financeanalyst_user';
     this.preferencesKey = 'financeanalyst_preferences';
     this.cryptoUtils = new CryptoUtils();
-    
+
+    /** @type {Session|null} */
     this.currentSession = null;
+    /** @type {User|null} */
     this.currentUser = null;
     this.sessionTimeout = 24 * 60 * 60 * 1000; // 24 hours
+    /** @type {Set<SessionEventCallback>} */
     this.listeners = new Set();
-    
+
     // Default user preferences
     this.defaultPreferences = {
       currency: 'USD',
@@ -37,31 +104,35 @@ export class SessionManager {
 
   /**
    * Initialize session manager
+   * @returns {Promise<{success: boolean, hasSession?: boolean, error?: string}>}
    */
   async initialize() {
     try {
       // Load existing session
       await this.loadSession();
-      
+
       // Setup session monitoring
       this.setupSessionMonitoring();
-      
-      console.log('✅ Session Manager initialized');
+
+      console.warn('✅ Session Manager initialized');
       return { success: true, hasSession: !!this.currentSession };
     } catch (error) {
       console.error('❌ Failed to initialize Session Manager:', error);
-      return { success: false, error: error.message };
+      const message = error instanceof Error ? error.message : String(error);
+      return { success: false, error: message };
     }
   }
 
   /**
    * Create a new session
+   * @param {Partial<User> & {preferences?: Partial<Preferences>}} [userInfo]
+   * @returns {Promise<{success: true, session: Session, user: User}>}
    */
   async createSession(userInfo = {}) {
     try {
       const sessionId = this.generateSessionId();
       const now = Date.now();
-      
+
       const session = {
         id: sessionId,
         userId: userInfo.id || this.generateUserId(),
@@ -88,13 +159,13 @@ export class SessionManager {
       // Store session and user data
       await this.storeSession(session);
       await this.storeUser(user);
-      
+
       this.currentSession = session;
       this.currentUser = user;
-      
+
       // Notify listeners
       this.notifyListeners('sessionCreated', { session, user });
-      
+
       return {
         success: true,
         session,
@@ -109,19 +180,20 @@ export class SessionManager {
 
   /**
    * Load existing session
+   * @returns {Promise<{ session: Session, user: User } | null>}
    */
   async loadSession() {
     try {
       const sessionData = localStorage.getItem(this.sessionKey);
       const userData = localStorage.getItem(this.userKey);
-      
+
       if (!sessionData || !userData) {
         return null;
       }
 
       const session = JSON.parse(sessionData);
       const user = JSON.parse(userData);
-      
+
       // Check if session is expired
       if (Date.now() > session.expires) {
         await this.destroySession();
@@ -131,13 +203,13 @@ export class SessionManager {
       // Update last activity
       session.lastActivity = Date.now();
       await this.storeSession(session);
-      
+
       this.currentSession = session;
       this.currentUser = user;
-      
+
       // Notify listeners
       this.notifyListeners('sessionLoaded', { session, user });
-      
+
       return { session, user };
 
     } catch (error) {
@@ -150,6 +222,7 @@ export class SessionManager {
 
   /**
    * Update session activity
+   * @returns {Promise<boolean>}
    */
   async updateActivity() {
     if (!this.currentSession) {
@@ -158,7 +231,7 @@ export class SessionManager {
 
     try {
       this.currentSession.lastActivity = Date.now();
-      
+
       // Extend session if needed
       const timeUntilExpiry = this.currentSession.expires - Date.now();
       if (timeUntilExpiry < this.sessionTimeout * 0.1) { // Extend if less than 10% time left
@@ -176,21 +249,22 @@ export class SessionManager {
 
   /**
    * Destroy current session
+   * @returns {Promise<boolean>}
    */
   async destroySession() {
     try {
       const session = this.currentSession;
       const user = this.currentUser;
-      
+
       // Clear session data
       localStorage.removeItem(this.sessionKey);
-      
+
       this.currentSession = null;
       this.currentUser = null;
-      
+
       // Notify listeners
       this.notifyListeners('sessionDestroyed', { session, user });
-      
+
       return true;
 
     } catch (error) {
@@ -201,6 +275,7 @@ export class SessionManager {
 
   /**
    * Get current session
+   * @returns {Session|null}
    */
   getSession() {
     return this.currentSession;
@@ -208,6 +283,7 @@ export class SessionManager {
 
   /**
    * Get current user
+   * @returns {User|null}
    */
   getUser() {
     return this.currentUser;
@@ -215,6 +291,7 @@ export class SessionManager {
 
   /**
    * Check if user is authenticated
+   * @returns {boolean}
    */
   isAuthenticated() {
     return !!(this.currentSession && Date.now() < this.currentSession.expires);
@@ -222,6 +299,7 @@ export class SessionManager {
 
   /**
    * Get user preferences
+   * @returns {Preferences}
    */
   getPreferences() {
     return this.currentUser ? this.currentUser.preferences : this.defaultPreferences;
@@ -229,6 +307,8 @@ export class SessionManager {
 
   /**
    * Update user preferences
+   * @param {Partial<Preferences>} newPreferences
+   * @returns {Promise<Preferences>}
    */
   async updatePreferences(newPreferences) {
     if (!this.currentUser) {
@@ -242,13 +322,13 @@ export class SessionManager {
       };
 
       await this.storeUser(this.currentUser);
-      
+
       // Also store preferences separately for quick access
       localStorage.setItem(this.preferencesKey, JSON.stringify(this.currentUser.preferences));
-      
+
       // Notify listeners
       this.notifyListeners('preferencesUpdated', { preferences: this.currentUser.preferences });
-      
+
       return this.currentUser.preferences;
 
     } catch (error) {
@@ -259,6 +339,7 @@ export class SessionManager {
 
   /**
    * Get session statistics
+   * @returns {null | { sessionId: string, userId: string, userName: string, sessionDuration: number, timeUntilExpiry: number, lastActivityAge: number, loginCount: number, userCreated: number, isExpired: boolean, isActive: boolean }}
    */
   getSessionStats() {
     if (!this.currentSession || !this.currentUser) {
@@ -286,6 +367,7 @@ export class SessionManager {
 
   /**
    * Export session data
+   * @returns {Promise<SessionExport|null>}
    */
   async exportSessionData() {
     if (!this.currentSession || !this.currentUser) {
@@ -302,6 +384,8 @@ export class SessionManager {
 
   /**
    * Import session data
+   * @param {SessionImport} sessionData
+   * @returns {Promise<{success: true, session: Session, user: User}>}
    */
   async importSessionData(sessionData) {
     try {
@@ -338,6 +422,8 @@ export class SessionManager {
 
   /**
    * Add session event listener
+   * @param {SessionEventCallback} callback
+   * @returns {void}
    */
   addEventListener(callback) {
     this.listeners.add(callback);
@@ -345,6 +431,8 @@ export class SessionManager {
 
   /**
    * Remove session event listener
+   * @param {SessionEventCallback} callback
+   * @returns {void}
    */
   removeEventListener(callback) {
     this.listeners.delete(callback);
@@ -354,6 +442,8 @@ export class SessionManager {
 
   /**
    * Store session data
+   * @param {Session} session
+   * @returns {Promise<void>}
    */
   async storeSession(session) {
     try {
@@ -366,6 +456,8 @@ export class SessionManager {
 
   /**
    * Store user data
+   * @param {User} user
+   * @returns {Promise<void>}
    */
   async storeUser(user) {
     try {
@@ -378,6 +470,7 @@ export class SessionManager {
 
   /**
    * Generate unique session ID
+   * @returns {string}
    */
   generateSessionId() {
     return 'sess_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
@@ -385,6 +478,7 @@ export class SessionManager {
 
   /**
    * Generate unique user ID
+   * @returns {string}
    */
   generateUserId() {
     return 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
@@ -392,6 +486,7 @@ export class SessionManager {
 
   /**
    * Setup session monitoring
+   * @returns {void}
    */
   setupSessionMonitoring() {
     // Update activity on user interaction
@@ -432,6 +527,10 @@ export class SessionManager {
 
   /**
    * Throttle function calls
+   * @template {(...args: any[]) => void} F
+   * @param {F} func
+   * @param {number} limit
+   * @returns {(...args: Parameters<F>) => void}
    */
   throttle(func, limit) {
     let inThrottle;
@@ -448,6 +547,9 @@ export class SessionManager {
 
   /**
    * Notify event listeners
+   * @param {SessionEvent} event
+   * @param {any} data
+   * @returns {void}
    */
   notifyListeners(event, data) {
     this.listeners.forEach(callback => {

@@ -12,7 +12,7 @@ class SecureApiClient {
       baseURL: this.baseURL,
       timeout: 15000,
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/json'
       }
     });
 
@@ -274,7 +274,7 @@ class SecureApiClient {
   async fetchMarketData(ticker, range = '1y') {
     try {
       const data = await this.getHistoricalData(ticker, range);
-      
+
       // Transform to match expected format from old API service
       return {
         symbol: data.symbol,
@@ -308,7 +308,7 @@ class SecureApiClient {
   async fetchFinancialStatements(ticker, statement = 'income-statement', period = 'annual', limit = 5) {
     try {
       let data;
-      
+
       switch (statement) {
         case 'income-statement':
           data = await this.getIncomeStatement(ticker, period, limit);

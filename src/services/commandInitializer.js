@@ -4,16 +4,16 @@
  */
 
 import { commandRegistry } from './commandRegistry';
-import { coreCommands } from './commands/coreCommands';
-import { portfolioCommands } from './commands/portfolioCommands';
-import { valuationCommands } from './commands/valuationCommands';
-import { technicalCommands } from './commands/technicalCommands';
-import { esgCommands } from './commands/esgCommands';
 import { automationCommands } from './commands/automationCommands';
+import { coreCommands } from './commands/coreCommands';
 import { dataCommands } from './commands/dataCommands';
-import { systemCommands } from './commands/systemCommands';
+import { esgCommands } from './commands/esgCommands';
 import { persistenceCommands } from './commands/persistenceCommands';
+import { portfolioCommands } from './commands/portfolioCommands';
 import { privateAnalysisCommands } from './commands/privateAnalysisCommands';
+import { systemCommands } from './commands/systemCommands';
+import { technicalCommands } from './commands/technicalCommands';
+import { valuationCommands } from './commands/valuationCommands';
 
 /**
  * Initialize all commands in the registry
@@ -741,18 +741,18 @@ export function initializeCommands() {
 
   // Register Utility Commands
   commandRegistry.register('HELP', {
-    execute: async (parsedCommand, context, processor) => {
+    execute: async(parsedCommand, context, processor) => {
       const [category] = parsedCommand.parameters;
-      
+
       // Show ALL commands in detail
       if (category && category.toLowerCase() === 'all') {
         const allCommands = commandRegistry.getAllCommands();
         const categories = commandRegistry.getAllCategories();
-        
-        let content = `📚 COMPREHENSIVE COMMAND REFERENCE\n`;
-        content += `FinanceAnalyst Pro Terminal v2.4.0 - Complete Command Suite\n`;
-        content += `═════════════════════════════════════════════════════════════\n\n`;
-        
+
+        let content = '📚 COMPREHENSIVE COMMAND REFERENCE\n';
+        content += 'FinanceAnalyst Pro Terminal v2.4.0 - Complete Command Suite\n';
+        content += '═════════════════════════════════════════════════════════════\n\n';
+
         // Group commands by category
         categories.forEach(cat => {
           const categoryCommands = commandRegistry.getCommandsByCategory(cat.key);
@@ -760,7 +760,7 @@ export function initializeCommands() {
             content += `${cat.icon} ${cat.name.toUpperCase()} COMMANDS (${categoryCommands.length})\n`;
             content += `${cat.description}\n`;
             content += '─'.repeat(50) + '\n';
-            
+
             categoryCommands.forEach(cmd => {
               content += `\n• ${cmd.usage}\n`;
               content += `  ${cmd.description}\n`;
@@ -774,17 +774,17 @@ export function initializeCommands() {
             content += '\n';
           }
         });
-        
+
         content += `\n📊 SUMMARY: ${allCommands.length} total commands across ${categories.length} categories\n`;
-        content += `\n💡 TIP: Use HELP(category) for specific category details\n`;
-        content += `💡 TIP: Use HELP() for quick overview and featured commands`;
-        
+        content += '\n💡 TIP: Use HELP(category) for specific category details\n';
+        content += '💡 TIP: Use HELP() for quick overview and featured commands';
+
         return {
           type: 'system',
           content
         };
       }
-      
+
       if (category) {
         // Show commands for specific category
         const categoryCommands = commandRegistry.getCommandsByCategory(category.toUpperCase());
@@ -797,7 +797,7 @@ export function initializeCommands() {
 
         let content = `📋 ${category.toUpperCase()} COMMANDS (${categoryCommands.length})\n`;
         content += '═'.repeat(40) + '\n\n';
-        
+
         categoryCommands.forEach(cmd => {
           content += `• ${cmd.usage}\n`;
           content += `  ${cmd.description}\n`;
@@ -806,8 +806,8 @@ export function initializeCommands() {
           }
           content += '\n';
         });
-        
-        content += `Use HELP() for overview or HELP(ALL) for all commands.`;
+
+        content += 'Use HELP() for overview or HELP(ALL) for all commands.';
 
         return {
           type: 'system',
@@ -820,9 +820,9 @@ export function initializeCommands() {
       const stats = commandRegistry.getCommandStats();
       const totalCommands = Object.values(stats).reduce((sum, cat) => sum + cat.count, 0);
 
-      const content = `🚀 FinanceAnalyst Pro Terminal v2.4.0 - Enhanced Command Suite\n\n📊 COMMAND CATEGORIES:\n${categories.map(cat => 
-  `${cat.icon} ${cat.name} (${stats[cat.key]?.count || 0} commands)\n   ${cat.description}`
-).join('\n\n')}\n\n⭐ FEATURED COMMANDS:\n• DCF(AAPL) - Discounted Cash Flow with live data\n• LBO(TSLA) - Leveraged Buyout analysis\n• PORTFOLIO([AAPL,MSFT], [0.5,0.5]) - Portfolio analysis\n• RISK_METRICS(GOOGL) - Comprehensive risk analysis\n• CORRELATION_MATRIX([AAPL,MSFT,GOOGL]) - Cross-asset correlations\n• PRIVATE_DCF() - Private company DCF valuation\n• PRIVATE_RATIOS() - Private company financial ratios\n• PRIVATE_SUMMARY() - Private company analysis summary\n\n🔧 PRIVATE ANALYSIS COMMANDS:\n• PRIVATE_LOAD() - Load private company data\n• PRIVATE_DCF() - DCF valuation for private companies\n• PRIVATE_RATIOS() - Calculate private company ratios\n• PRIVATE_SUMMARY() - Generate private company summary\n\n💡 HELP COMMANDS:\n• HELP() - Show this overview (current)\n• HELP(category) - Show commands for specific category\n• HELP(ALL) - Show complete list of ALL ${totalCommands} commands\n\n📋 AVAILABLE CATEGORIES:\n${categories.map(cat => `• ${cat.key}`).join(' • ')}\n\n🚀 ENHANCED FEATURES:\n• Watchlists: Create and track custom stock lists\n• Alerts: Set price and metric notifications\n• Batch Analysis: Analyze multiple stocks simultaneously\n• ESG Scoring: Environmental, social, governance analysis\n• Technical Analysis: RSI, MACD, support/resistance\n• Advanced Valuation: DDM, residual income, asset-based models\n• Private Company Analysis: Full financial modeling suite\n\n📊 ${categories.length} categories • ${totalCommands} total commands available\n\n💡 Pro Tip: Use HELP(ALL) to see every single command with examples!`;
+      const content = `🚀 FinanceAnalyst Pro Terminal v2.4.0 - Enhanced Command Suite\n\n📊 COMMAND CATEGORIES:\n${categories.map(cat =>
+        `${cat.icon} ${cat.name} (${stats[cat.key]?.count || 0} commands)\n   ${cat.description}`
+      ).join('\n\n')}\n\n⭐ FEATURED COMMANDS:\n• DCF(AAPL) - Discounted Cash Flow with live data\n• LBO(TSLA) - Leveraged Buyout analysis\n• PORTFOLIO([AAPL,MSFT], [0.5,0.5]) - Portfolio analysis\n• RISK_METRICS(GOOGL) - Comprehensive risk analysis\n• CORRELATION_MATRIX([AAPL,MSFT,GOOGL]) - Cross-asset correlations\n• PRIVATE_DCF() - Private company DCF valuation\n• PRIVATE_RATIOS() - Private company financial ratios\n• PRIVATE_SUMMARY() - Private company analysis summary\n\n🔧 PRIVATE ANALYSIS COMMANDS:\n• PRIVATE_LOAD() - Load private company data\n• PRIVATE_DCF() - DCF valuation for private companies\n• PRIVATE_RATIOS() - Calculate private company ratios\n• PRIVATE_SUMMARY() - Generate private company summary\n\n💡 HELP COMMANDS:\n• HELP() - Show this overview (current)\n• HELP(category) - Show commands for specific category\n• HELP(ALL) - Show complete list of ALL ${totalCommands} commands\n\n📋 AVAILABLE CATEGORIES:\n${categories.map(cat => `• ${cat.key}`).join(' • ')}\n\n🚀 ENHANCED FEATURES:\n• Watchlists: Create and track custom stock lists\n• Alerts: Set price and metric notifications\n• Batch Analysis: Analyze multiple stocks simultaneously\n• ESG Scoring: Environmental, social, governance analysis\n• Technical Analysis: RSI, MACD, support/resistance\n• Advanced Valuation: DDM, residual income, asset-based models\n• Private Company Analysis: Full financial modeling suite\n\n📊 ${categories.length} categories • ${totalCommands} total commands available\n\n💡 Pro Tip: Use HELP(ALL) to see every single command with examples!`;
 
       return {
         type: 'system',
@@ -842,7 +842,7 @@ export function initializeCommands() {
   });
 
   commandRegistry.register('CLEAR', {
-    execute: async (parsedCommand, context, processor) => {
+    execute: async(parsedCommand, context, processor) => {
       return {
         type: 'system',
         content: 'clear_terminal', // Special flag for terminal to clear
@@ -858,7 +858,7 @@ export function initializeCommands() {
   });
 
   commandRegistry.register('STATUS', {
-    execute: async (parsedCommand, context, processor) => {
+    execute: async(parsedCommand, context, processor) => {
       const settings = processor.getAllSettings();
       const variables = processor.getAllVariables();
       const history = processor.getHistory(5);

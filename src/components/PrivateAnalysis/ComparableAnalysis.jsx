@@ -1,12 +1,12 @@
-import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Users, TrendingUp, BarChart3, Plus, Search, DollarSign, Percent, Target, Filter } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
 
 const ComparableAnalysis = ({ data, formatCurrency, formatPercent }) => {
   const [activeTab, setActiveTab] = useState('multiples');
   const [selectedMultiple, setSelectedMultiple] = useState('ev_revenue');
   const [showAddComp, setShowAddComp] = useState(false);
-  
+
   // Sample comparable companies data (in practice, this would come from external API)
   const [comparableCompanies, setComparableCompanies] = useState([
     {
@@ -84,7 +84,7 @@ const ComparableAnalysis = ({ data, formatCurrency, formatPercent }) => {
   // Calculate market statistics
   const marketStats = useMemo(() => {
     const multiples = comparableMultiples.map(c => c.multiples);
-    
+
     const calculateStats = (values) => ({
       mean: values.reduce((a, b) => a + b, 0) / values.length,
       median: values.sort((a, b) => a - b)[Math.floor(values.length / 2)],
@@ -191,7 +191,7 @@ const ComparableAnalysis = ({ data, formatCurrency, formatPercent }) => {
 
       {/* Key Results Summary */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <motion.div 
+        <motion.div
           className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-4 border border-blue-200"
           whileHover={{ y: -2 }}
         >
@@ -207,7 +207,7 @@ const ComparableAnalysis = ({ data, formatCurrency, formatPercent }) => {
           </div>
         </motion.div>
 
-        <motion.div 
+        <motion.div
           className="bg-gradient-to-r from-green-50 to-green-100 rounded-lg p-4 border border-green-200"
           whileHover={{ y: -2 }}
         >
@@ -223,7 +223,7 @@ const ComparableAnalysis = ({ data, formatCurrency, formatPercent }) => {
           </div>
         </motion.div>
 
-        <motion.div 
+        <motion.div
           className="bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg p-4 border border-purple-200"
           whileHover={{ y: -2 }}
         >
@@ -239,7 +239,7 @@ const ComparableAnalysis = ({ data, formatCurrency, formatPercent }) => {
           </div>
         </motion.div>
 
-        <motion.div 
+        <motion.div
           className="bg-gradient-to-r from-orange-50 to-orange-100 rounded-lg p-4 border border-orange-200"
           whileHover={{ y: -2 }}
         >
@@ -324,13 +324,13 @@ const ComparableAnalysis = ({ data, formatCurrency, formatPercent }) => {
                       <td className="p-3 text-right font-medium">{comp.multiples.pe_ratio.toFixed(1)}x</td>
                     </tr>
                   ))}
-                  
+
                   {/* Summary Statistics */}
                   <tr className="border-t-2 border-gray-300 bg-blue-50 font-semibold">
                     <td className="p-3">Market Statistics</td>
-                    <td className="p-3"></td>
-                    <td className="p-3"></td>
-                    <td className="p-3"></td>
+                    <td className="p-3" />
+                    <td className="p-3" />
+                    <td className="p-3" />
                     <td className="p-3 text-right">{marketStats.ev_revenue.median.toFixed(1)}x</td>
                     <td className="p-3 text-right">{marketStats.ev_ebitda.median.toFixed(1)}x</td>
                     <td className="p-3 text-right">{marketStats.pe_ratio.median.toFixed(1)}x</td>
@@ -395,7 +395,7 @@ const ComparableAnalysis = ({ data, formatCurrency, formatPercent }) => {
         {activeTab === 'analysis' && (
           <div className="space-y-6">
             <h4 className="font-semibold text-lg">Valuation Analysis</h4>
-            
+
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Implied Valuation */}
               <div>
@@ -440,12 +440,12 @@ const ComparableAnalysis = ({ data, formatCurrency, formatPercent }) => {
                     <div>
                       <div className="text-sm text-blue-600 font-medium mb-1">Recommended Range</div>
                       <div className="text-2xl font-bold text-blue-800">
-                        {formatCurrency((impliedValuation.ev_revenue.p25 + impliedValuation.ev_ebitda.p25) / 2)} - 
+                        {formatCurrency((impliedValuation.ev_revenue.p25 + impliedValuation.ev_ebitda.p25) / 2)} -
                         {formatCurrency((impliedValuation.ev_revenue.p75 + impliedValuation.ev_ebitda.p75) / 2)}
                       </div>
                       <div className="text-sm text-blue-600">Blended 25th-75th percentile</div>
                     </div>
-                    
+
                     <div>
                       <div className="text-sm text-blue-600 font-medium mb-1">Midpoint Valuation</div>
                       <div className="text-xl font-bold text-blue-800">
@@ -514,7 +514,7 @@ const ComparableAnalysis = ({ data, formatCurrency, formatPercent }) => {
                       ×
                     </button>
                   </div>
-                  
+
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span>Market Cap:</span>
@@ -533,7 +533,7 @@ const ComparableAnalysis = ({ data, formatCurrency, formatPercent }) => {
                       <span className="font-medium">{comp.founded}</span>
                     </div>
                   </div>
-                  
+
                   <div className="mt-3 pt-3 border-t">
                     <div className="text-xs text-gray-600">{comp.businessModel}</div>
                   </div>
@@ -549,52 +549,75 @@ const ComparableAnalysis = ({ data, formatCurrency, formatPercent }) => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
             <h4 className="font-semibold text-lg mb-4">Add Comparable Company</h4>
-            <form onSubmit={(e) => {
-              e.preventDefault();
-              const formData = new FormData(e.target);
-              addComparableCompany(Object.fromEntries(formData));
-            }}>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                addComparableCompany(Object.fromEntries(formData));
+              }}
+            >
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Company Name</label>
-                  <input name="name" type="text" required className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  <input
+                    name="name" type="text" required
+                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Ticker</label>
-                  <input name="ticker" type="text" required className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  <input
+                    name="ticker" type="text" required
+                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Market Cap ($000s)</label>
-                    <input name="marketCap" type="number" required className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    <input
+                      name="marketCap" type="number" required
+                      className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Enterprise Value ($000s)</label>
-                    <input name="enterpriseValue" type="number" required className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    <input
+                      name="enterpriseValue" type="number" required
+                      className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Revenue ($000s)</label>
-                    <input name="revenue" type="number" required className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    <input
+                      name="revenue" type="number" required
+                      className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">EBITDA ($000s)</label>
-                    <input name="ebitda" type="number" required className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    <input
+                      name="ebitda" type="number" required
+                      className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
                   </div>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Business Model</label>
-                  <input name="businessModel" type="text" required className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  <input
+                    name="businessModel" type="text" required
+                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
                 </div>
               </div>
-              
+
               <div className="flex gap-3 mt-6">
                 <button type="submit" className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
                   Add Company
                 </button>
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   onClick={() => setShowAddComp(false)}
                   className="flex-1 px-4 py-2 border rounded-lg hover:bg-gray-50 transition-colors"
                 >

@@ -3,9 +3,9 @@ import { Provider } from 'react-redux';
 
 import App from './App';
 import { store } from './store/store';
-import { initializePWA } from './utils/serviceWorker';
 import { initializePerformanceMonitoring } from './utils/performanceMonitoring';
 import { initializeSecurity } from './utils/securityHeaders';
+import { initializePWA } from './utils/serviceWorker';
 import './styles/tailwind.css';
 import './styles/index.css';
 

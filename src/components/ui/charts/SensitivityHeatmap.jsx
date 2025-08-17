@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
+
 import { cn } from '../../../utils/cn';
 import { Card, CardContent, CardHeader, CardTitle } from '../Card';
 
-const SensitivityHeatmap = ({ 
-  data = [], 
+const SensitivityHeatmap = ({
+  data = [],
   xAxisLabels = [],
   yAxisLabels = [],
   className,
-  title = "Sensitivity Analysis",
+  title = 'Sensitivity Analysis',
   formatValue = (value) => `${value.toFixed(1)}%`,
   formatCell = (value) => `${value > 0 ? '+' : ''}${value.toFixed(1)}%`
 }) => {
@@ -31,7 +32,7 @@ const SensitivityHeatmap = ({
       // Green for positive values
       return `rgba(34, 197, 94, ${0.2 + intensity * 0.6})`;
     } else if (value < 0) {
-      // Red for negative values  
+      // Red for negative values
       return `rgba(239, 68, 68, ${0.2 + intensity * 0.6})`;
     } else {
       // Neutral for zero
@@ -41,9 +42,9 @@ const SensitivityHeatmap = ({
 
   const CustomTooltip = ({ x, y, value, xLabel, yLabel }) => {
     if (hoveredCell?.x !== x || hoveredCell?.y !== y) return null;
-    
+
     return (
-      <div 
+      <div
         className="absolute pointer-events-none z-10 bg-white border border-gray-200 rounded-md shadow-elevation-2 p-3 min-w-[180px]"
         style={{
           left: hoveredCell.clientX + 10,
@@ -54,10 +55,12 @@ const SensitivityHeatmap = ({
           {yLabel} × {xLabel}
         </p>
         <p className="text-sm text-muted-foreground">
-          Impact: <span className={cn(
-            "font-mono font-medium",
-            value > 0 ? "text-success" : value < 0 ? "text-destructive" : "text-muted-foreground"
-          )}>
+          Impact: <span
+            className={cn(
+              'font-mono font-medium',
+              value > 0 ? 'text-success' : value < 0 ? 'text-destructive' : 'text-muted-foreground'
+            )}
+          >
             {formatCell(value)}
           </span>
         </p>
@@ -66,7 +69,7 @@ const SensitivityHeatmap = ({
   };
 
   return (
-    <Card className={cn("w-full", className)}>
+    <Card className={cn('w-full', className)}>
       <CardHeader className="pb-4">
         <CardTitle className="text-lg font-semibold text-foreground">{title}</CardTitle>
       </CardHeader>
@@ -75,7 +78,7 @@ const SensitivityHeatmap = ({
           <div className="min-w-[600px]">
             {/* Header row */}
             <div className="grid grid-cols-[120px_repeat(var(--cols),1fr)] gap-1 mb-1">
-              <div></div> {/* Empty corner */}
+              <div /> {/* Empty corner */}
               {xAxisLabels.map((label, index) => (
                 <div key={index} className="text-center p-2">
                   <span className="text-xs font-medium text-muted-foreground">
@@ -87,8 +90,8 @@ const SensitivityHeatmap = ({
 
             {/* Data rows */}
             {data.map((row, yIndex) => (
-              <div 
-                key={yIndex} 
+              <div
+                key={yIndex}
                 className="grid grid-cols-[120px_repeat(var(--cols),1fr)] gap-1 mb-1"
                 style={{ '--cols': xAxisLabels.length }}
               >
@@ -98,12 +101,12 @@ const SensitivityHeatmap = ({
                     {yAxisLabels[yIndex]}
                   </span>
                 </div>
-                
+
                 {/* Data cells */}
                 {row.map((value, xIndex) => {
                   const intensity = getColorIntensity(value);
                   const backgroundColor = getCellColor(value, intensity);
-                  
+
                   return (
                     <div
                       key={xIndex}
@@ -121,12 +124,14 @@ const SensitivityHeatmap = ({
                       onMouseLeave={() => setHoveredCell(null)}
                     >
                       <div className="absolute inset-0 flex items-center justify-center">
-                        <span className={cn(
-                          "text-xs font-mono font-medium",
-                          Math.abs(value) > range * 0.6 
-                            ? "text-white" 
-                            : "text-gray-900"
-                        )}>
+                        <span
+                          className={cn(
+                            'text-xs font-mono font-medium',
+                            Math.abs(value) > range * 0.6
+                              ? 'text-white'
+                              : 'text-gray-900'
+                          )}
+                        >
                           {formatCell(value)}
                         </span>
                       </div>
@@ -153,19 +158,19 @@ const SensitivityHeatmap = ({
         <div className="flex items-center justify-center gap-6 mt-6 pt-4 border-t border-gray-100">
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1">
-              <div className="w-4 h-4 rounded-sm bg-red-500 opacity-40"></div>
-              <div className="w-4 h-4 rounded-sm bg-red-500 opacity-80"></div>
+              <div className="w-4 h-4 rounded-sm bg-red-500 opacity-40" />
+              <div className="w-4 h-4 rounded-sm bg-red-500 opacity-80" />
             </div>
             <span className="text-xs text-muted-foreground">Negative Impact</span>
           </div>
           <div className="flex items-center gap-3">
-            <div className="w-4 h-4 rounded-sm bg-slate-400 opacity-20 border border-gray-200"></div>
+            <div className="w-4 h-4 rounded-sm bg-slate-400 opacity-20 border border-gray-200" />
             <span className="text-xs text-muted-foreground">Neutral</span>
           </div>
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1">
-              <div className="w-4 h-4 rounded-sm bg-green-500 opacity-40"></div>
-              <div className="w-4 h-4 rounded-sm bg-green-500 opacity-80"></div>
+              <div className="w-4 h-4 rounded-sm bg-green-500 opacity-40" />
+              <div className="w-4 h-4 rounded-sm bg-green-500 opacity-80" />
             </div>
             <span className="text-xs text-muted-foreground">Positive Impact</span>
           </div>

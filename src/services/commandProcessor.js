@@ -130,7 +130,7 @@ export class CommandProcessor {
 
       // Get command handler
       const handler = commandRegistry.getHandler(parsedCommand.command);
-      
+
       if (!handler) {
         return this.createErrorResponse(`Unknown command: "${parsedCommand.command}"`, input);
       }
@@ -171,7 +171,7 @@ export class CommandProcessor {
    */
   parseCommand(input) {
     const trimmed = input.trim();
-    
+
     // Handle function-style commands: COMMAND(param1, param2)
     const functionMatch = trimmed.match(/^([A-Z_]+)\s*\(\s*([^)]*)\s*\)$/i);
     if (functionMatch) {
@@ -214,7 +214,7 @@ export class CommandProcessor {
 
     for (let i = 0; i < paramString.length; i++) {
       const char = paramString[i];
-      
+
       if ((char === '"' || char === "'") && !inQuotes) {
         inQuotes = true;
         quoteChar = char;
@@ -250,7 +250,7 @@ export class CommandProcessor {
    */
   parseParameterValue(value) {
     // Remove quotes
-    if ((value.startsWith('"') && value.endsWith('"')) || 
+    if ((value.startsWith('"') && value.endsWith('"')) ||
         (value.startsWith("'") && value.endsWith("'"))) {
       return value.slice(1, -1);
     }
@@ -332,9 +332,9 @@ export class CommandProcessor {
   getSuggestions(input) {
     const command = input.split(/[\s(]/)[0].toUpperCase();
     const allCommands = commandRegistry.getAllCommands();
-    
+
     return allCommands
-      .filter(cmd => cmd.includes(command.substring(0, 3)) || 
+      .filter(cmd => cmd.includes(command.substring(0, 3)) ||
                      cmd.toLowerCase().includes(command.toLowerCase()))
       .slice(0, 5);
   }

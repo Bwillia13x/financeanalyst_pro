@@ -3,14 +3,14 @@
  * Portfolio analysis, risk metrics, and optimization commands
  */
 
-import { dataFetchingService } from '../dataFetching';
 import { formatCurrency, formatPercentage, formatNumber } from '../../utils/dataTransformation';
+import { dataFetchingService } from '../dataFetching';
 
 export const portfolioCommands = {
   PORTFOLIO: {
-    execute: async (parsedCommand, context, processor) => {
+    execute: async(parsedCommand, context, processor) => {
       const [tickers, weights] = parsedCommand.parameters;
-      
+
       if (!tickers || !weights) {
         return {
           type: 'error',
@@ -39,7 +39,7 @@ export const portfolioCommands = {
 
         // Fetch data for all tickers
         const portfolioData = await Promise.all(
-          tickerArray.map(async (ticker, index) => {
+          tickerArray.map(async(ticker, index) => {
             const profile = await dataFetchingService.fetchCompanyProfile(ticker);
             return {
               ticker: ticker.toUpperCase(),
@@ -65,7 +65,7 @@ export const portfolioCommands = {
         const minWeight = Math.min(...weightArray);
         const concentrationRatio = maxWeight / minWeight;
 
-        const content = `Portfolio Analysis\n\n📊 PORTFOLIO COMPOSITION:\n${portfolioData.map(stock => 
+        const content = `Portfolio Analysis\n\n📊 PORTFOLIO COMPOSITION:\n${portfolioData.map(stock =>
           `• ${stock.ticker} (${stock.name}): ${formatPercentage(stock.weight)} - ${formatCurrency(stock.price)}`
         ).join('\n')}\n\n📈 PORTFOLIO METRICS:\n• Total Portfolio Value: ${formatCurrency(portfolioValue, 'USD', true)}\n• Weighted Beta: ${formatNumber(weightedBeta, 2)}\n• Weighted P/E: ${formatNumber(weightedPE, 1)}x\n• Weighted Dividend Yield: ${formatPercentage(weightedDividendYield)}\n\n🎯 DIVERSIFICATION:\n• Number of Holdings: ${tickerArray.length}\n• Max Position: ${formatPercentage(maxWeight)}\n• Min Position: ${formatPercentage(minWeight)}\n• Concentration Ratio: ${formatNumber(concentrationRatio, 1)}\n\n⚖️ RISK PROFILE:\n• Portfolio Beta: ${weightedBeta > 1.2 ? 'High Risk' : weightedBeta > 0.8 ? 'Moderate Risk' : 'Low Risk'}\n• Diversification: ${tickerArray.length >= 10 ? 'Well Diversified' : tickerArray.length >= 5 ? 'Moderately Diversified' : 'Concentrated'}\n• Concentration Risk: ${maxWeight > 0.3 ? 'High' : maxWeight > 0.2 ? 'Moderate' : 'Low'}\n\n💡 RECOMMENDATIONS:\n${maxWeight > 0.4 ? '• Consider reducing concentration in largest position\n' : ''}${tickerArray.length < 5 ? '• Consider adding more holdings for diversification\n' : ''}${weightedBeta > 1.5 ? '• Portfolio has high market risk exposure\n' : ''}${weightedDividendYield < 0.02 ? '• Consider adding dividend-paying stocks for income\n' : ''}`;
 
@@ -99,9 +99,9 @@ export const portfolioCommands = {
   },
 
   RISK_METRICS: {
-    execute: async (parsedCommand, context, processor) => {
+    execute: async(parsedCommand, context, processor) => {
       const [ticker, period = 252] = parsedCommand.parameters;
-      
+
       if (!ticker) {
         return {
           type: 'error',
@@ -156,9 +156,9 @@ export const portfolioCommands = {
   },
 
   CORRELATION_MATRIX: {
-    execute: async (parsedCommand, context, processor) => {
+    execute: async(parsedCommand, context, processor) => {
       const [tickers] = parsedCommand.parameters;
-      
+
       if (!tickers || !Array.isArray(tickers)) {
         return {
           type: 'error',
@@ -176,7 +176,7 @@ export const portfolioCommands = {
 
         // Fetch data for all tickers
         const stockData = await Promise.all(
-          tickers.map(async (ticker) => {
+          tickers.map(async(ticker) => {
             const profile = await dataFetchingService.fetchCompanyProfile(ticker);
             return {
               ticker: ticker.toUpperCase(),
@@ -232,8 +232,8 @@ export const portfolioCommands = {
           }
         }
 
-        const matrixDisplay = stockData.map(stock => 
-          `${stock.ticker.padEnd(6)} ${stockData.map(s => 
+        const matrixDisplay = stockData.map(stock =>
+          `${stock.ticker.padEnd(6)} ${stockData.map(s =>
             formatNumber(correlationMatrix[stock.ticker][s.ticker], 2).padStart(6)
           ).join(' ')}`
         ).join('\n');
@@ -271,7 +271,7 @@ export const portfolioCommands = {
   },
 
   EFFICIENT_FRONTIER: {
-    execute: async (parsedCommand, context, processor) => {
+    execute: async(parsedCommand, context, processor) => {
       const [tickers] = parsedCommand.parameters;
 
       if (!tickers || !Array.isArray(tickers)) {
@@ -291,7 +291,7 @@ export const portfolioCommands = {
 
         // Fetch data for all tickers
         const stockData = await Promise.all(
-          tickers.map(async (ticker) => {
+          tickers.map(async(ticker) => {
             const profile = await dataFetchingService.fetchCompanyProfile(ticker);
             return {
               ticker: ticker.toUpperCase(),
@@ -367,7 +367,7 @@ export const portfolioCommands = {
   },
 
   DRAWDOWN: {
-    execute: async (parsedCommand, context, processor) => {
+    execute: async(parsedCommand, context, processor) => {
       const [ticker, period = 252] = parsedCommand.parameters;
 
       if (!ticker) {

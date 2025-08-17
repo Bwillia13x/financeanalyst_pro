@@ -1,24 +1,25 @@
 import React from 'react';
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Dot } from 'recharts';
+
 import { cn } from '../../../utils/cn';
 import { Card, CardContent, CardHeader, CardTitle } from '../Card';
 
-const TrendLine = ({ 
-  data = [], 
+const TrendLine = ({
+  data = [],
   className,
-  title = "Growth Trend Analysis",
-  dataKey = "value",
+  title = 'Growth Trend Analysis',
+  dataKey = 'value',
   formatValue = (value) => `${value.toFixed(1)}%`,
   showGrowthRate = true
 }) => {
   // Calculate period-over-period growth
   const processedData = data.map((item, index) => {
     if (index === 0) return { ...item, growth: null };
-    
+
     const prevValue = data[index - 1][dataKey];
     const currentValue = item[dataKey];
     const growth = prevValue !== 0 ? ((currentValue - prevValue) / prevValue) * 100 : 0;
-    
+
     return { ...item, growth };
   });
 
@@ -47,7 +48,7 @@ const TrendLine = ({
     if (!active || !payload || !payload.length) return null;
 
     const data = payload[0].payload;
-    
+
     return (
       <div className="bg-white border border-gray-200 rounded-md shadow-elevation-1 p-3 min-w-[160px]">
         <p className="font-medium text-sm text-foreground mb-1">{label}</p>
@@ -56,10 +57,12 @@ const TrendLine = ({
         </p>
         {data.growth !== null && (
           <p className="text-sm text-muted-foreground">
-            Growth: <span className={cn(
-              "font-mono font-medium",
-              data.growth >= 0 ? "text-success" : "text-destructive"
-            )}>
+            Growth: <span
+              className={cn(
+                'font-mono font-medium',
+                data.growth >= 0 ? 'text-success' : 'text-destructive'
+              )}
+            >
               {data.growth >= 0 ? '+' : ''}{data.growth.toFixed(1)}%
             </span>
           </p>
@@ -69,17 +72,19 @@ const TrendLine = ({
   };
 
   return (
-    <Card className={cn("w-full", className)}>
+    <Card className={cn('w-full', className)}>
       <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg font-semibold text-foreground">{title}</CardTitle>
           {showGrowthRate && (
             <div className="text-right">
               <p className="text-xs text-muted-foreground">Overall Growth</p>
-              <p className={cn(
-                "text-sm font-mono font-semibold",
-                isPositiveTrend ? "text-success" : "text-destructive"
-              )}>
+              <p
+                className={cn(
+                  'text-sm font-mono font-semibold',
+                  isPositiveTrend ? 'text-success' : 'text-destructive'
+                )}
+              >
                 {isPositiveTrend ? '+' : ''}{overallGrowth.toFixed(1)}%
               </p>
             </div>
@@ -93,7 +98,7 @@ const TrendLine = ({
               data={processedData}
               margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
             >
-              <XAxis 
+              <XAxis
                 dataKey="period"
                 axisLine={false}
                 tickLine={false}
@@ -111,8 +116,8 @@ const TrendLine = ({
                 stroke="var(--color-secondary)"
                 strokeWidth={3}
                 dot={<CustomDot />}
-                activeDot={{ 
-                  r: 6, 
+                activeDot={{
+                  r: 6,
                   fill: 'var(--color-secondary)',
                   stroke: 'var(--color-background)',
                   strokeWidth: 2
@@ -140,10 +145,12 @@ const TrendLine = ({
           </div>
           <div className="text-center">
             <p className="text-xs text-muted-foreground mb-1">Net Change</p>
-            <p className={cn(
-              "font-mono text-sm font-medium",
-              isPositiveTrend ? "text-success" : "text-destructive"
-            )}>
+            <p
+              className={cn(
+                'font-mono text-sm font-medium',
+                isPositiveTrend ? 'text-success' : 'text-destructive'
+              )}
+            >
               {isPositiveTrend ? '+' : ''}{overallGrowth.toFixed(1)}%
             </p>
           </div>
