@@ -1,6 +1,8 @@
 // Accessibility Testing Framework with axe-core
 import axeCore from 'axe-core';
 
+import { reportPerformanceMetric } from './performanceMonitoring';
+
 class AccessibilityTester {
   constructor(options = {}) {
     this.options = {
@@ -55,6 +57,13 @@ class AccessibilityTester {
       // Store results for analytics
       this.storeResults(results);
 
+      // Report aggregated metrics for monitoring
+      reportPerformanceMetric('accessibility_test', {
+        violations: results.violations?.length || 0,
+        passes: results.passes?.length || 0,
+        timestamp: Date.now()
+      });
+
       return results;
     } catch (error) {
       console.error('Accessibility testing failed:', error);
@@ -71,7 +80,7 @@ class AccessibilityTester {
 
     // Component-specific test configurations
     const componentConfigs = {
-      'spreadsheet': {
+      spreadsheet: {
         rules: {
           'table-header': { enabled: true },
           'th-has-data-cells': { enabled: true },
@@ -81,7 +90,7 @@ class AccessibilityTester {
         tags: ['wcag2aa', 'section508']
       },
 
-      'chart': {
+      chart: {
         rules: {
           'image-alt': { enabled: true },
           'svg-img-alt': { enabled: true },
@@ -90,16 +99,16 @@ class AccessibilityTester {
         tags: ['wcag2aa']
       },
 
-      'calculator': {
+      calculator: {
         rules: {
-          'label': { enabled: true },
+          label: { enabled: true },
           'form-field-multiple-labels': { enabled: true },
           'duplicate-id': { enabled: true }
         },
         tags: ['wcag2aa', 'section508']
       },
 
-      'modal': {
+      modal: {
         rules: {
           'focus-trap': { enabled: true },
           'aria-dialog-name': { enabled: true },
@@ -168,7 +177,9 @@ class AccessibilityTester {
   async testColorContrast() {
     console.log('🎨 Testing color contrast...');
 
-    const textElements = document.querySelectorAll('p, span, div, td, th, label, button, a, h1, h2, h3, h4, h5, h6');
+    const textElements = document.querySelectorAll(
+      'p, span, div, td, th, label, button, a, h1, h2, h3, h4, h5, h6'
+    );
     const contrastIssues = [];
 
     textElements.forEach(element => {
@@ -186,7 +197,8 @@ class AccessibilityTester {
       const fontWeight = styles.fontWeight;
 
       // WCAG AA requirements
-      const isLargeText = fontSize >= 18 || (fontSize >= 14 && (fontWeight === 'bold' || fontWeight >= 700));
+      const isLargeText =
+        fontSize >= 18 || (fontSize >= 14 && (fontWeight === 'bold' || fontWeight >= 700));
       const requiredRatio = isLargeText ? 3.0 : 4.5;
 
       if (contrast < requiredRatio) {
@@ -327,8 +339,10 @@ class AccessibilityTester {
             category: 'Visual Design',
             priority: 'High',
             issue: 'Insufficient color contrast',
-            solution: 'Ensure text colors meet WCAG AA standards (4.5:1 for normal text, 3:1 for large text)',
-            financialContext: 'Critical for reading financial data and avoiding misinterpretation of numbers'
+            solution:
+              'Ensure text colors meet WCAG AA standards (4.5:1 for normal text, 3:1 for large text)',
+            financialContext:
+              'Critical for reading financial data and avoiding misinterpretation of numbers'
           });
           break;
 
@@ -337,8 +351,10 @@ class AccessibilityTester {
             category: 'Keyboard Access',
             priority: 'High',
             issue: 'Keyboard navigation issues',
-            solution: 'Ensure all interactive elements are keyboard accessible with visible focus indicators',
-            financialContext: 'Essential for users who rely on keyboard navigation to access financial tools'
+            solution:
+              'Ensure all interactive elements are keyboard accessible with visible focus indicators',
+            financialContext:
+              'Essential for users who rely on keyboard navigation to access financial tools'
           });
           break;
 
@@ -348,7 +364,8 @@ class AccessibilityTester {
             priority: 'High',
             issue: 'Missing form labels',
             solution: 'Add proper labels to all form controls, especially financial input fields',
-            financialContext: 'Critical for screen readers to understand financial input requirements'
+            financialContext:
+              'Critical for screen readers to understand financial input requirements'
           });
           break;
 
@@ -358,7 +375,8 @@ class AccessibilityTester {
             priority: 'Medium',
             issue: 'Focusable elements hidden from screen readers',
             solution: 'Review aria-hidden usage on interactive elements',
-            financialContext: 'May hide important financial controls from assistive technology users'
+            financialContext:
+              'May hide important financial controls from assistive technology users'
           });
           break;
       }
@@ -376,7 +394,8 @@ class AccessibilityTester {
     if (tables.length > 0) {
       insights.push({
         component: 'Data Tables',
-        recommendation: 'Ensure financial data tables have proper headers and scope attributes for screen reader navigation'
+        recommendation:
+          'Ensure financial data tables have proper headers and scope attributes for screen reader navigation'
       });
     }
 
@@ -394,7 +413,8 @@ class AccessibilityTester {
     if (calculators.length > 0) {
       insights.push({
         component: 'Financial Calculators',
-        recommendation: 'Ensure calculator inputs have clear labels and results are announced to screen readers'
+        recommendation:
+          'Ensure calculator inputs have clear labels and results are announced to screen readers'
       });
     }
 
@@ -457,8 +477,10 @@ class AccessibilityTester {
     const financialTypes = ['number', 'email', 'tel'];
     const financialNames = ['amount', 'price', 'rate', 'percent', 'currency', 'value'];
 
-    return financialTypes.includes(input.type) ||
-           financialNames.some(name => input.name?.toLowerCase().includes(name));
+    return (
+      financialTypes.includes(input.type) ||
+      financialNames.some(name => input.name?.toLowerCase().includes(name))
+    );
   }
 
   getAssociatedLabel(input) {
@@ -564,7 +586,8 @@ export const accessibilityTester = new AccessibilityTester();
 export function useAccessibilityTester() {
   return {
     runTests: (element, options) => accessibilityTester.runTests(element, options),
-    testFinancialComponent: (selector, type) => accessibilityTester.testFinancialComponent(selector, type),
+    testFinancialComponent: (selector, type) =>
+      accessibilityTester.testFinancialComponent(selector, type),
     testKeyboardNavigation: () => accessibilityTester.testKeyboardNavigation(),
     testColorContrast: () => accessibilityTester.testColorContrast(),
     testFormAccessibility: () => accessibilityTester.testFormAccessibility(),
