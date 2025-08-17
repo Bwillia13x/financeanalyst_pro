@@ -3,11 +3,20 @@
  * Handles data privacy controls, retention policies, and user data rights
  */
 
-import { persistenceManager } from './PersistenceManager';
 import { backupService } from './BackupService';
+import { persistenceManager } from './PersistenceManager';
+
+/**
+ * @typedef {'command_history'|'analysis_history'|'cached_data'|'export_data'|'session_data'} RetentionDataType
+ * @typedef {{ command_history: number, analysis_history: number, cached_data: number, export_data: number, session_data: number }} RetentionPolicies
+ * @typedef {{ dataRetention: boolean, analytics: boolean, crashReporting: boolean, dataSharing: boolean, cookieConsent: boolean, trackingConsent: boolean }} PrivacySettings
+ * @typedef {{ essential: string[], functional: string[], analytics: string[], marketing: string[], external: string[] }} DataCategories
+ * @typedef {{ includeEssential?: boolean, includeFunctional?: boolean, includeAnalytics?: boolean, format?: 'json' | 'csv' }} ExportOptions
+ */
 
 export class PrivacyService {
   constructor() {
+    /** @type {RetentionPolicies} */
     this.retentionPolicies = {
       command_history: 30, // days
       analysis_history: 90,
@@ -16,6 +25,7 @@ export class PrivacyService {
       session_data: 1
     };
     
+    /** @type {PrivacySettings} */
     this.privacySettings = {
       dataRetention: true,
       analytics: false,
@@ -25,6 +35,7 @@ export class PrivacyService {
       trackingConsent: false
     };
 
+    /** @type {DataCategories} */
     this.dataCategories = {
       essential: ['user_preferences', 'session_data', 'watchlists', 'alerts'],
       functional: ['command_history', 'user_variables'],
@@ -36,6 +47,7 @@ export class PrivacyService {
 
   /**
    * Initialize privacy service
+   * @returns {Promise<{ success: boolean, settings: PrivacySettings }>}
    */
   async initialize() {
     try {
@@ -54,17 +66,20 @@ export class PrivacyService {
       // Schedule cleanup
       this.scheduleCleanup();
 
-      console.log('✅ Privacy service initialized');
+      console.warn('✅ Privacy service initialized');
       return { success: true, settings: this.privacySettings };
 
     } catch (error) {
       console.error('❌ Failed to initialize privacy service:', error);
-      return { success: false, error: error.message };
+      const message = error instanceof Error ? error.message : String(error);
+      return { success: false, error: message };
     }
   }
 
   /**
    * Update privacy settings
+   * @param {Partial<PrivacySettings>} newSettings
+   * @returns {Promise<{ success: boolean, settings: PrivacySettings }>}
    */
   async updatePrivacySettings(newSettings) {
     try {
@@ -89,6 +104,9 @@ export class PrivacyService {
 
   /**
    * Handle privacy setting changes
+   * @param {PrivacySettings} oldSettings
+   * @param {PrivacySettings} newSettings
+   * @returns {Promise<void>}
    */
   async handlePrivacySettingChanges(oldSettings, newSettings) {
     // If data retention was disabled, clean up non-essential data
@@ -109,6 +127,9 @@ export class PrivacyService {
 
   /**
    * Set data retention policy
+   * @param {RetentionDataType} dataType
+   * @param {number} days
+   * @returns {Promise<{ success: boolean, policy: Record<string, number> }>}
    */
   async setRetentionPolicy(dataType, days) {
     try {
@@ -132,6 +153,8 @@ export class PrivacyService {
 
   /**
    * Clean up expired data based on retention policies
+   * @param {RetentionDataType | null} specificType
+   * @returns {Promise<{ cleaned: number, errors: number, details: Record<string, number | string> }>}
    */
   async cleanupExpiredData(specificType = null) {
     const results = {
@@ -141,7 +164,9 @@ export class PrivacyService {
     };
 
     try {
-      const typesToClean = specificType ? [specificType] : Object.keys(this.retentionPolicies);
+      const typesToClean = /** @type {RetentionDataType[]} */ (
+        specificType ? [specificType] : Object.keys(this.retentionPolicies)
+      );
 
       for (const dataType of typesToClean) {
         const retentionDays = this.retentionPolicies[dataType];
@@ -155,7 +180,8 @@ export class PrivacyService {
         } catch (error) {
           console.error(`Failed to cleanup ${dataType}:`, error);
           results.errors++;
-          results.details[dataType] = `Error: ${error.message}`;
+          const message = error instanceof Error ? error.message : String(error);
+          results.details[dataType] = `Error: ${message}`;
         }
       }
 
@@ -169,6 +195,9 @@ export class PrivacyService {
 
   /**
    * Clean up specific data type
+   * @param {RetentionDataType} dataType
+   * @param {number} retentionDays
+   * @returns {Promise<number>}
    */
   async cleanupDataType(dataType, retentionDays) {
     const cutoffTime = Date.now() - (retentionDays * 24 * 60 * 60 * 1000);
@@ -210,10 +239,14 @@ export class PrivacyService {
 
   /**
    * Clean up command history
+   * @param {number} cutoffTime
+   * @returns {Promise<number>}
    */
   async cleanupCommandHistory(cutoffTime) {
-    const history = await persistenceManager.retrieve('command_history') || [];
-    const filtered = history.filter(entry => 
+    const history = /** @type {Array<{ timestamp: number | string }>} */ (
+      await persistenceManager.retrieve('command_history')
+    ) || [];
+    const filtered = history.filter(entry =>
       new Date(entry.timestamp).getTime() > cutoffTime
     );
 
@@ -229,10 +262,14 @@ export class PrivacyService {
 
   /**
    * Clean up analysis history
+   * @param {number} cutoffTime
+   * @returns {Promise<number>}
    */
   async cleanupAnalysisHistory(cutoffTime) {
     // Get all analysis history from IndexedDB
-    const allHistory = await persistenceManager.indexedDB.getAll('analysis_history');
+    const allHistory = /** @type {Array<{ id: string | number, timestamp: number }>} */ (
+      await persistenceManager.indexedDB.getAll('analysis_history')
+    );
     let cleaned = 0;
 
     for (const entry of allHistory) {
@@ -247,9 +284,13 @@ export class PrivacyService {
 
   /**
    * Clean up cached data
+   * @param {number} cutoffTime
+   * @returns {Promise<number>}
    */
   async cleanupCachedData(cutoffTime) {
-    const allCached = await persistenceManager.indexedDB.getAll('cached_data');
+    const allCached = /** @type {Array<{ key: string | number, timestamp: number }>} */ (
+      await persistenceManager.indexedDB.getAll('cached_data')
+    );
     let cleaned = 0;
 
     for (const entry of allCached) {
@@ -264,9 +305,13 @@ export class PrivacyService {
 
   /**
    * Clean up export data
+   * @param {number} cutoffTime
+   * @returns {Promise<number>}
    */
   async cleanupExportData(cutoffTime) {
-    const allExports = await persistenceManager.indexedDB.getAll('export_data');
+    const allExports = /** @type {Array<{ id: string | number, timestamp: number }>} */ (
+      await persistenceManager.indexedDB.getAll('export_data')
+    );
     let cleaned = 0;
 
     for (const entry of allExports) {
@@ -281,8 +326,10 @@ export class PrivacyService {
 
   /**
    * Clean up session data
+   * @param {number} _cutoffTime
+   * @returns {Promise<number>}
    */
-  async cleanupSessionData(cutoffTime) {
+  async cleanupSessionData(_cutoffTime) {
     // Session data is typically current, but clean up old session logs if any
     return 0; // Placeholder
   }
@@ -338,11 +385,13 @@ export class PrivacyService {
   async removeDataSharingMarkers() {
     // Remove any markers that indicate data has been shared
     // This is a placeholder for future implementation
-    console.log('Data sharing markers removed');
+    console.warn('Data sharing markers removed');
   }
 
   /**
    * Export user data (GDPR compliance)
+   * @param {ExportOptions=} options
+   * @returns {Promise<{ success: boolean, data: { exportTimestamp: string, privacySettings: PrivacySettings, retentionPolicies: RetentionPolicies, data: Record<string, any> }, size: number, format: string }>}
    */
   async exportUserData(options = {}) {
     const {
@@ -353,6 +402,7 @@ export class PrivacyService {
     } = options;
 
     try {
+      /** @type {{ exportTimestamp: string, privacySettings: PrivacySettings, retentionPolicies: RetentionPolicies, data: Record<string, any> }} */
       const exportData = {
         exportTimestamp: new Date().toISOString(),
         privacySettings: this.privacySettings,
@@ -403,6 +453,8 @@ export class PrivacyService {
 
   /**
    * Delete all user data (Right to be forgotten)
+   * @param {boolean} [confirmation=false]
+   * @returns {Promise<{ success: true, backup: string, timestamp: string }>}
    */
   async deleteAllUserData(confirmation = false) {
     if (!confirmation) {
@@ -480,7 +532,7 @@ export class PrivacyService {
     setInterval(async () => {
       try {
         await this.cleanupExpiredData();
-        console.log('✅ Scheduled privacy cleanup completed');
+        console.warn('✅ Scheduled privacy cleanup completed');
       } catch (error) {
         console.error('❌ Scheduled privacy cleanup failed:', error);
       }
@@ -496,6 +548,7 @@ export class PrivacyService {
 
   /**
    * Get privacy settings
+   * @returns {PrivacySettings}
    */
   getPrivacySettings() {
     return { ...this.privacySettings };
@@ -503,6 +556,7 @@ export class PrivacyService {
 
   /**
    * Get retention policies
+   * @returns {RetentionPolicies}
    */
   getRetentionPolicies() {
     return { ...this.retentionPolicies };
