@@ -3,13 +3,11 @@
  * Comprehensive analytics, insights, and automated intelligence for financial platform
  */
 
-import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  Brain, 
-  Users, 
-  Activity, 
-  TrendingUp, 
+import {
+  Brain,
+  Users,
+  Activity,
   BarChart3,
   Lightbulb,
   Download,
@@ -20,13 +18,14 @@ import {
   ArrowDown,
   Minus,
   Zap,
-  Target,
-  Eye
+  Target
 } from 'lucide-react';
-import { 
-  useBusinessIntelligence, 
-  useUsageAnalytics, 
-  usePerformanceAnalytics, 
+import { useState } from 'react';
+
+import {
+  useBusinessIntelligence,
+  useUsageAnalytics,
+  usePerformanceAnalytics,
   useAutomatedInsights
 } from '../../hooks/useBusinessIntelligence';
 import SEOHead from '../SEO/SEOHead';
@@ -40,12 +39,12 @@ const BusinessIntelligenceDashboard = ({ isVisible = true, onClose }) => {
   const { performanceMetrics, benchmarks, alerts } = usePerformanceAnalytics();
   const { insights: automatedInsights, recommendations } = useAutomatedInsights();
 
-  const handleRefresh = async () => {
+  const handleRefresh = async() => {
     setRefreshing(true);
     try {
       await generateReport();
       setTimeout(() => setRefreshing(false), 1000);
-    } catch (error) {
+    } catch (_error) {
       setRefreshing(false);
     }
   };
@@ -58,11 +57,11 @@ const BusinessIntelligenceDashboard = ({ isVisible = true, onClose }) => {
       animate={{ opacity: 1, y: 0 }}
       className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50 p-4"
     >
-      <SEOHead 
+      <SEOHead
         title="Business Intelligence Analytics - FinanceAnalyst Pro"
         description="Advanced business intelligence, usage analytics, performance insights, and automated recommendations"
       />
-      
+
       <motion.div
         initial={{ scale: 0.95 }}
         animate={{ scale: 1 }}
@@ -135,7 +134,7 @@ const BusinessIntelligenceDashboard = ({ isVisible = true, onClose }) => {
                     <Users className="w-8 h-8 text-blue-500" />
                   </div>
                 </div>
-                
+
                 <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4">
                   <div className="flex items-center justify-between">
                     <div>
@@ -148,7 +147,7 @@ const BusinessIntelligenceDashboard = ({ isVisible = true, onClose }) => {
                     <Activity className="w-8 h-8 text-green-500" />
                   </div>
                 </div>
-                
+
                 <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4">
                   <div className="flex items-center justify-between">
                     <div>
@@ -161,7 +160,7 @@ const BusinessIntelligenceDashboard = ({ isVisible = true, onClose }) => {
                     <Zap className="w-8 h-8 text-purple-500" />
                   </div>
                 </div>
-                
+
                 <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg p-4">
                   <div className="flex items-center justify-between">
                     <div>
@@ -183,9 +182,11 @@ const BusinessIntelligenceDashboard = ({ isVisible = true, onClose }) => {
                   <div className="space-y-4">
                     {automatedInsights.slice(0, 3).map((insight) => (
                       <div key={insight.id} className="flex items-start space-x-3 p-4 bg-gray-50 rounded-lg">
-                        <div className={`w-2 h-2 rounded-full mt-2 ${
-                          insight.impact === 'high' ? 'bg-red-500' : insight.impact === 'medium' ? 'bg-yellow-500' : 'bg-green-500'
-                        }`}></div>
+                        <div
+                          className={`w-2 h-2 rounded-full mt-2 ${
+                            insight.impact === 'high' ? 'bg-red-500' : insight.impact === 'medium' ? 'bg-yellow-500' : 'bg-green-500'
+                          }`}
+                        />
                         <div className="flex-1">
                           <h4 className="font-medium text-gray-900">{insight.title}</h4>
                           <p className="text-sm text-gray-600 mt-1">{insight.description}</p>
@@ -242,7 +243,7 @@ const BusinessIntelligenceDashboard = ({ isVisible = true, onClose }) => {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="bg-white border border-gray-200 rounded-lg p-6">
                   <h4 className="font-medium text-gray-900 mb-4">Features</h4>
                   <div className="space-y-3">
@@ -260,7 +261,7 @@ const BusinessIntelligenceDashboard = ({ isVisible = true, onClose }) => {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="bg-white border border-gray-200 rounded-lg p-6">
                   <h4 className="font-medium text-gray-900 mb-4">Growth</h4>
                   <div className="space-y-3">
@@ -286,7 +287,7 @@ const BusinessIntelligenceDashboard = ({ isVisible = true, onClose }) => {
           {activeTab === 'performance' && (
             <div className="space-y-6">
               <h3 className="text-lg font-semibold text-gray-900">Performance Analytics</h3>
-              
+
               {alerts?.length > 0 && (
                 <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                   <div className="flex items-center mb-3">
@@ -317,7 +318,7 @@ const BusinessIntelligenceDashboard = ({ isVisible = true, onClose }) => {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="bg-white border border-gray-200 rounded-lg p-6">
                   <h4 className="font-medium text-gray-900 mb-4">Resources</h4>
                   <div className="space-y-3">
@@ -335,16 +336,19 @@ const BusinessIntelligenceDashboard = ({ isVisible = true, onClose }) => {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="bg-white border border-gray-200 rounded-lg p-6">
                   <h4 className="font-medium text-gray-900 mb-4">Benchmarks</h4>
                   <div className="space-y-3">
                     {Object.entries(benchmarks).map(([metric, data]) => (
                       <div key={metric} className="flex justify-between">
                         <span className="text-sm text-gray-600 capitalize">{metric.replace('_', ' ')}</span>
-                        <span className={`text-sm font-medium ${
-                          data.status === 'excellent' ? 'text-green-600' : 'text-blue-600'
-                        }`}>{data.status}</span>
+                        <span
+                          className={`text-sm font-medium ${
+                            data.status === 'excellent' ? 'text-green-600' : 'text-blue-600'
+                          }`}
+                        >{data.status}
+                        </span>
                       </div>
                     ))}
                   </div>
@@ -357,7 +361,7 @@ const BusinessIntelligenceDashboard = ({ isVisible = true, onClose }) => {
           {activeTab === 'insights' && (
             <div className="space-y-6">
               <h3 className="text-lg font-semibold text-gray-900">AI-Powered Insights</h3>
-              
+
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div className="bg-white border border-gray-200 rounded-lg p-6">
                   <h4 className="font-medium text-gray-900 mb-4">Automated Insights</h4>
@@ -368,11 +372,14 @@ const BusinessIntelligenceDashboard = ({ isVisible = true, onClose }) => {
                         <p className="text-sm text-gray-600 mt-1">{insight.description}</p>
                         <div className="flex items-center space-x-4 mt-2 text-xs text-gray-500">
                           <span>Confidence: {Math.round(insight.confidence * 100)}%</span>
-                          <span className={`px-2 py-1 rounded-full ${
-                            insight.impact === 'high' ? 'bg-red-100 text-red-800' :
-                            insight.impact === 'medium' ? 'bg-yellow-100 text-yellow-800' :
-                            'bg-green-100 text-green-800'
-                          }`}>{insight.impact} impact</span>
+                          <span
+                            className={`px-2 py-1 rounded-full ${
+                              insight.impact === 'high' ? 'bg-red-100 text-red-800' :
+                                insight.impact === 'medium' ? 'bg-yellow-100 text-yellow-800' :
+                                  'bg-green-100 text-green-800'
+                            }`}
+                          >{insight.impact} impact
+                          </span>
                         </div>
                       </div>
                     ))}

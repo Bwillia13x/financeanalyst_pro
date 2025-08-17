@@ -3,7 +3,6 @@
  * Provides AI-powered insights, recommendations, and key driver analysis
  */
 
-import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Brain,
@@ -37,6 +36,7 @@ import {
   Percent,
   Calculator
 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 import {
   LineChart,
   Line,
@@ -327,7 +327,7 @@ const AutomatedInsights = ({ modelData, financialData, onDataChange }) => {
                           <p className="text-sm text-gray-600 mt-1">{insight.description}</p>
                         </div>
                       </div>
-                      
+
                       <div className="flex items-center space-x-2">
                         <span className={`px-3 py-1 text-xs font-medium rounded-full border ${getImpactColor(insight.impact)}`}>
                           {insight.impact} impact
@@ -343,9 +343,11 @@ const AutomatedInsights = ({ modelData, financialData, onDataChange }) => {
                       </div>
                       <div>
                         <div className="text-sm font-medium text-gray-700 mb-2">Potential Impact</div>
-                        <p className={`text-sm font-medium ${
-                          insight.potentialValue.includes('+') ? 'text-green-600' : 'text-red-600'
-                        }`}>
+                        <p
+                          className={`text-sm font-medium ${
+                            insight.potentialValue.includes('+') ? 'text-green-600' : 'text-red-600'
+                          }`}
+                        >
                           {insight.potentialValue}
                         </p>
                       </div>
@@ -361,7 +363,7 @@ const AutomatedInsights = ({ modelData, financialData, onDataChange }) => {
                           ))}
                         </div>
                       </div>
-                      
+
                       <div className="flex items-center space-x-2">
                         <button className="text-gray-400 hover:text-green-600 p-2">
                           <ThumbsUp className="w-4 h-4" />
@@ -387,7 +389,7 @@ const AutomatedInsights = ({ modelData, financialData, onDataChange }) => {
           {activeTab === 'drivers' && (
             <div className="space-y-6">
               <h3 className="text-lg font-medium text-gray-900">Key Value Drivers</h3>
-              
+
               <div className="space-y-4">
                 {keyDrivers.map((driver) => (
                   <div key={driver.id} className="bg-gray-50 rounded-lg p-6">
@@ -459,8 +461,8 @@ const AutomatedInsights = ({ modelData, financialData, onDataChange }) => {
                         <span>{driver.sensitivity}/100</span>
                       </div>
                       <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div 
-                          className="bg-violet-600 h-2 rounded-full" 
+                        <div
+                          className="bg-violet-600 h-2 rounded-full"
                           style={{ width: `${driver.sensitivity}%` }}
                         />
                       </div>
@@ -475,7 +477,7 @@ const AutomatedInsights = ({ modelData, financialData, onDataChange }) => {
           {activeTab === 'sensitivity' && (
             <div className="space-y-6">
               <h3 className="text-lg font-medium text-gray-900">Sensitivity Analysis</h3>
-              
+
               <div className="bg-white border border-gray-200 rounded-lg p-6">
                 <h4 className="font-medium text-gray-900 mb-4">Key Driver Impact on Valuation</h4>
                 <ResponsiveContainer width="100%" height={400}>
@@ -486,8 +488,14 @@ const AutomatedInsights = ({ modelData, financialData, onDataChange }) => {
                     <YAxis yAxisId="right" orientation="right" />
                     <Tooltip />
                     <Legend />
-                    <Bar yAxisId="left" dataKey="value" fill="#8B5CF6" name="Valuation ($M)" />
-                    <Line yAxisId="right" type="monotone" dataKey="impact" stroke="#10B981" name="Impact %" />
+                    <Bar
+                      yAxisId="left" dataKey="value" fill="#8B5CF6"
+                      name="Valuation ($M)"
+                    />
+                    <Line
+                      yAxisId="right" type="monotone" dataKey="impact"
+                      stroke="#10B981" name="Impact %"
+                    />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -498,7 +506,7 @@ const AutomatedInsights = ({ modelData, financialData, onDataChange }) => {
           {activeTab === 'recommendations' && (
             <div className="space-y-6">
               <h3 className="text-lg font-medium text-gray-900">AI Recommendations</h3>
-              
+
               <div className="bg-violet-50 border border-violet-200 rounded-lg p-6">
                 <div className="flex items-start">
                   <Zap className="w-6 h-6 text-violet-600 mt-0.5 mr-3" />
@@ -521,9 +529,11 @@ const AutomatedInsights = ({ modelData, financialData, onDataChange }) => {
                     <h4 className="font-medium text-gray-900 mb-2">{insight.title}</h4>
                     <p className="text-sm text-gray-600 mb-4">{insight.recommendation}</p>
                     <div className="flex items-center justify-between">
-                      <span className={`text-sm font-medium ${
-                        insight.potentialValue.includes('+') ? 'text-green-600' : 'text-red-600'
-                      }`}>
+                      <span
+                        className={`text-sm font-medium ${
+                          insight.potentialValue.includes('+') ? 'text-green-600' : 'text-red-600'
+                        }`}
+                      >
                         {insight.potentialValue}
                       </span>
                       <button className="bg-violet-600 hover:bg-violet-700 text-white px-3 py-1 rounded text-xs">

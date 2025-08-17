@@ -26,10 +26,13 @@ h1, h2, h3 { line-height: 1.2; margin: 0.5rem 0; }
 
 /* Root container placeholder to avoid layout shift */
 #root {
-  display: flex;
-  align-items: stretch;
+  /* Fix: ensure the app spans the full viewport width.
+     Using block layout here avoids flex sizing that constrained width. */
+  display: block;
   min-height: 100vh;
+  width: 100%;
 }
 
 /* Basic focus visibility for accessibility */
 :focus-visible { outline: 2px solid #3b82f6; outline-offset: 2px; }
+

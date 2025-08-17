@@ -3,7 +3,6 @@
  * Provides step-by-step guidance for complex financial analysis workflows
  */
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Play,
@@ -26,18 +25,19 @@ import {
   Maximize,
   Minimize
 } from 'lucide-react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 
 /**
  * Tutorial Step Component
  */
-const TutorialStep = ({ 
-  step, 
-  isActive, 
-  onNext, 
-  onPrev, 
-  onComplete, 
+const TutorialStep = ({
+  step,
+  isActive,
+  onNext,
+  onPrev,
+  onComplete,
   onSkip,
-  targetElement 
+  targetElement
 }) => {
   const [isCompleted, setIsCompleted] = useState(false);
   const [userInput, setUserInput] = useState('');
@@ -46,11 +46,11 @@ const TutorialStep = ({
   // Calculate position for the tutorial overlay
   const getOverlayPosition = useCallback(() => {
     if (!targetElement) return { top: '50%', left: '50%' };
-    
+
     const rect = targetElement.getBoundingClientRect();
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
     const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
-    
+
     return {
       top: rect.top + scrollTop - 60,
       left: rect.left + scrollLeft + rect.width + 20
@@ -66,7 +66,7 @@ const TutorialStep = ({
 
   const validateUserAction = useCallback(() => {
     if (!step.validation) return true;
-    
+
     // Custom validation based on step requirements
     switch (step.validation.type) {
       case 'input':
@@ -127,7 +127,7 @@ const TutorialStep = ({
         <div className="p-4">
           <div className="space-y-3">
             <p className="text-slate-700">{step.description}</p>
-            
+
             {/* Interactive Elements */}
             {step.type === 'input' && (
               <div className="space-y-2">
@@ -190,9 +190,11 @@ const TutorialStep = ({
 
             {/* Validation Feedback */}
             {step.validation && userInput && (
-              <div className={`flex items-center gap-2 text-sm ${
-                validateUserAction() ? 'text-green-600' : 'text-red-600'
-              }`}>
+              <div
+                className={`flex items-center gap-2 text-sm ${
+                  validateUserAction() ? 'text-green-600' : 'text-red-600'
+                }`}
+              >
                 {validateUserAction() ? (
                   <CheckCircle size={14} />
                 ) : (
@@ -246,7 +248,7 @@ const TutorialStep = ({
         className="fixed inset-0 bg-black bg-opacity-50 z-40"
         onClick={onSkip}
       />
-      
+
       {targetElement && (
         <motion.div
           initial={{ opacity: 0 }}
@@ -280,8 +282,8 @@ const TutorialProgress = ({ currentStep, totalSteps, onStepClick }) => {
             index + 1 < currentStep
               ? 'bg-green-600 text-white'
               : index + 1 === currentStep
-              ? 'bg-blue-600 text-white'
-              : 'bg-slate-200 text-slate-600 hover:bg-slate-300'
+                ? 'bg-blue-600 text-white'
+                : 'bg-slate-200 text-slate-600 hover:bg-slate-300'
           }`}
         >
           {index + 1 < currentStep ? <CheckCircle size={12} /> : index + 1}

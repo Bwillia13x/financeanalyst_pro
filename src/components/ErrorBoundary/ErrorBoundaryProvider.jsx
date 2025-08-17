@@ -1,4 +1,5 @@
 import React, { Component, createContext, useContext } from 'react';
+
 import { trackError } from '../../utils/performanceMonitoring';
 
 // Error Boundary Context for advanced error handling
@@ -14,7 +15,7 @@ export const useErrorBoundary = () => useContext(ErrorBoundaryContext);
 class ErrorBoundaryProvider extends Component {
   constructor(props) {
     super(props);
-    
+
     this.state = {
       hasError: false,
       error: null,
@@ -38,10 +39,10 @@ class ErrorBoundaryProvider extends Component {
   componentDidCatch(error, errorInfo) {
     // Enhanced error logging with financial context
     const enhancedError = this.enhanceErrorWithContext(error, errorInfo);
-    
+
     // Track error for monitoring
     trackError(error, errorInfo);
-    
+
     // Log to console in development
     if (process.env.NODE_ENV === 'development') {
       console.group('🚨 Error Boundary Caught Error');
@@ -50,7 +51,7 @@ class ErrorBoundaryProvider extends Component {
       console.error('Enhanced Context:', enhancedError);
       console.groupEnd();
     }
-    
+
     // Update state with error details
     this.setState(prevState => ({
       errorInfo,
@@ -74,19 +75,19 @@ class ErrorBoundaryProvider extends Component {
     const financialContext = {
       // Current financial data state
       hasFinancialData: this.hasFinancialDataInDOM(),
-      
+
       // Active calculations
       activeCalculations: this.getActiveCalculations(),
-      
+
       // User interaction context
       lastUserAction: this.getLastUserAction(),
-      
+
       // Performance context
       memoryUsage: this.getMemoryUsage(),
-      
+
       // Network status
       isOnline: navigator.onLine,
-      
+
       // App state
       currentRoute: window.location.pathname,
       timestamp: new Date().toISOString()
@@ -114,22 +115,22 @@ class ErrorBoundaryProvider extends Component {
   getActiveCalculations = () => {
     // Extract active calculation context
     const calculations = [];
-    
+
     // Check for DCF calculations
     if (document.querySelector('[data-dcf-active]')) {
       calculations.push('DCF');
     }
-    
+
     // Check for Monte Carlo simulations
     if (document.querySelector('[data-montecarlo-active]')) {
       calculations.push('Monte Carlo');
     }
-    
+
     // Check for LBO modeling
     if (document.querySelector('[data-lbo-active]')) {
       calculations.push('LBO');
     }
-    
+
     return calculations;
   };
 
@@ -153,7 +154,7 @@ class ErrorBoundaryProvider extends Component {
     return null;
   };
 
-  reportErrorToService = async (enhancedError) => {
+  reportErrorToService = async(enhancedError) => {
     try {
       // In production, send to your error monitoring service
       if (process.env.NODE_ENV === 'production') {
@@ -284,7 +285,7 @@ const FinancialErrorFallback = ({ error, retry, retryCount, onReportFeedback }) 
 
   const getErrorMessage = () => {
     const errorType = getErrorType();
-    
+
     switch (errorType) {
       case 'network':
         return {
@@ -315,9 +316,14 @@ const FinancialErrorFallback = ({ error, retry, retryCount, onReportFeedback }) 
         {/* Error Icon */}
         <div className="mb-6">
           <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto">
-            <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+            <svg
+              className="w-8 h-8 text-red-600" fill="none" stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
+              />
             </svg>
           </div>
         </div>
@@ -329,9 +335,14 @@ const FinancialErrorFallback = ({ error, retry, retryCount, onReportFeedback }) 
         {/* Data Safety Assurance */}
         <div className="bg-green-900/20 border border-green-700 rounded-lg p-4 mb-6">
           <div className="flex items-center justify-center text-green-400 mb-2">
-            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <svg
+              className="w-5 h-5 mr-2" fill="none" stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
             <span className="font-medium">Your data is secure</span>
           </div>
@@ -345,7 +356,7 @@ const FinancialErrorFallback = ({ error, retry, retryCount, onReportFeedback }) 
           <button
             onClick={retry}
             disabled={retryCount >= 3}
-            className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 
+            className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600
                      text-white font-medium py-3 px-6 rounded-lg transition-colors
                      disabled:cursor-not-allowed"
           >
@@ -354,7 +365,7 @@ const FinancialErrorFallback = ({ error, retry, retryCount, onReportFeedback }) 
 
           <button
             onClick={() => window.location.reload()}
-            className="w-full bg-slate-600 hover:bg-slate-700 text-white 
+            className="w-full bg-slate-600 hover:bg-slate-700 text-white
                      font-medium py-3 px-6 rounded-lg transition-colors"
           >
             Refresh Page

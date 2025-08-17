@@ -11,12 +11,12 @@ export class SessionManager {
     this.userKey = 'financeanalyst_user';
     this.preferencesKey = 'financeanalyst_preferences';
     this.cryptoUtils = new CryptoUtils();
-    
+
     this.currentSession = null;
     this.currentUser = null;
     this.sessionTimeout = 24 * 60 * 60 * 1000; // 24 hours
     this.listeners = new Set();
-    
+
     // Default user preferences
     this.defaultPreferences = {
       currency: 'USD',
@@ -42,10 +42,10 @@ export class SessionManager {
     try {
       // Load existing session
       await this.loadSession();
-      
+
       // Setup session monitoring
       this.setupSessionMonitoring();
-      
+
       console.log('✅ Session Manager initialized');
       return { success: true, hasSession: !!this.currentSession };
     } catch (error) {
@@ -61,7 +61,7 @@ export class SessionManager {
     try {
       const sessionId = this.generateSessionId();
       const now = Date.now();
-      
+
       const session = {
         id: sessionId,
         userId: userInfo.id || this.generateUserId(),
@@ -88,13 +88,13 @@ export class SessionManager {
       // Store session and user data
       await this.storeSession(session);
       await this.storeUser(user);
-      
+
       this.currentSession = session;
       this.currentUser = user;
-      
+
       // Notify listeners
       this.notifyListeners('sessionCreated', { session, user });
-      
+
       return {
         success: true,
         session,
@@ -114,14 +114,14 @@ export class SessionManager {
     try {
       const sessionData = localStorage.getItem(this.sessionKey);
       const userData = localStorage.getItem(this.userKey);
-      
+
       if (!sessionData || !userData) {
         return null;
       }
 
       const session = JSON.parse(sessionData);
       const user = JSON.parse(userData);
-      
+
       // Check if session is expired
       if (Date.now() > session.expires) {
         await this.destroySession();
@@ -131,13 +131,13 @@ export class SessionManager {
       // Update last activity
       session.lastActivity = Date.now();
       await this.storeSession(session);
-      
+
       this.currentSession = session;
       this.currentUser = user;
-      
+
       // Notify listeners
       this.notifyListeners('sessionLoaded', { session, user });
-      
+
       return { session, user };
 
     } catch (error) {
@@ -158,7 +158,7 @@ export class SessionManager {
 
     try {
       this.currentSession.lastActivity = Date.now();
-      
+
       // Extend session if needed
       const timeUntilExpiry = this.currentSession.expires - Date.now();
       if (timeUntilExpiry < this.sessionTimeout * 0.1) { // Extend if less than 10% time left
@@ -181,16 +181,16 @@ export class SessionManager {
     try {
       const session = this.currentSession;
       const user = this.currentUser;
-      
+
       // Clear session data
       localStorage.removeItem(this.sessionKey);
-      
+
       this.currentSession = null;
       this.currentUser = null;
-      
+
       // Notify listeners
       this.notifyListeners('sessionDestroyed', { session, user });
-      
+
       return true;
 
     } catch (error) {
@@ -242,13 +242,13 @@ export class SessionManager {
       };
 
       await this.storeUser(this.currentUser);
-      
+
       // Also store preferences separately for quick access
       localStorage.setItem(this.preferencesKey, JSON.stringify(this.currentUser.preferences));
-      
+
       // Notify listeners
       this.notifyListeners('preferencesUpdated', { preferences: this.currentUser.preferences });
-      
+
       return this.currentUser.preferences;
 
     } catch (error) {

@@ -3,7 +3,6 @@
  * Provides drag-and-drop dashboard customization with widgets and analytics
  */
 
-import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard,
@@ -17,33 +16,21 @@ import {
   DollarSign,
   Activity,
   Users,
-  Calendar,
-  Clock,
   Download,
   Share2,
   Edit3,
   Trash2,
-  Move,
-  Maximize2,
-  Minimize2,
   RefreshCw,
-  Filter,
   Eye,
-  EyeOff,
-  Bookmark,
-  Star,
-  Zap,
-  AlertTriangle
+  AlertTriangle,
+  X
 } from 'lucide-react';
+import { useState } from 'react';
 import {
   LineChart,
   Line,
-  AreaChart,
-  Area,
   BarChart,
   Bar,
-  PieChart as RechartsPieChart,
-  Cell,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -52,7 +39,9 @@ import {
   ResponsiveContainer
 } from 'recharts';
 
-const CustomizableDashboards = ({ modelData, onDataChange }) => {
+import { useDensityPreference } from '../../hooks/useDensityPreference';
+
+const CustomizableDashboards = () => {
   const [dashboards, setDashboards] = useState([
     {
       id: 1,
@@ -75,6 +64,16 @@ const CustomizableDashboards = ({ modelData, onDataChange }) => {
   const [activeDashboard, setActiveDashboard] = useState(dashboards[0]);
   const [isEditing, setIsEditing] = useState(false);
   const [showWidgetLibrary, setShowWidgetLibrary] = useState(false);
+
+  // Density preference (persisted)
+  const { density, toggleDensity } = useDensityPreference('comfortable');
+  const isCompact = density === 'compact';
+  const cardPadding = isCompact ? 'p-3' : 'p-6';
+  const sectionMb = isCompact ? 'mb-3' : 'mb-4';
+  const titleText = isCompact ? 'text-base' : 'text-lg';
+  const valueText = isCompact ? 'text-xl' : 'text-2xl';
+  const smallText = isCompact ? 'text-xs' : 'text-sm';
+  const gridGap = isCompact ? 'gap-3' : 'gap-4';
 
   const [availableWidgets] = useState([
     {
@@ -210,9 +209,9 @@ const CustomizableDashboards = ({ modelData, onDataChange }) => {
     switch (widgetId) {
       case 'kpi-summary':
         return (
-          <div className="bg-white rounded-lg p-6 shadow-sm border">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-medium text-gray-900 flex items-center">
+          <div className={`bg-white rounded-lg ${cardPadding} shadow-sm border`}>
+            <div className={`flex items-center justify-between ${sectionMb}`}>
+              <h3 className={`${titleText} font-medium text-gray-900 flex items-center`}>
                 <Icon className="w-5 h-5 mr-2 text-blue-600" />
                 KPI Summary
               </h3>
@@ -225,12 +224,12 @@ const CustomizableDashboards = ({ modelData, onDataChange }) => {
                 </button>
               )}
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className={`grid grid-cols-2 ${gridGap}`}>
               {kpiData.map((kpi, index) => (
                 <div key={index} className="text-center">
-                  <div className="text-2xl font-bold text-gray-900">{kpi.value}</div>
-                  <div className="text-sm text-gray-600">{kpi.label}</div>
-                  <div className={`text-xs ${kpi.positive ? 'text-green-600' : 'text-red-600'}`}>
+                  <div className={`${valueText} font-bold text-gray-900`}>{kpi.value}</div>
+                  <div className={`${smallText} text-gray-600`}>{kpi.label}</div>
+                  <div className={`${smallText} ${kpi.positive ? 'text-green-600' : 'text-red-600'}`}>
                     {kpi.change}
                   </div>
                 </div>
@@ -241,9 +240,9 @@ const CustomizableDashboards = ({ modelData, onDataChange }) => {
 
       case 'revenue-chart':
         return (
-          <div className="bg-white rounded-lg p-6 shadow-sm border">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-medium text-gray-900 flex items-center">
+          <div className={`bg-white rounded-lg ${cardPadding} shadow-sm border`}>
+            <div className={`flex items-center justify-between ${sectionMb}`}>
+              <h3 className={`${titleText} font-medium text-gray-900 flex items-center`}>
                 <Icon className="w-5 h-5 mr-2 text-green-600" />
                 Revenue Growth
               </h3>
@@ -262,12 +261,12 @@ const CustomizableDashboards = ({ modelData, onDataChange }) => {
                 <XAxis dataKey="year" />
                 <YAxis />
                 <Tooltip />
-                <Line 
-                  type="monotone" 
-                  dataKey="revenue" 
-                  stroke="#10B981" 
+                <Line
+                  type="monotone"
+                  dataKey="revenue"
+                  stroke="#10B981"
                   strokeWidth={2}
-                  strokeDasharray={(entry) => entry.projected ? "5 5" : "0"}
+                  strokeDasharray={(entry) => entry.projected ? '5 5' : '0'}
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -276,9 +275,9 @@ const CustomizableDashboards = ({ modelData, onDataChange }) => {
 
       case 'scenario-comparison':
         return (
-          <div className="bg-white rounded-lg p-6 shadow-sm border">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-medium text-gray-900 flex items-center">
+          <div className={`bg-white rounded-lg ${cardPadding} shadow-sm border`}>
+            <div className={`flex items-center justify-between ${sectionMb}`}>
+              <h3 className={`${titleText} font-medium text-gray-900 flex items-center`}>
                 <Icon className="w-5 h-5 mr-2 text-purple-600" />
                 Scenario Analysis
               </h3>
@@ -307,9 +306,9 @@ const CustomizableDashboards = ({ modelData, onDataChange }) => {
 
       default:
         return (
-          <div className="bg-white rounded-lg p-6 shadow-sm border">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-medium text-gray-900 flex items-center">
+          <div className={`bg-white rounded-lg ${cardPadding} shadow-sm border`}>
+            <div className={`flex items-center justify-between ${sectionMb}`}>
+              <h3 className={`${titleText} font-medium text-gray-900 flex items-center`}>
                 <Icon className="w-5 h-5 mr-2 text-gray-600" />
                 {widget.name}
               </h3>
@@ -325,7 +324,7 @@ const CustomizableDashboards = ({ modelData, onDataChange }) => {
             <div className="flex items-center justify-center h-32 text-gray-500">
               <div className="text-center">
                 <Icon className="w-8 h-8 mx-auto mb-2" />
-                <p className="text-sm">{widget.description}</p>
+                <p className={`${smallText}`}>{widget.description}</p>
               </div>
             </div>
           </div>
@@ -365,12 +364,12 @@ const CustomizableDashboards = ({ modelData, onDataChange }) => {
                   </option>
                 ))}
               </select>
-              
+
               <button
                 onClick={() => setIsEditing(!isEditing)}
                 className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center ${
-                  isEditing 
-                    ? 'bg-green-600 hover:bg-green-700 text-white' 
+                  isEditing
+                    ? 'bg-green-600 hover:bg-green-700 text-white'
                     : 'bg-gray-600 hover:bg-gray-700 text-white'
                 }`}
               >
@@ -399,6 +398,19 @@ const CustomizableDashboards = ({ modelData, onDataChange }) => {
             </div>
 
             <div className="flex items-center space-x-3">
+              {/* Density toggle */}
+              <button
+                onClick={toggleDensity}
+                aria-pressed={isCompact}
+                className={`px-3 py-2 rounded-lg text-xs font-medium border transition-colors ${
+                  isCompact
+                    ? 'bg-gray-100 text-gray-800 border-gray-300 hover:bg-gray-200'
+                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                }`}
+                title={`Switch to ${isCompact ? 'comfortable' : 'compact'} density`}
+              >
+                {isCompact ? 'Compact' : 'Comfortable'}
+              </button>
               <button className="text-gray-600 hover:text-gray-800 p-2">
                 <RefreshCw className="w-4 h-4" />
               </button>

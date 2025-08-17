@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Save, 
-  Upload, 
-  Download, 
+import {
+  Save,
+  Upload,
+  Download,
   CheckCircle,
   Activity,
   FileText,
@@ -12,20 +11,25 @@ import {
   Database,
   Sidebar
 } from 'lucide-react';
-import Header from '../components/ui/Header';
-import Button from '../components/ui/Button';
-import SEOHead from '../components/SEO/SEOHead';
-import FinancialSpreadsheet from '../components/PrivateAnalysis/FinancialSpreadsheet';
-import ModelingTools from '../components/PrivateAnalysis/ModelingTools';
-import AnalysisResults from '../components/PrivateAnalysis/AnalysisResults';
-import WorkflowNavigation from '../components/PrivateAnalysis/WorkflowNavigation';
-import AdvancedLBOTool from '../components/PrivateAnalysis/AdvancedLBOTool';
-import FinancialModelWorkspace from '../components/PrivateAnalysis/FinancialModelWorkspace';
-import EnhancedScenarioAnalysis from '../components/PrivateAnalysis/EnhancedScenarioAnalysis';
-import EnhancedMarketDataDashboard from '../components/PrivateAnalysis/EnhancedMarketDataDashboard';
-import MonteCarloIntegrationHub from '../components/PrivateAnalysis/MonteCarloIntegrationHub';
-import ContextualInsightsSidebar from '../components/PrivateAnalysis/ContextualInsightsSidebar';
+import React, { useState, useEffect } from 'react';
+
 import DataExportImport from '../components/DataExportImport';
+import WorkflowNavigation from '../components/PrivateAnalysis/WorkflowNavigation';
+import SEOHead from '../components/SEO/SEOHead';
+import Button from '../components/ui/Button';
+import Header from '../components/ui/Header';
+
+// Lazy load heavy financial components
+const AdvancedLBOTool = React.lazy(() => import('../components/PrivateAnalysis/AdvancedLBOTool'));
+const AnalysisResults = React.lazy(() => import('../components/PrivateAnalysis/AnalysisResults'));
+const ContextualInsightsSidebar = React.lazy(() => import('../components/PrivateAnalysis/ContextualInsightsSidebar'));
+const EnhancedMarketDataDashboard = React.lazy(() => import('../components/PrivateAnalysis/EnhancedMarketDataDashboard'));
+const EnhancedScenarioAnalysis = React.lazy(() => import('../components/PrivateAnalysis/EnhancedScenarioAnalysis'));
+const FinancialModelWorkspace = React.lazy(() => import('../components/PrivateAnalysis/FinancialModelWorkspace'));
+const FinancialSpreadsheet = React.lazy(() => import('../components/PrivateAnalysis/FinancialSpreadsheet'));
+const ModelingTools = React.lazy(() => import('../components/PrivateAnalysis/ModelingTools'));
+const MonteCarloIntegrationHub = React.lazy(() => import('../components/PrivateAnalysis/MonteCarloIntegrationHub'));
+
 import defaultFinancialData from '../data/defaultFinancialData';
 import { formatCurrency, formatPercentage } from '../utils/dataTransformation';
 import { calculateDCF } from '../utils/dcfCalculations';
@@ -102,14 +106,14 @@ const PrivateAnalysis = () => {
   // Enhanced data completeness tracking
   const getDataCompleteness = () => {
     if (!financialData?.statements) return 0;
-    
+
     const coreIncomeFields = ['totalRevenue', 'totalCostOfGoodsSold', 'operatingIncome', 'netIncome'];
     const optionalBalanceFields = ['totalAssets', 'totalLiabilities', 'totalEquity'];
     const optionalCashFlowFields = ['operatingCashFlow', 'investingCashFlow', 'financingCashFlow'];
-    
+
     let completedFields = 0;
     let totalWeightedFields = 0;
-    
+
     // Check core income statement fields (weighted more heavily)
     coreIncomeFields.forEach(field => {
       totalWeightedFields += 3; // Core fields worth 3 points each
@@ -117,7 +121,7 @@ const PrivateAnalysis = () => {
         completedFields += 3;
       }
     });
-    
+
     // Check optional balance sheet fields
     optionalBalanceFields.forEach(field => {
       totalWeightedFields += 2; // Optional fields worth 2 points each
@@ -125,7 +129,7 @@ const PrivateAnalysis = () => {
         completedFields += 2;
       }
     });
-    
+
     // Check cash flow fields
     optionalCashFlowFields.forEach(field => {
       totalWeightedFields += 2;
@@ -133,65 +137,65 @@ const PrivateAnalysis = () => {
         completedFields += 2;
       }
     });
-    
+
     const completionPercentage = Math.round((completedFields / totalWeightedFields) * 100);
-    
+
     // If we have core income statement data, ensure minimum 80% completion
     const hasBasicIncomeData = financialData?.statements?.incomeStatement?.totalRevenue?.[2] !== undefined &&
                               financialData?.statements?.incomeStatement?.operatingIncome?.[2] !== undefined;
-    
+
     return hasBasicIncomeData ? Math.max(completionPercentage, 80) : completionPercentage;
   };
 
   const calculateModelingProgress = () => {
     let progress = 0;
-    
+
     // DCF Model completion
     if (modelInputs?.dcf?.discountRate && modelInputs?.dcf?.terminalGrowthRate) {
       progress += 40;
     }
-    
+
     // Enhanced data completeness boost
     const dataCompleteness = getDataCompleteness();
     if (dataCompleteness >= 80) {
       progress += 20; // Comprehensive data gets boost
     }
-    
+
     // Scenario analysis completion
     if (modelInputs?.scenario?.scenarios && modelInputs.scenario.scenarios.length > 0) {
       progress += 20;
     }
-    
+
     // Advanced tools usage
     if (advancedResults.lbo || advancedResults.threeStatement || advancedResults.monteCarlo) {
       progress += 20;
     }
-    
+
     return Math.min(progress, 100);
   };
 
   const calculateAnalysisProgress = () => {
     let progress = 0;
-    
+
     // Basic DCF analysis
     if (financialData?.statements?.incomeStatement) {
       progress += 30;
     }
-    
+
     // Advanced modeling results
     if (advancedResults.lbo) progress += 20;
     if (advancedResults.threeStatement) progress += 20;
     if (advancedResults.scenarios) progress += 15;
     if (advancedResults.monteCarlo) progress += 15;
-    
+
     return Math.min(progress, 100);
   };
 
-  const saveAnalysis = async (name) => {
+  const saveAnalysis = async(name) => {
     try {
       setIsLoading(true);
       setDataStatus('saving');
-      
+
       const analysis = {
         id: Date.now().toString(),
         name: name || `Analysis ${new Date().toLocaleDateString()}`,
@@ -204,20 +208,20 @@ const PrivateAnalysis = () => {
         modelingProgress: calculateModelingProgress(),
         analysisProgress: calculateAnalysisProgress()
       };
-      
+
       const updated = [...savedAnalyses, analysis];
       setSavedAnalyses(updated);
-      
+
       try {
         localStorage.setItem('privateAnalyses', JSON.stringify(updated));
       } catch (error) {
         console.error('Error saving analysis:', error);
         throw new Error('Failed to save analysis to localStorage');
       }
-      
+
       setDataStatus('ready');
       setLastSaved(new Date());
-      
+
     } catch (error) {
       console.error('Save failed:', error);
       setDataStatus('error');
@@ -304,26 +308,26 @@ const PrivateAnalysis = () => {
         keywords="private analysis, financial modeling, scenario analysis, Monte Carlo simulation, LBO analysis, private equity tools"
       />
       <Header />
-      
+
       <main id="main-content" className="container mx-auto px-4 py-8" role="main">
         {/* Header Section */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
             <h1 className="text-3xl font-bold text-white">Private Analysis</h1>
-            
+
             <div className="flex items-center gap-4">
-              <StatusIndicator 
-                status={dataStatus} 
-                label={dataStatus === 'ready' ? 'Ready' : dataStatus === 'saving' ? 'Saving...' : 'Modified'} 
+              <StatusIndicator
+                status={dataStatus}
+                label={dataStatus === 'ready' ? 'Ready' : dataStatus === 'saving' ? 'Saving...' : 'Modified'}
               />
-              
+
               {lastSaved && (
                 <div className="flex items-center gap-2 text-gray-400">
                   <Clock className="w-4 h-4" />
                   <span className="text-sm">Saved {lastSaved.toLocaleTimeString()}</span>
                 </div>
               )}
-              
+
               <Button
                 onClick={() => saveAnalysis()}
                 disabled={isLoading}
@@ -344,20 +348,20 @@ const PrivateAnalysis = () => {
                 <span className="text-white font-semibold">{getDataCompleteness()}%</span>
               </div>
               <div className="w-full bg-slate-700 rounded-full h-2">
-                <div 
+                <div
                   className="bg-blue-500 h-2 rounded-full transition-all duration-500"
                   style={{ width: `${getDataCompleteness()}%` }}
                 />
               </div>
             </div>
-            
+
             <div className="bg-slate-800 rounded-lg p-4">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-gray-400">Analysis Progress</span>
                 <span className="text-white font-semibold">{calculateAnalysisProgress()}%</span>
               </div>
               <div className="w-full bg-slate-700 rounded-full h-2">
-                <div 
+                <div
                   className="bg-green-500 h-2 rounded-full transition-all duration-500"
                   style={{ width: `${calculateAnalysisProgress()}%` }}
                 />
@@ -378,10 +382,10 @@ const PrivateAnalysis = () => {
                   className={`
                     flex items-center gap-2 px-4 py-2 rounded-md transition-all duration-200
                     ${
-                      activeTab === tab.id
-                        ? 'bg-blue-600 text-white shadow-lg'
-                        : 'text-gray-300 hover:text-white hover:bg-slate-700'
-                    }
+                activeTab === tab.id
+                  ? 'bg-blue-600 text-white shadow-lg'
+                  : 'text-gray-300 hover:text-white hover:bg-slate-700'
+                }
                   `}
                 >
                   <Icon className="w-4 h-4" />
@@ -410,7 +414,7 @@ const PrivateAnalysis = () => {
                 />
               </ErrorBoundary>
             )}
-            
+
             {activeTab === 'modeling' && (
               <ErrorBoundary fallback={<div className="p-8 text-center text-red-400">Error loading modeling tools. Please refresh the page.</div>}>
                 <ModelingTools
@@ -420,7 +424,7 @@ const PrivateAnalysis = () => {
                 />
               </ErrorBoundary>
             )}
-            
+
             {activeTab === 'analysis' && (
               <ErrorBoundary fallback={<div className="p-8 text-center text-red-400">Error loading analysis results. Please check your data and refresh.</div>}>
                 <AnalysisResults
@@ -433,58 +437,68 @@ const PrivateAnalysis = () => {
                 />
               </ErrorBoundary>
             )}
-            
+
             {activeTab === 'lbo' && (
               <ErrorBoundary fallback={<div className="p-8 text-center text-red-400">Error loading LBO tool. Please check your data.</div>}>
-                <AdvancedLBOTool
-                  data={financialData}
-                  onDataChange={(results) => setAdvancedResults(prev => ({ ...prev, lbo: results }))}
-                />
+                <React.Suspense fallback={<div className="p-8 text-center text-blue-400">Loading LBO Tool...</div>}>
+                  <AdvancedLBOTool
+                    data={financialData}
+                    onDataChange={(results) => setAdvancedResults(prev => ({ ...prev, lbo: results }))}
+                  />
+                </React.Suspense>
               </ErrorBoundary>
             )}
-            
+
             {activeTab === 'threestatement' && (
               <ErrorBoundary fallback={<div className="p-8 text-center text-red-400">Error loading financial model workspace.</div>}>
-                <FinancialModelWorkspace
-                  data={financialData}
-                  onDataChange={(results) => setAdvancedResults(prev => ({ ...prev, threeStatement: results }))}
-                />
+                <React.Suspense fallback={<div className="p-8 text-center text-blue-400">Loading Financial Model Workspace...</div>}>
+                  <FinancialModelWorkspace
+                    data={financialData}
+                    onDataChange={(results) => setAdvancedResults(prev => ({ ...prev, threeStatement: results }))}
+                  />
+                </React.Suspense>
               </ErrorBoundary>
             )}
-            
+
             {activeTab === 'scenarios' && (
               <ErrorBoundary fallback={<div className="p-8 text-center text-red-400">Error loading scenario analysis.</div>}>
-                <EnhancedScenarioAnalysis
-                  data={financialData}
-                  onDataChange={(results) => setAdvancedResults(prev => ({ ...prev, scenarios: results }))}
-                  calculateDCF={(data) => calculateDCF(data, modelInputs)}
-                  lboModelingEngine={null}
-                />
+                <React.Suspense fallback={<div className="p-8 text-center text-blue-400">Loading Scenario Analysis...</div>}>
+                  <EnhancedScenarioAnalysis
+                    data={financialData}
+                    onDataChange={(results) => setAdvancedResults(prev => ({ ...prev, scenarios: results }))}
+                    calculateDCF={(data) => calculateDCF(data, modelInputs)}
+                    lboModelingEngine={null}
+                  />
+                </React.Suspense>
               </ErrorBoundary>
             )}
-            
+
             {activeTab === 'marketdata' && (
               <ErrorBoundary fallback={<div className="p-8 text-center text-red-400">Error loading market data dashboard.</div>}>
-                <EnhancedMarketDataDashboard
-                  data={financialData}
-                  onDataChange={(results) => setAdvancedResults(prev => ({ ...prev, marketData: results }))}
-                />
+                <React.Suspense fallback={<div className="p-8 text-center text-blue-400">Loading Market Data Dashboard...</div>}>
+                  <EnhancedMarketDataDashboard
+                    data={financialData}
+                    onDataChange={(results) => setAdvancedResults(prev => ({ ...prev, marketData: results }))}
+                  />
+                </React.Suspense>
               </ErrorBoundary>
             )}
-            
+
             {activeTab === 'montecarlo' && (
               <ErrorBoundary fallback={<div className="p-8 text-center text-red-400">Error loading Monte Carlo integration.</div>}>
-                <MonteCarloIntegrationHub
-                  data={financialData}
-                  dcfResults={advancedResults.dcf}
-                  lboResults={advancedResults.lbo}
-                  financialModel={advancedResults.threeStatement}
-                  scenarioResults={advancedResults.scenarios}
-                  onDataChange={(results) => setAdvancedResults(prev => ({ ...prev, monteCarlo: results }))}
-                />
+                <React.Suspense fallback={<div className="p-8 text-center text-blue-400">Loading Monte Carlo Analysis...</div>}>
+                  <MonteCarloIntegrationHub
+                    data={financialData}
+                    dcfResults={advancedResults.dcf}
+                    lboResults={advancedResults.lbo}
+                    financialModel={advancedResults.threeStatement}
+                    scenarioResults={advancedResults.scenarios}
+                    onDataChange={(results) => setAdvancedResults(prev => ({ ...prev, monteCarlo: results }))}
+                  />
+                </React.Suspense>
               </ErrorBoundary>
             )}
-            
+
             {activeTab === 'import-export' && (
               <ErrorBoundary fallback={<div className="p-8 text-center text-red-400">Error loading import/export tools.</div>}>
                 <DataExportImport

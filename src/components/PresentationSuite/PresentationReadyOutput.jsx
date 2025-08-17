@@ -3,7 +3,6 @@
  * Every chart, table, and visualization designed for presentation to managing directors and clients
  */
 
-import React, { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import {
   Download,
@@ -22,6 +21,7 @@ import {
   Smartphone,
   FileSpreadsheet
 } from 'lucide-react';
+import React, { useState, useRef } from 'react';
 import {
   LineChart,
   Line,
@@ -50,7 +50,7 @@ const PresentationReadyOutput = ({ data, title, type = 'chart', chartType = 'lin
   const colorThemes = {
     professional: {
       primary: '#1E3A8A',
-      secondary: '#059669', 
+      secondary: '#059669',
       accent: '#DC2626',
       neutral: '#6B7280',
       background: '#FFFFFF',
@@ -137,13 +137,13 @@ const PresentationReadyOutput = ({ data, title, type = 'chart', chartType = 'lin
     if (chartRef.current) {
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
-      
+
       // Set high resolution for presentation quality
       const scale = 3; // 3x resolution for crisp presentation graphics
       canvas.width = 1200 * scale;
       canvas.height = 800 * scale;
       ctx.scale(scale, scale);
-      
+
       // Export logic here (simplified)
       console.log(`Exporting ${format} at presentation quality`);
     }
@@ -152,12 +152,14 @@ const PresentationReadyOutput = ({ data, title, type = 'chart', chartType = 'lin
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white p-4 rounded-lg shadow-xl border border-gray-200" 
-             style={{ fontFamily: typography.axis.fontFamily }}>
+        <div
+          className="bg-white p-4 rounded-lg shadow-xl border border-gray-200"
+          style={{ fontFamily: typography.axis.fontFamily }}
+        >
           <p className="font-semibold text-gray-900 mb-2">{label}</p>
           {payload.map((entry, index) => (
             <p key={index} style={{ color: entry.color }} className="text-sm">
-              {`${entry.name}: ${typeof entry.value === 'number' ? 
+              {`${entry.name}: ${typeof entry.value === 'number' ?
                 entry.value.toLocaleString() : entry.value}`}
             </p>
           ))}
@@ -178,31 +180,31 @@ const PresentationReadyOutput = ({ data, title, type = 'chart', chartType = 'lin
         return (
           <LineChart {...commonProps}>
             <CartesianGrid strokeDasharray="3 3" stroke={currentTheme.grid} />
-            <XAxis 
-              dataKey="period" 
+            <XAxis
+              dataKey="period"
               tick={{ ...typography.axis, fill: currentTheme.neutral }}
               axisLine={{ stroke: currentTheme.grid }}
               tickLine={{ stroke: currentTheme.grid }}
             />
-            <YAxis 
+            <YAxis
               tick={{ ...typography.axis, fill: currentTheme.neutral }}
               axisLine={{ stroke: currentTheme.grid }}
               tickLine={{ stroke: currentTheme.grid }}
             />
             <Tooltip content={<CustomTooltip />} />
             <Legend wrapperStyle={typography.legend} />
-            <Line 
-              type="monotone" 
-              dataKey="revenue" 
-              stroke={currentTheme.palette[0]} 
+            <Line
+              type="monotone"
+              dataKey="revenue"
+              stroke={currentTheme.palette[0]}
               strokeWidth={3}
               dot={{ fill: currentTheme.palette[0], strokeWidth: 2, r: 6 }}
               name="Revenue ($M)"
             />
-            <Line 
-              type="monotone" 
-              dataKey="ebitda" 
-              stroke={currentTheme.palette[1]} 
+            <Line
+              type="monotone"
+              dataKey="ebitda"
+              stroke={currentTheme.palette[1]}
               strokeWidth={3}
               dot={{ fill: currentTheme.palette[1], strokeWidth: 2, r: 6 }}
               name="EBITDA ($M)"
@@ -214,13 +216,13 @@ const PresentationReadyOutput = ({ data, title, type = 'chart', chartType = 'lin
         return (
           <BarChart {...commonProps}>
             <CartesianGrid strokeDasharray="3 3" stroke={currentTheme.grid} />
-            <XAxis 
-              dataKey="period" 
+            <XAxis
+              dataKey="period"
               tick={{ ...typography.axis, fill: currentTheme.neutral }}
               axisLine={{ stroke: currentTheme.grid }}
               tickLine={{ stroke: currentTheme.grid }}
             />
-            <YAxis 
+            <YAxis
               tick={{ ...typography.axis, fill: currentTheme.neutral }}
               axisLine={{ stroke: currentTheme.grid }}
               tickLine={{ stroke: currentTheme.grid }}
@@ -236,33 +238,33 @@ const PresentationReadyOutput = ({ data, title, type = 'chart', chartType = 'lin
         return (
           <AreaChart {...commonProps}>
             <CartesianGrid strokeDasharray="3 3" stroke={currentTheme.grid} />
-            <XAxis 
-              dataKey="period" 
+            <XAxis
+              dataKey="period"
               tick={{ ...typography.axis, fill: currentTheme.neutral }}
               axisLine={{ stroke: currentTheme.grid }}
               tickLine={{ stroke: currentTheme.grid }}
             />
-            <YAxis 
+            <YAxis
               tick={{ ...typography.axis, fill: currentTheme.neutral }}
               axisLine={{ stroke: currentTheme.grid }}
               tickLine={{ stroke: currentTheme.grid }}
             />
             <Tooltip content={<CustomTooltip />} />
             <Legend wrapperStyle={typography.legend} />
-            <Area 
-              type="monotone" 
-              dataKey="revenue" 
+            <Area
+              type="monotone"
+              dataKey="revenue"
               stackId="1"
-              stroke={currentTheme.palette[0]} 
+              stroke={currentTheme.palette[0]}
               fill={currentTheme.palette[0]}
               fillOpacity={0.6}
               name="Revenue ($M)"
             />
-            <Area 
-              type="monotone" 
-              dataKey="ebitda" 
+            <Area
+              type="monotone"
+              dataKey="ebitda"
               stackId="1"
-              stroke={currentTheme.palette[1]} 
+              stroke={currentTheme.palette[1]}
               fill={currentTheme.palette[1]}
               fillOpacity={0.6}
               name="EBITDA ($M)"
@@ -284,7 +286,7 @@ const PresentationReadyOutput = ({ data, title, type = 'chart', chartType = 'lin
             <h3 style={typography.title}>{title || 'Revenue & EBITDA Growth'}</h3>
             <p style={typography.subtitle}>Quarterly Performance Analysis</p>
           </div>
-          
+
           <div className="flex items-center space-x-2">
             <select
               value={colorTheme}
@@ -296,7 +298,7 @@ const PresentationReadyOutput = ({ data, title, type = 'chart', chartType = 'lin
               <option value="consulting">Consulting</option>
               <option value="investment">Investment</option>
             </select>
-            
+
             <select
               value={exportFormat}
               onChange={(e) => setExportFormat(e.target.value)}
@@ -307,7 +309,7 @@ const PresentationReadyOutput = ({ data, title, type = 'chart', chartType = 'lin
               <option value="pdf">PDF</option>
               <option value="pptx">PowerPoint</option>
             </select>
-            
+
             <button
               onClick={() => handleExport(exportFormat)}
               className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm flex items-center"
@@ -339,7 +341,7 @@ const PresentationReadyOutput = ({ data, title, type = 'chart', chartType = 'lin
               <span className="text-sm text-gray-600">High Resolution</span>
             </div>
           </div>
-          
+
           <div className="flex items-center space-x-2">
             <button className="text-gray-600 hover:text-gray-800 p-2">
               <Copy className="w-4 h-4" />

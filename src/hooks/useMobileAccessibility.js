@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+
 import { reportPerformanceMetric } from '../utils/performanceMonitoring';
 
 // Hook for mobile-specific accessibility features
@@ -15,18 +16,18 @@ export function useMobileAccessibility(options = {}) {
   const [isLandscape, setIsLandscape] = useState(false);
   const [touchTargets, setTouchTargets] = useState([]);
   const [accessibilityIssues, setAccessibilityIssues] = useState([]);
-  
+
   const touchStartRef = useRef(null);
   const gestureRef = useRef({ isGesturing: false, startTime: 0 });
 
   // Detect mobile device and orientation
   useEffect(() => {
     const checkMobile = () => {
-      const mobile = window.innerWidth <= 768 || 
+      const mobile = window.innerWidth <= 768 ||
                     /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
       setIsMobile(mobile);
       setIsLandscape(window.innerWidth > window.innerHeight);
-      
+
       if (debugMode) {
         console.log('Mobile detection:', { mobile, width: window.innerWidth, userAgent: navigator.userAgent });
       }
@@ -179,7 +180,7 @@ export function useMobileAccessibility(options = {}) {
   const toggleHighContrast = useCallback(() => {
     const body = document.body;
     const isHighContrast = body.classList.contains('high-contrast');
-    
+
     if (isHighContrast) {
       body.classList.remove('high-contrast');
     } else {
@@ -211,12 +212,12 @@ export function useMobileAccessibility(options = {}) {
     // Delay focus to ensure scrolling completes
     setTimeout(() => {
       element.focus({ preventScroll });
-      
+
       // Announce focus change for screen readers
-      const label = element.getAttribute('aria-label') || 
-                   element.getAttribute('title') || 
+      const label = element.getAttribute('aria-label') ||
+                   element.getAttribute('title') ||
                    element.textContent?.slice(0, 50);
-      
+
       if (label) {
         announceToScreenReader(`Focused on ${label}`);
       }
@@ -229,7 +230,7 @@ export function useMobileAccessibility(options = {}) {
     skipLink.href = `#${targetId}`;
     skipLink.textContent = label;
     skipLink.className = 'skip-link sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:bg-blue-600 focus:text-white focus:px-4 focus:py-2 focus:rounded';
-    
+
     skipLink.addEventListener('click', (e) => {
       e.preventDefault();
       const target = document.getElementById(targetId);
@@ -246,7 +247,7 @@ export function useMobileAccessibility(options = {}) {
     if (!isMobile) return;
 
     let viewportMeta = document.querySelector('meta[name="viewport"]');
-    
+
     if (!viewportMeta) {
       viewportMeta = document.createElement('meta');
       viewportMeta.name = 'viewport';
@@ -262,7 +263,7 @@ export function useMobileAccessibility(options = {}) {
     if (!isMobile) return;
 
     optimizeTouchTargets();
-    
+
     const auditInterval = setInterval(optimizeTouchTargets, 10000); // Every 10 seconds
 
     return () => clearInterval(auditInterval);
@@ -301,7 +302,7 @@ export function useMobileAccessibility(options = {}) {
       const rect = element.getBoundingClientRect();
       return (rect.width * rect.height) >= (minTouchTarget * minTouchTarget);
     },
-    
+
     addTouchTargetPadding: (element, padding = 8) => {
       element.style.padding = `${padding}px`;
       element.style.minHeight = `${minTouchTarget}px`;
@@ -312,9 +313,9 @@ export function useMobileAccessibility(options = {}) {
 
 // Utility function to check if two rectangles overlap
 function isOverlapping(rect1, rect2) {
-  return !(rect1.right < rect2.left || 
-           rect2.right < rect1.left || 
-           rect1.bottom < rect2.top || 
+  return !(rect1.right < rect2.left ||
+           rect2.right < rect1.left ||
+           rect1.bottom < rect2.top ||
            rect2.bottom < rect1.top);
 }
 
@@ -322,10 +323,10 @@ function isOverlapping(rect1, rect2) {
 export function withMobileAccessibility(WrappedComponent, options = {}) {
   return function MobileAccessibilityWrapper(props) {
     const mobileA11y = useMobileAccessibility(options);
-    
+
     return (
-      <WrappedComponent 
-        {...props} 
+      <WrappedComponent
+        {...props}
         mobileAccessibility={mobileA11y}
       />
     );

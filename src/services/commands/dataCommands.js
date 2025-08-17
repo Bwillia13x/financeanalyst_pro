@@ -3,14 +3,14 @@
  * Import, export, database operations, and data quality tools
  */
 
-import { dataFetchingService } from '../dataFetching';
 import { formatCurrency, formatPercentage, formatNumber } from '../../utils/dataTransformation';
+import { dataFetchingService } from '../dataFetching';
 
 export const dataCommands = {
   EXPORT_JSON: {
-    execute: async (parsedCommand, context, processor) => {
+    execute: async(parsedCommand, context, processor) => {
       const [dataType, filename] = parsedCommand.parameters;
-      
+
       if (!dataType) {
         return {
           type: 'error',
@@ -30,7 +30,7 @@ export const dataCommands = {
               data: processor.getVariable('watchlists') || {}
             };
             break;
-          
+
           case 'alerts':
             exportData = {
               type: 'alerts',
@@ -38,7 +38,7 @@ export const dataCommands = {
               data: processor.getVariable('alerts') || []
             };
             break;
-          
+
           case 'settings':
             exportData = {
               type: 'settings',
@@ -46,7 +46,7 @@ export const dataCommands = {
               data: processor.getAllSettings()
             };
             break;
-          
+
           case 'variables':
             exportData = {
               type: 'variables',
@@ -54,7 +54,7 @@ export const dataCommands = {
               data: processor.getAllVariables()
             };
             break;
-          
+
           case 'all':
             exportData = {
               type: 'complete_backup',
@@ -67,7 +67,7 @@ export const dataCommands = {
               }
             };
             break;
-          
+
           default:
             return {
               type: 'error',
@@ -105,12 +105,12 @@ export const dataCommands = {
   },
 
   CACHE_STATS: {
-    execute: async (parsedCommand, context, processor) => {
+    execute: async(parsedCommand, context, processor) => {
       try {
         // Get cache statistics from data fetching service
         const cacheSize = dataFetchingService.cache?.size || 0;
         const cacheKeys = dataFetchingService.cache ? Array.from(dataFetchingService.cache.keys()) : [];
-        
+
         // Analyze cache contents
         const cacheTypes = {};
         cacheKeys.forEach(key => {
@@ -121,11 +121,11 @@ export const dataCommands = {
         // Calculate cache efficiency
         const hitRate = Math.random() * 0.4 + 0.6; // Mock hit rate 60-100%
         const avgResponseTime = Math.random() * 200 + 50; // Mock response time 50-250ms
-        
+
         // Memory usage estimation
         const estimatedMemory = cacheSize * 2; // Rough estimate in KB
-        
-        const content = `💾 Cache Statistics\n\n📊 CACHE OVERVIEW:\n• Total Entries: ${formatNumber(cacheSize, 0)}\n• Cache Hit Rate: ${formatPercentage(hitRate)}\n• Average Response Time: ${formatNumber(avgResponseTime, 0)}ms\n• Estimated Memory Usage: ${formatNumber(estimatedMemory, 1)} KB\n\n📋 CACHE BREAKDOWN:\n${Object.entries(cacheTypes).map(([type, count]) => 
+
+        const content = `💾 Cache Statistics\n\n📊 CACHE OVERVIEW:\n• Total Entries: ${formatNumber(cacheSize, 0)}\n• Cache Hit Rate: ${formatPercentage(hitRate)}\n• Average Response Time: ${formatNumber(avgResponseTime, 0)}ms\n• Estimated Memory Usage: ${formatNumber(estimatedMemory, 1)} KB\n\n📋 CACHE BREAKDOWN:\n${Object.entries(cacheTypes).map(([type, count]) =>
           `• ${type.toUpperCase()}: ${count} entries`
         ).join('\n')}\n\n⚡ PERFORMANCE METRICS:\n• Cache Efficiency: ${hitRate > 0.8 ? 'Excellent' : hitRate > 0.6 ? 'Good' : 'Needs Improvement'}\n• Response Speed: ${avgResponseTime < 100 ? 'Fast' : avgResponseTime < 200 ? 'Moderate' : 'Slow'}\n• Memory Usage: ${estimatedMemory < 1000 ? 'Low' : estimatedMemory < 5000 ? 'Moderate' : 'High'}\n\n🔄 CACHE OPERATIONS:\n• Last Cleared: ${processor.getVariable('lastCacheCleared') || 'Never'}\n• Auto-Cleanup: ${dataFetchingService.demoMode ? 'Disabled (Demo Mode)' : 'Enabled'}\n• TTL Policy: Variable (15min - 24hrs)\n\n💡 RECOMMENDATIONS:\n${hitRate < 0.7 ? '• Consider increasing cache TTL for better hit rates\n' : ''}${estimatedMemory > 5000 ? '• Cache memory usage is high - consider clearing\n' : ''}${avgResponseTime > 200 ? '• Slow response times - check network connection\n' : ''}• Use "cache clear" command to reset cache if needed\n\n🛠️ CACHE COMMANDS:\n• cache clear - Clear all cached data\n• status - View overall system status\n• CACHE_STATS() - Refresh these statistics`;
 
@@ -158,9 +158,9 @@ export const dataCommands = {
   },
 
   DATA_QUALITY: {
-    execute: async (parsedCommand, context, processor) => {
+    execute: async(parsedCommand, context, processor) => {
       const [ticker] = parsedCommand.parameters;
-      
+
       if (!ticker) {
         return {
           type: 'error',
@@ -170,7 +170,7 @@ export const dataCommands = {
 
       try {
         const profile = await dataFetchingService.fetchCompanyProfile(ticker.toUpperCase());
-        
+
         // Analyze data quality
         const checks = [
           { field: 'Company Name', value: profile.companyName, quality: profile.companyName ? 100 : 0 },
@@ -197,7 +197,7 @@ export const dataCommands = {
           const status = check.quality === 100 ? '✅' : check.quality >= 50 ? '⚠️' : '❌';
           const qualityText = check.quality === 100 ? 'Complete' : check.quality >= 50 ? 'Partial' : 'Missing';
           return `${status} ${check.field}: ${qualityText} ${check.value !== null && check.value !== undefined ? `(${typeof check.value === 'number' ? formatNumber(check.value, 2) : check.value})` : ''}`;
-        }).join('\n')}\n\n📈 QUALITY METRICS:\n• Complete Fields: ${completeFields}/${checks.length} (${formatPercentage(completeFields / checks.length)})\n• Missing/Incomplete: ${missingFields} fields\n• Data Freshness: ${formatNumber(freshnessScore, 0)}/100 ${freshnessScore > 75 ? '🟢 Fresh' : freshnessScore > 50 ? '🟡 Recent' : '🔴 Stale'}\n• Last Updated: ${formatNumber(dataAge, 0)} minutes ago\n\n⚠️ DATA ISSUES:\n${checks.filter(check => check.quality < 100).map(check => 
+        }).join('\n')}\n\n📈 QUALITY METRICS:\n• Complete Fields: ${completeFields}/${checks.length} (${formatPercentage(completeFields / checks.length)})\n• Missing/Incomplete: ${missingFields} fields\n• Data Freshness: ${formatNumber(freshnessScore, 0)}/100 ${freshnessScore > 75 ? '🟢 Fresh' : freshnessScore > 50 ? '🟡 Recent' : '🔴 Stale'}\n• Last Updated: ${formatNumber(dataAge, 0)} minutes ago\n\n⚠️ DATA ISSUES:\n${checks.filter(check => check.quality < 100).map(check =>
           `• ${check.field}: ${check.quality < 50 ? 'Missing data' : 'Incomplete information'}`
         ).join('\n') || '• No significant data issues detected'}\n\n💡 RECOMMENDATIONS:\n${overallQuality < 75 ? '• Data quality is below optimal - consider alternative data sources\n' : ''}${missingFields > 3 ? '• Multiple missing fields may impact analysis accuracy\n' : ''}${freshnessScore < 50 ? '• Data may be stale - refresh recommended\n' : ''}• Use multiple data sources for critical analysis\n• Verify key metrics independently when possible\n\n🔄 DATA REFRESH:\n• Use FETCH(${ticker.toUpperCase()}) to refresh company data\n• Check "status" command for API connectivity\n• Consider "cache clear" if data seems outdated\n\n${dataFetchingService.demoMode ? '💡 Note: Demo mode may show simulated data quality issues.' : '✅ Live data quality assessment'}`;
 
@@ -232,9 +232,9 @@ export const dataCommands = {
   },
 
   BENCHMARK: {
-    execute: async (parsedCommand, context, processor) => {
+    execute: async(parsedCommand, context, processor) => {
       const [ticker, benchmark = 'SPY'] = parsedCommand.parameters;
-      
+
       if (!ticker) {
         return {
           type: 'error',

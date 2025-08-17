@@ -1,7 +1,7 @@
 // Real User Monitoring and Web Vitals Tracking
 
 // Web Vitals metrics tracking
-let webVitalsData = {
+const webVitalsData = {
   CLS: null,
   FID: null,
   FCP: null,
@@ -10,36 +10,46 @@ let webVitalsData = {
   INP: null
 };
 
-// Performance observer for tracking metrics
-const performanceEntries = [];
-let performanceObserver;
+// SSR/Non-browser guard
+const isBrowser = typeof window !== 'undefined';
+
+// Performance observer variables were previously declared but unused.
+// Removed to satisfy ESLint no-unused-vars.
 
 // Initialize performance monitoring
 export function initializePerformanceMonitoring() {
+  if (!isBrowser) {
+    return; // No-op on SSR/non-browser
+  }
+
   // Initialize Web Vitals tracking
   initializeWebVitals();
-  
+
   // Initialize custom performance tracking
   initializeCustomMetrics();
-  
+
   // Initialize navigation timing
   trackNavigationTiming();
-  
+
   // Initialize resource timing
   trackResourceTiming();
-  
+
   // Initialize user interactions
   trackUserInteractions();
-  
+
   console.log('Performance monitoring initialized');
 }
 
 // Web Vitals implementation
 function initializeWebVitals() {
+  if (!isBrowser || typeof PerformanceObserver !== 'function' || typeof performance === 'undefined') {
+    return;
+  }
+
   // Cumulative Layout Shift (CLS)
   let clsValue = 0;
-  let clsEntries = [];
-  
+  const clsEntries = [];
+
   new PerformanceObserver((entryList) => {
     for (const entry of entryList.getEntries()) {
       if (!entry.hadRecentInput) {
@@ -58,7 +68,7 @@ function initializeWebVitals() {
         webVitalsData.FID = entry.processingStart - entry.startTime;
         reportWebVital('FID', webVitalsData.FID, [entry]);
       }
-      
+
       // Track INP for better user interaction measurement
       if (entry.interactionId) {
         const duration = entry.processingEnd - entry.startTime;
@@ -89,7 +99,9 @@ function initializeWebVitals() {
   }).observe({ type: 'largest-contentful-paint', buffered: true });
 
   // Time to First Byte (TTFB)
-  const navigationEntry = performance.getEntriesByType('navigation')[0];
+  const navigationEntry = typeof performance.getEntriesByType === 'function'
+    ? performance.getEntriesByType('navigation')[0]
+    : null;
   if (navigationEntry) {
     webVitalsData.TTFB = navigationEntry.responseStart - navigationEntry.requestStart;
     reportWebVital('TTFB', webVitalsData.TTFB, [navigationEntry]);
@@ -98,6 +110,9 @@ function initializeWebVitals() {
 
 // Custom metrics for financial application
 function initializeCustomMetrics() {
+  if (!isBrowser || typeof performance === 'undefined') {
+    return;
+  }
   // Track when critical financial components load
   const criticalComponents = [
     'financial-spreadsheet',
@@ -105,11 +120,11 @@ function initializeCustomMetrics() {
     'chart-rendering',
     'market-data-fetch'
   ];
-  
+
   criticalComponents.forEach(component => {
     performance.mark(`${component}-start`);
   });
-  
+
   // Track component rendering times
   window.trackComponentRender = (componentName, renderTime) => {
     performance.mark(`${componentName}-end`);
@@ -118,14 +133,14 @@ function initializeCustomMetrics() {
       `${componentName}-start`,
       `${componentName}-end`
     );
-    
+
     reportCustomMetric('component-render', {
       component: componentName,
       renderTime,
       timestamp: Date.now()
     });
   };
-  
+
   // Track financial calculation performance
   window.trackCalculationPerformance = (calculationType, duration, complexity) => {
     reportCustomMetric('financial-calculation', {
@@ -139,9 +154,12 @@ function initializeCustomMetrics() {
 
 // Navigation timing tracking
 function trackNavigationTiming() {
+  if (!isBrowser || typeof performance === 'undefined') return;
   window.addEventListener('load', () => {
     setTimeout(() => {
-      const navigation = performance.getEntriesByType('navigation')[0];
+      const navigation = typeof performance.getEntriesByType === 'function'
+        ? performance.getEntriesByType('navigation')[0]
+        : null;
       if (navigation) {
         const timings = {
           dns: navigation.domainLookupEnd - navigation.domainLookupStart,
@@ -152,7 +170,7 @@ function trackNavigationTiming() {
           domProcessing: navigation.domComplete - navigation.domLoading,
           totalLoadTime: navigation.loadEventEnd - navigation.fetchStart
         };
-        
+
         reportNavigationTiming(timings);
       }
     }, 0);
@@ -161,14 +179,15 @@ function trackNavigationTiming() {
 
 // Resource timing tracking
 function trackResourceTiming() {
+  if (!isBrowser || typeof PerformanceObserver !== 'function') return;
   new PerformanceObserver((list) => {
     for (const entry of list.getEntries()) {
       // Track important resource types
-      if (entry.initiatorType === 'script' || 
-          entry.initiatorType === 'css' || 
+      if (entry.initiatorType === 'script' ||
+          entry.initiatorType === 'css' ||
           entry.initiatorType === 'img' ||
           entry.initiatorType === 'fetch') {
-        
+
         const resourceData = {
           name: entry.name,
           type: entry.initiatorType,
@@ -177,7 +196,7 @@ function trackResourceTiming() {
           cached: entry.transferSize === 0 && entry.encodedBodySize > 0,
           timestamp: Date.now()
         };
-        
+
         // Only report large resources or slow loads
         if (resourceData.size > 50000 || resourceData.duration > 1000) {
           reportResourceTiming(resourceData);
@@ -189,23 +208,24 @@ function trackResourceTiming() {
 
 // User interaction tracking
 function trackUserInteractions() {
+  if (!isBrowser || typeof document === 'undefined' || typeof requestAnimationFrame === 'undefined' || typeof performance === 'undefined') return;
   let interactionCount = 0;
   let totalInteractionTime = 0;
-  
+
   const interactionEvents = ['click', 'keydown', 'touchstart'];
-  
+
   interactionEvents.forEach(eventType => {
     document.addEventListener(eventType, (event) => {
       const startTime = performance.now();
-      
+
       // Track interaction delay
       requestAnimationFrame(() => {
         const endTime = performance.now();
         const interactionTime = endTime - startTime;
-        
+
         interactionCount++;
         totalInteractionTime += interactionTime;
-        
+
         // Report slow interactions
         if (interactionTime > 100) {
           reportSlowInteraction({
@@ -218,7 +238,7 @@ function trackUserInteractions() {
       });
     }, { passive: true });
   });
-  
+
   // Report interaction summary periodically
   setInterval(() => {
     if (interactionCount > 0) {
@@ -227,7 +247,7 @@ function trackUserInteractions() {
         averageTime: totalInteractionTime / interactionCount,
         timestamp: Date.now()
       });
-      
+
       // Reset counters
       interactionCount = 0;
       totalInteractionTime = 0;
@@ -237,6 +257,8 @@ function trackUserInteractions() {
 
 // Reporting functions
 function reportWebVital(name, value, entries) {
+  const url = isBrowser ? window.location.href : 'ssr';
+  const userAgent = isBrowser ? navigator.userAgent : 'ssr';
   const data = {
     metric: name,
     value: Math.round(value),
@@ -244,37 +266,41 @@ function reportWebVital(name, value, entries) {
       startTime: entry.startTime,
       duration: entry.duration || 0
     })),
-    url: window.location.href,
+    url,
     timestamp: Date.now(),
-    userAgent: navigator.userAgent,
+    userAgent,
     connection: getConnectionInfo()
   };
-  
+
   console.log(`Web Vital - ${name}:`, value);
   sendToAnalytics('web-vital', data);
 }
 
 function reportCustomMetric(type, data) {
+  const url = isBrowser ? window.location.href : 'ssr';
+  const userAgent = isBrowser ? navigator.userAgent : 'ssr';
   const metricData = {
     type,
     ...data,
-    url: window.location.href,
-    userAgent: navigator.userAgent
+    url,
+    userAgent
   };
-  
+
   console.log(`Custom Metric - ${type}:`, data);
   sendToAnalytics('custom-metric', metricData);
 }
 
 function reportNavigationTiming(timings) {
+  const url = isBrowser ? window.location.href : 'ssr';
+  const userAgent = isBrowser ? navigator.userAgent : 'ssr';
   const data = {
     ...timings,
-    url: window.location.href,
+    url,
     timestamp: Date.now(),
-    userAgent: navigator.userAgent,
+    userAgent,
     connection: getConnectionInfo()
   };
-  
+
   console.log('Navigation Timing:', timings);
   sendToAnalytics('navigation-timing', data);
 }
@@ -296,16 +322,18 @@ function reportInteractionSummary(summaryData) {
 
 // Error tracking
 export function trackError(error, errorInfo) {
+  const url = isBrowser ? window.location.href : 'ssr';
+  const userAgent = isBrowser ? navigator.userAgent : 'ssr';
   const errorData = {
     message: error.message,
     stack: error.stack,
-    url: window.location.href,
+    url,
     timestamp: Date.now(),
-    userAgent: navigator.userAgent,
+    userAgent,
     componentStack: errorInfo?.componentStack,
     errorBoundary: errorInfo?.errorBoundary
   };
-  
+
   console.error('Application Error:', errorData);
   sendToAnalytics('error', errorData);
 }
@@ -319,9 +347,9 @@ export function checkPerformanceBudgets() {
     FCP: 1800,  // 1.8s
     TTFB: 800   // 800ms
   };
-  
+
   const violations = [];
-  
+
   Object.entries(budgets).forEach(([metric, budget]) => {
     const value = webVitalsData[metric];
     if (value !== null && value > budget) {
@@ -333,22 +361,22 @@ export function checkPerformanceBudgets() {
       });
     }
   });
-  
+
   if (violations.length > 0) {
     console.warn('Performance Budget Violations:', violations);
     sendToAnalytics('budget-violations', {
       violations,
       timestamp: Date.now(),
-      url: window.location.href
+      url: isBrowser ? window.location.href : 'ssr'
     });
   }
-  
+
   return violations;
 }
 
 // Utility functions
 function getConnectionInfo() {
-  if ('connection' in navigator) {
+  if (isBrowser && 'connection' in navigator) {
     return {
       effectiveType: navigator.connection.effectiveType,
       downlink: navigator.connection.downlink,
@@ -361,7 +389,7 @@ function getConnectionInfo() {
 function sendToAnalytics(type, data) {
   // In production, send to your analytics service
   // For now, we'll store locally and batch send
-  
+
   try {
     const analyticsData = {
       type,
@@ -369,23 +397,23 @@ function sendToAnalytics(type, data) {
       sessionId: getSessionId(),
       userId: getUserId()
     };
-    
+
     // Store in localStorage for batching
-    const existingData = JSON.parse(localStorage.getItem('analytics-queue') || '[]');
+    const existingData = JSON.parse(safeLocalStorageGet('analytics-queue') || '[]');
     existingData.push(analyticsData);
-    
+
     // Keep only last 100 entries to prevent storage overflow
     if (existingData.length > 100) {
       existingData.splice(0, existingData.length - 100);
     }
-    
-    localStorage.setItem('analytics-queue', JSON.stringify(existingData));
-    
+
+    safeLocalStorageSet('analytics-queue', JSON.stringify(existingData));
+
     // Send batch if queue is full or on interval
     if (existingData.length >= 10) {
       sendAnalyticsBatch();
     }
-    
+
   } catch (error) {
     console.error('Failed to queue analytics data:', error);
   }
@@ -393,96 +421,117 @@ function sendToAnalytics(type, data) {
 
 function sendAnalyticsBatch() {
   try {
-    const queuedData = JSON.parse(localStorage.getItem('analytics-queue') || '[]');
+    const queuedData = JSON.parse(safeLocalStorageGet('analytics-queue') || '[]');
     if (queuedData.length === 0) return;
-    
+
     // In production, replace with your analytics endpoint
     console.log('Sending analytics batch:', queuedData.length, 'items');
-    
+
     // Simulate sending to analytics service
-    if (window.gtag) {
+    if (isBrowser && typeof window.gtag === 'function') {
       queuedData.forEach(item => {
         window.gtag('event', item.type, {
           custom_parameter: JSON.stringify(item.data)
         });
       });
     }
-    
+
     // Clear queue after successful send
-    localStorage.removeItem('analytics-queue');
-    
+    if (isBrowser && window.localStorage) {
+      localStorage.removeItem('analytics-queue');
+    }
+
   } catch (error) {
     console.error('Failed to send analytics batch:', error);
   }
 }
 
 // Session and user management
+let _fallbackSessionId;
 function getSessionId() {
-  let sessionId = sessionStorage.getItem('session-id');
-  if (!sessionId) {
-    sessionId = Date.now() + '-' + Math.random().toString(36).substr(2, 9);
-    sessionStorage.setItem('session-id', sessionId);
+  if (isBrowser && window.sessionStorage) {
+    let sessionId = sessionStorage.getItem('session-id');
+    if (!sessionId) {
+      sessionId = Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+      sessionStorage.setItem('session-id', sessionId);
+    }
+    return sessionId;
   }
-  return sessionId;
+  if (!_fallbackSessionId) {
+    _fallbackSessionId = Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+  }
+  return _fallbackSessionId;
 }
 
+let _fallbackUserId;
 function getUserId() {
-  let userId = localStorage.getItem('user-id');
-  if (!userId) {
-    userId = 'anonymous-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
-    localStorage.setItem('user-id', userId);
+  if (isBrowser && window.localStorage) {
+    let userId = localStorage.getItem('user-id');
+    if (!userId) {
+      userId = 'anonymous-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+      localStorage.setItem('user-id', userId);
+    }
+    return userId;
   }
-  return userId;
+  if (!_fallbackUserId) {
+    _fallbackUserId = 'anonymous-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+  }
+  return _fallbackUserId;
 }
 
-// Initialize batch sending on interval
-setInterval(sendAnalyticsBatch, 60000); // Every minute
-
-// Send batch before page unload
-window.addEventListener('beforeunload', () => {
-  sendAnalyticsBatch();
-});
+// Initialize batch sending on interval (browser only)
+if (isBrowser) {
+  setInterval(sendAnalyticsBatch, 60000); // Every minute
+  // Send batch before page unload
+  window.addEventListener('beforeunload', () => {
+    sendAnalyticsBatch();
+  });
+}
 
 // Accessibility metrics reporting
 export function reportPerformanceMetric(type, data) {
+  const url = isBrowser ? window.location.href : 'ssr';
+  const userAgent = isBrowser ? navigator.userAgent : 'ssr';
   const metricData = {
     type,
     ...data,
-    url: window.location.href,
-    userAgent: navigator.userAgent,
+    url,
+    userAgent,
     timestamp: Date.now()
   };
-  
+
   console.log(`Performance Metric - ${type}:`, data);
   sendToAnalytics('performance-metric', metricData);
 }
 
 // Track accessibility test results
 export function trackAccessibilityResults(results) {
+  const url = isBrowser ? window.location.href : 'ssr';
+  const userAgent = isBrowser ? navigator.userAgent : 'ssr';
   const accessibilityData = {
     violations: results.violations?.length || 0,
     passes: results.passes?.length || 0,
     incomplete: results.incomplete?.length || 0,
     score: results.score || 0,
-    url: window.location.href,
+    url,
     timestamp: Date.now(),
-    userAgent: navigator.userAgent
+    userAgent
   };
-  
+
   console.log('Accessibility Results:', accessibilityData);
   sendToAnalytics('accessibility-results', accessibilityData);
-  
+
   // Store accessibility history
   try {
-    const history = JSON.parse(localStorage.getItem('accessibility-history') || '[]');
+    const history = JSON.parse(safeLocalStorageGet('accessibility-history') || '[]');
     history.push(accessibilityData);
-    
+
     // Keep only last 50 entries
     if (history.length > 50) {
       history.splice(0, history.length - 50);
     }
-    
-    localStorage.setItem('accessibility-history', JSON.stringify(history));
+
+    safeLocalStorageSet('accessibility-history', JSON.stringify(history));
   } catch (error) {
     console.error('Failed to store accessibility history:', error);
   }
@@ -490,34 +539,36 @@ export function trackAccessibilityResults(results) {
 
 // Track financial component performance
 export function trackFinancialComponentPerformance(componentName, metrics) {
+  const url = isBrowser ? window.location.href : 'ssr';
+  const userAgent = isBrowser ? navigator.userAgent : 'ssr';
   const performanceData = {
     component: componentName,
     ...metrics,
-    url: window.location.href,
+    url,
     timestamp: Date.now(),
-    userAgent: navigator.userAgent
+    userAgent
   };
-  
+
   console.log(`Financial Component Performance - ${componentName}:`, metrics);
   sendToAnalytics('financial-component-performance', performanceData);
 }
 
 // Get comprehensive performance dashboard data
 export function getPerformanceDashboardData() {
-  const accessibilityHistory = JSON.parse(localStorage.getItem('accessibility-history') || '[]');
-  const analyticsQueue = JSON.parse(localStorage.getItem('analytics-queue') || '[]');
-  
+  const accessibilityHistory = JSON.parse(safeLocalStorageGet('accessibility-history') || '[]');
+  const analyticsQueue = JSON.parse(safeLocalStorageGet('analytics-queue') || '[]');
+
   // Calculate trends
   const recentAccessibility = accessibilityHistory.slice(-10);
   const avgScore = recentAccessibility.reduce((sum, entry) => sum + entry.score, 0) / recentAccessibility.length || 0;
   const avgViolations = recentAccessibility.reduce((sum, entry) => sum + entry.violations, 0) / recentAccessibility.length || 0;
-  
+
   // Get performance metrics from queue
   const performanceMetrics = analyticsQueue
     .filter(item => item.type === 'performance-metric')
     .slice(-20)
     .map(item => item.data);
-  
+
   const webVitalMetrics = analyticsQueue
     .filter(item => item.type === 'web-vital')
     .slice(-10)
@@ -532,8 +583,8 @@ export function getPerformanceDashboardData() {
       averageViolations: Math.round(avgViolations),
       history: recentAccessibility,
       trends: {
-        scoreImproving: recentAccessibility.length >= 2 && 
-          recentAccessibility[recentAccessibility.length - 1].score > 
+        scoreImproving: recentAccessibility.length >= 2 &&
+          recentAccessibility[recentAccessibility.length - 1].score >
           recentAccessibility[recentAccessibility.length - 2].score
       }
     },
@@ -552,4 +603,23 @@ export function getPerformanceData() {
     budgetViolations: checkPerformanceBudgets(),
     timestamp: Date.now()
   };
+}
+
+// Safe storage helpers
+function safeLocalStorageGet(key) {
+  try {
+    if (!isBrowser || !window.localStorage) return null;
+    return localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function safeLocalStorageSet(key, value) {
+  try {
+    if (!isBrowser || !window.localStorage) return;
+    localStorage.setItem(key, value);
+  } catch {
+    // ignore
+  }
 }

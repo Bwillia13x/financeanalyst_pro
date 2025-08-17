@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
 import { AlertCircle, Calculator, DollarSign, Percent } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+
 import { cn } from '../../utils/cn';
 
 const FinancialInput = React.forwardRef(({
@@ -40,7 +41,7 @@ const FinancialInput = React.forwardRef(({
   // Format value for display
   const formatValue = (val) => {
     if (!val && val !== 0) return '';
-    
+
     const numValue = typeof val === 'string' ? parseFloat(val) : val;
     if (isNaN(numValue)) return '';
 
@@ -48,22 +49,22 @@ const FinancialInput = React.forwardRef(({
       case 'currency':
         return new Intl.NumberFormat(locale, {
           style: 'currency',
-          currency: currency,
+          currency,
           minimumFractionDigits: decimals,
-          maximumFractionDigits: decimals,
+          maximumFractionDigits: decimals
         }).format(numValue);
-      
+
       case 'percentage':
         return new Intl.NumberFormat(locale, {
           style: 'percent',
           minimumFractionDigits: decimals,
-          maximumFractionDigits: decimals,
+          maximumFractionDigits: decimals
         }).format(numValue / 100);
-      
+
       default:
         return new Intl.NumberFormat(locale, {
           minimumFractionDigits: decimals,
-          maximumFractionDigits: decimals,
+          maximumFractionDigits: decimals
         }).format(numValue);
     }
   };
@@ -71,12 +72,12 @@ const FinancialInput = React.forwardRef(({
   // Parse display value to raw number
   const parseValue = (val) => {
     if (!val) return 0;
-    
+
     // Remove currency symbols, commas, and spaces
     const cleanValue = val
       .replace(/[^\d.-]/g, '')
       .replace(/,/g, '');
-    
+
     const numValue = parseFloat(cleanValue);
     return isNaN(numValue) ? 0 : numValue;
   };
@@ -84,7 +85,7 @@ const FinancialInput = React.forwardRef(({
   // Validate input
   const validateInput = (val) => {
     const numValue = typeof val === 'string' ? parseValue(val) : val;
-    
+
     let valid = true;
     let errorMessage = '';
 
@@ -103,7 +104,7 @@ const FinancialInput = React.forwardRef(({
     }
 
     setIsValid(valid);
-    
+
     if (onValidation) {
       onValidation(valid, errorMessage);
     }
@@ -124,7 +125,7 @@ const FinancialInput = React.forwardRef(({
     // Show raw number for editing
     const rawValue = value ? value.toString() : '';
     setDisplayValue(rawValue);
-    
+
     // Select all text for easy replacement
     setTimeout(() => {
       if (componentRef.current) {
@@ -137,17 +138,17 @@ const FinancialInput = React.forwardRef(({
   const handleBlur = (e) => {
     setIsFocused(false);
     const rawValue = parseValue(displayValue);
-    
+
     validateInput(rawValue);
-    
+
     // Format for display
     setDisplayValue(formatValue(rawValue));
-    
+
     // Call onChange with parsed value
     if (onChange) {
       onChange(rawValue);
     }
-    
+
     if (onBlur) {
       onBlur(e);
     }
@@ -156,10 +157,10 @@ const FinancialInput = React.forwardRef(({
   // Handle input change
   const handleChange = (e) => {
     const newValue = e.target.value;
-    
+
     // Basic validation for numeric input
     const numericRegex = allowNegative ? /^-?\d*\.?\d*$/ : /^\d*\.?\d*$/;
-    
+
     if (numericRegex.test(newValue) || newValue === '') {
       setDisplayValue(newValue);
     }
@@ -237,20 +238,20 @@ const FinancialInput = React.forwardRef(({
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
             'disabled:cursor-not-allowed disabled:opacity-50',
             'transition-all duration-200',
-            
+
             // Padding adjustments for icons
             'pl-10 pr-4',
             suffix && 'pr-16',
-            
+
             // Financial styling
             'font-mono text-right',
             'border-input hover:border-ring/50',
-            
+
             // States
             isFocused && 'ring-2 ring-ring ring-offset-2 border-ring',
             error && !isValid && 'border-destructive focus-visible:ring-destructive',
             loading && 'animate-pulse',
-            
+
             className
           )}
           {...props}

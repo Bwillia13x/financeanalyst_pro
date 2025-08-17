@@ -3,9 +3,10 @@
  * Handles data backup, restore, and synchronization operations
  */
 
-import { persistenceManager } from './PersistenceManager';
-import { CryptoUtils } from '../utils/CryptoUtils';
 import { CompressionUtils } from '../utils/CompressionUtils';
+import { CryptoUtils } from '../utils/CryptoUtils';
+
+import { persistenceManager } from './PersistenceManager';
 
 export class BackupService {
   constructor() {
@@ -98,7 +99,7 @@ export class BackupService {
 
       // Generate backup ID
       const backupId = this.generateBackupId();
-      
+
       // Store backup
       await this.storeBackup(backupId, backupString, backupData.metadata);
 
@@ -169,8 +170,8 @@ export class BackupService {
       }
 
       // Restore data selectively or completely
-      const dataToRestore = selectiveRestore ? 
-        this.filterBackupData(backupData.data, selectiveRestore) : 
+      const dataToRestore = selectiveRestore ?
+        this.filterBackupData(backupData.data, selectiveRestore) :
         backupData.data;
 
       const restoreResults = {
@@ -285,8 +286,8 @@ export class BackupService {
 
       const dataString = JSON.stringify(exportData, null, 2);
       const blob = new Blob([dataString], { type: 'application/json' });
-      
-      const suggestedFilename = filename || 
+
+      const suggestedFilename = filename ||
         `financeanalyst_backup_${backupId}_${new Date().toISOString().split('T')[0]}.json`;
 
       return {
@@ -308,7 +309,7 @@ export class BackupService {
   async importBackupFromFile(fileContent) {
     try {
       const backupData = JSON.parse(fileContent);
-      
+
       // Validate backup format
       if (!backupData.backupId || !backupData.data || !backupData.metadata) {
         throw new Error('Invalid backup file format');
@@ -335,7 +336,7 @@ export class BackupService {
   async getBackupStats() {
     try {
       const backups = await this.listBackups();
-      
+
       const stats = {
         totalBackups: backups.length,
         totalSize: backups.reduce((sum, backup) => sum + (backup.size || 0), 0),
@@ -399,10 +400,10 @@ export class BackupService {
   async cleanupOldBackups() {
     try {
       const backups = await this.listBackups();
-      
+
       if (backups.length > this.maxBackups) {
         const backupsToDelete = backups.slice(this.maxBackups);
-        
+
         for (const backup of backupsToDelete) {
           await this.deleteBackup(backup.id);
         }
@@ -429,7 +430,7 @@ export class BackupService {
    */
   filterBackupData(backupData, dataTypes) {
     const filtered = {};
-    
+
     dataTypes.forEach(dataType => {
       if (backupData[dataType]) {
         filtered[dataType] = backupData[dataType];

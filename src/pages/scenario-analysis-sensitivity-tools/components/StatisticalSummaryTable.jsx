@@ -7,6 +7,46 @@ const StatisticalSummaryTable = ({ simulationResults, isSimulating }) => {
   const [selectedMetric, setSelectedMetric] = useState('enterprise_value');
   const [viewMode, setViewMode] = useState('summary');
 
+  // Get actual statistics from simulation results
+  const getStatistics = () => {
+    if (!simulationResults || simulationResults.error) {
+      return null;
+    }
+
+    const summary = simulationResults.summary;
+    return {
+      enterprise_value: {
+        descriptive: {
+          count: summary.iterations,
+          mean: summary.mean,
+          median: summary.median,
+          stdDev: summary.stdDev,
+          skewness: summary.skewness || 0,
+          kurtosis: summary.kurtosis || 0,
+          min: summary.min,
+          max: summary.max,
+          range: summary.max - summary.min,
+          method: simulationResults.method
+        },
+        percentiles: {
+          p1: summary.percentile1,
+          p5: summary.percentile5,
+          p10: simulationResults.summary.percentile10 || summary.percentile5 * 1.1,
+          p25: simulationResults.summary.percentile25 || summary.percentile5 * 1.2,
+          p50: summary.median,
+          p75: simulationResults.summary.percentile75 || summary.percentile95 * 0.8,
+          p90: simulationResults.summary.percentile90 || summary.percentile95 * 0.9,
+          p95: summary.percentile95,
+          p99: summary.percentile99
+        },
+        confidence: simulationResults.confidenceInterval,
+        convergence: simulationResults.convergence,
+        performance: simulationResults.performance,
+        quality: simulationResults.quality
+      }
+    };
+  };
+
   // Mock statistical data
   const mockStatistics = {
     enterprise_value: {
@@ -69,7 +109,8 @@ const StatisticalSummaryTable = ({ simulationResults, isSimulating }) => {
     { value: 'risk', label: 'Risk Metrics' }
   ];
 
-  const statistics = simulationResults?.statistics || mockStatistics[selectedMetric];
+  const actualStatistics = getStatistics();
+  const statistics = actualStatistics ? actualStatistics[selectedMetric] : mockStatistics[selectedMetric];
 
   const formatValue = (value, metric = selectedMetric) => {
     if (metric === 'irr') return `${(value * 100).toFixed(2)}%`;
@@ -80,7 +121,22 @@ const StatisticalSummaryTable = ({ simulationResults, isSimulating }) => {
 
   const renderSummaryStatistics = () => (
     <div className="space-y-6">
-      <h3 className="text-lg font-semibold text-foreground">Descriptive Statistics</h3>
+      <div className="flex items-center justify-between">
+        <h3 className="text-lg font-semibold text-foreground">Descriptive Statistics</h3>
+        {actualStatistics && (
+          <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+            <span>Method:</span>
+            <span className="px-2 py-1 bg-primary/10 rounded text-primary font-medium">
+              {statistics.descriptive.method?.replace('_', ' ').toUpperCase() || 'Monte Carlo'}
+            </span>
+            {actualStatistics.enterprise_value.quality && (
+              <span className="px-2 py-1 bg-green-100 text-green-700 rounded text-xs">
+                {actualStatistics.enterprise_value.quality.efficiency} Efficiency
+              </span>
+            )}
+          </div>
+        )}
+      </div>
 
       <div className="grid grid-cols-2 gap-6">
         {/* Central Tendency */}

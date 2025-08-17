@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
-import { Card } from '../ui/Card';
-import Button from '../ui/Button';
+
+import AnalysisCanvas from '../AnalysisCanvas/AnalysisCanvas';
 import Icon from '../AppIcon';
 import SEOHead from '../SEO/SEOHead';
+import Button from '../ui/Button';
+import { Card } from '../ui/Card';
+
 import EnhancedDCFTool from './EnhancedDCFTool';
 import LivingModelDCF from './LivingModelDCF';
-import AnalysisCanvas from '../AnalysisCanvas/AnalysisCanvas';
+
 
 const ValuationTool = () => {
   const [activeView, setActiveView] = useState('overview'); // 'overview', 'dcf', 'living-dcf', 'lbo', 'comp', 'canvas'
@@ -68,7 +71,7 @@ const ValuationTool = () => {
                       No "Run" Button
                     </span>
                   </div>
-                  <Button 
+                  <Button
                     className="bg-white text-emerald-900 hover:bg-emerald-50 font-semibold px-8 py-3"
                     onClick={() => setActiveView('living-dcf')}
                   >
@@ -78,7 +81,7 @@ const ValuationTool = () => {
                 <div className="hidden lg:block">
                   <div className="w-32 h-32 bg-emerald-800/30 rounded-2xl flex items-center justify-center relative">
                     <Icon name="Activity" className="w-16 h-16 text-emerald-300" />
-                    <div className="absolute inset-0 rounded-2xl bg-emerald-400/20 animate-pulse"></div>
+                    <div className="absolute inset-0 rounded-2xl bg-emerald-400/20 animate-pulse" />
                   </div>
                 </div>
               </div>
@@ -113,7 +116,7 @@ const ValuationTool = () => {
                       Minimal Design
                     </span>
                   </div>
-                  <Button 
+                  <Button
                     className="bg-white text-blue-900 hover:bg-blue-50 font-semibold px-8 py-3"
                     onClick={() => setActiveView('canvas')}
                   >
@@ -132,7 +135,7 @@ const ValuationTool = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <Card className="bg-gray-800 border-gray-700 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-20 h-20 bg-emerald-500/10 rounded-full -translate-y-10 translate-x-10"></div>
+            <div className="absolute top-0 right-0 w-20 h-20 bg-emerald-500/10 rounded-full -translate-y-10 translate-x-10" />
             <div className="p-6 relative">
               <div className="flex items-center mb-4">
                 <Icon name="Zap" className="w-8 h-8 text-emerald-400 mr-3" />
@@ -144,7 +147,7 @@ const ValuationTool = () => {
               <p className="text-gray-400 mb-4">
                 Real-time, reactive DCF modeling with live data feeds and instantaneous calculations. No more "run" buttons—watch your model come alive.
               </p>
-              <Button 
+              <Button
                 className="w-full bg-emerald-600 hover:bg-emerald-700"
                 onClick={() => setActiveView('living-dcf')}
               >
@@ -162,7 +165,7 @@ const ValuationTool = () => {
               <p className="text-gray-400 mb-4">
                 Professional DCF modeling with year-by-year projections, sensitivity analysis, and detailed financial statements
               </p>
-              <Button 
+              <Button
                 className="w-full"
                 onClick={() => setActiveView('dcf')}
               >
@@ -241,7 +244,7 @@ const ValuationTool = () => {
                 </div>
               </div>
               <div className="mt-6">
-                <Button 
+                <Button
                   className="bg-blue-600 hover:bg-blue-700"
                   onClick={() => setActiveView('dcf')}
                 >

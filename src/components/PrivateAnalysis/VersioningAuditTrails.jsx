@@ -3,7 +3,6 @@
  * Provides model versioning, audit trails, and compliance features
  */
 
-import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Clock,
@@ -23,6 +22,7 @@ import {
   MessageSquare,
   Calendar
 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 
 const VersioningAuditTrails = ({ modelId, modelData, onDataChange }) => {
   const [activeTab, setActiveTab] = useState('versions');
@@ -201,15 +201,17 @@ const VersioningAuditTrails = ({ modelId, modelData, onDataChange }) => {
                         <div className="flex items-center space-x-3 mb-3">
                           {getStatusIcon(version.status)}
                           <h4 className="font-medium text-gray-900">{version.id}</h4>
-                          <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                            version.status === 'approved' ? 'bg-green-100 text-green-800' :
-                            version.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                            'bg-gray-100 text-gray-800'
-                          }`}>
+                          <span
+                            className={`px-2 py-1 text-xs font-medium rounded-full ${
+                              version.status === 'approved' ? 'bg-green-100 text-green-800' :
+                                version.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                                  'bg-gray-100 text-gray-800'
+                            }`}
+                          >
                             {version.status}
                           </span>
                         </div>
-                        
+
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
                           <div>
                             <div className="flex items-center mb-2">
@@ -241,7 +243,7 @@ const VersioningAuditTrails = ({ modelId, modelData, onDataChange }) => {
                           </div>
                         </div>
                       </div>
-                      
+
                       <div className="flex space-x-2 ml-4">
                         <button className="text-gray-400 hover:text-blue-600 p-2">
                           <Eye className="w-4 h-4" />
@@ -334,7 +336,7 @@ const VersioningAuditTrails = ({ modelId, modelData, onDataChange }) => {
           {activeTab === 'compliance' && (
             <div className="space-y-6">
               <h3 className="text-lg font-medium text-gray-900">Compliance Status</h3>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {/* SOX Compliance */}
                 <div className="bg-green-50 border border-green-200 rounded-lg p-6">
@@ -407,7 +409,7 @@ const VersioningAuditTrails = ({ modelId, modelData, onDataChange }) => {
           {activeTab === 'compare' && (
             <div className="space-y-6">
               <h3 className="text-lg font-medium text-gray-900">Compare Model Versions</h3>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">

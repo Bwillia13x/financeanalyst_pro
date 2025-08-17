@@ -4,7 +4,6 @@
  * Creates a digital equivalent of a clean, uncluttered desk
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Focus,
@@ -21,6 +20,7 @@ import {
   Wind,
   Feather
 } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 const FocusMode = ({ children, onFocusChange }) => {
   const [isFocusMode, setIsFocusMode] = useState(false);
@@ -70,8 +70,8 @@ const FocusMode = ({ children, onFocusChange }) => {
     const inactivityTimer = setInterval(() => {
       const timeSinceActivity = Date.now() - userActivity;
       // Suggest focus mode after 2 minutes of inactivity on analysis tasks
-      if (timeSinceActivity > 120000 && !isFocusMode && 
-          (window.location.pathname.includes('private-analysis') || 
+      if (timeSinceActivity > 120000 && !isFocusMode &&
+          (window.location.pathname.includes('private-analysis') ||
            window.location.pathname.includes('modeling'))) {
         // Could show subtle suggestion here
       }
@@ -106,7 +106,7 @@ const FocusMode = ({ children, onFocusChange }) => {
   const toggleFocusMode = useCallback(() => {
     const newFocusState = !isFocusMode;
     setIsFocusMode(newFocusState);
-    
+
     if (onFocusChange) {
       onFocusChange(newFocusState, focusLevel);
     }
@@ -134,7 +134,7 @@ const FocusMode = ({ children, onFocusChange }) => {
     transition: {
       duration: 4,
       repeat: Infinity,
-      ease: "easeInOut"
+      ease: 'easeInOut'
     }
   } : {};
 
@@ -174,7 +174,7 @@ const FocusMode = ({ children, onFocusChange }) => {
               exit={{ opacity: 0 }}
               className="fixed inset-0 pointer-events-none z-40"
               style={{
-                background: zenMode 
+                background: zenMode
                   ? `radial-gradient(circle at center, transparent 40%, rgba(0,0,0,${currentFocusConfig.dimOpacity}) 70%)`
                   : `radial-gradient(circle at center, transparent 50%, rgba(0,0,0,${currentFocusConfig.dimOpacity}) 80%)`
               }}
@@ -187,17 +187,19 @@ const FocusMode = ({ children, onFocusChange }) => {
               exit={{ opacity: 0, scale: 0.9 }}
               className="fixed top-4 right-4 z-50"
             >
-              <div className={`rounded-lg shadow-lg border p-2 ${
-                zenMode ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'
-              }`}>
+              <div
+                className={`rounded-lg shadow-lg border p-2 ${
+                  zenMode ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'
+                }`}
+              >
                 <div className="flex items-center space-x-1">
                   {/* Focus Level Selector */}
                   <select
                     value={focusLevel}
                     onChange={(e) => handleFocusLevelChange(e.target.value)}
                     className={`text-xs rounded px-2 py-1 border-0 ${
-                      zenMode 
-                        ? 'bg-gray-800 text-gray-200' 
+                      zenMode
+                        ? 'bg-gray-800 text-gray-200'
                         : 'bg-gray-50 text-gray-700'
                     }`}
                   >
@@ -210,8 +212,8 @@ const FocusMode = ({ children, onFocusChange }) => {
                   <button
                     onClick={() => setZenMode(!zenMode)}
                     className={`p-1 rounded ${
-                      zenMode 
-                        ? 'bg-yellow-600 text-white' 
+                      zenMode
+                        ? 'bg-yellow-600 text-white'
                         : 'text-gray-600 hover:bg-gray-100'
                     }`}
                     title="Zen Mode"
@@ -223,8 +225,8 @@ const FocusMode = ({ children, onFocusChange }) => {
                   <button
                     onClick={() => setBreathingMode(!breathingMode)}
                     className={`p-1 rounded ${
-                      breathingMode 
-                        ? 'bg-blue-600 text-white' 
+                      breathingMode
+                        ? 'bg-blue-600 text-white'
                         : zenMode ? 'text-gray-400 hover:bg-gray-800' : 'text-gray-600 hover:bg-gray-100'
                     }`}
                     title="Breathing Mode"
@@ -236,8 +238,8 @@ const FocusMode = ({ children, onFocusChange }) => {
                   <button
                     onClick={toggleFocusMode}
                     className={`p-1 rounded ${
-                      zenMode 
-                        ? 'text-gray-400 hover:bg-gray-800' 
+                      zenMode
+                        ? 'text-gray-400 hover:bg-gray-800'
                         : 'text-gray-600 hover:bg-gray-100'
                     }`}
                     title="Exit Focus Mode (ESC)"
@@ -255,22 +257,30 @@ const FocusMode = ({ children, onFocusChange }) => {
               exit={{ opacity: 0, x: -20 }}
               className="fixed bottom-4 left-4 z-50"
             >
-              <div className={`rounded-lg shadow-lg border px-3 py-2 ${
-                zenMode ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'
-              }`}>
+              <div
+                className={`rounded-lg shadow-lg border px-3 py-2 ${
+                  zenMode ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'
+                }`}
+              >
                 <div className="flex items-center space-x-2">
-                  <div className={`w-2 h-2 rounded-full animate-pulse ${
-                    focusLevel === 'deep' ? 'bg-red-400' :
-                    focusLevel === 'moderate' ? 'bg-yellow-400' : 'bg-green-400'
-                  }`} />
-                  <span className={`text-xs font-medium ${
-                    zenMode ? 'text-gray-200' : 'text-gray-700'
-                  }`}>
+                  <div
+                    className={`w-2 h-2 rounded-full animate-pulse ${
+                      focusLevel === 'deep' ? 'bg-red-400' :
+                        focusLevel === 'moderate' ? 'bg-yellow-400' : 'bg-green-400'
+                    }`}
+                  />
+                  <span
+                    className={`text-xs font-medium ${
+                      zenMode ? 'text-gray-200' : 'text-gray-700'
+                    }`}
+                  >
                     {currentFocusConfig.name}
                   </span>
-                  <Feather className={`w-3 h-3 ${
-                    zenMode ? 'text-gray-400' : 'text-gray-500'
-                  }`} />
+                  <Feather
+                    className={`w-3 h-3 ${
+                      zenMode ? 'text-gray-400' : 'text-gray-500'
+                    }`}
+                  />
                 </div>
               </div>
             </motion.div>
@@ -290,8 +300,8 @@ const FocusMode = ({ children, onFocusChange }) => {
             return React.cloneElement(child, {
               ...child.props,
               focusMode: isFocusMode,
-              focusLevel: focusLevel,
-              zenMode: zenMode,
+              focusLevel,
+              zenMode,
               hideElements: isFocusMode ? currentFocusConfig.hideElements : []
             });
           }
@@ -348,7 +358,8 @@ const FocusMode = ({ children, onFocusChange }) => {
           0%, 100% { transform: scale(1); }
           50% { transform: scale(1.02); }
         }
-      `}</style>
+      `}
+      </style>
     </div>
   );
 };

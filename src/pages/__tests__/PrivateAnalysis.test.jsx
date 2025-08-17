@@ -1,7 +1,8 @@
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { vi } from 'vitest';
+import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
+import { vi } from 'vitest';
+
 import PrivateAnalysis from '../PrivateAnalysis';
 
 const renderWithRouter = (component) => {

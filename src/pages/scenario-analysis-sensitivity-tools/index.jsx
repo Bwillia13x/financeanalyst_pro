@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 
 import Icon from '../../components/AppIcon';
-import Button from '../../components/ui/Button';
-import Header from '../../components/ui/Header';
 import SEOHead from '../../components/SEO/SEOHead';
 import Breadcrumbs from '../../components/ui/Breadcrumbs';
+import Button from '../../components/ui/Button';
+import Header from '../../components/ui/Header';
+import AdvancedSimulationEngine from '../../services/advancedSimulationEngine';
 
 import ResultsVisualizationPanel from './components/ResultsVisualizationPanel';
 import ScenarioConfigPanel from './components/ScenarioConfigPanel';
@@ -22,51 +23,103 @@ const ScenarioAnalysisSensitivityTools = () => {
     lastSync: new Date(Date.now() - 120000), // 2 minutes ago
     baseModel: 'DCF_Analysis_v2.3'
   });
+  const [simulationEngine] = useState(() => new AdvancedSimulationEngine());
 
-  // Simulate Monte Carlo calculation with Web Workers
+  // Run advanced simulation with selected method
   const runSimulation = async params => {
     setIsSimulating(true);
     setSimulationProgress(0);
     setSimulationResults(null);
 
-    // Simulate progress updates
-    const progressInterval = setInterval(() => {
-      setSimulationProgress(prev => {
-        if (prev >= 100) {
-          clearInterval(progressInterval);
-          return 100;
-        }
-        return prev + Math.random() * 5;
-      });
-    }, 200);
-
-    // Simulate completion after progress reaches 100%
-    setTimeout(() => {
-      clearInterval(progressInterval);
-      setSimulationProgress(100);
-
-      // Mock results
-      const mockResults = {
-        summary: {
-          mean: 2847.5,
-          median: 2823.1,
-          stdDev: 456.2,
-          min: 1654.3,
-          max: 4521.8,
-          percentile5: 2156.7,
-          percentile95: 3687.4,
-          iterations: params.iterations
+    try {
+      // Define sample distributions for DCF variables
+      const distributions = {
+        initialRevenue: {
+          type: 'normal',
+          params: { mean: 1000000, std: 150000 }
         },
-        completedAt: new Date(),
-        parameters: params
+        revenueGrowthRate: {
+          type: 'triangular',
+          params: { min: 0.05, mode: 0.12, max: 0.25 }
+        },
+        ebitdaMargin: {
+          type: 'triangular',
+          params: { min: 0.15, mode: 0.25, max: 0.35 }
+        },
+        discountRate: {
+          type: 'triangular',
+          params: { min: 0.08, mode: 0.12, max: 0.18 }
+        },
+        terminalGrowthRate: {
+          type: 'triangular',
+          params: { min: 0.02, mode: 0.03, max: 0.05 }
+        }
       };
 
-      setSimulationResults(mockResults);
+      // Base DCF inputs
+      const baseInputs = {
+        taxRate: 0.21,
+        capexPercent: 0.05,
+        workingCapitalPercent: 0.02,
+        forecastYears: 5
+      };
+
+      // Progress callback
+      const progressCallback = (progress) => {
+        setSimulationProgress(progress);
+      };
+
+      // Run the simulation
+      const results = await simulationEngine.runSimulation(
+        params,
+        distributions,
+        baseInputs,
+        progressCallback
+      );
+
+      // Format results for display
+      const formattedResults = {
+        method: results.method,
+        summary: {
+          mean: results.statistics.mean,
+          median: results.statistics.median,
+          stdDev: results.statistics.stdDev,
+          min: results.statistics.min,
+          max: results.statistics.max,
+          percentile5: results.statistics.percentiles.p5,
+          percentile95: results.statistics.percentiles.p95,
+          percentile1: results.statistics.percentiles.p1,
+          percentile99: results.statistics.percentiles.p99,
+          iterations: params.iterations,
+          skewness: results.statistics.skewness,
+          kurtosis: results.statistics.kurtosis
+        },
+        confidenceInterval: results.statistics.confidenceInterval,
+        convergence: results.convergence,
+        performance: results.performance,
+        quality: results.quality,
+        completedAt: results.completedAt,
+        parameters: params,
+        rawResults: results.results.slice(0, 100) // Sample for visualization
+      };
+
+      setSimulationResults(formattedResults);
+      setSimulationProgress(100);
+
+    } catch (error) {
+      console.error('Simulation failed:', error);
+      setSimulationResults({
+        error: true,
+        message: error.message,
+        parameters: params
+      });
+    } finally {
       setIsSimulating(false);
-    }, 8000);
+    }
   };
 
   const stopSimulation = () => {
+    simulationEngine.stopSimulation();
     setIsSimulating(false);
     setSimulationProgress(0);
   };

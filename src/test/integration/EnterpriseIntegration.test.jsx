@@ -29,6 +29,13 @@ vi.mock('../../services/collaborationService');
 vi.mock('../../services/businessIntelligenceService');
 vi.mock('../../services/realTimeDataService');
 
+// Mock LazyLoader to always render children immediately in tests
+// This bypasses IntersectionObserver gating and preload delays.
+vi.mock('../../components/LazyLoader/LazyLoader', () => ({
+  __esModule: true,
+  default: ({ children }) => <>{children}</>,
+}));
+
 // Mock React Router hooks
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');
@@ -45,75 +52,27 @@ vi.mock('react-router-dom', async () => {
   };
 });
 
-// Mock hooks that might be used by components
-vi.mock('../../hooks/useAIAnalytics', () => ({
-  default: () => ({
-    isLoading: false,
-    isInitialized: true,
-    analysis: {
-      insights: [
-        {
-          id: 'insight1',
-          type: 'pattern',
-          severity: 'high',
-          confidence: 0.85,
-          title: 'Bull Flag Pattern Detected',
-          description: 'Strong bullish continuation pattern identified'
-        }
-      ]
-    },
-    insights: [
-      {
-        id: 'insight1',
-        type: 'pattern',
-        severity: 'high',
-        confidence: 0.85,
-        title: 'Bull Flag Pattern Detected',
-        description: 'Strong bullish continuation pattern identified'
-      }
-    ],
-    patterns: [],
-    predictions: [],
-    riskMetrics: {},
-    recommendations: [],
-    error: null,
-    analyzeData: vi.fn(),
-    getFilteredInsights: vi.fn(() => []),
-    getHighPriorityRecommendations: vi.fn(() => []),
-    getPatternSummary: vi.fn(() => ({ totalPatterns: 3, highConfidencePatterns: 2 })),
-    getPredictionSummary: vi.fn(() => ({ shortTerm: { price: 168 }, mediumTerm: { price: 175 } })),
-    getRiskSummary: vi.fn(() => ({ overallRisk: 'moderate', riskScore: 6.5 })),
-    startAutoAnalysis: vi.fn(),
-    stopAutoAnalysis: vi.fn()
-  })
-}));
+// Do not mock useAIAnalytics; use the real hook to validate service interactions
 
-vi.mock('../../hooks/useCollaboration', () => ({
-  useCollaboration: () => ({
-    isInitialized: true,
-    connectionStatus: 'connected',
-    currentWorkspace: null,
-    workspaceMembers: [],
-    isLoading: false,
-    error: null,
-    joinWorkspace: vi.fn(),
-    leaveWorkspace: vi.fn(),
-    shareModel: vi.fn(),
-    getWorkspaceModels: vi.fn()
-  }),
-  useWorkspace: () => ({
-    workspace: null,
-    members: [],
-    models: [],
-    activity: [],
-    isLoading: false
-  }),
-  usePresence: () => ({
-    cursors: [],
-    presence: {},
-    updateCursor: vi.fn()
-  })
-}));
+vi.mock('../../hooks/useCollaboration', async () => {
+  const actual = await vi.importActual('../../hooks/useCollaboration');
+  return {
+    ...actual,
+    // Keep the real useCollaboration to ensure initialization is triggered
+    useWorkspace: () => ({
+      workspace: null,
+      members: [],
+      models: [],
+      activity: [],
+      isLoading: false
+    }),
+    usePresence: () => ({
+      cursors: [],
+      presence: {},
+      updateCursor: vi.fn()
+    })
+  };
+});
 
 // Mock WebSocket for real-time features
 const mockWebSocket = {
@@ -202,6 +161,8 @@ describe('Enterprise Integration Tests', () => {
     // Setup AI Analytics Service mocks
     aiAnalyticsService.initialize = vi.fn().mockResolvedValue(true);
     aiAnalyticsService.analyzeFinancialData = vi.fn().mockResolvedValue({
+      confidence: 0.82,
+      analysisType: 'comprehensive',
       insights: [
         {
           id: 'insight1',
@@ -226,29 +187,88 @@ describe('Enterprise Integration Tests', () => {
       predictions: [
         {
           horizon: '1w',
-          price: 168,
+          predictedPrice: 168,
           confidence: 0.78,
           range: { low: 162, high: 174 }
         }
       ],
       riskMetrics: {
+        riskCategory: 'Moderate',
+        riskScore: 5.6,
         volatility: 0.25,
-        var: -0.05,
         sharpeRatio: 1.2,
         maxDrawdown: 0.08
-      }
+      },
+      recommendations: [
+        { id: 'rec1', priority: 'high', action: 'Set trailing stop' },
+        { id: 'rec2', priority: 'medium', action: 'Monitor volume changes' }
+      ]
     });
 
-    // Setup Collaboration Service mocks
-    collaborationService.initialize = vi.fn().mockResolvedValue(true);
-    collaborationService.joinWorkspace = vi.fn().mockResolvedValue({
-      id: 'workspace123',
-      name: 'Test Workspace',
-      members: ['user123', 'user456']
+    // Setup Collaboration Service mocks with minimal event emitter behavior
+    const listeners = {};
+    const emit = (event, payload) => {
+      if (listeners[event]) {
+        // Use a copy to avoid mutation during iteration
+        Array.from(listeners[event]).forEach(cb => {
+          try { cb(payload); } catch (e) {}
+        });
+      }
+    };
+
+    collaborationService.on = vi.fn((event, cb) => {
+      if (!listeners[event]) listeners[event] = new Set();
+      listeners[event].add(cb);
     });
-    collaborationService.shareModel = vi.fn().mockResolvedValue({
-      shareId: 'share123',
-      url: 'https://example.com/shared/model123'
+    collaborationService.off = vi.fn((event, cb) => {
+      listeners[event]?.delete(cb);
+    });
+
+    // Initialize should flip loading, then emit connectionStatus so UI shows Connected
+    collaborationService.initialize = vi.fn().mockImplementation(async () => {
+      // simulate async init
+      await Promise.resolve();
+      emit('connectionStatus', { online: true, connected: true });
+      return true;
+    });
+
+    // Leave workspace should emit workspaceLeft
+    collaborationService.leaveWorkspace = vi.fn().mockImplementation(async (workspaceId) => {
+      emit('workspaceLeft', { workspaceId });
+      return true;
+    });
+
+    // Join workspace returns object matching hook expectations and emits workspaceJoined
+    collaborationService.joinWorkspace = vi.fn().mockImplementation(async (workspaceId, options = {}) => {
+      const workspace = {
+        id: workspaceId,
+        name: options.name || 'Test Workspace',
+        description: options.description || '',
+        members: new Map([
+          ['user123', { id: 'user123', name: 'Test User' }],
+          ['user456', { id: 'user456', name: 'Collaborator' }]
+        ]),
+        models: new Map(),
+        annotations: new Map()
+      };
+      emit('workspaceJoined', { workspaceId, workspace });
+      return workspace;
+    });
+
+    collaborationService.shareModel = vi.fn().mockImplementation(async (workspaceId, modelId, modelData, permissions = {}) => {
+      const sharedModel = {
+        id: modelId,
+        workspaceId,
+        data: modelData,
+        sharedBy: 'user123',
+        sharedAt: new Date().toISOString(),
+        permissions: { canEdit: !!permissions.canEdit, canComment: permissions.canComment !== false, canView: permissions.canView !== false },
+        version: 1,
+        lastModified: new Date().toISOString(),
+        modifiedBy: 'user123'
+      };
+      emit('modelShared', { workspaceId, modelId, sharedModel });
+      return sharedModel;
     });
 
     // Setup Business Intelligence Service mocks
@@ -305,17 +325,8 @@ describe('Enterprise Integration Tests', () => {
     });
 
     it('should handle AI analytics errors gracefully', async () => {
-      // Mock the hook to return an error state
-      vi.doMock('../../hooks/useAIAnalytics', () => ({
-        default: () => ({
-          isLoading: false,
-          isInitialized: true,
-          error: 'AI service unavailable',
-          analyzeData: vi.fn(),
-          startAutoAnalysis: vi.fn(),
-          stopAutoAnalysis: vi.fn()
-        })
-      }));
+      // Make service throw so the real hook sets error state
+      aiAnalyticsService.analyzeFinancialData.mockRejectedValueOnce(new Error('AI service unavailable'));
 
       renderWithProviders(
         <AIAnalyticsDashboard 
@@ -348,12 +359,10 @@ describe('Enterprise Integration Tests', () => {
       };
 
       rerender(
-        <TestWrapper>
-          <AIAnalyticsDashboard 
-            data={updatedData}
-            symbol="AAPL"
-          />
-        </TestWrapper>
+        <AIAnalyticsDashboard 
+          data={updatedData}
+          symbol="AAPL"
+        />
       );
 
       await waitFor(() => {
@@ -390,16 +399,20 @@ describe('Enterprise Integration Tests', () => {
         />
       );
 
-      // Click create workspace button
-      const createButton = screen.getByText(/Create Workspace/i);
+      // Switch to Workspaces tab first
+      const workspacesTab = await screen.findByRole('button', { name: /Workspaces/i });
+      fireEvent.click(workspacesTab);
+
+      // Click create workspace button (tab toolbar)
+      const createButton = await screen.findByRole('button', { name: /Create Workspace/i });
       fireEvent.click(createButton);
 
       // Fill in workspace name
-      const nameInput = screen.getByPlaceholderText(/workspace name/i);
+      const nameInput = await screen.findByPlaceholderText(/workspace name/i);
       fireEvent.change(nameInput, { target: { value: 'Test Integration Workspace' } });
 
-      // Click create
-      const confirmButton = screen.getByText(/Create/i);
+      // Click confirm 'Create' inside modal (exact label)
+      const confirmButton = await screen.findByRole('button', { name: /^Create$/i });
       fireEvent.click(confirmButton);
 
       await waitFor(() => {
@@ -421,16 +434,18 @@ describe('Enterprise Integration Tests', () => {
         />
       );
 
-      // Select a workspace first
-      const workspace = screen.getByText(/Portfolio Analysis Q4/i);
-      fireEvent.click(workspace);
+      // Ensure initialized UI and switch to Workspaces tab
+      const workspacesTab = await screen.findByRole('button', { name: /Workspaces/i });
+      fireEvent.click(workspacesTab);
+
+      // Select a workspace card
+      const workspaceCard = await screen.findByText(/Portfolio Analysis Q4/i);
+      fireEvent.click(workspaceCard);
 
       await waitFor(() => {
-        // Look for share button (may be in a different section)
+        // Look for a share-related control (e.g., tab or button)
         const shareElements = screen.queryAllByText(/Share/i);
-        if (shareElements.length > 0) {
-          fireEvent.click(shareElements[0]);
-        }
+        if (shareElements.length > 0) fireEvent.click(shareElements[0]);
       });
 
       // The share functionality should be triggered

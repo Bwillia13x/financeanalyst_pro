@@ -3,9 +3,10 @@
  * Handles data synchronization for future cloud storage integration
  */
 
-import { persistenceManager } from './PersistenceManager';
-import { backupService } from './BackupService';
 import { CryptoUtils } from '../utils/CryptoUtils';
+
+import { backupService } from './BackupService';
+import { persistenceManager } from './PersistenceManager';
 
 export class SyncService {
   constructor() {
@@ -16,7 +17,7 @@ export class SyncService {
     this.syncInProgress = false;
     this.conflictResolutionStrategy = 'client_wins'; // client_wins, server_wins, merge
     this.listeners = new Set();
-    
+
     // Sync queue for offline operations
     this.syncQueue = [];
     this.maxQueueSize = 100;
@@ -33,7 +34,7 @@ export class SyncService {
 
       // Load last sync time
       this.lastSyncTime = await persistenceManager.retrieve('last_sync_time');
-      
+
       // Load sync queue
       const queue = await persistenceManager.retrieve('sync_queue');
       if (queue && Array.isArray(queue)) {
@@ -111,21 +112,21 @@ export class SyncService {
     try {
       // Process operations in order
       const operations = [...this.syncQueue];
-      
+
       for (const operation of operations) {
         try {
           await this.syncOperation(operation);
-          
+
           // Remove from queue on success
           this.syncQueue = this.syncQueue.filter(op => op.id !== operation.id);
           processed++;
 
         } catch (error) {
           console.error(`Failed to sync operation ${operation.id}:`, error);
-          
+
           // Increment retry count
           operation.retries++;
-          
+
           // Remove if too many retries
           if (operation.retries > 3) {
             this.syncQueue = this.syncQueue.filter(op => op.id !== operation.id);
@@ -161,7 +162,7 @@ export class SyncService {
   async syncOperation(operation) {
     // This is a placeholder for future cloud sync implementation
     // For now, we'll simulate the operation
-    
+
     if (!this.syncEndpoint) {
       throw new Error('No sync endpoint configured');
     }
@@ -176,7 +177,7 @@ export class SyncService {
     // 4. Return success/failure
 
     console.log(`Simulated sync operation: ${operation.type} ${operation.dataType}:${operation.key}`);
-    
+
     return { success: true, operation: operation.id };
   }
 
@@ -199,7 +200,7 @@ export class SyncService {
 
       // Get local data
       const localData = await this.getLocalSyncData();
-      
+
       // Get remote data (placeholder)
       const remoteData = await this.getRemoteData();
 
@@ -224,18 +225,18 @@ export class SyncService {
       // Notify listeners
       this.notifyListeners('fullSyncCompleted', { backup: backup.backupId });
 
-      return { 
-        success: true, 
+      return {
+        success: true,
         timestamp: this.lastSyncTime,
-        backup: backup.backupId 
+        backup: backup.backupId
       };
 
     } catch (error) {
       console.error('Full sync failed:', error);
-      
+
       // Notify listeners
       this.notifyListeners('syncFailed', { error: error.message });
-      
+
       throw error;
 
     } finally {
@@ -248,11 +249,11 @@ export class SyncService {
    */
   async getLocalSyncData() {
     const data = {};
-    
+
     // Get all syncable data types
     const syncableTypes = [
       'watchlists',
-      'alerts', 
+      'alerts',
       'user_preferences',
       'user_variables'
     ];
@@ -318,16 +319,16 @@ export class SyncService {
     switch (this.conflictResolutionStrategy) {
       case 'client_wins':
         return local;
-      
+
       case 'server_wins':
         return remote;
-      
+
       case 'merge':
         return await this.mergeData(type, local, remote);
-      
+
       case 'latest_wins':
         return local.lastModified > remote.lastModified ? local : remote;
-      
+
       default:
         return local;
     }
@@ -341,13 +342,13 @@ export class SyncService {
     switch (type) {
       case 'watchlists':
         return this.mergeWatchlists(local.data, remote.data);
-      
+
       case 'alerts':
         return this.mergeAlerts(local.data, remote.data);
-      
+
       case 'user_preferences':
         return { ...remote.data, ...local.data }; // Local preferences win
-      
+
       default:
         return local; // Default to local data
     }
@@ -358,10 +359,10 @@ export class SyncService {
    */
   mergeWatchlists(local, remote) {
     const merged = { ...remote };
-    
+
     // Add local watchlists, keeping newer versions
     Object.entries(local).forEach(([name, watchlist]) => {
-      if (!merged[name] || 
+      if (!merged[name] ||
           new Date(watchlist.lastUpdated) > new Date(merged[name].lastUpdated)) {
         merged[name] = watchlist;
       }
@@ -376,7 +377,7 @@ export class SyncService {
   mergeAlerts(local, remote) {
     const merged = [...remote];
     const remoteIds = new Set(remote.map(alert => alert.id));
-    
+
     // Add local alerts that don't exist remotely
     local.forEach(alert => {
       if (!remoteIds.has(alert.id)) {

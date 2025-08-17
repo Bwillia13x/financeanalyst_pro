@@ -1,20 +1,21 @@
-import React, { useState, useMemo, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  Zap, BarChart3, TrendingUp, Target, Settings, 
+import {
+  Zap, BarChart3, TrendingUp, Target, Settings,
   Play, Download, RefreshCw, AlertTriangle, CheckCircle,
   Activity, DollarSign, Percent, Calculator
 } from 'lucide-react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ScatterChart, Scatter } from 'recharts';
+
 import { monteCarloEngine } from '../../services/monteCarloEngine.js';
 
-const MonteCarloIntegrationHub = ({ 
-  data, 
-  dcfResults, 
-  lboResults, 
-  financialModel, 
+const MonteCarloIntegrationHub = ({
+  data,
+  dcfResults,
+  lboResults,
+  financialModel,
   scenarioResults,
-  onDataChange 
+  onDataChange
 }) => {
   const [activeAnalysis, setActiveAnalysis] = useState('unified');
   const [simulationSettings, setSimulationSettings] = useState({
@@ -35,7 +36,7 @@ const MonteCarloIntegrationHub = ({
       style: 'currency',
       currency: 'USD',
       minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
+      maximumFractionDigits: 0
     }).format(value);
   }, []);
 
@@ -44,7 +45,7 @@ const MonteCarloIntegrationHub = ({
   }, []);
 
   // Cross-model Monte Carlo analysis
-  const runIntegratedSimulation = useCallback(async () => {
+  const runIntegratedSimulation = useCallback(async() => {
     setIsRunning(true);
     setProgress(0);
 
@@ -91,8 +92,8 @@ const MonteCarloIntegrationHub = ({
 
         setProgress(25);
         results.dcf = await monteCarloEngine.runDCFSimulation(
-          dcfInputs, 
-          dcfDistributions, 
+          dcfInputs,
+          dcfDistributions,
           {
             iterations: simulationSettings.iterations,
             confidenceLevel: simulationSettings.confidenceLevel,
@@ -142,7 +143,7 @@ const MonteCarloIntegrationHub = ({
       // Portfolio-level risk metrics
       setProgress(90);
       results.riskMetrics = calculateIntegratedRiskMetrics(results);
-      
+
       // Generate scenario-weighted results
       if (scenarioResults && scenarioResults.scenarios) {
         results.portfolio = generatePortfolioAnalysis(results, scenarioResults);
@@ -156,7 +157,7 @@ const MonteCarloIntegrationHub = ({
         onDataChange({
           monteCarloIntegrated: {
             settings: simulationSettings,
-            results: results,
+            results,
             timestamp: new Date().toISOString()
           }
         });
@@ -175,15 +176,15 @@ const MonteCarloIntegrationHub = ({
     // Calculate correlations between DCF and LBO outcomes
     const dcfValues = dcfResults.simulations?.map(s => s.pricePerShare) || [];
     const lboValues = lboResults.simulations?.map(s => s.irr) || [];
-    
+
     if (dcfValues.length === 0 || lboValues.length === 0) return null;
 
     const correlation = pearsonCorrelation(dcfValues, lboValues);
-    
+
     return {
       dcfLboCorrelation: correlation,
-      interpretation: Math.abs(correlation) > 0.7 ? 'Strong' : 
-                     Math.abs(correlation) > 0.4 ? 'Moderate' : 'Weak',
+      interpretation: Math.abs(correlation) > 0.7 ? 'Strong' :
+        Math.abs(correlation) > 0.4 ? 'Moderate' : 'Weak',
       riskImplication: correlation > 0 ? 'Aligned Risk' : 'Hedged Risk'
     };
   }, []);
@@ -191,22 +192,22 @@ const MonteCarloIntegrationHub = ({
   const pearsonCorrelation = (x, y) => {
     const n = Math.min(x.length, y.length);
     if (n === 0) return 0;
-    
+
     const sumX = x.slice(0, n).reduce((a, b) => a + b, 0);
     const sumY = y.slice(0, n).reduce((a, b) => a + b, 0);
     const sumXY = x.slice(0, n).reduce((sum, xi, i) => sum + xi * y[i], 0);
     const sumXX = x.slice(0, n).reduce((sum, xi) => sum + xi * xi, 0);
     const sumYY = y.slice(0, n).reduce((sum, yi) => sum + yi * yi, 0);
-    
+
     const numerator = n * sumXY - sumX * sumY;
     const denominator = Math.sqrt((n * sumXX - sumX * sumX) * (n * sumYY - sumY * sumY));
-    
+
     return denominator === 0 ? 0 : numerator / denominator;
   };
 
   const calculateIntegratedRiskMetrics = useCallback((results) => {
     const metrics = {};
-    
+
     if (results.dcf?.analysis) {
       metrics.dcf = {
         var95: results.dcf.analysis.percentiles?.pricePerShare?.p5 || 0,
@@ -214,7 +215,7 @@ const MonteCarloIntegrationHub = ({
         volatility: results.dcf.analysis.summary?.standardDeviation || 0
       };
     }
-    
+
     if (results.lbo?.analysis) {
       metrics.lbo = {
         var95: results.lbo.analysis.percentiles?.irr?.p5 || 0,
@@ -222,7 +223,7 @@ const MonteCarloIntegrationHub = ({
         volatility: results.lbo.analysis.summary?.standardDeviation || 0
       };
     }
-    
+
     return metrics;
   }, []);
 
@@ -230,20 +231,20 @@ const MonteCarloIntegrationHub = ({
     // Weight Monte Carlo results by scenario probabilities
     const weightedMetrics = scenarios.scenarios.reduce((acc, scenario) => {
       const weight = scenario.probability / 100;
-      
+
       if (results.dcf) {
-        acc.dcfWeighted = (acc.dcfWeighted || 0) + 
+        acc.dcfWeighted = (acc.dcfWeighted || 0) +
           (results.dcf.analysis?.summary?.mean || 0) * weight;
       }
-      
+
       if (results.lbo) {
-        acc.lboWeighted = (acc.lboWeighted || 0) + 
+        acc.lboWeighted = (acc.lboWeighted || 0) +
           (results.lbo.analysis?.summary?.mean || 0) * weight;
       }
-      
+
       return acc;
     }, {});
-    
+
     return weightedMetrics;
   }, []);
 
@@ -264,14 +265,14 @@ const MonteCarloIntegrationHub = ({
             <p className="text-gray-600">Cross-model risk analysis & unified simulations</p>
           </div>
         </div>
-        
+
         <div className="flex space-x-3">
           <motion.button
             onClick={runIntegratedSimulation}
             disabled={isRunning}
             className={`px-6 py-2 rounded-lg font-medium flex items-center space-x-2 ${
-              isRunning 
-                ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
+              isRunning
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                 : 'bg-purple-600 hover:bg-purple-700 text-white'
             }`}
             whileHover={!isRunning ? { scale: 1.02 } : {}}
@@ -291,7 +292,7 @@ const MonteCarloIntegrationHub = ({
             <span className="text-sm text-gray-500">{progress.toFixed(0)}%</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
-            <div 
+            <div
               className="bg-purple-600 h-2 rounded-full transition-all duration-300"
               style={{ width: `${progress}%` }}
             />
@@ -308,21 +309,21 @@ const MonteCarloIntegrationHub = ({
             <input
               type="number"
               value={simulationSettings.iterations}
-              onChange={(e) => setSimulationSettings(prev => ({ 
-                ...prev, 
-                iterations: parseInt(e.target.value) || 10000 
+              onChange={(e) => setSimulationSettings(prev => ({
+                ...prev,
+                iterations: parseInt(e.target.value) || 10000
               }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg"
             />
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Confidence Level</label>
             <select
               value={simulationSettings.confidenceLevel}
-              onChange={(e) => setSimulationSettings(prev => ({ 
-                ...prev, 
-                confidenceLevel: parseFloat(e.target.value) 
+              onChange={(e) => setSimulationSettings(prev => ({
+                ...prev,
+                confidenceLevel: parseFloat(e.target.value)
               }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg"
             >
@@ -331,30 +332,30 @@ const MonteCarloIntegrationHub = ({
               <option value={0.99}>99%</option>
             </select>
           </div>
-          
+
           <div className="flex items-end">
             <label className="flex items-center">
               <input
                 type="checkbox"
                 checked={simulationSettings.correlationsEnabled}
-                onChange={(e) => setSimulationSettings(prev => ({ 
-                  ...prev, 
-                  correlationsEnabled: e.target.checked 
+                onChange={(e) => setSimulationSettings(prev => ({
+                  ...prev,
+                  correlationsEnabled: e.target.checked
                 }))}
                 className="mr-2"
               />
               <span className="text-sm text-gray-700">Cross-Model Correlations</span>
             </label>
           </div>
-          
+
           <div className="flex items-end">
             <label className="flex items-center">
               <input
                 type="checkbox"
                 checked={simulationSettings.crossModelAnalysis}
-                onChange={(e) => setSimulationSettings(prev => ({ 
-                  ...prev, 
-                  crossModelAnalysis: e.target.checked 
+                onChange={(e) => setSimulationSettings(prev => ({
+                  ...prev,
+                  crossModelAnalysis: e.target.checked
                 }))}
                 className="mr-2"
               />
@@ -407,7 +408,7 @@ const MonteCarloIntegrationHub = ({
                     <div className="text-sm text-gray-600">DCF Expected Value</div>
                   </div>
                 )}
-                
+
                 {integratedResults.lbo && (
                   <div className="bg-green-50 p-4 rounded-lg text-center">
                     <div className="text-2xl font-bold text-green-600">
@@ -416,7 +417,7 @@ const MonteCarloIntegrationHub = ({
                     <div className="text-sm text-gray-600">LBO Expected IRR</div>
                   </div>
                 )}
-                
+
                 {integratedResults.correlation && (
                   <div className="bg-purple-50 p-4 rounded-lg text-center">
                     <div className="text-2xl font-bold text-purple-600">
@@ -425,7 +426,7 @@ const MonteCarloIntegrationHub = ({
                     <div className="text-sm text-gray-600">DCF-LBO Correlation</div>
                   </div>
                 )}
-                
+
                 <div className="bg-orange-50 p-4 rounded-lg text-center">
                   <div className="text-2xl font-bold text-orange-600">
                     {simulationSettings.iterations.toLocaleString()}
@@ -448,7 +449,7 @@ const MonteCarloIntegrationHub = ({
                         {integratedResults.correlation.riskImplication}
                       </div>
                     </div>
-                    
+
                     <div className="bg-white p-4 rounded-lg">
                       <div className="font-medium text-gray-800 mb-2">Risk Diversification</div>
                       <div className="text-2xl font-bold text-blue-600">
@@ -456,7 +457,7 @@ const MonteCarloIntegrationHub = ({
                       </div>
                       <div className="text-sm text-gray-600">Portfolio benefit</div>
                     </div>
-                    
+
                     <div className="bg-white p-4 rounded-lg">
                       <div className="font-medium text-gray-800 mb-2">Confidence Level</div>
                       <div className="text-2xl font-bold text-green-600">
@@ -479,7 +480,7 @@ const MonteCarloIntegrationHub = ({
                         {formatCurrency(integratedResults.portfolio.dcfWeighted || 0)}
                       </div>
                     </div>
-                    
+
                     <div className="bg-white p-4 rounded-lg">
                       <div className="font-medium text-gray-800 mb-2">Scenario-Weighted LBO IRR</div>
                       <div className="text-xl font-bold text-green-600">
@@ -549,7 +550,7 @@ const MonteCarloIntegrationHub = ({
                 </div>
                 <div className="text-center">
                   <div className="text-lg font-bold text-purple-600">
-                    {((integratedResults.lbo.analysis?.percentiles?.moic?.p95 || 0) + 
+                    {((integratedResults.lbo.analysis?.percentiles?.moic?.p95 || 0) +
                       (integratedResults.lbo.analysis?.percentiles?.moic?.p5 || 0)) / 2}x
                   </div>
                   <div className="text-sm text-gray-600">Avg MOIC</div>
@@ -563,8 +564,8 @@ const MonteCarloIntegrationHub = ({
           <Zap size={48} className="mx-auto mb-4 opacity-50" />
           <p>Configure settings and run integrated simulation to see cross-model analysis</p>
           <p className="text-sm mt-2">
-            {!dcfResults && !lboResults ? 'Run DCF and/or LBO analysis first to enable Monte Carlo integration' : 
-             'Ready to run comprehensive Monte Carlo analysis'}
+            {!dcfResults && !lboResults ? 'Run DCF and/or LBO analysis first to enable Monte Carlo integration' :
+              'Ready to run comprehensive Monte Carlo analysis'}
           </p>
         </div>
       )}

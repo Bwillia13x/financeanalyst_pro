@@ -3,8 +3,8 @@
  * Handles data privacy controls, retention policies, and user data rights
  */
 
-import { persistenceManager } from './PersistenceManager';
 import { backupService } from './BackupService';
+import { persistenceManager } from './PersistenceManager';
 
 export class PrivacyService {
   constructor() {
@@ -15,7 +15,7 @@ export class PrivacyService {
       export_data: 30,
       session_data: 1
     };
-    
+
     this.privacySettings = {
       dataRetention: true,
       analytics: false,
@@ -213,7 +213,7 @@ export class PrivacyService {
    */
   async cleanupCommandHistory(cutoffTime) {
     const history = await persistenceManager.retrieve('command_history') || [];
-    const filtered = history.filter(entry => 
+    const filtered = history.filter(entry =>
       new Date(entry.timestamp).getTime() > cutoffTime
     );
 
@@ -282,7 +282,7 @@ export class PrivacyService {
   /**
    * Clean up session data
    */
-  async cleanupSessionData(cutoffTime) {
+  async cleanupSessionData(_cutoffTime) {
     // Session data is typically current, but clean up old session logs if any
     return 0; // Placeholder
   }
@@ -322,7 +322,7 @@ export class PrivacyService {
    */
   async cleanupAnalyticsData() {
     const analyticsTypes = this.dataCategories.analytics;
-    
+
     for (const dataType of analyticsTypes) {
       try {
         await persistenceManager.remove(dataType);
@@ -422,7 +422,7 @@ export class PrivacyService {
 
       // Clear browser storage
       localStorage.clear();
-      
+
       // Clear IndexedDB
       if (window.indexedDB) {
         const databases = await indexedDB.databases();
@@ -477,7 +477,7 @@ export class PrivacyService {
    */
   scheduleCleanup() {
     // Run cleanup daily
-    setInterval(async () => {
+    setInterval(async() => {
       try {
         await this.cleanupExpiredData();
         console.log('✅ Scheduled privacy cleanup completed');

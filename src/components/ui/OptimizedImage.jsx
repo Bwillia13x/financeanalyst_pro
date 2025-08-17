@@ -23,10 +23,10 @@ const OptimizedImage = ({
   // Generate source sets for different formats
   const generateSrcSet = (baseSrc, format) => {
     if (!baseSrc) return '';
-    
+
     const baseName = baseSrc.split('.').slice(0, -1).join('.');
     const sizes = [320, 640, 768, 1024, 1280, 1920];
-    
+
     return sizes
       .map(size => `${baseName}-${size}w.${format} ${size}w`)
       .join(', ');
@@ -85,7 +85,7 @@ const OptimizedImage = ({
         />
       );
     }
-    
+
     if (placeholder === 'skeleton') {
       return (
         <div
@@ -96,7 +96,7 @@ const OptimizedImage = ({
         </div>
       );
     }
-    
+
     return null;
   };
 
@@ -133,7 +133,7 @@ const OptimizedImage = ({
       style={{ width, height }}
     >
       {!isLoaded && renderPlaceholder()}
-      
+
       {isInView && (
         <picture>
           {/* AVIF format for modern browsers */}
@@ -144,7 +144,7 @@ const OptimizedImage = ({
               type="image/avif"
             />
           )}
-          
+
           {/* WebP format for better compression */}
           {webpSrcSet && (
             <source
@@ -153,7 +153,7 @@ const OptimizedImage = ({
               type="image/webp"
             />
           )}
-          
+
           {/* JPEG fallback */}
           {jpegSrcSet && (
             <source
@@ -162,7 +162,7 @@ const OptimizedImage = ({
               type="image/jpeg"
             />
           )}
-          
+
           {/* Final fallback */}
           <img
             src={src}
@@ -195,7 +195,7 @@ export const withImageOptimization = (WrappedComponent) => {
       loading: props.priority ? 'eager' : 'lazy',
       decoding: 'async'
     };
-    
+
     return <WrappedComponent ref={ref} {...optimizedProps} />;
   });
 };
@@ -209,19 +209,19 @@ export const useResponsiveImage = (breakpoints = {}) => {
     xl: 1280,
     '2xl': 1920
   };
-  
+
   const allBreakpoints = { ...defaultBreakpoints, ...breakpoints };
-  
+
   const generateSizes = (sizeMap) => {
     return Object.entries(allBreakpoints)
-      .sort(([,a], [,b]) => b - a) // Sort by width descending
+      .sort(([, a], [, b]) => b - a) // Sort by width descending
       .map(([breakpoint, width]) => {
         const size = sizeMap[breakpoint] || sizeMap.default || '100vw';
         return `(min-width: ${width}px) ${size}`;
       })
       .join(', ');
   };
-  
+
   return { generateSizes };
 };
 
@@ -234,17 +234,17 @@ export const getOptimizedImageUrl = (src, options = {}) => {
     format = 'auto',
     fit = 'cover'
   } = options;
-  
+
   // In production, this would integrate with your image optimization service
   // For now, return the original URL with query parameters
   const params = new URLSearchParams();
-  
+
   if (width) params.set('w', width.toString());
   if (height) params.set('h', height.toString());
   if (quality !== 80) params.set('q', quality.toString());
   if (format !== 'auto') params.set('f', format);
   if (fit !== 'cover') params.set('fit', fit);
-  
+
   const queryString = params.toString();
   return queryString ? `${src}?${queryString}` : src;
 };
@@ -253,10 +253,10 @@ export const getOptimizedImageUrl = (src, options = {}) => {
 export const preloadImage = (src, options = {}) => {
   return new Promise((resolve, reject) => {
     const img = new Image();
-    
+
     img.onload = () => resolve(img);
     img.onerror = reject;
-    
+
     // Set up responsive preloading
     if (options.srcSet) {
       img.srcset = options.srcSet;
@@ -264,7 +264,7 @@ export const preloadImage = (src, options = {}) => {
     if (options.sizes) {
       img.sizes = options.sizes;
     }
-    
+
     img.src = src;
   });
 };
@@ -276,19 +276,19 @@ export const preloadCriticalImages = (imageList) => {
     link.rel = 'preload';
     link.as = 'image';
     link.href = imageConfig.src;
-    
+
     if (imageConfig.srcSet) {
       link.setAttribute('imagesrcset', imageConfig.srcSet);
     }
     if (imageConfig.sizes) {
       link.setAttribute('imagesizes', imageConfig.sizes);
     }
-    
+
     document.head.appendChild(link);
-    
+
     return preloadImage(imageConfig.src, imageConfig);
   });
-  
+
   return Promise.allSettled(preloadPromises);
 };
 

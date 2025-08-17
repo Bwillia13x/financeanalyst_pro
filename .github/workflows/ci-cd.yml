@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 env:
-  NODE_VERSION: '18'
+  NODE_VERSION: '20'
   CACHE_KEY: node-modules-${{ hashFiles('**/package-lock.json') }}
 
 jobs:
@@ -134,7 +134,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: build-${{ matrix.environment }}
-        path: build/
+        path: dist/
         retention-days: 30
 
   # Performance Testing Job
@@ -152,7 +152,7 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: build-staging
-        path: build/
+        path: dist/
         
     - name: Setup Node.js
       uses: actions/setup-node@v4
@@ -206,7 +206,7 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: build-production
-        path: build/
+        path: dist/
         
     - name: Deploy to production
       run: |

@@ -1,5 +1,6 @@
-import React from 'react';
 import { AlertCircle, CheckCircle, AlertTriangle, Info, X } from 'lucide-react';
+import React from 'react';
+
 import { cn } from '../../utils/cn';
 
 const ValidationFeedback = ({
@@ -167,7 +168,7 @@ const FieldValidation = ({
 }) => {
   // Determine the highest priority message
   let type, message;
-  
+
   if (error) {
     type = 'error';
     message = error;
@@ -230,9 +231,9 @@ const ValidationSummary = ({
   ...props
 }) => {
   const [isCollapsed, setIsCollapsed] = React.useState(collapsible);
-  
+
   const totalIssues = errors.length + warnings.length;
-  
+
   if (totalIssues === 0) return null;
 
   const allItems = [

@@ -11,7 +11,7 @@ export class CryptoUtils {
     this.tagLength = 16; // 128 bits for GCM
     this.textEncoder = new TextEncoder();
     this.textDecoder = new TextDecoder();
-    
+
     // Generate or retrieve encryption key
     this.initializeKey();
   }
@@ -23,7 +23,7 @@ export class CryptoUtils {
     try {
       // Try to get existing key from localStorage
       const storedKey = localStorage.getItem('financeanalyst_crypto_key');
-      
+
       if (storedKey) {
         // Import existing key
         const keyData = this.base64ToArrayBuffer(storedKey);
@@ -69,15 +69,15 @@ export class CryptoUtils {
     try {
       // Convert string to ArrayBuffer
       const dataBuffer = this.textEncoder.encode(data);
-      
+
       // Generate random IV
       const iv = crypto.getRandomValues(new Uint8Array(this.ivLength));
-      
+
       // Encrypt data
       const encryptedBuffer = await crypto.subtle.encrypt(
         {
           name: this.algorithm,
-          iv: iv
+          iv
         },
         this.cryptoKey,
         dataBuffer
@@ -108,7 +108,7 @@ export class CryptoUtils {
     try {
       // Convert base64 to ArrayBuffer
       const combined = this.base64ToArrayBuffer(encryptedData);
-      
+
       // Extract IV and encrypted data
       const iv = combined.slice(0, this.ivLength);
       const encryptedBuffer = combined.slice(this.ivLength);
@@ -117,7 +117,7 @@ export class CryptoUtils {
       const decryptedBuffer = await crypto.subtle.decrypt(
         {
           name: this.algorithm,
-          iv: iv
+          iv
         },
         this.cryptoKey,
         encryptedBuffer

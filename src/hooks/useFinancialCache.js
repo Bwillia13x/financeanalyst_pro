@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+
 import financialDataCache from '../utils/financialDataCache';
 
 // Custom hook for financial data caching
@@ -31,7 +32,7 @@ export function useFinancialCache(key, fetchFunction, options = {}) {
   }, [fetchFunction]);
 
   // Main fetch function with caching
-  const fetchData = useCallback(async (bypassCache = false) => {
+  const fetchData = useCallback(async(bypassCache = false) => {
     if (!enabled || !key) return;
 
     setIsLoading(true);
@@ -48,12 +49,12 @@ export function useFinancialCache(key, fetchFunction, options = {}) {
       setData(result);
       setLastFetch(Date.now());
       setRetryAttempt(0);
-      
+
       onSuccess?.(result);
     } catch (err) {
       console.error('Cache fetch failed:', err);
       setError(err);
-      
+
       // Retry logic
       if (retryAttempt < retryCount) {
         const delay = retryDelay * Math.pow(2, retryAttempt); // Exponential backoff
@@ -123,18 +124,18 @@ export function useFinancialCache(key, fetchFunction, options = {}) {
   }, [fetchData]);
 
   // Mutate cache data
-  const mutate = useCallback(async (updater) => {
+  const mutate = useCallback(async(updater) => {
     const currentData = data;
-    
+
     try {
       const newData = typeof updater === 'function' ? updater(currentData) : updater;
-      
+
       // Optimistically update local state
       setData(newData);
-      
+
       // Update cache
       await financialDataCache.set(key, newData, dataType);
-      
+
       return newData;
     } catch (err) {
       // Revert on error
@@ -165,9 +166,9 @@ export function useFinancialCache(key, fetchFunction, options = {}) {
 
 // Hook for market data with specific optimizations
 export function useMarketData(symbol, options = {}) {
-  const fetchMarketData = useCallback(async () => {
+  const fetchMarketData = useCallback(async() => {
     if (!symbol) throw new Error('Symbol is required');
-    
+
     // Simulate API call - replace with actual market data API
     const response = await fetch(`/api/market/${symbol}`);
     if (!response.ok) {
@@ -190,9 +191,9 @@ export function useMarketData(symbol, options = {}) {
 
 // Hook for company financials
 export function useCompanyFinancials(symbol, options = {}) {
-  const fetchFinancials = useCallback(async () => {
+  const fetchFinancials = useCallback(async() => {
     if (!symbol) throw new Error('Symbol is required');
-    
+
     const response = await fetch(`/api/financials/${symbol}`);
     if (!response.ok) {
       throw new Error(`Failed to fetch financials for ${symbol}`);
@@ -213,9 +214,9 @@ export function useCompanyFinancials(symbol, options = {}) {
 
 // Hook for user models with authentication
 export function useUserModel(modelId, options = {}) {
-  const fetchUserModel = useCallback(async () => {
+  const fetchUserModel = useCallback(async() => {
     if (!modelId) throw new Error('Model ID is required');
-    
+
     const token = localStorage.getItem('auth-token');
     if (!token) throw new Error('Authentication required');
 
@@ -224,11 +225,11 @@ export function useUserModel(modelId, options = {}) {
         'Authorization': `Bearer ${token}`
       }
     });
-    
+
     if (!response.ok) {
       throw new Error(`Failed to fetch model ${modelId}`);
     }
-    
+
     return response.json();
   }, [modelId]);
 
@@ -244,9 +245,9 @@ export function useUserModel(modelId, options = {}) {
 
 // Hook for private analysis data
 export function usePrivateAnalysis(analysisId, options = {}) {
-  const fetchAnalysis = useCallback(async () => {
+  const fetchAnalysis = useCallback(async() => {
     if (!analysisId) throw new Error('Analysis ID is required');
-    
+
     const token = localStorage.getItem('auth-token');
     if (!token) throw new Error('Authentication required');
 
@@ -255,11 +256,11 @@ export function usePrivateAnalysis(analysisId, options = {}) {
         'Authorization': `Bearer ${token}`
       }
     });
-    
+
     if (!response.ok) {
       throw new Error(`Failed to fetch analysis ${analysisId}`);
     }
-    
+
     return response.json();
   }, [analysisId]);
 
@@ -289,8 +290,8 @@ export function useCacheManager() {
   }, [refreshStats]);
 
   const clearSensitiveData = useCallback(() => {
-    financialDataCache.clear((key, metadata) => 
-      metadata.dataType === 'private-analysis' || 
+    financialDataCache.clear((key, metadata) =>
+      metadata.dataType === 'private-analysis' ||
       metadata.dataType === 'user-models'
     );
     refreshStats();
@@ -300,7 +301,7 @@ export function useCacheManager() {
   useEffect(() => {
     refreshStats();
     const interval = setInterval(refreshStats, 30000); // Every 30 seconds
-    
+
     return () => clearInterval(interval);
   }, [refreshStats]);
 
@@ -314,15 +315,15 @@ export function useCacheManager() {
 
 // Hook for preloading data
 export function usePreloadData() {
-  const preload = useCallback(async (keys, dataType = 'api-response') => {
-    const promises = keys.map(key => 
+  const preload = useCallback(async(keys, dataType = 'api-response') => {
+    const promises = keys.map(key =>
       financialDataCache.get(key, { dataType, requireFresh: false })
         .catch(error => {
           console.warn(`Failed to preload ${key}:`, error);
           return null;
         })
     );
-    
+
     return Promise.allSettled(promises);
   }, []);
 

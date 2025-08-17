@@ -12,7 +12,7 @@ export class IndexedDBService {
     this.db = null;
     this.isAvailable = false;
     this.compressionUtils = new CompressionUtils();
-    
+
     // Define object stores
     this.stores = {
       watchlists: {
@@ -94,10 +94,10 @@ export class IndexedDBService {
       this.db = await this.openDatabase();
       this.isAvailable = true;
       console.log('✅ IndexedDB service initialized');
-      
+
       // Cleanup expired data
       await this.cleanupExpiredData();
-      
+
       return { success: true, available: true, version: this.dbVersion };
     } catch (error) {
       console.error('❌ Failed to initialize IndexedDB:', error);

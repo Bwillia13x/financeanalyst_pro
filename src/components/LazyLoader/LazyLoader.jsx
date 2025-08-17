@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef, Suspense } from 'react';
+
 import { trackFinancialComponentPerformance } from '../../utils/performanceMonitoring';
 
 // Enhanced lazy loading component for financial components
-const LazyLoader = ({ 
-  children, 
+const LazyLoader = ({
+  children,
   fallback = null,
   componentName = 'unknown',
   threshold = 0.1,
@@ -18,7 +19,7 @@ const LazyLoader = ({
   const [isLoaded, setIsLoaded] = useState(false);
   const [loadError, setLoadError] = useState(null);
   const [preloadTimer, setPreloadTimer] = useState(null);
-  
+
   const containerRef = useRef(null);
   const observerRef = useRef(null);
   const loadStartTime = useRef(null);
@@ -37,7 +38,7 @@ const LazyLoader = ({
         if (entry.isIntersecting) {
           loadStartTime.current = performance.now();
           setIsVisible(true);
-          
+
           // Stop observing once visible
           if (observerRef.current) {
             observerRef.current.unobserve(entry.target);
@@ -65,7 +66,7 @@ const LazyLoader = ({
         loadStartTime.current = performance.now();
         setIsVisible(true);
       }, preloadDelay);
-      
+
       setPreloadTimer(timer);
     }
   }, [priority, preloadDelay]);
@@ -74,7 +75,7 @@ const LazyLoader = ({
   useEffect(() => {
     if (isLoaded && loadStartTime.current && performanceTracking) {
       const loadTime = performance.now() - loadStartTime.current;
-      
+
       trackFinancialComponentPerformance(componentName, {
         loadTime,
         priority,
@@ -96,7 +97,7 @@ const LazyLoader = ({
   const handleLoadError = (error) => {
     setLoadError(error);
     onError?.(error);
-    
+
     if (performanceTracking) {
       trackFinancialComponentPerformance(componentName, {
         loadError: error.message,
@@ -111,9 +112,9 @@ const LazyLoader = ({
   const defaultFallback = (
     <div className="animate-pulse bg-gray-100 rounded-lg p-6">
       <div className="space-y-4">
-        <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-        <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-        <div className="h-32 bg-gray-200 rounded"></div>
+        <div className="h-4 bg-gray-200 rounded w-3/4" />
+        <div className="h-4 bg-gray-200 rounded w-1/2" />
+        <div className="h-32 bg-gray-200 rounded" />
       </div>
     </div>
   );
@@ -159,7 +160,7 @@ const LazyLoader = ({
         errorFallback
       ) : (
         <Suspense fallback={fallback || defaultFallback}>
-          <ErrorBoundary 
+          <ErrorBoundary
             onError={handleLoadError}
             onLoad={handleLoadSuccess}
             componentName={componentName}

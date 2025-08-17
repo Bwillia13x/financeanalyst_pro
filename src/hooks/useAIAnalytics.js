@@ -5,6 +5,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+
 import aiAnalyticsService from '../services/aiAnalyticsService';
 import { reportPerformanceMetric } from '../utils/performanceMonitoring';
 
@@ -35,7 +36,7 @@ export function useAIAnalytics(options = {}) {
   /**
    * Initialize AI Analytics Service
    */
-  const initialize = useCallback(async () => {
+  const initialize = useCallback(async() => {
     if (isInitialized) return;
 
     try {
@@ -64,7 +65,7 @@ export function useAIAnalytics(options = {}) {
   /**
    * Analyze financial data with AI
    */
-  const analyzeData = useCallback(async (data, customOptions = {}) => {
+  const analyzeData = useCallback(async(data, customOptions = {}) => {
     if (!isInitialized) {
       await initialize();
     }
@@ -116,7 +117,7 @@ export function useAIAnalytics(options = {}) {
     } catch (err) {
       const errorMessage = `AI Analysis failed: ${err.message}`;
       setError(errorMessage);
-      
+
       reportPerformanceMetric('ai_analysis_error', {
         error: err.message,
         dataPoints: data.prices?.length || 0,
@@ -132,7 +133,7 @@ export function useAIAnalytics(options = {}) {
   /**
    * Get real-time insights for streaming data
    */
-  const getRealtimeInsights = useCallback(async (streamingData) => {
+  const getRealtimeInsights = useCallback(async(streamingData) => {
     if (!isInitialized || isLoading) return [];
 
     try {
@@ -181,7 +182,7 @@ export function useAIAnalytics(options = {}) {
    */
   const getFilteredInsights = useCallback((filters = {}) => {
     const { type, severity, minConfidence = 0 } = filters;
-    
+
     return insights.filter(insight => {
       if (type && insight.type !== type) return false;
       if (severity && insight.severity !== severity) return false;
@@ -204,14 +205,14 @@ export function useAIAnalytics(options = {}) {
     const summary = {
       totalPatterns: patterns.length,
       highConfidencePatterns: patterns.filter(p => p.confidence > 0.8).length,
-      bullishPatterns: patterns.filter(p => 
+      bullishPatterns: patterns.filter(p =>
         ['double_bottom', 'cup_and_handle', 'ascending_triangle'].includes(p.type)
       ).length,
-      bearishPatterns: patterns.filter(p => 
+      bearishPatterns: patterns.filter(p =>
         ['head_and_shoulders', 'double_top', 'descending_triangle'].includes(p.type)
       ).length,
-      averageConfidence: patterns.length > 0 
-        ? patterns.reduce((sum, p) => sum + p.confidence, 0) / patterns.length 
+      averageConfidence: patterns.length > 0
+        ? patterns.reduce((sum, p) => sum + p.confidence, 0) / patterns.length
         : 0
     };
 
@@ -261,11 +262,11 @@ export function useAIAnalytics(options = {}) {
       sharpeRatio: riskMetrics.sharpeRatio || 0,
       maxDrawdown: riskMetrics.maxDrawdown || 0,
       valueAtRisk: riskMetrics.valueAtRisk || 0,
-      recommendation: riskMetrics.riskScore > 7 
-        ? 'High risk - implement strict controls' 
-        : riskMetrics.riskScore > 4 
-        ? 'Moderate risk - monitor closely' 
-        : 'Low risk - stable investment'
+      recommendation: riskMetrics.riskScore > 7
+        ? 'High risk - implement strict controls'
+        : riskMetrics.riskScore > 4
+          ? 'Moderate risk - monitor closely'
+          : 'Low risk - stable investment'
     };
   }, [riskMetrics]);
 
@@ -373,9 +374,9 @@ export function useAIAnalytics(options = {}) {
 export function usePatternAnalysis(data, options = {}) {
   const { analyzeData, patterns, isLoading } = useAIAnalytics(options);
 
-  const analyzePatterns = useCallback(async () => {
+  const analyzePatterns = useCallback(async() => {
     if (!data) return [];
-    
+
     const result = await analyzeData(data, {
       includePatterns: true,
       includePredictions: false,
@@ -398,9 +399,9 @@ export function usePatternAnalysis(data, options = {}) {
 export function usePredictionAnalysis(data, options = {}) {
   const { analyzeData, predictions, isLoading } = useAIAnalytics(options);
 
-  const generatePredictions = useCallback(async () => {
+  const generatePredictions = useCallback(async() => {
     if (!data) return [];
-    
+
     const result = await analyzeData(data, {
       includePatterns: false,
       includePredictions: true,
@@ -423,9 +424,9 @@ export function usePredictionAnalysis(data, options = {}) {
 export function useRiskAnalysis(data, riskTolerance = 'moderate') {
   const { analyzeData, riskMetrics, isLoading } = useAIAnalytics({ riskTolerance });
 
-  const analyzeRisk = useCallback(async () => {
+  const analyzeRisk = useCallback(async() => {
     if (!data) return {};
-    
+
     const result = await analyzeData(data, {
       includePatterns: false,
       includePredictions: false,

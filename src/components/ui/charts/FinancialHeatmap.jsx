@@ -3,23 +3,23 @@
  * Interactive correlation and performance heatmaps for financial data
  */
 
-import React, { useState, useMemo, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  TrendingUp, 
-  TrendingDown, 
-  Info, 
+import {
+  TrendingUp,
+  TrendingDown,
+  Info,
   Download,
   Settings,
   Palette
 } from 'lucide-react';
+import React, { useState, useMemo, useCallback } from 'react';
 
 /**
  * Color interpolation for heatmap
  */
 const interpolateColor = (value, min, max, colorScheme = 'redGreen') => {
   const normalizedValue = Math.max(0, Math.min(1, (value - min) / (max - min)));
-  
+
   const colorSchemes = {
     redGreen: {
       low: { r: 220, g: 38, b: 38 },    // Red
@@ -63,13 +63,13 @@ const interpolateColor = (value, min, max, colorScheme = 'redGreen') => {
 /**
  * Heatmap Cell Component
  */
-const HeatmapCell = ({ 
-  value, 
-  rowLabel, 
-  colLabel, 
-  color, 
-  textColor, 
-  onClick, 
+const HeatmapCell = ({
+  value,
+  rowLabel,
+  colLabel,
+  color,
+  textColor,
+  onClick,
   onHover,
   size = 'md'
 }) => {
@@ -92,7 +92,7 @@ const HeatmapCell = ({
       <span className="font-mono font-semibold">
         {typeof value === 'number' ? value.toFixed(2) : value}
       </span>
-      
+
       {/* Tooltip on hover */}
       <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity z-10 whitespace-nowrap">
         {rowLabel} × {colLabel}: {typeof value === 'number' ? value.toFixed(4) : value}
@@ -107,7 +107,7 @@ const HeatmapCell = ({
 const ColorLegend = ({ min, max, colorScheme, title }) => {
   const steps = 10;
   const stepSize = (max - min) / steps;
-  
+
   return (
     <div className="flex flex-col items-center gap-2">
       <span className="text-sm font-medium text-slate-700">{title}</span>
@@ -139,14 +139,14 @@ const FinancialHeatmap = ({
   data = [],
   rowLabels = [],
   colLabels = [],
-  title = "Financial Heatmap",
-  type = "correlation", // correlation, returns, risk, etc.
-  colorScheme = "redGreen",
-  cellSize = "md",
+  title = 'Financial Heatmap',
+  type = 'correlation', // correlation, returns, risk, etc.
+  colorScheme = 'redGreen',
+  cellSize = 'md',
   showValues = true,
   showLegend = true,
   symmetric = false,
-  className = "",
+  className = '',
   onCellClick = null,
   onExport = null
 }) => {
@@ -159,7 +159,7 @@ const FinancialHeatmap = ({
   const { minValue, maxValue } = useMemo(() => {
     let min = Infinity;
     let max = -Infinity;
-    
+
     data.forEach(row => {
       row.forEach(value => {
         if (typeof value === 'number' && !isNaN(value)) {
@@ -168,13 +168,13 @@ const FinancialHeatmap = ({
         }
       });
     });
-    
+
     // For correlation matrices, ensure symmetric range around 0
     if (type === 'correlation') {
       const absMax = Math.max(Math.abs(min), Math.abs(max));
       return { minValue: -absMax, maxValue: absMax };
     }
-    
+
     return { minValue: min, maxValue: max };
   }, [data, type]);
 
@@ -207,7 +207,7 @@ const FinancialHeatmap = ({
         ['', ...colLabels].join(','),
         ...data.map((row, i) => [rowLabels[i], ...row].join(','))
       ].join('\n');
-      
+
       const blob = new Blob([csvContent], { type: 'text/csv' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -234,7 +234,7 @@ const FinancialHeatmap = ({
             </p>
           )}
         </div>
-        
+
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowSettings(!showSettings)}

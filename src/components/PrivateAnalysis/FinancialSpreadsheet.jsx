@@ -1,12 +1,16 @@
-import React, { useState, useRef, useEffect } from 'react';
 import { Plus, ChevronDown, ChevronRight, Calculator, FileText, TrendingUp, Edit2 } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
 
 import { useFinancialAccessibility } from '../../hooks/useAccessibility';
+import ResponsiveTable from '../ui/ResponsiveTable';
+
+import MobileFinancialSpreadsheet from './MobileFinancialSpreadsheet';
 
 const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) => {
   const [activeStatement, setActiveStatement] = useState('incomeStatement');
   const [adjustedValues, setAdjustedValues] = useState({});
-  
+  const [isMobile, setIsMobile] = useState(false);
+
   // Normalize incoming data to a safe structure to prevent undefined access
   const safeData = React.useMemo(() => ({
     periods: Array.isArray(data?.periods) ? data.periods : [],
@@ -16,7 +20,7 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
       cashFlow: data?.statements?.cashFlow || {}
     }
   }), [data]);
-  
+
   // Add accessibility monitoring for financial spreadsheet
   const { elementRef, testFinancialFeatures } = useFinancialAccessibility('spreadsheet');
   const [expandedSections, setExpandedSections] = useState({
@@ -40,7 +44,7 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
     investingActivities: true,
     financingActivities: true
   });
-  
+
   const [editingCell, setEditingCell] = useState(null);
   const [cellValue, setCellValue] = useState('');
   const inputRef = useRef(null);
@@ -360,13 +364,13 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
   const handleCellClick = (rowKey, periodIndex, isAdjusted = false) => {
     setEditingCell({ rowKey, periodIndex, isAdjusted });
     let currentValue = '';
-    
+
     if (isAdjusted) {
       currentValue = adjustedValues[rowKey] || '';
     } else {
       currentValue = currentStatementData[rowKey]?.[periodIndex] || '';
     }
-    
+
     setCellValue(currentValue.toString());
   };
 
@@ -375,7 +379,7 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
       const { rowKey, periodIndex, isAdjusted } = editingCell;
       const parsed = parseFloat(cellValue);
       const newValue = isNaN(parsed) ? 0 : parsed;
-      
+
       if (isAdjusted) {
         // Update adjusted values
         const newAdjustedValues = {
@@ -397,7 +401,7 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
         newData.statements[statementKey][rowKey] = { ...existingRow, [periodIndex]: newValue };
         onDataChange(newData);
       }
-      
+
       setEditingCell(null);
       setCellValue('');
     }
@@ -427,15 +431,15 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
 
   const formatNumber = (value) => {
     if (!value && value !== 0) return '';
-    
+
     // Convert to number if it's a string
     const numValue = typeof value === 'string' ? parseFloat(value) : value;
     if (isNaN(numValue)) return '';
-    
+
     // Format based on magnitude for better readability
     const absValue = Math.abs(numValue);
     let formattedValue;
-    
+
     if (absValue >= 1000000) {
       // Millions
       formattedValue = new Intl.NumberFormat('en-US', {
@@ -456,7 +460,7 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
         maximumFractionDigits: 2
       }).format(numValue);
     }
-    
+
     return formattedValue;
   };
 
@@ -485,9 +489,20 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
     }
   }, [editingCell]);
 
+  // Mobile detection
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   const renderRow = (item) => {
     const { key, label, level, formula, bold } = item;
-    
+
     // Enhanced spacing and visual hierarchy
     const indentClass = level === 1 ? 'pl-8' : level === 2 ? 'pl-12' : 'pl-4';
     const textWeight = bold ? 'font-bold' : level === 0 ? 'font-semibold' : 'font-medium';
@@ -495,7 +510,7 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
     const textColor = level === 0 ? 'text-slate-900' : 'text-slate-700';
     const rowBg = level === 0 ? 'bg-slate-50/70' : 'bg-white';
     const borderColor = level === 0 ? 'border-slate-200' : 'border-slate-100';
-    
+
     return (
       <tr key={key} className={`${rowBg} border-b ${borderColor} hover:bg-slate-50 transition-all duration-150 group`}>
         {/* Account Name Column */}
@@ -513,14 +528,14 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
             )}
           </div>
         </td>
-        
+
         {/* Units Column */}
         <td className="px-4 py-4 text-center">
           <span className="text-xs font-medium text-slate-500 uppercase tracking-wide bg-slate-100 px-2 py-1 rounded-md">
             $ 000s
           </span>
         </td>
-        
+
         {/* Period Columns */}
         {safeData.periods.map((_, periodIndex) => (
           <td key={periodIndex} className="px-4 py-4 text-right">
@@ -563,8 +578,8 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
               <div
                 onClick={() => !formula && handleCellClick(key, periodIndex)}
                 className={`px-3 py-2.5 rounded-lg font-mono text-sm transition-all duration-200 min-h-[40px] flex items-center justify-end ${
-                  formula 
-                    ? 'bg-gradient-to-r from-blue-50 to-blue-100 text-blue-800 font-semibold border border-blue-200 shadow-sm' 
+                  formula
+                    ? 'bg-gradient-to-r from-blue-50 to-blue-100 text-blue-800 font-semibold border border-blue-200 shadow-sm'
                     : 'hover:bg-slate-100 text-slate-800 cursor-pointer border border-transparent hover:border-slate-200 hover:shadow-sm group-hover:bg-slate-50'
                 }`}
               >
@@ -578,7 +593,7 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
             )}
           </td>
         ))}
-        
+
         {/* Adjusted Column */}
         <td className="px-4 py-4 text-right bg-gradient-to-r from-amber-50 to-yellow-50 border-l-2 border-amber-300">
           {editingCell?.rowKey === key && editingCell?.isAdjusted ? (
@@ -621,8 +636,8 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
             <div
               onClick={() => !formula && handleCellClick(key, null, true)}
               className={`px-3 py-2.5 rounded-lg font-mono text-sm transition-all duration-200 min-h-[40px] flex items-center justify-end ${
-                formula 
-                  ? 'bg-gradient-to-r from-blue-50 to-blue-100 text-blue-800 font-semibold border border-blue-200 shadow-sm' 
+                formula
+                  ? 'bg-gradient-to-r from-blue-50 to-blue-100 text-blue-800 font-semibold border border-blue-200 shadow-sm'
                   : 'hover:bg-slate-100 text-slate-800 cursor-pointer border border-transparent hover:border-slate-200 hover:shadow-sm group-hover:bg-slate-50'
               }`}
               data-testid={`adjusted-cell-${key}`}
@@ -636,14 +651,16 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
             </div>
           )}
         </td>
-        
+
         {/* Type Column */}
         <td className="px-4 py-4 text-center">
-          <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
-            formula 
-              ? 'bg-blue-100 text-blue-800 border border-blue-200' 
-              : 'bg-slate-100 text-slate-700 border border-slate-200'
-          }`}>
+          <span
+            className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
+              formula
+                ? 'bg-blue-100 text-blue-800 border border-blue-200'
+                : 'bg-slate-100 text-slate-700 border border-slate-200'
+            }`}
+          >
             {formula ? (
               <>
                 <Calculator size={10} className="mr-1" />
@@ -661,6 +678,17 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
     );
   };
 
+  // Render mobile view for small screens
+  if (isMobile) {
+    return (
+      <MobileFinancialSpreadsheet
+        data={data}
+        onDataChange={onDataChange}
+        onAdjustedValuesChange={onAdjustedValuesChange}
+      />
+    );
+  }
+
   return (
     <div ref={elementRef} role="main" className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 pb-8">
       {/* Header Section */}
@@ -676,7 +704,7 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
                 <p className="text-sm text-slate-600 mt-1">Professional financial modeling workspace</p>
               </div>
             </div>
-            
+
             <div className="flex items-center gap-3">
               <button
                 onClick={addPeriod}
@@ -702,7 +730,12 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
       {/* Main Content */}
       <div className="max-w-full mx-auto p-8">
         <div className="bg-white rounded-xl border border-slate-200 shadow-lg">
-          <div className="overflow-x-auto">
+          <ResponsiveTable
+            className="responsive-financial-table"
+            enableVirtualization={false}
+            mobileStackedView={false}
+            showDeviceToggle={true}
+          >
             <table className="w-full">
               {/* Enhanced Table Header */}
               <thead className="bg-gradient-to-r from-slate-800 to-slate-900 text-white">
@@ -736,7 +769,7 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
                   </th>
                 </tr>
               </thead>
-              
+
               <tbody className="divide-y divide-slate-100">
                 {Object.entries(currentTemplate).map(([sectionKey, section]) => (
                   <React.Fragment key={sectionKey}>
@@ -749,8 +782,8 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
                             className="flex items-center gap-3 text-white hover:text-slate-200 transition-colors flex-1"
                           >
                             <div className="flex items-center justify-center w-6 h-6 rounded-full bg-white/20 group-hover:bg-white/30 transition-colors">
-                              {expandedSections[sectionKey] ? 
-                                <ChevronDown size={14} /> : 
+                              {expandedSections[sectionKey] ?
+                                <ChevronDown size={14} /> :
                                 <ChevronRight size={14} />
                               }
                             </div>
@@ -769,16 +802,16 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
                         </div>
                       </td>
                     </tr>
-                    
+
                     {/* Section Rows */}
-                    {expandedSections[sectionKey] && section.items.map(item => 
+                    {expandedSections[sectionKey] && section.items.map(item =>
                       renderRow(item)
                     )}
                   </React.Fragment>
                 ))}
               </tbody>
             </table>
-          </div>
+          </ResponsiveTable>
         </div>
 
         {/* Enhanced Instructions Panel */}
@@ -809,7 +842,7 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
               </li>
             </ul>
           </div>
-          
+
           <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
             <div className="flex items-center gap-3 mb-4">
               <div className="p-2 bg-green-100 rounded-lg">

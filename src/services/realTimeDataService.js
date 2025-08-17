@@ -22,23 +22,23 @@ class RealTimeDataService {
    */
   subscribe(dataType, symbol, callback) {
     const key = `${dataType}_${symbol}`;
-    
+
     if (!this.subscribers.has(key)) {
       this.subscribers.set(key, new Set());
     }
-    
+
     this.subscribers.get(key).add(callback);
-    
+
     // Start the data feed if not already active
     if (!this.connections.has(key)) {
       this.startDataFeed(dataType, symbol);
     }
-    
+
     // Return current cached data if available
     if (this.dataCache.has(key)) {
       callback(this.dataCache.get(key));
     }
-    
+
     // Return unsubscribe function
     return () => {
       this.unsubscribe(dataType, symbol, callback);
@@ -51,10 +51,10 @@ class RealTimeDataService {
   unsubscribe(dataType, symbol, callback) {
     const key = `${dataType}_${symbol}`;
     const subscribers = this.subscribers.get(key);
-    
+
     if (subscribers) {
       subscribers.delete(callback);
-      
+
       // Stop data feed if no more subscribers
       if (subscribers.size === 0) {
         this.stopDataFeed(key);
@@ -67,7 +67,7 @@ class RealTimeDataService {
    */
   startDataFeed(dataType, symbol) {
     const key = `${dataType}_${symbol}`;
-    
+
     switch (dataType) {
       case 'stock_price':
         this.startStockPriceFeed(key, symbol);
@@ -99,20 +99,20 @@ class RealTimeDataService {
    * Stock Price Feed (simulated real-time data)
    */
   startStockPriceFeed(key, symbol) {
-    let basePrice = this.getBasePrice(symbol);
+    const basePrice = this.getBasePrice(symbol);
     let lastPrice = basePrice;
-    
+
     const interval = setInterval(() => {
       // Simulate realistic price movement
       const volatility = 0.02;
       const drift = 0.0001;
       const dt = this.updateInterval / (1000 * 60 * 60 * 24);
-      
+
       const randomShock = (Math.random() - 0.5) * 2;
       const priceChange = lastPrice * (drift * dt + volatility * Math.sqrt(dt) * randomShock);
-      
+
       lastPrice = Math.max(0.01, lastPrice + priceChange);
-      
+
       const data = {
         symbol,
         price: lastPrice,
@@ -121,10 +121,10 @@ class RealTimeDataService {
         timestamp: new Date().toISOString(),
         marketOpen: this.isMarketOpen()
       };
-      
+
       this.updateSubscribers(key, data);
     }, this.updateInterval);
-    
+
     this.connections.set(key, interval);
   }
 
@@ -133,27 +133,27 @@ class RealTimeDataService {
    */
   startInterestRateFeed(key, symbol) {
     let baseRate = this.getBaseInterestRate(symbol);
-    
+
     const interval = setInterval(() => {
       const change = (Math.random() - 0.5) * 0.01;
       baseRate = Math.max(0, baseRate + change);
-      
+
       const data = {
         symbol,
         rate: baseRate,
         timestamp: new Date().toISOString()
       };
-      
+
       this.updateSubscribers(key, data);
     }, this.updateInterval * 5);
-    
+
     this.connections.set(key, interval);
   }
 
   updateSubscribers(key, data) {
     this.dataCache.set(key, data);
     const subscribers = this.subscribers.get(key);
-    
+
     if (subscribers) {
       subscribers.forEach(callback => {
         try {
@@ -207,22 +207,22 @@ class RealTimeDataService {
    */
   startFXRateFeed(key, symbol) {
     let baseRate = this.getBaseFXRate(symbol);
-    
+
     const interval = setInterval(() => {
       const volatility = 0.005;
       const change = (Math.random() - 0.5) * 2 * volatility;
       baseRate = Math.max(0.01, baseRate * (1 + change));
-      
+
       const data = {
         symbol,
         rate: baseRate,
         change: change * 100,
         timestamp: new Date().toISOString()
       };
-      
+
       this.updateSubscribers(key, data);
     }, this.updateInterval);
-    
+
     this.connections.set(key, interval);
   }
 
@@ -231,22 +231,22 @@ class RealTimeDataService {
    */
   startCommodityFeed(key, symbol) {
     let basePrice = this.getBaseCommodityPrice(symbol);
-    
+
     const interval = setInterval(() => {
       const volatility = symbol === 'OIL' ? 0.03 : 0.02;
       const change = (Math.random() - 0.5) * 2 * volatility;
       basePrice = Math.max(1, basePrice * (1 + change));
-      
+
       const data = {
         symbol,
         price: basePrice,
         change: change * 100,
         timestamp: new Date().toISOString()
       };
-      
+
       this.updateSubscribers(key, data);
     }, this.updateInterval * 2);
-    
+
     this.connections.set(key, interval);
   }
 
@@ -255,20 +255,20 @@ class RealTimeDataService {
    */
   startBondYieldFeed(key, symbol) {
     let baseYield = this.getBaseBondYield(symbol);
-    
+
     const interval = setInterval(() => {
       const change = (Math.random() - 0.5) * 0.02;
       baseYield = Math.max(0, baseYield + change);
-      
+
       const data = {
         symbol,
         yield: baseYield,
         timestamp: new Date().toISOString()
       };
-      
+
       this.updateSubscribers(key, data);
     }, this.updateInterval * 3);
-    
+
     this.connections.set(key, interval);
   }
 
@@ -277,20 +277,20 @@ class RealTimeDataService {
    */
   startVolatilityFeed(key, symbol) {
     let baseVol = this.getBaseVolatility(symbol);
-    
+
     const interval = setInterval(() => {
       const change = (Math.random() - 0.5) * 2;
       baseVol = Math.max(5, Math.min(80, baseVol + change));
-      
+
       const data = {
         symbol,
         volatility: baseVol,
         timestamp: new Date().toISOString()
       };
-      
+
       this.updateSubscribers(key, data);
     }, this.updateInterval * 4);
-    
+
     this.connections.set(key, interval);
   }
 
@@ -299,20 +299,20 @@ class RealTimeDataService {
    */
   startEconomicIndicatorFeed(key, symbol) {
     let baseValue = this.getBaseEconomicIndicator(symbol);
-    
+
     const interval = setInterval(() => {
       const change = (Math.random() - 0.5) * 0.1;
       baseValue = Math.max(0, baseValue + change);
-      
+
       const data = {
         symbol,
         value: baseValue,
         timestamp: new Date().toISOString()
       };
-      
+
       this.updateSubscribers(key, data);
     }, this.updateInterval * 10);
-    
+
     this.connections.set(key, interval);
   }
 
@@ -385,12 +385,12 @@ class RealTimeDataService {
    */
   subscribeMultiple(subscriptions) {
     const unsubscribeFunctions = [];
-    
+
     subscriptions.forEach(({ dataType, symbol, callback }) => {
       const unsubscribe = this.subscribe(dataType, symbol, callback);
       unsubscribeFunctions.push(unsubscribe);
     });
-    
+
     return () => {
       unsubscribeFunctions.forEach(fn => fn());
     };

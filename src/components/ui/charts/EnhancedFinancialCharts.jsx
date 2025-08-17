@@ -3,6 +3,23 @@
  * Professional-grade interactive charts for financial data visualization
  */
 
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  TrendingUp,
+  TrendingDown,
+  BarChart3,
+  LineChart as LineChartIcon,
+  PieChart,
+  Download,
+  Maximize,
+  Settings,
+  Eye,
+  EyeOff,
+  Palette,
+  ZoomIn,
+  ZoomOut,
+  RotateCcw
+} from 'lucide-react';
 import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import {
   ResponsiveContainer,
@@ -31,23 +48,6 @@ import {
   Funnel,
   LabelList
 } from 'recharts';
-import { 
-  TrendingUp, 
-  TrendingDown, 
-  BarChart3, 
-  LineChart as LineChartIcon,
-  PieChart,
-  Download,
-  Maximize,
-  Settings,
-  Eye,
-  EyeOff,
-  Palette,
-  ZoomIn,
-  ZoomOut,
-  RotateCcw
-} from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
 
 // Custom color schemes for financial data
 const FINANCIAL_COLOR_SCHEMES = {
@@ -90,14 +90,14 @@ const CustomTooltip = ({ active, payload, label, formatters = {} }) => {
       {payload.map((entry, index) => (
         <div key={index} className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <div 
+            <div
               className="w-3 h-3 rounded-full"
               style={{ backgroundColor: entry.color }}
             />
             <span className="text-sm text-slate-600">{entry.dataKey}:</span>
           </div>
           <span className="font-mono text-sm">
-            {formatters[entry.dataKey] 
+            {formatters[entry.dataKey]
               ? formatters[entry.dataKey](entry.value)
               : entry.value?.toLocaleString()
             }
@@ -111,10 +111,10 @@ const CustomTooltip = ({ active, payload, label, formatters = {} }) => {
 /**
  * Chart Controls Component
  */
-const ChartControls = ({ 
-  chartType, 
-  onChartTypeChange, 
-  colorScheme, 
+const ChartControls = ({
+  chartType,
+  onChartTypeChange,
+  colorScheme,
   onColorSchemeChange,
   showLegend,
   onToggleLegend,
@@ -138,7 +138,7 @@ const ChartControls = ({
         >
           <Settings size={16} />
         </button>
-        
+
         <AnimatePresence>
           {showControls && (
             <motion.div
@@ -249,15 +249,15 @@ const ChartControls = ({
  */
 const EnhancedFinancialCharts = ({
   data = [],
-  title = "Financial Chart",
-  type = "line",
+  title = 'Financial Chart',
+  type = 'line',
   series = [],
   height = 400,
-  className = "",
+  className = '',
   showBrush = false,
   showGrid = true,
   animations = true,
-  colorScheme = "professional",
+  colorScheme = 'professional',
   formatters = {},
   referenceLines = [],
   onDataPointClick = null,
@@ -271,12 +271,27 @@ const EnhancedFinancialCharts = ({
   const [visibleSeries, setVisibleSeries] = useState(series.map(s => s.key));
   const [zoomDomain, setZoomDomain] = useState(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isTablet, setIsTablet] = useState(false);
 
   // Get current color palette
   const colors = FINANCIAL_COLOR_SCHEMES[currentColorScheme];
 
   // Filter data for visible series
   const filteredSeries = series.filter(s => visibleSeries.includes(s.key));
+
+  // Device detection for responsive behavior
+  useEffect(() => {
+    const checkDevice = () => {
+      const width = window.innerWidth;
+      setIsMobile(width < 768);
+      setIsTablet(width >= 768 && width < 1024);
+    };
+
+    checkDevice();
+    window.addEventListener('resize', checkDevice);
+    return () => window.removeEventListener('resize', checkDevice);
+  }, []);
 
   // Handle real-time updates
   useEffect(() => {
@@ -300,17 +315,17 @@ const EnhancedFinancialCharts = ({
     canvas.width = 1200;
     canvas.height = 800;
     const ctx = canvas.getContext('2d');
-    
+
     // White background
     ctx.fillStyle = 'white';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
+
     // Add title
     ctx.fillStyle = 'black';
     ctx.font = 'bold 24px Arial';
     ctx.textAlign = 'center';
     ctx.fillText(title, canvas.width / 2, 40);
-    
+
     // Export as PNG
     const link = document.createElement('a');
     link.download = `${title.replace(/\s+/g, '_')}_chart.png`;
@@ -323,29 +338,34 @@ const EnhancedFinancialCharts = ({
   }, [isFullscreen]);
 
   const handleToggleSeries = useCallback((seriesKey) => {
-    setVisibleSeries(prev => 
-      prev.includes(seriesKey) 
+    setVisibleSeries(prev =>
+      prev.includes(seriesKey)
         ? prev.filter(k => k !== seriesKey)
         : [...prev, seriesKey]
     );
   }, []);
 
   const renderChart = () => {
+    // Responsive margins and properties
     const commonProps = {
       data,
-      margin: { top: 20, right: 30, left: 20, bottom: 5 }
+      margin: isMobile
+        ? { top: 10, right: 10, left: 10, bottom: 5 }
+        : isTablet
+          ? { top: 15, right: 20, left: 15, bottom: 5 }
+          : { top: 20, right: 30, left: 20, bottom: 5 }
     };
 
     const chartComponents = {
       line: (
         <LineChart {...commonProps}>
           <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-          <XAxis 
-            dataKey="period" 
+          <XAxis
+            dataKey="period"
             tick={{ fontSize: 12 }}
             stroke="#64748b"
           />
-          <YAxis 
+          <YAxis
             tick={{ fontSize: 12 }}
             stroke="#64748b"
             tickFormatter={(value) => formatters.yAxis ? formatters.yAxis(value) : value}
@@ -370,7 +390,7 @@ const EnhancedFinancialCharts = ({
               key={index}
               y={line.value}
               stroke={line.color || colors.tertiary}
-              strokeDasharray={line.dashArray || "5 5"}
+              strokeDasharray={line.dashArray || '5 5'}
               label={line.label}
             />
           ))}
@@ -382,7 +402,10 @@ const EnhancedFinancialCharts = ({
         <AreaChart {...commonProps}>
           <defs>
             {filteredSeries.map((s, index) => (
-              <linearGradient key={s.key} id={`gradient-${s.key}`} x1="0" y1="0" x2="0" y2="1">
+              <linearGradient
+                key={s.key} id={`gradient-${s.key}`} x1="0"
+                y1="0" x2="0" y2="1"
+              >
                 <stop offset="5%" stopColor={colors.gradient[index % colors.gradient.length]} stopOpacity={0.8}/>
                 <stop offset="95%" stopColor={colors.gradient[index % colors.gradient.length]} stopOpacity={0.1}/>
               </linearGradient>
@@ -422,8 +445,8 @@ const EnhancedFinancialCharts = ({
               animationDuration={animations ? 1500 : 0}
             >
               {data.map((entry, entryIndex) => (
-                <Cell 
-                  key={entryIndex} 
+                <Cell
+                  key={entryIndex}
                   fill={colors.gradient[index % colors.gradient.length]}
                 />
               ))}
@@ -525,8 +548,11 @@ const EnhancedFinancialCharts = ({
       />
 
       {/* Chart Container */}
-      <div className="p-4">
-        <ResponsiveContainer width="100%" height={height}>
+      <div className={`${isMobile ? 'p-2' : isTablet ? 'p-3' : 'p-4'}`}>
+        <ResponsiveContainer
+          width="100%"
+          height={isMobile ? Math.min(height, 300) : isTablet ? Math.min(height, 350) : height}
+        >
           {renderChart()}
         </ResponsiveContainer>
       </div>

@@ -10,7 +10,7 @@ class WorkerManager {
     this.pendingTasks = new Map();
     this.requestId = 0;
     this.initialized = false;
-    
+
     // Performance monitoring
     this.metrics = {
       totalTasks: 0,
@@ -33,10 +33,10 @@ class WorkerManager {
           new URL('../workers/financialCalculationWorker.js', import.meta.url),
           { type: 'module' }
         );
-        
+
         worker.onmessage = this.handleWorkerMessage.bind(this);
         worker.onerror = this.handleWorkerError.bind(this);
-        
+
         this.workerPool.push({
           worker,
           busy: false,
@@ -46,7 +46,7 @@ class WorkerManager {
 
       this.initialized = true;
       console.log(`Financial calculation worker pool initialized with ${this.maxWorkers} workers`);
-      
+
     } catch (error) {
       console.error('Failed to initialize worker pool:', error);
       // Fallback to main thread calculations
@@ -70,7 +70,7 @@ class WorkerManager {
     return new Promise((resolve, reject) => {
       const requestId = ++this.requestId;
       const timeoutMs = options.timeout || 30000; // 30 second default timeout
-      
+
       // Store the pending request
       this.pendingTasks.set(requestId, {
         resolve,
@@ -85,7 +85,7 @@ class WorkerManager {
 
       // Find available worker or queue the task
       const availableWorker = this.getAvailableWorker();
-      
+
       if (availableWorker) {
         this.assignTask(availableWorker, type, payload, requestId);
       } else {
@@ -110,7 +110,7 @@ class WorkerManager {
   assignTask(workerInfo, type, payload, requestId) {
     workerInfo.busy = true;
     workerInfo.taskCount++;
-    
+
     workerInfo.worker.postMessage({
       type,
       payload,
@@ -141,16 +141,16 @@ class WorkerManager {
    */
   handleWorkerMessage(event) {
     const { type, requestId, result, error, progress, cached } = event.data;
-    
+
     switch (type) {
       case 'CALCULATION_COMPLETE':
         this.handleCalculationComplete(requestId, result, cached);
         break;
-        
+
       case 'CALCULATION_ERROR':
         this.handleCalculationError(requestId, error);
         break;
-        
+
       case 'SIMULATION_PROGRESS':
         this.handleProgressUpdate(requestId, progress);
         break;
@@ -167,14 +167,14 @@ class WorkerManager {
     // Clear timeout and resolve promise
     clearTimeout(pendingTask.timeout);
     this.pendingTasks.delete(requestId);
-    
+
     // Update metrics
     this.metrics.completedTasks++;
     const executionTime = Date.now() - pendingTask.startTime;
     this.updateAverageExecutionTime(executionTime);
-    
+
     if (cached) {
-      this.metrics.cacheHitRatio = 
+      this.metrics.cacheHitRatio =
         (this.metrics.cacheHitRatio * (this.metrics.completedTasks - 1) + 1) / this.metrics.completedTasks;
     }
 
@@ -196,7 +196,7 @@ class WorkerManager {
 
     clearTimeout(pendingTask.timeout);
     this.pendingTasks.delete(requestId);
-    
+
     // Free up the worker
     const worker = this.findWorkerByMessage(event);
     if (worker) {
@@ -228,7 +228,7 @@ class WorkerManager {
    */
   updateAverageExecutionTime(newTime) {
     const n = this.metrics.completedTasks;
-    this.metrics.averageExecutionTime = 
+    this.metrics.averageExecutionTime =
       (this.metrics.averageExecutionTime * (n - 1) + newTime) / n;
   }
 
@@ -247,21 +247,21 @@ class WorkerManager {
     // Import the calculation engines dynamically to avoid loading them unless needed
     const { FinancialModelingEngine } = await import('./financialModelingEngine.js');
     const { MonteCarloEngine } = await import('./monteCarloEngine.js');
-    
+
     const financialEngine = new FinancialModelingEngine();
     const monteCarloEngine = new MonteCarloEngine();
-    
+
     switch (type) {
       case 'DCF_CALCULATION':
         return financialEngine.buildDCFModel(payload.inputs, payload.scenarios);
-        
+
       case 'MONTE_CARLO_SIMULATION':
         return await monteCarloEngine.runDCFSimulation(
-          payload.baseInputs, 
-          payload.distributions, 
+          payload.baseInputs,
+          payload.distributions,
           payload.options
         );
-        
+
       // Add other calculation types as needed
       default:
         throw new Error(`Unsupported calculation type in fallback mode: ${type}`);
@@ -297,14 +297,14 @@ class WorkerManager {
     this.workerPool.forEach(workerInfo => {
       workerInfo.worker.terminate();
     });
-    
+
     this.workerPool = [];
     this.pendingTasks.clear();
     this.initialized = false;
   }
 
   // Convenience methods for specific calculation types
-  
+
   /**
    * Calculate DCF valuation
    */
@@ -316,10 +316,10 @@ class WorkerManager {
    * Run Monte Carlo simulation
    */
   async runMonteCarloSimulation(baseInputs, distributions, options = {}) {
-    return this.calculate('MONTE_CARLO_SIMULATION', { 
-      baseInputs, 
-      distributions, 
-      options 
+    return this.calculate('MONTE_CARLO_SIMULATION', {
+      baseInputs,
+      distributions,
+      options
     }, { timeout: 60000 }); // Longer timeout for simulations
   }
 
@@ -334,10 +334,10 @@ class WorkerManager {
    * Run sensitivity analysis
    */
   async runSensitivityAnalysis(baseCase, variables, ranges, options = {}) {
-    return this.calculate('SENSITIVITY_ANALYSIS', { 
-      baseCase, 
-      variables, 
-      ranges 
+    return this.calculate('SENSITIVITY_ANALYSIS', {
+      baseCase,
+      variables,
+      ranges
     }, options);
   }
 
@@ -345,9 +345,9 @@ class WorkerManager {
    * Calculate financial ratios
    */
   async calculateFinancialRatios(financialData, marketData = null, options = {}) {
-    return this.calculate('FINANCIAL_RATIOS', { 
-      financialData, 
-      marketData 
+    return this.calculate('FINANCIAL_RATIOS', {
+      financialData,
+      marketData
     }, options);
   }
 }

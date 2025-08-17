@@ -66,7 +66,7 @@ jobs:
     - name: Check bundle size
       run: |
         echo "Checking bundle sizes against budgets..."
-        node scripts/check-bundle-budget.js
+        node scripts/check-bundle-budget.cjs
         
     - name: Upload bundle analysis
       uses: actions/upload-artifact@v4

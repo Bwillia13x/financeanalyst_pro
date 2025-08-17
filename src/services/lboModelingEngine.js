@@ -318,8 +318,8 @@ class LBOModelingEngine {
     const schedule = [];
     let seniorDebtBalance = transactionStructure.seniorDebt;
     let subordinatedDebtBalance = transactionStructure.subordinatedDebt;
-    let revolvingDebtBalance = transactionStructure.revolvingDebt || 0;
-    
+    const revolvingDebtBalance = transactionStructure.revolvingDebt || 0;
+
     // Enhanced debt assumptions
     const enhancedAssumptions = {
       ...debtAssumptions,
@@ -365,7 +365,7 @@ class LBOModelingEngine {
       const leverageRatio = (seniorDebtBalance + subordinatedDebtBalance + revolvingDebtBalance) / projection.ebitda;
       const coverageRatio = projection.ebitda / totalInterest;
       const capexRatio = (projection.capex || 0) / projection.revenue;
-      
+
       const covenantTests = {
         leverageCompliance: leverageRatio <= enhancedAssumptions.maxLeverageRatio,
         coverageCompliance: coverageRatio >= enhancedAssumptions.minCoverageRatio,
@@ -374,10 +374,10 @@ class LBOModelingEngine {
         coverageRatio,
         capexRatio
       };
-      
+
       // Calculate debt service coverage ratio (DSCR)
       const dscr = cashAvailableForDebt / (totalInterest + mandatoryPaydown);
-      
+
       schedule.push({
         year,
         beginningBalance: {
@@ -561,15 +561,15 @@ class LBOModelingEngine {
     }
 
     const { tolerance = 1e-8, maxIterations = 200, initialGuess = 0.1 } = options;
-    
+
     // Try Newton-Raphson method first
     let rate = this.newtonRaphsonIRR(cashFlows, initialGuess, tolerance, maxIterations);
-    
+
     // If Newton-Raphson fails, try bisection method
     if (isNaN(rate) || !isFinite(rate)) {
       rate = this.bisectionIRR(cashFlows, tolerance, maxIterations);
     }
-    
+
     // If both fail, try Secant method
     if (isNaN(rate) || !isFinite(rate)) {
       rate = this.secantIRR(cashFlows, tolerance, maxIterations);
@@ -577,7 +577,7 @@ class LBOModelingEngine {
 
     return rate;
   }
-  
+
   /**
    * Newton-Raphson method for IRR calculation
    */
@@ -592,7 +592,7 @@ class LBOModelingEngine {
         const factor = Math.pow(1 + rate, j);
         npv += cashFlows[j] / factor;
         if (j > 0) {
-          dnpv -= j * cashFlows[j] / (factor * (1 + rate));
+          dnpv -= (j * cashFlows[j]) / (factor * (1 + rate));
         }
       }
 
@@ -600,101 +600,98 @@ class LBOModelingEngine {
         return rate;
       }
 
-      if (Math.abs(dnpv) < tolerance) {
-        break; // Avoid division by zero
+      if (Math.abs(dnpv) < Number.EPSILON) {
+        break; // Avoid division by near-zero derivative
       }
 
-      const newRate = rate - npv / dnpv;
+      const proposed = rate - npv / dnpv;
 
-      // Prevent rate from going too negative or too high
-      if (newRate < -0.99) {
-        rate = -0.99;
-      } else if (newRate > 50) {
-        rate = 50;
-      } else {
-        rate = newRate;
+      // Clamp to sane bounds
+      const clamped = Math.max(-0.99, Math.min(proposed, 50));
+
+      // Check for convergence against previous iterate
+      if (Math.abs(clamped - rate) < tolerance) {
+        return clamped;
       }
-      
-      // Check for convergence
-      if (Math.abs(newRate - rate) < tolerance) {
-        return newRate;
-      }
-      
-      rate = newRate;
+
+      rate = clamped;
     }
 
     return rate;
   }
-  
+
   /**
    * Bisection method for IRR calculation (fallback)
    */
   bisectionIRR(cashFlows, tolerance, maxIterations) {
     let low = -0.99;
     let high = 5.0;
-    
+
     // Check if bounds contain a root
-    const npvLow = this.calculateNPV(cashFlows, low);
-    const npvHigh = this.calculateNPV(cashFlows, high);
-    
+    let npvLow = this.calculateNPV(cashFlows, low);
+    let npvHigh = this.calculateNPV(cashFlows, high);
+
     if (npvLow * npvHigh > 0) {
       return NaN; // No root in bounds
     }
-    
+
     for (let i = 0; i < maxIterations; i++) {
       const mid = (low + high) / 2;
       const npvMid = this.calculateNPV(cashFlows, mid);
-      
+
       if (Math.abs(npvMid) < tolerance) {
         return mid;
       }
-      
+
+      // Decide which subinterval contains the root and update both bound and its NPV
       if (npvLow * npvMid < 0) {
         high = mid;
+        npvHigh = npvMid;
       } else {
         low = mid;
+        npvLow = npvMid;
       }
-      
+
       if (Math.abs(high - low) < tolerance) {
         return (low + high) / 2;
       }
     }
-    
+
     return (low + high) / 2;
   }
-  
+
   /**
    * Secant method for IRR calculation (second fallback)
    */
   secantIRR(cashFlows, tolerance, maxIterations) {
     let x0 = 0;
     let x1 = 0.1;
-    
+
     for (let i = 0; i < maxIterations; i++) {
       const f0 = this.calculateNPV(cashFlows, x0);
       const f1 = this.calculateNPV(cashFlows, x1);
-      
+
       if (Math.abs(f1) < tolerance) {
         return x1;
       }
-      
+
       if (Math.abs(f1 - f0) < tolerance) {
         break;
       }
-      
+
       const x2 = x1 - f1 * (x1 - x0) / (f1 - f0);
-      
+
       if (Math.abs(x2 - x1) < tolerance) {
         return x2;
       }
-      
+
       x0 = x1;
       x1 = x2;
     }
-    
+
     return x1;
   }
-  
+
   /**
    * Calculate NPV for a given discount rate
    */
@@ -716,58 +713,58 @@ class LBOModelingEngine {
     // Calculate entry EBITDA multiple
     const impliedEntryEbitda = transactionStructure.purchasePrice / (transactionStructure.entryMultiple || 10);
     const actualEntryMultiple = impliedEntryEbitda > 0 ? transactionStructure.purchasePrice / impliedEntryEbitda : null;
-    
+
     // Calculate leverage metrics
     const peakLeverage = Math.max(...debtSchedule.map(d => d.netDebtToEbitda || 0));
     const minCoverage = Math.min(...debtSchedule.map(d => d.ebitdaToInterest || Infinity));
-    const avgDSCR = debtSchedule.length > 0 ? 
+    const avgDSCR = debtSchedule.length > 0 ?
       debtSchedule.reduce((sum, d) => sum + (d.dscr || 0), 0) / debtSchedule.length : 0;
-    
+
     // Calculate multiple arbitrage components
     const multipleExpansion = exitAnalysis.exitMultiple - (actualEntryMultiple || 10);
     const operationalImprovement = returnsAnalysis.moic - 1 - multipleExpansion;
     const leverage = transactionStructure.totalDebt / transactionStructure.equityContribution;
-    
+
     return {
       // Entry metrics
       entryMultiple: actualEntryMultiple,
       entryLeverage: transactionStructure.debtToEbitda,
       equityContribution: transactionStructure.equityContribution,
       debtToEquity: leverage,
-      
+
       // Exit metrics
       exitMultiple: exitAnalysis.exitMultiple,
       exitLeverage: exitAnalysis.totalDebtAtExit / exitAnalysis.exitEbitda,
-      
+
       // Returns metrics
       irr: returnsAnalysis.irr,
       moic: returnsAnalysis.moic,
       totalReturn: returnsAnalysis.totalCashReturned,
-      
+
       // Leverage and credit metrics
       leverageReduction: transactionStructure.totalDebt - exitAnalysis.totalDebtAtExit,
       peakLeverage,
       minCoverage,
       avgDSCR,
-      
+
       // Value creation analysis
       multipleExpansion,
       operationalImprovement,
       leverageContribution: leverage > 1 ? (returnsAnalysis.moic - 1) * (leverage - 1) / leverage : 0,
-      
+
       // Risk metrics
-      breakdownLeverage: debtSchedule.length > 0 ? 
+      breakdownLeverage: debtSchedule.length > 0 ?
         Math.max(...debtSchedule.map(d => d.leverageRatio || 0)) : null,
-      covenantBreaches: debtSchedule.filter(d => 
+      covenantBreaches: debtSchedule.filter(d =>
         d.covenantTests && (!d.covenantTests.leverageCompliance || !d.covenantTests.coverageCompliance)
       ).length,
-      
+
       // Efficiency ratios
       equityEfficiency: returnsAnalysis.totalCashReturned / transactionStructure.equityContribution,
       timeToRecoverEquity: this.calculateTimeToRecoverEquity(returnsAnalysis.cashFlows, transactionStructure.equityContribution)
     };
   }
-  
+
   /**
    * Calculate time to recover initial equity investment
    * @param {Array} cashFlows - Array of cash flows
@@ -776,16 +773,16 @@ class LBOModelingEngine {
    */
   calculateTimeToRecoverEquity(cashFlows, initialEquity) {
     if (!cashFlows || cashFlows.length === 0) return null;
-    
+
     let cumulativeCashFlow = 0;
-    
+
     for (let i = 1; i < cashFlows.length; i++) { // Skip initial investment
       cumulativeCashFlow += cashFlows[i];
       if (cumulativeCashFlow >= initialEquity) {
         return i;
       }
     }
-    
+
     return null; // Equity not recovered within holding period
   }
 

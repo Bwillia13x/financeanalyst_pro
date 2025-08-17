@@ -4,6 +4,7 @@
  */
 
 import { EventEmitter } from 'events';
+
 import { performanceMonitoring } from '../utils/performanceMonitoring';
 
 class CollaborationService extends EventEmitter {
@@ -21,19 +22,19 @@ class CollaborationService extends EventEmitter {
     this.heartbeatInterval = null;
     this.syncQueue = [];
     this.isOnline = navigator.onLine;
-    
+
     // Bind methods to preserve context
     this.handleConnectionOpen = this.handleConnectionOpen.bind(this);
     this.handleConnectionMessage = this.handleConnectionMessage.bind(this);
     this.handleConnectionClose = this.handleConnectionClose.bind(this);
     this.handleConnectionError = this.handleConnectionError.bind(this);
-    
+
     // Listen for online/offline status
     window.addEventListener('online', () => {
       this.isOnline = true;
       this.reconnectWebSocket();
     });
-    
+
     window.addEventListener('offline', () => {
       this.isOnline = false;
       this.emit('connectionStatus', { online: false });
@@ -96,7 +97,7 @@ class CollaborationService extends EventEmitter {
       // In production, this would connect to your WebSocket server
       // For demo purposes, we'll simulate the connection
       const wsUrl = process.env.REACT_APP_WS_URL || 'ws://localhost:8080/collaboration';
-      
+
       // Simulate WebSocket connection
       this.wsConnection = {
         readyState: 1, // OPEN
@@ -115,7 +116,7 @@ class CollaborationService extends EventEmitter {
       };
 
       this.handleConnectionOpen();
-      
+
     } catch (error) {
       console.error('WebSocket initialization failed:', error);
       throw error;
@@ -129,7 +130,7 @@ class CollaborationService extends EventEmitter {
     console.log('Collaboration WebSocket connected');
     this.reconnectAttempts = 0;
     this.emit('connectionStatus', { online: true, connected: true });
-    
+
     // Send authentication message
     this.sendMessage({
       type: 'auth',
@@ -147,7 +148,7 @@ class CollaborationService extends EventEmitter {
   handleConnectionMessage(event) {
     try {
       const message = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
-      
+
       switch (message.type) {
         case 'workspace_update':
           this.handleWorkspaceUpdate(message.data);
@@ -190,7 +191,7 @@ class CollaborationService extends EventEmitter {
   handleConnectionClose() {
     console.log('Collaboration WebSocket disconnected');
     this.emit('connectionStatus', { online: this.isOnline, connected: false });
-    
+
     if (this.isOnline && this.reconnectAttempts < this.maxReconnectAttempts) {
       setTimeout(() => {
         this.reconnectWebSocket();
@@ -217,7 +218,7 @@ class CollaborationService extends EventEmitter {
 
     this.reconnectAttempts++;
     console.log(`Attempting to reconnect... (${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
-    
+
     try {
       await this.initializeWebSocket();
     } catch (error) {
@@ -282,7 +283,7 @@ class CollaborationService extends EventEmitter {
       };
 
       this.workspaces.set(workspaceId, workspace);
-      
+
       // Notify server
       this.sendMessage({
         type: 'join_workspace',
@@ -292,7 +293,7 @@ class CollaborationService extends EventEmitter {
       });
 
       this.emit('workspaceJoined', { workspaceId, workspace });
-      
+
       // Track performance
       if (typeof performanceMonitoring !== 'undefined') {
         performanceMonitoring.trackCustomMetric('workspace_joined', 1);
@@ -316,7 +317,7 @@ class CollaborationService extends EventEmitter {
       }
 
       workspace.members.delete(this.currentUserId);
-      
+
       if (workspace.members.size === 0) {
         this.workspaces.delete(workspaceId);
       }
@@ -329,7 +330,7 @@ class CollaborationService extends EventEmitter {
       });
 
       this.emit('workspaceLeft', { workspaceId });
-      
+
       return true;
     } catch (error) {
       console.error('Failed to leave workspace:', error);
@@ -377,7 +378,7 @@ class CollaborationService extends EventEmitter {
       });
 
       this.emit('modelShared', { workspaceId, modelId, sharedModel });
-      
+
       return sharedModel;
     } catch (error) {
       console.error('Failed to share model:', error);
@@ -426,7 +427,7 @@ class CollaborationService extends EventEmitter {
       });
 
       this.emit('modelUpdated', { workspaceId, modelId, updates, model });
-      
+
       return model;
     } catch (error) {
       console.error('Failed to update model:', error);
@@ -473,7 +474,7 @@ class CollaborationService extends EventEmitter {
       });
 
       this.emit('annotationAdded', { workspaceId, modelId, annotation: newAnnotation });
-      
+
       return newAnnotation;
     } catch (error) {
       console.error('Failed to add annotation:', error);
@@ -516,7 +517,7 @@ class CollaborationService extends EventEmitter {
   getModelAnnotations(workspaceId, modelId) {
     const workspace = this.workspaces.get(workspaceId);
     if (!workspace) return [];
-    
+
     return Array.from(workspace.annotations.values())
       .filter(annotation => annotation.modelId === modelId);
   }
@@ -639,7 +640,7 @@ class CollaborationService extends EventEmitter {
 
       this.isInitialized = false;
       this.emit('cleanup');
-      
+
       console.log('CollaborationService cleaned up');
     } catch (error) {
       console.error('Error during cleanup:', error);

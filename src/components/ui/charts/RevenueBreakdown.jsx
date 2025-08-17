@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
+
 import { cn } from '../../../utils/cn';
 import { Card, CardContent, CardHeader, CardTitle } from '../Card';
 
-const RevenueBreakdown = ({ 
-  data = [], 
+const RevenueBreakdown = ({
+  data = [],
   className,
-  title = "Revenue Breakdown",
+  title = 'Revenue Breakdown',
   formatValue = (value) => `$${(value / 1000000).toFixed(1)}M`
 }) => {
   const [activeIndex, setActiveIndex] = useState(null);
@@ -14,7 +15,7 @@ const RevenueBreakdown = ({
   // Generate colors using CSS variables with fallbacks
   const colors = [
     'var(--color-primary)',
-    'var(--color-secondary)', 
+    'var(--color-secondary)',
     'var(--color-accent)',
     'var(--color-success)',
     'var(--color-warning)',
@@ -24,7 +25,7 @@ const RevenueBreakdown = ({
   ];
 
   const total = data.reduce((sum, item) => sum + item.value, 0);
-  
+
   const processedData = data.map((item, index) => ({
     ...item,
     percentage: ((item.value / total) * 100).toFixed(1),
@@ -43,7 +44,7 @@ const RevenueBreakdown = ({
     if (!active || !payload || !payload.length) return null;
 
     const data = payload[0].payload;
-    
+
     return (
       <div className="bg-white border border-gray-200 rounded-md shadow-elevation-1 p-3 min-w-[160px]">
         <p className="font-medium text-sm text-foreground mb-1">{data.name}</p>
@@ -58,7 +59,7 @@ const RevenueBreakdown = ({
   };
 
   return (
-    <Card className={cn("w-full", className)}>
+    <Card className={cn('w-full', className)}>
       <CardHeader className="pb-4">
         <CardTitle className="text-lg font-semibold text-foreground">{title}</CardTitle>
       </CardHeader>
@@ -80,8 +81,8 @@ const RevenueBreakdown = ({
                   onMouseLeave={onPieLeave}
                 >
                   {processedData.map((entry, index) => (
-                    <Cell 
-                      key={`cell-${index}`} 
+                    <Cell
+                      key={`cell-${index}`}
                       fill={entry.color}
                       className="transition-all duration-200"
                       style={{
@@ -101,19 +102,19 @@ const RevenueBreakdown = ({
           <div className="flex-1 min-w-0">
             <div className="space-y-3">
               {processedData.map((item, index) => (
-                <div 
+                <div
                   key={item.name}
                   className={cn(
-                    "flex items-center justify-between p-3 rounded-md transition-colors duration-200 cursor-pointer",
-                    activeIndex === index 
-                      ? "bg-muted" 
-                      : "hover:bg-gray-50"
+                    'flex items-center justify-between p-3 rounded-md transition-colors duration-200 cursor-pointer',
+                    activeIndex === index
+                      ? 'bg-muted'
+                      : 'hover:bg-gray-50'
                   )}
                   onMouseEnter={() => setActiveIndex(index)}
                   onMouseLeave={() => setActiveIndex(null)}
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <div 
+                    <div
                       className="w-4 h-4 rounded-sm flex-shrink-0"
                       style={{ backgroundColor: item.color }}
                     />
@@ -134,7 +135,7 @@ const RevenueBreakdown = ({
                 </div>
               ))}
             </div>
-            
+
             {/* Total */}
             <div className="mt-4 pt-4 border-t border-gray-100">
               <div className="flex items-center justify-between">

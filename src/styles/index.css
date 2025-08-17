@@ -10,3 +10,16 @@ body {
   font-family: inherit;
   margin: unset;
 }
+
+/* Ensure full-viewport layout for the React root in all environments */
+html, body {
+  width: 100%;
+  height: 100%;
+}
+
+/* Some generators add a wrapper class on #root; ensure it doesn't constrain width */
+.dhiwise-code, #root {
+  display: block;
+  width: 100%; /* use percentage to avoid scrollbar-induced overflow */
+  min-height: 100vh;
+}

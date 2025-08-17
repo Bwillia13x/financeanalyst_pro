@@ -1,9 +1,9 @@
-import React, { useState, useMemo, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  BarChart3, TrendingUp, TrendingDown, Target, Plus, Trash2, 
+import {
+  BarChart3, TrendingUp, TrendingDown, Target, Plus, Trash2,
   Play, Download, Settings, RefreshCw, AlertTriangle, CheckCircle
 } from 'lucide-react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, LineChart, Line } from 'recharts';
 
 const EnhancedScenarioAnalysis = ({ data, onDataChange, calculateDCF, lboModelingEngine }) => {
@@ -57,7 +57,7 @@ const EnhancedScenarioAnalysis = ({ data, onDataChange, calculateDCF, lboModelin
       style: 'currency',
       currency: 'USD',
       minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
+      maximumFractionDigits: 0
     }).format(value);
   }, []);
 
@@ -65,15 +65,15 @@ const EnhancedScenarioAnalysis = ({ data, onDataChange, calculateDCF, lboModelin
     return `${(value || 0).toFixed(1)}%`;
   }, []);
 
-  const runScenarioAnalysis = useCallback(async () => {
+  const runScenarioAnalysis = useCallback(async() => {
     setIsCalculating(true);
-    
+
     try {
       const scenarioResults = [];
-      
+
       for (const scenario of scenarios) {
         let result = null;
-        
+
         if (analysisSettings.modelType === 'dcf') {
           // Run DCF analysis for each scenario
           const scenarioData = {
@@ -90,10 +90,9 @@ const EnhancedScenarioAnalysis = ({ data, onDataChange, calculateDCF, lboModelin
               }
             }
           };
-          
+
           result = calculateDCF ? calculateDCF(scenarioData) : null;
-        } 
-        else if (analysisSettings.modelType === 'lbo' && lboModelingEngine) {
+        } else if (analysisSettings.modelType === 'lbo' && lboModelingEngine) {
           // Run LBO analysis for each scenario
           const lboInputs = {
             symbol: data.symbol || 'COMPANY',
@@ -111,32 +110,32 @@ const EnhancedScenarioAnalysis = ({ data, onDataChange, calculateDCF, lboModelin
               }
             }
           };
-          
+
           result = lboModelingEngine.buildLBOModel(lboInputs);
         }
-        
+
         scenarioResults.push({
           ...scenario,
-          result: result,
+          result,
           enterpriseValue: result?.enterpriseValue || result?.baseCase?.exitAnalysis?.enterpriseValue || 0,
           equityValue: result?.equityValue || result?.baseCase?.exitAnalysis?.equityProceeds || 0,
           irr: result?.irr || result?.baseCase?.returnsAnalysis?.irr || 0,
           moic: result?.moic || result?.baseCase?.returnsAnalysis?.moic || 0
         });
       }
-      
+
       // Calculate probability-weighted metrics
-      const weightedValue = scenarioResults.reduce((sum, s) => 
+      const weightedValue = scenarioResults.reduce((sum, s) =>
         sum + (s.enterpriseValue * s.probability / 100), 0
       );
-      
+
       const valueRange = {
         min: Math.min(...scenarioResults.map(s => s.enterpriseValue)),
         max: Math.max(...scenarioResults.map(s => s.enterpriseValue)),
-        range: Math.max(...scenarioResults.map(s => s.enterpriseValue)) - 
+        range: Math.max(...scenarioResults.map(s => s.enterpriseValue)) -
                Math.min(...scenarioResults.map(s => s.enterpriseValue))
       };
-      
+
       // Risk metrics
       const standardDeviation = Math.sqrt(
         scenarioResults.reduce((sum, s) => {
@@ -144,9 +143,9 @@ const EnhancedScenarioAnalysis = ({ data, onDataChange, calculateDCF, lboModelin
           return sum + (deviation * deviation * s.probability / 100);
         }, 0)
       );
-      
+
       const coefficientOfVariation = standardDeviation / weightedValue;
-      
+
       setResults({
         scenarios: scenarioResults,
         summary: {
@@ -166,7 +165,7 @@ const EnhancedScenarioAnalysis = ({ data, onDataChange, calculateDCF, lboModelin
           moic: s.moic
         }))
       });
-      
+
     } catch (error) {
       console.error('Scenario analysis error:', error);
       alert(`Error running scenario analysis: ${error.message}`);
@@ -190,7 +189,7 @@ const EnhancedScenarioAnalysis = ({ data, onDataChange, calculateDCF, lboModelin
   }, [scenarios]);
 
   const updateScenario = useCallback((id, field, value) => {
-    setScenarios(prev => prev.map(scenario => 
+    setScenarios(prev => prev.map(scenario =>
       scenario.id === id ? { ...scenario, [field]: parseFloat(value) || value } : scenario
     ));
   }, []);
@@ -199,7 +198,7 @@ const EnhancedScenarioAnalysis = ({ data, onDataChange, calculateDCF, lboModelin
     setScenarios(prev => prev.filter(scenario => scenario.id !== id && !scenario.isBase));
   }, []);
 
-  const totalProbability = useMemo(() => 
+  const totalProbability = useMemo(() =>
     scenarios.reduce((sum, s) => sum + s.probability, 0), [scenarios]
   );
 
@@ -213,14 +212,14 @@ const EnhancedScenarioAnalysis = ({ data, onDataChange, calculateDCF, lboModelin
             <p className="text-gray-600">Cross-model scenario planning & risk assessment</p>
           </div>
         </div>
-        
+
         <div className="flex space-x-3">
           <motion.button
             onClick={runScenarioAnalysis}
             disabled={isCalculating || totalProbability !== 100}
             className={`px-6 py-2 rounded-lg font-medium flex items-center space-x-2 ${
               isCalculating || totalProbability !== 100
-                ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                 : 'bg-purple-600 hover:bg-purple-700 text-white'
             }`}
             whileHover={!isCalculating && totalProbability === 100 ? { scale: 1.02 } : {}}
@@ -246,7 +245,7 @@ const EnhancedScenarioAnalysis = ({ data, onDataChange, calculateDCF, lboModelin
               <option value="3statement">3-Statement Model</option>
             </select>
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Output Metric</label>
             <select
@@ -260,7 +259,7 @@ const EnhancedScenarioAnalysis = ({ data, onDataChange, calculateDCF, lboModelin
               <option value="moic">MOIC</option>
             </select>
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Simulations</label>
             <input
@@ -270,7 +269,7 @@ const EnhancedScenarioAnalysis = ({ data, onDataChange, calculateDCF, lboModelin
               className="w-full px-3 py-2 border border-gray-300 rounded-lg"
             />
           </div>
-          
+
           <div className="flex items-end">
             <label className="flex items-center">
               <input
@@ -308,7 +307,7 @@ const EnhancedScenarioAnalysis = ({ data, onDataChange, calculateDCF, lboModelin
             <span>Add Scenario</span>
           </motion.button>
         </div>
-        
+
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
@@ -470,7 +469,7 @@ const EnhancedScenarioAnalysis = ({ data, onDataChange, calculateDCF, lboModelin
                 </div>
               </div>
             </div>
-            
+
             <div className="bg-gray-50 rounded-lg p-4">
               <h4 className="font-semibold mb-3">Scenario Returns</h4>
               <div className="space-y-2 text-sm">
@@ -478,9 +477,9 @@ const EnhancedScenarioAnalysis = ({ data, onDataChange, calculateDCF, lboModelin
                   <div key={scenario.id} className="flex justify-between">
                     <span>{scenario.name}:</span>
                     <span className="font-medium">
-                      {analysisSettings.outputMetric === 'irr' ? formatPercent(scenario.irr) : 
-                       analysisSettings.outputMetric === 'moic' ? `${scenario.moic.toFixed(1)}x` :
-                       formatCurrency(scenario[analysisSettings.outputMetric])}
+                      {analysisSettings.outputMetric === 'irr' ? formatPercent(scenario.irr) :
+                        analysisSettings.outputMetric === 'moic' ? `${scenario.moic.toFixed(1)}x` :
+                          formatCurrency(scenario[analysisSettings.outputMetric])}
                     </span>
                   </div>
                 ))}

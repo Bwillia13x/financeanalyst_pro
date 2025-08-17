@@ -121,7 +121,7 @@ describe('Financial Modeling Engine', () => {
     it('should throw error when discount rate <= terminal growth rate', () => {
       expect(() => {
         financialModelingEngine.calculateTerminalValue(1000000, 0.09, 0.08);
-      }).toThrow('Discount rate must be greater than terminal growth rate');
+      }).toThrow(/Discount rate.*must be greater than terminal growth rate/);
     });
   });
 

@@ -2,9 +2,60 @@ import { useState, useEffect } from 'react';
 
 const DCFInputs = ({ inputs, setInputs }) => {
   const [viewMode, setViewMode] = useState('simple'); // 'simple' or 'detailed'
+  const [validationErrors, setValidationErrors] = useState({});
+
+  // Business logic validation rules
+  const validationRules = {
+    terminalGrowthRate: { min: 0, max: 0.05, label: 'Terminal Growth Rate' },
+    discountRate: { min: 0.02, max: 0.25, label: 'Discount Rate (WACC)' },
+    revenueGrowthRate: { min: -0.5, max: 1.0, label: 'Revenue Growth Rate' },
+    ebitdaMargin: { min: -0.5, max: 1.0, label: 'EBITDA Margin' },
+    taxRate: { min: 0, max: 0.5, label: 'Tax Rate' },
+    projectionYears: { min: 3, max: 10, label: 'Projection Years' },
+    currentRevenue: { min: 0, max: 1e12, label: 'Current Revenue' }
+  };
+
+  const validateInput = (field, value) => {
+    const rule = validationRules[field];
+    if (!rule) return null;
+
+    const numValue = parseFloat(value);
+    if (isNaN(numValue)) {
+      return `${rule.label} must be a valid number`;
+    }
+
+    if (numValue < rule.min || numValue > rule.max) {
+      const minPercent = rule.min >= 0 && rule.min <= 1 ? `${rule.min * 100}%` : rule.min;
+      const maxPercent = rule.max >= 0 && rule.max <= 1 ? `${rule.max * 100}%` : rule.max;
+      return `${rule.label} must be between ${minPercent} and ${maxPercent}`;
+    }
+
+    // Additional business logic validations
+    if (field === 'discountRate' && inputs.terminalGrowthRate && numValue <= inputs.terminalGrowthRate) {
+      return 'Discount rate must be greater than terminal growth rate';
+    }
+
+    return null;
+  };
 
   const handleChange = (field, value) => {
-    setInputs(prev => ({ ...prev, [field]: parseFloat(value) || 0 }));
+    const numValue = parseFloat(value) || 0;
+    const error = validateInput(field, numValue);
+
+    // Update validation errors
+    setValidationErrors(prev => ({
+      ...prev,
+      [field]: error
+    }));
+
+    // Apply bounds to keep values within reasonable ranges
+    let boundedValue = numValue;
+    const rule = validationRules[field];
+    if (rule) {
+      boundedValue = Math.max(rule.min, Math.min(rule.max, numValue));
+    }
+
+    setInputs(prev => ({ ...prev, [field]: boundedValue }));
   };
 
   const handleYearlyChange = (year, field, value) => {
@@ -73,8 +124,13 @@ const DCFInputs = ({ inputs, setInputs }) => {
           type="number"
           value={inputs.currentRevenue || 0}
           onChange={(e) => handleChange('currentRevenue', e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+            validationErrors.currentRevenue ? 'border-red-500' : 'border-gray-300'
+          }`}
         />
+        {validationErrors.currentRevenue && (
+          <p className="text-red-500 text-xs mt-1">{validationErrors.currentRevenue}</p>
+        )}
       </div>
 
       <div>
@@ -87,8 +143,13 @@ const DCFInputs = ({ inputs, setInputs }) => {
           step="0.01"
           value={(inputs.revenueGrowthRate || 0) * 100}
           onChange={(e) => handleChange('revenueGrowthRate', e.target.value / 100)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+            validationErrors.revenueGrowthRate ? 'border-red-500' : 'border-gray-300'
+          }`}
         />
+        {validationErrors.revenueGrowthRate && (
+          <p className="text-red-500 text-xs mt-1">{validationErrors.revenueGrowthRate}</p>
+        )}
       </div>
 
       <div>
@@ -129,8 +190,13 @@ const DCFInputs = ({ inputs, setInputs }) => {
           step="0.01"
           value={(inputs.terminalGrowthRate || 0) * 100}
           onChange={(e) => handleChange('terminalGrowthRate', e.target.value / 100)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+            validationErrors.terminalGrowthRate ? 'border-red-500' : 'border-gray-300'
+          }`}
         />
+        {validationErrors.terminalGrowthRate && (
+          <p className="text-red-500 text-xs mt-1">{validationErrors.terminalGrowthRate}</p>
+        )}
       </div>
 
       <div>
@@ -143,8 +209,13 @@ const DCFInputs = ({ inputs, setInputs }) => {
           step="0.01"
           value={(inputs.discountRate || 0) * 100}
           onChange={(e) => handleChange('discountRate', e.target.value / 100)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+            validationErrors.discountRate ? 'border-red-500' : 'border-gray-300'
+          }`}
         />
+        {validationErrors.discountRate && (
+          <p className="text-red-500 text-xs mt-1">{validationErrors.discountRate}</p>
+        )}
       </div>
 
       <div>

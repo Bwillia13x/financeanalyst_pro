@@ -1,14 +1,14 @@
-import React from 'react';
 import { TrendingUp, Percent, BarChart3, Calculator } from 'lucide-react';
+import React from 'react';
 
 // Simplified test version of AnalysisResults to isolate React errors
-const AnalysisResultsTest = ({ 
-  data, 
+const AnalysisResultsTest = ({
+  data,
   adjustedValues,
-  modelInputs, 
-  calculateDCF, 
-  formatCurrency, 
-  formatPercentage 
+  modelInputs,
+  calculateDCF,
+  formatCurrency,
+  formatPercentage
 }) => {
   console.log('AnalysisResultsTest - Props received:', {
     data: !!data,
@@ -22,7 +22,7 @@ const AnalysisResultsTest = ({
   // Test MetricCard component in isolation
   const MetricCard = ({ title, value, trend, description, icon: Icon }) => {
     console.log('MetricCard rendering:', { title, value, trend, description, icon: !!Icon });
-    
+
     if (!Icon) {
       console.error('MetricCard: Icon is missing!');
       return <div>Error: Missing icon for {title}</div>;
@@ -33,11 +33,13 @@ const AnalysisResultsTest = ({
         <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
           <div className="flex items-start justify-between mb-4">
             <div className="flex items-center gap-3">
-              <div className={`p-2 rounded-lg ${
-                trend === 'up' ? 'bg-green-900/30 text-green-400' : 
-                trend === 'down' ? 'bg-red-900/30 text-red-400' : 
-                'bg-gray-700 text-gray-400'
-              }`}>
+              <div
+                className={`p-2 rounded-lg ${
+                  trend === 'up' ? 'bg-green-900/30 text-green-400' :
+                    trend === 'down' ? 'bg-red-900/30 text-red-400' :
+                      'bg-gray-700 text-gray-400'
+                }`}
+              >
                 <Icon className="h-5 w-5" />
               </div>
               <div>

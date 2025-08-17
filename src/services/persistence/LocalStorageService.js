@@ -3,8 +3,8 @@
  * Manages localStorage operations with encryption, compression, and data validation
  */
 
-import { CryptoUtils } from '../utils/CryptoUtils';
 import { CompressionUtils } from '../utils/CompressionUtils';
+import { CryptoUtils } from '../utils/CryptoUtils';
 
 export class LocalStorageService {
   constructor() {
@@ -24,10 +24,10 @@ export class LocalStorageService {
       const testKey = this.prefix + 'test';
       localStorage.setItem(testKey, 'test');
       localStorage.removeItem(testKey);
-      
+
       this.isAvailable = true;
       console.log('✅ LocalStorage service initialized');
-      
+
       return { success: true, available: true };
     } catch (error) {
       console.warn('⚠️ LocalStorage not available:', error);
@@ -132,12 +132,12 @@ export class LocalStorageService {
       let storageObject;
       try {
         storageObject = JSON.parse(serializedData);
-      } catch (parseError) {
+      } catch {
         // Try decompression first
         try {
           const decompressed = await this.compressionUtils.decompress(serializedData);
           storageObject = JSON.parse(decompressed);
-        } catch (decompressError) {
+        } catch {
           throw new Error('Failed to parse stored data');
         }
       }
@@ -146,7 +146,7 @@ export class LocalStorageService {
       if (validateTTL && storageObject.metadata && storageObject.metadata.ttl) {
         const now = Date.now();
         const expiry = storageObject.metadata.timestamp + storageObject.metadata.ttl;
-        
+
         if (now > expiry) {
           await this.remove(key);
           return null;
@@ -158,8 +158,8 @@ export class LocalStorageService {
         metadata: storageObject.metadata
       };
 
-    } catch (error) {
-      console.error(`Failed to retrieve data from localStorage for key "${key}":`, error);
+    } catch (_error) {
+      console.error(`Failed to retrieve data from localStorage for key "${key}":`, _error);
       return null;
     }
   }
@@ -176,8 +176,8 @@ export class LocalStorageService {
       const storageKey = this.prefix + key;
       localStorage.removeItem(storageKey);
       return true;
-    } catch (error) {
-      console.error(`Failed to remove data from localStorage for key "${key}":`, error);
+    } catch (_error) {
+      console.error(`Failed to remove data from localStorage for key "${key}":`, _error);
       return false;
     }
   }
@@ -193,14 +193,14 @@ export class LocalStorageService {
     try {
       const keys = Object.keys(localStorage);
       const appKeys = keys.filter(key => key.startsWith(this.prefix));
-      
+
       appKeys.forEach(key => {
         localStorage.removeItem(key);
       });
 
       return true;
-    } catch (error) {
-      console.error('Failed to clear localStorage:', error);
+    } catch (_error) {
+      console.error('Failed to clear localStorage:', _error);
       return false;
     }
   }
@@ -218,8 +218,8 @@ export class LocalStorageService {
       return keys
         .filter(key => key.startsWith(this.prefix))
         .map(key => key.substring(this.prefix.length));
-    } catch (error) {
-      console.error('Failed to get localStorage keys:', error);
+    } catch (_error) {
+      console.error('Failed to get localStorage keys:', _error);
       return [];
     }
   }
@@ -256,13 +256,13 @@ export class LocalStorageService {
         maxSize: this.maxSize,
         usagePercentage: (totalSize / this.maxSize) * 100,
         itemSizes,
-        largestItem: Object.entries(itemSizes).reduce((max, [key, size]) => 
+        largestItem: Object.entries(itemSizes).reduce((max, [key, size]) =>
           size > max.size ? { key, size } : max, { key: null, size: 0 })
       };
 
-    } catch (error) {
-      console.error('Failed to get localStorage stats:', error);
-      return { available: false, used: 0, keys: 0, error: error.message };
+    } catch (_error) {
+      console.error('Failed to get localStorage stats:', _error);
+      return { available: false, used: 0, keys: 0, error: _error.message };
     }
   }
 
@@ -286,8 +286,8 @@ export class LocalStorageService {
       }
 
       return exportData;
-    } catch (error) {
-      console.error('Failed to export localStorage data:', error);
+    } catch (_error) {
+      console.error('Failed to export localStorage data:', _error);
       return {};
     }
   }
@@ -326,16 +326,16 @@ export class LocalStorageService {
           });
 
           results.imported++;
-        } catch (error) {
-          console.error(`Failed to import key "${key}":`, error);
+        } catch (_error) {
+          console.error(`Failed to import key "${key}":`, _error);
           results.errors++;
         }
       }
 
       return results;
-    } catch (error) {
-      console.error('Failed to import localStorage data:', error);
-      throw error;
+    } catch (_error) {
+      console.error('Failed to import localStorage data:', _error);
+      throw _error;
     }
   }
 
@@ -350,7 +350,7 @@ export class LocalStorageService {
     try {
       const stats = await this.getStats();
       return (stats.used + dataSize) <= this.maxSize;
-    } catch (error) {
+    } catch {
       return false;
     }
   }
@@ -375,9 +375,9 @@ export class LocalStorageService {
       }
 
       return { cleaned };
-    } catch (error) {
-      console.error('Failed to cleanup localStorage:', error);
-      return { cleaned: 0, error: error.message };
+    } catch (_error) {
+      console.error('Failed to cleanup localStorage:', _error);
+      return { cleaned: 0, error: _error.message };
     }
   }
 
@@ -388,7 +388,7 @@ export class LocalStorageService {
     try {
       // Check if data is serializable
       JSON.stringify(data);
-      
+
       // Check for circular references
       const seen = new WeakSet();
       const checkCircular = (obj) => {
@@ -407,7 +407,7 @@ export class LocalStorageService {
       };
 
       return checkCircular(data);
-    } catch (error) {
+    } catch {
       return false;
     }
   }
@@ -429,7 +429,7 @@ export class LocalStorageService {
 
     const testData = { test: 'performance', data: new Array(1000).fill('test') };
     const iterations = 100;
-    
+
     try {
       // Test write performance
       const writeStart = performance.now();

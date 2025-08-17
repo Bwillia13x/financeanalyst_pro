@@ -53,7 +53,7 @@ class FinancialModelingCache {
    */
   get(key) {
     const cached = this.cache.get(key);
-    
+
     if (!cached) {
       this.performanceMetrics.misses++;
       return null;
@@ -110,10 +110,10 @@ class FinancialModelingCache {
     const endTime = performance.now();
 
     this.performanceMetrics.computationTime += (endTime - startTime);
-    
+
     // Cache result with longer TTL for complex calculations
     this.set(key, result, 600000); // 10 minutes for DCF
-    
+
     apiLogger.log('DEBUG', 'DCF calculation cached', {
       key,
       computationTime: endTime - startTime
@@ -142,10 +142,10 @@ class FinancialModelingCache {
     const endTime = performance.now();
 
     this.performanceMetrics.computationTime += (endTime - startTime);
-    
+
     // Cache result with longer TTL for complex calculations
     this.set(key, result, 600000); // 10 minutes for LBO
-    
+
     apiLogger.log('DEBUG', 'LBO calculation cached', {
       key,
       computationTime: endTime - startTime
@@ -176,21 +176,21 @@ class FinancialModelingCache {
     }
 
     const startTime = performance.now();
-    
+
     // Check for partial results that can be reused
     const partialResults = this.getPartialMonteCarloResults(inputs);
-    
+
     const result = await calculator(inputs, partialResults);
     const endTime = performance.now();
 
     this.performanceMetrics.computationTime += (endTime - startTime);
-    
+
     // Cache result with shorter TTL for stochastic calculations
     this.set(baseKey, result, 180000); // 3 minutes for Monte Carlo
-    
+
     // Cache intermediate statistical distributions for reuse
     this.cacheMonteCarloIntermediate(inputs, result);
-    
+
     apiLogger.log('DEBUG', 'Monte Carlo calculation cached', {
       baseKey,
       computationTime: endTime - startTime,
@@ -220,10 +220,10 @@ class FinancialModelingCache {
     const endTime = performance.now();
 
     this.performanceMetrics.computationTime += (endTime - startTime);
-    
+
     // Cache ratios with moderate TTL
     this.set(key, result, 300000); // 5 minutes for ratios
-    
+
     return result;
   }
 
@@ -235,12 +235,12 @@ class FinancialModelingCache {
   async batchCachedOperations(operations) {
     const results = [];
     const uncachedOperations = [];
-    
+
     // First pass: check cache for all operations
     for (const operation of operations) {
       const key = this.generateCacheKey(operation.type, operation.inputs);
       const cached = this.get(key);
-      
+
       if (cached) {
         results.push({ ...operation, result: cached, fromCache: true });
       } else {
@@ -251,19 +251,19 @@ class FinancialModelingCache {
 
     // Second pass: execute uncached operations in parallel
     if (uncachedOperations.length > 0) {
-      const computePromises = uncachedOperations.map(async (op) => {
+      const computePromises = uncachedOperations.map(async(op) => {
         const startTime = performance.now();
         const result = await op.calculator(op.inputs);
         const endTime = performance.now();
-        
+
         this.performanceMetrics.computationTime += (endTime - startTime);
         this.set(op.key, result);
-        
+
         return { ...op, result, computationTime: endTime - startTime };
       });
 
       const computedResults = await Promise.all(computePromises);
-      
+
       // Merge computed results back into results array
       let computedIndex = 0;
       for (let i = 0; i < results.length; i++) {
@@ -283,7 +283,7 @@ class FinancialModelingCache {
    */
   invalidateByPattern(pattern) {
     const keysToDelete = [];
-    
+
     for (const key of this.cache.keys()) {
       if (key.includes(pattern)) {
         keysToDelete.push(key);
@@ -291,7 +291,7 @@ class FinancialModelingCache {
     }
 
     keysToDelete.forEach(key => this.cache.delete(key));
-    
+
     apiLogger.log('DEBUG', 'Cache invalidated by pattern', {
       pattern,
       keysDeleted: keysToDelete.length
@@ -384,7 +384,7 @@ class FinancialModelingCache {
     if (inputs.randomSeed && cached.parameters?.randomSeed !== inputs.randomSeed) {
       return false;
     }
-    
+
     // Check if iterations count matches
     if (cached.parameters?.iterations !== inputs.iterations) {
       return false;
@@ -433,14 +433,14 @@ class FinancialModelingCache {
       scenarioCount: scenarios.length
     });
 
-    const precomputePromises = scenarios.map(async (scenario) => {
+    const precomputePromises = scenarios.map(async(scenario) => {
       const key = this.generateCacheKey(scenario.type, scenario.inputs);
-      
+
       if (!this.get(key)) {
         try {
           const result = await scenario.calculator(scenario.inputs);
           this.set(key, result, 1800000); // 30 minutes for precomputed scenarios
-          
+
           return { scenario: scenario.name, success: true };
         } catch (error) {
           apiLogger.log('ERROR', 'Failed to precompute scenario', {
@@ -450,12 +450,12 @@ class FinancialModelingCache {
           return { scenario: scenario.name, success: false, error: error.message };
         }
       }
-      
+
       return { scenario: scenario.name, success: true, fromCache: true };
     });
 
     const results = await Promise.all(precomputePromises);
-    
+
     apiLogger.log('INFO', 'Completed precomputation of common scenarios', {
       results: results.filter(r => r.success).length,
       failures: results.filter(r => !r.success).length
@@ -471,7 +471,7 @@ class FinancialModelingCache {
   setupCacheWarming(warmingConfig) {
     const { interval = 300000, scenarios = [] } = warmingConfig; // Default 5 minutes
 
-    setInterval(async () => {
+    setInterval(async() => {
       try {
         await this.precomputeCommonScenarios(scenarios);
       } catch (error) {
@@ -492,7 +492,7 @@ class FinancialModelingCache {
   exportStatistics() {
     const metrics = this.getPerformanceMetrics();
     const cacheDistribution = {};
-    
+
     // Analyze cache key distribution
     for (const key of this.cache.keys()) {
       const operationType = key.split(':')[0];

@@ -1,17 +1,17 @@
-import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  LineChart, Line, BarChart, Bar, AreaChart, Area, PieChart, Pie, Cell,
-  XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer 
-} from 'recharts';
 import { TrendingUp, BarChart3, PieChart as PieChartIcon, Activity, Eye, EyeOff } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import {
+  LineChart, Line, BarChart, Bar, AreaChart, Area, PieChart, Pie, Cell,
+  XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
+} from 'recharts';
 
-const DataVisualization = ({ 
-  dcfData, 
-  sensitivityData, 
-  scenarioData, 
-  formatCurrency, 
-  formatPercent 
+const DataVisualization = ({
+  dcfData,
+  sensitivityData,
+  scenarioData,
+  formatCurrency,
+  formatPercent
 }) => {
   const [activeChart, setActiveChart] = useState('dcf-waterfall');
   const [showDetails, setShowDetails] = useState(true);
@@ -28,15 +28,15 @@ const DataVisualization = ({
   // Prepare DCF Waterfall Data
   const dcfWaterfallData = useMemo(() => {
     if (!dcfData?.years) return [];
-    
+
     let cumulativeValue = 0;
     const data = [];
-    
+
     // Add each year's contribution
     dcfData.years.forEach((year, index) => {
       const startValue = cumulativeValue;
       cumulativeValue += year.presentValue;
-      
+
       data.push({
         name: `Year ${year.year}`,
         value: year.presentValue,
@@ -46,11 +46,11 @@ const DataVisualization = ({
         category: 'operations'
       });
     });
-    
+
     // Add terminal value
     const terminalStart = cumulativeValue;
     cumulativeValue += dcfData.presentValueTerminal;
-    
+
     data.push({
       name: 'Terminal Value',
       value: dcfData.presentValueTerminal,
@@ -58,14 +58,14 @@ const DataVisualization = ({
       start: terminalStart,
       category: 'terminal'
     });
-    
+
     return data;
   }, [dcfData]);
 
   // Prepare Cash Flow Trend Data
   const cashFlowTrendData = useMemo(() => {
     if (!dcfData?.years) return [];
-    
+
     return dcfData.years.map((year, index) => ({
       year: `Year ${year.year}`,
       freeCashFlow: year.freeCashFlow,
@@ -80,11 +80,11 @@ const DataVisualization = ({
   // Prepare Sensitivity Tornado Data
   const sensitivityTornadoData = useMemo(() => {
     if (!sensitivityData) return [];
-    
+
     return Object.entries(sensitivityData).map(([variable, result]) => {
       const maxUpside = Math.max(...result.dataPoints.map(d => d.changeFromBase));
       const maxDownside = Math.min(...result.dataPoints.map(d => d.changeFromBase));
-      
+
       return {
         variable: result.definition.name,
         upside: maxUpside,
@@ -97,7 +97,7 @@ const DataVisualization = ({
   // Prepare Scenario Distribution Data
   const scenarioDistributionData = useMemo(() => {
     if (!scenarioData?.length) return [];
-    
+
     return scenarioData.map((scenario, index) => ({
       name: scenario.name,
       value: scenario.enterpriseValue,
@@ -152,9 +152,18 @@ const DataVisualization = ({
         <YAxis tickFormatter={(value) => formatCurrency(value)} />
         <Tooltip content={<CustomTooltip chartType="trend" />} />
         <Legend />
-        <Line type="monotone" dataKey="freeCashFlow" stroke="#10B981" strokeWidth={3} name="Free Cash Flow" />
-        <Line type="monotone" dataKey="presentValue" stroke="#3B82F6" strokeWidth={2} name="Present Value" />
-        <Line type="monotone" dataKey="revenue" stroke="#8B5CF6" strokeWidth={2} name="Revenue" />
+        <Line
+          type="monotone" dataKey="freeCashFlow" stroke="#10B981"
+          strokeWidth={3} name="Free Cash Flow"
+        />
+        <Line
+          type="monotone" dataKey="presentValue" stroke="#3B82F6"
+          strokeWidth={2} name="Present Value"
+        />
+        <Line
+          type="monotone" dataKey="revenue" stroke="#8B5CF6"
+          strokeWidth={2} name="Revenue"
+        />
       </LineChart>
     </ResponsiveContainer>
   );
@@ -162,15 +171,15 @@ const DataVisualization = ({
   // Sensitivity Tornado Chart
   const SensitivityTornadoChart = () => (
     <ResponsiveContainer width="100%" height={400}>
-      <BarChart 
-        data={sensitivityTornadoData} 
+      <BarChart
+        data={sensitivityTornadoData}
         layout="horizontal"
         margin={{ top: 20, right: 30, left: 100, bottom: 5 }}
       >
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis type="number" tickFormatter={(value) => `${value.toFixed(1)}%`} />
         <YAxis type="category" dataKey="variable" />
-        <Tooltip 
+        <Tooltip
           formatter={(value, name) => [`${value.toFixed(1)}%`, name]}
           labelFormatter={(label) => `Variable: ${label}`}
         />
@@ -200,7 +209,7 @@ const DataVisualization = ({
           <Tooltip formatter={(value) => `${value}%`} />
         </PieChart>
       </ResponsiveContainer>
-      
+
       <ResponsiveContainer width="100%" height={300}>
         <BarChart data={scenarioDistributionData}>
           <CartesianGrid strokeDasharray="3 3" />
@@ -228,8 +237,8 @@ const DataVisualization = ({
           <XAxis dataKey="name" />
           <YAxis tickFormatter={(value) => formatCurrency(value)} />
           <Tooltip content={<CustomTooltip chartType="bridge" />} />
-          <Bar 
-            dataKey="value" 
+          <Bar
+            dataKey="value"
             fill={(entry) => entry.type === 'total' ? '#1F2937' : '#3B82F6'}
           />
         </BarChart>
@@ -330,7 +339,7 @@ const DataVisualization = ({
             </span>
           )}
         </div>
-        
+
         <div className="min-h-[400px]">
           {renderChart()}
         </div>
@@ -340,15 +349,15 @@ const DataVisualization = ({
       {showDetails && (
         <div className="bg-white rounded-lg border p-6">
           <h4 className="font-semibold text-lg mb-4">Key Insights</h4>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {activeChart === 'dcf-waterfall' && (
               <>
                 <div className="p-4 bg-blue-50 rounded-lg">
                   <div className="text-sm text-blue-600 font-medium">Operations Contribution</div>
                   <div className="text-lg font-bold text-blue-800">
-                    {dcfData?.cumulativePV ? 
-                      `${((dcfData.cumulativePV / dcfData.enterpriseValue) * 100).toFixed(1)}%` : 
+                    {dcfData?.cumulativePV ?
+                      `${((dcfData.cumulativePV / dcfData.enterpriseValue) * 100).toFixed(1)}%` :
                       'N/A'
                     }
                   </div>
@@ -356,8 +365,8 @@ const DataVisualization = ({
                 <div className="p-4 bg-purple-50 rounded-lg">
                   <div className="text-sm text-purple-600 font-medium">Terminal Contribution</div>
                   <div className="text-lg font-bold text-purple-800">
-                    {dcfData?.presentValueTerminal ? 
-                      `${((dcfData.presentValueTerminal / dcfData.enterpriseValue) * 100).toFixed(1)}%` : 
+                    {dcfData?.presentValueTerminal ?
+                      `${((dcfData.presentValueTerminal / dcfData.enterpriseValue) * 100).toFixed(1)}%` :
                       'N/A'
                     }
                   </div>
@@ -365,8 +374,8 @@ const DataVisualization = ({
                 <div className="p-4 bg-green-50 rounded-lg">
                   <div className="text-sm text-green-600 font-medium">Avg. Annual FCF</div>
                   <div className="text-lg font-bold text-green-800">
-                    {dcfData?.freeCashFlows ? 
-                      formatCurrency(dcfData.freeCashFlows.reduce((a, b) => a + b, 0) / dcfData.freeCashFlows.length) : 
+                    {dcfData?.freeCashFlows ?
+                      formatCurrency(dcfData.freeCashFlows.reduce((a, b) => a + b, 0) / dcfData.freeCashFlows.length) :
                       'N/A'
                     }
                   </div>

@@ -53,6 +53,56 @@
     --color-error: #e74c3c; /* red-600 */
     --color-error-foreground: #ffffff; /* white */
   }
+
+  /* Dark mode overrides using Tailwind's class strategy: `.dark` on <html> */
+  .dark {
+    /* Core Colors */
+    --color-background: #0b1220; /* slate-950-ish */
+    --color-foreground: #e8eef6; /* light slate */
+    --color-border: #1f2a44; /* slate-800 */
+    --color-input: #0f172a; /* slate-900 */
+    --color-ring: #38bdf8; /* sky-400 */
+
+    /* Card Colors */
+    --color-card: #0e1526; /* very dark card */
+    --color-card-foreground: #e2e8f0; /* slate-200 */
+
+    /* Popover Colors */
+    --color-popover: #0e1526;
+    --color-popover-foreground: #e2e8f0;
+
+    /* Muted Colors */
+    --color-muted: #0f1a2c; /* dark muted */
+    --color-muted-foreground: #93a4bd; /* slate-400 */
+
+    /* Primary Colors */
+    --color-primary: #60a5fa; /* blue-400 */
+    --color-primary-foreground: #0b1220; /* dark bg */
+
+    /* Secondary Colors */
+    --color-secondary: #38bdf8; /* sky-400 */
+    --color-secondary-foreground: #061021;
+
+    /* Destructive Colors */
+    --color-destructive: #ef4444; /* red-500 */
+    --color-destructive-foreground: #0b1220;
+
+    /* Accent Colors */
+    --color-accent: #f59e0b; /* amber-500 */
+    --color-accent-foreground: #0b1220;
+
+    /* Success Colors */
+    --color-success: #22c55e; /* green-500 */
+    --color-success-foreground: #052014;
+
+    /* Warning Colors */
+    --color-warning: #f59e0b; /* amber-500 */
+    --color-warning-foreground: #1a1205;
+
+    /* Error Colors */
+    --color-error: #ef4444; /* red-500 */
+    --color-error-foreground: #2a0b0c;
+  }
 }
 
 @layer base {
@@ -78,6 +128,33 @@
 
   .font-mono {
     font-family: 'JetBrains Mono', monospace;
+  }
+}
+
+/* Density utilities applied app-wide when wrapper classes are present */
+@layer components {
+  /* Compact density reduces cell padding and line-height in tables */
+  .fa-density-compact table th,
+  .fa-density-compact table td {
+    padding-top: 0.5rem;   /* 8px */
+    padding-bottom: 0.5rem;/* 8px */
+  }
+
+  .fa-density-compact .responsive-table-wrapper .flex > .px-2.py-1 {
+    padding-top: 0.125rem; /* tighten small buttons in device toggle */
+    padding-bottom: 0.125rem;
+  }
+
+  .fa-density-compact .text-sm {
+    font-size: 0.85rem; /* slightly smaller */
+    line-height: 1.25rem;
+  }
+
+  /* Comfortable density is default; this class can expand padding slightly when needed */
+  .fa-density-comfortable table th,
+  .fa-density-comfortable table td {
+    padding-top: 0.875rem; /* 14px */
+    padding-bottom: 0.875rem;
   }
 }
 

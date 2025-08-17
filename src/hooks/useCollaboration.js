@@ -4,6 +4,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+
 import collaborationService from '../services/collaborationService';
 import { performanceMonitoring } from '../utils/performanceMonitoring';
 
@@ -20,22 +21,22 @@ export function useCollaboration(userId, userProfile = {}) {
   const [workspaceMembers, setWorkspaceMembers] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  
+
   const initialized = useRef(false);
 
   // Initialize collaboration service
   useEffect(() => {
     if (!userId || initialized.current) return;
 
-    const initializeService = async () => {
+    const initializeService = async() => {
       try {
         setIsLoading(true);
         setError(null);
-        
+
         await collaborationService.initialize(userId, userProfile);
         setIsInitialized(true);
         initialized.current = true;
-        
+
         // Track initialization success
         if (typeof performanceMonitoring !== 'undefined') {
           performanceMonitoring.trackCustomMetric('collaboration_hook_init_success', 1);
@@ -43,7 +44,7 @@ export function useCollaboration(userId, userProfile = {}) {
       } catch (err) {
         setError(err.message);
         console.error('Failed to initialize collaboration:', err);
-        
+
         if (typeof performanceMonitoring !== 'undefined') {
           performanceMonitoring.trackCustomMetric('collaboration_hook_init_error', 1);
         }
@@ -115,7 +116,7 @@ export function useCollaboration(userId, userProfile = {}) {
   }, [isInitialized, currentWorkspace?.id]);
 
   // Join workspace
-  const joinWorkspace = useCallback(async (workspaceId, options = {}) => {
+  const joinWorkspace = useCallback(async(workspaceId, options = {}) => {
     if (!isInitialized) {
       throw new Error('Collaboration service not initialized');
     }
@@ -123,7 +124,7 @@ export function useCollaboration(userId, userProfile = {}) {
     try {
       setIsLoading(true);
       setError(null);
-      
+
       const workspace = await collaborationService.joinWorkspace(workspaceId, options);
       return workspace;
     } catch (err) {
@@ -135,7 +136,7 @@ export function useCollaboration(userId, userProfile = {}) {
   }, [isInitialized]);
 
   // Leave workspace
-  const leaveWorkspace = useCallback(async (workspaceId) => {
+  const leaveWorkspace = useCallback(async(workspaceId) => {
     if (!isInitialized) return;
 
     try {
@@ -224,14 +225,14 @@ export function useModelSharing(workspaceId, modelId) {
     };
   }, [workspaceId, modelId]);
 
-  const shareModel = useCallback(async (modelData, permissions = {}) => {
+  const shareModel = useCallback(async(modelData, permissions = {}) => {
     if (!workspaceId || !modelId) return;
-    
+
     try {
       const sharedModel = await collaborationService.shareModel(
-        workspaceId, 
-        modelId, 
-        modelData, 
+        workspaceId,
+        modelId,
+        modelData,
         permissions
       );
       return sharedModel;
@@ -241,13 +242,13 @@ export function useModelSharing(workspaceId, modelId) {
     }
   }, [workspaceId, modelId]);
 
-  const updateModel = useCallback(async (updates) => {
+  const updateModel = useCallback(async(updates) => {
     if (!workspaceId || !modelId) return;
-    
+
     try {
       const updatedModel = await collaborationService.updateModel(
-        workspaceId, 
-        modelId, 
+        workspaceId,
+        modelId,
         updates
       );
       return updatedModel;
@@ -257,13 +258,13 @@ export function useModelSharing(workspaceId, modelId) {
     }
   }, [workspaceId, modelId]);
 
-  const addAnnotation = useCallback(async (annotation) => {
+  const addAnnotation = useCallback(async(annotation) => {
     if (!workspaceId || !modelId) return;
-    
+
     try {
       const newAnnotation = await collaborationService.addAnnotation(
-        workspaceId, 
-        modelId, 
+        workspaceId,
+        modelId,
         annotation
       );
       return newAnnotation;
@@ -387,7 +388,7 @@ export function useWorkspace(workspaceId) {
     const loadWorkspaceData = () => {
       const workspaceMembers = collaborationService.getWorkspaceMembers(workspaceId);
       const workspaceModels = collaborationService.getWorkspaceModels(workspaceId);
-      
+
       setMembers(workspaceMembers);
       setModels(workspaceModels);
       setIsLoading(false);
@@ -408,7 +409,7 @@ export function useWorkspace(workspaceId) {
           if (existing) return prev;
           return [...prev, user];
         });
-        
+
         setActivity(prev => [{
           id: `activity_${Date.now()}`,
           type: 'user_joined',
@@ -423,7 +424,7 @@ export function useWorkspace(workspaceId) {
     const handleUserLeft = ({ userId, workspaceId: wsId }) => {
       if (wsId === workspaceId) {
         setMembers(prev => prev.filter(member => member.id !== userId));
-        
+
         setActivity(prev => [{
           id: `activity_${Date.now()}`,
           type: 'user_left',
@@ -437,7 +438,7 @@ export function useWorkspace(workspaceId) {
     const handleModelShared = ({ sharedModel, workspaceId: wsId }) => {
       if (wsId === workspaceId) {
         setModels(prev => [...prev, sharedModel]);
-        
+
         setActivity(prev => [{
           id: `activity_${Date.now()}`,
           type: 'model_shared',

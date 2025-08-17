@@ -48,8 +48,8 @@ class MonitoringService {
           environment: import.meta.env.VITE_APP_ENV,
           release: import.meta.env.VITE_APP_VERSION,
           integrations: [
-            // Add performance monitoring
-            new BrowserTracing()
+            // Add performance monitoring - BrowserTracing will be imported dynamically
+            ...(window.Sentry?.BrowserTracing ? [new window.Sentry.BrowserTracing()] : [])
           ],
           tracesSampleRate: this.isProduction ? 0.1 : 1.0,
           beforeSend: event => {
@@ -88,7 +88,7 @@ class MonitoringService {
     // Initialize gtag
     window.dataLayer = window.dataLayer || [];
     function gtag() {
-      dataLayer.push(arguments);
+      window.dataLayer.push(arguments);
     }
     window.gtag = gtag;
 

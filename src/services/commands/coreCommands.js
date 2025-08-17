@@ -3,21 +3,21 @@
  * DCF, LBO, COMP, and other fundamental analysis commands
  */
 
-import { dataFetchingService } from '../dataFetching';
-import { 
-  calculateDCFValuation, 
-  calculateLBOReturns, 
+import {
+  calculateDCFValuation,
+  calculateLBOReturns,
   calculateComparableMetrics,
   formatCurrency,
   formatPercentage,
   formatNumber
 } from '../../utils/dataTransformation';
+import { dataFetchingService } from '../dataFetching';
 
 export const coreCommands = {
   DCF: {
-    execute: async (parsedCommand, context, processor) => {
+    execute: async(parsedCommand, context, processor) => {
       const [ticker] = parsedCommand.parameters;
-      
+
       if (!ticker) {
         return {
           type: 'error',
@@ -27,7 +27,7 @@ export const coreCommands = {
 
       try {
         const loadingMessage = `🔄 Building DCF model for ${ticker.toUpperCase()}...\n• Fetching financial statements\n• Calculating free cash flows\n• Determining terminal value\n• Computing present values...\n${dataFetchingService.demoMode ? '\n⚠️  Using demo data - configure API keys for live data' : '\n✅ Using live market data'}`;
-        
+
         // This would be called from the terminal to show loading
         if (context.showLoading) {
           context.showLoading(loadingMessage);
@@ -62,9 +62,9 @@ export const coreCommands = {
   },
 
   LBO: {
-    execute: async (parsedCommand, context, processor) => {
+    execute: async(parsedCommand, context, processor) => {
       const [ticker] = parsedCommand.parameters;
-      
+
       if (!ticker) {
         return {
           type: 'error',
@@ -74,7 +74,7 @@ export const coreCommands = {
 
       try {
         const loadingMessage = `🔄 Analyzing LBO potential for ${ticker.toUpperCase()}...\n• Fetching financial statements\n• Calculating debt capacity\n• Analyzing peer multiples\n• Computing returns scenarios...\n${dataFetchingService.demoMode ? '\n⚠️  Using demo data - configure API keys for live data' : '\n✅ Using live market data'}`;
-        
+
         if (context.showLoading) {
           context.showLoading(loadingMessage);
         }
@@ -122,9 +122,9 @@ export const coreCommands = {
   },
 
   COMP: {
-    execute: async (parsedCommand, context, processor) => {
+    execute: async(parsedCommand, context, processor) => {
       const [ticker] = parsedCommand.parameters;
-      
+
       if (!ticker) {
         return {
           type: 'error',
@@ -134,7 +134,7 @@ export const coreCommands = {
 
       try {
         const loadingMessage = `🔄 Building comparable company analysis for ${ticker.toUpperCase()}...\n• Identifying peer companies\n• Fetching peer financial data\n• Calculating valuation multiples\n• Generating relative analysis...\n${dataFetchingService.demoMode ? '\n⚠️  Using demo data - configure API keys for live data' : '\n✅ Using live market data'}`;
-        
+
         if (context.showLoading) {
           context.showLoading(loadingMessage);
         }
@@ -182,9 +182,9 @@ export const coreCommands = {
   },
 
   FETCH: {
-    execute: async (parsedCommand, context, processor) => {
+    execute: async(parsedCommand, context, processor) => {
       const [ticker] = parsedCommand.parameters;
-      
+
       if (!ticker) {
         return {
           type: 'error',

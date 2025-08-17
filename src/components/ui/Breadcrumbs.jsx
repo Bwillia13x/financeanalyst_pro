@@ -5,7 +5,7 @@ const LABELS = {
   'financial-model-workspace': 'Workspace',
   'real-time-market-data-center': 'Market Data',
   'scenario-analysis-sensitivity-tools': 'Analysis',
-  'private-analysis': 'Private Analysis',
+  'private-analysis': 'Private Analysis'
 };
 
 const Breadcrumbs = () => {
@@ -16,7 +16,7 @@ const Breadcrumbs = () => {
     const path = `/${segments.slice(0, idx + 1).join('/')}`;
     return {
       label: LABELS[seg] || seg.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
-      path,
+      path
     };
   });
 

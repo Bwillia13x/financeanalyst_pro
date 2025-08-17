@@ -4,7 +4,6 @@
  * Surfaces relevant metrics and customizes layouts based on usage patterns
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   User,
@@ -27,12 +26,13 @@ import {
   ArrowDown,
   MoreHorizontal
 } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
 
-const PersonalizationEngine = ({ 
-  userId, 
-  onPreferencesChange, 
+const PersonalizationEngine = ({
+  userId,
+  onPreferencesChange,
   onLayoutChange,
-  children 
+  children
 }) => {
   const [userProfile, setUserProfile] = useState(null);
   const [preferences, setPreferences] = useState({});
@@ -118,14 +118,14 @@ const PersonalizationEngine = ({
     trackFeatureUsage: (featureId, success = true) => {
       setInteractions(prev => {
         const newMap = new Map(prev.usedFeatures);
-        const current = newMap.get(featureId) || { 
-          count: 0, 
-          successRate: 1, 
+        const current = newMap.get(featureId) || {
+          count: 0,
+          successRate: 1,
           lastUsed: null,
           timeOfDay: [],
           dayOfWeek: []
         };
-        
+
         const now = new Date();
         newMap.set(featureId, {
           count: current.count + 1,
@@ -145,9 +145,9 @@ const PersonalizationEngine = ({
 
     // Metric visibility recommendations
     const metricUsage = Array.from(interactions.viewedMetrics.entries())
-      .sort(([,a], [,b]) => b.count - a.count)
+      .sort(([, a], [, b]) => b.count - a.count)
       .slice(0, 6);
-    
+
     if (metricUsage.length > 0) {
       recommendations.push({
         type: 'metric_visibility',
@@ -160,8 +160,8 @@ const PersonalizationEngine = ({
 
     // Chart type recommendations
     const chartUsage = Array.from(interactions.preferredCharts.entries())
-      .sort(([,a], [,b]) => b.count - a.count);
-    
+      .sort(([, a], [, b]) => b.count - a.count);
+
     if (chartUsage.length > 0) {
       recommendations.push({
         type: 'chart_preference',
@@ -174,9 +174,9 @@ const PersonalizationEngine = ({
 
     // Workflow recommendations
     const featureUsage = Array.from(interactions.usedFeatures.entries())
-      .sort(([,a], [,b]) => b.count - a.count)
+      .sort(([, a], [, b]) => b.count - a.count)
       .slice(0, 3);
-    
+
     if (featureUsage.length > 0) {
       recommendations.push({
         type: 'quick_access',
@@ -196,7 +196,7 @@ const PersonalizationEngine = ({
 
     // Prioritize frequently viewed metrics
     const prioritizedMetrics = Array.from(interactions.viewedMetrics.entries())
-      .sort(([,a], [,b]) => (b.count * b.avgTime) - (a.count * a.avgTime))
+      .sort(([, a], [, b]) => (b.count * b.avgTime) - (a.count * a.avgTime))
       .slice(0, 8)
       .map(([metricId]) => metricId);
 
@@ -205,7 +205,7 @@ const PersonalizationEngine = ({
     // Adapt sidebar based on usage
     const totalInteractions = Array.from(interactions.usedFeatures.values())
       .reduce((sum, feature) => sum + feature.count, 0);
-    
+
     layout.sidebarCollapsed = totalInteractions > 50; // Collapse for power users
 
     // Generate dashboard layout
@@ -262,12 +262,12 @@ const PersonalizationEngine = ({
 
   // Load user profile and preferences
   useEffect(() => {
-    const loadUserData = async () => {
+    const loadUserData = async() => {
       try {
         // In production, this would load from your backend
         const savedPreferences = localStorage.getItem(`preferences_${userId}`);
         const savedInteractions = localStorage.getItem(`interactions_${userId}`);
-        
+
         if (savedPreferences) {
           setPreferences(JSON.parse(savedPreferences));
         } else {
@@ -355,7 +355,7 @@ const PersonalizationEngine = ({
               ×
             </button>
           </div>
-          
+
           <div className="mt-3 flex space-x-1">
             {['insights', 'preferences', 'layout'].map((tab) => (
               <button

@@ -1,6 +1,6 @@
-import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Calculator, TrendingUp, DollarSign, Percent, Info, BookOpen, Settings } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
 
 const WACCCalculator = ({ modelInputs, onModelInputChange, formatPercent }) => {
   const [showDetails, setShowDetails] = useState(true);
@@ -14,15 +14,15 @@ const WACCCalculator = ({ modelInputs, onModelInputChange, formatPercent }) => {
     beta: 1.2,
     smallCompanyPremium: 3.0,
     companySpecificRisk: 2.0,
-    
+
     // Cost of Debt
     debtInterestRate: 6.5,
     taxRate: 25,
-    
+
     // Capital Structure
     marketValueEquity: 100000,
     marketValueDebt: 30000,
-    
+
     // Alternative methods
     buildUpMethod: {
       riskFreeRate: 4.5,
@@ -31,7 +31,7 @@ const WACCCalculator = ({ modelInputs, onModelInputChange, formatPercent }) => {
       industryRiskPremium: 2.0,
       companySpecificRisk: 2.0
     },
-    
+
     // Industry benchmarks
     industryWACC: 10.5,
     industryBeta: 1.1,
@@ -41,38 +41,38 @@ const WACCCalculator = ({ modelInputs, onModelInputChange, formatPercent }) => {
   // Calculate WACC components
   const waccCalculation = useMemo(() => {
     const inputs = { ...waccInputs, ...modelInputs.dcf.wacc };
-    
+
     // Cost of Equity - CAPM Method
-    const costOfEquityCAPM = inputs.riskFreeRate + 
-                            (inputs.beta * inputs.marketRiskPremium) + 
-                            inputs.smallCompanyPremium + 
+    const costOfEquityCAPM = inputs.riskFreeRate +
+                            (inputs.beta * inputs.marketRiskPremium) +
+                            inputs.smallCompanyPremium +
                             inputs.companySpecificRisk;
-    
+
     // Cost of Equity - Build-up Method
     const costOfEquityBuildUp = inputs.buildUpMethod.riskFreeRate +
                                inputs.buildUpMethod.equityRiskPremium +
                                inputs.buildUpMethod.sizeRiskPremium +
                                inputs.buildUpMethod.industryRiskPremium +
                                inputs.buildUpMethod.companySpecificRisk;
-    
+
     // Cost of Debt (after-tax)
     const costOfDebtAfterTax = inputs.debtInterestRate * (1 - inputs.taxRate / 100);
-    
+
     // Capital structure weights
     const totalCapital = inputs.marketValueEquity + inputs.marketValueDebt;
     const equityWeight = inputs.marketValueEquity / totalCapital;
     const debtWeight = inputs.marketValueDebt / totalCapital;
-    
+
     // WACC calculations
-    const waccCAPM = (costOfEquityCAPM / 100 * equityWeight) + 
+    const waccCAPM = (costOfEquityCAPM / 100 * equityWeight) +
                      (costOfDebtAfterTax / 100 * debtWeight);
-    
-    const waccBuildUp = (costOfEquityBuildUp / 100 * equityWeight) + 
+
+    const waccBuildUp = (costOfEquityBuildUp / 100 * equityWeight) +
                         (costOfDebtAfterTax / 100 * debtWeight);
-    
+
     // Risk-adjusted WACC (average of methods)
     const finalWACC = (waccCAPM + waccBuildUp) / 2;
-    
+
     return {
       costOfEquityCAPM,
       costOfEquityBuildUp,
@@ -152,7 +152,7 @@ const WACCCalculator = ({ modelInputs, onModelInputChange, formatPercent }) => {
 
       {/* Key Results */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <motion.div 
+        <motion.div
           className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-4 border border-blue-200"
           whileHover={{ y: -2 }}
         >
@@ -168,7 +168,7 @@ const WACCCalculator = ({ modelInputs, onModelInputChange, formatPercent }) => {
           </div>
         </motion.div>
 
-        <motion.div 
+        <motion.div
           className="bg-gradient-to-r from-green-50 to-green-100 rounded-lg p-4 border border-green-200"
           whileHover={{ y: -2 }}
         >
@@ -184,7 +184,7 @@ const WACCCalculator = ({ modelInputs, onModelInputChange, formatPercent }) => {
           </div>
         </motion.div>
 
-        <motion.div 
+        <motion.div
           className="bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg p-4 border border-purple-200"
           whileHover={{ y: -2 }}
         >
@@ -200,7 +200,7 @@ const WACCCalculator = ({ modelInputs, onModelInputChange, formatPercent }) => {
           </div>
         </motion.div>
 
-        <motion.div 
+        <motion.div
           className="bg-gradient-to-r from-orange-50 to-orange-100 rounded-lg p-4 border border-orange-200"
           whileHover={{ y: -2 }}
         >
@@ -243,7 +243,7 @@ const WACCCalculator = ({ modelInputs, onModelInputChange, formatPercent }) => {
         {activeTab === 'inputs' && (
           <div className="space-y-6">
             <h4 className="font-semibold text-lg">WACC Input Parameters</h4>
-            
+
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Cost of Equity - CAPM */}
               <div>
@@ -262,7 +262,7 @@ const WACCCalculator = ({ modelInputs, onModelInputChange, formatPercent }) => {
                     />
                     <span className="text-xs text-gray-500">10-year Treasury rate</span>
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Market Risk Premium (%)
@@ -276,7 +276,7 @@ const WACCCalculator = ({ modelInputs, onModelInputChange, formatPercent }) => {
                     />
                     <span className="text-xs text-gray-500">Expected market return - risk-free rate</span>
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Beta (β)
@@ -290,7 +290,7 @@ const WACCCalculator = ({ modelInputs, onModelInputChange, formatPercent }) => {
                     />
                     <span className="text-xs text-gray-500">Systematic risk relative to market</span>
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Small Company Premium (%)
@@ -304,7 +304,7 @@ const WACCCalculator = ({ modelInputs, onModelInputChange, formatPercent }) => {
                     />
                     <span className="text-xs text-gray-500">Size-related risk premium</span>
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Company-Specific Risk (%)
@@ -336,7 +336,7 @@ const WACCCalculator = ({ modelInputs, onModelInputChange, formatPercent }) => {
                       className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Market Value of Debt ($000s)
@@ -348,7 +348,7 @@ const WACCCalculator = ({ modelInputs, onModelInputChange, formatPercent }) => {
                       className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Pre-Tax Cost of Debt (%)
@@ -362,7 +362,7 @@ const WACCCalculator = ({ modelInputs, onModelInputChange, formatPercent }) => {
                     />
                     <span className="text-xs text-gray-500">Interest rate on debt</span>
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Tax Rate (%)
@@ -404,7 +404,7 @@ const WACCCalculator = ({ modelInputs, onModelInputChange, formatPercent }) => {
         {activeTab === 'calculation' && (
           <div className="space-y-6">
             <h4 className="font-semibold text-lg">WACC Calculation Breakdown</h4>
-            
+
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* CAPM Method */}
               <div className="p-6 bg-blue-50 rounded-lg border border-blue-200">
@@ -478,7 +478,7 @@ const WACCCalculator = ({ modelInputs, onModelInputChange, formatPercent }) => {
                       <span className="font-medium">{formatPercent(waccCalculation.waccCAPM)}</span>
                     </div>
                     <div className="text-xs text-gray-600">
-                      [{formatPercent(waccCalculation.costOfEquityCAPM)} × {formatPercent(waccCalculation.equityWeight)}] + 
+                      [{formatPercent(waccCalculation.costOfEquityCAPM)} × {formatPercent(waccCalculation.equityWeight)}] +
                       [{formatPercent(waccCalculation.costOfDebtAfterTax)} × {formatPercent(waccCalculation.debtWeight)}]
                     </div>
                   </div>
@@ -488,12 +488,12 @@ const WACCCalculator = ({ modelInputs, onModelInputChange, formatPercent }) => {
                       <span className="font-medium">{formatPercent(waccCalculation.waccBuildUp)}</span>
                     </div>
                     <div className="text-xs text-gray-600">
-                      [{formatPercent(waccCalculation.costOfEquityBuildUp)} × {formatPercent(waccCalculation.equityWeight)}] + 
+                      [{formatPercent(waccCalculation.costOfEquityBuildUp)} × {formatPercent(waccCalculation.equityWeight)}] +
                       [{formatPercent(waccCalculation.costOfDebtAfterTax)} × {formatPercent(waccCalculation.debtWeight)}]
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="border-t pt-4">
                   <div className="flex justify-between items-center">
                     <span className="text-lg font-semibold">Risk-Adjusted WACC:</span>
@@ -511,7 +511,7 @@ const WACCCalculator = ({ modelInputs, onModelInputChange, formatPercent }) => {
         {activeTab === 'benchmarks' && (
           <div className="space-y-6">
             <h4 className="font-semibold text-lg">Industry Benchmarks & Validation</h4>
-            
+
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="p-4 bg-blue-50 rounded-lg">
                 <h6 className="font-medium text-blue-800 mb-2">Your Company</h6>
@@ -530,7 +530,7 @@ const WACCCalculator = ({ modelInputs, onModelInputChange, formatPercent }) => {
                   </div>
                 </div>
               </div>
-              
+
               <div className="p-4 bg-green-50 rounded-lg">
                 <h6 className="font-medium text-green-800 mb-2">Industry Average</h6>
                 <div className="space-y-2 text-sm">
@@ -548,24 +548,28 @@ const WACCCalculator = ({ modelInputs, onModelInputChange, formatPercent }) => {
                   </div>
                 </div>
               </div>
-              
+
               <div className="p-4 bg-yellow-50 rounded-lg">
                 <h6 className="font-medium text-yellow-800 mb-2">Variance</h6>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span>WACC Diff:</span>
-                    <span className={`font-semibold ${
-                      waccCalculation.finalWACC > waccInputs.industryWACC ? 'text-red-600' : 'text-green-600'
-                    }`}>
+                    <span
+                      className={`font-semibold ${
+                        waccCalculation.finalWACC > waccInputs.industryWACC ? 'text-red-600' : 'text-green-600'
+                      }`}
+                    >
                       {waccCalculation.finalWACC > waccInputs.industryWACC ? '+' : ''}
                       {formatPercent(waccCalculation.finalWACC - waccInputs.industryWACC)}
                     </span>
                   </div>
                   <div className="flex justify-between">
                     <span>Beta Diff:</span>
-                    <span className={`font-semibold ${
-                      (modelInputs.dcf.wacc?.beta || waccInputs.beta) > waccInputs.industryBeta ? 'text-red-600' : 'text-green-600'
-                    }`}>
+                    <span
+                      className={`font-semibold ${
+                        (modelInputs.dcf.wacc?.beta || waccInputs.beta) > waccInputs.industryBeta ? 'text-red-600' : 'text-green-600'
+                      }`}
+                    >
                       {(modelInputs.dcf.wacc?.beta || waccInputs.beta) > waccInputs.industryBeta ? '+' : ''}
                       {((modelInputs.dcf.wacc?.beta || waccInputs.beta) - waccInputs.industryBeta).toFixed(2)}
                     </span>

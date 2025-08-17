@@ -399,6 +399,9 @@ class StorageService {
       if (key && key.startsWith(STORAGE_CONFIG.prefix)) {
         try {
           const stored = localStorage.getItem(key);
+          if (!stored) {
+            continue;
+          }
           const parsedStored = JSON.parse(stored);
           const decompressedData = await this.decompressData(
             parsedStored.data,
@@ -406,12 +409,12 @@ class StorageService {
           );
           const storageObject = JSON.parse(decompressedData);
 
-          if (storageObject.timestamp < cutoffTime) {
+          if (typeof storageObject?.timestamp === 'number' && storageObject.timestamp < cutoffTime) {
             localStorage.removeItem(key);
             cleanedCount++;
           }
         } catch (error) {
-          // Remove corrupted data
+          apiLogger.log('WARN', 'Error during cleanup, removing key', { key, error: error?.message });
           localStorage.removeItem(key);
           cleanedCount++;
         }

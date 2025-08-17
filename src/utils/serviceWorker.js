@@ -21,7 +21,7 @@ export function registerSW() {
       if (isLocalhost) {
         checkValidServiceWorker(swUrl);
         navigator.serviceWorker.ready.then(() => {
-          console.log('PWA: Service Worker ready in development mode');
+          console.warn('PWA: Service Worker ready in development mode');
         });
       } else {
         registerValidSW(swUrl);
@@ -34,7 +34,7 @@ function registerValidSW(swUrl) {
   navigator.serviceWorker
     .register(swUrl)
     .then((registration) => {
-      console.log('PWA: Service Worker registered successfully:', registration);
+      console.warn('PWA: Service Worker registered successfully:', registration);
       
       // Check for updates
       registration.addEventListener('updatefound', () => {
@@ -46,10 +46,10 @@ function registerValidSW(swUrl) {
         installingWorker.addEventListener('statechange', () => {
           if (installingWorker.state === 'installed') {
             if (navigator.serviceWorker.controller) {
-              console.log('PWA: New content available, will update on next visit');
+              console.warn('PWA: New content available, will update on next visit');
               showUpdateAvailableNotification();
             } else {
-              console.log('PWA: Content cached for offline use');
+              console.warn('PWA: Content cached for offline use');
               showCachedNotification();
             }
           }
@@ -63,7 +63,7 @@ function registerValidSW(swUrl) {
 
 function checkValidServiceWorker(swUrl) {
   fetch(swUrl, {
-    headers: { 'Service-Worker': 'script' },
+    headers: { 'Service-Worker': 'script' }
   })
     .then((response) => {
       const contentType = response.headers.get('content-type');
@@ -81,7 +81,7 @@ function checkValidServiceWorker(swUrl) {
       }
     })
     .catch(() => {
-      console.log('PWA: No internet connection found. App is running in offline mode.');
+      console.warn('PWA: No internet connection found. App is running in offline mode.');
       showOfflineNotification();
     });
 }
@@ -176,7 +176,7 @@ function showInAppNotification(title, message, type = 'info') {
 export function requestNotificationPermission() {
   if ('Notification' in window && Notification.permission === 'default') {
     Notification.requestPermission().then((permission) => {
-      console.log('PWA: Notification permission:', permission);
+      console.warn('PWA: Notification permission:', permission);
     });
   }
 }
@@ -235,20 +235,20 @@ function showInstallPrompt() {
 
 // Handle successful installation
 window.addEventListener('appinstalled', () => {
-  console.log('PWA: App was installed successfully');
+  console.warn('PWA: App was installed successfully');
   showInAppNotification(
     'App Installed',
     'FinanceAnalyst Pro has been installed successfully!',
     'success'
   );
-  deferredPromit = null;
+  deferredPrompt = null;
 });
 
 // Network status handling
 export function setupNetworkHandling() {
   function updateOnlineStatus() {
     const isOnline = navigator.onLine;
-    console.log('PWA: Network status:', isOnline ? 'online' : 'offline');
+    console.warn('PWA: Network status:', isOnline ? 'online' : 'offline');
     
     if (!isOnline) {
       showInAppNotification(
@@ -277,9 +277,9 @@ export function setupNetworkHandling() {
 
 // Initialize PWA features
 export function initializePWA() {
-  registerSW();
-  setupNetworkHandling();
-  requestNotificationPermission();
-  
-  console.log('PWA: Initialization complete');
+registerSW();
+setupNetworkHandling();
+requestNotificationPermission();
+
+console.warn('PWA: Initialization complete');
 }

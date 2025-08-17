@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, TrendingUp, Building2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
 const CompanySelector = ({ onCompanySelect }) => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -85,7 +85,7 @@ const CompanySelector = ({ onCompanySelect }) => {
   useEffect(() => {
     if (searchTerm.length > 0) {
       setIsSearching(true);
-      
+
       // Simulate API delay
       const timer = setTimeout(() => {
         const filtered = mockCompanies.filter(company =>
@@ -143,7 +143,7 @@ const CompanySelector = ({ onCompanySelect }) => {
           >
             {isSearching ? (
               <div className="p-4 text-center text-gray-500">
-                <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600" />
                 <p className="mt-2 text-sm">Searching...</p>
               </div>
             ) : (
@@ -180,13 +180,15 @@ const CompanySelector = ({ onCompanySelect }) => {
                         <div className="text-sm font-medium text-gray-900">
                           ${company.price}
                         </div>
-                        <div className={`text-xs flex items-center ${
-                          company.changePercent >= 0 ? 'text-green-600' : 'text-red-600'
-                        }`}>
-                          <TrendingUp 
+                        <div
+                          className={`text-xs flex items-center ${
+                            company.changePercent >= 0 ? 'text-green-600' : 'text-red-600'
+                          }`}
+                        >
+                          <TrendingUp
                             className={`w-3 h-3 mr-1 ${
                               company.changePercent < 0 ? 'rotate-180' : ''
-                            }`} 
+                            }`}
                           />
                           {company.changePercent >= 0 ? '+' : ''}
                           {company.changePercent.toFixed(2)}%

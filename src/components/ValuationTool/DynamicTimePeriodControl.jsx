@@ -1,13 +1,14 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { Card } from '../ui/Card';
-import Icon from '../AppIcon';
 
-const DynamicTimePeriodControl = ({ 
-  initialYears = 5, 
-  minYears = 1, 
-  maxYears = 15, 
+import Icon from '../AppIcon';
+import { Card } from '../ui/Card';
+
+const DynamicTimePeriodControl = ({
+  initialYears = 5,
+  minYears = 1,
+  maxYears = 15,
   onYearsChange,
-  className = "" 
+  className = ''
 }) => {
   const [years, setYears] = useState(initialYears);
   const [isDragging, setIsDragging] = useState(false);
@@ -32,12 +33,12 @@ const DynamicTimePeriodControl = ({
 
   const handleMouseMove = useCallback((e) => {
     if (!isDragging) return;
-    
+
     const deltaX = e.clientX - dragStartX;
     const sensitivity = 0.02; // Adjust sensitivity
     const deltaYears = deltaX * sensitivity;
     const newYears = dragStartYears + deltaYears;
-    
+
     handleYearsChange(newYears);
   }, [isDragging, dragStartX, dragStartYears, handleYearsChange]);
 
@@ -50,7 +51,7 @@ const DynamicTimePeriodControl = ({
     if (isDragging) {
       document.addEventListener('mousemove', handleMouseMove);
       document.addEventListener('mouseup', handleMouseUp);
-      
+
       return () => {
         document.removeEventListener('mousemove', handleMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);
@@ -70,7 +71,7 @@ const DynamicTimePeriodControl = ({
   const getTimelineMarkers = () => {
     const markers = [];
     const step = years <= 5 ? 1 : years <= 10 ? 2 : 3;
-    
+
     for (let i = 1; i <= years; i += step) {
       const percentage = (i / years) * 100;
       markers.push(
@@ -79,12 +80,12 @@ const DynamicTimePeriodControl = ({
           className="absolute flex flex-col items-center transform -translate-x-1/2"
           style={{ left: `${percentage}%` }}
         >
-          <div className="w-px h-3 bg-blue-400"></div>
+          <div className="w-px h-3 bg-blue-400" />
           <span className="text-xs text-gray-400 mt-1">Y{i}</span>
         </div>
       );
     }
-    
+
     return markers;
   };
 
@@ -108,21 +109,21 @@ const DynamicTimePeriodControl = ({
           <div className="relative h-12">
             {/* Timeline Track */}
             <div className="absolute top-4 left-0 right-0 h-2 bg-gray-700 rounded-full overflow-hidden">
-              <div 
+              <div
                 className="h-full bg-gradient-to-r from-blue-600 to-blue-400 rounded-full transition-all duration-200"
                 style={{ width: `${(years / maxYears) * 100}%` }}
-              ></div>
+              />
             </div>
-            
+
             {/* Draggable Handle */}
             <div
               className="absolute top-2 w-6 h-6 bg-blue-500 rounded-full border-2 border-white shadow-lg cursor-ew-resize transform -translate-x-1/2 hover:bg-blue-400 transition-colors duration-200"
               style={{ left: `${(years / maxYears) * 100}%` }}
               onMouseDown={handleMouseDown}
             >
-              <div className="absolute inset-0 rounded-full animate-pulse bg-blue-400 opacity-30"></div>
+              <div className="absolute inset-0 rounded-full animate-pulse bg-blue-400 opacity-30" />
             </div>
-            
+
             {/* Timeline Markers */}
             {getTimelineMarkers()}
           </div>
@@ -163,16 +164,16 @@ const DynamicTimePeriodControl = ({
         {/* Period Description */}
         <div className="text-center">
           <p className="text-sm text-gray-400">
-            {years <= 3 && "Short-term focus with higher accuracy"}
-            {years > 3 && years <= 7 && "Balanced projection period for most analyses"}
-            {years > 7 && years <= 10 && "Extended projection for growth companies"}
-            {years > 10 && "Long-term strategic planning horizon"}
+            {years <= 3 && 'Short-term focus with higher accuracy'}
+            {years > 3 && years <= 7 && 'Balanced projection period for most analyses'}
+            {years > 7 && years <= 10 && 'Extended projection for growth companies'}
+            {years > 10 && 'Long-term strategic planning horizon'}
           </p>
         </div>
 
         {/* Real-time Impact Indicator */}
         <div className="flex items-center justify-center space-x-2 text-xs text-gray-500">
-          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
           <span>Model updates automatically</span>
         </div>
       </div>
@@ -215,7 +216,8 @@ const DynamicTimePeriodControl = ({
           height: 8px;
           border-radius: 4px;
         }
-      `}</style>
+      `}
+      </style>
     </Card>
   );
 };

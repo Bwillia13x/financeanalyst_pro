@@ -26,7 +26,7 @@ export function usePerformanceDashboard() {
     };
 
     document.addEventListener('keydown', handleKeyDown);
-    
+
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
@@ -40,11 +40,11 @@ export function usePerformanceDashboard() {
         // This would integrate with your performance monitoring
         const webVitals = window.webVitalsData;
         if (webVitals) {
-          const hasIssues = 
+          const hasIssues =
             (webVitals.LCP && webVitals.LCP > 2500) ||
             (webVitals.FID && webVitals.FID > 100) ||
             (webVitals.CLS && webVitals.CLS > 0.1);
-          
+
           if (hasIssues) {
             console.warn('Performance issues detected. Press Ctrl/Cmd + Shift + P to open dashboard.');
           }

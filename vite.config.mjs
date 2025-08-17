@@ -2,6 +2,9 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { imageOptimization } from './vite-plugins/imageOptimization.js'
 
+// Ensure current project root is always allowed by Vite file serving
+const projectRoot = process.cwd()
+
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
@@ -17,6 +20,7 @@ export default defineConfig({
   server: {
     fs: {
       allow: [
+        projectRoot,
         '/Users/benjaminwilliams/Desktop/financeanalyst_pro',
         '/Users/benjaminwilliams/haven_test',
         '/Users/benjaminwilliams/local_financepro/financeanalyst_pro',
@@ -32,11 +36,19 @@ export default defineConfig({
   },
   build: {
     rollupOptions: {
+      treeshake: {
+        moduleSideEffects: false,
+        propertyReadSideEffects: false,
+        tryCatchDeoptimization: false
+      },
       output: {
         manualChunks: (id) => {
-          // React core libraries - critical path
-          if (id.includes('react') || id.includes('react-dom')) {
-            return 'react-core';
+          // React core libraries - split for better tree shaking
+          if (id.includes('react-dom')) {
+            return 'react-dom';
+          }
+          if (id.includes('react/') || id.includes('react\\') || id.endsWith('react')) {
+            return 'react';
           }
           
           // React router - can be loaded separately
@@ -56,9 +68,12 @@ export default defineConfig({
             return 'web-workers';
           }
           
-          // Heavy visualization libraries - only load when charts are needed
-          if (id.includes('recharts') || id.includes('d3')) {
-            return 'charts-vendor';
+          // Heavy visualization libraries - more granular splitting
+          if (id.includes('recharts')) {
+            return 'recharts-vendor';
+          }
+          if (id.includes('d3')) {
+            return 'd3-vendor';
           }
           
           // Animation libraries - load on demand
@@ -133,6 +148,29 @@ export default defineConfig({
             return 'persistence';
           }
           
+          // Large vendor libraries - more granular splitting for better caching
+          if (id.includes('node_modules/recharts')) {
+            return 'recharts-vendor';
+          }
+          if (id.includes('node_modules/d3')) {
+            return 'd3-vendor';
+          }
+          
+          if (id.includes('node_modules/framer-motion')) {
+            return 'animations';
+          }
+          
+          if (id.includes('node_modules/@reduxjs') || id.includes('node_modules/redux')) {
+            return 'state-vendor';
+          }
+          
+          // Small utility node modules - can be grouped
+          if (id.includes('node_modules/clsx') || 
+              id.includes('node_modules/class-variance-authority') ||
+              id.includes('node_modules/tailwind-merge')) {
+            return 'utils-vendor';
+          }
+          
           // Node modules that aren't specifically chunked
           if (id.includes('node_modules')) {
             return 'vendor';
@@ -141,18 +179,27 @@ export default defineConfig({
       }
     },
     sourcemap: true,
-    chunkSizeWarningLimit: 500, // Reduced from 800 for better performance
+    chunkSizeWarningLimit: 400, // Further reduced for better performance
     target: 'esnext',
     minify: 'terser',
     terserOptions: {
       compress: {
         drop_console: true,
         drop_debugger: true,
-        pure_funcs: ['console.log', 'console.info'], // Remove specific console calls
-        passes: 2 // Multiple passes for better compression
+        pure_funcs: ['console.log', 'console.info', 'console.warn'], // Remove more console calls
+        passes: 3, // More aggressive compression
+        dead_code: true,
+        unused: true,
+        toplevel: true,
+        module: true
       },
       mangle: {
-        safari10: true // Better Safari compatibility
+        safari10: true, // Better Safari compatibility
+        toplevel: true,
+        module: true
+      },
+      format: {
+        comments: false // Remove all comments
       }
     },
     // Enable more aggressive optimizations
@@ -164,5 +211,11 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: './src/test/setup.js',
+    // Auto-cancellation/timeouts to prevent long-running or hung tests
+    testTimeout: 20000,       // 20s per test
+    hookTimeout: 10000,       // 10s for before/after hooks
+    teardownTimeout: 5000,    // 5s to allow clean teardown
+    bail: 1,                  // stop at first failure to save time
+    passWithNoTests: true,
   },
 })

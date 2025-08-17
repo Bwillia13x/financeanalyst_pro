@@ -14,10 +14,10 @@ class AccessibilityTester {
         'heading-order': { enabled: true },
         'landmark-one-main': { enabled: true },
         'skip-link': { enabled: true },
-        
+
         // Disable rules that might conflict with financial widgets
         'nested-interactive': { enabled: false }, // Some financial tables need nested controls
-        
+
         ...options.rules
       },
       tags: ['wcag2a', 'wcag2aa', 'wcag21aa', 'best-practice'],
@@ -40,13 +40,13 @@ class AccessibilityTester {
     try {
       console.log('🔍 Running accessibility tests...');
       const results = await axeCore.run(element, testOptions);
-      
+
       this.lastTestResults = results;
       this.violations = results.violations;
 
       // Log results
       this.logResults(results);
-      
+
       // Report violations in development
       if (process.env.NODE_ENV === 'development') {
         this.reportViolations(results.violations);
@@ -80,7 +80,7 @@ class AccessibilityTester {
         },
         tags: ['wcag2aa', 'section508']
       },
-      
+
       'chart': {
         rules: {
           'image-alt': { enabled: true },
@@ -89,7 +89,7 @@ class AccessibilityTester {
         },
         tags: ['wcag2aa']
       },
-      
+
       'calculator': {
         rules: {
           'label': { enabled: true },
@@ -98,7 +98,7 @@ class AccessibilityTester {
         },
         tags: ['wcag2aa', 'section508']
       },
-      
+
       'modal': {
         rules: {
           'focus-trap': { enabled: true },
@@ -116,15 +116,15 @@ class AccessibilityTester {
   // Test keyboard navigation
   async testKeyboardNavigation() {
     console.log('🎹 Testing keyboard navigation...');
-    
+
     const focusableElements = this.getFocusableElements();
     const tabOrderIssues = [];
-    
+
     // Test tab order
     let previousTabIndex = -1;
     focusableElements.forEach((element, index) => {
       const tabIndex = element.tabIndex || 0;
-      
+
       if (tabIndex > 0 && tabIndex <= previousTabIndex) {
         tabOrderIssues.push({
           element: element.tagName,
@@ -134,7 +134,7 @@ class AccessibilityTester {
           issue: 'Tab order not sequential'
         });
       }
-      
+
       previousTabIndex = tabIndex;
     });
 
@@ -145,7 +145,7 @@ class AccessibilityTester {
       const hasOutline = styles.outline !== 'none' && styles.outline !== '0px';
       const hasBoxShadow = styles.boxShadow !== 'none';
       const hasBackground = styles.backgroundColor !== 'transparent';
-      
+
       if (!hasOutline && !hasBoxShadow && !hasBackground) {
         focusVisibilityIssues.push({
           element: element.tagName,
@@ -167,7 +167,7 @@ class AccessibilityTester {
   // Test color contrast for financial data
   async testColorContrast() {
     console.log('🎨 Testing color contrast...');
-    
+
     const textElements = document.querySelectorAll('p, span, div, td, th, label, button, a, h1, h2, h3, h4, h5, h6');
     const contrastIssues = [];
 
@@ -175,7 +175,7 @@ class AccessibilityTester {
       const styles = window.getComputedStyle(element);
       const textColor = styles.color;
       const backgroundColor = styles.backgroundColor;
-      
+
       // Skip if background is transparent
       if (backgroundColor === 'transparent' || backgroundColor === 'rgba(0, 0, 0, 0)') {
         return;
@@ -184,11 +184,11 @@ class AccessibilityTester {
       const contrast = this.calculateContrastRatio(textColor, backgroundColor);
       const fontSize = parseInt(styles.fontSize);
       const fontWeight = styles.fontWeight;
-      
+
       // WCAG AA requirements
       const isLargeText = fontSize >= 18 || (fontSize >= 14 && (fontWeight === 'bold' || fontWeight >= 700));
       const requiredRatio = isLargeText ? 3.0 : 4.5;
-      
+
       if (contrast < requiredRatio) {
         contrastIssues.push({
           element: element.tagName,
@@ -215,32 +215,32 @@ class AccessibilityTester {
   // Test financial forms accessibility
   async testFormAccessibility() {
     console.log('📝 Testing form accessibility...');
-    
+
     const forms = document.querySelectorAll('form');
     const formIssues = [];
 
     forms.forEach((form, formIndex) => {
       const inputs = form.querySelectorAll('input, select, textarea');
-      
+
       inputs.forEach(input => {
         const issues = [];
-        
+
         // Check for labels
         const hasLabel = this.hasAssociatedLabel(input);
         if (!hasLabel) {
           issues.push('Missing label');
         }
-        
+
         // Check for required field indication
         if (input.required && !this.hasRequiredIndication(input)) {
           issues.push('Required field not clearly indicated');
         }
-        
+
         // Check for error states
         if (input.getAttribute('aria-invalid') === 'true' && !this.hasErrorMessage(input)) {
           issues.push('Error state without error message');
         }
-        
+
         // Check for autocomplete on financial inputs
         if (this.isFinancialInput(input) && !input.autocomplete) {
           issues.push('Financial input missing autocomplete attribute');
@@ -272,7 +272,7 @@ class AccessibilityTester {
     }
 
     const { violations, passes, incomplete, inapplicable } = this.lastTestResults;
-    
+
     return {
       summary: {
         timestamp: new Date().toISOString(),
@@ -303,7 +303,7 @@ class AccessibilityTester {
 
     const { violations, passes } = this.lastTestResults;
     const totalTests = violations.length + passes.length;
-    
+
     if (totalTests === 0) return 100;
 
     // Weight violations by impact
@@ -331,7 +331,7 @@ class AccessibilityTester {
             financialContext: 'Critical for reading financial data and avoiding misinterpretation of numbers'
           });
           break;
-          
+
         case 'keyboard-navigation':
           recommendations.push({
             category: 'Keyboard Access',
@@ -341,7 +341,7 @@ class AccessibilityTester {
             financialContext: 'Essential for users who rely on keyboard navigation to access financial tools'
           });
           break;
-          
+
         case 'label':
           recommendations.push({
             category: 'Form Controls',
@@ -351,7 +351,7 @@ class AccessibilityTester {
             financialContext: 'Critical for screen readers to understand financial input requirements'
           });
           break;
-          
+
         case 'aria-hidden-focus':
           recommendations.push({
             category: 'ARIA Usage',
@@ -411,7 +411,7 @@ class AccessibilityTester {
       'textarea:not([disabled])',
       '[tabindex]:not([tabindex="-1"])'
     ];
-    
+
     return Array.from(document.querySelectorAll(focusableSelectors.join(',')));
   }
 
@@ -419,10 +419,10 @@ class AccessibilityTester {
     const id = input.id;
     const ariaLabel = input.getAttribute('aria-label');
     const ariaLabelledby = input.getAttribute('aria-labelledby');
-    
+
     if (ariaLabel || ariaLabelledby) return true;
     if (id && document.querySelector(`label[for="${id}"]`)) return true;
-    
+
     // Check for wrapping label
     const parentLabel = input.closest('label');
     return !!parentLabel;
@@ -432,14 +432,14 @@ class AccessibilityTester {
     const ariaRequired = input.getAttribute('aria-required');
     const requiredAttr = input.hasAttribute('required');
     const hasRequiredText = this.hasRequiredTextIndicator(input);
-    
+
     return ariaRequired === 'true' || requiredAttr || hasRequiredText;
   }
 
   hasRequiredTextIndicator(input) {
     const label = this.getAssociatedLabel(input);
     if (!label) return false;
-    
+
     const text = label.textContent || '';
     return text.includes('*') || text.toLowerCase().includes('required');
   }
@@ -456,8 +456,8 @@ class AccessibilityTester {
   isFinancialInput(input) {
     const financialTypes = ['number', 'email', 'tel'];
     const financialNames = ['amount', 'price', 'rate', 'percent', 'currency', 'value'];
-    
-    return financialTypes.includes(input.type) || 
+
+    return financialTypes.includes(input.type) ||
            financialNames.some(name => input.name?.toLowerCase().includes(name));
   }
 
@@ -467,7 +467,7 @@ class AccessibilityTester {
       const label = document.querySelector(`label[for="${id}"]`);
       if (label) return label;
     }
-    
+
     return input.closest('label');
   }
 
@@ -476,13 +476,13 @@ class AccessibilityTester {
     // This is a simplified version - in production use a proper color contrast library
     const rgb1 = this.parseColor(color1);
     const rgb2 = this.parseColor(color2);
-    
+
     const l1 = this.getLuminance(rgb1);
     const l2 = this.getLuminance(rgb2);
-    
+
     const lighter = Math.max(l1, l2);
     const darker = Math.min(l1, l2);
-    
+
     return (lighter + 0.05) / (darker + 0.05);
   }
 
@@ -509,7 +509,7 @@ class AccessibilityTester {
     console.log(`❌ Violations: ${results.violations.length}`);
     console.log(`⚠️  Incomplete: ${results.incomplete.length}`);
     console.log(`➖ Not applicable: ${results.inapplicable.length}`);
-    
+
     if (results.violations.length > 0) {
       console.warn('Violations found:');
       results.violations.forEach(violation => {
@@ -541,15 +541,15 @@ class AccessibilityTester {
         passes: results.passes.length,
         score: this.calculateAccessibilityScore()
       };
-      
+
       const existingReports = JSON.parse(localStorage.getItem('accessibility-reports') || '[]');
       existingReports.push(reportData);
-      
+
       // Keep only last 10 reports
       if (existingReports.length > 10) {
         existingReports.splice(0, existingReports.length - 10);
       }
-      
+
       localStorage.setItem('accessibility-reports', JSON.stringify(existingReports));
     } catch (error) {
       console.error('Failed to store accessibility results:', error);

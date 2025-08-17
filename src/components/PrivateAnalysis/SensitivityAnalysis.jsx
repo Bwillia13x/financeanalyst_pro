@@ -1,10 +1,10 @@
-import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Activity, TrendingUp, TrendingDown, Settings, BarChart3, Plus, Minus } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
 
 const SensitivityAnalysis = ({ data, modelInputs, onModelInputChange, calculateDCF, formatCurrency, formatPercent }) => {
   const [selectedVariable, setSelectedVariable] = useState(null);
-  
+
   const sensitivityConfig = modelInputs.sensitivity || {
     variables: ['revenue', 'grossMargin', 'discountRate'],
     ranges: {
@@ -16,23 +16,23 @@ const SensitivityAnalysis = ({ data, modelInputs, onModelInputChange, calculateD
 
   // Variable definitions with display names and units
   const variableDefinitions = {
-    revenue: { 
-      name: 'Revenue Growth', 
-      unit: '%', 
+    revenue: {
+      name: 'Revenue Growth',
+      unit: '%',
       description: 'Annual revenue growth rate',
       baseValue: 15,
       isPercentage: true
     },
-    grossMargin: { 
-      name: 'Gross Margin', 
-      unit: '%', 
+    grossMargin: {
+      name: 'Gross Margin',
+      unit: '%',
       description: 'Gross profit margin improvement',
       baseValue: 45,
       isPercentage: true
     },
-    discountRate: { 
-      name: 'Discount Rate (WACC)', 
-      unit: '%', 
+    discountRate: {
+      name: 'Discount Rate (WACC)',
+      unit: '%',
       description: 'Weighted average cost of capital',
       baseValue: modelInputs.dcf?.discountRate || 10,
       isPercentage: true
@@ -61,37 +61,37 @@ const SensitivityAnalysis = ({ data, modelInputs, onModelInputChange, calculateD
   // Generate sensitivity analysis data
   const sensitivityResults = useMemo(() => {
     const results = {};
-    
+
     sensitivityConfig.variables.forEach(variable => {
       const range = sensitivityConfig.ranges[variable];
       const variableDef = variableDefinitions[variable];
-      
+
       if (!range || !variableDef) return;
-      
+
       const steps = 9; // Number of data points
       const stepSize = (range.max - range.min) / (steps - 1);
       const dataPoints = [];
-      
+
       for (let i = 0; i < steps; i++) {
         const value = range.min + (stepSize * i);
-        
+
         // Create modified DCF inputs based on variable type
         let modifiedData = { ...data };
-        let dcfInputs = {
+        const dcfInputs = {
           ...modelInputs.dcf,
           [variable]: variableDef.isPercentage ? value : value
         };
-        
+
         // For revenue and margin variables, we need to simulate the impact
         if (variable === 'revenue' || variable === 'grossMargin') {
           // Create a copy of the income statement with modified values
           const incomeStatement = { ...data.statements.incomeStatement };
-          
+
           if (variable === 'revenue') {
             // Apply revenue growth change across periods
             const baseRevenue = incomeStatement.totalRevenue || {};
             const modifiedRevenue = {};
-            
+
             Object.keys(baseRevenue).forEach(periodIndex => {
               const index = parseInt(periodIndex);
               if (index === 0) {
@@ -101,16 +101,16 @@ const SensitivityAnalysis = ({ data, modelInputs, onModelInputChange, calculateD
                 modifiedRevenue[periodIndex] = baseRevenue[0] * Math.pow(growthRate, index);
               }
             });
-            
+
             incomeStatement.totalRevenue = modifiedRevenue;
           }
-          
+
           if (variable === 'grossMargin') {
             // Apply margin change to operating income
             const baseOperating = incomeStatement.operatingIncome || {};
             const baseRevenue = incomeStatement.totalRevenue || {};
             const modifiedOperating = {};
-            
+
             Object.keys(baseOperating).forEach(periodIndex => {
               const revenue = baseRevenue[periodIndex] || 0;
               const originalIncome = baseOperating[periodIndex] || 0;
@@ -122,10 +122,10 @@ const SensitivityAnalysis = ({ data, modelInputs, onModelInputChange, calculateD
                 modifiedOperating[periodIndex] = originalIncome;
               }
             });
-            
+
             incomeStatement.operatingIncome = modifiedOperating;
           }
-          
+
           modifiedData = {
             ...data,
             statements: {
@@ -134,7 +134,7 @@ const SensitivityAnalysis = ({ data, modelInputs, onModelInputChange, calculateD
             }
           };
         }
-        
+
         // Use a temporary calculateDCF with modified inputs
         const tempCalculateDCF = () => {
           try {
@@ -144,19 +144,19 @@ const SensitivityAnalysis = ({ data, modelInputs, onModelInputChange, calculateD
               projectionYears: dcfInputs.projectionYears || 5,
               taxRate: dcfInputs.taxRate || 25
             };
-            
+
             const sourceData = modifiedData;
             const operatingIncomeData = sourceData.statements.incomeStatement.operatingIncome || {};
-            
+
             // Extract operating incomes from object structure
-            let operatingIncomes = [];
+            const operatingIncomes = [];
             Object.keys(operatingIncomeData).forEach(periodKey => {
               const index = parseInt(periodKey);
               if (index >= 0) {
                 operatingIncomes.push(operatingIncomeData[periodKey] || 0);
               }
             });
-            
+
             if (operatingIncomes.length === 0) return { enterpriseValue: 0, equityValue: 0 };
 
             let presentValue = 0;
@@ -176,37 +176,37 @@ const SensitivityAnalysis = ({ data, modelInputs, onModelInputChange, calculateD
             const terminalValue = terminalCashFlow / ((dcfParams.discountRate - dcfParams.terminalGrowthRate) / 100);
             const presentTerminalValue = terminalValue / Math.pow(discountFactor, dcfParams.projectionYears);
 
-          const enterpriseValue = presentValue + presentTerminalValue;
-          
-          return {
-            enterpriseValue,
-            equityValue: enterpriseValue,
-            presentValueOperations: presentValue,
-            presentValueTerminal: presentTerminalValue,
-            terminalValue
-          };
+            const enterpriseValue = presentValue + presentTerminalValue;
+
+            return {
+              enterpriseValue,
+              equityValue: enterpriseValue,
+              presentValueOperations: presentValue,
+              presentValueTerminal: presentTerminalValue,
+              terminalValue
+            };
           } catch (error) {
             console.error('DCF calculation error:', error);
             return { enterpriseValue: 0, equityValue: 0 };
           }
         };
-        
+
         const result = tempCalculateDCF();
-        
+
         dataPoints.push({
           variable: value,
           valuation: result.enterpriseValue,
           changeFromBase: ((result.enterpriseValue - baseValuation.enterpriseValue) / baseValuation.enterpriseValue) * 100
         });
       }
-      
+
       results[variable] = {
         definition: variableDef,
-        range: range,
-        dataPoints: dataPoints
+        range,
+        dataPoints
       };
     });
-    
+
     return results;
   }, [data, modelInputs, sensitivityConfig, baseValuation, calculateDCF]);
 
@@ -260,12 +260,12 @@ const SensitivityAnalysis = ({ data, modelInputs, onModelInputChange, calculateD
       <div className="flex justify-between items-start">
         <div>
           <p className="text-gray-600 mb-4">
-            Analyze how changes in key variables impact enterprise valuation. 
+            Analyze how changes in key variables impact enterprise valuation.
             Higher sensitivity indicates greater risk and importance for due diligence.
           </p>
           <div className="flex items-center gap-4 text-sm">
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-blue-500 rounded"></div>
+              <div className="w-3 h-3 bg-blue-500 rounded" />
               <span>Base Case: {formatCurrency(baseValuation.enterpriseValue)}</span>
             </div>
             <div className="flex items-center gap-2">
@@ -288,7 +288,7 @@ const SensitivityAnalysis = ({ data, modelInputs, onModelInputChange, calculateD
           <BarChart3 size={20} />
           Impact Ranking (Tornado Chart)
         </h4>
-        
+
         <div className="space-y-3">
           {tornadoData.map((item, index) => (
             <div key={item.variable} className="relative">
@@ -296,28 +296,28 @@ const SensitivityAnalysis = ({ data, modelInputs, onModelInputChange, calculateD
                 <span className="text-sm font-medium">{index + 1}. {item.definition.name}</span>
                 <span className="text-xs text-gray-500">±{item.maxImpact.toFixed(1)}%</span>
               </div>
-              
+
               <div className="relative h-8 bg-gray-100 rounded">
                 {/* Negative impact bar */}
-                <div 
+                <div
                   className="absolute left-1/2 h-full bg-red-400 rounded-l"
                   style={{
                     width: `${Math.abs(item.negativeImpact) / Math.max(Math.abs(item.negativeImpact), item.positiveImpact) * 50}%`,
                     transform: 'translateX(-100%)'
                   }}
                 />
-                
+
                 {/* Positive impact bar */}
-                <div 
+                <div
                   className="absolute left-1/2 h-full bg-green-400 rounded-r"
                   style={{
                     width: `${item.positiveImpact / Math.max(Math.abs(item.negativeImpact), item.positiveImpact) * 50}%`
                   }}
                 />
-                
+
                 {/* Center line */}
                 <div className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-gray-400 transform -translate-x-0.5" />
-                
+
                 {/* Labels */}
                 <div className="absolute inset-0 flex items-center justify-between px-2 text-xs font-medium text-white">
                   <span>{item.negativeImpact.toFixed(1)}%</span>
@@ -332,12 +332,12 @@ const SensitivityAnalysis = ({ data, modelInputs, onModelInputChange, calculateD
       {/* Variable Configuration */}
       <div className="bg-white rounded-lg border p-6">
         <h4 className="font-semibold text-lg mb-4">Variable Configuration</h4>
-        
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {sensitivityConfig.variables.map(variable => {
             const result = sensitivityResults[variable];
             if (!result) return null;
-            
+
             return (
               <div key={variable} className="border rounded-lg p-4">
                 <div className="flex items-center justify-between mb-3">
@@ -352,7 +352,7 @@ const SensitivityAnalysis = ({ data, modelInputs, onModelInputChange, calculateD
                     <Minus size={16} />
                   </button>
                 </div>
-                
+
                 <div className="grid grid-cols-2 gap-3 mb-3">
                   <div>
                     <label className="block text-xs font-medium text-gray-700 mb-1">
@@ -379,7 +379,7 @@ const SensitivityAnalysis = ({ data, modelInputs, onModelInputChange, calculateD
                     />
                   </div>
                 </div>
-                
+
                 {/* Mini chart */}
                 <div className="h-16 bg-gray-50 rounded p-2">
                   <div className="text-xs text-gray-500 mb-1">Valuation Sensitivity</div>
@@ -388,8 +388,8 @@ const SensitivityAnalysis = ({ data, modelInputs, onModelInputChange, calculateD
                       <div
                         key={index}
                         className={`w-1 rounded-t ${
-                          point.changeFromBase > 0 ? 'bg-green-400' : 
-                          point.changeFromBase < 0 ? 'bg-red-400' : 'bg-blue-400'
+                          point.changeFromBase > 0 ? 'bg-green-400' :
+                            point.changeFromBase < 0 ? 'bg-red-400' : 'bg-blue-400'
                         }`}
                         style={{
                           height: `${Math.abs(point.changeFromBase) / 50 * 100}%`,
@@ -403,7 +403,7 @@ const SensitivityAnalysis = ({ data, modelInputs, onModelInputChange, calculateD
               </div>
             );
           })}
-          
+
           {/* Add Variable */}
           <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 flex items-center justify-center">
             <div className="text-center">
@@ -434,7 +434,7 @@ const SensitivityAnalysis = ({ data, modelInputs, onModelInputChange, calculateD
           <h4 className="font-semibold text-lg mb-4">
             Detailed Analysis: {sensitivityResults[selectedVariable].definition.name}
           </h4>
-          
+
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div>
               <h6 className="font-medium mb-3">Data Points</h6>
@@ -443,17 +443,19 @@ const SensitivityAnalysis = ({ data, modelInputs, onModelInputChange, calculateD
                   <div key={index} className="flex justify-between items-center text-sm p-2 bg-gray-50 rounded">
                     <span>{point.variable}{sensitivityResults[selectedVariable].definition.unit}</span>
                     <span className="font-medium">{formatCurrency(point.valuation)}</span>
-                    <span className={`font-medium ${
-                      point.changeFromBase > 0 ? 'text-green-600' : 
-                      point.changeFromBase < 0 ? 'text-red-600' : 'text-gray-600'
-                    }`}>
+                    <span
+                      className={`font-medium ${
+                        point.changeFromBase > 0 ? 'text-green-600' :
+                          point.changeFromBase < 0 ? 'text-red-600' : 'text-gray-600'
+                      }`}
+                    >
                       {point.changeFromBase > 0 ? '+' : ''}{point.changeFromBase.toFixed(1)}%
                     </span>
                   </div>
                 ))}
               </div>
             </div>
-            
+
             <div>
               <h6 className="font-medium mb-3">Key Statistics</h6>
               <div className="space-y-3">

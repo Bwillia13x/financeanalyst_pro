@@ -4,7 +4,9 @@ export const API_CONFIG = {
   // Alpha Vantage (Real-time market data, technical indicators)
   ALPHA_VANTAGE: {
     baseURL: 'https://www.alphavantage.co/query',
-    apiKey: import.meta.env.VITE_ALPHA_VANTAGE_API_KEY || 'demo', // Fixed for Vite
+    get apiKey() {
+      return getApiKey('ALPHA_VANTAGE');
+    }, // Dynamic key retrieval
     rateLimit: {
       requests: 5,
       period: 60000 // 5 requests per minute for free tier
@@ -21,7 +23,9 @@ export const API_CONFIG = {
   // Financial Modeling Prep (Comprehensive financial data)
   FMP: {
     baseURL: 'https://financialmodelingprep.com/api/v3',
-    apiKey: import.meta.env.VITE_FMP_API_KEY || 'demo', // Fixed for Vite
+    get apiKey() {
+      return getApiKey('FMP');
+    }, // Dynamic key retrieval
     rateLimit: {
       requests: 250,
       period: 86400000 // 250 requests per day for free tier
@@ -67,7 +71,9 @@ export const API_CONFIG = {
   // Quandl/NASDAQ Data Link (Economic and financial datasets)
   QUANDL: {
     baseURL: 'https://data.nasdaq.com/api/v3',
-    apiKey: import.meta.env.VITE_QUANDL_API_KEY || 'demo', // Fixed for Vite
+    get apiKey() {
+      return getApiKey('QUANDL');
+    }, // Dynamic key retrieval
     rateLimit: {
       requests: 50,
       period: 86400000 // 50 requests per day for free tier
@@ -77,7 +83,9 @@ export const API_CONFIG = {
   // Federal Reserve Economic Data (FRED)
   FRED: {
     baseURL: 'https://api.stlouisfed.org/fred',
-    apiKey: import.meta.env.VITE_FRED_API_KEY || 'demo', // Fixed for Vite
+    get apiKey() {
+      return getApiKey('FRED');
+    }, // Dynamic key retrieval
     rateLimit: {
       requests: 120,
       period: 60000 // 120 requests per minute
@@ -204,16 +212,54 @@ export const getEnvironmentConfig = () => {
   return configs[env] || configs.development;
 };
 
-// Helper function to get API key for a service
+// API Key validation patterns
+const API_KEY_PATTERNS = {
+  ALPHA_VANTAGE: /^[A-Z0-9]{16}$/,
+  FMP: /^[a-f0-9]{32}$/,
+  QUANDL: /^[A-Za-z0-9_-]{20}$/,
+  FRED: /^[a-f0-9]{32}$/
+};
+
+// Validate API key format
+export const validateApiKey = (service, key) => {
+  if (!key || key === 'demo') {
+    return { valid: false, reason: 'Demo key - limited functionality' };
+  }
+
+  const pattern = API_KEY_PATTERNS[service];
+  if (pattern && !pattern.test(key)) {
+    return { valid: false, reason: 'Invalid key format' };
+  }
+
+  return { valid: true };
+};
+
+// Secure API key retrieval with validation
 export const getApiKey = service => {
   const keyMap = {
-    ALPHA_VANTAGE: import.meta.env.VITE_ALPHA_VANTAGE_API_KEY, // Fixed for Vite
-    FMP: import.meta.env.VITE_FMP_API_KEY, // Fixed for Vite
-    QUANDL: import.meta.env.VITE_QUANDL_API_KEY, // Fixed for Vite
-    FRED: import.meta.env.VITE_FRED_API_KEY // Fixed for Vite
+    ALPHA_VANTAGE: import.meta.env.VITE_ALPHA_VANTAGE_API_KEY,
+    FMP: import.meta.env.VITE_FMP_API_KEY,
+    QUANDL: import.meta.env.VITE_QUANDL_API_KEY,
+    FRED: import.meta.env.VITE_FRED_API_KEY
   };
 
-  return keyMap[service] || 'demo';
+  const key = keyMap[service];
+  const validation = validateApiKey(service, key);
+
+  if (!validation.valid && import.meta.env.MODE === 'production') {
+    console.warn(`⚠️ ${service} API key validation failed: ${validation.reason}`);
+  }
+
+  return key || 'demo';
+};
+
+// Check if we're using production-ready API keys
+export const hasProductionKeys = () => {
+  const services = ['ALPHA_VANTAGE', 'FMP', 'QUANDL', 'FRED'];
+  return services.every(service => {
+    const key = getApiKey(service);
+    return validateApiKey(service, key).valid;
+  });
 };
 
 // Helper function to build request headers

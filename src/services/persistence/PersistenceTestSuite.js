@@ -3,8 +3,8 @@
  * Browser-based integration tests for the persistence layer
  */
 
-import { persistenceManager } from './PersistenceManager';
 import { backupService } from './BackupService';
+import { persistenceManager } from './PersistenceManager';
 import { privacyService } from './PrivacyService';
 import { syncService } from './SyncService';
 
@@ -25,7 +25,7 @@ export class PersistenceTestSuite {
 
     this.isRunning = true;
     this.testResults = [];
-    
+
     console.log('🧪 Starting Persistence Layer Test Suite...');
 
     try {
@@ -34,28 +34,28 @@ export class PersistenceTestSuite {
       await this.testDataStorageAndRetrieval();
       await this.testDataRemoval();
       await this.testStorageStatistics();
-      
+
       // Backup service tests
       await this.testBackupCreation();
       await this.testBackupListing();
       await this.testBackupRestore();
-      
+
       // Privacy service tests
       await this.testPrivacySettings();
       await this.testDataCleanup();
-      
+
       // Sync service tests
       await this.testSyncStatus();
-      
+
       // Integration tests
       await this.testDataLifecycle();
       await this.testErrorHandling();
 
       const passed = this.testResults.filter(r => r.passed).length;
       const total = this.testResults.length;
-      
+
       console.log(`✅ Test Suite Complete: ${passed}/${total} tests passed`);
-      
+
       return {
         passed,
         total,
@@ -82,17 +82,17 @@ export class PersistenceTestSuite {
    */
   async testPersistenceManagerInitialization() {
     const testName = 'Persistence Manager Initialization';
-    
+
     try {
       const result = await persistenceManager.initialize();
-      
+
       this.assert(
         result.success === true,
         testName,
         'Should initialize successfully',
         result
       );
-      
+
       this.assert(
         persistenceManager.isInitialized === true,
         testName,
@@ -110,7 +110,7 @@ export class PersistenceTestSuite {
    */
   async testDataStorageAndRetrieval() {
     const testName = 'Data Storage and Retrieval';
-    
+
     try {
       const testData = {
         test: true,
@@ -122,7 +122,7 @@ export class PersistenceTestSuite {
       const storeResult = await persistenceManager.store('test_data', testData, {
         storage: 'localStorage'
       });
-      
+
       this.assert(
         storeResult.success === true,
         testName,
@@ -132,7 +132,7 @@ export class PersistenceTestSuite {
 
       // Test data retrieval
       const retrievedData = await persistenceManager.retrieve('test_data');
-      
+
       this.assert(
         JSON.stringify(retrievedData) === JSON.stringify(testData),
         testName,
@@ -144,7 +144,7 @@ export class PersistenceTestSuite {
       const indexedStoreResult = await persistenceManager.store('test_indexed_data', testData, {
         storage: 'indexedDB'
       });
-      
+
       this.assert(
         indexedStoreResult.success === true,
         testName,
@@ -162,14 +162,14 @@ export class PersistenceTestSuite {
    */
   async testDataRemoval() {
     const testName = 'Data Removal';
-    
+
     try {
       // Store test data first
       await persistenceManager.store('test_removal', { data: 'to_be_removed' });
-      
+
       // Remove the data
       const removeResult = await persistenceManager.remove('test_removal');
-      
+
       this.assert(
         removeResult === true,
         testName,
@@ -179,7 +179,7 @@ export class PersistenceTestSuite {
 
       // Verify data is gone
       const retrievedData = await persistenceManager.retrieve('test_removal');
-      
+
       this.assert(
         retrievedData === null,
         testName,
@@ -197,10 +197,10 @@ export class PersistenceTestSuite {
    */
   async testStorageStatistics() {
     const testName = 'Storage Statistics';
-    
+
     try {
       const stats = await persistenceManager.getStorageStats();
-      
+
       this.assert(
         stats !== null && typeof stats === 'object',
         testName,
@@ -225,10 +225,10 @@ export class PersistenceTestSuite {
    */
   async testBackupCreation() {
     const testName = 'Backup Creation';
-    
+
     try {
       // Store some test data first
-      await persistenceManager.store('backup_test_data', { 
+      await persistenceManager.store('backup_test_data', {
         test: 'backup_data',
         timestamp: Date.now()
       });
@@ -237,7 +237,7 @@ export class PersistenceTestSuite {
         description: 'Test backup',
         compress: true
       });
-      
+
       this.assert(
         backup.success === true,
         testName,
@@ -262,10 +262,10 @@ export class PersistenceTestSuite {
    */
   async testBackupListing() {
     const testName = 'Backup Listing';
-    
+
     try {
       const backups = await backupService.listBackups();
-      
+
       this.assert(
         Array.isArray(backups),
         testName,
@@ -283,18 +283,18 @@ export class PersistenceTestSuite {
    */
   async testBackupRestore() {
     const testName = 'Backup Restore';
-    
+
     try {
       // Get available backups
       const backups = await backupService.listBackups();
-      
+
       if (backups.length > 0) {
         const backupId = backups[0].id;
-        
+
         const restoreResult = await backupService.restoreBackup(backupId, {
           overwrite: false
         });
-        
+
         this.assert(
           restoreResult.success === true,
           testName,
@@ -315,10 +315,10 @@ export class PersistenceTestSuite {
    */
   async testPrivacySettings() {
     const testName = 'Privacy Settings';
-    
+
     try {
       const settings = privacyService.getPrivacySettings();
-      
+
       this.assert(
         typeof settings === 'object',
         testName,
@@ -328,9 +328,9 @@ export class PersistenceTestSuite {
 
       // Test updating a setting
       await privacyService.updatePrivacySettings({ analytics: false });
-      
+
       const updatedSettings = privacyService.getPrivacySettings();
-      
+
       this.assert(
         updatedSettings.analytics === false,
         testName,
@@ -348,10 +348,10 @@ export class PersistenceTestSuite {
    */
   async testDataCleanup() {
     const testName = 'Data Cleanup';
-    
+
     try {
       const cleanupResult = await privacyService.cleanupExpiredData();
-      
+
       this.assert(
         typeof cleanupResult.cleaned === 'number',
         testName,
@@ -369,10 +369,10 @@ export class PersistenceTestSuite {
    */
   async testSyncStatus() {
     const testName = 'Sync Status';
-    
+
     try {
       const status = syncService.getSyncStatus();
-      
+
       this.assert(
         typeof status === 'object',
         testName,
@@ -397,40 +397,40 @@ export class PersistenceTestSuite {
    */
   async testDataLifecycle() {
     const testName = 'Data Lifecycle';
-    
+
     try {
       const testKey = 'lifecycle_test';
       const testData = { lifecycle: true, step: 1 };
 
       // Store
       await persistenceManager.store(testKey, testData);
-      
+
       // Retrieve
       const retrieved = await persistenceManager.retrieve(testKey);
-      
+
       // Update
       const updatedData = { ...testData, step: 2 };
       await persistenceManager.store(testKey, updatedData);
-      
+
       // Retrieve updated
       const retrievedUpdated = await persistenceManager.retrieve(testKey);
-      
+
       // Remove
       await persistenceManager.remove(testKey);
-      
+
       // Verify removal
       const retrievedAfterRemoval = await persistenceManager.retrieve(testKey);
-      
+
       this.assert(
-        retrieved.step === 1 && 
-        retrievedUpdated.step === 2 && 
+        retrieved.step === 1 &&
+        retrievedUpdated.step === 2 &&
         retrievedAfterRemoval === null,
         testName,
         'Should handle complete data lifecycle',
-        { 
-          initial: retrieved?.step, 
-          updated: retrievedUpdated?.step, 
-          afterRemoval: retrievedAfterRemoval 
+        {
+          initial: retrieved?.step,
+          updated: retrievedUpdated?.step,
+          afterRemoval: retrievedAfterRemoval
         }
       );
 
@@ -444,11 +444,11 @@ export class PersistenceTestSuite {
    */
   async testErrorHandling() {
     const testName = 'Error Handling';
-    
+
     try {
       // Test invalid data retrieval
       const invalidResult = await persistenceManager.retrieve('non_existent_key_12345');
-      
+
       this.assert(
         invalidResult === null,
         testName,

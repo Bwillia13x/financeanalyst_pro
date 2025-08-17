@@ -2,6 +2,8 @@
  * Performance monitoring and optimization utilities
  */
 
+import React from 'react';
+
 // Performance metrics collection
 export class PerformanceMonitor {
   constructor() {

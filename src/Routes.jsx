@@ -16,6 +16,12 @@ const ValuationToolDocs = lazy(() => import('./components/ValuationTool/Valuatio
 const ValuationToolDemo = lazy(() => import('./pages/valuation-tool-demo'));
 const PrivateAnalysis = lazy(() => import('./pages/PrivateAnalysis'));
 const FinancialInputsDemo = lazy(() => import('./components/FinancialInputsDemo'));
+
+// New Advanced Features
+const FixedIncomeAnalytics = lazy(() => import('./components/FixedIncome/FixedIncomeAnalytics'));
+const OptionsTradingDashboard = lazy(() => import('./components/Options/OptionsTradingDashboard'));
+const AdvancedRiskDashboard = lazy(() => import('./components/RiskManagement/AdvancedRiskDashboard'));
+
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 const Routes = () => {
@@ -38,6 +44,12 @@ const Routes = () => {
             <Route path="/valuation-tool/demo" element={<ValuationToolDemo />} />
             <Route path="/private-analysis" element={<PrivateAnalysis />} />
             <Route path="/financial-inputs-demo" element={<FinancialInputsDemo />} />
+
+            {/* Advanced Financial Analytics */}
+            <Route path="/fixed-income" element={<FixedIncomeAnalytics />} />
+            <Route path="/options-trading" element={<OptionsTradingDashboard />} />
+            <Route path="/risk-management" element={<AdvancedRiskDashboard />} />
+
             <Route path="*" element={<NotFound />} />
           </RouterRoutes>
         </Suspense>

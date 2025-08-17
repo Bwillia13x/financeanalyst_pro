@@ -1,5 +1,6 @@
-import React from 'react';
 import { Calculator, TrendingUp, DollarSign, Percent } from 'lucide-react';
+import React from 'react';
+
 import { cn } from '../../utils/cn';
 
 const LoadingState = ({
@@ -67,11 +68,13 @@ const LoadingState = ({
   if (type === 'inline') {
     return (
       <div className={cn('flex items-center justify-center', config.gap, className)} {...props}>
-        <div className={cn(
-          config.spinner,
-          'border-muted-foreground border-t-transparent rounded-full animate-spin',
-          variantStyles[variant]
-        )} />
+        <div
+          className={cn(
+            config.spinner,
+            'border-muted-foreground border-t-transparent rounded-full animate-spin',
+            variantStyles[variant]
+          )}
+        />
         {message && (
           <span className={cn(config.text, variantStyles[variant])}>
             {message}
@@ -93,40 +96,46 @@ const LoadingState = ({
   const displayMessage = message || defaultMessage[type];
 
   return (
-    <div className={cn(
-      'flex flex-col items-center justify-center',
-      config.padding,
-      config.gap,
-      'bg-muted/30 rounded-lg border border-dashed border-muted-foreground/30',
-      className
-    )} {...props}>
+    <div
+      className={cn(
+        'flex flex-col items-center justify-center',
+        config.padding,
+        config.gap,
+        'bg-muted/30 rounded-lg border border-dashed border-muted-foreground/30',
+        className
+      )} {...props}
+    >
       <div className="flex items-center gap-2">
         {/* Animated spinner */}
-        <div className={cn(
-          config.spinner,
-          'border-muted-foreground border-t-transparent rounded-full animate-spin',
-          variantStyles[variant]
-        )} />
-        
+        <div
+          className={cn(
+            config.spinner,
+            'border-muted-foreground border-t-transparent rounded-full animate-spin',
+            variantStyles[variant]
+          )}
+        />
+
         {/* Icon with subtle animation */}
         {showIcon && (
-          <Icon 
-            size={config.icon} 
+          <Icon
+            size={config.icon}
             className={cn(
               'animate-pulse',
               variantStyles[variant]
-            )} 
+            )}
           />
         )}
       </div>
-      
+
       {/* Loading message */}
       {displayMessage && (
-        <p className={cn(
-          config.text,
-          'font-medium text-center',
-          variantStyles[variant]
-        )}>
+        <p
+          className={cn(
+            config.text,
+            'font-medium text-center',
+            variantStyles[variant]
+          )}
+        >
           {displayMessage}
         </p>
       )}
@@ -201,8 +210,8 @@ const LoadingDots = ({
   };
 
   return (
-    <div 
-      className={cn('flex items-center gap-1', className)} 
+    <div
+      className={cn('flex items-center gap-1', className)}
       {...props}
     >
       {[0, 1, 2].map((i) => (

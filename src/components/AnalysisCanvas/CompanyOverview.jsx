@@ -1,6 +1,6 @@
-import React from 'react';
 import { motion } from 'framer-motion';
 import { TrendingUp, Building2, Calendar, DollarSign } from 'lucide-react';
+// React import not needed for modern JSX transform
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer } from 'recharts';
 
 const CompanyOverview = ({ company, compact = false }) => {
@@ -48,13 +48,15 @@ const CompanyOverview = ({ company, compact = false }) => {
           </div>
           <div className="text-right">
             <div className="text-2xl font-semibold text-gray-900">${company.price}</div>
-            <div className={`text-sm flex items-center justify-end ${
-              company.changePercent >= 0 ? 'text-green-600' : 'text-red-600'
-            }`}>
-              <TrendingUp 
+            <div
+              className={`text-sm flex items-center justify-end ${
+                company.changePercent >= 0 ? 'text-green-600' : 'text-red-600'
+              }`}
+            >
+              <TrendingUp
                 className={`w-4 h-4 mr-1 ${
                   company.changePercent < 0 ? 'rotate-180' : ''
-                }`} 
+                }`}
               />
               {company.changePercent >= 0 ? '+' : ''}
               {company.changePercent.toFixed(2)}%
@@ -86,18 +88,20 @@ const CompanyOverview = ({ company, compact = false }) => {
             </div>
           </div>
         </div>
-        
+
         <div className="text-right">
           <div className="text-4xl font-light text-gray-900 mb-1">
             ${company.price}
           </div>
-          <div className={`text-lg flex items-center justify-end ${
-            company.changePercent >= 0 ? 'text-green-600' : 'text-red-600'
-          }`}>
-            <TrendingUp 
+          <div
+            className={`text-lg flex items-center justify-end ${
+              company.changePercent >= 0 ? 'text-green-600' : 'text-red-600'
+            }`}
+          >
+            <TrendingUp
               className={`w-5 h-5 mr-2 ${
                 company.changePercent < 0 ? 'rotate-180' : ''
-              }`} 
+              }`}
             />
             {company.changePercent >= 0 ? '+' : ''}
             {company.change.toFixed(2)} ({company.changePercent.toFixed(2)}%)
@@ -119,13 +123,13 @@ const CompanyOverview = ({ company, compact = false }) => {
           <div className="h-48">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={chartData}>
-                <XAxis 
-                  dataKey="year" 
+                <XAxis
+                  dataKey="year"
                   axisLine={false}
                   tickLine={false}
                   tick={{ fontSize: 12, fill: '#6B7280' }}
                 />
-                <YAxis 
+                <YAxis
                   axisLine={false}
                   tickLine={false}
                   tick={{ fontSize: 12, fill: '#6B7280' }}
@@ -154,9 +158,11 @@ const CompanyOverview = ({ company, compact = false }) => {
             <div className="text-2xl font-semibold text-gray-900">
               {formatCurrency(company.financials?.revenue?.slice(-1)[0] || 0)}
             </div>
-            <div className={`text-sm mt-1 ${
-              revenueGrowth >= 0 ? 'text-green-600' : 'text-red-600'
-            }`}>
+            <div
+              className={`text-sm mt-1 ${
+                revenueGrowth >= 0 ? 'text-green-600' : 'text-red-600'
+              }`}
+            >
               {revenueGrowth >= 0 ? '+' : ''}{revenueGrowth.toFixed(1)}% YoY
             </div>
           </div>
@@ -192,7 +198,7 @@ const CompanyOverview = ({ company, compact = false }) => {
       {/* Analysis Ready Indicator */}
       <div className="bg-green-50 border border-green-200 rounded-2xl p-4">
         <div className="flex items-center space-x-3">
-          <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+          <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse" />
           <span className="text-sm font-medium text-green-800">
             Financial data loaded • Ready for analysis
           </span>

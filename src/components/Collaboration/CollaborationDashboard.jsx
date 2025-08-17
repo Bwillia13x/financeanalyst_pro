@@ -3,35 +3,31 @@
  * Main interface for managing workspaces, sharing models, and real-time collaboration
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Users, 
-  Share2, 
-  MessageSquare, 
-  Settings, 
-  Plus, 
-  Wifi, 
+import {
+  Users,
+  Share2,
+  MessageSquare,
+  Plus,
+  Wifi,
   WifiOff,
   Activity,
-  Eye,
   Edit3,
   Clock,
   User,
-  Globe,
-  Lock,
   ChevronRight,
-  Play,
-  Pause
+  Eye
 } from 'lucide-react';
+import { useState, useCallback } from 'react';
+
 import { useCollaboration, useWorkspace, usePresence } from '../../hooks/useCollaboration';
 import SEOHead from '../SEO/SEOHead';
 
-const CollaborationDashboard = ({ 
-  userId, 
-  userProfile, 
-  isVisible = true, 
-  onClose 
+const CollaborationDashboard = ({
+  userId,
+  userProfile,
+  isVisible = true,
+  onClose
 }) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [selectedWorkspace, setSelectedWorkspace] = useState(null);
@@ -44,31 +40,31 @@ const CollaborationDashboard = ({
     isInitialized,
     connectionStatus,
     currentWorkspace,
-    workspaceMembers,
+    _workspaceMembers,
     isLoading,
     error,
     joinWorkspace,
-    leaveWorkspace,
-    shareModel,
-    getWorkspaceModels
+    _leaveWorkspace,
+    _shareModel,
+    _getWorkspaceModels
   } = useCollaboration(userId, userProfile);
 
   const {
-    workspace,
-    members,
-    models,
-    activity,
-    isLoading: workspaceLoading
+    _workspace,
+    _members,
+    _models,
+    _activity,
+    isLoading: _workspaceLoading
   } = useWorkspace(selectedWorkspace?.id);
 
   const {
     cursors,
-    presence,
-    updateCursor
+    _presence,
+    _updateCursor
   } = usePresence(selectedWorkspace?.id);
 
   // Handle workspace creation
-  const handleCreateWorkspace = useCallback(async () => {
+  const handleCreateWorkspace = useCallback(async() => {
     if (!newWorkspaceName.trim()) return;
 
     try {
@@ -89,7 +85,7 @@ const CollaborationDashboard = ({
   }, [newWorkspaceName, joinWorkspace, userProfile.name]);
 
   // Handle workspace selection
-  const handleSelectWorkspace = useCallback(async (workspaceId) => {
+  const handleSelectWorkspace = useCallback(async(workspaceId) => {
     try {
       if (currentWorkspace?.id !== workspaceId) {
         await joinWorkspace(workspaceId);
@@ -151,12 +147,12 @@ const CollaborationDashboard = ({
       exit={{ opacity: 0, y: -20 }}
       className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50 p-4"
     >
-      <SEOHead 
+      <SEOHead
         title="Real-Time Collaboration - FinanceAnalyst Pro"
         description="Collaborate in real-time on financial models, share insights, and work together with your team"
         canonical="/collaboration"
       />
-      
+
       <motion.div
         initial={{ scale: 0.95 }}
         animate={{ scale: 1 }}
@@ -202,7 +198,7 @@ const CollaborationDashboard = ({
         {/* Loading State */}
         {isLoading && (
           <div className="flex items-center justify-center py-12">
-            <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full"></div>
+            <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full" />
             <span className="ml-3 text-gray-600">Initializing collaboration...</span>
           </div>
         )}
@@ -211,7 +207,7 @@ const CollaborationDashboard = ({
         {error && (
           <div className="bg-red-50 border border-red-200 rounded-lg p-4 m-6">
             <div className="flex items-center">
-              <div className="w-4 h-4 bg-red-500 rounded-full mr-3"></div>
+              <div className="w-4 h-4 bg-red-500 rounded-full mr-3" />
               <span className="text-red-700">{error}</span>
             </div>
           </div>
@@ -272,7 +268,7 @@ const CollaborationDashboard = ({
                           <Users className="w-8 h-8 text-blue-500" />
                         </div>
                       </div>
-                      
+
                       <div className="bg-green-50 rounded-lg p-4">
                         <div className="flex items-center justify-between">
                           <div>
@@ -284,7 +280,7 @@ const CollaborationDashboard = ({
                           <Share2 className="w-8 h-8 text-green-500" />
                         </div>
                       </div>
-                      
+
                       <div className="bg-purple-50 rounded-lg p-4">
                         <div className="flex items-center justify-between">
                           <div>
@@ -296,7 +292,7 @@ const CollaborationDashboard = ({
                           <User className="w-8 h-8 text-purple-500" />
                         </div>
                       </div>
-                      
+
                       <div className="bg-orange-50 rounded-lg p-4">
                         <div className="flex items-center justify-between">
                           <div>
@@ -342,10 +338,12 @@ const CollaborationDashboard = ({
                           }
                         ].map((activity, index) => (
                           <div key={index} className="flex items-center space-x-3 p-3 bg-white rounded-lg">
-                            <div className={`w-2 h-2 rounded-full ${
-                              activity.type === 'model_shared' ? 'bg-green-500' :
-                              activity.type === 'model_updated' ? 'bg-blue-500' : 'bg-purple-500'
-                            }`}></div>
+                            <div
+                              className={`w-2 h-2 rounded-full ${
+                                activity.type === 'model_shared' ? 'bg-green-500' :
+                                  activity.type === 'model_updated' ? 'bg-blue-500' : 'bg-purple-500'
+                              }`}
+                            />
                             <div className="flex-1">
                               <p className="text-sm text-gray-900">
                                 <span className="font-medium">{activity.user}</span> {activity.action}
@@ -444,9 +442,9 @@ const CollaborationDashboard = ({
                               <h4 className="font-semibold text-gray-900 mb-1">{workspace.name}</h4>
                               <p className="text-sm text-gray-600 line-clamp-2">{workspace.description}</p>
                             </div>
-                            <div className={`w-2 h-2 rounded-full ${workspace.isActive ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+                            <div className={`w-2 h-2 rounded-full ${workspace.isActive ? 'bg-green-500' : 'bg-gray-300'}`} />
                           </div>
-                          
+
                           <div className="flex items-center justify-between text-sm text-gray-500">
                             <div className="flex items-center space-x-4">
                               <span className="flex items-center space-x-1">
@@ -463,14 +461,16 @@ const CollaborationDashboard = ({
                               <span>{workspace.lastActivity}</span>
                             </span>
                           </div>
-                          
+
                           <div className="mt-3 pt-3 border-t border-gray-100">
                             <div className="flex items-center justify-between">
-                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                workspace.type === 'financial_analysis' ? 'bg-blue-100 text-blue-800' :
-                                workspace.type === 'risk_analysis' ? 'bg-red-100 text-red-800' :
-                                'bg-green-100 text-green-800'
-                              }`}>
+                              <span
+                                className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                  workspace.type === 'financial_analysis' ? 'bg-blue-100 text-blue-800' :
+                                    workspace.type === 'risk_analysis' ? 'bg-red-100 text-red-800' :
+                                      'bg-green-100 text-green-800'
+                                }`}
+                              >
                                 {workspace.type.replace('_', ' ')}
                               </span>
                               <ChevronRight className="w-4 h-4 text-gray-400" />
@@ -492,7 +492,7 @@ const CollaborationDashboard = ({
                     className="space-y-6"
                   >
                     <h3 className="text-lg font-semibold text-gray-900">Shared Financial Models</h3>
-                    
+
                     {/* Demo Models */}
                     <div className="space-y-4">
                       {[
@@ -535,35 +535,37 @@ const CollaborationDashboard = ({
                             <div className="flex-1">
                               <div className="flex items-center space-x-3 mb-2">
                                 <h4 className="font-semibold text-gray-900">{model.name}</h4>
-                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${ 
-                                  model.type === 'portfolio' ? 'bg-blue-100 text-blue-800' :
-                                  model.type === 'risk' ? 'bg-red-100 text-red-800' :
-                                  'bg-green-100 text-green-800'
-                                }`}>
+                                <span
+                                  className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                    model.type === 'portfolio' ? 'bg-blue-100 text-blue-800' :
+                                      model.type === 'risk' ? 'bg-red-100 text-red-800' :
+                                        'bg-green-100 text-green-800'
+                                  }`}
+                                >
                                   {model.type}
                                 </span>
                               </div>
                               <p className="text-sm text-gray-600 mb-3">{model.description}</p>
-                              
+
                               <div className="flex items-center space-x-6 text-sm text-gray-500">
                                 <span>Shared by <strong>{model.sharedBy}</strong></span>
                                 <span>in <strong>{model.workspace}</strong></span>
                                 <span>Modified {model.lastModified}</span>
                               </div>
                             </div>
-                            
+
                             <div className="flex items-center space-x-3">
                               <div className="flex items-center space-x-1 text-sm text-gray-500">
                                 <Users className="w-4 h-4" />
                                 <span>{model.collaborators}</span>
                               </div>
-                              
+
                               <div className="flex items-center space-x-1">
                                 {model.permissions === 'edit' && <Edit3 className="w-4 h-4 text-green-500" />}
                                 {model.permissions === 'view' && <Eye className="w-4 h-4 text-blue-500" />}
                                 {model.permissions === 'comment' && <MessageSquare className="w-4 h-4 text-purple-500" />}
                               </div>
-                              
+
                               <button className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition-colors">
                                 Open
                               </button>
@@ -585,7 +587,7 @@ const CollaborationDashboard = ({
                     className="space-y-6"
                   >
                     <h3 className="text-lg font-semibold text-gray-900">Live Presence & Activity</h3>
-                    
+
                     {/* Active Users */}
                     <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-4">
                       <h4 className="font-semibold text-gray-900 mb-3">Currently Online</h4>
@@ -600,7 +602,7 @@ const CollaborationDashboard = ({
                               <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold text-sm">
                                 {user.avatar}
                               </div>
-                              <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
+                              <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white" />
                             </div>
                             <div>
                               <p className="text-sm font-medium text-gray-900">{user.name}</p>
@@ -617,7 +619,7 @@ const CollaborationDashboard = ({
                       <div className="space-y-2">
                         {cursors.map((cursor, index) => (
                           <div key={index} className="flex items-center space-x-3 text-sm">
-                            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                            <div className="w-2 h-2 bg-blue-500 rounded-full" />
                             <span className="text-gray-600">
                               User {cursor.userId} at position ({cursor.position?.x || 0}, {cursor.position?.y || 0})
                             </span>

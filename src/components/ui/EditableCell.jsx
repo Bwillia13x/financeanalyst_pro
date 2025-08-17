@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
 import { Check, X, Edit2, Calculator, AlertCircle } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+
 import { cn } from '../../utils/cn';
 
 const EditableCell = ({
@@ -35,7 +36,7 @@ const EditableCell = ({
   // Format value for display
   const formatValue = (val) => {
     if (!val && val !== 0) return '—';
-    
+
     const numValue = typeof val === 'string' ? parseFloat(val) : val;
     if (isNaN(numValue)) return '—';
 
@@ -43,11 +44,11 @@ const EditableCell = ({
       case 'currency':
         const formatted = new Intl.NumberFormat(locale, {
           style: 'currency',
-          currency: currency,
+          currency,
           minimumFractionDigits: decimals,
-          maximumFractionDigits: decimals,
+          maximumFractionDigits: decimals
         }).format(numValue);
-        
+
         // For large numbers, add suffix
         const absValue = Math.abs(numValue);
         if (absValue >= 1000000) {
@@ -62,20 +63,20 @@ const EditableCell = ({
           }).format(numValue);
         }
         return formatted.replace(/\.00$/, '');
-      
+
       case 'percentage':
         return new Intl.NumberFormat(locale, {
           style: 'percent',
           minimumFractionDigits: decimals,
-          maximumFractionDigits: decimals,
+          maximumFractionDigits: decimals
         }).format(numValue / 100);
-      
+
       case 'number':
         return new Intl.NumberFormat(locale, {
           minimumFractionDigits: decimals,
-          maximumFractionDigits: decimals,
+          maximumFractionDigits: decimals
         }).format(numValue);
-      
+
       default:
         return val?.toString() || '';
     }
@@ -84,12 +85,12 @@ const EditableCell = ({
   // Parse display value to raw number
   const parseValue = (val) => {
     if (!val) return 0;
-    
+
     // Remove currency symbols, commas, and spaces
     const cleanValue = val
       .replace(/[^\d.-]/g, '')
       .replace(/,/g, '');
-    
+
     const numValue = parseFloat(cleanValue);
     return isNaN(numValue) ? 0 : numValue;
   };
@@ -97,24 +98,24 @@ const EditableCell = ({
   // Validate input
   const validateInput = (val) => {
     const numValue = type === 'text' ? val : parseValue(val);
-    
+
     if (type === 'text') return true;
-    
+
     if (!allowNegative && numValue < 0) {
       setLocalError('Negative values are not allowed');
       return false;
     }
-    
+
     if (min !== undefined && numValue < min) {
       setLocalError(`Value must be at least ${formatValue(min)}`);
       return false;
     }
-    
+
     if (max !== undefined && numValue > max) {
       setLocalError(`Value must not exceed ${formatValue(max)}`);
       return false;
     }
-    
+
     setLocalError('');
     return true;
   };
@@ -122,10 +123,10 @@ const EditableCell = ({
   // Handle edit start
   const handleEdit = () => {
     if (disabled || isFormula) return;
-    
+
     setEditingValue(value ? value.toString() : '');
     setLocalError('');
-    
+
     if (onEdit) {
       onEdit(true);
     }
@@ -134,19 +135,19 @@ const EditableCell = ({
   // Handle save
   const handleSave = () => {
     const finalValue = type === 'text' ? editingValue : parseValue(editingValue);
-    
+
     if (!validateInput(editingValue)) {
       return;
     }
-    
+
     if (onChange) {
       onChange(finalValue);
     }
-    
+
     if (onSave) {
       onSave(finalValue);
     }
-    
+
     if (onEdit) {
       onEdit(false);
     }
@@ -156,11 +157,11 @@ const EditableCell = ({
   const handleCancel = () => {
     setEditingValue('');
     setLocalError('');
-    
+
     if (onCancel) {
       onCancel();
     }
-    
+
     if (onEdit) {
       onEdit(false);
     }
@@ -169,7 +170,7 @@ const EditableCell = ({
   // Handle input change
   const handleChange = (e) => {
     const newValue = e.target.value;
-    
+
     if (type !== 'text') {
       const numericRegex = allowNegative ? /^-?\d*\.?\d*$/ : /^\d*\.?\d*$/;
       if (numericRegex.test(newValue) || newValue === '') {
@@ -254,7 +255,7 @@ const EditableCell = ({
             className
           )}
         />
-        
+
         {/* Action buttons */}
         <div className="absolute -top-2 -right-2 flex gap-1">
           <button
@@ -329,13 +330,13 @@ const EditableCell = ({
 
       {/* Edit icon */}
       {!isFormula && !disabled && showEditIcon && (
-        <Edit2 
-          size={12} 
+        <Edit2
+          size={12}
           className={cn(
             'ml-2 transition-opacity',
             isHovered ? 'opacity-60' : 'opacity-0',
             styles.editIcon
-          )} 
+          )}
         />
       )}
 

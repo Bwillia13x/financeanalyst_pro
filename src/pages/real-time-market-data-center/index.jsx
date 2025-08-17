@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 
 import Icon from '../../components/AppIcon';
-import Button from '../../components/ui/Button';
-import Header from '../../components/ui/Header';
 import SEOHead from '../../components/SEO/SEOHead';
 import Breadcrumbs from '../../components/ui/Breadcrumbs';
+import Button from '../../components/ui/Button';
+import Header from '../../components/ui/Header';
 import { useFinancialAccessibility } from '../../hooks/useAccessibility';
-import { trackFinancialComponentPerformance } from '../../utils/performanceMonitoring';
 import { dataValidationService } from '../../services/dataValidationService';
 import { enhancedApiService } from '../../services/enhancedApiService';
 import realTimeDataService from '../../services/realTimeDataService';
+import { trackFinancialComponentPerformance } from '../../utils/performanceMonitoring';
 
 import ApiStatusPanel from './components/ApiStatusPanel';
 import BulkOperationsPanel from './components/BulkOperationsPanel';

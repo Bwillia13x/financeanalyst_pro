@@ -159,14 +159,14 @@ class AIAnalyticsService {
 
     // Simulate AI pattern detection
     const patternTypes = model.patterns;
-    
+
     for (const patternType of patternTypes) {
       const confidence = this.simulatePatternDetection(prices, patternType);
-      
+
       if (confidence > 0.7) {
         patterns.push({
           type: patternType,
-          confidence: confidence,
+          confidence,
           timeframe,
           startIndex: Math.max(0, prices.length - 20),
           endIndex: prices.length - 1,
@@ -195,7 +195,7 @@ class AIAnalyticsService {
 
     for (const horizon of model.horizons) {
       const prediction = this.simulatePricePrediction(currentPrice, volatility, horizon);
-      
+
       predictions.push({
         horizon,
         predictedPrice: prediction.price,
@@ -217,7 +217,7 @@ class AIAnalyticsService {
    */
   async calculateRiskMetrics(data, riskTolerance = 'moderate') {
     const model = this.models.get('risk_assessment');
-    
+
     if (!data || !data.prices) {
       return { error: 'Insufficient data for risk analysis' };
     }
@@ -229,7 +229,7 @@ class AIAnalyticsService {
       valueAtRisk: this.calculateVaR(returns, 0.05), // 5% VaR
       conditionalVaR: this.calculateCVaR(returns, 0.05),
       sharpeRatio: this.calculateSharpeRatio(returns),
-      volatility: volatility,
+      volatility,
       beta: this.calculateBeta(returns, data.marketReturns || []),
       maxDrawdown: this.calculateMaxDrawdown(data.prices),
       riskScore: this.calculateRiskScore(volatility, riskTolerance),
@@ -270,7 +270,7 @@ class AIAnalyticsService {
     predictions.forEach(prediction => {
       if (prediction.confidence > 0.7) {
         const direction = prediction.predictedPrice > 0 ? 'upward' : 'downward';
-        
+
         insights.push({
           type: 'prediction',
           severity: prediction.confidence > 0.8 ? 'high' : 'medium',
@@ -378,11 +378,11 @@ class AIAnalyticsService {
     const timeMultiplier = this.getTimeMultiplier(horizon);
     const trend = (Math.random() - 0.5) * 0.1; // -5% to +5% trend
     const uncertainty = volatility * timeMultiplier;
-    
+
     return {
       price: currentPrice * (1 + trend),
       confidence: Math.max(0.3, 0.9 - timeMultiplier * 0.1),
-      uncertainty: uncertainty,
+      uncertainty,
       probability: Math.random() * 0.4 + 0.6, // 60-100%
       factors: ['Technical indicators', 'Market sentiment', 'Historical patterns']
     };
@@ -435,7 +435,7 @@ class AIAnalyticsService {
 
   calculateBeta(returns, marketReturns) {
     if (!marketReturns.length) return 1.0;
-    
+
     const covariance = this.calculateCovariance(returns, marketReturns);
     const marketVariance = this.calculateVariance(marketReturns);
     return marketVariance === 0 ? 1.0 : covariance / marketVariance;
@@ -444,7 +444,7 @@ class AIAnalyticsService {
   calculateMaxDrawdown(prices) {
     let maxDrawdown = 0;
     let peak = prices[0];
-    
+
     for (const price of prices) {
       if (price > peak) {
         peak = price;
@@ -452,7 +452,7 @@ class AIAnalyticsService {
       const drawdown = (peak - price) / peak;
       maxDrawdown = Math.max(maxDrawdown, drawdown);
     }
-    
+
     return maxDrawdown;
   }
 
@@ -476,14 +476,14 @@ class AIAnalyticsService {
   calculateCovariance(returns1, returns2) {
     const mean1 = returns1.reduce((sum, r) => sum + r, 0) / returns1.length;
     const mean2 = returns2.reduce((sum, r) => sum + r, 0) / returns2.length;
-    
+
     let covariance = 0;
     const length = Math.min(returns1.length, returns2.length);
-    
+
     for (let i = 0; i < length; i++) {
       covariance += (returns1[i] - mean1) * (returns2[i] - mean2);
     }
-    
+
     return covariance / length;
   }
 
@@ -496,7 +496,7 @@ class AIAnalyticsService {
     // Simplified diversification calculation
     const correlationValues = Object.values(correlations);
     if (correlationValues.length === 0) return 1.0;
-    
+
     const avgCorrelation = correlationValues.reduce((sum, corr) => sum + Math.abs(corr), 0) / correlationValues.length;
     return Math.max(0, 1 - avgCorrelation);
   }
@@ -551,7 +551,7 @@ class AIAnalyticsService {
   calculatePatternTarget(prices, patternType) {
     const currentPrice = prices[prices.length - 1];
     const volatility = this.calculateVolatility(prices);
-    
+
     const targetMultipliers = {
       'head_and_shoulders': -0.15,
       'double_top': -0.12,
@@ -560,14 +560,14 @@ class AIAnalyticsService {
       'flag_pattern': 0.05,
       'cup_and_handle': 0.20
     };
-    
+
     const multiplier = targetMultipliers[patternType] || 0;
     return currentPrice * (1 + multiplier);
   }
 
   calculateStopLoss(prices, patternType) {
     const currentPrice = prices[prices.length - 1];
-    
+
     const stopLossMultipliers = {
       'head_and_shoulders': 0.05,
       'double_top': 0.03,
@@ -576,7 +576,7 @@ class AIAnalyticsService {
       'flag_pattern': 0.02,
       'cup_and_handle': -0.05
     };
-    
+
     const multiplier = stopLossMultipliers[patternType] || 0.02;
     return currentPrice * (1 + multiplier);
   }

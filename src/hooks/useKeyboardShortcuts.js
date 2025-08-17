@@ -1,6 +1,6 @@
 import { useEffect, useCallback } from 'react';
 
-// Keyboard shortcut configuration
+// Keyboard shortcut configuration (static, app-wide)
 const SHORTCUT_CONFIG = {
   // Command Palette
   'cmd+k': { action: 'open-command-palette', description: 'Open command palette' },
@@ -32,6 +32,9 @@ const SHORTCUT_CONFIG = {
   'alt+3': { action: 'quick-company', company: 'GOOGL', description: 'Quick Google analysis' },
   'alt+4': { action: 'quick-company', company: 'AMZN', description: 'Quick Amazon analysis' }
 };
+
+// Dynamic (scoped) shortcut registry. Entries here override static ones for resolution.
+const DYNAMIC_SHORTCUTS = {};
 
 export const useKeyboardShortcuts = (handlers = {}) => {
   // Normalize key combination
@@ -76,18 +79,15 @@ export const useKeyboardShortcuts = (handlers = {}) => {
     }
 
     const keyCombo = normalizeKey(event);
-    const shortcut = SHORTCUT_CONFIG[keyCombo];
+    const shortcut = DYNAMIC_SHORTCUTS[keyCombo] || SHORTCUT_CONFIG[keyCombo];
 
     if (shortcut) {
-      event.preventDefault();
-      event.stopPropagation();
-
-      // Call the appropriate handler
+      // Call the appropriate handler, and only consume the event if a handler exists
       const handler = handlers[shortcut.action];
       if (handler) {
+        event.preventDefault();
+        event.stopPropagation();
         handler(shortcut);
-      } else {
-        console.warn(`No handler found for shortcut action: ${shortcut.action}`);
       }
     }
   }, [normalizeKey, shouldHandleShortcut, handlers]);
@@ -103,10 +103,9 @@ export const useKeyboardShortcuts = (handlers = {}) => {
 
   // Get all shortcuts for help display
   const getAllShortcuts = useCallback(() => {
-    return Object.entries(SHORTCUT_CONFIG).map(([key, config]) => ({
-      key,
-      ...config
-    }));
+    // Merge dynamic over static
+    const merged = { ...SHORTCUT_CONFIG, ...DYNAMIC_SHORTCUTS };
+    return Object.entries(merged).map(([key, config]) => ({ key, ...config }));
   }, []);
 
   // Get shortcuts by category
@@ -120,7 +119,8 @@ export const useKeyboardShortcuts = (handlers = {}) => {
       quick: []
     };
 
-    Object.entries(SHORTCUT_CONFIG).forEach(([key, config]) => {
+    const merged = { ...SHORTCUT_CONFIG, ...DYNAMIC_SHORTCUTS };
+    Object.entries(merged).forEach(([key, config]) => {
       const shortcut = { key, ...config };
 
       if (config.action === 'navigate') {
@@ -129,7 +129,12 @@ export const useKeyboardShortcuts = (handlers = {}) => {
         categories.analysis.push(shortcut);
       } else if (config.action.includes('data') || config.action === 'import-data' || config.action === 'export-data') {
         categories.data.push(shortcut);
-      } else if (config.action.includes('toggle') || config.action === 'help') {
+      } else if (
+        config.action.includes('toggle') ||
+        config.action === 'help' ||
+        config.action.startsWith('resize') ||
+        config.action.startsWith('focus')
+      ) {
         categories.view.push(shortcut);
       } else if (config.action === 'quick-company') {
         categories.quick.push(shortcut);
@@ -165,7 +170,8 @@ export const useKeyboardShortcuts = (handlers = {}) => {
 
   // Check if a key combination is available
   const isShortcutAvailable = useCallback((keyCombo) => {
-    return !SHORTCUT_CONFIG[keyCombo.toLowerCase()];
+    const k = keyCombo.toLowerCase();
+    return !SHORTCUT_CONFIG[k] && !DYNAMIC_SHORTCUTS[k];
   }, []);
 
   // Register a new shortcut (for dynamic shortcuts)
@@ -180,11 +186,26 @@ export const useKeyboardShortcuts = (handlers = {}) => {
     return true;
   }, []);
 
+  // Register a scoped (dynamic) shortcut that overrides static mapping for the current session
+  const registerScopedShortcut = useCallback((keyCombo, config) => {
+    const normalizedKey = keyCombo.toLowerCase();
+    DYNAMIC_SHORTCUTS[normalizedKey] = config;
+    return true;
+  }, []);
+
+  // Unregister a previously registered scoped shortcut
+  const unregisterScopedShortcut = useCallback((keyCombo) => {
+    const normalizedKey = keyCombo.toLowerCase();
+    delete DYNAMIC_SHORTCUTS[normalizedKey];
+  }, []);
+
   return {
     getAllShortcuts,
     getShortcutsByCategory,
     formatKeyCombo,
     isShortcutAvailable,
-    registerShortcut
+    registerShortcut,
+    registerScopedShortcut,
+    unregisterScopedShortcut
   };
 };

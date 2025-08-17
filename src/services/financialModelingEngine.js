@@ -115,6 +115,48 @@ class FinancialModelingEngine {
   }
 
   /**
+   * Calculate WACC (Weighted Average Cost of Capital)
+   * @param {Object} inputs - Financial inputs
+   * @param {Object} assumptions - Model assumptions
+   * @returns {number} WACC as decimal
+   */
+  calculateWACC(inputs, assumptions) {
+    const {
+      marketCap = 0,
+      totalDebt = 0,
+      cash = 0,
+      beta = 1.0,
+      riskFreeRate = assumptions.riskFreeRate || 0.045,
+      marketPremium = assumptions.marketPremium || 0.065,
+      taxRate = assumptions.taxRate || 0.21,
+      costOfDebt = assumptions.costOfDebt || 0.055
+    } = inputs;
+
+    // Calculate cost of equity using CAPM
+    const costOfEquity = riskFreeRate + beta * marketPremium;
+
+    // Calculate net debt
+    const netDebt = Math.max(0, totalDebt - cash);
+
+    // Calculate total value
+    const totalValue = marketCap + netDebt;
+
+    if (totalValue === 0) {
+      // Fallback to a reasonable WACC estimate
+      return costOfEquity;
+    }
+
+    // Calculate weights
+    const equityWeight = marketCap / totalValue;
+    const debtWeight = netDebt / totalValue;
+
+    // Calculate WACC
+    const wacc = (equityWeight * costOfEquity) + (debtWeight * costOfDebt * (1 - taxRate));
+
+    return Math.max(0.02, Math.min(0.25, wacc)); // Bound between 2% and 25%
+  }
+
+  /**
    * Calculate DCF for a specific scenario
    * @param {Object} inputs - Model inputs
    * @param {Object} assumptions - Scenario assumptions
@@ -129,6 +171,19 @@ class FinancialModelingEngine {
       totalDebt = 0,
       cash = 0
     } = inputs;
+
+    // Calculate WACC if not provided or use discountRate as fallback
+    let wacc = assumptions.wacc;
+    if (!wacc && assumptions.discountRate) {
+      wacc = assumptions.discountRate;
+    } else if (!wacc) {
+      wacc = this.calculateWACC(inputs, assumptions);
+    }
+
+    // Validate WACC
+    if (isNaN(wacc) || wacc <= 0) {
+      wacc = 0.1; // Default 10% WACC
+    }
 
     // Project revenues
     const revenueProjections = this.projectRevenues(
@@ -149,21 +204,27 @@ class FinancialModelingEngine {
       assumptions
     );
 
+    // Get final FCF for terminal value calculation
+    const finalFCF = fcfProjections[fcfProjections.length - 1]?.unleveredFCF || 0;
+
     // Calculate terminal value
     const terminalValue = this.calculateTerminalValue(
-      fcfProjections[fcfProjections.length - 1],
+      finalFCF,
       assumptions.terminalGrowthRate,
-      assumptions.wacc
+      wacc
     );
 
+    // Extract FCF values for present value calculation
+    const fcfValues = fcfProjections.map(fcf => fcf.unleveredFCF);
+
     // Calculate present values
-    const pvOfCashFlows = this.calculatePresentValue(fcfProjections, assumptions.wacc);
-    const pvOfTerminalValue = this.calculatePresentValue([terminalValue], assumptions.wacc, assumptions.projectionYears);
+    const pvOfCashFlows = this.calculatePresentValue(fcfValues, wacc);
+    const pvOfTerminalValue = this.calculatePresentValue([terminalValue], wacc, assumptions.projectionYears);
 
     // Calculate enterprise and equity values
     const enterpriseValue = pvOfCashFlows + pvOfTerminalValue;
     const equityValue = enterpriseValue - totalDebt + cash;
-    const pricePerShare = equityValue / sharesOutstanding;
+    const pricePerShare = sharesOutstanding > 0 ? equityValue / sharesOutstanding : 0;
 
     // Calculate valuation metrics
     const upside = currentPrice ? ((pricePerShare - currentPrice) / currentPrice) * 100 : null;
@@ -181,9 +242,9 @@ class FinancialModelingEngine {
       pricePerShare,
       currentPrice,
       upside,
-      wacc: assumptions.wacc,
+      wacc,
       terminalGrowthRate: assumptions.terminalGrowthRate,
-      impliedMultiples: this.calculateImpliedMultiples(enterpriseValue, operatingProjections)
+      impliedMultiples: this.calculateImpliedMultiples(enterpriseValue, operatingProjections, fcfProjections, currentRevenue)
     };
   }
 
@@ -251,21 +312,21 @@ class FinancialModelingEngine {
     return operatingProjections.map((projection, index) => {
       // More sophisticated CapEx modeling
       const maintenanceCapex = projection.revenue * (assumptions.maintenanceCapexRate || 0.015);
-      const growthCapex = index > 0 ? 
+      const growthCapex = index > 0 ?
         (projection.revenue - operatingProjections[index - 1].revenue) * (assumptions.growthCapexRate || 0.8) : 0;
       const totalCapex = maintenanceCapex + growthCapex;
-      
+
       // Enhanced working capital calculation
       const nwcChange = this.calculateWorkingCapitalChange(projection, operatingProjections[index - 1], assumptions);
-      
+
       // Add non-cash charges beyond depreciation
       const stockBasedComp = projection.revenue * (assumptions.stockBasedCompRate || 0.005);
       const otherNonCash = projection.revenue * (assumptions.otherNonCashRate || 0.001);
       const totalNonCash = projection.depreciation + stockBasedComp + otherNonCash;
-      
+
       // Calculate unlevered FCF
       const fcf = projection.nopat + totalNonCash - totalCapex - nwcChange;
-      
+
       return {
         year: index + 1,
         nopat: projection.nopat,
@@ -282,7 +343,7 @@ class FinancialModelingEngine {
       };
     });
   }
-  
+
   /**
    * Calculate working capital change with detailed components
    * @param {Object} currentProjection - Current year projection
@@ -294,22 +355,22 @@ class FinancialModelingEngine {
     if (!priorProjection) {
       return currentProjection.revenue * assumptions.nwcAsPercentOfRevenue;
     }
-    
+
     // Component-based NWC calculation
     const receivablesDays = assumptions.receivablesDays || 45;
     const inventoryDays = assumptions.inventoryDays || 30;
     const payablesDays = assumptions.payablesDays || 35;
-    
+
     const currentReceivables = (currentProjection.revenue * receivablesDays) / 365;
     const currentInventory = (currentProjection.revenue * inventoryDays) / 365 * (assumptions.cogsPct || 0.6);
     const currentPayables = (currentProjection.revenue * payablesDays) / 365 * (assumptions.cogsPct || 0.6);
     const currentNWC = currentReceivables + currentInventory - currentPayables;
-    
+
     const priorReceivables = (priorProjection.revenue * receivablesDays) / 365;
     const priorInventory = (priorProjection.revenue * inventoryDays) / 365 * (assumptions.cogsPct || 0.6);
     const priorPayables = (priorProjection.revenue * payablesDays) / 365 * (assumptions.cogsPct || 0.6);
     const priorNWC = priorReceivables + priorInventory - priorPayables;
-    
+
     return currentNWC - priorNWC;
   }
 
@@ -326,49 +387,49 @@ class FinancialModelingEngine {
     if (discountRate <= terminalGrowthRate) {
       throw new Error(`Discount rate (${(discountRate * 100).toFixed(2)}%) must be greater than terminal growth rate (${(terminalGrowthRate * 100).toFixed(2)}%)`);
     }
-    
+
     if (terminalGrowthRate < 0 || terminalGrowthRate > 0.05) {
       console.warn(`Terminal growth rate ${(terminalGrowthRate * 100).toFixed(2)}% is outside typical range (0-5%)`);
     }
-    
+
     if (finalFCF <= 0) {
       console.warn('Final year FCF is negative or zero, terminal value calculation may be unreliable');
     }
-    
+
     // Multiple terminal value methods
     const { method = 'gordon', exitMultiple = null, fadeToGrowth = false } = options;
-    
+
     switch (method) {
       case 'gordon':
         return (finalFCF * (1 + terminalGrowthRate)) / (discountRate - terminalGrowthRate);
-        
+
       case 'exit_multiple':
         if (exitMultiple && finalFCF > 0) {
           // Assume FCF approximates EBITDA for multiple calculation
           return finalFCF * exitMultiple;
         }
         return (finalFCF * (1 + terminalGrowthRate)) / (discountRate - terminalGrowthRate);
-        
+
       case 'fade_to_growth':
         // Implement fade-to-growth model where high growth fades to long-term rate
         const fadeYears = options.fadeYears || 5;
         const longTermGrowth = options.longTermGrowth || 0.025;
         let terminalValue = 0;
-        
+
         for (let year = 1; year <= fadeYears; year++) {
-          const fadeRate = terminalGrowthRate * Math.pow((fadeYears - year + 1) / fadeYears, 2) + 
+          const fadeRate = terminalGrowthRate * Math.pow((fadeYears - year + 1) / fadeYears, 2) +
                           longTermGrowth * Math.pow(year / fadeYears, 2);
           const yearFCF = finalFCF * Math.pow(1 + fadeRate, year);
           terminalValue += yearFCF / Math.pow(1 + discountRate, year);
         }
-        
+
         // Add perpetual value after fade period
         const finalFadeFCF = finalFCF * Math.pow(1 + longTermGrowth, fadeYears);
         const perpetualValue = finalFadeFCF / (discountRate - longTermGrowth);
         terminalValue += perpetualValue / Math.pow(1 + discountRate, fadeYears);
-        
+
         return terminalValue;
-        
+
       default:
         return (finalFCF * (1 + terminalGrowthRate)) / (discountRate - terminalGrowthRate);
     }
@@ -392,7 +453,7 @@ class FinancialModelingEngine {
    * Calculate comprehensive implied valuation multiples
    * @param {number} enterpriseValue - Enterprise value
    * @param {Array} operatingProjections - Operating projections
-   * @param {Array} fcfProjections - Free cash flow projections  
+   * @param {Array} fcfProjections - Free cash flow projections
    * @param {number} currentRevenue - Current year revenue
    * @returns {Object} Comprehensive implied multiples
    */
@@ -409,24 +470,24 @@ class FinancialModelingEngine {
       // Revenue multiples
       evToCurrentRevenue: currentRevenue ? enterpriseValue / currentRevenue : null,
       evToForwardRevenue: nextYearRevenue ? enterpriseValue / nextYearRevenue : null,
-      
+
       // EBITDA multiples
       evToCurrentEbitda: currentYearEbitda ? enterpriseValue / currentYearEbitda : null,
       evToForwardEbitda: nextYearEbitda ? enterpriseValue / nextYearEbitda : null,
-      
+
       // EBIT multiples
       evToCurrentEbit: currentYearEbit ? enterpriseValue / currentYearEbit : null,
       evToForwardEbit: nextYearEbit ? enterpriseValue / nextYearEbit : null,
-      
+
       // FCF multiples
       evToCurrentFCF: currentYearFCF ? enterpriseValue / currentYearFCF : null,
       evToForwardFCF: nextYearFCF ? enterpriseValue / nextYearFCF : null,
-      
+
       // PEG ratio approximation (P/E to Growth)
       pegRatio: this.calculatePEGRatio(operatingProjections, enterpriseValue)
     };
   }
-  
+
   /**
    * Calculate PEG ratio approximation
    * @param {Array} operatingProjections - Operating projections
@@ -435,15 +496,15 @@ class FinancialModelingEngine {
    */
   calculatePEGRatio(operatingProjections, enterpriseValue) {
     if (operatingProjections.length < 2) return null;
-    
+
     const currentEarnings = operatingProjections[0]?.nopat || 0;
     const futureEarnings = operatingProjections[operatingProjections.length - 1]?.nopat || 0;
-    
+
     if (currentEarnings <= 0 || futureEarnings <= 0) return null;
-    
+
     const growthRate = Math.pow(futureEarnings / currentEarnings, 1 / (operatingProjections.length - 1)) - 1;
     const peRatio = enterpriseValue / currentEarnings;
-    
+
     return growthRate > 0 ? peRatio / (growthRate * 100) : null;
   }
 

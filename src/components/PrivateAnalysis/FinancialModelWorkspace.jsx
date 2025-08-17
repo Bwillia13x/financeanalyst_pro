@@ -1,6 +1,6 @@
-import React, { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { FileText, TrendingUp, Building, Activity, Calculator, RefreshCw, CheckCircle, AlertCircle } from 'lucide-react';
+import React, { useState, useCallback } from 'react';
 
 const FinancialModelWorkspace = ({ data, onDataChange }) => {
   const [activeStatement, setActiveStatement] = useState('income');
@@ -17,7 +17,7 @@ const FinancialModelWorkspace = ({ data, onDataChange }) => {
     ebt: [10000, 10800, 11650, 12551, 13505],
     taxes: [2100, 2268, 2447, 2636, 2836],
     netIncome: [7900, 8532, 9203, 9915, 10669],
-    
+
     // Balance Sheet
     cash: [5000, 8532, 12735, 17650, 23319],
     accountsReceivable: [8333, 8750, 9188, 9647, 10129],
@@ -25,7 +25,7 @@ const FinancialModelWorkspace = ({ data, onDataChange }) => {
     totalCurrentAssets: [23333, 27782, 32948, 38873, 45603],
     ppe: [50000, 51850, 53543, 55070, 56423],
     totalAssets: [73333, 79632, 86491, 93943, 102026],
-    
+
     accountsPayable: [5000, 5250, 5513, 5789, 6078],
     shortTermDebt: [3000, 2000, 1000, 0, 0],
     totalCurrentLiabilities: [8000, 7250, 6513, 5789, 6078],
@@ -33,7 +33,7 @@ const FinancialModelWorkspace = ({ data, onDataChange }) => {
     totalLiabilities: [33000, 30250, 27513, 24789, 23078],
     shareholderEquity: [40333, 49382, 58978, 69154, 78948],
     totalLiabilitiesEquity: [73333, 79632, 86491, 93943, 102026],
-    
+
     // Cash Flow
     operatingCashFlow: [8567, 10233, 11345, 12464, 13584],
     capex: [-5000, -4850, -5000, -5000, -5000],
@@ -60,53 +60,53 @@ const FinancialModelWorkspace = ({ data, onDataChange }) => {
   const formatCurrency = useCallback((value) => {
     if (!value && value !== 0) return '$0';
     return new Intl.NumberFormat('en-US', {
-      style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0,
+      style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0
     }).format(value * 1000); // Convert from thousands
   }, []);
 
   const recalculateModel = useCallback(() => {
     const newData = { ...modelData };
-    
+
     // Recalculate projections based on assumptions
     for (let i = 1; i < 5; i++) {
       // Income Statement
-      newData.revenue[i] = newData.revenue[i-1] * (1 + assumptions.revenueGrowthRate);
+      newData.revenue[i] = newData.revenue[i - 1] * (1 + assumptions.revenueGrowthRate);
       newData.costOfGoodsSold[i] = newData.revenue[i] * assumptions.cogsPercentOfRevenue;
       newData.grossProfit[i] = newData.revenue[i] - newData.costOfGoodsSold[i];
-      newData.operatingExpenses[i] = newData.operatingExpenses[i-1] * (1 + assumptions.opexGrowthRate);
+      newData.operatingExpenses[i] = newData.operatingExpenses[i - 1] * (1 + assumptions.opexGrowthRate);
       newData.ebitda[i] = newData.grossProfit[i] - newData.operatingExpenses[i];
-      newData.depreciation[i] = newData.ppe[i-1] * assumptions.depreciationRate;
+      newData.depreciation[i] = newData.ppe[i - 1] * assumptions.depreciationRate;
       newData.ebit[i] = newData.ebitda[i] - newData.depreciation[i];
-      newData.interestExpense[i] = newData.longTermDebt[i-1] * 0.06;
+      newData.interestExpense[i] = newData.longTermDebt[i - 1] * 0.06;
       newData.ebt[i] = newData.ebit[i] - newData.interestExpense[i];
       newData.taxes[i] = Math.max(0, newData.ebt[i] * assumptions.taxRate);
       newData.netIncome[i] = newData.ebt[i] - newData.taxes[i];
-      
+
       // Balance Sheet
       const capex = newData.revenue[i] * assumptions.capexPercentOfRevenue;
-      newData.ppe[i] = newData.ppe[i-1] + capex - newData.depreciation[i];
-      newData.longTermDebt[i] = Math.max(0, newData.longTermDebt[i-1] - assumptions.debtPaydown);
-      newData.shortTermDebt[i] = Math.max(0, newData.shortTermDebt[i-1] - 1000);
-      
+      newData.ppe[i] = newData.ppe[i - 1] + capex - newData.depreciation[i];
+      newData.longTermDebt[i] = Math.max(0, newData.longTermDebt[i - 1] - assumptions.debtPaydown);
+      newData.shortTermDebt[i] = Math.max(0, newData.shortTermDebt[i - 1] - 1000);
+
       // Working capital (simplified)
       newData.accountsReceivable[i] = newData.revenue[i] * 0.083; // ~30 days
       newData.inventory[i] = newData.costOfGoodsSold[i] * 0.1; // ~36 days
       newData.accountsPayable[i] = newData.costOfGoodsSold[i] * 0.05; // ~18 days
-      
+
       // Cash Flow
-      const wcChange = (newData.accountsReceivable[i] - newData.accountsReceivable[i-1]) + 
-                      (newData.inventory[i] - newData.inventory[i-1]) - 
-                      (newData.accountsPayable[i] - newData.accountsPayable[i-1]);
-      
+      const wcChange = (newData.accountsReceivable[i] - newData.accountsReceivable[i - 1]) +
+                      (newData.inventory[i] - newData.inventory[i - 1]) -
+                      (newData.accountsPayable[i] - newData.accountsPayable[i - 1]);
+
       newData.operatingCashFlow[i] = newData.netIncome[i] + newData.depreciation[i] - wcChange;
       newData.capex[i] = -capex;
       newData.investingCashFlow[i] = newData.capex[i];
       newData.debtRepayment[i] = -assumptions.debtPaydown;
       newData.financingCashFlow[i] = newData.debtRepayment[i];
       newData.netCashFlow[i] = newData.operatingCashFlow[i] + newData.investingCashFlow[i] + newData.financingCashFlow[i];
-      newData.endingCash[i] = newData.cash[i-1] + newData.netCashFlow[i];
+      newData.endingCash[i] = newData.cash[i - 1] + newData.netCashFlow[i];
       newData.cash[i] = newData.endingCash[i];
-      
+
       // Complete Balance Sheet
       newData.totalCurrentAssets[i] = newData.cash[i] + newData.accountsReceivable[i] + newData.inventory[i];
       newData.totalAssets[i] = newData.totalCurrentAssets[i] + newData.ppe[i];
@@ -115,9 +115,9 @@ const FinancialModelWorkspace = ({ data, onDataChange }) => {
       newData.shareholderEquity[i] = newData.totalAssets[i] - newData.totalLiabilities[i];
       newData.totalLiabilitiesEquity[i] = newData.totalLiabilities[i] + newData.shareholderEquity[i];
     }
-    
+
     setModelData(newData);
-    
+
     // Validate model
     const errors = [];
     for (let i = 0; i < 5; i++) {
@@ -127,11 +127,11 @@ const FinancialModelWorkspace = ({ data, onDataChange }) => {
       }
     }
     setValidationErrors(errors);
-    
+
   }, [modelData, assumptions, periods]);
 
   const handleAssumptionChange = useCallback((field, value) => {
-    setAssumptions(prev => ({ ...prev, [field]: parseFloat(value) || 0 }));
+    setAssumptions(prev => ({ ...prev, [field]: parseFloat(value) / 100 || 0 }));
   }, []);
 
   const statements = [
@@ -151,7 +151,7 @@ const FinancialModelWorkspace = ({ data, onDataChange }) => {
             <p className="text-gray-600">Integrated Income Statement, Balance Sheet & Cash Flow</p>
           </div>
         </div>
-        
+
         <motion.button
           onClick={recalculateModel}
           className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg flex items-center space-x-2"
@@ -269,7 +269,7 @@ const FinancialModelWorkspace = ({ data, onDataChange }) => {
                     ))}
                   </tr>
                 ))}
-                
+
                 <tr className="bg-gray-100"><td colSpan={6} className="py-2 px-4 font-semibold">LIABILITIES & EQUITY</td></tr>
                 {[
                   { label: 'Accounts Payable', key: 'accountsPayable' },
@@ -343,15 +343,16 @@ const FinancialModelWorkspace = ({ data, onDataChange }) => {
                   { label: 'Annual Debt Paydown ($000s)', key: 'debtPaydown', isPercent: false }
                 ].map(assumption => (
                   <div key={assumption.key}>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor={assumption.key} className="block text-sm font-medium text-gray-700 mb-1">
                       {assumption.label}
                     </label>
                     <input
+                      id={assumption.key}
                       type="number"
                       step="0.01"
                       value={assumption.isPercent ? assumptions[assumption.key] * 100 : assumptions[assumption.key]}
                       onChange={(e) => handleAssumptionChange(
-                        assumption.key, 
+                        assumption.key,
                         assumption.isPercent ? (e.target.value || 0) / 100 : e.target.value
                       )}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg"
@@ -360,17 +361,17 @@ const FinancialModelWorkspace = ({ data, onDataChange }) => {
                 ))}
               </div>
             </div>
-            
+
             <div className="bg-blue-50 p-4 rounded-lg">
               <h3 className="font-semibold mb-4">Model Metrics</h3>
               <div className="space-y-3">
                 <div className="flex justify-between">
                   <span>5-Year Revenue CAGR:</span>
-                  <span className="font-medium">{((Math.pow(modelData.revenue[4] / modelData.revenue[0], 1/4) - 1) * 100).toFixed(1)}%</span>
+                  <span className="font-medium">{((Math.pow(modelData.revenue[4] / modelData.revenue[0], 1 / 4) - 1) * 100).toFixed(1)}%</span>
                 </div>
                 <div className="flex justify-between">
                   <span>5-Year EBITDA CAGR:</span>
-                  <span className="font-medium">{((Math.pow(modelData.ebitda[4] / modelData.ebitda[0], 1/4) - 1) * 100).toFixed(1)}%</span>
+                  <span className="font-medium">{((Math.pow(modelData.ebitda[4] / modelData.ebitda[0], 1 / 4) - 1) * 100).toFixed(1)}%</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Exit EBITDA Margin:</span>

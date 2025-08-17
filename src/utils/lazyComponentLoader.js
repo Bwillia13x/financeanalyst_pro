@@ -3,8 +3,43 @@
  * Provides intelligent component loading with performance optimizations
  */
 
+import PropTypes from 'prop-types';
 import React, { Suspense, memo } from 'react';
-import LoadingSpinner from '../components/ui/LoadingSpinner';
+
+import LoadingState from '../components/ui/LoadingState';
+import { trackError } from './performanceMonitoring';
+
+// Simple Error Boundary to catch lazy load/render errors
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error, info) {
+    try {
+      trackError(error, { componentStack: info?.componentStack, errorBoundary: 'LazyComponentBoundary' });
+    } catch {
+      // ignore analytics/reporting errors
+    }
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback || <div className="p-4 text-red-600">Failed to load component</div>;
+    }
+    return this.props.children;
+  }
+}
+
+ErrorBoundary.propTypes = {
+  fallback: PropTypes.node,
+  children: PropTypes.node
+};
 
 /**
  * Enhanced lazy loading with custom fallback and error handling
@@ -14,31 +49,31 @@ export const createLazyComponent = (
   options = {}
 ) => {
   const {
-    fallback = <LoadingSpinner />,
-    errorFallback = <div className="p-4 text-red-600">Failed to load component</div>,
+    fallback = <LoadingState />,
+    _errorFallback = <div className="p-4 text-red-600">Failed to load component</div>,
     preload = false,
     retryAttempts = 3,
     retryDelay = 1000
   } = options;
 
   // Create the lazy component with retry logic
-  const LazyComponent = React.lazy(async () => {
+  const LazyComponent = React.lazy(async() => {
     let lastError;
-    
+
     for (let attempt = 0; attempt < retryAttempts; attempt++) {
       try {
         const module = await importFunction();
         return module;
       } catch (error) {
         lastError = error;
-        
+
         if (attempt < retryAttempts - 1) {
           // Wait before retrying
           await new Promise(resolve => setTimeout(resolve, retryDelay * (attempt + 1)));
         }
       }
     }
-    
+
     // If all retries failed, throw the last error
     throw lastError;
   });
@@ -55,13 +90,17 @@ export const createLazyComponent = (
 
   // Return a wrapped component with Suspense and error boundary
   const WrappedComponent = memo((props) => (
-    <Suspense fallback={fallback}>
-      <LazyComponent {...props} />
-    </Suspense>
+    <ErrorBoundary fallback={_errorFallback}>
+      <Suspense fallback={fallback}>
+        <LazyComponent {...props} />
+      </Suspense>
+    </ErrorBoundary>
   ));
 
   // Add preload method to the component
   WrappedComponent.preload = () => importFunction();
+  // Set display name for better debugging
+  WrappedComponent.displayName = options.displayName || 'LazyLoadedComponent';
 
   return WrappedComponent;
 };
@@ -73,67 +112,67 @@ export const LazyFinancialComponents = {
   // Heavy calculation components
   AdvancedDCF: createLazyComponent(
     () => import('../components/PrivateAnalysis/AdvancedDCF'),
-    { 
-      fallback: <div className="p-8"><LoadingSpinner message="Loading DCF Calculator..." /></div>,
+    {
+      fallback: <div className="p-8"><LoadingState message="Loading DCF Calculator..." /></div>,
       preload: false // Only load when needed
     }
   ),
 
   AdvancedLBOTool: createLazyComponent(
     () => import('../components/PrivateAnalysis/AdvancedLBOTool'),
-    { 
-      fallback: <div className="p-8"><LoadingSpinner message="Loading LBO Tool..." /></div>
+    {
+      fallback: <div className="p-8"><LoadingState message="Loading LBO Tool..." /></div>
     }
   ),
 
   MonteCarloSimulation: createLazyComponent(
     () => import('../components/PrivateAnalysis/MonteCarloSimulation'),
-    { 
-      fallback: <div className="p-8"><LoadingSpinner message="Loading Monte Carlo Simulation..." /></div>
+    {
+      fallback: <div className="p-8"><LoadingState message="Loading Monte Carlo Simulation..." /></div>
     }
   ),
 
   EnhancedScenarioAnalysis: createLazyComponent(
     () => import('../components/PrivateAnalysis/EnhancedScenarioAnalysis'),
-    { 
-      fallback: <div className="p-8"><LoadingSpinner message="Loading Scenario Analysis..." /></div>
+    {
+      fallback: <div className="p-8"><LoadingState message="Loading Scenario Analysis..." /></div>
     }
   ),
 
   // Chart components
   DataVisualization: createLazyComponent(
     () => import('../components/PrivateAnalysis/DataVisualization'),
-    { 
-      fallback: <div className="p-4"><LoadingSpinner message="Loading Charts..." /></div>
+    {
+      fallback: <div className="p-4"><LoadingState message="Loading Charts..." /></div>
     }
   ),
 
   DCFWaterfall: createLazyComponent(
     () => import('../components/ui/charts/DCFWaterfall'),
-    { 
-      fallback: <div className="h-64 flex items-center justify-center"><LoadingSpinner /></div>
+    {
+      fallback: <div className="h-64 flex items-center justify-center"><LoadingState /></div>
     }
   ),
 
   MetricsDashboard: createLazyComponent(
     () => import('../components/ui/charts/MetricsDashboard'),
-    { 
-      fallback: <div className="h-96 flex items-center justify-center"><LoadingSpinner /></div>
+    {
+      fallback: <div className="h-96 flex items-center justify-center"><LoadingState /></div>
     }
   ),
 
   // AI and Business Intelligence
   AIAnalyticsDashboard: createLazyComponent(
     () => import('../components/AIAnalytics/AIAnalyticsDashboard'),
-    { 
-      fallback: <div className="p-8"><LoadingSpinner message="Loading AI Analytics..." /></div>
+    {
+      fallback: <div className="p-8"><LoadingState message="Loading AI Analytics..." /></div>
     }
   ),
 
   BusinessIntelligenceDashboard: createLazyComponent(
     () => import('../components/BusinessIntelligence/BusinessIntelligenceDashboard'),
-    { 
-      fallback: <div className="p-8"><LoadingSpinner message="Loading Business Intelligence..." /></div>
+    {
+      fallback: <div className="p-8"><LoadingState message="Loading Business Intelligence..." /></div>
     }
   )
 };
@@ -166,7 +205,7 @@ export const preloadComponentsForRoute = (routeName) => {
   };
 
   const componentsToPreload = preloadMap[routeName] || [];
-  
+
   componentsToPreload.forEach(componentName => {
     if (LazyFinancialComponents[componentName]?.preload) {
       LazyFinancialComponents[componentName].preload();
@@ -184,10 +223,10 @@ export const createIntersectionObserverLazy = (
   const {
     rootMargin = '50px',
     threshold = 0.1,
-    fallback = <LoadingSpinner />
+    fallback = <LoadingState />
   } = options;
 
-  return React.forwardRef((props, ref) => {
+  const IntersectionObserverLazy = React.forwardRef((props, ref) => {
     const [isIntersecting, setIsIntersecting] = React.useState(false);
     const [Component, setComponent] = React.useState(null);
     const elementRef = React.useRef();
@@ -210,13 +249,14 @@ export const createIntersectionObserverLazy = (
         { rootMargin, threshold }
       );
 
-      if (elementRef.current) {
-        observer.observe(elementRef.current);
+      const current = elementRef.current;
+      if (current) {
+        observer.observe(current);
       }
 
       return () => {
-        if (elementRef.current) {
-          observer.unobserve(elementRef.current);
+        if (current) {
+          observer.unobserve(current);
         }
       };
     }, [Component]);
@@ -231,6 +271,11 @@ export const createIntersectionObserverLazy = (
 
     return <Component {...props} ref={ref} />;
   });
+
+  // Set display name for better debugging
+  IntersectionObserverLazy.displayName = options.displayName || 'IntersectionObserverLazy';
+
+  return IntersectionObserverLazy;
 };
 
 /**
@@ -246,7 +291,7 @@ export const createProgressiveLoader = (dataLoader, options = {}) => {
   return async function* loadDataProgressively() {
     const data = await dataLoader();
     const chunks = [];
-    
+
     // Split data into chunks
     for (let i = 0; i < data.length; i += chunkSize) {
       chunks.push(data.slice(i, i + chunkSize));
@@ -256,7 +301,7 @@ export const createProgressiveLoader = (dataLoader, options = {}) => {
     for (let i = 0; i < chunks.length; i++) {
       yield chunks[i];
       onProgress((i + 1) / chunks.length);
-      
+
       // Small delay to prevent blocking
       if (i < chunks.length - 1) {
         await new Promise(resolve => setTimeout(resolve, delay));
