@@ -9,23 +9,13 @@ import {
   Save,
   Settings,
   HelpCircle,
-  Users,
-  Zap,
-  Globe,
-  PieChart,
-  LineChart,
-  Activity,
-  Target,
-  ArrowRight,
-  RefreshCw,
-  Filter,
   Eye,
-  Edit,
-  Copy,
-  Trash2,
-  Plus
+  Target,
+  Activity,
+  LineChart,
+  PieChart
 } from 'lucide-react';
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 // Natural language patterns for command matching
 const NATURAL_LANGUAGE_PATTERNS = {
@@ -68,7 +58,7 @@ const COMMAND_REGISTRY = {
     icon: FileText,
     shortcut: 'Ctrl+1',
     keywords: ['data', 'spreadsheet', 'financial', 'entry', 'input'],
-    execute: (params, context) => ({ action: 'navigate', target: 'data' })
+    execute: (_params, _context) => ({ action: 'navigate', target: 'data' })
   },
 
   'go-to-modeling': {
@@ -79,7 +69,7 @@ const COMMAND_REGISTRY = {
     icon: Calculator,
     shortcut: 'Ctrl+2',
     keywords: ['modeling', 'tools', 'dcf', 'models'],
-    execute: (params, context) => ({ action: 'navigate', target: 'modeling' })
+    execute: (_params, _context) => ({ action: 'navigate', target: 'modeling' })
   },
 
   'go-to-analysis': {
@@ -90,7 +80,7 @@ const COMMAND_REGISTRY = {
     icon: TrendingUp,
     shortcut: 'Ctrl+3',
     keywords: ['analysis', 'results', 'outputs', 'valuation'],
-    execute: (params, context) => ({ action: 'navigate', target: 'analysis' })
+    execute: (_params, _context) => ({ action: 'navigate', target: 'analysis' })
   },
 
   // Analysis Commands
@@ -105,10 +95,10 @@ const COMMAND_REGISTRY = {
     parameters: [
       { name: 'company', type: 'string', description: 'Company ticker or name', optional: true }
     ],
-    execute: (params, context) => ({
+    execute: (_params, _context) => ({
       action: 'create-model',
       type: 'dcf',
-      company: params?.company || 'New Model'
+      company: _params?.company || 'New Model'
     })
   },
 
@@ -123,9 +113,9 @@ const COMMAND_REGISTRY = {
     parameters: [
       { name: 'variable', type: 'string', description: 'Variable to analyze (WACC, growth rate, etc.)', optional: true }
     ],
-    execute: (params, context) => ({
+    execute: (_params, _context) => ({
       action: 'run-sensitivity',
-      variable: params?.variable || 'wacc'
+      variable: _params?.variable || 'wacc'
     })
   },
 
@@ -136,7 +126,7 @@ const COMMAND_REGISTRY = {
     category: 'analysis',
     icon: Activity,
     keywords: ['monte', 'carlo', 'simulation', 'probability', 'risk'],
-    execute: (params, context) => ({ action: 'run-monte-carlo' })
+    execute: (_params, _context) => ({ action: 'run-monte-carlo' })
   },
 
   // Data Commands
@@ -151,9 +141,9 @@ const COMMAND_REGISTRY = {
     parameters: [
       { name: 'query', type: 'string', description: 'What to search for', required: true }
     ],
-    execute: (params, context) => ({
+    execute: (_params, _context) => ({
       action: 'search',
-      query: params?.query
+      query: _params?.query
     })
   },
 
@@ -165,7 +155,7 @@ const COMMAND_REGISTRY = {
     icon: Upload,
     shortcut: 'Ctrl+I',
     keywords: ['import', 'upload', 'excel', 'csv', 'data', 'file'],
-    execute: (params, context) => ({ action: 'import-data' })
+    execute: (_params, _context) => ({ action: 'import-data' })
   },
 
   'export-data': {
@@ -179,9 +169,9 @@ const COMMAND_REGISTRY = {
     parameters: [
       { name: 'format', type: 'string', description: 'Export format (PDF, Excel, PowerPoint)', optional: true }
     ],
-    execute: (params, context) => ({
+    execute: (_params, _context) => ({
       action: 'export',
-      format: params?.format || 'pdf'
+      format: _params?.format || 'pdf'
     })
   },
 
@@ -197,10 +187,10 @@ const COMMAND_REGISTRY = {
       { name: 'type', type: 'string', description: 'Chart type (line, bar, pie, etc.)', optional: true },
       { name: 'data', type: 'string', description: 'Data to visualize', optional: true }
     ],
-    execute: (params, context) => ({
+    execute: (_params, _context) => ({
       action: 'create-chart',
-      type: params?.type || 'line',
-      data: params?.data
+      type: _params?.type || 'line',
+      data: _params?.data
     })
   },
 
@@ -211,7 +201,7 @@ const COMMAND_REGISTRY = {
     category: 'charts',
     icon: LineChart,
     keywords: ['revenue', 'sales', 'income', 'trend', 'growth'],
-    execute: (params, context) => ({
+    execute: (_params, _context) => ({
       action: 'create-chart',
       type: 'line',
       data: 'revenue'
@@ -225,7 +215,7 @@ const COMMAND_REGISTRY = {
     category: 'charts',
     icon: PieChart,
     keywords: ['margin', 'profitability', 'ebitda', 'operating', 'gross'],
-    execute: (params, context) => ({
+    execute: (_params, _context) => ({
       action: 'create-chart',
       type: 'bar',
       data: 'margins'
@@ -240,7 +230,7 @@ const COMMAND_REGISTRY = {
     category: 'analysis',
     icon: Calculator,
     keywords: ['apple', 'aapl', 'company', 'stock'],
-    execute: (params, context) => ({
+    execute: (_params, _context) => ({
       action: 'create-model',
       company: 'AAPL'
     })
@@ -253,7 +243,7 @@ const COMMAND_REGISTRY = {
     category: 'analysis',
     icon: Calculator,
     keywords: ['microsoft', 'msft', 'company', 'stock'],
-    execute: (params, context) => ({
+    execute: (_params, _context) => ({
       action: 'create-model',
       company: 'MSFT'
     })
@@ -268,7 +258,7 @@ const COMMAND_REGISTRY = {
     icon: Save,
     shortcut: 'Ctrl+S',
     keywords: ['save', 'store', 'backup'],
-    execute: (params, context) => ({ action: 'save' })
+    execute: (_params, _context) => ({ action: 'save' })
   },
 
   'toggle-insights': {
@@ -278,7 +268,7 @@ const COMMAND_REGISTRY = {
     category: 'navigation',
     icon: Eye,
     keywords: ['insights', 'sidebar', 'toggle', 'show', 'hide'],
-    execute: (params, context) => ({ action: 'toggle-insights' })
+    execute: (_params, _context) => ({ action: 'toggle-insights' })
   },
 
   'settings': {
@@ -288,7 +278,7 @@ const COMMAND_REGISTRY = {
     category: 'settings',
     icon: Settings,
     keywords: ['settings', 'preferences', 'config', 'options'],
-    execute: (params, context) => ({ action: 'open-settings' })
+    execute: (_params, _context) => ({ action: 'open-settings' })
   },
 
   'help': {
@@ -299,7 +289,7 @@ const COMMAND_REGISTRY = {
     icon: HelpCircle,
     shortcut: 'F1',
     keywords: ['help', 'documentation', 'tutorial', 'support'],
-    execute: (params, context) => ({ action: 'open-help' })
+    execute: (_params, _context) => ({ action: 'open-help' })
   }
 };
 
@@ -318,7 +308,7 @@ export const useCommandRegistry = (currentContext = {}) => {
   const parseNaturalLanguage = useCallback((query) => {
     const results = [];
 
-    for (const [category, patterns] of Object.entries(NATURAL_LANGUAGE_PATTERNS)) {
+    for (const [_category, patterns] of Object.entries(NATURAL_LANGUAGE_PATTERNS)) {
       for (const pattern of patterns) {
         const match = query.match(pattern.pattern);
         if (match) {

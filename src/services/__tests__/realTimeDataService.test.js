@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 import { dataFetchingService } from '../dataFetching.js';
-import { realTimeDataService } from '../realTimeDataService.js';
+import realTimeDataService from '../realTimeDataService.js';
 
 // Mock dependencies
 vi.mock('../utils/apiLogger.js', () => ({

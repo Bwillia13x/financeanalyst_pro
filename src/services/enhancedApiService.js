@@ -1,4 +1,6 @@
 import { apiLogger } from '../utils/apiLogger.js';
+
+import { API_CONFIG } from './apiConfig.js';
 import secureApiClient from './secureApiClient.js';
 
 class RateLimiter {
@@ -49,7 +51,7 @@ class EnhancedApiService {
    */
   initializeSecureClient() {
     this.client = secureApiClient;
-    
+
     apiLogger.log('INFO', 'EnhancedApiService initialized with secure backend proxy');
   }
 
@@ -324,7 +326,7 @@ class EnhancedApiService {
    * @param {Object} options - Request options
    * @returns {Promise<Object>} Raw data from Alpha Vantage
    */
-  async fetchFromAlphaVantage(symbol, function_name, options = {}) {
+  async fetchFromAlphaVantage(symbol, functionName, options = {}) {
     if (!this.hasValidApiKey('ALPHA_VANTAGE')) {
       throw new Error('Alpha Vantage API key not available');
     }
@@ -332,7 +334,7 @@ class EnhancedApiService {
     const config = API_CONFIG.ALPHA_VANTAGE;
 
     const params = {
-      function: function_name,
+      function: functionName,
       symbol,
       apikey: this.apiKeys.ALPHA_VANTAGE,
       ...options.params

@@ -1,14 +1,13 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { 
-  PieChart, 
-  TrendingUp, 
-  TrendingDown, 
-  DollarSign, 
-  BarChart3, 
-  Target, 
-  AlertTriangle, 
-  Plus, 
-  Edit, 
+import {
+  PieChart,
+  TrendingUp,
+  TrendingDown,
+  DollarSign,
+  BarChart3,
+  Target,
+  AlertTriangle,
+  Plus,
+  Edit,
   Trash2,
   Download,
   Upload,
@@ -16,12 +15,13 @@ import {
   Eye,
   EyeOff
 } from 'lucide-react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 
+import PortfolioAnalytics from '../components/PortfolioAnalytics/PortfolioAnalytics';
+import PortfolioBuilder from '../components/PortfolioBuilder/PortfolioBuilder';
 import SEOHead from '../components/SEO/SEOHead';
 import secureApiClient from '../services/secureApiClient';
 import { formatCurrency, formatPercentage, formatNumber } from '../utils/formatters';
-import PortfolioBuilder from '../components/PortfolioBuilder/PortfolioBuilder';
-import PortfolioAnalytics from '../components/PortfolioAnalytics/PortfolioAnalytics';
 
 const PortfolioManagement = () => {
   const [portfolios, setPortfolios] = useState([]);
@@ -55,34 +55,34 @@ const PortfolioManagement = () => {
         { symbol: 'NVDA', name: 'NVIDIA Corporation', shares: 25, currentPrice: 425.30, allocation: 10.0, value: 10632.50, costBasis: 400.00 }
       ]
     };
-    
+
     setPortfolios([samplePortfolio]);
     setActivePortfolio(samplePortfolio);
   }, []);
 
   // Fetch real-time market data for portfolio holdings
-  const fetchMarketData = useCallback(async () => {
+  const fetchMarketData = useCallback(async() => {
     if (!activePortfolio || loading.market) return;
-    
+
     setLoading(prev => ({ ...prev, market: true }));
     try {
       const symbols = activePortfolio.holdings.map(h => h.symbol);
-      const marketPromises = symbols.map(symbol => 
+      const marketPromises = symbols.map(symbol =>
         secureApiClient.getQuote(symbol).catch(error => {
           console.warn(`Failed to fetch data for ${symbol}:`, error);
           return null;
         })
       );
-      
+
       const results = await Promise.all(marketPromises);
       const marketDataMap = {};
-      
+
       results.forEach((data, index) => {
         if (data) {
           marketDataMap[symbols[index]] = data;
         }
       });
-      
+
       setMarketData(marketDataMap);
     } catch (error) {
       console.error('Failed to fetch market data:', error);
@@ -105,16 +105,16 @@ const PortfolioManagement = () => {
       const currentPrice = marketQuote?.currentPrice || holding.currentPrice;
       const previousClose = marketQuote?.previousClose || holding.currentPrice;
       const change = marketQuote?.change || 0;
-      
+
       const currentValue = holding.shares * currentPrice;
       const costBasisValue = holding.shares * holding.costBasis;
       const holdingDailyChange = holding.shares * change;
-      
+
       totalValue += currentValue;
       totalCostBasis += costBasisValue;
       dailyChange += holdingDailyChange;
       dividendYield += (marketQuote?.dividendYield || 0) * (currentValue / 100000); // Weighted by portfolio allocation
-      
+
       return {
         ...holding,
         currentPrice,
@@ -204,7 +204,7 @@ const PortfolioManagement = () => {
                 <p className="text-sm text-gray-500">Real-time portfolio tracking & analysis</p>
               </div>
             </div>
-            
+
             <div className="flex items-center space-x-4">
               {/* View Mode Switcher */}
               <div className="flex bg-gray-100 rounded-lg p-1">
@@ -253,7 +253,7 @@ const PortfolioManagement = () => {
             timeframeOptions={timeframeOptions}
           />
         )}
-        
+
         {viewMode === 'builder' && (
           <PortfolioBuilder
             portfolio={activePortfolio}
@@ -261,7 +261,7 @@ const PortfolioManagement = () => {
             marketData={marketData}
           />
         )}
-        
+
         {viewMode === 'analytics' && (
           <PortfolioAnalytics
             portfolio={activePortfolio}
@@ -277,19 +277,19 @@ const PortfolioManagement = () => {
 };
 
 // Portfolio Overview Component
-const PortfolioOverview = ({ 
-  portfolio, 
-  metrics, 
-  marketData, 
-  loading, 
-  selectedTimeframe, 
-  onTimeframeChange, 
-  timeframeOptions 
+const PortfolioOverview = ({
+  portfolio,
+  metrics,
+  marketData,
+  loading,
+  selectedTimeframe,
+  onTimeframeChange,
+  timeframeOptions
 }) => {
   if (!metrics) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
       </div>
     );
   }
@@ -391,7 +391,7 @@ const PortfolioOverview = ({
                 </select>
               </div>
               {loading.market && (
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600" />
               )}
             </div>
           </div>
@@ -454,7 +454,7 @@ const PortfolioOverview = ({
                   </td>
                 </tr>
               ))}
-              
+
               {/* Cash Row */}
               {portfolio.cash > 0 && (
                 <tr className="hover:bg-gray-50">

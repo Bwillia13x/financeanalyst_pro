@@ -3,7 +3,6 @@
  * Conversational AI assistant for financial analysis and portfolio management
  */
 
-import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   MessageCircle,
@@ -26,11 +25,12 @@ import {
   Maximize2,
   X
 } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
 
 import secureApiClient from '../../services/secureApiClient';
 
-const AIFinancialAssistant = ({ 
-  isOpen = false, 
+const AIFinancialAssistant = ({
+  isOpen = false,
   onToggle,
   currentContext = {},
   portfolioData = null,
@@ -57,14 +57,14 @@ const AIFinancialAssistant = ({
   const inputRef = useRef(null);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
-  const handleSendMessage = async (message = inputValue) => {
+  const handleSendMessage = async(message = inputValue) => {
     if (!message.trim()) return;
 
     const userMessage = {
@@ -103,7 +103,7 @@ const AIFinancialAssistant = ({
       setMessages(prev => [...prev, assistantMessage]);
     } catch (error) {
       console.error('AI Assistant error:', error);
-      
+
       // Fallback response
       const fallbackMessage = {
         id: (Date.now() + 1).toString(),
@@ -150,9 +150,9 @@ const AIFinancialAssistant = ({
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <motion.div
         initial={{ opacity: 0, scale: 0.9, y: 20 }}
-        animate={{ 
-          opacity: 1, 
-          scale: 1, 
+        animate={{
+          opacity: 1,
+          scale: 1,
           y: 0,
           height: isMinimized ? 'auto' : '80vh'
         }}
@@ -200,20 +200,24 @@ const AIFinancialAssistant = ({
                     className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
                   >
                     <div className={`max-w-3xl flex ${message.type === 'user' ? 'flex-row-reverse' : 'flex-row'} items-start space-x-3`}>
-                      <div className={`p-2 rounded-lg ${
-                        message.type === 'user' 
-                          ? 'bg-blue-100 text-blue-600' 
-                          : 'bg-purple-100 text-purple-600'
-                      }`}>
+                      <div
+                        className={`p-2 rounded-lg ${
+                          message.type === 'user'
+                            ? 'bg-blue-100 text-blue-600'
+                            : 'bg-purple-100 text-purple-600'
+                        }`}
+                      >
                         {message.type === 'user' ? <User className="w-5 h-5" /> : <Bot className="w-5 h-5" />}
                       </div>
-                      <div className={`px-4 py-3 rounded-2xl ${
-                        message.type === 'user'
-                          ? 'bg-blue-600 text-white ml-3'
-                          : 'bg-gray-100 text-gray-800 mr-3'
-                      }`}>
+                      <div
+                        className={`px-4 py-3 rounded-2xl ${
+                          message.type === 'user'
+                            ? 'bg-blue-600 text-white ml-3'
+                            : 'bg-gray-100 text-gray-800 mr-3'
+                        }`}
+                      >
                         <p className="whitespace-pre-wrap">{message.content}</p>
-                        
+
                         {/* Suggestions */}
                         {message.suggestions && message.suggestions.length > 0 && (
                           <div className="mt-3 space-y-2">
@@ -250,7 +254,7 @@ const AIFinancialAssistant = ({
                   </motion.div>
                 ))}
               </AnimatePresence>
-              
+
               {isLoading && (
                 <motion.div
                   initial={{ opacity: 0 }}
@@ -263,9 +267,9 @@ const AIFinancialAssistant = ({
                     </div>
                     <div className="px-4 py-3 rounded-2xl bg-gray-100">
                       <div className="flex space-x-1">
-                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
+                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
+                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
                       </div>
                     </div>
                   </div>
@@ -326,7 +330,7 @@ const AIFinancialAssistant = ({
             <div className="flex items-center justify-between">
               <p className="text-sm text-gray-600">AI Assistant is minimized</p>
               <div className="flex space-x-2">
-                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
                 <span className="text-xs text-gray-500">Online</span>
               </div>
             </div>

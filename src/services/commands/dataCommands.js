@@ -3,12 +3,12 @@
  * Import, export, database operations, and data quality tools
  */
 
-import { formatCurrency, formatPercentage, formatNumber } from '../../utils/dataTransformation';
+import { formatPercentage, formatNumber } from '../../utils/dataTransformation';
 import { dataFetchingService } from '../dataFetching';
 
 export const dataCommands = {
   EXPORT_JSON: {
-    execute: async(parsedCommand, context, processor) => {
+    execute: async(parsedCommand, _context, _processor) => {
       const [dataType, filename] = parsedCommand.parameters;
 
       if (!dataType) {
@@ -27,7 +27,7 @@ export const dataCommands = {
             exportData = {
               type: 'watchlists',
               timestamp,
-              data: processor.getVariable('watchlists') || {}
+              data: _processor.getVariable('watchlists') || {}
             };
             break;
 
@@ -35,7 +35,7 @@ export const dataCommands = {
             exportData = {
               type: 'alerts',
               timestamp,
-              data: processor.getVariable('alerts') || []
+              data: _processor.getVariable('alerts') || []
             };
             break;
 
@@ -43,7 +43,7 @@ export const dataCommands = {
             exportData = {
               type: 'settings',
               timestamp,
-              data: processor.getAllSettings()
+              data: _processor.getAllSettings()
             };
             break;
 
@@ -51,7 +51,7 @@ export const dataCommands = {
             exportData = {
               type: 'variables',
               timestamp,
-              data: processor.getAllVariables()
+              data: _processor.getAllVariables()
             };
             break;
 
@@ -60,10 +60,10 @@ export const dataCommands = {
               type: 'complete_backup',
               timestamp,
               data: {
-                watchlists: processor.getVariable('watchlists') || {},
-                alerts: processor.getVariable('alerts') || [],
-                settings: processor.getAllSettings(),
-                variables: processor.getAllVariables()
+                watchlists: _processor.getVariable('watchlists') || {},
+                alerts: _processor.getVariable('alerts') || [],
+                settings: _processor.getAllSettings(),
+                variables: _processor.getAllVariables()
               }
             };
             break;
@@ -158,8 +158,8 @@ export const dataCommands = {
   },
 
   DATA_QUALITY: {
-    execute: async(parsedCommand, context, processor) => {
-      const [ticker] = parsedCommand.parameters;
+    execute: async(_parsedCommand, _context, _processor) => {
+      const [ticker] = _parsedCommand.parameters;
 
       if (!ticker) {
         return {
@@ -232,8 +232,8 @@ export const dataCommands = {
   },
 
   BENCHMARK: {
-    execute: async(parsedCommand, context, processor) => {
-      const [ticker, benchmark = 'SPY'] = parsedCommand.parameters;
+    execute: async(_parsedCommand, _context, _processor) => {
+      const [ticker, benchmark = 'SPY'] = _parsedCommand.parameters;
 
       if (!ticker) {
         return {
@@ -279,7 +279,7 @@ export const dataCommands = {
           fiveYear: performance.fiveYear - benchmarkPerformance.fiveYear
         };
 
-        const content = `📊 Benchmark Comparison: ${stockProfile.companyName} vs ${benchmarkProfile.companyName || benchmark.toUpperCase()}\n\n📈 PERFORMANCE COMPARISON:\n• YTD: ${formatPercentage(performance.ytd)} vs ${formatPercentage(benchmarkPerformance.ytd)} (${outperformance.ytd > 0 ? '+' : ''}${formatPercentage(outperformance.ytd)} ${outperformance.ytd > 0 ? '📈' : '📉'})\n• 1 Year: ${formatPercentage(performance.oneYear)} vs ${formatPercentage(benchmarkPerformance.oneYear)} (${outperformance.oneYear > 0 ? '+' : ''}${formatPercentage(outperformance.oneYear)} ${outperformance.oneYear > 0 ? '📈' : '📉'})\n• 3 Year: ${formatPercentage(performance.threeYear)} vs ${formatPercentage(benchmarkPerformance.threeYear)} (${outperformance.threeYear > 0 ? '+' : ''}${formatPercentage(outperformance.threeYear)} ${outperformance.threeYear > 0 ? '📈' : '📉'})\n• 5 Year: ${formatPercentage(performance.fiveYear)} vs ${formatPercentage(benchmarkPerformance.fiveYear)} (${outperformance.fiveYear > 0 ? '+' : ''}${formatPercentage(outperformance.fiveYear)} ${outperformance.fiveYear > 0 ? '📈' : '📉'})\n\n⚖️ RELATIVE VALUATION:\n• P/E Ratio: ${formatNumber(stockProfile.pe, 1)}x vs ${formatNumber(benchmarkProfile.pe, 1)}x (${formatNumber(relativeMetrics.pe, 2)}x relative)\n• P/B Ratio: ${formatNumber(stockProfile.pb, 1)}x vs ${formatNumber(benchmarkProfile.pb, 1)}x (${formatNumber(relativeMetrics.pb, 2)}x relative)\n• Beta: ${formatNumber(stockProfile.beta, 2)} vs ${formatNumber(benchmarkProfile.beta, 2)} (${formatNumber(relativeMetrics.beta, 2)}x relative)\n\n💰 PROFITABILITY COMPARISON:\n• ROE: ${formatPercentage(stockProfile.returnOnEquityTTM)} vs ${formatPercentage(benchmarkProfile.returnOnEquityTTM)} (${formatNumber(relativeMetrics.roe, 2)}x relative)\n• Profit Margin: ${formatPercentage(stockProfile.profitMargin)} vs ${formatPercentage(benchmarkProfile.profitMargin)} (${formatNumber(relativeMetrics.profitMargin, 2)}x relative)\n\n🎯 RELATIVE ASSESSMENT:\n• Risk Profile: ${stockProfile.beta > benchmarkProfile.beta ? 'Higher risk than benchmark' : 'Lower risk than benchmark'}\n• Valuation: ${relativeMetrics.pe > 1.2 ? 'Premium valuation' : relativeMetrics.pe < 0.8 ? 'Discount valuation' : 'Fair valuation'} vs benchmark\n• Performance: ${Object.values(outperformance).filter(x => x > 0).length >= 3 ? 'Consistent outperformance' : 'Mixed performance'}\n\n📊 CORRELATION ANALYSIS:\n• Estimated Correlation: ${formatNumber(0.6 + Math.random() * 0.3, 2)} ${0.8 > 0.7 ? '(High)' : '(Moderate)'}\n• Tracking Error: ${formatPercentage(Math.random() * 0.15 + 0.05)}\n• Information Ratio: ${formatNumber((Math.random() - 0.5) * 2, 2)}\n\n💡 INSIGHTS:\n• ${outperformance.oneYear > 0.1 ? `Strong outperformance over 1 year (+${formatPercentage(outperformance.oneYear)})` : outperformance.oneYear < -0.1 ? `Underperformance over 1 year (${formatPercentage(outperformance.oneYear)})` : 'Performance in line with benchmark'}\n• ${relativeMetrics.pe > 1.5 ? 'Trading at significant premium - justify with growth' : relativeMetrics.pe < 0.7 ? 'Trading at discount - potential value opportunity' : 'Reasonable valuation relative to benchmark'}\n• ${stockProfile.beta > 1.5 ? 'High beta suggests amplified market movements' : stockProfile.beta < 0.7 ? 'Low beta suggests defensive characteristics' : 'Moderate beta in line with market'}\n\n${dataFetchingService.demoMode ? '💡 Note: Using estimated performance data. Configure API keys for historical returns.' : '✅ Based on historical performance data'}`;
+        const content = `📊 Benchmark Comparison: ${stockProfile.companyName} vs ${benchmarkProfile.companyName || benchmark.toUpperCase()}\n\n📈 PERFORMANCE COMPARISON:\n• YTD: ${formatPercentage(performance.ytd)} vs ${formatPercentage(benchmarkPerformance.ytd)} (${outperformance.ytd > 0 ? '+' : ''}${formatPercentage(outperformance.ytd)} ${outperformance.ytd > 0 ? '📈' : '📉'})\n• 1 Year: ${formatPercentage(performance.oneYear)} vs ${formatPercentage(benchmarkPerformance.oneYear)} (${outperformance.oneYear > 0 ? '+' : ''}${formatPercentage(outperformance.oneYear)} ${outperformance.oneYear > 0 ? '📈' : '📉'})\n• 3 Year: ${formatPercentage(performance.threeYear)} vs ${formatPercentage(benchmarkPerformance.threeYear)} (${outperformance.threeYear > 0 ? '+' : ''}${formatPercentage(outperformance.threeYear)} ${outperformance.threeYear > 0 ? '📈' : '📉'})\n• 5 Year: ${formatPercentage(performance.fiveYear)} vs ${formatPercentage(benchmarkPerformance.fiveYear)} (${outperformance.fiveYear > 0 ? '+' : ''}${formatPercentage(outperformance.fiveYear)} ${outperformance.fiveYear > 0 ? '📈' : '📉'})\n\n⚖️ RELATIVE VALUATION:\n• P/E Ratio: ${formatNumber(stockProfile.pe, 1)}x vs ${formatNumber(benchmarkProfile.pe, 1)}x (${formatNumber(relativeMetrics.pe, 2)}x relative)\n• P/B Ratio: ${formatNumber(stockProfile.pb, 1)}x vs ${formatNumber(benchmarkProfile.pb, 1)}x (${formatNumber(relativeMetrics.pb, 2)}x relative)\n• Beta: ${formatNumber(stockProfile.beta, 2)} vs ${formatNumber(benchmarkProfile.beta, 2)} (${formatNumber(relativeMetrics.beta, 2)}x relative)\n\n💰 PROFITABILITY COMPARISON:\n• ROE: ${formatPercentage(stockProfile.returnOnEquityTTM)} vs ${formatPercentage(benchmarkProfile.returnOnEquityTTM)} (${formatNumber(relativeMetrics.roe, 2)}x relative)\n• Profit Margin: ${formatPercentage(stockProfile.profitMargin)} vs ${formatPercentage(benchmarkProfile.profitMargin)} (${formatNumber(relativeMetrics.profitMargin, 2)}x relative)\n\n🎯 RELATIVE ASSESSMENT:\n• Risk Profile: ${stockProfile.beta > benchmarkProfile.beta ? 'Higher risk than benchmark' : 'Lower risk than benchmark'}\n• Valuation: ${relativeMetrics.pe > 1.2 ? 'Premium valuation' : relativeMetrics.pe < 0.8 ? 'Discount valuation' : 'Fair valuation'} vs benchmark\n• Performance: ${Object.values(outperformance).filter(x => x > 0).length >= 3 ? 'Consistent outperformance' : 'Mixed performance'}\n\n📊 CORRELATION ANALYSIS:\n• Estimated Correlation: ${formatNumber(0.6 + Math.random() * 0.3, 2)} ${(0.6 + Math.random() * 0.3) > 0.7 ? '(High)' : '(Moderate)'}\n• Tracking Error: ${formatPercentage(Math.random() * 0.15 + 0.05)}\n• Information Ratio: ${formatNumber((Math.random() - 0.5) * 2, 2)}\n\n💡 INSIGHTS:\n• ${outperformance.oneYear > 0.1 ? `Strong outperformance over 1 year (+${formatPercentage(outperformance.oneYear)})` : outperformance.oneYear < -0.1 ? `Underperformance over 1 year (${formatPercentage(outperformance.oneYear)})` : 'Performance in line with benchmark'}\n• ${relativeMetrics.pe > 1.5 ? 'Trading at significant premium - justify with growth' : relativeMetrics.pe < 0.7 ? 'Trading at discount - potential value opportunity' : 'Reasonable valuation relative to benchmark'}\n• ${stockProfile.beta > 1.5 ? 'High beta suggests amplified market movements' : stockProfile.beta < 0.7 ? 'Low beta suggests defensive characteristics' : 'Moderate beta in line with market'}\n\n${dataFetchingService.demoMode ? '💡 Note: Using estimated performance data. Configure API keys for historical returns.' : '✅ Based on historical performance data'}`;
 
         return {
           type: 'success',
