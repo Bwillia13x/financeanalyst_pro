@@ -9,7 +9,7 @@ const SensitivityHeatmap = ({
   yAxisLabels = [],
   className,
   title = 'Sensitivity Analysis',
-  formatValue = (value) => `${value.toFixed(1)}%`,
+  _formatValue = (value) => `${value.toFixed(1)}%`,
   formatCell = (value) => `${value > 0 ? '+' : ''}${value.toFixed(1)}%`
 }) => {
   const [hoveredCell, setHoveredCell] = useState(null);

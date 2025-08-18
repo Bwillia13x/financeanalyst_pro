@@ -135,7 +135,7 @@ const FinancialInput = React.forwardRef(({
   };
 
   // Handle blur
-  const handleBlur = (e) => {
+  const handleBlur = (_e) => {
     setIsFocused(false);
     const rawValue = parseValue(displayValue);
 
@@ -150,7 +150,7 @@ const FinancialInput = React.forwardRef(({
     }
 
     if (onBlur) {
-      onBlur(e);
+      onBlur(_e);
     }
   };
 

@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Cur, Pct } from '../../utils/valuationUtils';
 
-const ProjectionsTable = ({ rows, currency }) => {
+const ProjectionsTable = ({ rows, _currency }) => {
   return (
     <div className="overflow-auto rounded-xl border border-slate-200">
       <table className="min-w-[720px] text-right text-[12px]">

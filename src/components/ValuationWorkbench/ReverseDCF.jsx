@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { Card, NumberInput, Switch } from 'src/components/ui/UIHelpers.jsx';
+import { Card, NumberInput } from 'src/components/ui/UIHelpers.jsx';
 
 import { project, valueEquity, growthVector, wacc } from '../../utils/valuationUtils';
 
@@ -75,7 +75,7 @@ function calculateTargetPrice(assumptions, targetMOS) {
   return assumptions.price * (1 + targetMOS);
 }
 
-const ReverseDCF = ({ assumptions, setAssumptions, currentValuation }) => {
+const ReverseDCF = ({ assumptions, setAssumptions, _currentValuation }) => {
   const [targetPrice, setTargetPrice] = useState(assumptions.price * 1.25);
   const [targetMOS, setTargetMOS] = useState(0.25);
   const [solveFor, setSolveFor] = useState('growth');

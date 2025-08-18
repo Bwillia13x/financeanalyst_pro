@@ -12,9 +12,6 @@ import {
   Settings,
   LogOut,
   Eye,
-  EyeOff,
-  CheckCircle,
-  AlertCircle,
   Users
 } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
@@ -27,12 +24,12 @@ import { encryptionService } from '../services/encryptionService.js';
 import { userContextService } from '../services/userContextService.js';
 
 const AuthenticationIntegrationExample = () => {
-  const [currentView, setCurrentView] = useState('login');
+  const [_currentView, setCurrentView] = useState('login');
   const [showProfile, setShowProfile] = useState(false);
   const [contextStats, setContextStats] = useState(null);
   const [encryptionStatus, setEncryptionStatus] = useState(null);
 
-  const { user, isAuthenticated, hasPermission, hasRole, logout } = useAuth();
+  const { user, isAuthenticated, logout } = useAuth();
 
   useEffect(() => {
     if (isAuthenticated) {
