@@ -5,7 +5,7 @@
 
 import { EventEmitter } from 'events';
 
-import { performanceMonitoring } from '../utils/performanceMonitoring';
+// import { performanceMonitoring } from '../utils/performanceMonitoring'; // Missing module
 
 class CollaborationService extends EventEmitter {
   constructor() {
@@ -22,6 +22,11 @@ class CollaborationService extends EventEmitter {
     this.heartbeatInterval = null;
     this.syncQueue = [];
     this.isOnline = navigator.onLine;
+
+    // Env and feature flags (Vite)
+    this.env = (typeof import.meta !== 'undefined' && import.meta.env) ? import.meta.env : {};
+    // Explicitly opt-in to collaboration to avoid unexpected WS errors in dev/staging
+    this.collabEnabled = this.env.VITE_ENABLE_COLLABORATION === 'true';
 
     // Bind methods to preserve context
     this.handleConnectionOpen = this.handleConnectionOpen.bind(this);
@@ -65,25 +70,31 @@ class CollaborationService extends EventEmitter {
       // Store current user
       this.users.set(userId, this.currentUserProfile);
 
-      // Initialize WebSocket connection
-      await this.initializeWebSocket();
+      // Initialize WebSocket connection only if collaboration is enabled
+      if (this.collabEnabled) {
+        await this.initializeWebSocket();
+      } else {
+        console.info('Collaboration disabled via VITE_ENABLE_COLLABORATION. Skipping WebSocket initialization.');
+      }
 
-      // Start heartbeat
-      this.startHeartbeat();
+      // Start heartbeat if enabled
+      if (this.collabEnabled) {
+        this.startHeartbeat();
+      }
 
       this.isInitialized = true;
       this.emit('initialized', { userId, userProfile: this.currentUserProfile });
 
       // Track initialization performance
       if (typeof performanceMonitoring !== 'undefined') {
-        performanceMonitoring.trackCustomMetric('collaboration_init_success', 1);
+        // performanceMonitoring.trackCustomMetric('collaboration_init_success', 1);
       }
 
       console.log('CollaborationService initialized successfully');
     } catch (error) {
       console.error('Failed to initialize CollaborationService:', error);
       if (typeof performanceMonitoring !== 'undefined') {
-        performanceMonitoring.trackCustomMetric('collaboration_init_error', 1);
+        // performanceMonitoring.trackCustomMetric('collaboration_init_error', 1);
       }
       throw error;
     }
@@ -94,28 +105,46 @@ class CollaborationService extends EventEmitter {
    */
   async initializeWebSocket() {
     try {
-      // In production, this would connect to your WebSocket server
-      // For demo purposes, we'll simulate the connection
-      const wsUrl = process.env.REACT_APP_WS_URL || 'ws://localhost:8080/collaboration';
+      // Resolve WebSocket URL from Vite env or current origin
+      const explicitUrl = this.env.VITE_COLLAB_WS_URL;
+      let wsUrl;
+      if (explicitUrl) {
+        wsUrl = explicitUrl;
+      } else if (typeof window !== 'undefined' && window.location) {
+        const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+        wsUrl = `${protocol}://${window.location.host}/collaboration`;
+      } else {
+        wsUrl = 'ws://localhost:8080/collaboration';
+      }
 
-      // Simulate WebSocket connection
-      this.wsConnection = {
-        readyState: 1, // OPEN
-        send: (data) => {
-          // Simulate message sending
-          console.log('WebSocket send:', data);
-          // Echo back for demo
-          setTimeout(() => {
-            this.handleConnectionMessage({ data });
-          }, 100);
-        },
-        close: () => {
-          this.wsConnection.readyState = 3; // CLOSED
-          this.handleConnectionClose();
-        }
-      };
-
-      this.handleConnectionOpen();
+      // If mock flag is set, simulate a WS connection; otherwise, attempt a real one
+      const useMock = this.env.VITE_COLLAB_WS_MOCK === 'true';
+      if (useMock || typeof WebSocket === 'undefined') {
+        // Simulated WebSocket for demo/testing
+        this.wsConnection = {
+          readyState: 1, // OPEN
+          send: (data) => {
+            console.log('WebSocket send (mock):', data);
+            setTimeout(() => {
+              this.handleConnectionMessage({ data });
+            }, 100);
+          },
+          close: () => {
+            this.wsConnection.readyState = 3; // CLOSED
+            this.handleConnectionClose();
+          }
+        };
+        console.info(`Collaboration WebSocket running in MOCK mode at ${wsUrl}`);
+        this.handleConnectionOpen();
+      } else {
+        // Real WebSocket connection
+        this.wsConnection = new WebSocket(wsUrl);
+        this.wsConnection.addEventListener('open', this.handleConnectionOpen);
+        this.wsConnection.addEventListener('message', this.handleConnectionMessage);
+        this.wsConnection.addEventListener('close', this.handleConnectionClose);
+        this.wsConnection.addEventListener('error', this.handleConnectionError);
+        console.info(`Connecting to Collaboration WebSocket at ${wsUrl}`);
+      }
 
     } catch (error) {
       console.error('WebSocket initialization failed:', error);
@@ -296,7 +325,7 @@ class CollaborationService extends EventEmitter {
 
       // Track performance
       if (typeof performanceMonitoring !== 'undefined') {
-        performanceMonitoring.trackCustomMetric('workspace_joined', 1);
+        // performanceMonitoring.trackCustomMetric('workspace_joined', 1);
       }
 
       return workspace;

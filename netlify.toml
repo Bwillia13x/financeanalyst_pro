@@ -27,7 +27,7 @@
     X-XSS-Protection = "1; mode=block"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
-    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://api.alphavantage.co https://financialmodelingprep.com https://api.polygon.io https://api.stlouisfed.org https://data.nasdaq.com; font-src 'self' data:;"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://api.financeanalyst.pro https://financeanalyst-pro-backend.onrender.com https://www.alphavantage.co https://financialmodelingprep.com https://data.sec.gov https://query1.finance.yahoo.com https://query2.finance.yahoo.com https://data.nasdaq.com https://fred.stlouisfed.org https://api.stlouisfed.org; font-src 'self' data:;"
 
 # Cache static assets
 [[headers]]

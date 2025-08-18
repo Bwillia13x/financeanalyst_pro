@@ -1,4 +1,4 @@
-import React from 'react';
+// React not needed for class component
 
 import ErrorBoundaryProvider from './ErrorBoundaryProvider';
 

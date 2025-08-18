@@ -1,86 +1,91 @@
 {
-  "timestamp": "2025-07-31T18:50:33.309Z",
+  "timestamp": "2025-08-18T17:59:50.750Z",
   "summary": {
-    "totalBundles": 28,
-    "totalSize": 2286.51,
+    "totalBundles": 33,
+    "totalSize": 3121.8199999999997,
     "totalGzipSize": 0,
     "violations": 0,
     "warnings": 0
   },
   "bundles": [
     {
-      "filename": "index-BWJrIqeS.css",
-      "rawSize": 72.45,
+      "filename": "index-Pzcq1EGn.css",
+      "rawSize": 82.58,
       "gzipSize": 0
     },
     {
-      "filename": "Card-BzCfOk1i.js",
+      "filename": "Card-CXpAywus.js",
       "rawSize": 1.05,
       "gzipSize": 0
     },
     {
-      "filename": "Progress-BkdrnzmF.js",
+      "filename": "Progress-DTqZ3GVh.js",
       "rawSize": 1.19,
       "gzipSize": 0
     },
     {
-      "filename": "NotFound-CZi8YeFw.js",
-      "rawSize": 1.26,
+      "filename": "NotFound-DC2Dg_gJ.js",
+      "rawSize": 1.33,
       "gzipSize": 0
     },
     {
-      "filename": "Input-BkAWvzgW.js",
+      "filename": "Input-Bs2oZUc3.js",
       "rawSize": 1.74,
       "gzipSize": 0
     },
     {
-      "filename": "Button-C0m44oek.js",
+      "filename": "UIHelpers-CxhvCNNl.js",
+      "rawSize": 2.03,
+      "gzipSize": 0
+    },
+    {
+      "filename": "Button-B67yZOyD.js",
       "rawSize": 2.31,
       "gzipSize": 0
     },
     {
-      "filename": "SEOHead-DrWvJWRJ.js",
+      "filename": "SEOHead-DhiHNgzz.js",
       "rawSize": 2.36,
       "gzipSize": 0
     },
     {
-      "filename": "Select-TUHkO3ep.js",
+      "filename": "defaultFinancialData-CL3DkgK1.js",
+      "rawSize": 3.4,
+      "gzipSize": 0
+    },
+    {
+      "filename": "Select-B-nntOOR.js",
       "rawSize": 4.33,
       "gzipSize": 0
     },
     {
-      "filename": "defaultFinancialData-BqNGcy_-.js",
-      "rawSize": 5.77,
+      "filename": "apiLogger-BNPwdfUB.js",
+      "rawSize": 4.4,
       "gzipSize": 0
     },
     {
-      "filename": "Header-BLfrZqKV.js",
-      "rawSize": 5.93,
+      "filename": "Header-CAxsU7Uz.js",
+      "rawSize": 6.63,
       "gzipSize": 0
     },
     {
-      "filename": "valuation-tool-demo-CTuny8N5.js",
+      "filename": "valuation-tool-demo-IDwZ9V5G.js",
       "rawSize": 8.8,
       "gzipSize": 0
     },
     {
-      "filename": "state-vendor-D3vL4m0Q.js",
+      "filename": "state-vendor-DL0PFC30.js",
       "rawSize": 9.21,
       "gzipSize": 0
     },
     {
-      "filename": "ValuationToolDocs-D9UyTDZe.js",
+      "filename": "lboModelingEngine-DdqVJUup.js",
+      "rawSize": 9.87,
+      "gzipSize": 0
+    },
+    {
+      "filename": "ValuationToolDocs-k4tZhKtW.js",
       "rawSize": 14.13,
-      "gzipSize": 0
-    },
-    {
-      "filename": "lboModelingEngine-DSAML38E.js",
-      "rawSize": 14.18,
-      "gzipSize": 0
-    },
-    {
-      "filename": "index-Dc3K68ej.js",
-      "rawSize": 18.38,
       "gzipSize": 0
     },
     {
@@ -89,13 +94,8 @@
       "gzipSize": 0
     },
     {
-      "filename": "dataFetching-BV_9doRC.js",
-      "rawSize": 31.65,
-      "gzipSize": 0
-    },
-    {
-      "filename": "FinancialInputsDemo-mCQGYD5h.js",
-      "rawSize": 32.88,
+      "filename": "portfolioCommands-dL_3w5_b.js",
+      "rawSize": 31.2,
       "gzipSize": 0
     },
     {
@@ -104,48 +104,73 @@
       "gzipSize": 0
     },
     {
-      "filename": "index-CyEhkFRl.js",
-      "rawSize": 39.83,
+      "filename": "PortfolioManagement-CdRtEmsY.js",
+      "rawSize": 39.19,
       "gzipSize": 0
     },
     {
-      "filename": "index-BYURjSeK.js",
-      "rawSize": 45.37,
+      "filename": "index-22eMLs-z.js",
+      "rawSize": 39.9,
       "gzipSize": 0
     },
     {
-      "filename": "ValuationTool-BTaWGY1r.js",
-      "rawSize": 74.81,
+      "filename": "ValuationWorkbench-BRy7JQ0e.js",
+      "rawSize": 40.1,
       "gzipSize": 0
     },
     {
-      "filename": "vendor-uZFMUkl0.js",
-      "rawSize": 82.43,
+      "filename": "ModelLab-CUracIuD.js",
+      "rawSize": 41.13,
       "gzipSize": 0
     },
     {
-      "filename": "ui-vendor-x_EeA8uv.js",
+      "filename": "index-BwSaKcf6.js",
+      "rawSize": 48.03,
+      "gzipSize": 0
+    },
+    {
+      "filename": "FinancialInputsDemo-D15dJiXc.js",
+      "rawSize": 52.9,
+      "gzipSize": 0
+    },
+    {
+      "filename": "ValuationTool-v5tbbrXv.js",
+      "rawSize": 74.84,
+      "gzipSize": 0
+    },
+    {
+      "filename": "index-yG5NERWO.js",
+      "rawSize": 75.41,
+      "gzipSize": 0
+    },
+    {
+      "filename": "ui-vendor-DOXsx3JB.js",
       "rawSize": 102.32,
       "gzipSize": 0
     },
     {
-      "filename": "index-lYAmGw1N.js",
-      "rawSize": 258.29,
+      "filename": "index-DtCAuLKN.js",
+      "rawSize": 249.09,
       "gzipSize": 0
     },
     {
-      "filename": "PrivateAnalysis-NeQwhiBW.js",
-      "rawSize": 268.53,
+      "filename": "PrivateAnalysis-0H0vUb2A.js",
+      "rawSize": 268.96,
       "gzipSize": 0
     },
     {
-      "filename": "charts-vendor-CB3i9QZK.js",
+      "filename": "charts-vendor-DVkUTdXq.js",
       "rawSize": 416.93,
       "gzipSize": 0
     },
     {
-      "filename": "react-vendor-BWiQdkVb.js",
-      "rawSize": 708.75,
+      "filename": "react-vendor-CaXMqa0k.js",
+      "rawSize": 707.78,
+      "gzipSize": 0
+    },
+    {
+      "filename": "vendor-zO7HU-o7.js",
+      "rawSize": 717.05,
       "gzipSize": 0
     }
   ],

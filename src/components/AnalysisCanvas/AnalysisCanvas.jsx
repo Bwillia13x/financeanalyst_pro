@@ -1,15 +1,13 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Search,
-  TrendingUp,
   BarChart3,
+  Minimize2,
   Calculator,
   Target,
-  ChevronRight,
-  Minimize2,
-  Maximize2
+  Search,
+  ChevronRight
 } from 'lucide-react';
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 
 import { calculateEnhancedDCF } from '../../utils/dcfCalculations';
 
@@ -31,7 +29,7 @@ const AnalysisCanvas = () => {
   const [focusedModule, setFocusedModule] = useState(null);
 
   // Company data state with intelligent defaults
-  const [companyData, setCompanyData] = useState({
+  const [_companyData, _setCompanyData] = useState({
     profile: null,
     financials: null,
     marketData: null,

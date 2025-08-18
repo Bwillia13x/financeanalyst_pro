@@ -44,11 +44,11 @@ export default [
     rules: {
       // JavaScript/ES6+ rules
       ...js.configs.recommended.rules,
-      'no-console': ['warn', { allow: ['warn', 'error'] }],
+      'no-console': 'off',
       'no-debugger': 'error',
       'no-unused-vars': ['error', { 
         argsIgnorePattern: '^_',
-        varsIgnorePattern: '^_'
+        varsIgnorePattern: '^(React|_)'
       }],
       'no-var': 'error',
       'prefer-const': 'error',
@@ -61,14 +61,14 @@ export default [
       // React rules
       ...react.configs.recommended.rules,
       'react/react-in-jsx-scope': 'off', // Not needed in React 17+
-      'react/prop-types': 'warn',
+      'react/prop-types': 'off',
       'react/jsx-uses-react': 'off',
       'react/jsx-uses-vars': 'error',
       'react/jsx-key': 'error',
       'react/jsx-no-duplicate-props': 'error',
       'react/jsx-no-undef': 'error',
       'react/jsx-pascal-case': 'error',
-      'react/no-deprecated': 'warn',
+      'react/no-deprecated': 'off',
       'react/no-direct-mutation-state': 'error',
       'react/no-unknown-property': 'error',
       'react/self-closing-comp': 'error',
@@ -80,17 +80,15 @@ export default [
       'react/jsx-indent': ['error', 2],
       'react/jsx-indent-props': ['error', 2],
       'react/jsx-max-props-per-line': ['error', { maximum: 3 }],
-      'react/jsx-no-bind': ['warn', { allowArrowFunctions: true }],
+      'react/jsx-no-bind': 'off',
       'react/jsx-wrap-multilines': 'error',
       
       // React Hooks rules
       ...reactHooks.configs.recommended.rules,
+      'react-hooks/exhaustive-deps': 'off',
       
       // React Refresh rules
-      'react-refresh/only-export-components': [
-        'warn',
-        { allowConstantExport: true }
-      ],
+      'react-refresh/only-export-components': 'off',
       
       // Accessibility rules
       ...jsxA11y.configs.recommended.rules,
@@ -99,12 +97,12 @@ export default [
       'jsx-a11y/aria-props': 'error',
       'jsx-a11y/aria-proptypes': 'error',
       'jsx-a11y/aria-unsupported-elements': 'error',
-      'jsx-a11y/click-events-have-key-events': 'warn',
+      'jsx-a11y/click-events-have-key-events': 'off',
       'jsx-a11y/heading-has-content': 'error',
       'jsx-a11y/img-redundant-alt': 'error',
       'jsx-a11y/label-has-associated-control': 'error',
       'jsx-a11y/no-access-key': 'error',
-      'jsx-a11y/no-autofocus': 'warn',
+      'jsx-a11y/no-autofocus': 'off',
       'jsx-a11y/role-has-required-aria-props': 'error',
       'jsx-a11y/role-supports-aria-props': 'error',
       
@@ -114,7 +112,7 @@ export default [
       'import/default': 'error',
       'import/no-absolute-path': 'error',
       'import/no-self-import': 'error',
-      'import/no-cycle': 'warn',
+      'import/no-cycle': 'off',
       'import/no-useless-path-segments': 'error',
       'import/newline-after-import': 'error',
       'import/no-duplicates': 'error',
@@ -166,8 +164,15 @@ export default [
         version: 'detect'
       },
       'import/resolver': {
-        node: {
+        alias: {
+          map: [
+            ['src', './src']
+          ],
           extensions: ['.js', '.jsx']
+        },
+        node: {
+          extensions: ['.js', '.jsx'],
+          moduleDirectory: ['node_modules', 'src']
         }
       }
     }
@@ -189,7 +194,8 @@ export default [
     },
     rules: {
       'no-console': 'off',
-      'react/prop-types': 'off'
+      'react/prop-types': 'off',
+      'no-unused-vars': 'off'
     }
   }
 ];

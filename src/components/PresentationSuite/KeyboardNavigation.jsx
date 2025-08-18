@@ -13,8 +13,8 @@ import {
   ArrowDown,
   ArrowLeft,
   ArrowRight,
-  Enter,
-  Escape,
+  // Enter, // not available in lucide-react
+  // Escape, // not available in lucide-react
   Hash,
   Zap,
   Navigation,
@@ -317,11 +317,11 @@ const KeyboardNavigation = ({ onNavigate, onExecuteCommand, children }) => {
                       <span>navigate</span>
                     </div>
                     <div className="flex items-center space-x-1">
-                      <Enter className="w-3 h-3" />
+                      <kbd className="px-1 text-xs border rounded">↵</kbd>
                       <span>select</span>
                     </div>
                     <div className="flex items-center space-x-1">
-                      <Escape className="w-3 h-3" />
+                      <kbd className="px-1 text-xs border rounded">Esc</kbd>
                       <span>close</span>
                     </div>
                   </div>

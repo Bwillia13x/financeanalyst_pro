@@ -1,4 +1,5 @@
 import axios from 'axios';
+
 import cacheService from './cacheService.js';
 
 class ApiService {
@@ -11,7 +12,7 @@ class ApiService {
     };
 
     this.demoMode = process.env.DEMO_MODE === 'true';
-    
+
     // API base URLs
     this.baseUrls = {
       alphaVantage: 'https://www.alphavantage.co/query',
@@ -24,7 +25,7 @@ class ApiService {
 
     // Rate limiting tracking
     this.rateLimits = new Map();
-    
+
     // Setup axios defaults
     this.setupAxiosDefaults();
   }
@@ -32,7 +33,7 @@ class ApiService {
   setupAxiosDefaults() {
     // Global timeout
     axios.defaults.timeout = 15000;
-    
+
     // Global headers
     axios.defaults.headers.common['User-Agent'] = 'FinanceAnalyst-Pro/1.0';
   }
@@ -62,10 +63,10 @@ class ApiService {
 
     const key = `rate_limit_${service}`;
     let requests = this.rateLimits.get(key) || [];
-    
+
     // Clean old requests outside the window
     requests = requests.filter(time => now - time < limit.windowMs);
-    
+
     if (requests.length >= limit.requests) {
       throw new Error(`Rate limit exceeded for ${service}. Please try again later.`);
     }
@@ -73,7 +74,7 @@ class ApiService {
     // Add current request
     requests.push(now);
     this.rateLimits.set(key, requests);
-    
+
     return true;
   }
 
@@ -81,18 +82,18 @@ class ApiService {
    * Generic API request with caching and error handling
    */
   async makeApiRequest(config) {
-    const { 
-      service, 
-      endpoint, 
-      params = {}, 
-      cacheType = 'market', 
+    const {
+      service,
+      endpoint,
+      params = {},
+      cacheType = 'market',
       cacheTtl = null,
-      skipCache = false 
+      skipCache = false
     } = config;
 
     // Generate cache key
     const cacheKey = cacheService.generateKey(`${service}_${endpoint}`, params);
-    
+
     // Try cache first
     if (!skipCache) {
       const cached = cacheService.get(cacheType, cacheKey);
@@ -106,7 +107,7 @@ class ApiService {
 
     try {
       let response;
-      
+
       switch (service) {
         case 'alphaVantage':
           response = await this.callAlphaVantage(endpoint, params);
@@ -136,12 +137,12 @@ class ApiService {
 
     } catch (error) {
       console.error(`API request failed for ${service}:`, error.message);
-      
+
       // Return demo data if in demo mode or API fails
       if (this.demoMode || !this.hasValidApiKey(service)) {
         return this.generateDemoData(endpoint, params);
       }
-      
+
       throw error;
     }
   }
@@ -255,7 +256,7 @@ class ApiService {
    */
   generateDemoData(endpoint, params) {
     console.log(`Generating demo data for ${endpoint}`);
-    
+
     // Basic demo data structure - customize based on endpoint
     const demoData = {
       symbol: params.symbol || 'DEMO',

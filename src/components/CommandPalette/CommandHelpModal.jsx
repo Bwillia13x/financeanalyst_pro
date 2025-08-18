@@ -10,7 +10,7 @@ import {
   Zap,
   HelpCircle
 } from 'lucide-react';
-import React from 'react';
+// React not needed for JSX-only component
 
 import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts';
 
@@ -164,7 +164,7 @@ const CommandHelpModal = ({ isOpen, onClose }) => {
                         >
                           <div className="flex-1">
                             <div className="font-medium text-slate-900 text-sm">
-                              {shortcut.description}
+                              Use &quot;g&quot; shortcuts for quick navigation
                             </div>
                             {shortcut.target && (
                               <div className="text-xs text-slate-500 mt-1">
@@ -201,11 +201,11 @@ const CommandHelpModal = ({ isOpen, onClose }) => {
                   <ul className="space-y-2 text-sm text-amber-800">
                     <li className="flex items-start gap-2">
                       <span className="w-1.5 h-1.5 bg-amber-500 rounded-full mt-2 flex-shrink-0" />
-                      <span>Use natural language in the command palette: "Create a chart for revenue trends"</span>
+                      <span>Use natural language in the command palette: &quot;Create a chart for revenue trends&quot;</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="w-1.5 h-1.5 bg-amber-500 rounded-full mt-2 flex-shrink-0" />
-                      <span>The command palette learns from your usage and shows relevant suggestions</span>
+                      <span>Cmd+K opens the &quot;Command Palette&quot; learns from your usage and shows relevant suggestions</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="w-1.5 h-1.5 bg-amber-500 rounded-full mt-2 flex-shrink-0" />

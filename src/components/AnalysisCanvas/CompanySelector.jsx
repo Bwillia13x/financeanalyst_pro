@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, TrendingUp, Building2 } from 'lucide-react';
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 const CompanySelector = ({ onCompanySelect }) => {
   const [searchTerm, setSearchTerm] = useState('');

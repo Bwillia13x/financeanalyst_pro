@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { fileURLToPath, URL } from 'node:url'
 import { imageOptimization } from './vite-plugins/imageOptimization.js'
 
 // https://vitejs.dev/config/
@@ -14,6 +15,11 @@ export default defineConfig({
       enableInDev: false
     })
   ],
+  resolve: {
+    alias: {
+      src: fileURLToPath(new URL('./src', import.meta.url))
+    }
+  },
   server: {
     fs: {
       allow: [
@@ -21,6 +27,7 @@ export default defineConfig({
         '/Users/benjaminwilliams/haven_test',
         '/Users/benjaminwilliams/local_financepro/financeanalyst_pro',
         '/Users/benjaminwilliams/financeanalyst_pro-1',
+        '/Users/benjaminwilliams/valor-ivx-pro(08.17.2025)/financeanalyst_pro',
       ],
     },
     proxy: {

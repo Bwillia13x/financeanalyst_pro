@@ -24,6 +24,12 @@ const Header = () => {
       tooltip: 'Real-time data aggregation from Bloomberg, FactSet, and Refinitiv feeds'
     },
     {
+      id: 'portfolio-management',
+      label: 'Portfolio',
+      path: '/portfolio-management',
+      tooltip: 'Comprehensive portfolio management dashboard with real-time tracking and analytics'
+    },
+    {
       id: 'analysis',
       label: 'Analysis',
       path: '/scenario-analysis-sensitivity-tools',
@@ -34,6 +40,24 @@ const Header = () => {
       label: 'Private Analysis',
       path: '/private-analysis',
       tooltip: 'Manual financial data input and sophisticated modeling with spreadsheet-style interface'
+    },
+    {
+      id: 'valuation-workbench',
+      label: 'Valuation Workbench',
+      path: '/valuation-workbench',
+      tooltip: 'World-class DCF valuation studio with sensitivity analysis, Monte Carlo, and scenario modeling'
+    },
+    {
+      id: 'model-lab',
+      label: 'Model Lab',
+      path: '/model-lab',
+      tooltip: 'Reusable model library with DCF, LBO, Comps, and EPV templates for quick financial modeling'
+    },
+    {
+      id: 'advanced-charts',
+      label: 'Advanced Charts',
+      path: '/advanced-charts',
+      tooltip: 'Professional-grade charting and data visualization with real-time updates and customizable dashboards'
     }
   ];
 

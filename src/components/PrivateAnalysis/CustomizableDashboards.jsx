@@ -32,7 +32,8 @@ import {
   Bookmark,
   Star,
   Zap,
-  AlertTriangle
+  AlertTriangle,
+  X
 } from 'lucide-react';
 import React, { useState, useCallback } from 'react';
 import {

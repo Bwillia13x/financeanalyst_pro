@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { TrendingUp, Building2, Calendar, DollarSign } from 'lucide-react';
-import React from 'react';
+// React not needed for JSX-only component
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer } from 'recharts';
 
 const CompanyOverview = ({ company, compact = false }) => {

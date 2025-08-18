@@ -21,10 +21,10 @@ import EnhancedMarketDataDashboard from '../components/PrivateAnalysis/EnhancedM
 import EnhancedScenarioAnalysis from '../components/PrivateAnalysis/EnhancedScenarioAnalysis';
 import FinancialModelWorkspace from '../components/PrivateAnalysis/FinancialModelWorkspace';
 import FinancialSpreadsheet from '../components/PrivateAnalysis/FinancialSpreadsheet';
-import SEOHead from '../components/SEO/SEOHead';
 import ModelingTools from '../components/PrivateAnalysis/ModelingTools';
-import WorkflowNavigation from '../components/PrivateAnalysis/WorkflowNavigation';
 import MonteCarloIntegrationHub from '../components/PrivateAnalysis/MonteCarloIntegrationHub';
+import WorkflowNavigation from '../components/PrivateAnalysis/WorkflowNavigation';
+import SEOHead from '../components/SEO/SEOHead';
 import Button from '../components/ui/Button';
 import Header from '../components/ui/Header';
 import defaultFinancialData from '../data/defaultFinancialData';

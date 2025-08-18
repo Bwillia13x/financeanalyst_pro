@@ -17,7 +17,7 @@ import {
   Lock,
   Unlock,
   RotateCcw,
-  Compare,
+  // Compare, // not available in lucide-react, using RotateCcw instead
   Tag,
   MessageSquare,
   Calendar
@@ -148,7 +148,7 @@ const VersioningAuditTrails = ({ modelId, modelData, onDataChange }) => {
               { id: 'versions', label: 'Version History', icon: GitBranch },
               { id: 'audit', label: 'Audit Logs', icon: FileText },
               { id: 'compliance', label: 'Compliance', icon: Lock },
-              { id: 'compare', label: 'Compare Versions', icon: Compare }
+              { id: 'compare', label: 'Compare Versions', icon: RotateCcw }
             ].map((tab) => {
               const Icon = tab.icon;
               return (
@@ -434,7 +434,7 @@ const VersioningAuditTrails = ({ modelId, modelData, onDataChange }) => {
               </div>
 
               <button className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-medium flex items-center">
-                <Compare className="w-5 h-5 mr-2" />
+                <RotateCcw className="w-5 h-5 mr-2" />
                 Generate Comparison Report
               </button>
 

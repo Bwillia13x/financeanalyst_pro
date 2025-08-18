@@ -1,5 +1,6 @@
 import express from 'express';
 import { body, param, query, validationResult } from 'express-validator';
+
 import apiService from '../services/apiService.js';
 
 const router = express.Router();
@@ -23,10 +24,10 @@ const validateRequest = (req, res, next) => {
 router.get('/quote/:symbol',
   param('symbol').isAlpha().isLength({ min: 1, max: 5 }).toUpperCase(),
   validateRequest,
-  async (req, res) => {
+  async(req, res) => {
     try {
       const { symbol } = req.params;
-      
+
       // Try Yahoo Finance first (no API key required)
       try {
         const yahooData = await apiService.makeApiRequest({
@@ -114,7 +115,7 @@ router.get('/historical/:symbol',
   query('range').optional().isIn(['1d', '5d', '1mo', '3mo', '6mo', '1y', '2y', '5y']),
   query('interval').optional().isIn(['1m', '2m', '5m', '15m', '30m', '60m', '90m', '1h', '1d', '5d', '1wk', '1mo', '3mo']),
   validateRequest,
-  async (req, res) => {
+  async(req, res) => {
     try {
       const { symbol } = req.params;
       const { range = '1mo', interval = '1d' } = req.query;
@@ -180,7 +181,7 @@ router.get('/intraday/:symbol',
   param('symbol').isAlpha().isLength({ min: 1, max: 5 }).toUpperCase(),
   query('interval').optional().isIn(['1min', '5min', '15min', '30min', '60min']),
   validateRequest,
-  async (req, res) => {
+  async(req, res) => {
     try {
       const { symbol } = req.params;
       const { interval = '5min' } = req.query;
@@ -188,8 +189,8 @@ router.get('/intraday/:symbol',
       const alphaData = await apiService.makeApiRequest({
         service: 'alphaVantage',
         endpoint: 'TIME_SERIES_INTRADAY',
-        params: { 
-          symbol, 
+        params: {
+          symbol,
           interval,
           outputsize: 'compact'
         },
@@ -241,13 +242,13 @@ router.post('/batch',
   body('symbols').isArray({ min: 1, max: 10 }),
   body('symbols.*').isAlpha().isLength({ min: 1, max: 5 }),
   validateRequest,
-  async (req, res) => {
+  async(req, res) => {
     try {
       const { symbols } = req.body;
       const results = {};
 
       // Process symbols in parallel with error handling
-      const promises = symbols.map(async (symbol) => {
+      const promises = symbols.map(async(symbol) => {
         try {
           const data = await apiService.makeApiRequest({
             service: 'yahoo',
@@ -260,7 +261,7 @@ router.post('/batch',
           if (data?.chart?.result?.[0]) {
             const result = data.chart.result[0];
             const meta = result.meta;
-            
+
             results[symbol] = {
               symbol: meta.symbol,
               price: meta.regularMarketPrice,

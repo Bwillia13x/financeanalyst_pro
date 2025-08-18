@@ -5,24 +5,22 @@
 
 import { motion } from 'framer-motion';
 import {
-  Brain,
-  Users,
-  Activity,
-  TrendingUp,
   BarChart3,
+  Activity,
+  Target,
+  Brain,
   Lightbulb,
   Download,
-  RefreshCw,
   AlertTriangle,
-  CheckCircle,
+  Users,
+  Zap,
+  RefreshCw,
   ArrowUp,
   ArrowDown,
   Minus,
-  Zap,
-  Target,
-  Eye
+  CheckCircle
 } from 'lucide-react';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 import {
   useBusinessIntelligence,
@@ -46,8 +44,8 @@ const BusinessIntelligenceDashboard = ({ isVisible = true, onClose }) => {
     try {
       await generateReport();
       setTimeout(() => setRefreshing(false), 1000);
-    } catch (error) {
-      setRefreshing(false);
+    } catch (_error) {
+      console.error('Error fetching insights:', _error);
     }
   };
 

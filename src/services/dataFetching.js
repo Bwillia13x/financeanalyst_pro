@@ -1,33 +1,12 @@
-import axios from 'axios';
-
-import { apiKeyValidator } from '../utils/apiKeyValidator.js';
+import secureApiClient from './secureApiClient.js';
 import { apiLogger } from '../utils/apiLogger.js';
 
 import { financialModelingEngine } from './financialModelingEngine.js';
 import { lboModelingEngine } from './lboModelingEngine.js';
 import { monteCarloEngine } from './monteCarloEngine.js';
 
-// Data source configurations - Updated for Vite environment variables
-const DATA_SOURCES = {
-  ALPHA_VANTAGE: {
-    baseURL: 'https://www.alphavantage.co/query',
-    apiKey: import.meta.env.VITE_ALPHA_VANTAGE_API_KEY || 'demo'
-  },
-  FMP: {
-    baseURL: 'https://financialmodelingprep.com/api/v3',
-    apiKey: import.meta.env.VITE_FMP_API_KEY || 'demo'
-  },
-  SEC_EDGAR: {
-    baseURL: 'https://data.sec.gov',
-    headers: {
-      'User-Agent': 'FinanceAnalyst-Pro (contact@financeanalyst.com)'
-    }
-  },
-  YAHOO_FINANCE: {
-    baseURL: 'https://query1.finance.yahoo.com/v8/finance/chart',
-    fallbackURL: 'https://query2.finance.yahoo.com/v8/finance/chart'
-  }
-};
+// SECURITY NOTE: All API calls now route through secure backend proxy
+// No API keys are exposed in frontend code
 
 // Rate limiting configuration
 const RATE_LIMITS = {
@@ -308,41 +287,14 @@ class RetryManager {
 }
 
 class DataFetchingService {
-  constructor(
-    env = import.meta.env,
-    customRateLimits = null,
-    retryConfig = null,
-    circuitBreakerConfig = null
-  ) {
-    this.rateLimiters = {};
+  constructor() {
     this.cache = new Map();
     this.cacheExpiry = new Map();
-    this.env = env;
-    this.customRateLimits = customRateLimits;
-    this.demoMode = this.isDemoMode(env);
-    this.retryManager = new RetryManager(retryConfig);
-    this.circuitBreakers = this.initializeCircuitBreakers(circuitBreakerConfig);
     this.logger = apiLogger;
-    this.initializeRateLimiters();
+    this.client = secureApiClient;
 
     // Log service initialization
-    this.logger.log('INFO', '🚀 DataFetchingService initialized', {
-      demoMode: this.demoMode,
-      environment: env.VITE_APP_ENV || 'development'
-    });
-  }
-
-  isDemoMode(env = import.meta.env) {
-    // Check if we're forcing demo mode
-    if (env.VITE_FORCE_DEMO_MODE === 'true') {
-      return true;
-    }
-
-    // Check if we're using demo API keys
-    const hasValidKeys =
-      (env.VITE_ALPHA_VANTAGE_API_KEY && env.VITE_ALPHA_VANTAGE_API_KEY !== 'demo') ||
-      (env.VITE_FMP_API_KEY && env.VITE_FMP_API_KEY !== 'demo');
-    return !hasValidKeys;
+    this.logger.log('INFO', '🚀 DataFetchingService initialized (using secure backend proxy)');
   }
 
   initializeCircuitBreakers(config) {
@@ -513,64 +465,14 @@ class DataFetchingService {
     const cached = this.getFromCache(cacheKey);
     if (cached) return cached;
 
-    if (this.demoMode) {
-      console.warn('Using demo mode - generating mock data for', ticker);
-      const mockData = this.generateMockData(ticker, 'profile');
-      this.setCache(cacheKey, mockData, 1440);
-      return mockData;
-    }
-
-    return this.circuitBreakers.FMP.execute(async() => {
-      return this.retryManager.executeWithRetry(async() => {
-        await this.checkRateLimit('FMP');
-
-        // Log API request start
-        const requestId = this.logger.logApiRequest('FMP', `/profile/${ticker}`, { ticker });
-
-        try {
-          const response = await axios.get(`${DATA_SOURCES.FMP.baseURL}/profile/${ticker}`, {
-            params: { apikey: DATA_SOURCES.FMP.apiKey },
-            timeout: 10000
-          });
-
-          if (!response.data || !Array.isArray(response.data) || response.data.length === 0) {
-            throw new Error(`Company profile not found for ticker: ${ticker}`);
-          }
-
-          const profile = response.data[0];
-          if (!profile || typeof profile !== 'object') {
-            throw new Error(`Company profile not found for ticker: ${ticker}`);
-          }
-
-          // Log successful API response
-          this.logger.logApiResponse(requestId, true, {
-            profileFound: true,
-            ticker: profile.symbol
-          });
-
-          this.setCache(cacheKey, profile, 1440); // Cache for 24 hours
-          return profile;
-        } catch (error) {
-          // Log failed API response
-          this.logger.logApiResponse(requestId, false, null, error);
-          throw error;
-        }
-      }, `Company profile fetch for ${ticker}`);
-    }).catch(error => {
-      // Handle circuit breaker errors - preserve the circuitBreakerOpen property
-      if (error.circuitBreakerOpen) {
-        throw error;
-      }
-
-      // Handle authentication errors with fallback to demo mode
-      if (error.response?.status === 403 || error.response?.status === 401) {
-        console.warn('API key invalid, falling back to demo mode');
-        const mockData = this.generateMockData(ticker, 'profile');
-        this.setCache(cacheKey, mockData, 1440);
-        return mockData;
-      }
+    try {
+      const profile = await this.client.getCompanyProfile(ticker);
+      this.setCache(cacheKey, profile, 1440); // Cache for 24 hours
+      return profile;
+    } catch (error) {
+      this.logger.log('ERROR', `Failed to fetch company profile for ${ticker}`, { error: error.message });
       throw new Error(`Failed to fetch company profile: ${error.message}`);
-    });
+    }
   }
 
   async fetchFinancialStatements(
@@ -583,49 +485,14 @@ class DataFetchingService {
     const cached = this.getFromCache(cacheKey);
     if (cached) return cached;
 
-    if (this.demoMode) {
-      console.warn('Using demo mode - generating mock financial data for', ticker);
-      const mockData = this.generateMockData(
-        ticker,
-        statement.replace('-statement', '').replace('-', '')
-      );
-      this.setCache(cacheKey, mockData, 360);
-      return mockData;
+    try {
+      const data = await this.client.fetchFinancialStatements(ticker, statement, period, limit);
+      this.setCache(cacheKey, data, 360); // Cache for 6 hours
+      return data;
+    } catch (error) {
+      this.logger.log('ERROR', `Failed to fetch ${statement} for ${ticker}`, { error: error.message });
+      throw new Error(`Failed to fetch ${statement}: ${error.message}`);
     }
-
-    return this.retryManager
-      .executeWithRetry(async() => {
-        await this.checkRateLimit('FMP');
-
-        const response = await axios.get(`${DATA_SOURCES.FMP.baseURL}/${statement}/${ticker}`, {
-          params: {
-            apikey: DATA_SOURCES.FMP.apiKey,
-            period,
-            limit
-          },
-          timeout: 15000
-        });
-
-        if (!response.data || response.data.length === 0) {
-          throw new Error(`No ${statement} data found for ${ticker}`);
-        }
-
-        this.setCache(cacheKey, response.data, 360); // Cache for 6 hours
-        return response.data;
-      }, `Financial statements fetch for ${ticker} (${statement})`)
-      .catch(error => {
-        // Handle authentication errors with fallback to demo mode
-        if (error.response?.status === 403 || error.response?.status === 401) {
-          console.warn('API key invalid, falling back to demo mode');
-          const mockData = this.generateMockData(
-            ticker,
-            statement.replace('-statement', '').replace('-', '')
-          );
-          this.setCache(cacheKey, mockData, 360);
-          return mockData;
-        }
-        throw new Error(`Failed to fetch ${statement}: ${error.message}`);
-      });
   }
 
   async fetchMarketData(ticker, range = '1y') {
@@ -633,44 +500,13 @@ class DataFetchingService {
     const cached = this.getFromCache(cacheKey);
     if (cached) return cached;
 
-    if (this.demoMode) {
-      console.warn('Using demo mode - generating mock market data for', ticker);
-      const mockData = this.generateMockData(ticker, 'marketData');
-      this.setCache(cacheKey, mockData, 15);
-      return mockData;
-    }
-
     try {
-      return await this.retryManager.executeWithRetry(async() => {
-        // Try Yahoo Finance first (no API key required)
-        const response = await axios.get(`${DATA_SOURCES.YAHOO_FINANCE.baseURL}/${ticker}`, {
-          params: { range, interval: '1d' },
-          timeout: 10000
-        });
-
-        const result = response.data.chart.result[0];
-        if (!result) {
-          throw new Error(`No market data found for ticker: ${ticker}`);
-        }
-
-        const marketData = {
-          symbol: result.meta.symbol,
-          currentPrice: result.meta.regularMarketPrice,
-          previousClose: result.meta.previousClose,
-          marketCap: result.meta.marketCap,
-          volume: result.meta.regularMarketVolume,
-          timestamps: result.timestamp,
-          prices: result.indicators.quote[0],
-          currency: result.meta.currency
-        };
-
-        this.setCache(cacheKey, marketData, 15); // Cache for 15 minutes
-        return marketData;
-      }, `Market data fetch for ${ticker}`);
+      const data = await this.client.fetchMarketData(ticker, range);
+      this.setCache(cacheKey, data, 15); // Cache for 15 minutes
+      return data;
     } catch (error) {
-      // Fallback to Alpha Vantage or demo mode
-      console.warn(`Primary market data source failed for ${ticker}, trying alternative`);
-      return this.fetchMarketDataAlternative(ticker);
+      this.logger.log('ERROR', `Failed to fetch market data for ${ticker}`, { error: error.message });
+      throw new Error(`Failed to fetch market data: ${error.message}`);
     }
   }
 
@@ -762,65 +598,11 @@ class DataFetchingService {
     if (cached) return cached;
 
     try {
-      if (this.demoMode) {
-        console.warn('Using demo peer data');
-        const peerTickers = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META'].filter(t => t !== ticker);
-        const peers = peerTickers.slice(0, 5).map(peerTicker => {
-          const basePrice = 100 + Math.random() * 200;
-          const marketCap = 1000000000 + Math.random() * 2000000000;
-          return {
-            symbol: peerTicker,
-            name: `${peerTicker} Corporation`,
-            marketCap,
-            currentPrice: basePrice,
-            sector: 'Technology',
-            industry: 'Software',
-            peRatio: 15 + Math.random() * 20,
-            evToEbitda: 10 + Math.random() * 15,
-            priceToBook: 1 + Math.random() * 4,
-            debtToEquity: Math.random() * 2
-          };
-        });
-        this.setCache(cacheKey, peers, 240);
-        return peers;
-      }
-
-      await this.checkRateLimit('FMP');
-
-      // Get company profile first to determine industry
-      const profile = await this.fetchCompanyProfile(ticker);
-
-      // For demo, use hardcoded peer list
-      const peerTickers = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META'].filter(t => t !== ticker);
-
-      // Fetch key metrics for peer analysis
-      const peerData = await Promise.allSettled(
-        peerTickers.slice(0, 5).map(async peerTicker => {
-          const peerProfile = await this.fetchCompanyProfile(peerTicker);
-          const peerMarket = await this.fetchMarketData(peerTicker);
-
-          return {
-            symbol: peerTicker,
-            name: peerProfile.companyName,
-            marketCap: peerProfile.mktCap,
-            currentPrice: peerMarket.currentPrice,
-            sector: peerProfile.sector,
-            industry: peerProfile.industry,
-            peRatio: peerProfile.pe,
-            evToEbitda: peerProfile.enterpriseValueOverEBITDA,
-            priceToBook: peerProfile.pb,
-            debtToEquity: peerProfile.debtToEquity
-          };
-        })
-      );
-
-      const validPeers = peerData
-        .filter(result => result.status === 'fulfilled')
-        .map(result => result.value);
-
-      this.setCache(cacheKey, validPeers, 240); // Cache for 4 hours
-      return validPeers;
+      const peers = await this.client.fetchPeerComparables(ticker);
+      this.setCache(cacheKey, peers, 240); // Cache for 4 hours
+      return peers;
     } catch (error) {
+      this.logger.log('ERROR', `Failed to fetch peer comparables for ${ticker}`, { error: error.message });
       throw new Error(`Failed to fetch peer comparables: ${error.message}`);
     }
   }

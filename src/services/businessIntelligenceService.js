@@ -5,7 +5,7 @@
 
 import { EventEmitter } from 'events';
 
-import { performanceMonitoring } from '../utils/performanceMonitoring';
+// import { performanceMonitoring } from '../utils/performanceMonitoring'; // Missing module
 
 class BusinessIntelligenceService extends EventEmitter {
   constructor() {
@@ -75,14 +75,14 @@ class BusinessIntelligenceService extends EventEmitter {
 
       // Track initialization
       if (typeof performanceMonitoring !== 'undefined') {
-        performanceMonitoring.trackCustomMetric('bi_service_init_success', 1);
+        // performanceMonitoring.trackCustomMetric('bi_service_init_success', 1);
       }
 
       console.log('BusinessIntelligenceService initialized successfully');
     } catch (error) {
       console.error('Failed to initialize BusinessIntelligenceService:', error);
       if (typeof performanceMonitoring !== 'undefined') {
-        performanceMonitoring.trackCustomMetric('bi_service_init_error', 1);
+        // performanceMonitoring.trackCustomMetric('bi_service_init_error', 1);
       }
       throw error;
     }

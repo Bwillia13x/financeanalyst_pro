@@ -147,6 +147,10 @@ const RealTimeMarketDataCenter = () => {
   useEffect(() => {
     const initializeRealData = async() => {
       try {
+        // Ensure backend base URL is initialized from environment at runtime
+        const base = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api';
+        enhancedApiService.setBaseUrl(base);
+
         // Check API health status
         const healthStatus = enhancedApiService.getSourceHealthStatus();
         setApiHealthStatus(healthStatus);

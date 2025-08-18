@@ -15,6 +15,9 @@ const ValuationTool = lazy(() => import('./components/ValuationTool/ValuationToo
 const ValuationToolDocs = lazy(() => import('./components/ValuationTool/ValuationToolDocs'));
 const ValuationToolDemo = lazy(() => import('./pages/valuation-tool-demo'));
 const PrivateAnalysis = lazy(() => import('./pages/PrivateAnalysis'));
+const ValuationWorkbench = lazy(() => import('./pages/ValuationWorkbench'));
+const ModelLab = lazy(() => import('./pages/ModelLab'));
+const PortfolioManagement = lazy(() => import('./pages/PortfolioManagement'));
 const FinancialInputsDemo = lazy(() => import('./components/FinancialInputsDemo'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
@@ -36,6 +39,9 @@ const Routes = () => {
             <Route path="/valuation-tool" element={<ValuationTool />} />
             <Route path="/valuation-tool/docs" element={<ValuationToolDocs />} />
             <Route path="/valuation-tool/demo" element={<ValuationToolDemo />} />
+            <Route path="/valuation-workbench" element={<ValuationWorkbench />} />
+            <Route path="/model-lab" element={<ModelLab />} />
+            <Route path="/portfolio-management" element={<PortfolioManagement />} />
             <Route path="/private-analysis" element={<PrivateAnalysis />} />
             <Route path="/financial-inputs-demo" element={<FinancialInputsDemo />} />
             <Route path="*" element={<NotFound />} />

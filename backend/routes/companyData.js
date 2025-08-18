@@ -1,5 +1,6 @@
 import express from 'express';
 import { param, query, validationResult } from 'express-validator';
+
 import apiService from '../services/apiService.js';
 
 const router = express.Router();
@@ -23,7 +24,7 @@ const validateRequest = (req, res, next) => {
 router.get('/profile/:symbol',
   param('symbol').isAlpha().isLength({ min: 1, max: 5 }).toUpperCase(),
   validateRequest,
-  async (req, res) => {
+  async(req, res) => {
     try {
       const { symbol } = req.params;
 
@@ -39,7 +40,7 @@ router.get('/profile/:symbol',
 
         if (Array.isArray(fmpData) && fmpData.length > 0) {
           const profile = fmpData[0];
-          
+
           const response = {
             symbol: profile.symbol,
             companyName: profile.companyName,
@@ -141,7 +142,7 @@ router.get('/peers/:symbol',
   param('symbol').isAlpha().isLength({ min: 1, max: 5 }).toUpperCase(),
   query('limit').optional().isInt({ min: 1, max: 20 }),
   validateRequest,
-  async (req, res) => {
+  async(req, res) => {
     try {
       const { symbol } = req.params;
       const { limit = 10 } = req.query;
@@ -157,7 +158,7 @@ router.get('/peers/:symbol',
       if (Array.isArray(fmpData) && fmpData.length > 0) {
         // Get detailed data for each peer
         const peerSymbols = fmpData[0].peersList.slice(0, parseInt(limit));
-        const peerPromises = peerSymbols.map(async (peerSymbol) => {
+        const peerPromises = peerSymbols.map(async(peerSymbol) => {
           try {
             const peerProfile = await apiService.makeApiRequest({
               service: 'fmp',
@@ -220,7 +221,7 @@ router.get('/peers/:symbol',
 router.get('/dcf/:symbol',
   param('symbol').isAlpha().isLength({ min: 1, max: 5 }).toUpperCase(),
   validateRequest,
-  async (req, res) => {
+  async(req, res) => {
     try {
       const { symbol } = req.params;
 
@@ -234,7 +235,7 @@ router.get('/dcf/:symbol',
 
       if (Array.isArray(fmpData) && fmpData.length > 0) {
         const dcf = fmpData[0];
-        
+
         const response = {
           symbol: dcf.symbol,
           dcfValue: dcf.dcf,
@@ -268,7 +269,7 @@ router.get('/earnings/:symbol',
   param('symbol').isAlpha().isLength({ min: 1, max: 5 }).toUpperCase(),
   query('limit').optional().isInt({ min: 1, max: 20 }),
   validateRequest,
-  async (req, res) => {
+  async(req, res) => {
     try {
       const { symbol } = req.params;
       const { limit = 8 } = req.query;

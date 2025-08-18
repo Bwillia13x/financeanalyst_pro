@@ -1,98 +1,63 @@
-// API configuration and environment setup for data fetching services
+// SECURITY NOTE: API configuration for reference only
+// All actual API calls now route through secure backend proxy
+// No API keys are exposed in frontend code
 
 export const API_CONFIG = {
-  // Alpha Vantage (Real-time market data, technical indicators)
-  ALPHA_VANTAGE: {
-    baseURL: 'https://www.alphavantage.co/query',
-    apiKey: import.meta.env.VITE_ALPHA_VANTAGE_API_KEY || 'demo', // Fixed for Vite
-    rateLimit: {
-      requests: 5,
-      period: 60000 // 5 requests per minute for free tier
-    },
+  // Backend proxy configuration
+  BACKEND_PROXY: {
+    baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api',
     endpoints: {
-      quote: 'GLOBAL_QUOTE',
-      dailyAdjusted: 'TIME_SERIES_DAILY_ADJUSTED',
-      company: 'OVERVIEW',
-      earnings: 'EARNINGS',
-      fundamentals: 'INCOME_STATEMENT'
+      marketData: '/market-data',
+      financialStatements: '/financial-statements',
+      companyData: '/company-data',
+      economicData: '/economic-data',
+      health: '/health'
     }
   },
 
-  // Financial Modeling Prep (Comprehensive financial data)
-  FMP: {
-    baseURL: 'https://financialmodelingprep.com/api/v3',
-    apiKey: import.meta.env.VITE_FMP_API_KEY || 'demo', // Fixed for Vite
-    rateLimit: {
-      requests: 250,
-      period: 86400000 // 250 requests per day for free tier
+  // External service information (for backend reference only)
+  EXTERNAL_SERVICES: {
+    ALPHA_VANTAGE: {
+      name: 'Alpha Vantage',
+      description: 'Real-time market data and technical indicators',
+      rateLimit: { requests: 5, period: 60000 }
     },
-    endpoints: {
-      profile: '/profile/',
-      incomeStatement: '/income-statement/',
-      balanceSheet: '/balance-sheet-statement/',
-      cashFlow: '/cash-flow-statement/',
-      ratios: '/ratios/',
-      peers: '/stock_peers',
-      dcf: '/discounted-cash-flow/',
-      enterprise: '/enterprise-values/'
-    }
-  },
-
-  // SEC EDGAR (Regulatory filings)
-  SEC_EDGAR: {
-    baseURL: 'https://data.sec.gov',
-    headers: {
-      'User-Agent': 'FinanceAnalyst-Pro contact@financeanalyst.com'
+    FMP: {
+      name: 'Financial Modeling Prep',
+      description: 'Comprehensive financial data',
+      rateLimit: { requests: 250, period: 86400000 }
     },
-    rateLimit: {
-      requests: 10,
-      period: 1000 // 10 requests per second
+    SEC_EDGAR: {
+      name: 'SEC EDGAR',
+      description: 'Regulatory filings',
+      rateLimit: { requests: 10, period: 1000 }
     },
-    endpoints: {
-      submissions: '/submissions/CIK',
-      filings: '/Archives/edgar/data/'
-    }
-  },
-
-  // Yahoo Finance (Real-time quotes and market data)
-  YAHOO_FINANCE: {
-    baseURL: 'https://query1.finance.yahoo.com/v8/finance/chart',
-    fallbackURL: 'https://query2.finance.yahoo.com/v8/finance/chart',
-    rateLimit: {
-      requests: 100,
-      period: 60000 // Conservative limit
-    }
-  },
-
-  // Quandl/NASDAQ Data Link (Economic and financial datasets)
-  QUANDL: {
-    baseURL: 'https://data.nasdaq.com/api/v3',
-    apiKey: import.meta.env.VITE_QUANDL_API_KEY || 'demo', // Fixed for Vite
-    rateLimit: {
-      requests: 50,
-      period: 86400000 // 50 requests per day for free tier
-    }
-  },
-
-  // Federal Reserve Economic Data (FRED)
-  FRED: {
-    baseURL: 'https://api.stlouisfed.org/fred',
-    apiKey: import.meta.env.VITE_FRED_API_KEY || 'demo', // Fixed for Vite
-    rateLimit: {
-      requests: 120,
-      period: 60000 // 120 requests per minute
+    YAHOO_FINANCE: {
+      name: 'Yahoo Finance',
+      description: 'Real-time quotes and market data',
+      rateLimit: { requests: 100, period: 60000 }
+    },
+    QUANDL: {
+      name: 'Quandl/NASDAQ Data Link',
+      description: 'Economic and financial datasets',
+      rateLimit: { requests: 50, period: 86400000 }
+    },
+    FRED: {
+      name: 'Federal Reserve Economic Data',
+      description: 'Economic indicators and data',
+      rateLimit: { requests: 120, period: 60000 }
     }
   }
 };
 
-// Data source priority configuration
+// All data now routes through secure backend proxy
 export const DATA_SOURCE_PRIORITY = {
-  marketData: ['YAHOO_FINANCE', 'ALPHA_VANTAGE'],
-  financialStatements: ['FMP', 'ALPHA_VANTAGE'],
-  companyProfile: ['FMP', 'ALPHA_VANTAGE'],
-  secFilings: ['SEC_EDGAR'],
-  economicData: ['FRED', 'QUANDL'],
-  peers: ['FMP']
+  marketData: ['BACKEND_PROXY'],
+  financialStatements: ['BACKEND_PROXY'],
+  companyProfile: ['BACKEND_PROXY'],
+  secFilings: ['BACKEND_PROXY'],
+  economicData: ['BACKEND_PROXY'],
+  peers: ['BACKEND_PROXY']
 };
 
 // Cache configuration
@@ -204,34 +169,21 @@ export const getEnvironmentConfig = () => {
   return configs[env] || configs.development;
 };
 
-// Helper function to get API key for a service
+// DEPRECATED: API keys are now handled securely by backend
 export const getApiKey = service => {
-  const keyMap = {
-    ALPHA_VANTAGE: import.meta.env.VITE_ALPHA_VANTAGE_API_KEY, // Fixed for Vite
-    FMP: import.meta.env.VITE_FMP_API_KEY, // Fixed for Vite
-    QUANDL: import.meta.env.VITE_QUANDL_API_KEY, // Fixed for Vite
-    FRED: import.meta.env.VITE_FRED_API_KEY // Fixed for Vite
-  };
-
-  return keyMap[service] || 'demo';
+  console.warn('getApiKey is deprecated - all API calls now route through secure backend proxy');
+  return null;
 };
 
-// Helper function to build request headers
-export const buildHeaders = (service, customHeaders = {}) => {
+// Helper function to build secure request headers for backend proxy
+export const buildHeaders = (customHeaders = {}) => {
   const baseHeaders = {
     'Content-Type': 'application/json',
     Accept: 'application/json'
   };
 
-  const serviceHeaders = {
-    SEC_EDGAR: {
-      'User-Agent': API_CONFIG.SEC_EDGAR.headers['User-Agent']
-    }
-  };
-
   return {
     ...baseHeaders,
-    ...serviceHeaders[service],
     ...customHeaders
   };
 };

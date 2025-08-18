@@ -1,0 +1,37 @@
+/* FinanceAnalyst Pro - Critical Path CSS (kept tiny) */
+:root {
+  --fa-bg: #ffffff;
+  --fa-text: #0f172a; /* slate-900 */
+}
+
+html, body {
+  background: var(--fa-bg);
+  color: var(--fa-text);
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Ensure root paints immediately */
+#root {
+  display: block;
+  min-height: 100vh;
+}
+
+/* Keep initial loading indicators visible */
+[data-app-loading="true"], .loading, .loading-spinner {
+  opacity: 1;
+}
+
+/* Accessibility: avoid long running animations for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Utility */
+[hidden] { display: none !important; }

@@ -5,25 +5,19 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Users,
   Share2,
-  MessageSquare,
-  Settings,
-  Plus,
-  Wifi,
-  WifiOff,
-  Activity,
-  Eye,
-  Edit3,
+  Users,
+  MessageCircle,
+  Video,
   Clock,
   User,
-  Globe,
-  Lock,
+  Plus,
   ChevronRight,
-  Play,
-  Pause
+  Edit3,
+  Eye,
+  MessageSquare
 } from 'lucide-react';
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 
 import { useCollaboration, useWorkspace, usePresence } from '../../hooks/useCollaboration';
 import SEOHead from '../SEO/SEOHead';
@@ -45,28 +39,34 @@ const CollaborationDashboard = ({
     isInitialized,
     connectionStatus,
     currentWorkspace,
-    workspaceMembers,
+    members: _members2,
     isLoading,
     error,
     joinWorkspace,
-    leaveWorkspace,
-    shareModel,
-    getWorkspaceModels
+    leaveWorkspace: _leaveWorkspace,
+    shareModel: _shareModel,
+    getWorkspaceModels: _getWorkspaceModels
   } = useCollaboration(userId, userProfile);
 
   const {
-    workspace,
-    members,
-    models,
-    activity,
-    isLoading: workspaceLoading
+    workspace: _workspace,
+    members: _members,
+    models: _models,
+    activity: _activity,
+    workspaceLoading: _workspaceLoading
   } = useWorkspace(selectedWorkspace?.id);
 
   const {
     cursors,
-    presence,
-    updateCursor
+    presence: _presence,
+    updateCursor: _updateCursor
   } = usePresence(selectedWorkspace?.id);
+
+  // Demo data
+  const _workspaceMembers = [
+    { id: '1', name: 'Alex Chen', email: 'alex@company.com', role: 'Owner', status: 'online' },
+    { id: '2', name: 'Sarah Kim', email: 'sarah@company.com', role: 'Editor', status: 'away' }
+  ];
 
   // Handle workspace creation
   const handleCreateWorkspace = useCallback(async() => {
@@ -180,12 +180,12 @@ const CollaborationDashboard = ({
               <div className="flex items-center space-x-2">
                 {connectionStatus.connected ? (
                   <>
-                    <Wifi className="w-4 h-4 text-green-300" />
+                    <Video className="w-4 h-4 text-green-300" />
                     <span className="text-sm text-green-300">Connected</span>
                   </>
                 ) : (
                   <>
-                    <WifiOff className="w-4 h-4 text-red-300" />
+                    <Video className="w-4 h-4 text-red-300" />
                     <span className="text-sm text-red-300">Disconnected</span>
                   </>
                 )}
@@ -224,10 +224,10 @@ const CollaborationDashboard = ({
             <div className="border-b border-gray-200 px-6">
               <div className="flex space-x-8">
                 {[
-                  { id: 'overview', label: 'Overview', icon: Activity },
+                  { id: 'overview', label: 'Overview', icon: Clock },
                   { id: 'workspaces', label: 'Workspaces', icon: Users },
                   { id: 'models', label: 'Shared Models', icon: Share2 },
-                  { id: 'presence', label: 'Live Presence', icon: Eye }
+                  { id: 'presence', label: 'Live Presence', icon: MessageCircle }
                 ].map((tab) => {
                   const Icon = tab.icon;
                   return (
@@ -307,9 +307,9 @@ const CollaborationDashboard = ({
                             </p>
                           </div>
                           {connectionStatus.connected ? (
-                            <Wifi className="w-8 h-8 text-orange-500" />
+                            <Video className="w-8 h-8 text-orange-500" />
                           ) : (
-                            <WifiOff className="w-8 h-8 text-orange-500" />
+                            <Video className="w-8 h-8 text-orange-500" />
                           )}
                         </div>
                       </div>

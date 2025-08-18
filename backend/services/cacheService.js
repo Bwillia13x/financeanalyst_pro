@@ -3,17 +3,17 @@ import NodeCache from 'node-cache';
 class CacheService {
   constructor() {
     // Create different cache instances for different data types
-    this.marketDataCache = new NodeCache({ 
+    this.marketDataCache = new NodeCache({
       stdTTL: parseInt(process.env.CACHE_TTL_MARKET_DATA) || 900,
       checkperiod: 120
     });
-    
-    this.financialDataCache = new NodeCache({ 
+
+    this.financialDataCache = new NodeCache({
       stdTTL: parseInt(process.env.CACHE_TTL_FINANCIAL_DATA) || 21600,
       checkperiod: 600
     });
-    
-    this.companyDataCache = new NodeCache({ 
+
+    this.companyDataCache = new NodeCache({
       stdTTL: parseInt(process.env.CACHE_TTL_COMPANY_DATA) || 86400,
       checkperiod: 3600
     });
@@ -41,11 +41,11 @@ class CacheService {
           cache.on('set', (key, value) => {
             console.log(`Cache SET: ${key}`);
           });
-          
+
           cache.on('del', (key, value) => {
             console.log(`Cache DEL: ${key}`);
           });
-          
+
           cache.on('expired', (key, value) => {
             console.log(`Cache EXPIRED: ${key}`);
           });
@@ -62,12 +62,12 @@ class CacheService {
   get(cacheType, key) {
     const cache = this.getCache(cacheType);
     const data = cache.get(key);
-    
+
     if (data !== undefined) {
       this.stats.hits++;
       return data;
     }
-    
+
     this.stats.misses++;
     return null;
   }
@@ -83,11 +83,11 @@ class CacheService {
   set(cacheType, key, value, ttl = null) {
     const cache = this.getCache(cacheType);
     const success = cache.set(key, value, ttl);
-    
+
     if (success) {
       this.stats.sets++;
     }
-    
+
     return success;
   }
 
@@ -120,7 +120,7 @@ class CacheService {
 
   /**
    * Get cache instance by type
-   * @param {string} cacheType 
+   * @param {string} cacheType
    * @returns {NodeCache}
    */
   getCache(cacheType) {
@@ -166,7 +166,7 @@ class CacheService {
       .sort()
       .map(key => `${key}:${params[key]}`)
       .join('|');
-    
+
     return `${prefix}:${sortedParams}`;
   }
 }

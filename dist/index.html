@@ -22,18 +22,77 @@
   <!-- Preload critical CSS -->
   <link rel="preload" href="/assets/critical.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
   <noscript><link rel="stylesheet" href="/assets/critical.css"></noscript>
-<script type="module" src="https://static.rocket.new/rocket-web.js?_cfg=https%3A%2F%2Ffinanceana4733back.builtwithrocket.new&_be=https%3A%2F%2Fapplication.rocket.new&_v=0.1.5"></script>
-  <script type="module" crossorigin src="/assets/index-Dc3K68ej.js"></script>
-  <link rel="modulepreload" crossorigin href="/assets/vendor-uZFMUkl0.js">
-  <link rel="modulepreload" crossorigin href="/assets/react-vendor-BWiQdkVb.js">
+  <script type="module" crossorigin src="/assets/index-DPdPN0n0.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/vendor-zO7HU-o7.js">
+  <link rel="modulepreload" crossorigin href="/assets/react-vendor-CaXMqa0k.js">
+  <link rel="modulepreload" crossorigin href="/assets/data-vendor-DpIj8wd6.js">
+  <link rel="modulepreload" crossorigin href="/assets/ui-vendor-DOXsx3JB.js">
   <link rel="modulepreload" crossorigin href="/assets/utils-vendor-Cj_bvvWu.js">
-  <link rel="modulepreload" crossorigin href="/assets/state-vendor-D3vL4m0Q.js">
-  <link rel="stylesheet" crossorigin href="/assets/index-BWJrIqeS.css">
+  <link rel="modulepreload" crossorigin href="/assets/state-vendor-DL0PFC30.js">
+  <link rel="stylesheet" crossorigin href="/assets/index-Pzcq1EGn.css">
 </head>
 
 <body>
   <noscript>You need to enable JavaScript to run this app.</noscript>
-  <div class="dhiwise-code" id="root"></div>
+  <div class="dhiwise-code" id="root">
+    <!-- Inline preloader for immediate First Contentful Paint -->
+    <div id="app-preloader" style="
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      background: #ffffff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      font-family: Inter, system-ui, sans-serif;
+    ">
+      <div style="
+        width: 48px;
+        height: 48px;
+        border: 3px solid #e5e7eb;
+        border-top: 3px solid #3b82f6;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-bottom: 16px;
+      "></div>
+      <p style="
+        color: #374151;
+        font-size: 16px;
+        font-weight: 500;
+        margin: 0;
+        text-align: center;
+      ">Loading FinanceAnalyst Pro...</p>
+      <p style="
+        color: #6b7280;
+        font-size: 14px;
+        margin: 8px 0 0 0;
+        text-align: center;
+      ">Professional Financial Modeling Platform</p>
+    </div>
+    <style>
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    </style>
+    <script>
+      // Remove preloader once React renders
+      document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() {
+          const preloader = document.getElementById('app-preloader');
+          if (preloader && document.querySelector('[data-reactroot]')) {
+            preloader.style.opacity = '0';
+            preloader.style.transition = 'opacity 0.3s ease-out';
+            setTimeout(() => preloader.remove(), 300);
+          }
+        }, 100);
+      });
+    </script>
+  </div>
 </body>
 
 </html>

@@ -10,12 +10,12 @@ import {
   Percent,
   Calendar
 } from 'lucide-react';
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 const AnalysisModule = ({
   moduleId,
-  companyData,
+  companyData: _companyData,
   inputs,
   results,
   onInputChange,
@@ -24,7 +24,18 @@ const AnalysisModule = ({
   isCompact = false,
   isFullscreen = false
 }) => {
-  const [activeInputTab, setActiveInputTab] = useState('assumptions');
+  const [_activeInputTab, _setActiveInputTab] = useState('assumptions');
+
+  // Generate chart data for visualization at component level
+  const chartData = useMemo(() => {
+    if (!results?.freeCashFlows) return [];
+
+    return results.years.map((year, index) => ({
+      year: `Y${year}`,
+      fcf: results.freeCashFlows[index] / 1e6, // Convert to millions
+      pv: results.presentValues[index] / 1e6
+    }));
+  }, [results]);
 
   const moduleConfig = {
     dcf: {
@@ -95,16 +106,7 @@ const AnalysisModule = ({
       onInputChange({ yearlyData: updatedYearlyData });
     };
 
-    // Generate chart data for visualization
-    const chartData = useMemo(() => {
-      if (!results?.freeCashFlows) return [];
-
-      return results.years.map((year, index) => ({
-        year: `Y${year}`,
-        fcf: results.freeCashFlows[index] / 1e6, // Convert to millions
-        pv: results.presentValues[index] / 1e6
-      }));
-    }, [results]);
+    // Chart data is now calculated at component level
 
     if (isCompact) {
       return (

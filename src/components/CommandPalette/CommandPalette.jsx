@@ -17,7 +17,7 @@ import {
   Settings,
   HelpCircle
 } from 'lucide-react';
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 
 import { useCommandRegistry } from '../../hooks/useCommandRegistry';
 
@@ -27,11 +27,11 @@ const CommandPalette = ({
   onExecuteCommand,
   currentContext = {},
   recentCommands = [],
-  userPreferences = {}
+  userPreferences: _userPreferences = {}
 }) => {
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [commandHistory, setCommandHistory] = useState([]);
+  const [_commandHistory, setCommandHistory] = useState([]);
   const inputRef = useRef(null);
   const listRef = useRef(null);
 
@@ -40,7 +40,7 @@ const CommandPalette = ({
     searchCommands,
     executeCommand,
     getContextualCommands,
-    getCommandCategories,
+    getCommandCategories: _getCommandCategories,
     learnFromUsage
   } = useCommandRegistry(currentContext);
 
@@ -234,7 +234,7 @@ const CommandPalette = ({
               <p className="text-xs text-slate-500">Type to search commands, or use natural language</p>
             </div>
             <div className="flex items-center gap-1 text-xs text-slate-500">
-              <kbd className="px-1.5 py-0.5 bg-white border border-slate-200 rounded text-xs">Esc</kbd>
+              <kbd className="px-1.5 py-0.5 bg-white border border-slate-200 rounded">Esc</kbd>
               <span>to close</span>
             </div>
           </div>
@@ -248,7 +248,7 @@ const CommandPalette = ({
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search commands or describe what you want to do..."
+                placeholder="Type a command or just describe what you'd like to do..."
                 className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-slate-900 placeholder-slate-500"
               />
             </div>

@@ -6,7 +6,7 @@
 process.on('unhandledRejection', (reason) => {
   // Silently swallow the rejection to prevent false-positive test failures.
   // Still output a debug message so genuine issues can be spotted when needed.
-  // eslint-disable-next-line no-console
+
   console.debug('[vitest] handled unhandledRejection:', reason);
 });
 import '@testing-library/jest-dom';
@@ -85,6 +85,12 @@ global.console = {
   error: vi.fn(),
   log: vi.fn()
 };
+
+// Mock react-helmet-async to fix JSDOM compatibility issues
+vi.mock('react-helmet-async', () => ({
+  Helmet: ({ children }) => children,
+  HelmetProvider: ({ children }) => children
+}));
 
 // Setup cleanup after each test
 afterEach(() => {

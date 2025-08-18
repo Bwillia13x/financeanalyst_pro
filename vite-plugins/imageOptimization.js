@@ -22,7 +22,7 @@ export function imageOptimization(options = {}) {
 
   return {
     name: 'vite-plugin-image-optimization',
-    
+
     configResolved(resolvedConfig) {
       config = resolvedConfig;
       isDev = resolvedConfig.command === 'serve';
@@ -30,7 +30,7 @@ export function imageOptimization(options = {}) {
 
     async buildStart() {
       if (isDev && !enableInDev) return;
-      
+
       // Create output directory
       const outputPath = path.join(config.root, 'public', outputDir);
       await fs.mkdir(outputPath, { recursive: true });
@@ -38,14 +38,14 @@ export function imageOptimization(options = {}) {
 
     async load(id) {
       if (isDev && !enableInDev) return null;
-      
+
       const match = id.match(/\.(jpg|jpeg|png|webp|avif)\?optimize=(.+)$/);
       if (!match) return null;
 
       const [, ext, paramsStr] = match;
       const imagePath = id.replace(/\?optimize=.+$/, '');
       const params = new URLSearchParams(paramsStr);
-      
+
       try {
         const optimizedImages = await generateOptimizedImages(
           imagePath,
@@ -63,7 +63,7 @@ export function imageOptimization(options = {}) {
           export const srcSet = ${JSON.stringify(generateSrcSet(optimizedImages))};
           export const placeholder = ${JSON.stringify(await generatePlaceholder(imagePath))};
         `;
-        
+
       } catch (error) {
         console.error('Image optimization failed:', error);
         return null;
@@ -85,7 +85,7 @@ async function generateOptimizedImages(imagePath, options) {
 
   const imageInfo = path.parse(imagePath);
   const outputDir = path.join(path.dirname(imagePath), 'optimized');
-  
+
   await fs.mkdir(outputDir, { recursive: true });
 
   // Generate hash for cache busting
@@ -95,11 +95,11 @@ async function generateOptimizedImages(imagePath, options) {
   // Process each format
   for (const format of formats) {
     results[format] = [];
-    
+
     for (const size of sizes) {
       const filename = `${imageInfo.name}-${size}w-${hash}.${format}`;
       const outputPath = path.join(outputDir, filename);
-      
+
       // In a real implementation, you would use sharp or similar for image processing
       // For now, we'll simulate the optimization
       await simulateImageOptimization(imagePath, outputPath, {
@@ -107,7 +107,7 @@ async function generateOptimizedImages(imagePath, options) {
         format,
         quality
       });
-      
+
       results[format].push({
         src: outputPath.replace(process.cwd(), ''),
         width: size,
@@ -132,16 +132,16 @@ async function simulateImageOptimization(inputPath, outputPath, options) {
   // In production, replace this with actual image processing using sharp:
   /*
   const sharp = require('sharp');
-  
+
   let pipeline = sharp(inputPath);
-  
+
   if (options.width) {
     pipeline = pipeline.resize(options.width, null, {
       withoutEnlargement: true,
       fit: 'inside'
     });
   }
-  
+
   switch (options.format) {
     case 'webp':
       pipeline = pipeline.webp({ quality: options.quality });
@@ -157,10 +157,10 @@ async function simulateImageOptimization(inputPath, outputPath, options) {
       pipeline = pipeline.png({ quality: options.quality });
       break;
   }
-  
+
   await pipeline.toFile(outputPath);
   */
-  
+
   // For now, just copy the original file
   const inputBuffer = await fs.readFile(inputPath);
   await fs.writeFile(outputPath, inputBuffer);
@@ -168,15 +168,15 @@ async function simulateImageOptimization(inputPath, outputPath, options) {
 
 function generateSrcSet(optimizedImages) {
   const srcSets = {};
-  
+
   Object.entries(optimizedImages).forEach(([format, images]) => {
     if (format === 'original') return;
-    
+
     srcSets[format] = images
       .map(img => `${img.src} ${img.width}w`)
       .join(', ');
   });
-  
+
   return srcSets;
 }
 
@@ -223,7 +223,7 @@ export const imageUtils = {
   // Generate sizes attribute for responsive images
   generateSizes: (breakpoints) => {
     return Object.entries(breakpoints)
-      .sort(([,a], [,b]) => parseInt(b) - parseInt(a))
+      .sort(([, a], [, b]) => parseInt(b) - parseInt(a))
       .map(([size, width]) => `(min-width: ${width}px) ${size}`)
       .join(', ');
   },
@@ -237,11 +237,11 @@ export const imageUtils = {
   // Get image format support
   getFormatSupport: () => {
     if (typeof window === 'undefined') return { webp: false, avif: false };
-    
+
     const canvas = document.createElement('canvas');
     canvas.width = 1;
     canvas.height = 1;
-    
+
     return {
       webp: canvas.toDataURL('image/webp').startsWith('data:image/webp'),
       avif: canvas.toDataURL('image/avif').startsWith('data:image/avif')

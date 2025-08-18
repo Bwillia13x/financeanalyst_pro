@@ -1,5 +1,6 @@
 import express from 'express';
 import { param, query, validationResult } from 'express-validator';
+
 import apiService from '../services/apiService.js';
 
 const router = express.Router();
@@ -26,7 +27,7 @@ router.get('/fred/:seriesId',
   query('start_date').optional().isISO8601(),
   query('end_date').optional().isISO8601(),
   validateRequest,
-  async (req, res) => {
+  async(req, res) => {
     try {
       const { seriesId } = req.params;
       const { limit = 100, start_date, end_date } = req.query;
@@ -34,7 +35,7 @@ router.get('/fred/:seriesId',
       const fredData = await apiService.makeApiRequest({
         service: 'fred',
         endpoint: 'series/observations',
-        params: { 
+        params: {
           series_id: seriesId,
           limit,
           sort_order: 'desc',
@@ -83,7 +84,7 @@ router.get('/fred/:seriesId',
  * GET /api/economic-data/indicators
  * Get popular economic indicators
  */
-router.get('/indicators', async (req, res) => {
+router.get('/indicators', async(req, res) => {
   try {
     const indicators = [
       { id: 'GDP', name: 'Gross Domestic Product', seriesId: 'GDP' },
@@ -97,12 +98,12 @@ router.get('/indicators', async (req, res) => {
     ];
 
     // Fetch recent data for each indicator
-    const promises = indicators.map(async (indicator) => {
+    const promises = indicators.map(async(indicator) => {
       try {
         const data = await apiService.makeApiRequest({
           service: 'fred',
           endpoint: 'series/observations',
-          params: { 
+          params: {
             series_id: indicator.seriesId,
             limit: 1,
             sort_order: 'desc'
@@ -151,7 +152,7 @@ router.get('/indicators', async (req, res) => {
  * GET /api/economic-data/treasury-rates
  * Get treasury yield curve data
  */
-router.get('/treasury-rates', async (req, res) => {
+router.get('/treasury-rates', async(req, res) => {
   try {
     const treasuryRates = [
       { maturity: '1M', seriesId: 'DGS1MO', name: '1-Month' },
@@ -167,12 +168,12 @@ router.get('/treasury-rates', async (req, res) => {
       { maturity: '30Y', seriesId: 'DGS30', name: '30-Year' }
     ];
 
-    const promises = treasuryRates.map(async (rate) => {
+    const promises = treasuryRates.map(async(rate) => {
       try {
         const data = await apiService.makeApiRequest({
           service: 'fred',
           endpoint: 'series/observations',
-          params: { 
+          params: {
             series_id: rate.seriesId,
             limit: 1,
             sort_order: 'desc'

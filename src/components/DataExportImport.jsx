@@ -7,38 +7,32 @@ import {
   Download,
   Upload,
   FileText,
-  Database,
-  AlertCircle,
+  Share2,
+  RefreshCw,
   CheckCircle,
-  Loader2,
-  Info,
-  FileSpreadsheet,
-  Bookmark,
-  Users,
-  Clock,
-  Eye,
-  Edit3,
-  Share,
-  Save
+  AlertTriangle,
+  X
 } from 'lucide-react';
-import React, { useState, useCallback } from 'react';
+import { useState } from 'react';
 
 import { financialDataStorage } from '../services/financialDataStorage.js';
 import { apiLogger } from '../utils/apiLogger.js';
 
-const DataExportImport = ({ data, onDataChange, savedAnalyses, onAnalysesChange }) => {
+const defaultTemplates = [
+  { id: 1, name: 'Standard 3-Statement Model', category: 'General', lastUsed: '2024-01-15', uses: 42 },
+  { id: 2, name: 'SaaS DCF Template', category: 'Technology', lastUsed: '2024-01-10', uses: 28 },
+  { id: 3, name: 'LBO Analysis Template', category: 'Private Equity', lastUsed: '2024-01-05', uses: 35 }
+];
+
+const DataExportImport = ({ data: _data, onDataChange: _onDataChange, savedAnalyses: _savedAnalyses, onAnalysesChange: _onAnalysesChange, className = '' }) => {
   const [activeTab, setActiveTab] = useState('excel');
   const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const [exportStatus, setExportStatus] = useState(null);
   const [importStatus, setImportStatus] = useState(null);
   const [stats, setStats] = useState(null);
-  const [templates, setTemplates] = useState([
-    { id: 1, name: 'Standard 3-Statement Model', category: 'General', lastUsed: '2024-01-15', uses: 42 },
-    { id: 2, name: 'SaaS DCF Template', category: 'Technology', lastUsed: '2024-01-10', uses: 28 },
-    { id: 3, name: 'LBO Analysis Template', category: 'Private Equity', lastUsed: '2024-01-05', uses: 35 }
-  ]);
-  const [collaborators, setCollaborators] = useState([
+  const [templates, _setTemplates] = useState(defaultTemplates);
+  const [collaborators, _setCollaborators] = useState([
     { id: 1, name: 'John Smith', email: 'john@company.com', role: 'Analyst', lastActive: '2 min ago', avatar: 'JS' },
     { id: 2, name: 'Sarah Johnson', email: 'sarah@company.com', role: 'VP', lastActive: '1 hour ago', avatar: 'SJ' }
   ]);

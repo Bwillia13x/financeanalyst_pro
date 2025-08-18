@@ -54,6 +54,7 @@ ENVIRONMENT=$1
 SKIP_TESTS=false
 SKIP_BUILD=false
 DRY_RUN=false
+DEPLOY_BACKEND=false
 
 # Parse additional options
 shift
@@ -69,6 +70,10 @@ while [[ $# -gt 0 ]]; do
             ;;
         --dry-run)
             DRY_RUN=true
+            shift
+            ;;
+        --deploy-backend)
+            DEPLOY_BACKEND=true
             shift
             ;;
         *)
@@ -174,6 +179,42 @@ if [[ "$ENVIRONMENT" == "production" && "$DRY_RUN" == false ]]; then
     log "Backup created: $BACKUP_NAME"
 fi
 
+# Backend deployment (if applicable)
+if [ "$DEPLOY_BACKEND" = "true" ]; then
+  echo "🔧 Deploying backend services..."
+  
+  # Check if we have backend deployment configuration
+  if [ -f "backend/package.json" ]; then
+    cd backend
+    
+    # Deploy to Render, Railway, or Heroku based on environment
+    if [ ! -z "$RENDER_SERVICE_ID" ]; then
+      echo "Deploying backend to Render..."
+      # Render deploys automatically on git push to connected repository
+      echo "✅ Backend deployment triggered via git push (Render auto-deploy)"
+    elif [ ! -z "$RAILWAY_PROJECT_ID" ]; then
+      echo "Deploying backend to Railway..."
+      if command -v railway &> /dev/null; then
+        railway up
+        echo "✅ Backend deployed to Railway"
+      else
+        echo "❌ Railway CLI not found. Install with: npm install -g @railway/cli"
+      fi
+    elif command -v heroku &> /dev/null; then
+      echo "Deploying backend to Heroku..."
+      heroku git:remote -a "$HEROKU_APP_NAME"
+      git push heroku main
+      echo "✅ Backend deployed to Heroku"
+    else
+      echo "⚠️  No backend deployment configuration found"
+    fi
+    
+    cd ..
+  else
+    echo "⚠️  No backend found - skipping backend deployment"
+  fi
+fi
+
 # Deployment based on environment
 if [[ "$DRY_RUN" == true ]]; then
     log "DRY RUN: Would deploy to $ENVIRONMENT environment"
@@ -229,15 +270,31 @@ deploy_to_production() {
         error "Staging environment is not healthy. Aborting production deployment."
     fi
     
-    # Example: Deploy to production server
-    # rsync -avz --delete $BUILD_DIR/ user@production-server:/var/www/html/
+    # Production deployment to Netlify
+    echo "🚀 Starting production deployment..."
+    if command -v netlify &> /dev/null; then
+      echo "Deploying to Netlify production..."
+      netlify deploy --prod --dir dist --message "Production deployment $(date)"
+      if [ $? -eq 0 ]; then
+        echo "✅ Production deployment successful"
+      else
+        echo "❌ Production deployment failed"
+        exit 1
+      fi
+    else
+      echo "❌ Netlify CLI not found. Install with: npm install -g netlify-cli"
+      exit 1
+    fi
     
-    # Example: Deploy to AWS S3 with CloudFront invalidation
-    # aws s3 sync $BUILD_DIR/ s3://production-bucket/ --delete
-    # aws cloudfront create-invalidation --distribution-id DISTRIBUTION_ID --paths "/*"
-    
-    # Example: Deploy to Netlify
-    # netlify deploy --dir=$BUILD_DIR --prod --site=production-site-id
+    # Health check for production
+    echo "⚡ Running production health check..."
+    if [ ! -z "$PRODUCTION_URL" ]; then
+      sleep 30  # Allow time for deployment to propagate
+      curl -f "$PRODUCTION_URL/health" || { echo "❌ Production health check failed"; exit 1; }
+      echo "✅ Production health check passed"
+    else
+      echo "⚠️  PRODUCTION_URL not set - skipping health check"
+    fi
     
     log "Production deployment completed"
     
@@ -286,13 +343,19 @@ send_deployment_notification() {
     log "Sending deployment notification..."
     
     # Example: Send Slack notification
-    # curl -X POST -H 'Content-type: application/json' \
-    #   --data '{"text":"🚀 FinanceAnalyst Pro deployed to production successfully!"}' \
-    #   $SLACK_WEBHOOK_URL
-    
-    # Example: Send email notification
-    # echo "Deployment completed successfully" | mail -s "Production Deployment" team@company.com
-    
+    if [ ! -z "$SLACK_WEBHOOK_URL" ]; then
+      curl -X POST -H 'Content-type: application/json' \
+        --data "{\"text\":\"🚀 FinanceAnalyst Pro deployed successfully to $ENVIRONMENT at $(date)\"}" \
+        "$SLACK_WEBHOOK_URL"
+      echo "✅ Slack notification sent"
+    elif [ ! -z "$DISCORD_WEBHOOK_URL" ]; then
+      curl -X POST -H 'Content-type: application/json' \
+        --data "{\"content\":\"🚀 FinanceAnalyst Pro deployed successfully to $ENVIRONMENT at $(date)\"}" \
+        "$DISCORD_WEBHOOK_URL"
+      echo "✅ Discord notification sent"
+    else
+      echo "⚠️  No notification webhook configured - skipping notification"
+    fi
     log "Deployment notification sent"
 }
 

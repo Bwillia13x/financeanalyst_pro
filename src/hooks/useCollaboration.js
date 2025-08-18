@@ -6,7 +6,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 
 import collaborationService from '../services/collaborationService';
-import { performanceMonitoring } from '../utils/performanceMonitoring';
+// import { performanceMonitoring } from '../utils/performanceMonitoring'; // Missing module
 
 /**
  * Main collaboration hook
@@ -39,14 +39,14 @@ export function useCollaboration(userId, userProfile = {}) {
 
         // Track initialization success
         if (typeof performanceMonitoring !== 'undefined') {
-          performanceMonitoring.trackCustomMetric('collaboration_hook_init_success', 1);
+          // performanceMonitoring.trackCustomMetric('collaboration_hook_init_success', 1);
         }
       } catch (err) {
         setError(err.message);
         console.error('Failed to initialize collaboration:', err);
 
         if (typeof performanceMonitoring !== 'undefined') {
-          performanceMonitoring.trackCustomMetric('collaboration_hook_init_error', 1);
+          // performanceMonitoring.trackCustomMetric('collaboration_hook_init_error', 1);
         }
       } finally {
         setIsLoading(false);

@@ -1,6 +1,7 @@
 // Test file to verify Monte Carlo Simulation component works
 import React from 'react';
 import { createRoot } from 'react-dom/client';
+
 import MonteCarloSimulation from './src/components/PrivateAnalysis/MonteCarloSimulation';
 
 // Test data similar to what would be passed from PrivateAnalysis
@@ -27,22 +28,22 @@ const testData = {
 function testMonteCarloComponent() {
   try {
     console.log('Testing Monte Carlo Simulation component...');
-    
+
     // Create a container element
     const container = document.createElement('div');
     document.body.appendChild(container);
-    
+
     // Try to render the component
     const root = createRoot(container);
     root.render(React.createElement(MonteCarloSimulation, {
       data: testData,
       onDataChange: (newData) => console.log('Data changed:', newData)
     }));
-    
+
     console.log('✅ Monte Carlo Simulation component rendered successfully!');
     console.log('✅ No styling errors detected (styles.* references fixed)');
     console.log('✅ Component imports and dependencies working correctly');
-    
+
     return true;
   } catch (error) {
     console.error('❌ Error testing Monte Carlo component:', error);
@@ -54,10 +55,10 @@ function testMonteCarloComponent() {
 async function testMonteCarloEngine() {
   try {
     console.log('Testing Monte Carlo Engine...');
-    
+
     // Dynamic import to test the engine
     const { default: monteCarloEngine } = await import('./src/services/monteCarloEngine.js');
-    
+
     // Test simulation with basic inputs
     const baseInputs = {
       revenue: 1000000,
@@ -65,7 +66,7 @@ async function testMonteCarloEngine() {
       discountRate: 0.08,
       terminalGrowthRate: 0.02
     };
-    
+
     const distributions = {
       growthRate: {
         type: 'normal',
@@ -74,19 +75,19 @@ async function testMonteCarloEngine() {
         enabled: true
       }
     };
-    
+
     const options = {
       iterations: 100, // Small number for testing
       progressCallback: (progress) => console.log(`Progress: ${progress.toFixed(1)}%`)
     };
-    
+
     console.log('Running test simulation...');
     const results = await monteCarloEngine.runDCFSimulation(baseInputs, distributions, options);
-    
+
     console.log('✅ Monte Carlo Engine working correctly!');
     console.log(`✅ Simulation completed with ${results.results.length} iterations`);
     console.log(`✅ Analysis generated: ${Object.keys(results.analysis).length} metrics`);
-    
+
     return true;
   } catch (error) {
     console.error('❌ Error testing Monte Carlo engine:', error);
@@ -107,7 +108,7 @@ testMonteCarloEngine().then(engineTest => {
   console.log(`Component Test: ${componentTest ? '✅ PASSED' : '❌ FAILED'}`);
   console.log(`Engine Test: ${engineTest ? '✅ PASSED' : '❌ FAILED'}`);
   console.log(`Overall Status: ${componentTest && engineTest ? '✅ ALL TESTS PASSED' : '❌ SOME TESTS FAILED'}`);
-  
+
   if (componentTest && engineTest) {
     console.log('\n🎉 Monte Carlo Simulation feature is working correctly!');
     console.log('The styling issues have been resolved and the feature is ready for use.');

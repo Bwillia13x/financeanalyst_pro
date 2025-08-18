@@ -4,10 +4,10 @@
  * In real deployment, this would be your actual production server
  */
 
-import express from 'express';
 import cors from 'cors';
-import helmet from 'helmet';
 import dotenv from 'dotenv';
+import express from 'express';
+import helmet from 'helmet';
 
 // Load production environment
 dotenv.config({ path: '.env.production' });
@@ -64,7 +64,7 @@ app.get('/api/health/services', (req, res) => {
 // Start production simulation server
 app.listen(PORT, () => {
   console.log(`🚀 Production Backend Simulator running on port ${PORT}`);
-  console.log(`📊 Environment: production-simulation`);
+  console.log('📊 Environment: production-simulation');
   console.log(`🌐 CORS enabled for: ${process.env.FRONTEND_URL}`);
   console.log(`🔗 Health check: http://localhost:${PORT}/api/health`);
 });

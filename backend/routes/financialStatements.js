@@ -1,5 +1,6 @@
 import express from 'express';
 import { param, query, validationResult } from 'express-validator';
+
 import apiService from '../services/apiService.js';
 
 const router = express.Router();
@@ -25,7 +26,7 @@ router.get('/income/:symbol',
   query('period').optional().isIn(['annual', 'quarter']),
   query('limit').optional().isInt({ min: 1, max: 10 }),
   validateRequest,
-  async (req, res) => {
+  async(req, res) => {
     try {
       const { symbol } = req.params;
       const { period = 'annual', limit = 5 } = req.query;
@@ -132,7 +133,7 @@ router.get('/balance/:symbol',
   query('period').optional().isIn(['annual', 'quarter']),
   query('limit').optional().isInt({ min: 1, max: 10 }),
   validateRequest,
-  async (req, res) => {
+  async(req, res) => {
     try {
       const { symbol } = req.params;
       const { period = 'annual', limit = 5 } = req.query;
@@ -198,7 +199,7 @@ router.get('/cash-flow/:symbol',
   query('period').optional().isIn(['annual', 'quarter']),
   query('limit').optional().isInt({ min: 1, max: 10 }),
   validateRequest,
-  async (req, res) => {
+  async(req, res) => {
     try {
       const { symbol } = req.params;
       const { period = 'annual', limit = 5 } = req.query;
@@ -265,7 +266,7 @@ router.get('/ratios/:symbol',
   query('period').optional().isIn(['annual', 'quarter']),
   query('limit').optional().isInt({ min: 1, max: 10 }),
   validateRequest,
-  async (req, res) => {
+  async(req, res) => {
     try {
       const { symbol } = req.params;
       const { period = 'annual', limit = 5 } = req.query;

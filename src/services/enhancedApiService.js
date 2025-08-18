@@ -1,7 +1,5 @@
 import { apiLogger } from '../utils/apiLogger.js';
-
-import { API_CONFIG, DATA_SOURCE_PRIORITY } from './apiConfig.js';
-import { dataFetchingService } from './dataFetching.js';
+import secureApiClient from './secureApiClient.js';
 
 class RateLimiter {
   constructor(requestsPerInterval, interval) {
@@ -36,44 +34,30 @@ class EnhancedApiService {
     this.rateLimiters = new Map();
     this.sourceHealth = new Map();
     this.lastRequests = new Map();
-    this.apiKeys = this.loadApiKeys();
     this.cache = new Map();
     this.rateLimitInfo = { remaining: null, reset: null };
 
-    // Initialize source health tracking
+    // Initialize secure client and source health tracking
+    this.initializeSecureClient();
     this.initializeSourceHealth();
     this.rateLimiters.set('default', new RateLimiter(5, 1000));
   }
 
   /**
-   * Load and validate API keys from environment
+   * SECURITY NOTE: API keys are now handled securely by backend
+   * This service routes all requests through secure backend proxy
    */
-  loadApiKeys() {
-    const keys = {
-      ALPHA_VANTAGE: import.meta.env.VITE_ALPHA_VANTAGE_API_KEY,
-      FMP: import.meta.env.VITE_FMP_API_KEY,
-      QUANDL: import.meta.env.VITE_QUANDL_API_KEY,
-      FRED: import.meta.env.VITE_FRED_API_KEY
-    };
-
-    // Log available keys (without exposing actual values)
-    const availableKeys = Object.entries(keys)
-      .filter(([_, value]) => value && value !== 'demo')
-      .map(([key, _]) => key);
-
-    apiLogger.log('INFO', 'API keys loaded', {
-      availableKeys,
-      totalKeys: availableKeys.length
-    });
-
-    return keys;
+  initializeSecureClient() {
+    this.client = secureApiClient;
+    
+    apiLogger.log('INFO', 'EnhancedApiService initialized with secure backend proxy');
   }
 
   /**
    * Initialize health tracking for all data sources
    */
   initializeSourceHealth() {
-    const sources = ['ALPHA_VANTAGE', 'FMP', 'YAHOO_FINANCE', 'SEC_EDGAR', 'QUANDL', 'FRED'];
+    const sources = ['BACKEND_PROXY', 'ALPHA_VANTAGE', 'FMP', 'YAHOO_FINANCE', 'SEC_EDGAR', 'QUANDL', 'FRED'];
 
     sources.forEach(source => {
       this.sourceHealth.set(source, {
@@ -89,40 +73,22 @@ class EnhancedApiService {
   }
 
   /**
-   * Check if we have valid API key for a source
+   * DEPRECATED: API keys are now handled by secure backend
    * @param {string} source - Data source name
    * @returns {boolean}
    */
   hasValidApiKey(source) {
-    const key = this.apiKeys[source];
-    return key && key !== 'demo' && key.length > 5;
+    // Always return true as backend handles authentication
+    return true;
   }
 
   /**
-   * Get the best available data source for a data type
+   * All requests now route through secure backend proxy
    * @param {string} dataType - Type of data needed
-   * @returns {string} Best available source
+   * @returns {string} Always returns 'BACKEND_PROXY'
    */
   getBestSource(dataType) {
-    const priorityList = DATA_SOURCE_PRIORITY[dataType] || [];
-
-    for (const source of priorityList) {
-      const health = this.sourceHealth.get(source);
-
-      // Check if source is healthy and has valid API key (if required)
-      if (health && health.status !== 'error') {
-        if (this.requiresApiKey(source)) {
-          if (this.hasValidApiKey(source)) {
-            return source;
-          }
-        } else {
-          return source;
-        }
-      }
-    }
-
-    // Fallback to first available source
-    return priorityList[0] || 'YAHOO_FINANCE';
+    return 'BACKEND_PROXY';
   }
 
   /**
@@ -135,42 +101,180 @@ class EnhancedApiService {
   }
 
   /**
-   * Fetch real-time market data with intelligent source selection
+   * Fetch real-time market data via secure backend proxy
    * @param {string} symbol - Stock symbol
    * @param {Object} options - Additional options
    * @returns {Promise<Object>} Market data
    */
   async fetchRealTimeMarketData(symbol, options = {}) {
-    const source = this.getBestSource('marketData');
-
+    const t0 = Date.now();
     try {
-      let data;
-
-      switch (source) {
-        case 'YAHOO_FINANCE':
-          data = await this.fetchFromYahooFinance(symbol, options);
-          break;
-        case 'ALPHA_VANTAGE':
-          data = await this.fetchFromAlphaVantage(symbol, 'GLOBAL_QUOTE', options);
-          break;
-        default:
-          throw new Error(`Unsupported source for market data: ${source}`);
-      }
-
-      this.updateSourceHealth(source, true, Date.now());
-      return this.normalizeMarketData(data, source);
-
+      const data = await this.client.getQuote(symbol);
+      this.updateSourceHealth('BACKEND_PROXY', true, Date.now() - t0);
+      return data;
     } catch (error) {
-      this.updateSourceHealth(source, false, Date.now(), error);
-
-      // Try fallback source
-      const fallbackSources = DATA_SOURCE_PRIORITY.marketData.filter(s => s !== source);
-      if (fallbackSources.length > 0) {
-        apiLogger.log('WARN', `Primary source ${source} failed, trying fallback`, { error: error.message });
-        return this.fetchRealTimeMarketData(symbol, { ...options, excludeSource: source });
-      }
-
+      this.updateSourceHealth('BACKEND_PROXY', false, Date.now() - t0, error);
+      apiLogger.log('ERROR', 'Failed to fetch real-time market data', { symbol, error: error.message });
       throw error;
+    }
+  }
+
+  /**
+   * Fetch historical market data (backend-first with fallbacks)
+   * @param {string} symbol
+   * @param {{range?: string, interval?: string}} options
+   * @returns {Promise<Object>}
+   */
+  async fetchHistoricalMarketData(symbol, options = {}) {
+    const range = options.range || '1mo';
+    const interval = options.interval || '1d';
+    const qs = new URLSearchParams({ range, interval }).toString();
+    // Try backend proxy first
+    const t0 = Date.now();
+    try {
+      const backendData = await this.request(`/market-data/historical/${symbol.toUpperCase()}?${qs}`);
+      const result = {
+        ...(typeof backendData === 'object' ? backendData : { data: backendData }),
+        symbol: backendData?.symbol || symbol.toUpperCase(),
+        range,
+        interval,
+        source: (backendData?.source || 'backend_proxy').toUpperCase()
+      };
+      this.updateSourceHealth('BACKEND_PROXY', true, Date.now() - t0);
+      return result;
+    } catch (backendError) {
+      this.updateSourceHealth('BACKEND_PROXY', false, Date.now() - t0, backendError);
+      apiLogger.log('WARN', 'Backend historical data failed, falling back to direct sources', { error: backendError.message });
+    }
+    // Fallback to Yahoo Finance
+    try {
+      const yf = await this.fetchFromYahooFinance(symbol, { range, interval });
+      const timestamps = yf.timestamp || [];
+      const quote = yf.indicators?.quote?.[0] || {};
+      const data = timestamps.map((t, i) => ({
+        timestamp: new Date(t * 1000).toISOString(),
+        open: quote.open?.[i] ?? null,
+        high: quote.high?.[i] ?? null,
+        low: quote.low?.[i] ?? null,
+        close: quote.close?.[i] ?? null,
+        volume: quote.volume?.[i] ?? null
+      }));
+      return {
+        symbol: yf.meta?.symbol || symbol.toUpperCase(),
+        range,
+        interval,
+        data,
+        meta: yf.meta,
+        source: 'YAHOO_FINANCE'
+      };
+    } catch (yahooError) {
+      this.updateSourceHealth('YAHOO_FINANCE', false, Date.now(), yahooError);
+      apiLogger.log('WARN', 'Yahoo Finance historical fallback failed, trying Alpha Vantage', { error: yahooError.message });
+    }
+    // Fallback to Alpha Vantage (daily adjusted)
+    try {
+      const av = await this.fetchFromAlphaVantage(symbol, 'TIME_SERIES_DAILY_ADJUSTED', options);
+      const series = av['Time Series (Daily)'] || av['Time Series (Daily)'.toLowerCase()];
+      if (!series) throw new Error('Alpha Vantage daily series missing');
+      const data = Object.entries(series)
+        .map(([date, values]) => ({
+          timestamp: new Date(date).toISOString(),
+          open: parseFloat(values['1. open']),
+          high: parseFloat(values['2. high']),
+          low: parseFloat(values['3. low']),
+          close: parseFloat(values['4. close']),
+          volume: parseInt(values['6. volume'])
+        }))
+        .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+      return {
+        symbol: symbol.toUpperCase(),
+        range,
+        interval: '1d',
+        data,
+        source: 'ALPHA_VANTAGE'
+      };
+    } catch (alphaError) {
+      this.updateSourceHealth('ALPHA_VANTAGE', false, Date.now(), alphaError);
+      throw alphaError;
+    }
+  }
+
+  /**
+   * Fetch intraday market data (backend-first with fallbacks)
+   * @param {string} symbol
+   * @param {{interval?: string}} options
+   * @returns {Promise<Object>}
+   */
+  async fetchIntradayMarketData(symbol, options = {}) {
+    const interval = options.interval || '5min';
+    const qs = new URLSearchParams({ interval }).toString();
+    // Try backend proxy first
+    const t0 = Date.now();
+    try {
+      const backendData = await this.request(`/market-data/intraday/${symbol.toUpperCase()}?${qs}`);
+      const result = {
+        ...(typeof backendData === 'object' ? backendData : { data: backendData }),
+        symbol: backendData?.symbol || symbol.toUpperCase(),
+        interval,
+        source: (backendData?.source || 'backend_proxy').toUpperCase()
+      };
+      this.updateSourceHealth('BACKEND_PROXY', true, Date.now() - t0);
+      return result;
+    } catch (backendError) {
+      this.updateSourceHealth('BACKEND_PROXY', false, Date.now() - t0, backendError);
+      apiLogger.log('WARN', 'Backend intraday data failed, falling back to direct sources', { error: backendError.message });
+    }
+    // Fallback to Yahoo Finance (use 1d range)
+    try {
+      const range = '1d';
+      const yf = await this.fetchFromYahooFinance(symbol, { range, interval: interval.replace('min', 'm') });
+      const timestamps = yf.timestamp || [];
+      const quote = yf.indicators?.quote?.[0] || {};
+      const data = timestamps.map((t, i) => ({
+        timestamp: new Date(t * 1000).toISOString(),
+        open: quote.open?.[i] ?? null,
+        high: quote.high?.[i] ?? null,
+        low: quote.low?.[i] ?? null,
+        close: quote.close?.[i] ?? null,
+        volume: quote.volume?.[i] ?? null
+      }));
+      return {
+        symbol: yf.meta?.symbol || symbol.toUpperCase(),
+        range,
+        interval,
+        data,
+        meta: yf.meta,
+        source: 'YAHOO_FINANCE'
+      };
+    } catch (yahooError) {
+      this.updateSourceHealth('YAHOO_FINANCE', false, Date.now(), yahooError);
+      apiLogger.log('WARN', 'Yahoo Finance intraday fallback failed, trying Alpha Vantage', { error: yahooError.message });
+    }
+    // Fallback to Alpha Vantage intraday
+    try {
+      const av = await this.fetchFromAlphaVantage(symbol, 'TIME_SERIES_INTRADAY', { params: { interval } });
+      const seriesKey = Object.keys(av).find(k => k.startsWith('Time Series'));
+      const series = av[seriesKey];
+      if (!series) throw new Error('Alpha Vantage intraday series missing');
+      const data = Object.entries(series)
+        .map(([ts, values]) => ({
+          timestamp: new Date(ts).toISOString(),
+          open: parseFloat(values['1. open']),
+          high: parseFloat(values['2. high']),
+          low: parseFloat(values['3. low']),
+          close: parseFloat(values['4. close']),
+          volume: parseInt(values['5. volume'])
+        }))
+        .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+      return {
+        symbol: symbol.toUpperCase(),
+        interval,
+        data,
+        source: 'ALPHA_VANTAGE'
+      };
+    } catch (alphaError) {
+      this.updateSourceHealth('ALPHA_VANTAGE', false, Date.now(), alphaError);
+      throw alphaError;
     }
   }
 
@@ -260,7 +364,7 @@ class EnhancedApiService {
   }
 
   /**
-   * Fetch comprehensive financial data
+   * Fetch comprehensive financial data via secure backend proxy
    * @param {string} symbol - Stock symbol
    * @returns {Promise<Object>} Comprehensive financial data
    */
@@ -268,23 +372,17 @@ class EnhancedApiService {
     const results = {};
     const errors = {};
 
-    // Fetch multiple data types in parallel
+    // Fetch multiple data types in parallel via secure client
     const dataTypes = [
-      { key: 'marketData', method: 'fetchRealTimeMarketData' },
-      { key: 'profile', method: 'fetchCompanyProfile' },
-      { key: 'financials', method: 'fetchFinancialStatements' },
-      { key: 'peers', method: 'fetchPeerComparison' }
+      { key: 'marketData', method: 'getQuote' },
+      { key: 'profile', method: 'getCompanyProfile' },
+      { key: 'financials', method: 'getIncomeStatement' },
+      { key: 'peers', method: 'getPeerCompanies' }
     ];
 
     const promises = dataTypes.map(async({ key, method }) => {
       try {
-        if (method === 'fetchFinancialStatements') {
-          results[key] = await dataFetchingService[method](symbol, 'income-statement');
-        } else if (method === 'fetchPeerComparison') {
-          results[key] = await dataFetchingService[method](symbol);
-        } else {
-          results[key] = await this[method](symbol);
-        }
+        results[key] = await this.client[method](symbol);
       } catch (error) {
         errors[key] = error.message;
         apiLogger.log('ERROR', `Failed to fetch ${key} for ${symbol}`, { error: error.message });
@@ -298,7 +396,7 @@ class EnhancedApiService {
       timestamp: new Date().toISOString(),
       data: results,
       errors: Object.keys(errors).length > 0 ? errors : null,
-      sources: this.getSourcesUsed(results)
+      sources: ['BACKEND_PROXY']
     };
   }
 
@@ -441,7 +539,7 @@ class EnhancedApiService {
   /**
    * Configuration properties
    */
-  baseUrl = 'https://api.example.com';
+  baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api';
   defaultHeaders = {};
   timeout = 10000;
   authToken = null;

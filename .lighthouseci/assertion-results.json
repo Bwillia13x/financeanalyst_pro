@@ -1,0 +1,102 @@
+[
+  {
+    "name": "maxNumericValue",
+    "expected": 100,
+    "actual": 775,
+    "values": [
+      979,
+      824,
+      775
+    ],
+    "operator": "<=",
+    "passed": false,
+    "auditId": "metrics",
+    "level": "error",
+    "url": "http://localhost:4173/?lhci=1&pwa=0",
+    "auditTitle": "Metrics"
+  },
+  {
+    "name": "maxNumericValue",
+    "expected": 0.1,
+    "actual": 775,
+    "values": [
+      979,
+      824,
+      775
+    ],
+    "operator": "<=",
+    "passed": false,
+    "auditId": "metrics",
+    "level": "error",
+    "url": "http://localhost:4173/?lhci=1&pwa=0",
+    "auditTitle": "Metrics"
+  },
+  {
+    "name": "auditRan",
+    "expected": 1,
+    "actual": 0,
+    "values": [
+      0,
+      0,
+      0
+    ],
+    "operator": ">=",
+    "passed": false,
+    "message": "\"uses-https\" is not a known audit.",
+    "auditId": "uses-https",
+    "level": "error",
+    "url": "http://localhost:4173/?lhci=1&pwa=0"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0,
+    "values": [
+      0,
+      0,
+      0
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "unused-css-rules",
+    "level": "warn",
+    "url": "http://localhost:4173/?lhci=1&pwa=0",
+    "auditTitle": "Reduce unused CSS",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/unused-css-rules/"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0.5,
+    "values": [
+      0.5,
+      0,
+      0
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditId": "unused-javascript",
+    "level": "warn",
+    "url": "http://localhost:4173/?lhci=1&pwa=0",
+    "auditTitle": "Reduce unused JavaScript",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/unused-javascript/"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": null,
+    "values": [
+      null,
+      null,
+      null
+    ],
+    "operator": ">=",
+    "passed": false,
+    "message": "Audit did not produce a value at all. \"minScore\" might not be a valid assertion for this audit.",
+    "auditId": "structured-data",
+    "level": "warn",
+    "url": "http://localhost:4173/?lhci=1&pwa=0",
+    "auditTitle": "Structured data is valid",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/seo/structured-data/"
+  }
+]

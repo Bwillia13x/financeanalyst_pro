@@ -6,7 +6,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 
 import businessIntelligenceService from '../services/businessIntelligenceService';
-import { performanceMonitoring } from '../utils/performanceMonitoring';
+// import { performanceMonitoring } from '../utils/performanceMonitoring'; // Missing module
 
 /**
  * Main Business Intelligence hook
@@ -37,14 +37,14 @@ export function useBusinessIntelligence(config = {}) {
 
         // Track initialization success
         if (typeof performanceMonitoring !== 'undefined') {
-          performanceMonitoring.trackCustomMetric('bi_hook_init_success', 1);
+          // performanceMonitoring.trackCustomMetric('bi_hook_init_success', 1);
         }
       } catch (err) {
         setError(err.message);
         console.error('Failed to initialize business intelligence:', err);
 
         if (typeof performanceMonitoring !== 'undefined') {
-          performanceMonitoring.trackCustomMetric('bi_hook_init_error', 1);
+          // performanceMonitoring.trackCustomMetric('bi_hook_init_error', 1);
         }
       } finally {
         setIsLoading(false);

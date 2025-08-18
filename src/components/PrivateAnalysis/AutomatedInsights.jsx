@@ -50,8 +50,7 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-  ScatterChart,
-  GitBranch
+  ScatterChart
 } from 'recharts';
 
 const AutomatedInsights = ({ modelData, financialData, onDataChange }) => {
