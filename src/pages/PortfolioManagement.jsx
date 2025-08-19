@@ -5,15 +5,9 @@ import {
   DollarSign,
   BarChart3,
   Target,
-  AlertTriangle,
   Plus,
-  Edit,
-  Trash2,
-  Download,
-  Upload,
   Settings,
-  Eye,
-  EyeOff
+  Eye
 } from 'lucide-react';
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 
@@ -24,10 +18,10 @@ import secureApiClient from '../services/secureApiClient';
 import { formatCurrency, formatPercentage, formatNumber } from '../utils/formatters';
 
 const PortfolioManagement = () => {
-  const [portfolios, setPortfolios] = useState([]);
+  const [_portfolios, setPortfolios] = useState([]);
   const [activePortfolio, setActivePortfolio] = useState(null);
-  const [portfolioPerformance, setPortfolioPerformance] = useState(null);
-  const [riskMetrics, setRiskMetrics] = useState(null);
+  const [_portfolioPerformance, setPortfolioPerformance] = useState(null);
+  const [_riskMetrics, setRiskMetrics] = useState(null);
   const [marketData, setMarketData] = useState({});
   const [loading, setLoading] = useState({
     portfolios: false,
@@ -35,7 +29,7 @@ const PortfolioManagement = () => {
     risk: false,
     market: false
   });
-  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [_showCreateModal, setShowCreateModal] = useState(false);
   const [selectedTimeframe, setSelectedTimeframe] = useState('1M');
   const [viewMode, setViewMode] = useState('overview'); // overview, builder, analytics
 
