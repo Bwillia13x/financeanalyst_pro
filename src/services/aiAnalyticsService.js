@@ -422,9 +422,9 @@ class AIAnalyticsService {
   }
 
   calculateCVaR(returns, confidence) {
-    const var_value = this.calculateVaR(returns, confidence);
-    const tail_returns = returns.filter(r => r <= var_value);
-    return tail_returns.reduce((sum, r) => sum + r, 0) / tail_returns.length || 0;
+    const varValue = this.calculateVaR(returns, confidence);
+    const tailReturns = returns.filter(r => r <= varValue);
+    return tailReturns.reduce((sum, r) => sum + r, 0) / tailReturns.length || 0;
   }
 
   calculateSharpeRatio(returns, riskFreeRate = 0.02) {

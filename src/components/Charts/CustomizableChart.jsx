@@ -3,6 +3,17 @@
  * Flexible chart builder with multiple visualization types and customization options
  */
 
+import {
+  Settings,
+  Palette,
+  Type,
+  Grid,
+  TrendingUp,
+  BarChart3,
+  PieChart as PieIcon,
+  Activity,
+  Target
+} from 'lucide-react';
 import React, { useState, useMemo } from 'react';
 import {
   ResponsiveContainer,
@@ -24,17 +35,6 @@ import {
   Pie,
   Cell
 } from 'recharts';
-import {
-  Settings,
-  Palette,
-  Type,
-  Grid,
-  TrendingUp,
-  BarChart3,
-  PieChart as PieIcon,
-  Activity,
-  Target
-} from 'lucide-react';
 
 const CustomizableChart = ({
   data = [],
@@ -51,7 +51,7 @@ const CustomizableChart = ({
     colors: ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6'],
     xAxisKey: 'timestamp',
     yAxisKeys: ['price'],
-    title: title,
+    title,
     subtitle: '',
     smooth: true,
     strokeWidth: 2,
@@ -62,16 +62,16 @@ const CustomizableChart = ({
 
   const processedData = useMemo(() => {
     if (!data || !Array.isArray(data) || !data.length) return [];
-    
+
     return data.map(item => {
       const processed = { ...item };
-      
+
       // Format timestamp for display
       if (processed.timestamp) {
         processed.displayTime = new Date(processed.timestamp).toLocaleTimeString();
         processed.displayDate = new Date(processed.timestamp).toLocaleDateString();
       }
-      
+
       return processed;
     });
   }, [data]);
@@ -115,11 +115,11 @@ const CustomizableChart = ({
     if (!active || !payload || !payload.length) return null;
 
     const theme = colorThemes[chartSettings.theme];
-    
+
     return (
-      <div 
+      <div
         className="p-3 border rounded-lg shadow-lg"
-        style={{ 
+        style={{
           backgroundColor: theme.background,
           borderColor: theme.grid,
           color: theme.text
@@ -130,10 +130,10 @@ const CustomizableChart = ({
           {payload.map((item, index) => (
             <div key={index} className="flex items-center justify-between space-x-4">
               <div className="flex items-center space-x-2">
-                <div 
+                <div
                   className="w-3 h-3 rounded-full"
                   style={{ backgroundColor: item.color }}
-                ></div>
+                />
                 <span className="text-sm">{item.name}:</span>
               </div>
               <span className="font-mono text-sm font-semibold">
@@ -195,37 +195,37 @@ const CustomizableChart = ({
 
     return (
       <ResponsiveContainer width="100%" height="100%">
-        <ChartComponent 
-          data={processedData} 
+        <ChartComponent
+          data={processedData}
           margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
         >
           {chartSettings.showGrid && (
             <CartesianGrid strokeDasharray="3 3" stroke={theme.grid} />
           )}
-          <XAxis 
+          <XAxis
             dataKey={chartSettings.xAxisKey}
             stroke={theme.text}
             fontSize={12}
             tickLine={false}
             axisLine={false}
           />
-          <YAxis 
+          <YAxis
             stroke={theme.text}
             fontSize={12}
             tickLine={false}
             axisLine={false}
-            tickFormatter={(value) => 
-              typeof value === 'number' && value > 1000 
-                ? `${(value / 1000).toFixed(1)}K` 
+            tickFormatter={(value) =>
+              typeof value === 'number' && value > 1000
+                ? `${(value / 1000).toFixed(1)}K`
                 : value.toLocaleString()
             }
           />
           {chartSettings.showTooltip && <Tooltip content={<CustomTooltip />} />}
           {chartSettings.showLegend && <Legend />}
-          
+
           {chartSettings.yAxisKeys.map((key, index) => {
             const color = theme.colors[index % theme.colors.length];
-            
+
             if (chartSettings.type === 'line') {
               return (
                 <Line
@@ -268,7 +268,7 @@ const CustomizableChart = ({
                 />
               );
             }
-            
+
             return null;
           })}
         </ChartComponent>
@@ -286,7 +286,7 @@ const CustomizableChart = ({
             <p className="text-sm text-gray-600">{chartSettings.subtitle}</p>
           )}
         </div>
-        
+
         <button
           onClick={() => setShowSettings(!showSettings)}
           className="p-2 hover:bg-gray-100 rounded-lg transition-colors"

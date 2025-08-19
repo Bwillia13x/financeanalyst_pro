@@ -72,7 +72,7 @@ export function generateHeatmap(assumptions, waccVals, termVals, termIsGrowth) {
 
       // Force wacc for the run by overriding keManual to hit target
       const ke = aa.capmMode === 'capm' ? (aa.rf + aa.beta * aa.erp) : aa.keManual;
-      const curW = aa.wd * aa.kd * (1 - aa.taxRate) + aa.we * ke;
+      const _curW = aa.wd * aa.kd * (1 - aa.taxRate) + aa.we * ke;
       const deltaKe = (waccVals[i] - (aa.wd * aa.kd * (1 - aa.taxRate))) / (aa.we || 1e-9);
       aa.capmMode = 'manualKe';
       aa.keManual = deltaKe;

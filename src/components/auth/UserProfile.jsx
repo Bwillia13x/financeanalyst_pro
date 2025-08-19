@@ -7,7 +7,6 @@ import {
   User,
   Settings,
   Shield,
-  Bell,
   Moon,
   Sun,
   Save,
@@ -84,7 +83,7 @@ const UserProfile = ({ onClose }) => {
       });
 
       setTimeout(() => setSaveStatus(null), 3000);
-    } catch (error) {
+    } catch (_error) {
       setSaveStatus({
         type: 'error',
         message: 'Failed to save preferences'

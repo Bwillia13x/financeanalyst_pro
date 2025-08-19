@@ -3,48 +3,28 @@
  * Professional-grade financial charting and analytics dashboard
  */
 
-import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
   BarChart3,
   LineChart,
-  PieChart,
-  TrendingUp,
-  TrendingDown,
   Activity,
   Target,
   Layers,
   Grid3X3,
-  Maximize2,
-  Minimize2,
   Download,
-  Settings,
   RefreshCw,
   Play,
   Pause,
-  Filter,
-  Calendar,
-  Search,
   Plus,
   X,
-  Move,
-  Eye,
-  EyeOff,
-  Zap,
-  BarChart,
-  CandlestickChart
+  BarChart
 } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
 
 import SEOHead from '../components/SEO/SEOHead';
 import secureApiClient from '../services/secureApiClient';
-import { formatCurrency, formatPercentage, formatNumber } from '../utils/formatters';
 
 // Import chart components
-import CandlestickChart from '../components/Charts/CandlestickChart';
-import HeatmapChart from '../components/Charts/HeatmapChart';
-import CorrelationMatrix from '../components/Charts/CorrelationMatrix';
-import RealTimeChart from '../components/Charts/RealTimeChart';
-import CustomizableChart from '../components/Charts/CustomizableChart';
 
 const AdvancedCharting = () => {
   const [selectedTimeframe, setSelectedTimeframe] = useState('1D');
@@ -52,7 +32,7 @@ const AdvancedCharting = () => {
   const [chartLayout, setChartLayout] = useState('grid');
   const [isRealTime, setIsRealTime] = useState(true);
   const [marketData, setMarketData] = useState({});
-  const [portfolioData, setPortfolioData] = useState(null);
+  const [_portfolioData, setPortfolioData] = useState(null);
   const [loading, setLoading] = useState({
     charts: false,
     data: false,
@@ -78,12 +58,12 @@ const AdvancedCharting = () => {
   ];
 
   const chartTypes = [
-    { id: 'candlestick', name: 'Candlestick', icon: CandlestickChart, description: 'OHLC price data' },
-    { id: 'line', name: 'Line Chart', icon: LineChart, description: 'Price trends over time' },
-    { id: 'bar', name: 'Bar Chart', icon: BarChart, description: 'Volume and comparison data' },
-    { id: 'area', name: 'Area Chart', icon: Activity, description: 'Filled area charts' },
-    { id: 'heatmap', name: 'Heatmap', icon: Grid3X3, description: 'Correlation matrices' },
-    { id: 'scatter', name: 'Scatter Plot', icon: Target, description: 'Risk vs return analysis' }
+    { id: 'candlestick', name: 'Candlestick', icon: '📊', description: 'OHLC price data' },
+    { id: 'line', name: 'Line Chart', icon: '📈', description: 'Price trends over time' },
+    { id: 'bar', name: 'Bar Chart', icon: '📊', description: 'Volume and comparison data' },
+    { id: 'area', name: 'Area Chart', icon: '📊', description: 'Filled area charts' },
+    { id: 'heatmap', name: 'Heatmap', icon: '🔥', description: 'Correlation matrices' },
+    { id: 'scatter', name: 'Scatter Plot', icon: '🎯', description: 'Risk vs return analysis' }
   ];
 
   const realTimeUpdateRef = useRef(null);
@@ -584,14 +564,14 @@ const ChartRenderer = ({ chart, marketData, timeframe, isRealTime }) => {
         <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
           {React.createElement(
             { 
-              candlestick: CandlestickChart,
+              candlestick: BarChart3,
               line: LineChart, 
               bar: BarChart,
               area: Activity,
               heatmap: Grid3X3,
               scatter: Target
             }[chart.type] || BarChart3,
-            { className: "w-8 h-8 text-blue-600" }
+            { className: 'w-8 h-8 text-blue-600' }
           )}
         </div>
         <h3 className="font-semibold text-gray-900 mb-1">

@@ -3,7 +3,7 @@
  * Demonstrates how to integrate the new storage services with financial modeling components
  */
 
-import { Save, FolderOpen, Download, Upload, Database } from 'lucide-react';
+import { Save, FolderOpen, Database } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 
 import DataExportImport from '../components/DataExportImport.jsx';

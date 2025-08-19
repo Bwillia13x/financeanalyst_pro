@@ -94,7 +94,7 @@ const Header = () => {
 
   const dataSyncStatus = getDataSyncStatus();
   const modelState = getModelState();
-  const activeTab = getActiveTab();
+  const _activeTab = getActiveTab();
 
   return (
     <>

@@ -706,9 +706,6 @@ class BusinessIntelligenceService extends EventEmitter {
     return {};
   }
   updatePerformanceTrends(aggregated) {}
-  identifyPatterns() {
-    return {};
-  }
   detectSystemAnomalies() {
     return [];
   }

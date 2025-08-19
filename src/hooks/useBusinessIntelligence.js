@@ -16,7 +16,7 @@ export function useBusinessIntelligence(config = {}) {
   const [analytics, setAnalytics] = useState({});
   const [insights, setInsights] = useState([]);
   const [reports, setReports] = useState([]);
-  const [benchmarks, setBenchmarks] = useState({});
+  const [benchmarks, _setBenchmarks] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -243,7 +243,7 @@ export function useUsageAnalytics() {
  */
 export function usePerformanceAnalytics() {
   const [performanceMetrics, setPerformanceMetrics] = useState({});
-  const [benchmarks, setBenchmarks] = useState({});
+      const [benchmarks, _setBenchmarks] = useState({});
   const [alerts, setAlerts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -283,7 +283,7 @@ export function usePerformanceAnalytics() {
         ];
 
         setPerformanceMetrics(mockPerformanceData);
-        setBenchmarks(mockBenchmarks);
+        _setBenchmarks(mockBenchmarks);
         setAlerts(mockAlerts);
       } catch (error) {
         console.error('Failed to load performance analytics:', error);
