@@ -8,7 +8,7 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
   const [adjustedValues, setAdjustedValues] = useState({});
 
   // Add accessibility monitoring for financial spreadsheet
-  const { elementRef, testFinancialFeatures } = useFinancialAccessibility('spreadsheet');
+  const { elementRef: _elementRef, testFinancialFeatures: _testFinancialFeatures } = useFinancialAccessibility('spreadsheet');
   const [expandedSections, setExpandedSections] = useState({
     // Income Statement
     revenue: true,
@@ -550,6 +550,14 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
                     ? 'bg-gradient-to-r from-blue-50 to-blue-100 text-blue-800 font-semibold border border-blue-200 shadow-sm'
                     : 'hover:bg-slate-100 text-slate-800 cursor-pointer border border-transparent hover:border-slate-200 hover:shadow-sm group-hover:bg-slate-50'
                 }`}
+                role="button"
+                tabIndex={formula ? -1 : 0}
+                onKeyDown={(e) => {
+                  if ((e.key === 'Enter' || e.key === ' ') && !formula) {
+                    e.preventDefault();
+                    handleCellClick(key, periodIndex);
+                  }
+                }}
               >
                 <span className={formula ? 'text-blue-900' : 'text-slate-700'}>
                   {formatNumber(data.statements.incomeStatement[key]?.[periodIndex]) || '—'}
@@ -607,6 +615,14 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
                   ? 'bg-gradient-to-r from-amber-100 to-yellow-100 text-amber-800 font-semibold border border-amber-300 shadow-sm'
                   : 'hover:bg-amber-100 text-slate-800 cursor-pointer border border-transparent hover:border-amber-300 hover:shadow-sm'
               }`}
+              role="button"
+              tabIndex={formula ? -1 : 0}
+              onKeyDown={(e) => {
+                if ((e.key === 'Enter' || e.key === ' ') && !formula) {
+                  e.preventDefault();
+                  handleCellClick(key, null, true);
+                }
+              }}
             >
               <span className={formula ? 'text-amber-900' : 'text-slate-700'}>
                 {formatNumber(adjustedValues[key] || 0) || '—'}

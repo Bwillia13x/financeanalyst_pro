@@ -1,6 +1,5 @@
 import DCFWaterfallBase from './DCFWaterfall';
 import { withLazyChart } from './LazyChartWrapper';
-
 // Import chart components
 import { MetricsDashboard as MetricsDashboardBase, MetricCard } from './MetricsDashboard';
 import RevenueBreakdownBase from './RevenueBreakdown';

@@ -12,8 +12,8 @@ import { syncService } from '../persistence/SyncService';
 
 export const persistenceCommands = {
   BACKUP_CREATE: {
-    execute: async(parsedCommand, context, processor) => {
-      const [description] = parsedCommand.parameters;
+    execute: async(_parsedCommand, _context, _processor) => {
+      const [description] = _parsedCommand.parameters;
 
       try {
         const backup = await backupService.createBackup({
@@ -51,7 +51,7 @@ export const persistenceCommands = {
   },
 
   BACKUP_LIST: {
-    execute: async(parsedCommand, context, processor) => {
+    execute: async(_parsedCommand, _context, _processor) => {
       try {
         const backups = await backupService.listBackups();
         const stats = await backupService.getBackupStats();
@@ -97,8 +97,8 @@ export const persistenceCommands = {
   },
 
   BACKUP_RESTORE: {
-    execute: async(parsedCommand, context, processor) => {
-      const [backupId, overwrite = 'false'] = parsedCommand.parameters;
+    execute: async(_parsedCommand, _context, _processor) => {
+      const [backupId, overwrite = 'false'] = _parsedCommand.parameters;
 
       if (!backupId) {
         return {
@@ -142,7 +142,7 @@ export const persistenceCommands = {
   },
 
   STORAGE_STATS: {
-    execute: async(parsedCommand, context, processor) => {
+    execute: async(_parsedCommand, _context, _processor) => {
       try {
         const stats = await persistenceManager.getStorageStats();
 
@@ -184,7 +184,7 @@ export const persistenceCommands = {
   },
 
   PRIVACY_CLEANUP: {
-    execute: async(parsedCommand, context, processor) => {
+    execute: async(_parsedCommand, _context, _processor) => {
       try {
         const results = await privacyService.cleanupExpiredData();
 
@@ -217,8 +217,8 @@ export const persistenceCommands = {
   },
 
   PRIVACY_SETTINGS: {
-    execute: async(parsedCommand, context, processor) => {
-      const [setting, value] = parsedCommand.parameters;
+    execute: async(_parsedCommand, _context, _processor) => {
+      const [setting, value] = _parsedCommand.parameters;
 
       try {
         if (!setting) {
@@ -279,7 +279,7 @@ export const persistenceCommands = {
   },
 
   SYNC_STATUS: {
-    execute: async(parsedCommand, context, processor) => {
+    execute: async(_parsedCommand, _context, _processor) => {
       try {
         const status = syncService.getSyncStatus();
 
@@ -308,7 +308,7 @@ export const persistenceCommands = {
   },
 
   PERSISTENCE_TEST: {
-    execute: async(parsedCommand, context, processor) => {
+    execute: async(_parsedCommand, _context, _processor) => {
       try {
         const testResults = await persistenceTestSuite.runAllTests();
 

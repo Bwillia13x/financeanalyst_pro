@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
 
 import Icon from '../../components/AppIcon';
-import SEOHead from '../../components/SEO/SEOHead';
 import Button from '../../components/ui/Button';
 import Header from '../../components/ui/Header';
 import { useFinancialAccessibility } from '../../hooks/useAccessibility';
 import { dataValidationService } from '../../services/dataValidationService';
 import { enhancedApiService } from '../../services/enhancedApiService';
+import { normalizeQuote } from '../../services/normalizers/marketDataNormalizer';
 import realTimeDataService from '../../services/realTimeDataService';
-import { trackFinancialComponentPerformance } from '../../utils/performanceMonitoring';
 
 import ApiStatusPanel from './components/ApiStatusPanel';
 import BulkOperationsPanel from './components/BulkOperationsPanel';
@@ -22,7 +21,7 @@ import WatchlistPanel from './components/WatchlistPanel';
 
 const RealTimeMarketDataCenter = () => {
   // Add accessibility and performance monitoring
-  const { elementRef, testFinancialFeatures } = useFinancialAccessibility('market-data-center');
+  const { elementRef: _elementRef, testFinancialFeatures: _testFinancialFeatures } = useFinancialAccessibility('market-data-center');
 
   const [dataSources, setDataSources] = useState([
     { id: 'yahoo', name: 'Yahoo Finance', enabled: true, status: 'connected', latency: 12, requiresKey: false },
@@ -31,7 +30,7 @@ const RealTimeMarketDataCenter = () => {
     { id: 'sec_edgar', name: 'SEC EDGAR', enabled: true, status: 'connected', latency: 45, requiresKey: false }
   ]);
 
-  const [connectionHealth, setConnectionHealth] = useState({
+  const [connectionHealth, _setConnectionHealth] = useState({
     overall: 'good',
     sources: {
       yahoo: 'connected',
@@ -43,7 +42,7 @@ const RealTimeMarketDataCenter = () => {
 
   const [realDataEnabled, setRealDataEnabled] = useState(false);
   const [apiHealthStatus, setApiHealthStatus] = useState({});
-  const [dataQuality, setDataQuality] = useState({});
+  const [dataQuality, _setDataQuality] = useState({});
 
   const [widgets, setWidgets] = useState([
     {
@@ -138,9 +137,9 @@ const RealTimeMarketDataCenter = () => {
     }
   ]);
 
-  const [selectedSymbols, setSelectedSymbols] = useState([]);
+  const [selectedSymbols, _setSelectedSymbols] = useState([]);
   const [lastUpdate, setLastUpdate] = useState('2 min ago');
-  const [refreshInterval, setRefreshInterval] = useState(5000);
+  const [refreshInterval, _setRefreshInterval] = useState(5000);
   const [isAutoRefresh, setIsAutoRefresh] = useState(true);
 
   // Initialize real data services and check API health
@@ -195,22 +194,23 @@ const RealTimeMarketDataCenter = () => {
           widgets.map(async(widget) => {
             try {
               const marketData = await enhancedApiService.fetchRealTimeMarketData(widget.symbol);
-              const validation = dataValidationService.validateData(marketData, 'marketData');
+              const normalized = normalizeQuote(marketData, widget);
+              const validation = dataValidationService.validateData(normalized, 'marketData');
 
               return {
                 ...widget,
-                currentValue: marketData.currentPrice,
-                change: marketData.change,
-                changePercent: marketData.changePercent,
-                dayHigh: marketData.dayHigh,
-                dayLow: marketData.dayLow,
-                volume: marketData.volume,
-                lastUpdate: new Date(),
-                source: marketData.source,
+                currentValue: normalized.currentPrice,
+                change: normalized.change,
+                changePercent: normalized.changePercent,
+                dayHigh: normalized.dayHigh,
+                dayLow: normalized.dayLow,
+                volume: normalized.volume,
+                lastUpdate: new Date(normalized.timestamp),
+                source: normalized.source,
                 dataQuality: validation.qualityScore,
                 sparklineData: [
                   ...widget.sparklineData.slice(1),
-                  marketData.currentPrice
+                  normalized.currentPrice
                 ]
               };
             } catch (error) {
@@ -272,8 +272,9 @@ const RealTimeMarketDataCenter = () => {
       if (realDataEnabled) {
         try {
           marketData = await enhancedApiService.fetchRealTimeMarketData(symbol.symbol);
-          const validation = dataValidationService.validateData(marketData, 'marketData');
-          source = marketData.source;
+          const normalized = normalizeQuote(marketData);
+          const validation = dataValidationService.validateData(normalized, 'marketData');
+          source = normalized.source;
           dataQuality = validation.qualityScore;
         } catch (error) {
           console.warn(`Failed to fetch real data for ${symbol.symbol}, using simulation:`, error);
@@ -281,22 +282,23 @@ const RealTimeMarketDataCenter = () => {
         }
       }
 
+      const normalizedInitial = normalizeQuote(marketData || {}, {});
       const newWidget = {
         id: `widget-${Date.now()}`,
         symbol: symbol.symbol,
         name: symbol.name,
-        currentValue: marketData?.currentPrice || Math.random() * 1000 + 50,
-        change: marketData?.change || (Math.random() - 0.5) * 10,
-        changePercent: marketData?.changePercent || (Math.random() - 0.5) * 5,
+        currentValue: normalizedInitial.currentPrice || Math.random() * 1000 + 50,
+        change: normalizedInitial.change || (Math.random() - 0.5) * 10,
+        changePercent: normalizedInitial.changePercent || (Math.random() - 0.5) * 5,
         valueType: 'currency',
-        dayHigh: marketData?.dayHigh || Math.random() * 1000 + 60,
-        dayLow: marketData?.dayLow || Math.random() * 1000 + 40,
-        volume: marketData?.volume || Math.floor(Math.random() * 100000000),
+        dayHigh: normalizedInitial.dayHigh || Math.random() * 1000 + 60,
+        dayLow: normalizedInitial.dayLow || Math.random() * 1000 + 40,
+        volume: normalizedInitial.volume || Math.floor(Math.random() * 100000000),
         source,
         dataQuality,
         lastUpdate: new Date(),
         sparklineData: Array.from({ length: 6 }, () =>
-          marketData?.currentPrice || Math.random() * 1000 + 50
+          normalizedInitial.currentPrice || Math.random() * 1000 + 50
         )
       };
 
@@ -304,20 +306,24 @@ const RealTimeMarketDataCenter = () => {
 
       // Subscribe to real-time updates for this symbol
       if (realDataEnabled) {
-        realTimeDataService.subscribe(symbol.symbol, 'marketData', (data) => {
+        realTimeDataService.subscribe('stock_price', symbol.symbol, (data) => {
           setWidgets(prevWidgets =>
-            prevWidgets.map(widget =>
-              widget.symbol === symbol.symbol
-                ? {
-                  ...widget,
-                  currentValue: data.currentPrice,
-                  change: data.change,
-                  changePercent: data.changePercent,
-                  lastUpdate: new Date(data.timestamp),
-                  source: data.source
-                }
-                : widget
-            )
+            prevWidgets.map(widget => {
+              if (widget.symbol !== symbol.symbol) return widget;
+              const normalized = normalizeQuote({ ...data, symbol: widget.symbol, source: data.source || widget.source || 'SIM_FEED' }, widget);
+              return {
+                ...widget,
+                currentValue: normalized.currentPrice ?? widget.currentValue,
+                change: normalized.change ?? widget.change,
+                changePercent: normalized.changePercent ?? widget.changePercent,
+                lastUpdate: new Date(normalized.timestamp),
+                source: normalized.source,
+                sparklineData: [
+                  ...widget.sparklineData.slice(1),
+                  normalized.currentPrice ?? widget.currentValue
+                ]
+              };
+            })
           );
         });
       }

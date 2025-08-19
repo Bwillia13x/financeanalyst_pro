@@ -1,4 +1,4 @@
-import { Plus, Minus, Copy, Trash2, Calculator, PieChart, BarChart3, Target } from 'lucide-react';
+import { Plus, Trash2, Calculator, Target, BarChart3, PieChart, Copy } from 'lucide-react';
 import React, { useState, useMemo, useCallback } from 'react';
 
 const Card = ({ title, right, children, className = '' }) => (
@@ -123,10 +123,11 @@ const SOTPComponent = ({
             {/* Component configuration */}
             {component.type === 'model' && (
               <div>
-                <label className="block text-[11px] font-medium text-slate-700 mb-1">
+                <label htmlFor={`model-${component.id}`} className="block text-[11px] font-medium text-slate-700 mb-1">
                   Source Model
                 </label>
                 <select
+                  id={`model-${component.id}`}
                   value={component.modelId || ''}
                   onChange={(e) => onUpdate(component.id, { modelId: e.target.value })}
                   className="w-full text-[11px] px-2 py-1 border border-slate-200 rounded"
@@ -144,10 +145,11 @@ const SOTPComponent = ({
 
             {component.type === 'manual' && (
               <div>
-                <label className="block text-[11px] font-medium text-slate-700 mb-1">
+                <label htmlFor={`manual-${component.id}`} className="block text-[11px] font-medium text-slate-700 mb-1">
                   Manual Value
                 </label>
                 <input
+                  id={`manual-${component.id}`}
                   type="number"
                   value={component.manualValue || 0}
                   onChange={(e) => onUpdate(component.id, { manualValue: parseFloat(e.target.value) || 0 })}
@@ -161,10 +163,11 @@ const SOTPComponent = ({
             {component.type === 'adjustment' && (
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="block text-[11px] font-medium text-slate-700 mb-1">
+                  <label htmlFor={`adj-type-${component.id}`} className="block text-[11px] font-medium text-slate-700 mb-1">
                     Adjustment Type
                   </label>
                   <select
+                    id={`adj-type-${component.id}`}
                     value={component.adjustmentType || 'add'}
                     onChange={(e) => onUpdate(component.id, { adjustmentType: e.target.value })}
                     className="w-full text-[11px] px-2 py-1 border border-slate-200 rounded"
@@ -177,10 +180,11 @@ const SOTPComponent = ({
                   </select>
                 </div>
                 <div>
-                  <label className="block text-[11px] font-medium text-slate-700 mb-1">
+                  <label htmlFor={`adj-value-${component.id}`} className="block text-[11px] font-medium text-slate-700 mb-1">
                     Value
                   </label>
                   <input
+                    id={`adj-value-${component.id}`}
                     type="number"
                     value={component.adjustmentValue || 0}
                     onChange={(e) => onUpdate(component.id, { adjustmentValue: parseFloat(e.target.value) || 0 })}
@@ -192,10 +196,11 @@ const SOTPComponent = ({
             )}
 
             <div>
-              <label className="block text-[11px] font-medium text-slate-700 mb-1">
+              <label htmlFor={`desc-${component.id}`} className="block text-[11px] font-medium text-slate-700 mb-1">
                 Description
               </label>
               <textarea
+                id={`desc-${component.id}`}
                 value={component.description || ''}
                 onChange={(e) => onUpdate(component.id, { description: e.target.value })}
                 className="w-full text-[11px] px-2 py-1 border border-slate-200 rounded h-16 resize-none"

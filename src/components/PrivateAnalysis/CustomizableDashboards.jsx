@@ -16,35 +16,21 @@ import {
   DollarSign,
   Activity,
   Users,
-  Calendar,
-  Clock,
   Download,
   Share2,
   Edit3,
   Trash2,
-  Move,
-  Maximize2,
-  Minimize2,
   RefreshCw,
-  Filter,
   Eye,
-  EyeOff,
-  Bookmark,
-  Star,
-  Zap,
   AlertTriangle,
   X
 } from 'lucide-react';
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import {
   LineChart,
   Line,
-  AreaChart,
-  Area,
   BarChart,
   Bar,
-  PieChart as RechartsPieChart,
-  Cell,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -53,7 +39,7 @@ import {
   ResponsiveContainer
 } from 'recharts';
 
-const CustomizableDashboards = ({ modelData, onDataChange }) => {
+const CustomizableDashboards = ({ modelData: _modelData, onDataChange: _onDataChange }) => {
   const [dashboards, setDashboards] = useState([
     {
       id: 1,

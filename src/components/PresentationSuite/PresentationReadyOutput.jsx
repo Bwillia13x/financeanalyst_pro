@@ -3,23 +3,13 @@
  * Every chart, table, and visualization designed for presentation to managing directors and clients
  */
 
-import { motion } from 'framer-motion';
 import {
   Download,
   Copy,
   Share2,
   Presentation,
-  FileImage,
-  FileText,
-  Printer,
   Settings,
-  Palette,
-  Type,
-  Layout,
-  Camera,
-  Monitor,
-  Smartphone,
-  FileSpreadsheet
+  Camera
 } from 'lucide-react';
 import React, { useState, useRef } from 'react';
 import {
@@ -29,9 +19,6 @@ import {
   Area,
   BarChart,
   Bar,
-  PieChart,
-  Pie,
-  Cell,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -40,8 +27,8 @@ import {
   ResponsiveContainer
 } from 'recharts';
 
-const PresentationReadyOutput = ({ data, title, type = 'chart', chartType = 'line' }) => {
-  const [presentationMode, setPresentationMode] = useState('executive');
+const PresentationReadyOutput = ({ data, title, type: _type = 'chart', chartType = 'line' }) => {
+  const [_presentationMode, _setPresentationMode] = useState('executive');
   const [exportFormat, setExportFormat] = useState('png');
   const [colorTheme, setColorTheme] = useState('professional');
   const chartRef = useRef(null);
@@ -149,14 +136,14 @@ const PresentationReadyOutput = ({ data, title, type = 'chart', chartType = 'lin
     }
   };
 
-  const CustomTooltip = ({ active, payload, label }) => {
+  const CustomTooltip = ({ active, payload, label: _label }) => {
     if (active && payload && payload.length) {
       return (
         <div
           className="bg-white p-4 rounded-lg shadow-xl border border-gray-200"
           style={{ fontFamily: typography.axis.fontFamily }}
         >
-          <p className="font-semibold text-gray-900 mb-2">{label}</p>
+          <p className="font-semibold text-gray-900 mb-2">{_label}</p>
           {payload.map((entry, index) => (
             <p key={index} style={{ color: entry.color }} className="text-sm">
               {`${entry.name}: ${typeof entry.value === 'number' ?

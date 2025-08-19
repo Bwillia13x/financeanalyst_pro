@@ -671,19 +671,19 @@ class BusinessIntelligenceService extends EventEmitter {
   }
 
   // Placeholder implementations for complex analysis methods
-  identifyTrends(data) {
+  identifyTrends(_data) {
     return [];
   }
-  findCorrelations(data) {
+  findCorrelations(_data) {
     return [];
   }
-  detectAnomalies(data) {
+  detectAnomalies(_data) {
     return [];
   }
-  generateTradingSignals(data) {
+  generateTradingSignals(_data) {
     return [];
   }
-  analyzeSession(session) {
+  analyzeSession(_session) {
     return {};
   }
   getMemoryUsage() {
@@ -698,17 +698,14 @@ class BusinessIntelligenceService extends EventEmitter {
   getUserExperienceMetrics() {
     return {};
   }
-  updatePageViewMetrics(item) {}
-  updateFeatureUsageMetrics(item) {}
-  updateInteractionMetrics(item) {}
-  updateBehaviorPatterns(item) {}
-  aggregatePerformanceMetrics(batch) {
+  updatePageViewMetrics(_item) {}
+  updateFeatureUsageMetrics(_item) {}
+  updateInteractionMetrics(_item) {}
+  updateBehaviorPatterns(_item) {}
+  aggregatePerformanceMetrics(_batch) {
     return {};
   }
-  updatePerformanceTrends(aggregated) {}
-  identifyPatterns() {
-    return {};
-  }
+  updatePerformanceTrends(_aggregated) {}
   detectSystemAnomalies() {
     return [];
   }
@@ -718,28 +715,28 @@ class BusinessIntelligenceService extends EventEmitter {
   generateAlerts() {
     return [];
   }
-  countSessions(start, end) {
+  countSessions(_start, _end) {
     return 0;
   }
-  countUniqueUsers(start, end) {
+  countUniqueUsers(_start, _end) {
     return 0;
   }
-  calculateAverageSessionDuration(start, end) {
+  calculateAverageSessionDuration(_start, _end) {
     return 0;
   }
-  getTopFeatures(start, end) {
+  getTopFeatures(_start, _end) {
     return [];
   }
-  countPageViews(start, end) {
+  countPageViews(_start, _end) {
     return 0;
   }
-  calculateEngagementMetrics(start, end) {
+  calculateEngagementMetrics(_start, _end) {
     return {};
   }
-  calculateGrowthRate(metric, start, end) {
+  calculateGrowthRate(_metric, _start, _end) {
     return 0;
   }
-  calculateEngagementTrend(start, end) {
+  calculateEngagementTrend(_start, _end) {
     return 0;
   }
   calculateOverallHealth() {
@@ -775,10 +772,10 @@ class BusinessIntelligenceService extends EventEmitter {
   identifyChurnRisk() {
     return [];
   }
-  getCurrentMetrics(category) {
+  getCurrentMetrics(_category) {
     return {};
   }
-  getBenchmarkStatus(current, benchmark, metric) {
+  getBenchmarkStatus(_current, _benchmark, _metric) {
     return 'good';
   }
   identifyBehaviorPatterns() {
@@ -817,13 +814,13 @@ class BusinessIntelligenceService extends EventEmitter {
   getMarketMetrics() {
     return {};
   }
-  calculateTrend(data) {
+  calculateTrend(_data) {
     return 0;
   }
   generateRecommendations() {
     return [];
   }
-  convertToCSV(data) {
+  convertToCSV(_data) {
     return '';
   }
 }

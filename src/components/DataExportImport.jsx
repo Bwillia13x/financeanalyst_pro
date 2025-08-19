@@ -7,13 +7,16 @@ import {
   Download,
   Upload,
   FileText,
-  Share2,
-  RefreshCw,
   CheckCircle,
-  AlertTriangle,
-  X
+  Loader2,
+  Info,
+  AlertCircle,
+  FileSpreadsheet,
+  Bookmark,
+  Users,
+  Database
 } from 'lucide-react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 
 import { financialDataStorage } from '../services/financialDataStorage.js';
 import { apiLogger } from '../utils/apiLogger.js';
@@ -24,7 +27,7 @@ const defaultTemplates = [
   { id: 3, name: 'LBO Analysis Template', category: 'Private Equity', lastUsed: '2024-01-05', uses: 35 }
 ];
 
-const DataExportImport = ({ data: _data, onDataChange: _onDataChange, savedAnalyses: _savedAnalyses, onAnalysesChange: _onAnalysesChange, className = '' }) => {
+const DataExportImport = ({ data: _data, onDataChange: _onDataChange, savedAnalyses: _savedAnalyses, onAnalysesChange: _onAnalysesChange, onClose, className: _className }) => {
   const [activeTab, setActiveTab] = useState('excel');
   const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);

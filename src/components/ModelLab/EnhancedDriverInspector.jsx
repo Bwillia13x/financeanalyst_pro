@@ -29,19 +29,16 @@ const Pill = ({ children, tone = 'slate' }) => {
   );
 };
 
-const NudgeButton = ({ label, onChange, currentValue, delta, suffix = '' }) => {
+const _NudgeButton = ({ label, onChange, currentValue, delta, suffix = '' }) => {
   const handleNudge = (direction) => {
     const newValue = currentValue + (delta * direction);
     onChange(newValue);
   };
 
-  const calculateImpact = (direction) => {
-    const testModel = {
-      kind: 'DCF', // This would need to be passed in
-      assumptions: { ...currentValue, [label.toLowerCase()]: currentValue + (delta * direction) }
-    };
+  const _calculateImpact = async(_direction) => {
+    const _testModel = async() => ({ kind: 'DCF', assumptions: { ...currentValue, [label.toLowerCase()]: currentValue + (delta * _direction) } });
     // This is a simplified impact calculation - would need full model context
-    return delta * direction;
+    return delta * _direction;
   };
 
   return (
@@ -236,7 +233,7 @@ const EnhancedDriverInspector = ({ model, onModelUpdate, lastSavedModel }) => {
   const drivers = driverMapping[model.kind] || [];
 
   // Calculate impact of nudges
-  const calculateNudgeImpact = (driverKey, delta) => {
+  const calculateNudgeImpact = async(driverKey, delta) => {
     const testAssumptions = {
       ...model.assumptions,
       [driverKey]: (model.assumptions[driverKey] || 0) + delta
@@ -437,6 +434,7 @@ const EnhancedDriverInspector = ({ model, onModelUpdate, lastSavedModel }) => {
                       <div className="grid grid-cols-2 gap-2 text-[10px]">
                         {['positive', 'negative'].map(direction => {
                           const delta = direction === 'positive' ? driver.nudgeDelta : -driver.nudgeDelta;
+                          const _prediction = model.predict('up');
                           const impacts = calculateNudgeImpact(driver.key, delta);
 
                           return (

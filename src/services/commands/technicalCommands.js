@@ -8,7 +8,7 @@ import { dataFetchingService } from '../dataFetching';
 
 export const technicalCommands = {
   TECHNICALS: {
-    execute: async(parsedCommand, context, processor) => {
+    execute: async(parsedCommand, _context, _processor) => {
       const [ticker] = parsedCommand.parameters;
 
       if (!ticker) {
@@ -20,7 +20,7 @@ export const technicalCommands = {
 
       try {
         const profile = await dataFetchingService.fetchCompanyProfile(ticker.toUpperCase());
-        const marketData = await dataFetchingService.fetchMarketData(ticker.toUpperCase());
+        const _marketData = await dataFetchingService.fetchMarketData(ticker.toUpperCase());
 
         // Mock technical indicators (in real implementation, would calculate from price data)
         const price = profile.price;
@@ -98,7 +98,7 @@ export const technicalCommands = {
   },
 
   SUPPORT_RESISTANCE: {
-    execute: async(parsedCommand, context, processor) => {
+    execute: async(parsedCommand, _context, _processor) => {
       const [ticker] = parsedCommand.parameters;
 
       if (!ticker) {

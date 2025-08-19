@@ -1,10 +1,10 @@
-import { motion, AnimatePresence } from 'framer-motion';
-import { Building2, Calculator, TrendingUp, DollarSign, BarChart3, Target } from 'lucide-react';
-import React, { useState, useMemo, useCallback } from 'react';
+import { motion } from 'framer-motion';
+import { Building2, Calculator, DollarSign, BarChart3 } from 'lucide-react';
+import React, { useState, useCallback } from 'react';
 
 import { lboModelingEngine } from '../../services/lboModelingEngine.js';
 
-const AdvancedLBOTool = ({ data, onDataChange }) => {
+const AdvancedLBOTool = ({ data: _data, onDataChange }) => {
   const [activeTab, setActiveTab] = useState('inputs');
   const [lboResults, setLBOResults] = useState(null);
   const [isCalculating, setIsCalculating] = useState(false);
@@ -159,8 +159,9 @@ const AdvancedLBOTool = ({ data, onDataChange }) => {
               <h3 className="font-semibold mb-3">Transaction</h3>
               <div className="space-y-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Purchase Price</label>
+                  <label htmlFor="purchase-price" className="block text-sm font-medium text-gray-700 mb-1">Purchase Price</label>
                   <input
+                    id="purchase-price"
                     type="number"
                     value={lboInputs.purchasePrice}
                     onChange={(e) => handleInputChange('purchasePrice', e.target.value)}
@@ -169,8 +170,9 @@ const AdvancedLBOTool = ({ data, onDataChange }) => {
                   <p className="text-xs text-gray-500">{formatCurrency(lboInputs.purchasePrice)}</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Current EBITDA</label>
+                  <label htmlFor="current-ebitda" className="block text-sm font-medium text-gray-700 mb-1">Current EBITDA</label>
                   <input
+                    id="current-ebitda"
                     type="number"
                     value={lboInputs.ebitda}
                     onChange={(e) => handleInputChange('ebitda', e.target.value)}
@@ -178,8 +180,9 @@ const AdvancedLBOTool = ({ data, onDataChange }) => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Holding Period</label>
+                  <label htmlFor="holding-period" className="block text-sm font-medium text-gray-700 mb-1">Holding Period</label>
                   <input
+                    id="holding-period"
                     type="number"
                     value={lboInputs.holdingPeriod}
                     onChange={(e) => handleInputChange('holdingPeriod', e.target.value)}
@@ -194,8 +197,9 @@ const AdvancedLBOTool = ({ data, onDataChange }) => {
               <h3 className="font-semibold mb-3">Financing</h3>
               <div className="space-y-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Senior Debt Multiple</label>
+                  <label htmlFor="senior-debt" className="block text-sm font-medium text-gray-700 mb-1">Senior Debt Multiple</label>
                   <input
+                    id="senior-debt"
                     type="number"
                     step="0.1"
                     value={lboInputs.seniorDebtMultiple}
@@ -204,8 +208,9 @@ const AdvancedLBOTool = ({ data, onDataChange }) => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Sub Debt Multiple</label>
+                  <label htmlFor="sub-debt" className="block text-sm font-medium text-gray-700 mb-1">Sub Debt Multiple</label>
                   <input
+                    id="sub-debt"
                     type="number"
                     step="0.1"
                     value={lboInputs.subordinatedDebtMultiple}
@@ -214,8 +219,9 @@ const AdvancedLBOTool = ({ data, onDataChange }) => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Senior Rate (%)</label>
+                  <label htmlFor="lbo-senior-rate" className="block text-sm font-medium text-gray-700 mb-1">Senior Rate (%)</label>
                   <input
+                    id="lbo-senior-rate"
                     type="number"
                     step="0.001"
                     value={lboInputs.seniorInterestRate * 100}
@@ -231,8 +237,9 @@ const AdvancedLBOTool = ({ data, onDataChange }) => {
               <h3 className="font-semibold mb-3">Operating</h3>
               <div className="space-y-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">EBITDA Growth (%)</label>
+                  <label htmlFor="lbo-ebitda-growth" className="block text-sm font-medium text-gray-700 mb-1">EBITDA Growth (%)</label>
                   <input
+                    id="lbo-ebitda-growth"
                     type="number"
                     step="0.01"
                     value={lboInputs.ebitdaGrowthRate * 100}
@@ -241,8 +248,9 @@ const AdvancedLBOTool = ({ data, onDataChange }) => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Exit Multiple</label>
+                  <label htmlFor="lbo-exit-multiple" className="block text-sm font-medium text-gray-700 mb-1">Exit Multiple</label>
                   <input
+                    id="lbo-exit-multiple"
                     type="number"
                     step="0.1"
                     value={lboInputs.exitMultiple}
@@ -251,8 +259,9 @@ const AdvancedLBOTool = ({ data, onDataChange }) => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Tax Rate (%)</label>
+                  <label htmlFor="lbo-tax-rate" className="block text-sm font-medium text-gray-700 mb-1">Tax Rate (%)</label>
                   <input
+                    id="lbo-tax-rate"
                     type="number"
                     step="0.01"
                     value={lboInputs.taxRate * 100}

@@ -206,7 +206,7 @@ class VersioningService {
     const history = this.getVersionHistory(modelId);
     if (history.length === 0) return null;
 
-    const now = new Date();
+    const _now = new Date();
     const oldestVersion = history[history.length - 1];
     const newestVersion = history[0];
 

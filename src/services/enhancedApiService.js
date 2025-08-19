@@ -1,4 +1,5 @@
 import { apiLogger } from '../utils/apiLogger.js';
+
 import secureApiClient from './secureApiClient.js';
 
 class RateLimiter {
@@ -49,7 +50,7 @@ class EnhancedApiService {
    */
   initializeSecureClient() {
     this.client = secureApiClient;
-    
+
     apiLogger.log('INFO', 'EnhancedApiService initialized with secure backend proxy');
   }
 
@@ -77,7 +78,7 @@ class EnhancedApiService {
    * @param {string} source - Data source name
    * @returns {boolean}
    */
-  hasValidApiKey(source) {
+  hasValidApiKey(_source) {
     // Always return true as backend handles authentication
     return true;
   }
@@ -87,7 +88,7 @@ class EnhancedApiService {
    * @param {string} dataType - Type of data needed
    * @returns {string} Always returns 'BACKEND_PROXY'
    */
-  getBestSource(dataType) {
+  getBestSource(_dataType) {
     return 'BACKEND_PROXY';
   }
 
@@ -106,7 +107,7 @@ class EnhancedApiService {
    * @param {Object} options - Additional options
    * @returns {Promise<Object>} Market data
    */
-  async fetchRealTimeMarketData(symbol, options = {}) {
+  async fetchRealTimeMarketData(symbol, _options = {}) {
     const t0 = Date.now();
     try {
       const data = await this.client.getQuote(symbol);
@@ -324,15 +325,15 @@ class EnhancedApiService {
    * @param {Object} options - Request options
    * @returns {Promise<Object>} Raw data from Alpha Vantage
    */
-  async fetchFromAlphaVantage(symbol, function_name, options = {}) {
+  async fetchFromAlphaVantage(symbol, functionName, options = {}) {
     if (!this.hasValidApiKey('ALPHA_VANTAGE')) {
       throw new Error('Alpha Vantage API key not available');
     }
 
-    const config = API_CONFIG.ALPHA_VANTAGE;
+    const config = this.apiConfigs?.ALPHA_VANTAGE || { baseURL: 'https://www.alphavantage.co/query' };
 
     const params = {
-      function: function_name,
+      function: functionName,
       symbol,
       apikey: this.apiKeys.ALPHA_VANTAGE,
       ...options.params

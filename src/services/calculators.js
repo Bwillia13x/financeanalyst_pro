@@ -6,7 +6,7 @@
 const DCFCalculator = {
   kind: 'DCF',
 
-  compute(assumptions, config = {}) {
+  compute(assumptions, _config = {}) {
     const a = assumptions;
     const warnings = [];
 
@@ -86,7 +86,7 @@ const DCFCalculator = {
 const CompsCalculator = {
   kind: 'Comps',
 
-  compute(assumptions, config = {}) {
+  compute(assumptions, _config = {}) {
     const a = assumptions;
     const warnings = [];
 
@@ -130,7 +130,7 @@ const CompsCalculator = {
 const EPVCalculator = {
   kind: 'EPV',
 
-  compute(assumptions, config = {}) {
+  compute(assumptions, _config = {}) {
     const a = assumptions;
     const warnings = [];
 
@@ -176,7 +176,7 @@ const EPVCalculator = {
 const LBOCalculator = {
   kind: 'LBO',
 
-  compute(assumptions, config = {}) {
+  compute(assumptions, _config = {}) {
     const a = assumptions;
     const warnings = [];
 

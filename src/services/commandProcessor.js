@@ -4,7 +4,7 @@
  */
 
 import { commandRegistry } from './commandRegistry';
-import { dataFetchingService } from './dataFetching';
+import { dataFetchingService as _dataFetchingService } from './dataFetching';
 import { persistenceManager } from './persistence/PersistenceManager';
 
 export class CommandProcessor {

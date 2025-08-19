@@ -54,6 +54,12 @@ const Header = () => {
       tooltip: 'Reusable model library with DCF, LBO, Comps, and EPV templates for quick financial modeling'
     },
     {
+      id: 'canvas',
+      label: 'Canvas',
+      path: '/canvas',
+      tooltip: 'Interactive investment thesis builder and visualization canvas for strategic analysis'
+    },
+    {
       id: 'advanced-charts',
       label: 'Advanced Charts',
       path: '/advanced-charts',

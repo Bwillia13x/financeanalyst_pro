@@ -11,8 +11,6 @@ import {
   Keyboard,
   ArrowUp,
   ArrowDown,
-  ArrowLeft,
-  ArrowRight,
   // Enter, // not available in lucide-react
   // Escape, // not available in lucide-react
   Hash,
@@ -24,12 +22,12 @@ import {
 } from 'lucide-react';
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 
-const KeyboardNavigation = ({ onNavigate, onExecuteCommand, children }) => {
+const KeyboardNavigation = ({ onNavigate: _onNavigate, onExecuteCommand, children }) => {
   const [showCommandPalette, setShowCommandPalette] = useState(false);
   const [showShortcutsHelp, setShowShortcutsHelp] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [activeMode, setActiveMode] = useState('navigation'); // navigation, analysis, modeling
+  const [_activeMode, _setActiveMode] = useState('navigation'); // navigation, analysis, modeling
   const commandPaletteRef = useRef(null);
   const searchInputRef = useRef(null);
 
@@ -302,7 +300,7 @@ const KeyboardNavigation = ({ onNavigate, onExecuteCommand, children }) => {
                 ) : (
                   <div className="p-8 text-center">
                     <Search className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                    <p className="text-gray-500">No commands found for "{searchQuery}"</p>
+                    <p className="text-gray-500">No commands found for &quot;{searchQuery}&quot;</p>
                   </div>
                 )}
               </div>

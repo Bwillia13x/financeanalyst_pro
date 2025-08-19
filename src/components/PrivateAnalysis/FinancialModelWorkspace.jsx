@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { FileText, TrendingUp, Building, Activity, Calculator, RefreshCw, CheckCircle, AlertCircle } from 'lucide-react';
 import React, { useState, useCallback } from 'react';
 
-const FinancialModelWorkspace = ({ data, onDataChange }) => {
+const FinancialModelWorkspace = ({ _data, _onDataChange }) => {
   const [activeStatement, setActiveStatement] = useState('income');
   const [modelData, setModelData] = useState({
     // Income Statement (in thousands)

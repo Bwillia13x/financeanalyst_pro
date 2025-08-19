@@ -59,7 +59,7 @@ class EncryptionService {
   checkCryptoSupport() {
     try {
       return !!cryptoUtils.subtle;
-    } catch (e) {
+    } catch {
       return false;
     }
   }

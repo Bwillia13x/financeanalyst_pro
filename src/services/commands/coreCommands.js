@@ -15,7 +15,7 @@ import { dataFetchingService } from '../dataFetching';
 
 export const coreCommands = {
   DCF: {
-    execute: async(parsedCommand, context, processor) => {
+    execute: async(parsedCommand, _context, _processor) => {
       const [ticker] = parsedCommand.parameters;
 
       if (!ticker) {
@@ -28,10 +28,8 @@ export const coreCommands = {
       try {
         const loadingMessage = `🔄 Building DCF model for ${ticker.toUpperCase()}...\n• Fetching financial statements\n• Calculating free cash flows\n• Determining terminal value\n• Computing present values...\n${dataFetchingService.demoMode ? '\n⚠️  Using demo data - configure API keys for live data' : '\n✅ Using live market data'}`;
 
-        // This would be called from the terminal to show loading
-        if (context.showLoading) {
-          context.showLoading(loadingMessage);
-        }
+        // Loading message would be shown by context if available
+        console.log('DCF Analysis:', loadingMessage);
 
         const dcfInputs = await dataFetchingService.fetchDCFInputs(ticker.toUpperCase());
         const dcfResults = calculateDCFValuation(dcfInputs);
@@ -62,7 +60,7 @@ export const coreCommands = {
   },
 
   LBO: {
-    execute: async(parsedCommand, context, processor) => {
+    execute: async(parsedCommand, _context, _processor) => {
       const [ticker] = parsedCommand.parameters;
 
       if (!ticker) {
@@ -73,11 +71,10 @@ export const coreCommands = {
       }
 
       try {
-        const loadingMessage = `🔄 Analyzing LBO potential for ${ticker.toUpperCase()}...\n• Fetching financial statements\n• Calculating debt capacity\n• Analyzing peer multiples\n• Computing returns scenarios...\n${dataFetchingService.demoMode ? '\n⚠️  Using demo data - configure API keys for live data' : '\n✅ Using live market data'}`;
+        const loadingMessage = `🔄 Analyzing LBO potential for ${ticker.toUpperCase()}...`;
 
-        if (context.showLoading) {
-          context.showLoading(loadingMessage);
-        }
+        // Loading message would be shown by context if available
+        console.log('LBO Analysis:', loadingMessage);
 
         const [profile, financials] = await Promise.all([
           dataFetchingService.fetchCompanyProfile(ticker.toUpperCase()),
@@ -122,7 +119,7 @@ export const coreCommands = {
   },
 
   COMP: {
-    execute: async(parsedCommand, context, processor) => {
+    execute: async(parsedCommand, _context, _processor) => {
       const [ticker] = parsedCommand.parameters;
 
       if (!ticker) {
@@ -133,11 +130,8 @@ export const coreCommands = {
       }
 
       try {
-        const loadingMessage = `🔄 Building comparable company analysis for ${ticker.toUpperCase()}...\n• Identifying peer companies\n• Fetching peer financial data\n• Calculating valuation multiples\n• Generating relative analysis...\n${dataFetchingService.demoMode ? '\n⚠️  Using demo data - configure API keys for live data' : '\n✅ Using live market data'}`;
-
-        if (context.showLoading) {
-          context.showLoading(loadingMessage);
-        }
+        const loadingMessage = `🔄 Building comparable company analysis for ${ticker.toUpperCase()}...`;
+        console.log('Peer Analysis:', loadingMessage);
 
         const [profile, peers] = await Promise.all([
           dataFetchingService.fetchCompanyProfile(ticker.toUpperCase()),
@@ -182,7 +176,7 @@ export const coreCommands = {
   },
 
   FETCH: {
-    execute: async(parsedCommand, context, processor) => {
+    execute: async(parsedCommand, _context, _processor) => {
       const [ticker] = parsedCommand.parameters;
 
       if (!ticker) {

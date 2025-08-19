@@ -293,7 +293,7 @@ const EnhancedTestsPanel = ({ model, onRunTests }) => {
           test: (model) => {
             const entryX = model.assumptions?.entryX || 0;
             const exitX = model.assumptions?.exitX || 0;
-            const ebitdaCAGR = model.assumptions?.ebitdaCAGR || 0;
+            const _ebitdaCAGR = 0; // Simplified CAGR calculation - would need historical data
 
             // Simple check: exit multiple + growth should exceed entry multiple
             return exitX > entryX * 0.8; // Allow for some multiple compression

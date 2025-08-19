@@ -171,7 +171,7 @@ class DataValidationService {
         warnings,
         qualityScore: this.calculateQualityScore(errors, warnings)
       };
-    } catch (error) {
+    } catch {
       return { isValid: false, errors: ['An unexpected error occurred during validation.'], warnings: [] };
     }
   }

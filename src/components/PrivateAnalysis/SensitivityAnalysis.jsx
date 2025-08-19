@@ -1,9 +1,8 @@
-import { motion } from 'framer-motion';
-import { Activity, TrendingUp, TrendingDown, Settings, BarChart3, Plus, Minus } from 'lucide-react';
+import { Activity, Settings, BarChart3, Plus, Minus } from 'lucide-react';
 import React, { useState, useMemo } from 'react';
 
-const SensitivityAnalysis = ({ data, modelInputs, onModelInputChange, calculateDCF, formatCurrency, formatPercent }) => {
-  const [selectedVariable, setSelectedVariable] = useState(null);
+const SensitivityAnalysis = ({ data, modelInputs, onModelInputChange, calculateDCF, formatCurrency, _formatPercent }) => {
+  const [selectedVariable, _setSelectedVariable] = useState(null);
 
   const sensitivityConfig = modelInputs.sensitivity || {
     variables: ['revenue', 'grossMargin', 'discountRate'],
@@ -249,7 +248,7 @@ const SensitivityAnalysis = ({ data, modelInputs, onModelInputChange, calculateD
 
   const removeVariable = (variableName) => {
     const updatedVariables = sensitivityConfig.variables.filter(v => v !== variableName);
-    const { [variableName]: removed, ...updatedRanges } = sensitivityConfig.ranges;
+    const { [variableName]: _removed, ...updatedRanges } = sensitivityConfig.ranges;
     onModelInputChange('sensitivity', 'variables', updatedVariables);
     onModelInputChange('sensitivity', 'ranges', updatedRanges);
   };

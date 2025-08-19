@@ -3,6 +3,14 @@
  * Flexible chart builder with multiple visualization types and customization options
  */
 
+import {
+  Settings,
+  TrendingUp,
+  BarChart3,
+  PieChart as PieIcon,
+  Activity,
+  Target
+} from 'lucide-react';
 import React, { useState, useMemo } from 'react';
 import {
   ResponsiveContainer,
@@ -19,27 +27,15 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
-  ReferenceLine,
   PieChart,
   Pie,
   Cell
 } from 'recharts';
-import {
-  Settings,
-  Palette,
-  Type,
-  Grid,
-  TrendingUp,
-  BarChart3,
-  PieChart as PieIcon,
-  Activity,
-  Target
-} from 'lucide-react';
 
 const CustomizableChart = ({
   data = [],
   title = 'Custom Chart',
-  height = 400,
+  height: _height = 400,
   onSettingsChange
 }) => {
   const [chartSettings, setChartSettings] = useState({
@@ -51,7 +47,7 @@ const CustomizableChart = ({
     colors: ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6'],
     xAxisKey: 'timestamp',
     yAxisKeys: ['price'],
-    title: title,
+    title,
     subtitle: '',
     smooth: true,
     strokeWidth: 2,
@@ -62,16 +58,16 @@ const CustomizableChart = ({
 
   const processedData = useMemo(() => {
     if (!data || !Array.isArray(data) || !data.length) return [];
-    
+
     return data.map(item => {
       const processed = { ...item };
-      
+
       // Format timestamp for display
       if (processed.timestamp) {
         processed.displayTime = new Date(processed.timestamp).toLocaleTimeString();
         processed.displayDate = new Date(processed.timestamp).toLocaleDateString();
       }
-      
+
       return processed;
     });
   }, [data]);
@@ -111,29 +107,29 @@ const CustomizableChart = ({
     onSettingsChange?.(newSettings);
   };
 
-  const CustomTooltip = ({ active, payload, label }) => {
+  const CustomTooltip = ({ active, payload, label: _label }) => {
     if (!active || !payload || !payload.length) return null;
 
     const theme = colorThemes[chartSettings.theme];
-    
+
     return (
-      <div 
+      <div
         className="p-3 border rounded-lg shadow-lg"
-        style={{ 
+        style={{
           backgroundColor: theme.background,
           borderColor: theme.grid,
           color: theme.text
         }}
       >
-        <p className="font-semibold">{label}</p>
+        <p className="font-semibold">{_label}</p>
         <div className="mt-2 space-y-1">
           {payload.map((item, index) => (
             <div key={index} className="flex items-center justify-between space-x-4">
               <div className="flex items-center space-x-2">
-                <div 
+                <div
                   className="w-3 h-3 rounded-full"
                   style={{ backgroundColor: item.color }}
-                ></div>
+                />
                 <span className="text-sm">{item.name}:</span>
               </div>
               <span className="font-mono text-sm font-semibold">
@@ -195,37 +191,37 @@ const CustomizableChart = ({
 
     return (
       <ResponsiveContainer width="100%" height="100%">
-        <ChartComponent 
-          data={processedData} 
+        <ChartComponent
+          data={processedData}
           margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
         >
           {chartSettings.showGrid && (
             <CartesianGrid strokeDasharray="3 3" stroke={theme.grid} />
           )}
-          <XAxis 
+          <XAxis
             dataKey={chartSettings.xAxisKey}
             stroke={theme.text}
             fontSize={12}
             tickLine={false}
             axisLine={false}
           />
-          <YAxis 
+          <YAxis
             stroke={theme.text}
             fontSize={12}
             tickLine={false}
             axisLine={false}
-            tickFormatter={(value) => 
-              typeof value === 'number' && value > 1000 
-                ? `${(value / 1000).toFixed(1)}K` 
+            tickFormatter={(value) =>
+              typeof value === 'number' && value > 1000
+                ? `${(value / 1000).toFixed(1)}K`
                 : value.toLocaleString()
             }
           />
           {chartSettings.showTooltip && <Tooltip content={<CustomTooltip />} />}
           {chartSettings.showLegend && <Legend />}
-          
+
           {chartSettings.yAxisKeys.map((key, index) => {
             const color = theme.colors[index % theme.colors.length];
-            
+
             if (chartSettings.type === 'line') {
               return (
                 <Line
@@ -268,7 +264,7 @@ const CustomizableChart = ({
                 />
               );
             }
-            
+
             return null;
           })}
         </ChartComponent>
@@ -286,7 +282,7 @@ const CustomizableChart = ({
             <p className="text-sm text-gray-600">{chartSettings.subtitle}</p>
           )}
         </div>
-        
+
         <button
           onClick={() => setShowSettings(!showSettings)}
           className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
@@ -302,10 +298,11 @@ const CustomizableChart = ({
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Chart Type */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="chart-type" className="block text-sm font-medium text-gray-700 mb-2">
                 Chart Type
               </label>
               <select
+                id="chart-type"
                 value={chartSettings.type}
                 onChange={(e) => handleSettingChange('type', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
@@ -318,10 +315,11 @@ const CustomizableChart = ({
 
             {/* Theme */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="chart-theme" className="block text-sm font-medium text-gray-700 mb-2">
                 Theme
               </label>
               <select
+                id="chart-theme"
                 value={chartSettings.theme}
                 onChange={(e) => handleSettingChange('theme', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
@@ -336,10 +334,11 @@ const CustomizableChart = ({
 
             {/* Stroke Width */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="line-width" className="block text-sm font-medium text-gray-700 mb-2">
                 Line Width
               </label>
               <input
+                id="line-width"
                 type="range"
                 min="1"
                 max="5"
@@ -351,10 +350,11 @@ const CustomizableChart = ({
 
             {/* Fill Opacity */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="fill-opacity" className="block text-sm font-medium text-gray-700 mb-2">
                 Fill Opacity
               </label>
               <input
+                id="fill-opacity"
                 type="range"
                 min="0"
                 max="1"
@@ -411,10 +411,11 @@ const CustomizableChart = ({
 
           {/* Title Input */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="chart-title" className="block text-sm font-medium text-gray-700 mb-2">
               Chart Title
             </label>
             <input
+              id="chart-title"
               type="text"
               value={chartSettings.title}
               onChange={(e) => handleSettingChange('title', e.target.value)}

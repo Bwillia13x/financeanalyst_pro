@@ -245,9 +245,10 @@ class MonteCarloEngine {
       case 'normal':
         return this.normalRandom(parameters.mean, parameters.stdDev);
 
-      case 'lognormal':
+      case 'lognormal': {
         const normalSample = this.normalRandom(parameters.mu, parameters.sigma);
         return Math.exp(normalSample);
+      }
 
       case 'uniform':
         return parameters.min + Math.random() * (parameters.max - parameters.min);
@@ -867,12 +868,12 @@ class MonteCarloEngine {
    */
   logGamma(x) {
     const coef = [
-      76.18009172947146, -86.50532032941677, 24.01409824083091,
+      76.18009172947144, -86.50532032941676, 24.01409824083091,
       -1.231739572450155, 0.1208650973866179e-2, -0.5395239384953e-5
     ];
 
     let j = 0;
-    let ser = 1.000000000190015;
+    let ser = 1.0000000001900151;
     let xx = x;
     let y = xx = x;
     let tmp = x + 5.5;
@@ -882,7 +883,7 @@ class MonteCarloEngine {
       ser += coef[j] / ++y;
     }
 
-    return -tmp + Math.log(2.5066282746310005 * ser / xx);
+    return -tmp + Math.log(2.506628274631001 * ser / xx);
   }
 
   /**

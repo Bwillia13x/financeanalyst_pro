@@ -1,11 +1,9 @@
 import { motion } from 'framer-motion';
 import {
-  Zap, BarChart3, TrendingUp, Target, Settings,
-  Play, Download, RefreshCw, AlertTriangle, CheckCircle,
-  Activity, DollarSign, Percent, Calculator
+  Zap, Play, TrendingUp, Target, Activity
 } from 'lucide-react';
-import React, { useState, useMemo, useCallback } from 'react';
-import { ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ScatterChart, Scatter } from 'recharts';
+import React, { useState, useCallback } from 'react';
+// import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ScatterChart, Scatter } from 'recharts';
 
 import { monteCarloEngine } from '../../services/monteCarloEngine.js';
 
@@ -13,7 +11,7 @@ const MonteCarloIntegrationHub = ({
   data,
   dcfResults,
   lboResults,
-  financialModel,
+  financialModel: _financialModel,
   scenarioResults,
   onDataChange
 }) => {
@@ -305,8 +303,9 @@ const MonteCarloIntegrationHub = ({
         <h3 className="font-semibold mb-3">Simulation Settings</h3>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Iterations</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="iterations">Iterations</label>
             <input
+              id="iterations"
               type="number"
               value={simulationSettings.iterations}
               onChange={(e) => setSimulationSettings(prev => ({
@@ -318,8 +317,9 @@ const MonteCarloIntegrationHub = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Confidence Level</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="confidence-level">Confidence Level</label>
             <select
+              id="confidence-level"
               value={simulationSettings.confidenceLevel}
               onChange={(e) => setSimulationSettings(prev => ({
                 ...prev,

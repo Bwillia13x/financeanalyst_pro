@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
-import { Card, NumberInput, Switch } from 'src/components/ui/UIHelpers.jsx';
+import { Card, NumberInput } from 'src/components/ui/UIHelpers.jsx';
+
 
 import { project, valueEquity, growthVector, wacc } from '../../utils/valuationUtils';
 
@@ -75,11 +76,23 @@ function calculateTargetPrice(assumptions, targetMOS) {
   return assumptions.price * (1 + targetMOS);
 }
 
-const ReverseDCF = ({ assumptions, setAssumptions, currentValuation }) => {
-  const [targetPrice, setTargetPrice] = useState(assumptions.price * 1.25);
-  const [targetMOS, setTargetMOS] = useState(0.25);
+const ReverseDCF = ({ _symbol, _onBack, _currentValuation }) => {
+  // Default assumptions for reverse DCF
+  const assumptions = {
+    price: 150,
+    shares: 1000000,
+    cashAndInvestments: 50000000,
+    debt: 25000000,
+    tg: 0.025,
+    years: 5,
+    growthYears: 5
+  };
+
+  const [targetPrice, setTargetPrice] = useState(150);
+  const [targetMOS, setTargetMOS] = useState(0);
   const [solveFor, setSolveFor] = useState('growth');
   const [results, setResults] = useState(null);
+  const [assumptionsState, setAssumptions] = useState(assumptions);
 
   const runReverseDCF = () => {
     try {

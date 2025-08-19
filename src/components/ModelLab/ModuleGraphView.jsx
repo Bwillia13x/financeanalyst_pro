@@ -121,6 +121,14 @@ const ModuleNode = ({
         transform: isDragging ? 'scale(1.05)' : 'scale(1)'
       }}
       onMouseDown={handleMouseDown}
+      role="button"
+      tabIndex={0}
+      aria-label={`Module ${module.name || module.id}`}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          handleMouseDown(e);
+        }
+      }}
     >
       <div className="p-3">
         <div className="flex items-center gap-2 mb-2">
@@ -219,7 +227,7 @@ const ConnectionLine = ({ connection, modules, positions }) => {
 const ModuleGraphView = ({ models = [], sotpCompositions = [], onModuleSelect }) => {
   const [positions, setPositions] = useState({});
   const [selectedModule, setSelectedModule] = useState(null);
-  const [draggedModule, setDraggedModule] = useState(null);
+  const [draggedModule, _setDraggedModule] = useState(null);
   const [viewMode, setViewMode] = useState('dependency'); // dependency, flow, hierarchy
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showConnections, setShowConnections] = useState(true);

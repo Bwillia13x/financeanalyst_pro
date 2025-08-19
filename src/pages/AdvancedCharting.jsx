@@ -3,7 +3,6 @@
  * Professional-grade financial charting and analytics dashboard
  */
 
-import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   BarChart3,
@@ -15,8 +14,6 @@ import {
   Target,
   Layers,
   Grid3X3,
-  Maximize2,
-  Minimize2,
   Download,
   Settings,
   RefreshCw,
@@ -26,25 +23,19 @@ import {
   Calendar,
   Search,
   Plus,
-  X,
-  Move,
-  Eye,
-  EyeOff,
   Zap,
-  BarChart,
-  CandlestickChart
+  X
 } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
 
+import CandlestickChart from '../components/Charts/CandlestickChart';
+import CorrelationMatrix from '../components/Charts/CorrelationMatrix';
+import CustomizableChart from '../components/Charts/CustomizableChart';
+import HeatmapChart from '../components/Charts/HeatmapChart';
+import RealTimeChart from '../components/Charts/RealTimeChart';
 import SEOHead from '../components/SEO/SEOHead';
 import secureApiClient from '../services/secureApiClient';
 import { formatCurrency, formatPercentage, formatNumber } from '../utils/formatters';
-
-// Import chart components
-import CandlestickChart from '../components/Charts/CandlestickChart';
-import HeatmapChart from '../components/Charts/HeatmapChart';
-import CorrelationMatrix from '../components/Charts/CorrelationMatrix';
-import RealTimeChart from '../components/Charts/RealTimeChart';
-import CustomizableChart from '../components/Charts/CustomizableChart';
 
 const AdvancedCharting = () => {
   const [selectedTimeframe, setSelectedTimeframe] = useState('1D');
@@ -110,18 +101,18 @@ const AdvancedCharting = () => {
     }
   }, [isRealTime]);
 
-  const loadChartData = async () => {
+  const loadChartData = async() => {
     setLoading(prev => ({ ...prev, data: true }));
-    
+
     try {
       // Load market data for selected symbols
-      const dataPromises = selectedSymbols.map(async (symbol) => {
+      const dataPromises = selectedSymbols.map(async(symbol) => {
         try {
           const [quote, historical] = await Promise.all([
             secureApiClient.get(`/market-data/quote/${symbol}`),
             secureApiClient.get(`/market-data/historical/${symbol}?period=${selectedTimeframe}`)
           ]);
-          
+
           return {
             symbol,
             quote: quote.data,
@@ -139,7 +130,7 @@ const AdvancedCharting = () => {
 
       const results = await Promise.all(dataPromises);
       const newMarketData = {};
-      
+
       results.forEach(result => {
         if (result) {
           newMarketData[result.symbol] = result;
@@ -165,11 +156,11 @@ const AdvancedCharting = () => {
 
   const startRealTimeUpdates = () => {
     stopRealTimeUpdates(); // Clear existing interval
-    
-    realTimeUpdateRef.current = setInterval(async () => {
+
+    realTimeUpdateRef.current = setInterval(async() => {
       try {
         // Update quotes for selected symbols
-        const quotePromises = selectedSymbols.map(async (symbol) => {
+        const quotePromises = selectedSymbols.map(async(symbol) => {
           try {
             const response = await secureApiClient.get(`/market-data/quote/${symbol}`);
             return { symbol, quote: response.data };
@@ -179,7 +170,7 @@ const AdvancedCharting = () => {
         });
 
         const quotes = await Promise.all(quotePromises);
-        
+
         setMarketData(prev => {
           const updated = { ...prev };
           quotes.forEach(({ symbol, quote }) => {
@@ -207,7 +198,7 @@ const AdvancedCharting = () => {
     const basePrice = { AAPL: 175, MSFT: 280, GOOGL: 2800, AMZN: 3200, TSLA: 250 }[symbol] || 100;
     const change = (Math.random() - 0.5) * 10;
     const price = basePrice + change;
-    
+
     return {
       symbol,
       price: price.toFixed(2),
@@ -223,24 +214,24 @@ const AdvancedCharting = () => {
     const data = [];
     const basePrice = { AAPL: 175, MSFT: 280, GOOGL: 2800, AMZN: 3200, TSLA: 250 }[symbol] || 100;
     let currentPrice = basePrice;
-    
+
     const intervals = { '1D': 390, '5D': 78, '1M': 22, '3M': 65, '6M': 130, '1Y': 252, '2Y': 104, '5Y': 260, 'MAX': 520 }[selectedTimeframe] || 100;
-    
+
     for (let i = 0; i < intervals; i++) {
       const change = (Math.random() - 0.5) * 5;
       currentPrice += change;
       const volume = Math.floor(Math.random() * 1000000);
-      
+
       data.push({
         timestamp: new Date(Date.now() - (intervals - i) * 24 * 60 * 60 * 1000).toISOString(),
         open: currentPrice - Math.random() * 2,
         high: currentPrice + Math.random() * 3,
         low: currentPrice - Math.random() * 3,
         close: currentPrice,
-        volume: volume
+        volume
       });
     }
-    
+
     return data;
   };
 
@@ -252,7 +243,7 @@ const AdvancedCharting = () => {
       symbols,
       position: { x: 0, y: 0, w: 6, h: 4 }
     };
-    
+
     setActiveCharts(prev => [...prev, newChart]);
   };
 
@@ -260,17 +251,17 @@ const AdvancedCharting = () => {
     setActiveCharts(prev => prev.filter(chart => chart.id !== chartId));
   };
 
-  const exportChart = async (chartId, format = 'png') => {
+  const exportChart = async(chartId, format = 'png') => {
     setLoading(prev => ({ ...prev, export: true }));
-    
+
     try {
       // In a real implementation, this would capture the chart and export it
       const chart = activeCharts.find(c => c.id === chartId);
       console.log(`Exporting chart ${chart.type} as ${format}`);
-      
+
       // Mock export functionality
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
       // Create download link (placeholder)
       const blob = new Blob(['Chart export placeholder'], { type: 'text/plain' });
       const url = URL.createObjectURL(blob);
@@ -281,7 +272,7 @@ const AdvancedCharting = () => {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      
+
     } catch (error) {
       console.error('Export failed:', error);
     } finally {
@@ -291,7 +282,7 @@ const AdvancedCharting = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 pb-16">
-      <SEOHead 
+      <SEOHead
         title="Advanced Charting & Data Visualization - FinanceAnalyst Pro"
         description="Professional-grade financial charting with real-time data, customizable dashboards, and advanced visualization tools for comprehensive market analysis."
       />
@@ -308,9 +299,9 @@ const AdvancedCharting = () => {
                   <p className="text-sm text-gray-600">Professional financial data visualization</p>
                 </div>
               </div>
-              
+
               <div className="flex items-center space-x-2">
-                <div className={`w-2 h-2 rounded-full ${isRealTime ? 'bg-green-400 animate-pulse' : 'bg-gray-400'}`}></div>
+                <div className={`w-2 h-2 rounded-full ${isRealTime ? 'bg-green-400 animate-pulse' : 'bg-gray-400'}`} />
                 <span className="text-xs text-gray-500">
                   {isRealTime ? 'Live Data' : 'Static Data'}
                 </span>
@@ -322,8 +313,8 @@ const AdvancedCharting = () => {
               <button
                 onClick={() => setIsRealTime(!isRealTime)}
                 className={`flex items-center space-x-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                  isRealTime 
-                    ? 'bg-green-100 text-green-700 hover:bg-green-200' 
+                  isRealTime
+                    ? 'bg-green-100 text-green-700 hover:bg-green-200'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
@@ -436,7 +427,7 @@ const AdvancedCharting = () => {
                     <div className="p-1 bg-blue-100 rounded">
                       {React.createElement(
                         chartTypes.find(t => t.id === chart.type)?.icon || BarChart3,
-                        { className: "w-4 h-4 text-blue-600" }
+                        { className: 'w-4 h-4 text-blue-600' }
                       )}
                     </div>
                     <div>
@@ -448,7 +439,7 @@ const AdvancedCharting = () => {
                       </p>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center space-x-1">
                     <button
                       onClick={() => exportChart(chart.id, 'png')}
@@ -478,7 +469,7 @@ const AdvancedCharting = () => {
                 </div>
               </motion.div>
             ))}
-            
+
             {/* Add Chart Button */}
             <div className="col-span-6 bg-white border-2 border-dashed border-gray-300 rounded-xl flex items-center justify-center min-h-64 hover:border-blue-400 hover:bg-blue-50 transition-colors cursor-pointer">
               <div className="text-center">
@@ -514,7 +505,7 @@ const AdvancedCharting = () => {
                     <div className="p-1 bg-blue-100 rounded">
                       {React.createElement(
                         chartTypes.find(t => t.id === chart.type)?.icon || BarChart3,
-                        { className: "w-4 h-4 text-blue-600" }
+                        { className: 'w-4 h-4 text-blue-600' }
                       )}
                     </div>
                     <div>
@@ -526,7 +517,7 @@ const AdvancedCharting = () => {
                       </p>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center space-x-1">
                     <button
                       onClick={() => exportChart(chart.id, 'png')}
@@ -583,15 +574,15 @@ const ChartRenderer = ({ chart, marketData, timeframe, isRealTime }) => {
       <div className="text-center">
         <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
           {React.createElement(
-            { 
+            {
               candlestick: CandlestickChart,
-              line: LineChart, 
+              line: LineChart,
               bar: BarChart,
               area: Activity,
               heatmap: Grid3X3,
               scatter: Target
             }[chart.type] || BarChart3,
-            { className: "w-8 h-8 text-blue-600" }
+            { className: 'w-8 h-8 text-blue-600' }
           )}
         </div>
         <h3 className="font-semibold text-gray-900 mb-1">
@@ -602,7 +593,7 @@ const ChartRenderer = ({ chart, marketData, timeframe, isRealTime }) => {
         </p>
         {isRealTime && (
           <div className="flex items-center justify-center space-x-1 mt-2">
-            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
             <span className="text-xs text-green-600">Live Updates</span>
           </div>
         )}

@@ -291,8 +291,9 @@ const FormulaBuilder = ({ onFormulaCreate, variables }) => {
         <div className="border-t border-border bg-background">
           <div className="p-4 space-y-4">
             <div>
-              <label className="text-sm font-medium text-foreground mb-2 block">Formula Name</label>
+              <label htmlFor="formula-name-input" className="text-sm font-medium text-foreground mb-2 block">Formula Name</label>
               <input
+                id="formula-name-input"
                 type="text"
                 value={formulaName}
                 onChange={e => setFormulaName(e.target.value)}
@@ -302,10 +303,11 @@ const FormulaBuilder = ({ onFormulaCreate, variables }) => {
             </div>
 
             <div>
-              <label className="text-sm font-medium text-foreground mb-2 block">
+              <label htmlFor="formula-expression-input" className="text-sm font-medium text-foreground mb-2 block">
                 Formula Expression
               </label>
               <div
+                id="formula-expression-input"
                 ref={dropZoneRef}
                 onDragOver={handleDragOver}
                 onDrop={handleDrop}

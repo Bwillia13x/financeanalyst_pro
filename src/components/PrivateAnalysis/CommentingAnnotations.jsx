@@ -8,32 +8,21 @@ import {
   MessageSquare,
   Plus,
   Reply,
-  Edit3,
-  Trash2,
-  Flag,
   CheckCircle,
   AlertCircle,
   Clock,
-  User,
-  AtSign,
   Pin,
-  Eye,
-  EyeOff,
   Filter,
   Search,
   MoreVertical,
-  Download,
-  Star,
   ThumbsUp,
-  ThumbsDown,
-  Bookmark,
-  Share2,
   Tag,
-  PaperclipIcon
+  PaperclipIcon,
+  Star
 } from 'lucide-react';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 
-const CommentingAnnotations = ({ modelData, currentUser, onDataChange }) => {
+const CommentingAnnotations = ({ modelData: _modelData, currentUser, onDataChange: _onDataChange }) => {
   const [comments, setComments] = useState([
     {
       id: 1,
@@ -108,7 +97,7 @@ const CommentingAnnotations = ({ modelData, currentUser, onDataChange }) => {
   ]);
 
   const [newComment, setNewComment] = useState('');
-  const [selectedLocation, setSelectedLocation] = useState(null);
+  const [selectedLocation, _setSelectedLocation] = useState(null);
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterPriority, setFilterPriority] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');

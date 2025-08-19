@@ -133,7 +133,7 @@ const ValuationToolDocs = () => {
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">What is LBO?</h3>
                 <p className="text-gray-700 leading-relaxed">
                   LBO analysis evaluates the potential returns from acquiring a company using significant debt financing.
-                  The model projects the company's performance under new ownership and calculates returns based on
+                  The model projects the company&apos;s performance under new ownership and calculates returns based on
                   the exit strategy (typically sale or IPO).
                 </p>
               </div>

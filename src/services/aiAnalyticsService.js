@@ -184,8 +184,8 @@ class AIAnalyticsService {
   /**
    * Generate price predictions using AI models
    */
-  async generatePredictions(data, timeframe) {
-    const model = this.models.get('price_prediction');
+  async generatePredictions(data, _timeframe) {
+    const _model = this.models.get('price_prediction');
     const predictions = [];
 
     if (!data || !data.prices) return predictions;
@@ -193,7 +193,7 @@ class AIAnalyticsService {
     const currentPrice = data.prices[data.prices.length - 1];
     const volatility = this.calculateVolatility(data.prices);
 
-    for (const horizon of model.horizons) {
+    for (const horizon of _model.horizons) {
       const prediction = this.simulatePricePrediction(currentPrice, volatility, horizon);
 
       predictions.push({
@@ -216,7 +216,7 @@ class AIAnalyticsService {
    * Calculate comprehensive risk metrics
    */
   async calculateRiskMetrics(data, riskTolerance = 'moderate') {
-    const model = this.models.get('risk_assessment');
+    const _model = this.models.get('risk_assessment');
 
     if (!data || !data.prices) {
       return { error: 'Insufficient data for risk analysis' };
@@ -422,9 +422,9 @@ class AIAnalyticsService {
   }
 
   calculateCVaR(returns, confidence) {
-    const var_value = this.calculateVaR(returns, confidence);
-    const tail_returns = returns.filter(r => r <= var_value);
-    return tail_returns.reduce((sum, r) => sum + r, 0) / tail_returns.length || 0;
+    const varValue = this.calculateVaR(returns, confidence);
+    const tailReturns = returns.filter(r => r <= varValue);
+    return tailReturns.reduce((sum, r) => sum + r, 0) / tailReturns.length || 0;
   }
 
   calculateSharpeRatio(returns, riskFreeRate = 0.02) {
@@ -466,7 +466,7 @@ class AIAnalyticsService {
     return Math.min(10, baseScore * (toleranceMultiplier[riskTolerance] || 1.0));
   }
 
-  categorizeRisk(volatility, riskTolerance) {
+  categorizeRisk(volatility, _riskTolerance) {
     if (volatility < 0.1) return 'Low';
     if (volatility < 0.2) return 'Medium';
     if (volatility < 0.3) return 'High';
@@ -550,7 +550,7 @@ class AIAnalyticsService {
 
   calculatePatternTarget(prices, patternType) {
     const currentPrice = prices[prices.length - 1];
-    const volatility = this.calculateVolatility(prices);
+    const _volatility = this.calculateVolatility(prices);
 
     const targetMultipliers = {
       'head_and_shoulders': -0.15,

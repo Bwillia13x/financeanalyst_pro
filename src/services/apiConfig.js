@@ -170,7 +170,7 @@ export const getEnvironmentConfig = () => {
 };
 
 // DEPRECATED: API keys are now handled securely by backend
-export const getApiKey = service => {
+export const getApiKey = _service => {
   console.warn('getApiKey is deprecated - all API calls now route through secure backend proxy');
   return null;
 };

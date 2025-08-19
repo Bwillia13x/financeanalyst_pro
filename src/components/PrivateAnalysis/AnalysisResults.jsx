@@ -1,45 +1,32 @@
-import { motion } from 'framer-motion';
 import {
   TrendingUp,
   TrendingDown,
   DollarSign,
   Percent,
-  BarChart3,
-  Target,
+  Activity,
   AlertTriangle,
   CheckCircle,
-  Calculator,
+  BarChart3,
+  Target,
   PieChart,
-  Activity,
   Zap,
   Shield,
-  Clock,
-  Layers,
   Award,
-  TrendingDown as Decline,
   Eye,
-  FileText,
-  BarChart2,
-  LineChart,
   Timer,
-  ArrowUpRight,
-  ArrowDownRight,
   Gauge,
   CreditCard,
-  Banknote,
-  Building2,
-  Users,
-  Star
+  Users
 } from 'lucide-react';
 import React, { useMemo } from 'react';
 
 const AnalysisResults = ({
   data,
   adjustedValues,
-  modelInputs,
+  modelInputs: _modelInputs,
   calculateDCF,
   formatCurrency,
-  formatPercentage
+  formatPercentage: _formatPercentage
 }) => {
   // Calculate comprehensive financial metrics
   const analysis = useMemo(() => {
@@ -66,15 +53,15 @@ const AnalysisResults = ({
       const operatingIncomeLatest = adjustedValues?.operatingIncome || income.operatingIncome?.[latest] || 0;
       const operatingIncomePrevious = income.operatingIncome?.[previous] || 0;
 
-      const totalCOGSLatest = adjustedValues?.totalCostOfGoodsSold || income.totalCostOfGoodsSold?.[latest] || 0;
-      const totalCOGSPrevious = income.totalCostOfGoodsSold?.[previous] || 0;
+      const _totalCOGSLatest = adjustedValues?.totalCostOfGoodsSold || income.totalCostOfGoodsSold?.[latest] || 0;
+      const _totalCOGSPrevious = income.totalCostOfGoodsSold?.[previous] || 0;
 
       // Growth Calculations
       const revenueGrowthYoY = revenuePrevious ? ((revenueLatest - revenuePrevious) / revenuePrevious) * 100 : 0;
       const revenueCAGR = revenueEarliest && periods.length > 2 ?
         (Math.pow(revenueLatest / revenueEarliest, 1 / (periods.length - 1)) - 1) * 100 : 0;
 
-      const grossProfitGrowth = grossProfitPrevious ? ((grossProfitLatest - grossProfitPrevious) / grossProfitPrevious) * 100 : 0;
+      const _grossProfitGrowth = grossProfitPrevious ? ((grossProfitLatest - grossProfitPrevious) / grossProfitPrevious) * 100 : 0;
       const operatingIncomeGrowth = operatingIncomePrevious ? ((operatingIncomeLatest - operatingIncomePrevious) / operatingIncomePrevious) * 100 : 0;
 
       // Profitability Ratios (with safe calculations)
@@ -463,7 +450,7 @@ const AnalysisResults = ({
           Financial Analysis Results
         </h2>
         <p className="text-gray-400">
-          Comprehensive analysis of your company's financial performance and valuation
+          Comprehensive analysis of your company&#39;s financial performance and valuation
         </p>
       </div>
 

@@ -1,5 +1,5 @@
-import { Plus, Minus, ChevronDown, ChevronRight, Calculator, FileText, TrendingUp } from 'lucide-react';
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import { Plus, ChevronDown, ChevronRight, Calculator } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
 
 import styles from './styles.module.css';
 
@@ -39,7 +39,7 @@ const FinancialSpreadsheet = ({ data, onDataChange }) => {
     }
   };
 
-  const currentTemplate = getCurrentTemplate();
+  const _currentTemplate = getCurrentTemplate();
 
   // Income Statement Template Structure
   // Balance Sheet Template Structure
@@ -305,8 +305,8 @@ const FinancialSpreadsheet = ({ data, onDataChange }) => {
     }).format(value);
   };
 
-  const addNewRow = (sectionKey) => {
-    const newRowKey = `custom_${Date.now()}`;
+  const addNewRow = (_sectionKey) => {
+    const _newRowKey = `custom_${Date.now()}`;
     const newRowLabel = prompt('Enter row label:');
     if (newRowLabel) {
       const newData = { ...data };
@@ -331,7 +331,7 @@ const FinancialSpreadsheet = ({ data, onDataChange }) => {
     }
   }, [editingCell]);
 
-  const renderRow = (item, sectionKey) => {
+  const renderRow = (item, _sectionKey) => {
     const { key, label, level, formula, bold } = item;
     const indentClass = level === 1 ? 'pl-8' : level === 2 ? 'pl-12' : 'pl-4';
     const textWeight = bold ? 'font-bold' : level === 0 ? 'font-semibold' : 'font-normal';
@@ -361,6 +361,9 @@ const FinancialSpreadsheet = ({ data, onDataChange }) => {
             ) : (
               <div
                 onClick={() => !formula && handleCellClick(key, periodIndex)}
+                onKeyDown={(e) => e.key === 'Enter' && !formula && handleCellClick(key, periodIndex)}
+                role="button"
+                tabIndex={0}
                 className={`px-2 py-1 rounded cursor-pointer hover:bg-blue-50 ${
                   formula ? 'bg-blue-100 text-blue-800 font-semibold' : 'hover:bg-gray-100'
                 }`}
@@ -466,7 +469,7 @@ const FinancialSpreadsheet = ({ data, onDataChange }) => {
           <li>• Press Enter to save, Escape to cancel</li>
           <li>• Use the + button to add custom rows to each section</li>
           <li>• Formulated cells (with calculator icon) auto-calculate</li>
-          <li>• Add new periods using the "Add Period" button</li>
+          <li>• Add new periods using the &ldquo;Add Period&rdquo; button</li>
         </ul>
       </div>
     </div>

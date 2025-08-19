@@ -68,7 +68,7 @@ const ValuationTool = () => {
                       Dynamic Time Periods
                     </span>
                     <span className="px-3 py-1 bg-emerald-800/50 text-emerald-200 rounded-full text-sm">
-                      No "Run" Button
+                      No &quot;Run&quot; Button
                     </span>
                   </div>
                   <Button
@@ -145,7 +145,7 @@ const ValuationTool = () => {
                 </div>
               </div>
               <p className="text-gray-400 mb-4">
-                Real-time, reactive DCF modeling with live data feeds and instantaneous calculations. No more "run" buttons—watch your model come alive.
+                Real-time, reactive DCF modeling with live data feeds and instantaneous calculations. No more &quot;run&quot; buttons—watch your model come alive.
               </p>
               <Button
                 className="w-full bg-emerald-600 hover:bg-emerald-700"
@@ -266,7 +266,7 @@ const ValuationTool = () => {
                 <div className="text-green-400">$ DCF(AAPL)</div>
                 <div className="text-green-400">$ LBO(TSLA)</div>
                 <div className="text-green-400">$ COMP(MSFT)</div>
-                <div className="text-green-400">$ HELP("VALUATION")</div>
+                <div className="text-green-400">$ HELP(&quot;VALUATION&quot;)</div>
               </div>
               <div className="mt-4">
                 <Button disabled>

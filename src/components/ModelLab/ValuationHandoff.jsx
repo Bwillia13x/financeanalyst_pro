@@ -34,7 +34,7 @@ const HandoffOption = ({
   description,
   icon: Icon,
   tone,
-  path,
+  path: _path,
   disabled = false,
   onClick,
   modelCompatibility
@@ -84,7 +84,7 @@ const HandoffOption = ({
 );
 
 const ValuationHandoff = ({ model, onHandoff }) => {
-  const [selectedOption, setSelectedOption] = useState(null);
+  const [_selectedOption, _setSelectedOption] = useState(null);
   const [handoffConfig, setHandoffConfig] = useState({
     includeAssumptions: true,
     includeOutputs: true,

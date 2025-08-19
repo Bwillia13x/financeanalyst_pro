@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { Calculator, Download, BarChart3, TrendingUp, AlertCircle, ArrowLeft } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 import { calculateEnhancedDCF, calculateSensitivityAnalysis } from '../../utils/dcfCalculations';
 

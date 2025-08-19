@@ -6,13 +6,8 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  FileText,
   ExternalLink,
   Search,
-  Calendar,
-  Building,
-  TrendingUp,
-  DollarSign,
   Database,
   Shield,
   CheckCircle,
@@ -20,15 +15,16 @@ import {
   Info,
   Download,
   Eye,
-  Clock,
   Hash,
-  MapPin
+  Clock,
+  FileText,
+  TrendingUp
 } from 'lucide-react';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 const SourceTransparency = ({ dataPoint, value, onClose }) => {
   const [activeTab, setActiveTab] = useState('source');
-  const [verificationStatus, setVerificationStatus] = useState('verified');
+  const [verificationStatus, _setVerificationStatus] = useState('verified');
 
   // Sample source data - in production this would come from your data service
   const sourceData = {
@@ -255,7 +251,7 @@ const SourceTransparency = ({ dataPoint, value, onClose }) => {
 
                   <div className="mt-4 p-3 bg-white rounded border">
                     <span className="text-xs text-gray-600 font-medium">EXTRACTED TEXT:</span>
-                    <p className="text-sm text-gray-900 mt-1 italic">"{currentSource.source.extractedText}"</p>
+                    <p className="text-sm text-gray-900 mt-1 italic">&ldquo;{currentSource.source.extractedText}&rdquo;</p>
                   </div>
                 </div>
 

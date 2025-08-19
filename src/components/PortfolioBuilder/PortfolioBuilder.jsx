@@ -1,33 +1,33 @@
-import React, { useState, useCallback, useMemo } from 'react';
-import { 
-  Target, 
-  Plus, 
-  Trash2, 
-  Search, 
-  TrendingUp, 
-  TrendingDown, 
-  BarChart3, 
-  PieChart, 
-  RefreshCw,
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import {
+  Search,
+  Plus,
+  TrendingUp,
+  TrendingDown,
+  BarChart3,
+  PieChart,
+  Trash2,
   Save,
   RotateCcw,
   AlertTriangle,
-  CheckCircle
+  CheckCircle,
+  Target,
+  RefreshCw
 } from 'lucide-react';
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
-import { 
-  arrayMove, 
-  SortableContext, 
-  sortableKeyboardCoordinates, 
-  verticalListSortingStrategy 
-} from '@dnd-kit/sortable';
-import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
+import React, { useState, useCallback, useMemo } from 'react';
 
 import secureApiClient from '../../services/secureApiClient';
 import { formatCurrency, formatPercentage, formatNumber } from '../../utils/formatters';
 
-const PortfolioBuilder = ({ portfolio, onPortfolioUpdate, marketData }) => {
+const PortfolioBuilder = ({ portfolio, onPortfolioUpdate, marketData: _marketData }) => {
   const [builderMode, setBuilderMode] = useState('allocation'); // allocation, optimization, rebalancing
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState([]);
@@ -60,7 +60,7 @@ const PortfolioBuilder = ({ portfolio, onPortfolioUpdate, marketData }) => {
   }, [portfolio, targetAllocation]);
 
   // Search for stocks to add to portfolio
-  const searchStocks = useCallback(async (query) => {
+  const searchStocks = useCallback(async(query) => {
     if (!query || query.length < 2) {
       setSearchResults([]);
       return;
@@ -82,7 +82,7 @@ const PortfolioBuilder = ({ portfolio, onPortfolioUpdate, marketData }) => {
         { symbol: 'V', name: 'Visa Inc.', sector: 'Technology', marketCap: 500000000000 }
       ];
 
-      const filtered = mockResults.filter(stock => 
+      const filtered = mockResults.filter(stock =>
         stock.symbol.toLowerCase().includes(query.toLowerCase()) ||
         stock.name.toLowerCase().includes(query.toLowerCase())
       );
@@ -107,7 +107,7 @@ const PortfolioBuilder = ({ portfolio, onPortfolioUpdate, marketData }) => {
     const holdings = portfolio?.holdings || [];
     const totalTarget = Object.values(targetAllocation).reduce((sum, val) => sum + (val || 0), 0);
     const cashAllocation = Math.max(0, 100 - totalTarget);
-    
+
     const deviations = holdings.map(holding => {
       const currentAllocation = holding.allocation || 0;
       const targetVal = targetAllocation[holding.symbol] || 0;
@@ -130,7 +130,7 @@ const PortfolioBuilder = ({ portfolio, onPortfolioUpdate, marketData }) => {
   }, [portfolio, targetAllocation, rebalanceSettings.threshold]);
 
   // Add stock to portfolio
-  const addStock = useCallback(async (stock) => {
+  const addStock = useCallback(async(stock) => {
     try {
       const quote = await secureApiClient.getQuote(stock.symbol);
       const newHolding = {
@@ -164,7 +164,7 @@ const PortfolioBuilder = ({ portfolio, onPortfolioUpdate, marketData }) => {
       ...portfolio,
       holdings: portfolio.holdings.filter(h => h.symbol !== symbol)
     };
-    
+
     onPortfolioUpdate(updatedPortfolio);
     setTargetAllocation(prev => {
       const updated = { ...prev };
@@ -217,7 +217,7 @@ const PortfolioBuilder = ({ portfolio, onPortfolioUpdate, marketData }) => {
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
+      coordinateGetter: sortableKeyboardCoordinates
     })
   );
 
@@ -226,12 +226,12 @@ const PortfolioBuilder = ({ portfolio, onPortfolioUpdate, marketData }) => {
     if (active.id !== over.id) {
       const oldIndex = portfolio.holdings.findIndex(h => h.symbol === active.id);
       const newIndex = portfolio.holdings.findIndex(h => h.symbol === over.id);
-      
+
       const updatedPortfolio = {
         ...portfolio,
         holdings: arrayMove(portfolio.holdings, oldIndex, newIndex)
       };
-      
+
       onPortfolioUpdate(updatedPortfolio);
       setIsDirty(true);
     }
@@ -303,7 +303,7 @@ const PortfolioBuilder = ({ portfolio, onPortfolioUpdate, marketData }) => {
               sensors={sensors}
             />
           )}
-          
+
           {builderMode === 'optimization' && (
             <OptimizationBuilder
               portfolio={portfolio}
@@ -311,7 +311,7 @@ const PortfolioBuilder = ({ portfolio, onPortfolioUpdate, marketData }) => {
               onSettingsChange={setOptimizationSettings}
             />
           )}
-          
+
           {builderMode === 'rebalancing' && (
             <RebalancingBuilder
               portfolio={portfolio}
@@ -328,7 +328,7 @@ const PortfolioBuilder = ({ portfolio, onPortfolioUpdate, marketData }) => {
           {/* Stock Search & Add */}
           <div className="bg-white rounded-xl shadow-sm border p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Add Securities</h3>
-            
+
             <div className="relative mb-4">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input
@@ -371,7 +371,7 @@ const PortfolioBuilder = ({ portfolio, onPortfolioUpdate, marketData }) => {
           {/* Allocation Summary */}
           <div className="bg-white rounded-xl shadow-sm border p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Allocation Summary</h3>
-            
+
             <div className="space-y-3">
               <div className="flex justify-between">
                 <span className="text-gray-600">Total Allocated:</span>
@@ -391,14 +391,14 @@ const PortfolioBuilder = ({ portfolio, onPortfolioUpdate, marketData }) => {
                   {formatPercentage(allocationAnalysis.maxDeviation)}
                 </span>
               </div>
-              
+
               {!allocationAnalysis.isValid && (
                 <div className="flex items-center space-x-2 p-3 bg-red-50 rounded-lg">
                   <AlertTriangle className="w-4 h-4 text-red-600" />
                   <span className="text-sm text-red-700">Total allocation exceeds 100%</span>
                 </div>
               )}
-              
+
               {allocationAnalysis.needsRebalancing && (
                 <div className="flex items-center space-x-2 p-3 bg-orange-50 rounded-lg">
                   <AlertTriangle className="w-4 h-4 text-orange-600" />
@@ -414,14 +414,14 @@ const PortfolioBuilder = ({ portfolio, onPortfolioUpdate, marketData }) => {
 };
 
 // Allocation Builder Component
-const AllocationBuilder = ({ 
-  portfolio, 
-  targetAllocation, 
-  onUpdateAllocation, 
-  onRemoveStock, 
+const AllocationBuilder = ({
+  portfolio,
+  targetAllocation,
+  onUpdateAllocation,
+  onRemoveStock,
   allocationAnalysis,
   handleDragEnd,
-  sensors 
+  sensors
 }) => {
   return (
     <div className="bg-white rounded-xl shadow-sm border">
@@ -465,13 +465,13 @@ const SortableHoldingRow = ({ holding, targetAllocation, onUpdateAllocation, onR
     setNodeRef,
     transform,
     transition,
-    isDragging,
+    isDragging
   } = useSortable({ id: holding.symbol });
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    opacity: isDragging ? 0.5 : 1,
+    opacity: isDragging ? 0.5 : 1
   };
 
   return (
@@ -485,7 +485,7 @@ const SortableHoldingRow = ({ holding, targetAllocation, onUpdateAllocation, onR
         {...listeners}
         className="cursor-grab active:cursor-grabbing p-1"
       >
-        <div className="w-2 h-8 bg-gray-300 rounded-full"></div>
+        <div className="w-2 h-8 bg-gray-300 rounded-full" />
       </div>
 
       <div className="flex-1">
@@ -526,7 +526,7 @@ const SortableHoldingRow = ({ holding, targetAllocation, onUpdateAllocation, onR
 };
 
 // Optimization Builder Component (placeholder)
-const OptimizationBuilder = ({ portfolio, optimizationSettings, onSettingsChange }) => {
+const OptimizationBuilder = ({ portfolio: _portfolio, optimizationSettings: _optimizationSettings, onSettingsChange: _onSettingsChange }) => {
   return (
     <div className="bg-white rounded-xl shadow-sm border p-6">
       <div className="text-center py-12">
@@ -542,12 +542,12 @@ const OptimizationBuilder = ({ portfolio, optimizationSettings, onSettingsChange
 };
 
 // Rebalancing Builder Component
-const RebalancingBuilder = ({ 
-  portfolio, 
-  rebalanceSettings, 
-  onSettingsChange, 
-  allocationAnalysis, 
-  generateTrades 
+const RebalancingBuilder = ({
+  portfolio: _portfolio,
+  rebalanceSettings,
+  onSettingsChange,
+  allocationAnalysis: _allocationAnalysis,
+  generateTrades
 }) => {
   const trades = generateTrades();
 
@@ -556,19 +556,20 @@ const RebalancingBuilder = ({
       {/* Rebalancing Settings */}
       <div className="bg-white rounded-xl shadow-sm border p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Rebalancing Settings</h3>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="rebalance-threshold" className="block text-sm font-medium text-gray-700 mb-1">
               Deviation Threshold
             </label>
             <div className="flex items-center space-x-2">
               <input
+                id="rebalance-threshold"
                 type="number"
                 value={rebalanceSettings.threshold}
-                onChange={(e) => onSettingsChange(prev => ({ 
-                  ...prev, 
-                  threshold: parseFloat(e.target.value) || 0 
+                onChange={(e) => onSettingsChange(prev => ({
+                  ...prev,
+                  threshold: parseFloat(e.target.value) || 0
                 }))}
                 className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 min="0.1"
@@ -580,17 +581,18 @@ const RebalancingBuilder = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="rebalance-cashBuffer" className="block text-sm font-medium text-gray-700 mb-1">
               Cash Buffer
             </label>
             <div className="flex items-center space-x-2">
               <span className="text-sm text-gray-500">$</span>
               <input
+                id="rebalance-cashBuffer"
                 type="number"
                 value={rebalanceSettings.cashBuffer}
-                onChange={(e) => onSettingsChange(prev => ({ 
-                  ...prev, 
-                  cashBuffer: parseFloat(e.target.value) || 0 
+                onChange={(e) => onSettingsChange(prev => ({
+                  ...prev,
+                  cashBuffer: parseFloat(e.target.value) || 0
                 }))}
                 className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 min="0"
@@ -600,17 +602,18 @@ const RebalancingBuilder = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="rebalance-minimumTrade" className="block text-sm font-medium text-gray-700 mb-1">
               Minimum Trade
             </label>
             <div className="flex items-center space-x-2">
               <span className="text-sm text-gray-500">$</span>
               <input
+                id="rebalance-minimumTrade"
                 type="number"
                 value={rebalanceSettings.minimumTrade}
-                onChange={(e) => onSettingsChange(prev => ({ 
-                  ...prev, 
-                  minimumTrade: parseFloat(e.target.value) || 0 
+                onChange={(e) => onSettingsChange(prev => ({
+                  ...prev,
+                  minimumTrade: parseFloat(e.target.value) || 0
                 }))}
                 className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 min="0"

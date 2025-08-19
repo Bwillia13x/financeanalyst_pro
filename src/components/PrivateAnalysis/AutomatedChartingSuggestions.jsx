@@ -3,7 +3,6 @@ import {
   BarChart3,
   LineChart,
   PieChart,
-  TrendingUp,
   GitBranch,
   Activity,
   Plus,

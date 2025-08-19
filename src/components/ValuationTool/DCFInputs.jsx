@@ -176,10 +176,11 @@ const DCFInputs = ({ inputs, setInputs }) => {
           <h4 className="text-md font-semibold text-gray-900 mb-3">Base Year (Current)</h4>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="currentRevenue" className="block text-sm font-medium text-gray-700 mb-1">
                 Current Revenue ($)
               </label>
               <input
+                id="currentRevenue"
                 type="number"
                 value={inputs.currentRevenue || 0}
                 onChange={(e) => handleChange('currentRevenue', e.target.value)}
@@ -187,10 +188,11 @@ const DCFInputs = ({ inputs, setInputs }) => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="terminalGrowthRate" className="block text-sm font-medium text-gray-700 mb-1">
                 Terminal Growth Rate (%)
               </label>
               <input
+                id="terminalGrowthRate"
                 type="number"
                 step="0.01"
                 value={(inputs.terminalGrowthRate || 0) * 100}
@@ -199,10 +201,11 @@ const DCFInputs = ({ inputs, setInputs }) => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="discountRate" className="block text-sm font-medium text-gray-700 mb-1">
                 Discount Rate (WACC) (%)
               </label>
               <input
+                id="discountRate"
                 type="number"
                 step="0.01"
                 value={(inputs.discountRate || 0) * 100}
@@ -327,10 +330,11 @@ const DCFInputs = ({ inputs, setInputs }) => {
           <h4 className="text-md font-semibold text-gray-900 mb-3">Balance Sheet Items</h4>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="cash-input" className="block text-sm font-medium text-gray-700 mb-1">
                 Cash ($)
               </label>
               <input
+                id="cash-input"
                 type="number"
                 value={balanceSheet.cash || 0}
                 onChange={(e) => handleBalanceSheetChange('cash', e.target.value)}
@@ -338,10 +342,11 @@ const DCFInputs = ({ inputs, setInputs }) => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="total-debt-input" className="block text-sm font-medium text-gray-700 mb-1">
                 Total Debt ($)
               </label>
               <input
+                id="total-debt-input"
                 type="number"
                 value={balanceSheet.totalDebt || 0}
                 onChange={(e) => handleBalanceSheetChange('totalDebt', e.target.value)}
@@ -349,10 +354,11 @@ const DCFInputs = ({ inputs, setInputs }) => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="shares-outstanding-input" className="block text-sm font-medium text-gray-700 mb-1">
                 Shares Outstanding
               </label>
               <input
+                id="shares-outstanding-input"
                 type="number"
                 value={balanceSheet.sharesOutstanding || 0}
                 onChange={(e) => handleBalanceSheetChange('sharesOutstanding', e.target.value)}

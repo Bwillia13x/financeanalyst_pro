@@ -119,6 +119,7 @@ class CollaborationService extends EventEmitter {
 
       // If mock flag is set, simulate a WS connection; otherwise, attempt a real one
       const useMock = this.env.VITE_COLLAB_WS_MOCK === 'true';
+      const _options = { useMock };
       if (useMock || typeof WebSocket === 'undefined') {
         // Simulated WebSocket for demo/testing
         this.wsConnection = {

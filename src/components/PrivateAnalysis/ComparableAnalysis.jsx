@@ -1,8 +1,8 @@
 import { motion } from 'framer-motion';
-import { Users, TrendingUp, BarChart3, Plus, Search, DollarSign, Percent, Target, Filter } from 'lucide-react';
+import { Users, TrendingUp, BarChart3, Plus, Search, DollarSign, Target, Filter } from 'lucide-react';
 import React, { useState, useMemo } from 'react';
 
-const ComparableAnalysis = ({ data, formatCurrency, formatPercent }) => {
+const ComparableAnalysis = ({ data, formatCurrency, formatPercent: _formatPercent }) => {
   const [activeTab, setActiveTab] = useState('multiples');
   const [selectedMultiple, setSelectedMultiple] = useState('ev_revenue');
   const [showAddComp, setShowAddComp] = useState(false);
@@ -308,7 +308,7 @@ const ComparableAnalysis = ({ data, formatCurrency, formatPercent }) => {
                   </tr>
                 </thead>
                 <tbody>
-                  {comparableMultiples.map((comp, index) => (
+                  {comparableMultiples.map((comp, _index) => (
                     <tr key={comp.id} className="border-b hover:bg-gray-50">
                       <td className="p-3">
                         <div>
@@ -558,55 +558,72 @@ const ComparableAnalysis = ({ data, formatCurrency, formatPercent }) => {
             >
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Company Name</label>
+                  <label htmlFor="company-name" className="block text-sm font-medium text-gray-700 mb-1">Company Name</label>
                   <input
+                    id="company-name"
                     name="name" type="text" required
                     className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Ticker</label>
+                  <label htmlFor="ticker" className="block text-sm font-medium text-gray-700 mb-1">Ticker</label>
                   <input
+                    id="ticker"
                     name="ticker" type="text" required
                     className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Market Cap ($000s)</label>
+                    <label htmlFor="marketCap" className="block text-sm font-medium text-gray-700 mb-1">Market Cap ($000s)</label>
                     <input
-                      name="marketCap" type="number" required
+                      id="marketCap"
+                      name="marketCap"
+                      type="number"
+                      required
                       className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Enterprise Value ($000s)</label>
+                    <label htmlFor="enterpriseValue" className="block text-sm font-medium text-gray-700 mb-1">Enterprise Value ($000s)</label>
                     <input
-                      name="enterpriseValue" type="number" required
+                      id="enterpriseValue"
+                      name="enterpriseValue"
+                      type="number"
+                      required
                       className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Revenue ($000s)</label>
+                    <label htmlFor="revenue" className="block text-sm font-medium text-gray-700 mb-1">Revenue ($000s)</label>
                     <input
-                      name="revenue" type="number" required
+                      id="revenue"
+                      name="revenue"
+                      type="number"
+                      required
                       className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">EBITDA ($000s)</label>
+                    <label htmlFor="ebitda" className="block text-sm font-medium text-gray-700 mb-1">EBITDA ($000s)</label>
                     <input
-                      name="ebitda" type="number" required
+                      id="ebitda"
+                      name="ebitda"
+                      type="number"
+                      required
                       className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Business Model</label>
+                  <label htmlFor="businessModel" className="block text-sm font-medium text-gray-700 mb-1">Business Model</label>
                   <input
-                    name="businessModel" type="text" required
+                    id="businessModel"
+                    name="businessModel"
+                    type="text"
+                    required
                     className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>

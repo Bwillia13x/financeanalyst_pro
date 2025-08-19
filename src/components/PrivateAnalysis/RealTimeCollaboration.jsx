@@ -6,28 +6,24 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Users,
-  MessageCircle,
-  Video,
   Share2,
-  Bell,
-  Settings,
-  UserPlus,
-  Eye,
   Edit3,
-  MousePointer2,
+  UserPlus,
+  Settings,
+  Bell,
   Wifi,
   WifiOff,
-  Circle,
+  MessageCircle,
+  Video,
+  CheckCircle2,
+  MousePointer2,
   Send,
   Phone,
-  Calendar,
-  Clock,
-  CheckCircle2,
-  AlertCircle
+  Calendar
 } from 'lucide-react';
 import React, { useState, useEffect, useRef } from 'react';
 
-const RealTimeCollaboration = ({ modelId, currentUser, onDataChange }) => {
+const RealTimeCollaboration = ({ _modelId, currentUser, _onDataChange }) => {
   const [activeUsers, setActiveUsers] = useState([
     {
       id: 1,
@@ -65,7 +61,7 @@ const RealTimeCollaboration = ({ modelId, currentUser, onDataChange }) => {
   ]);
 
   const [isConnected, setIsConnected] = useState(true);
-  const [notifications, setNotifications] = useState([
+  const [notifications, _setNotifications] = useState([
     {
       id: 1,
       type: 'change',

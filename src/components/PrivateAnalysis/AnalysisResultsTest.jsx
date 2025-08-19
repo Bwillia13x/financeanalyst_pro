@@ -1,4 +1,4 @@
-import { TrendingUp, Percent, BarChart3, Calculator } from 'lucide-react';
+import { TrendingUp, Percent } from 'lucide-react';
 import React from 'react';
 
 // Simplified test version of AnalysisResults to isolate React errors

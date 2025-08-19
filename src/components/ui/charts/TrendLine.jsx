@@ -44,7 +44,7 @@ const TrendLine = ({
     );
   };
 
-  const CustomTooltip = ({ active, payload, label }) => {
+  const CustomTooltip = ({ active, payload, label: _label }) => {
     if (!active || !payload || !payload.length) return null;
 
     const data = payload[0].payload;

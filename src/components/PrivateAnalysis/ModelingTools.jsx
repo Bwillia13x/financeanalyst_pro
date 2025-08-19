@@ -1,5 +1,11 @@
-import { motion } from 'framer-motion';
-import { Target, BarChart3, Activity, DollarSign, Users, Zap } from 'lucide-react';
+import {
+  DollarSign,
+  Target,
+  Activity,
+  BarChart3,
+  Users,
+  Zap
+} from 'lucide-react';
 import React, { useState, useMemo } from 'react';
 
 import AdvancedDCF from './AdvancedDCF.jsx';
@@ -165,7 +171,7 @@ const ModelingTools = ({ data, adjustedValues, onDataChange }) => {
     };
   };
 
-  const dcfResults = calculateDCF();
+  const _dcfResults = calculateDCF();
 
   const modelTypes = [
     { id: 'dcf', label: 'DCF Valuation', icon: DollarSign, description: 'Discounted Cash Flow analysis' },

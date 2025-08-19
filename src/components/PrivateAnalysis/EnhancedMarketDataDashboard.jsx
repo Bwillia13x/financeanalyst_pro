@@ -1,13 +1,13 @@
 import { motion } from 'framer-motion';
 import {
   TrendingUp, TrendingDown, Activity, Globe, Bell,
-  Plus, Minus, RefreshCw, Settings, Download, Search,
-  BarChart3, LineChart, PieChart, AlertCircle, CheckCircle
+  Plus, Minus, RefreshCw, Settings,
+  BarChart3, LineChart, AlertCircle, CheckCircle
 } from 'lucide-react';
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { LineChart as RechartsLineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, BarChart, Bar } from 'recharts';
+import { LineChart as RechartsLineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
-const EnhancedMarketDataDashboard = ({ data, onDataChange }) => {
+const EnhancedMarketDataDashboard = ({ data: _data, onDataChange: _onDataChange }) => {
   const [activeView, setActiveView] = useState('overview');
   const [watchlist, setWatchlist] = useState([
     { symbol: 'SPY', name: 'SPDR S&P 500 ETF', price: 445.67, change: 2.34, changePercent: 0.53, category: 'index' },
@@ -17,7 +17,7 @@ const EnhancedMarketDataDashboard = ({ data, onDataChange }) => {
     { symbol: '^TNX', name: '10-Year Treasury Yield', price: 4.25, change: 0.05, changePercent: 1.19, category: 'rates' }
   ]);
 
-  const [marketData, setMarketData] = useState({
+  const [marketData] = useState({
     indices: {
       'S&P 500': { value: 4456.78, change: 23.45, changePercent: 0.53 },
       'NASDAQ': { value: 13789.45, change: -45.67, changePercent: -0.33 },
@@ -41,7 +41,7 @@ const EnhancedMarketDataDashboard = ({ data, onDataChange }) => {
     }
   });
 
-  const [alerts, setAlerts] = useState([
+  const [alerts] = useState([
     { id: 1, type: 'price', symbol: 'SPY', condition: 'above', value: 450, active: true },
     { id: 2, type: 'volatility', symbol: 'VIX', condition: 'above', value: 20, active: true }
   ]);

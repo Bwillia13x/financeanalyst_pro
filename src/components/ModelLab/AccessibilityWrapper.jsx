@@ -13,7 +13,7 @@ export const useAccessibility = () => {
 };
 
 // Accessibility Provider Component
-export const AccessibilityProvider = ({ children }) => {
+export const AccessibilityWrapper = ({ children, onError: _onError, error: _error }) => {
   const [settings, setSettings] = useState({
     highContrast: false,
     largeText: false,
@@ -219,7 +219,7 @@ export const AccessibilityControls = ({ className = '' }) => {
 
           <div className="p-3 space-y-3 max-h-64 overflow-y-auto">
             {controls.map(({ key, label, description, icon: Icon }) => (
-              <label key={key} className="flex items-start gap-3 cursor-pointer">
+              <label key={key} className="flex items-start gap-3 cursor-pointer" aria-label={label}>
                 <input
                   type="checkbox"
                   checked={settings[key]}

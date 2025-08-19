@@ -295,8 +295,9 @@ export class CommandRegistry {
 
     for (const [name, command] of this.commands) {
       if (name.toLowerCase().startsWith(partialLower)) {
+        const _name = command.name;
         suggestions.push({
-          name: command.name,
+          name: _name,
           description: command.description,
           usage: command.usage,
           category: command.category

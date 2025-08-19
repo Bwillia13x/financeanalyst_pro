@@ -1,6 +1,6 @@
 // Model Lab Calculation Utilities
 
-const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+// const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
 
 // Template definitions
 export const templates = [

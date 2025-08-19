@@ -3,12 +3,12 @@
  * Environmental, social, governance metrics and alternative data analysis
  */
 
-import { formatCurrency, formatPercentage, formatNumber } from '../../utils/dataTransformation';
+import { formatPercentage, formatNumber } from '../../utils/formatters.js';
 import { dataFetchingService } from '../dataFetching';
 
 export const esgCommands = {
   ESG_SCORE: {
-    execute: async(parsedCommand, context, processor) => {
+    execute: async(parsedCommand, _context, _processor) => {
       const [ticker] = parsedCommand.parameters;
 
       if (!ticker) {
@@ -101,7 +101,7 @@ export const esgCommands = {
   },
 
   SOCIAL_SENTIMENT: {
-    execute: async(parsedCommand, context, processor) => {
+    execute: async(parsedCommand, _context, _processor) => {
       const [ticker, days = 30] = parsedCommand.parameters;
 
       if (!ticker) {
@@ -176,7 +176,7 @@ export const esgCommands = {
   },
 
   NEWS_IMPACT: {
-    execute: async(parsedCommand, context, processor) => {
+    execute: async(parsedCommand, _context, _processor) => {
       const [ticker, days = 7] = parsedCommand.parameters;
 
       if (!ticker) {

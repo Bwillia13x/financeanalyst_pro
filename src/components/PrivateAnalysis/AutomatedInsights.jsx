@@ -3,45 +3,26 @@
  * Provides AI-powered insights, recommendations, and key driver analysis
  */
 
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
   Brain,
   TrendingUp,
-  TrendingDown,
   Target,
   AlertTriangle,
   CheckCircle,
   Lightbulb,
   BarChart3,
-  PieChart,
   Activity,
   Zap,
-  Eye,
-  RefreshCw,
-  Download,
-  Share2,
   Settings,
-  Filter,
-  Search,
-  Star,
-  ThumbsUp,
-  ThumbsDown,
-  MessageSquare,
-  ArrowRight,
   Info,
   Bookmark,
-  Clock,
-  Users,
-  DollarSign,
-  Percent,
-  Calculator
+  ThumbsUp,
+  ThumbsDown,
+  RefreshCw
 } from 'lucide-react';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
-  LineChart,
-  Line,
-  AreaChart,
-  Area,
   BarChart,
   Bar,
   XAxis,
@@ -50,12 +31,12 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-  ScatterChart
+  Line
 } from 'recharts';
 
-const AutomatedInsights = ({ modelData, financialData, onDataChange }) => {
+const AutomatedInsights = ({ modelData: _modelData, financialData: _financialData, onDataChange: _onDataChange }) => {
   const [activeTab, setActiveTab] = useState('insights');
-  const [insights, setInsights] = useState([
+  const [insights, _setInsights] = useState([
     {
       id: 1,
       type: 'opportunity',
@@ -106,7 +87,7 @@ const AutomatedInsights = ({ modelData, financialData, onDataChange }) => {
     }
   ]);
 
-  const [keyDrivers, setKeyDrivers] = useState([
+  const [keyDrivers, _setKeyDrivers] = useState([
     {
       id: 1,
       name: 'Revenue Growth Rate',
@@ -199,17 +180,7 @@ const AutomatedInsights = ({ modelData, financialData, onDataChange }) => {
     }
   };
 
-  const formatCurrency = (value) => {
-    if (typeof value === 'string' && (value.includes('$') || value.includes('M'))) {
-      return value;
-    }
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    }).format(value * 1000000);
-  };
+  const _formatCurrency = (value) => value;
 
   return (
     <div className="max-w-7xl mx-auto p-6 space-y-6">

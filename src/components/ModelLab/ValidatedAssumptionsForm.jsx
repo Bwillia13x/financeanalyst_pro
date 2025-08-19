@@ -102,18 +102,18 @@ function ValidatedNumberInput({
               onFocus={handleFocus}
               onBlur={handleBlur}
               onKeyDown={(e) => {
-                if (e.key === 'ArrowUp') {
-                  e.preventDefault();
-                  stepUp();
-                } else if (e.key === 'ArrowDown') {
-                  e.preventDefault();
-                  stepDown();
-                } else if (e.shiftKey && e.key === 'ArrowUp') {
+                if (e.shiftKey && e.key === 'ArrowUp') {
                   e.preventDefault();
                   onChange(clamp((value || 0) + step * 10, min ?? -Infinity, max ?? Infinity));
                 } else if (e.shiftKey && e.key === 'ArrowDown') {
                   e.preventDefault();
                   onChange(clamp((value || 0) - step * 10, min ?? -Infinity, max ?? Infinity));
+                } else if (e.key === 'ArrowUp') {
+                  e.preventDefault();
+                  stepUp();
+                } else if (e.key === 'ArrowDown') {
+                  e.preventDefault();
+                  stepDown();
                 }
               }}
             />

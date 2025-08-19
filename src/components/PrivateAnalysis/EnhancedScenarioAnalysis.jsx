@@ -1,13 +1,13 @@
 import { motion } from 'framer-motion';
 import {
-  BarChart3, TrendingUp, TrendingDown, Target, Plus, Trash2,
-  Play, Download, Settings, RefreshCw, AlertTriangle, CheckCircle
+  BarChart3, Plus, Trash2,
+  Play, AlertTriangle
 } from 'lucide-react';
 import React, { useState, useMemo, useCallback } from 'react';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, LineChart, Line } from 'recharts';
+import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 
-const EnhancedScenarioAnalysis = ({ data, onDataChange, calculateDCF, lboModelingEngine }) => {
-  const [activeView, setActiveView] = useState('scenarios');
+const EnhancedScenarioAnalysis = ({ data, _onDataChange, calculateDCF, lboModelingEngine }) => {
+  const [_activeView, _setActiveView] = useState('scenarios');
   const [scenarios, setScenarios] = useState([
     {
       id: 1,
@@ -234,8 +234,9 @@ const EnhancedScenarioAnalysis = ({ data, onDataChange, calculateDCF, lboModelin
       <div className="mb-6 p-4 bg-gray-50 rounded-lg">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Model Type</label>
+            <label htmlFor="modelType" className="block text-sm font-medium text-gray-700 mb-2">Model Type</label>
             <select
+              id="modelType"
               value={analysisSettings.modelType}
               onChange={(e) => setAnalysisSettings(prev => ({ ...prev, modelType: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg"
@@ -247,8 +248,9 @@ const EnhancedScenarioAnalysis = ({ data, onDataChange, calculateDCF, lboModelin
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Output Metric</label>
+            <label htmlFor="outputMetric" className="block text-sm font-medium text-gray-700 mb-2">Output Metric</label>
             <select
+              id="outputMetric"
               value={analysisSettings.outputMetric}
               onChange={(e) => setAnalysisSettings(prev => ({ ...prev, outputMetric: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg"
@@ -261,8 +263,9 @@ const EnhancedScenarioAnalysis = ({ data, onDataChange, calculateDCF, lboModelin
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Simulations</label>
+            <label htmlFor="simulations" className="block text-sm font-medium text-gray-700 mb-2">Simulations</label>
             <input
+              id="simulations"
               type="number"
               value={analysisSettings.numSimulations}
               onChange={(e) => setAnalysisSettings(prev => ({ ...prev, numSimulations: parseInt(e.target.value) || 1000 }))}

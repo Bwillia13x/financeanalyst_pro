@@ -1,4 +1,4 @@
-import { Users, Plus, Trash2, Edit3, TrendingUp, BarChart3, Target } from 'lucide-react';
+import { Plus, Users, Trash2, BarChart3, Target } from 'lucide-react';
 import React, { useState, useMemo } from 'react';
 
 const Card = ({ title, right, children, className = '' }) => (
@@ -36,7 +36,7 @@ const Pill = ({ children, tone = 'slate', size = 'sm' }) => {
 const PeerCompany = ({ peer, onUpdate, onRemove, isEditable = true }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const formatCurrency = (value) => {
+  const _formatCurrency = (value) => {
     if (!value) return '—';
     return value >= 1e9 ? `$${(value / 1e9).toFixed(1)}B` :
       value >= 1e6 ? `$${(value / 1e6).toFixed(0)}M` :
@@ -82,10 +82,11 @@ const PeerCompany = ({ peer, onUpdate, onRemove, isEditable = true }) => {
           <div className="mt-3 pt-3 border-t border-slate-200 space-y-3">
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-[10px] font-medium text-slate-600 mb-1">
+                <label htmlFor={`peer-${peer.id}-name`} className="block text-[10px] font-medium text-slate-600 mb-1">
                   Company Name
                 </label>
                 <input
+                  id={`peer-${peer.id}-name`}
                   type="text"
                   value={peer.name}
                   onChange={(e) => onUpdate(peer.id, { name: e.target.value })}
@@ -94,10 +95,11 @@ const PeerCompany = ({ peer, onUpdate, onRemove, isEditable = true }) => {
                 />
               </div>
               <div>
-                <label className="block text-[10px] font-medium text-slate-600 mb-1">
+                <label htmlFor={`peer-${peer.id}-ticker`} className="block text-[10px] font-medium text-slate-600 mb-1">
                   Ticker
                 </label>
                 <input
+                  id={`peer-${peer.id}-ticker`}
                   type="text"
                   value={peer.ticker}
                   onChange={(e) => onUpdate(peer.id, { ticker: e.target.value.toUpperCase() })}
@@ -109,10 +111,11 @@ const PeerCompany = ({ peer, onUpdate, onRemove, isEditable = true }) => {
 
             <div className="grid grid-cols-3 gap-2">
               <div>
-                <label className="block text-[10px] font-medium text-slate-600 mb-1">
+                <label htmlFor={`peer-${peer.id}-marketcap`} className="block text-[10px] font-medium text-slate-600 mb-1">
                   Market Cap
                 </label>
                 <input
+                  id={`peer-${peer.id}-marketcap`}
                   type="number"
                   value={peer.marketCap || 0}
                   onChange={(e) => onUpdate(peer.id, { marketCap: parseFloat(e.target.value) || 0 })}
@@ -121,10 +124,11 @@ const PeerCompany = ({ peer, onUpdate, onRemove, isEditable = true }) => {
                 />
               </div>
               <div>
-                <label className="block text-[10px] font-medium text-slate-600 mb-1">
+                <label htmlFor={`peer-${peer.id}-revenue`} className="block text-[10px] font-medium text-slate-600 mb-1">
                   Revenue
                 </label>
                 <input
+                  id={`peer-${peer.id}-revenue`}
                   type="number"
                   value={peer.revenue || 0}
                   onChange={(e) => onUpdate(peer.id, { revenue: parseFloat(e.target.value) || 0 })}
@@ -133,10 +137,11 @@ const PeerCompany = ({ peer, onUpdate, onRemove, isEditable = true }) => {
                 />
               </div>
               <div>
-                <label className="block text-[10px] font-medium text-slate-600 mb-1">
+                <label htmlFor={`peer-${peer.id}-evmultiple`} className="block text-[10px] font-medium text-slate-600 mb-1">
                   EV/Revenue
                 </label>
                 <input
+                  id={`peer-${peer.id}-evmultiple`}
                   type="number"
                   step="0.1"
                   value={peer.evMultiple || 0}
@@ -149,10 +154,11 @@ const PeerCompany = ({ peer, onUpdate, onRemove, isEditable = true }) => {
 
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="block text-[10px] font-medium text-slate-600 mb-1">
+                <label htmlFor={`peer-${peer.id}-sector`} className="block text-[10px] font-medium text-slate-600 mb-1">
                   Sector
                 </label>
                 <select
+                  id={`peer-${peer.id}-sector`}
                   value={peer.sector || ''}
                   onChange={(e) => onUpdate(peer.id, { sector: e.target.value })}
                   className="w-full text-[11px] px-2 py-1 border border-slate-200 rounded"
@@ -171,10 +177,11 @@ const PeerCompany = ({ peer, onUpdate, onRemove, isEditable = true }) => {
                 </select>
               </div>
               <div>
-                <label className="block text-[10px] font-medium text-slate-600 mb-1">
+                <label htmlFor={`peer-${peer.id}-geography`} className="block text-[10px] font-medium text-slate-600 mb-1">
                   Geography
                 </label>
                 <select
+                  id={`peer-${peer.id}-geography`}
                   value={peer.geography || ''}
                   onChange={(e) => onUpdate(peer.id, { geography: e.target.value })}
                   className="w-full text-[11px] px-2 py-1 border border-slate-200 rounded"
@@ -191,10 +198,11 @@ const PeerCompany = ({ peer, onUpdate, onRemove, isEditable = true }) => {
             </div>
 
             <div>
-              <label className="block text-[10px] font-medium text-slate-600 mb-1">
+              <label htmlFor={`peer-${peer.id}-notes`} className="block text-[10px] font-medium text-slate-600 mb-1">
                 Notes
               </label>
               <textarea
+                id={`peer-${peer.id}-notes`}
                 value={peer.notes || ''}
                 onChange={(e) => onUpdate(peer.id, { notes: e.target.value })}
                 className="w-full text-[11px] px-2 py-1 border border-slate-200 rounded h-12 resize-none"

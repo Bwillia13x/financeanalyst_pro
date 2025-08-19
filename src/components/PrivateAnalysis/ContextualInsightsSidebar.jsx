@@ -8,12 +8,10 @@ import {
   ChevronDown,
   Target,
   Users,
-  DollarSign,
-  Building2,
   Lightbulb,
   X
 } from 'lucide-react';
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 
 const ContextualInsightsSidebar = ({
   financialData,
@@ -31,7 +29,7 @@ const ContextualInsightsSidebar = ({
   });
 
   // Industry benchmark data (in real implementation, this would come from APIs)
-  const industryBenchmarks = useMemo(() => ({
+  const _industryBenchmarks = useMemo(() => ({
     healthcare: {
       revenueGrowth: { min: 8, median: 15, max: 25, unit: '%' },
       ebitdaMargin: { min: 18, median: 28, max: 40, unit: '%' },

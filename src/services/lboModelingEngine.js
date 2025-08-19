@@ -1,4 +1,4 @@
-import { apiLogger } from '../utils/apiLogger.js';
+// import { apiLogger } from '../utils/apiLogger.js';
 
 /**
  * Advanced LBO (Leveraged Buyout) Modeling Engine
@@ -61,9 +61,9 @@ class LBOModelingEngine {
       companyName,
       purchasePrice,
       ebitda,
-      revenue,
-      marketData = {},
-      peerData = {},
+      revenue: _revenue,
+      marketData: _marketData = {},
+      peerData: _peerData = {},
       assumptions = {}
     } = inputs;
 

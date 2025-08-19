@@ -1,4 +1,4 @@
-import { apiLogger } from '../utils/apiLogger.js';
+import { apiLogger as _apiLogger } from '../utils/apiLogger.js';
 
 /**
  * Advanced Financial Metrics Service
@@ -195,7 +195,7 @@ class AdvancedFinancialMetrics {
    */
   calculateValuationRatios(financialData) {
     const { balanceSheet, incomeStatement, marketData } = financialData;
-    const { stockPrice, sharesOutstanding, marketCap, enterpriseValue } = marketData;
+    const { stockPrice, sharesOutstanding: _sharesOutstanding, marketCap, enterpriseValue } = marketData;
 
     return {
       // Price ratios
@@ -682,7 +682,7 @@ class AdvancedFinancialMetrics {
    * Calculate distance to default (simplified)
    */
   calculateDistanceToDefault(financialData) {
-    const { balanceSheet, incomeStatement, marketData } = financialData;
+    const { balanceSheet, incomeStatement: _incomeStatement, marketData } = financialData;
     const marketValueEquity = marketData?.marketCap || balanceSheet.totalEquity;
     const volatility = marketData?.volatility || 0.3; // Default 30% volatility
     const debtValue = balanceSheet.totalDebt;
@@ -749,7 +749,7 @@ class AdvancedFinancialMetrics {
    */
   calculateBenishMScore(financialData) {
     // This is a simplified version - actual implementation would require more historical data
-    const { balanceSheet, incomeStatement, priorYearData } = financialData;
+    const { balanceSheet, incomeStatement, priorYearData: _priorYearData } = financialData;
 
     // Placeholder calculation - would need proper implementation with all 8 variables
     const daysInReceivables = this.safeDivide(365, this.safeDivide(incomeStatement.revenue, balanceSheet.accountsReceivable));

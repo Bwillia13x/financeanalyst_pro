@@ -3,12 +3,12 @@
  * System monitoring, configuration, and performance tools
  */
 
-import { formatCurrency, formatPercentage, formatNumber } from '../../utils/dataTransformation';
+import { formatPercentage, formatNumber } from '../../utils/dataTransformation';
 import { dataFetchingService } from '../dataFetching';
 
 export const systemCommands = {
   PERFORMANCE_TEST: {
-    execute: async(parsedCommand, context, processor) => {
+    execute: async(_parsedCommand, _context, _processor) => {
       try {
         const startTime = Date.now();
 
@@ -112,7 +112,7 @@ export const systemCommands = {
   },
 
   API_USAGE: {
-    execute: async(parsedCommand, context, processor) => {
+    execute: async(_parsedCommand, _context, _processor) => {
       try {
         // Mock API usage statistics (in real implementation, would track actual usage)
         const usage = {
@@ -178,13 +178,13 @@ export const systemCommands = {
   },
 
   CONFIG: {
-    execute: async(parsedCommand, context, processor) => {
+    execute: async(parsedCommand, _context, processor) => {
       const [setting, value] = parsedCommand.parameters;
 
       if (!setting) {
         // Show all current settings
-        const settings = processor.getAllSettings();
-        const variables = processor.getAllVariables();
+        const settings = processor?.getAllSettings() || {};
+        const variables = processor?.getAllVariables() || {};
 
         const content = `⚙️ System Configuration\n\n🔧 CURRENT SETTINGS:\n${Object.entries(settings).map(([key, val]) =>
           `• ${key}: ${val}`
@@ -205,7 +205,7 @@ export const systemCommands = {
 
       if (value === undefined) {
         // Show specific setting
-        const currentValue = processor.getSetting(setting);
+        const currentValue = processor?.getSetting(setting);
         return {
           type: 'info',
           content: `⚙️ Setting: ${setting}\nCurrent Value: ${currentValue || 'Not set'}\n\nTo update: CONFIG("${setting}", "new_value")`
@@ -230,8 +230,8 @@ export const systemCommands = {
           };
         }
 
-        const oldValue = processor.getSetting(setting);
-        processor.updateSetting(setting, value);
+        const oldValue = processor?.getSetting(setting);
+        processor?.updateSetting(setting, value);
 
         return {
           type: 'success',

@@ -3,30 +3,27 @@
  * Provides model versioning, audit trails, and compliance features
  */
 
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
   Clock,
   GitBranch,
   Users,
   Eye,
   Download,
-  Upload,
   CheckCircle,
   AlertTriangle,
   FileText,
   Lock,
-  Unlock,
   RotateCcw,
-  // Compare, // not available in lucide-react, using RotateCcw instead
   Tag,
   MessageSquare,
   Calendar
 } from 'lucide-react';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
-const VersioningAuditTrails = ({ modelId, modelData, onDataChange }) => {
+const VersioningAuditTrails = ({ _modelId, _modelData, _onDataChange }) => {
   const [activeTab, setActiveTab] = useState('versions');
-  const [versions, setVersions] = useState([
+  const [versions, _setVersions] = useState([
     {
       id: 'v1.0.3',
       timestamp: '2024-01-15T14:30:00Z',
@@ -51,7 +48,7 @@ const VersioningAuditTrails = ({ modelId, modelData, onDataChange }) => {
     }
   ]);
 
-  const [auditLogs, setAuditLogs] = useState([
+  const [auditLogs, _setAuditLogs] = useState([
     {
       id: 1,
       timestamp: '2024-01-15T14:35:22Z',
@@ -94,7 +91,7 @@ const VersioningAuditTrails = ({ modelId, modelData, onDataChange }) => {
     }
   ]);
 
-  const [complianceStatus, setComplianceStatus] = useState({
+  const [complianceStatus, _setComplianceStatus] = useState({
     sox: { compliant: true, lastAudit: '2024-01-01', nextAudit: '2024-04-01' },
     gdpr: { compliant: true, lastReview: '2024-01-10', dataRetention: '7 years' },
     ifrs: { compliant: true, standards: ['IFRS 9', 'IFRS 16'], lastUpdate: '2024-01-05' }
@@ -412,20 +409,20 @@ const VersioningAuditTrails = ({ modelId, modelData, onDataChange }) => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="baseVersion" className="block text-sm font-medium text-gray-700 mb-2">
                     Base Version
                   </label>
-                  <select className="w-full border border-gray-300 rounded-lg px-3 py-2">
+                  <select id="baseVersion" className="w-full border border-gray-300 rounded-lg px-3 py-2">
                     <option>v1.0.3 (Current)</option>
                     <option>v1.0.2</option>
                     <option>v1.0.1</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="compareAgainst" className="block text-sm font-medium text-gray-700 mb-2">
                     Compare Against
                   </label>
-                  <select className="w-full border border-gray-300 rounded-lg px-3 py-2">
+                  <select id="compareAgainst" className="w-full border border-gray-300 rounded-lg px-3 py-2">
                     <option>v1.0.2</option>
                     <option>v1.0.1</option>
                     <option>v1.0.0</option>

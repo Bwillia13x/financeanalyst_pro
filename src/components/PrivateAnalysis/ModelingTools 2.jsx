@@ -2,12 +2,12 @@ import { motion } from 'framer-motion';
 import { Target, BarChart3, Activity, DollarSign } from 'lucide-react';
 import React, { useState, useMemo } from 'react';
 
-import AdvancedDCF from './AdvancedDCF.jsx';
+// import AdvancedDCF from './AdvancedDCF.jsx';
 import ScenarioModeling from './ScenarioModeling.jsx';
 import SensitivityAnalysis from './SensitivityAnalysis.jsx';
 import styles from './styles.module.css';
 
-const ModelingTools = ({ data, onDataChange }) => {
+const ModelingTools = ({ data, onDataChange: _onDataChange }) => {
   const [activeModel, setActiveModel] = useState('dcf');
   const [modelInputs, setModelInputs] = useState({
     dcf: {
@@ -218,10 +218,11 @@ const ModelingTools = ({ data, onDataChange }) => {
                 <h4 className="font-semibold mb-4">Model Assumptions</h4>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="discount-rate">
                       Discount Rate (WACC) %
                     </label>
                     <input
+                      id="discount-rate"
                       type="number"
                       step="0.1"
                       value={modelInputs.dcf.discountRate}
@@ -231,10 +232,11 @@ const ModelingTools = ({ data, onDataChange }) => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="terminal-growth-rate">
                       Terminal Growth Rate %
                     </label>
                     <input
+                      id="terminal-growth-rate"
                       type="number"
                       step="0.1"
                       value={modelInputs.dcf.terminalGrowthRate}
@@ -244,10 +246,11 @@ const ModelingTools = ({ data, onDataChange }) => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="tax-rate">
                       Tax Rate %
                     </label>
                     <input
+                      id="tax-rate"
                       type="number"
                       step="0.1"
                       value={modelInputs.dcf.taxRate}
@@ -257,10 +260,11 @@ const ModelingTools = ({ data, onDataChange }) => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="projection-years">
                       Projection Years
                     </label>
                     <input
+                      id="projection-years"
                       type="number"
                       min="3"
                       max="10"

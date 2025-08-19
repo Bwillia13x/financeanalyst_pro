@@ -1,13 +1,13 @@
 import { motion } from 'framer-motion';
-import { Calculator, TrendingUp, DollarSign, BarChart3, Info, Settings, PieChart } from 'lucide-react';
+import { Calculator, TrendingUp, DollarSign, BarChart3, Info, Settings } from 'lucide-react';
 import React, { useState, useMemo } from 'react';
 
 import DataVisualization from './DataVisualization';
 import WACCCalculator from './WACCCalculator';
 
 const AdvancedDCF = ({ data, modelInputs, onModelInputChange, formatCurrency, formatPercent }) => {
-  const [showDetails, setShowDetails] = useState(false);
-  const [showAssumptions, setShowAssumptions] = useState(true);
+  const [_showDetails, _setShowDetails] = useState(false);
+  const [_showAssumptions, _setShowAssumptions] = useState(true);
   const [activeTab, setActiveTab] = useState('results');
 
   // Enhanced DCF calculation with working capital
@@ -346,10 +346,11 @@ const AdvancedDCF = ({ data, modelInputs, onModelInputChange, formatCurrency, fo
               <h5 className="font-medium mb-3 text-gray-800">Core Assumptions</h5>
               <div className="space-y-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="dcf-discount-rate" className="block text-sm font-medium text-gray-700 mb-1">
                     Discount Rate (WACC) %
                   </label>
                   <input
+                    id="dcf-discount-rate"
                     type="number"
                     step="0.1"
                     value={modelInputs.dcf.discountRate}
@@ -358,10 +359,11 @@ const AdvancedDCF = ({ data, modelInputs, onModelInputChange, formatCurrency, fo
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="dcf-terminal-growth" className="block text-sm font-medium text-gray-700 mb-1">
                     Terminal Growth Rate %
                   </label>
                   <input
+                    id="dcf-terminal-growth"
                     type="number"
                     step="0.1"
                     value={modelInputs.dcf.terminalGrowthRate}
@@ -370,10 +372,11 @@ const AdvancedDCF = ({ data, modelInputs, onModelInputChange, formatCurrency, fo
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="dcf-tax-rate" className="block text-sm font-medium text-gray-700 mb-1">
                     Tax Rate %
                   </label>
                   <input
+                    id="dcf-tax-rate"
                     type="number"
                     step="0.1"
                     value={modelInputs.dcf.taxRate}
@@ -389,10 +392,11 @@ const AdvancedDCF = ({ data, modelInputs, onModelInputChange, formatCurrency, fo
               <h5 className="font-medium mb-3 text-gray-800">Working Capital</h5>
               <div className="space-y-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="dcf-receivables-days" className="block text-sm font-medium text-gray-700 mb-1">
                     Receivables (Days)
                   </label>
                   <input
+                    id="dcf-receivables-days"
                     type="number"
                     value={modelInputs.dcf.workingCapital?.receivablesDays || 45}
                     onChange={(e) => updateDCFAssumption('workingCapital', 'receivablesDays', e.target.value)}
@@ -400,10 +404,11 @@ const AdvancedDCF = ({ data, modelInputs, onModelInputChange, formatCurrency, fo
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="dcf-inventory-days" className="block text-sm font-medium text-gray-700 mb-1">
                     Inventory (Days)
                   </label>
                   <input
+                    id="dcf-inventory-days"
                     type="number"
                     value={modelInputs.dcf.workingCapital?.inventoryDays || 60}
                     onChange={(e) => updateDCFAssumption('workingCapital', 'inventoryDays', e.target.value)}
@@ -411,10 +416,11 @@ const AdvancedDCF = ({ data, modelInputs, onModelInputChange, formatCurrency, fo
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="dcf-payables-days" className="block text-sm font-medium text-gray-700 mb-1">
                     Payables (Days)
                   </label>
                   <input
+                    id="dcf-payables-days"
                     type="number"
                     value={modelInputs.dcf.workingCapital?.payablesDays || 30}
                     onChange={(e) => updateDCFAssumption('workingCapital', 'payablesDays', e.target.value)}
@@ -429,10 +435,11 @@ const AdvancedDCF = ({ data, modelInputs, onModelInputChange, formatCurrency, fo
               <h5 className="font-medium mb-3 text-gray-800">Capital Expenditure</h5>
               <div className="space-y-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="dcf-capex-percent" className="block text-sm font-medium text-gray-700 mb-1">
                     Capex (% of Revenue)
                   </label>
                   <input
+                    id="dcf-capex-percent"
                     type="number"
                     step="0.1"
                     value={modelInputs.dcf.capex?.capexAsPercentOfRevenue || 3.5}
@@ -441,10 +448,11 @@ const AdvancedDCF = ({ data, modelInputs, onModelInputChange, formatCurrency, fo
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="dcf-depreciation-period" className="block text-sm font-medium text-gray-700 mb-1">
                     Depreciation Period (Years)
                   </label>
                   <input
+                    id="dcf-depreciation-period"
                     type="number"
                     value={modelInputs.dcf.capex?.depreciationRate || 7}
                     onChange={(e) => updateDCFAssumption('capex', 'depreciationRate', e.target.value)}
@@ -452,10 +460,11 @@ const AdvancedDCF = ({ data, modelInputs, onModelInputChange, formatCurrency, fo
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="dcf-shares-outstanding" className="block text-sm font-medium text-gray-700 mb-1">
                     Shares Outstanding (000s)
                   </label>
                   <input
+                    id="dcf-shares-outstanding"
                     type="number"
                     value={modelInputs.dcf.sharesOutstanding || 1000}
                     onChange={(e) => updateBasicAssumption('sharesOutstanding', e.target.value)}

@@ -5,11 +5,11 @@
 
 import React, { useMemo } from 'react';
 
-const CorrelationMatrix = ({ 
+const CorrelationMatrix = ({
   symbols = [],
   data = {},
-  height = 300,
-  showLabels = true 
+  height: _height = 300,
+  showLabels = true
 }) => {
   const correlationData = useMemo(() => {
     if (!symbols.length || !Object.keys(data).length) {
@@ -18,7 +18,7 @@ const CorrelationMatrix = ({
 
     // Calculate correlation matrix from price data
     const priceArrays = {};
-    
+
     symbols.forEach(symbol => {
       if (data[symbol] && data[symbol].historical) {
         priceArrays[symbol] = data[symbol].historical.map(item => parseFloat(item.close || 0));
@@ -26,7 +26,7 @@ const CorrelationMatrix = ({
     });
 
     const validSymbols = Object.keys(priceArrays).filter(symbol => priceArrays[symbol].length > 0);
-    
+
     if (validSymbols.length < 2) {
       return { matrix: [], labels: validSymbols };
     }
@@ -47,30 +47,30 @@ const CorrelationMatrix = ({
 
     const xSlice = x.slice(-n);
     const ySlice = y.slice(-n);
-    
+
     const xMean = xSlice.reduce((sum, val) => sum + val, 0) / n;
     const yMean = ySlice.reduce((sum, val) => sum + val, 0) / n;
-    
+
     let numerator = 0;
     let xSumSq = 0;
     let ySumSq = 0;
-    
+
     for (let i = 0; i < n; i++) {
       const xDiff = xSlice[i] - xMean;
       const yDiff = ySlice[i] - yMean;
-      
+
       numerator += xDiff * yDiff;
       xSumSq += xDiff * xDiff;
       ySumSq += yDiff * yDiff;
     }
-    
+
     const denominator = Math.sqrt(xSumSq * ySumSq);
     return denominator === 0 ? 0 : numerator / denominator;
   };
 
   const getCorrelationColor = (correlation) => {
-    const absCorr = Math.abs(correlation);
-    
+    const _absCorr = Math.abs(correlation);
+
     if (correlation > 0.7) return '#10b981'; // Strong positive - green
     if (correlation > 0.3) return '#84cc16'; // Moderate positive - light green
     if (correlation > -0.3) return '#6b7280'; // Weak - gray
@@ -98,8 +98,14 @@ const CorrelationMatrix = ({
       <div className="w-full h-full flex items-center justify-center bg-gray-50 rounded-lg">
         <div className="text-center">
           <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-2">
-            <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+            <svg
+              className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"
+              />
             </svg>
           </div>
           <p className="text-sm text-gray-500">Insufficient data for correlation analysis</p>
@@ -124,23 +130,23 @@ const CorrelationMatrix = ({
       {/* Legend */}
       <div className="flex flex-wrap items-center gap-3 mb-4 text-xs">
         <div className="flex items-center space-x-1">
-          <div className="w-3 h-3 rounded" style={{ backgroundColor: '#10b981' }}></div>
+          <div className="w-3 h-3 rounded" style={{ backgroundColor: '#10b981' }} />
           <span>Strong Positive (&gt;0.7)</span>
         </div>
         <div className="flex items-center space-x-1">
-          <div className="w-3 h-3 rounded" style={{ backgroundColor: '#84cc16' }}></div>
+          <div className="w-3 h-3 rounded" style={{ backgroundColor: '#84cc16' }} />
           <span>Moderate Positive (0.3-0.7)</span>
         </div>
         <div className="flex items-center space-x-1">
-          <div className="w-3 h-3 rounded" style={{ backgroundColor: '#6b7280' }}></div>
+          <div className="w-3 h-3 rounded" style={{ backgroundColor: '#6b7280' }} />
           <span>Weak (-0.3 to 0.3)</span>
         </div>
         <div className="flex items-center space-x-1">
-          <div className="w-3 h-3 rounded" style={{ backgroundColor: '#f59e0b' }}></div>
+          <div className="w-3 h-3 rounded" style={{ backgroundColor: '#f59e0b' }} />
           <span>Moderate Negative (-0.7 to -0.3)</span>
         </div>
         <div className="flex items-center space-x-1">
-          <div className="w-3 h-3 rounded" style={{ backgroundColor: '#ef4444' }}></div>
+          <div className="w-3 h-3 rounded" style={{ backgroundColor: '#ef4444' }} />
           <span>Strong Negative (&lt;-0.7)</span>
         </div>
       </div>
@@ -205,7 +211,7 @@ const CorrelationMatrix = ({
                 >
                   {correlation.toFixed(2)}
                 </text>
-                
+
                 {/* Tooltip area */}
                 <rect
                   x={80 + colIndex * cellSize}

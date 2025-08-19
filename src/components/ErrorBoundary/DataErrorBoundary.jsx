@@ -254,7 +254,7 @@ const DataErrorBoundary = ({ children, dataSource, onError }) => {
                     />
                   </svg>
                   <p className="text-orange-800 text-sm">
-                    You're currently offline. Some features may not work until your connection is restored.
+                    You&apos;re currently offline. Some features may not work until your connection is restored.
                   </p>
                 </div>
               </div>

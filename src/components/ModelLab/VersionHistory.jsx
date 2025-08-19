@@ -1,4 +1,4 @@
-import { Clock, RotateCcw, GitBranch, Download, Eye, Trash2, AlertTriangle } from 'lucide-react';
+import { Clock, RotateCcw, GitBranch, Download, Eye, AlertTriangle } from 'lucide-react';
 import React, { useState, useMemo } from 'react';
 
 import versioningService from '../../services/versioningService';
@@ -363,6 +363,15 @@ const VersionHistory = ({ model, onRevert, onClose }) => {
                   : 'border-slate-200 bg-slate-50 hover:bg-slate-100'
               }`}
               onClick={() => toggleVersionSelection(version.id)}
+              role="button"
+              tabIndex={0}
+              aria-label={`Select version ${version.version}`}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  toggleVersionSelection(version.id);
+                }
+              }}
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">

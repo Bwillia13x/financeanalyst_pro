@@ -27,7 +27,8 @@ const CommandPalette = ({
   onExecuteCommand,
   currentContext = {},
   recentCommands = [],
-  userPreferences: _userPreferences = {}
+  userPreferences: _userPreferences = {},
+  className: _className
 }) => {
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -263,7 +264,7 @@ const CommandPalette = ({
                     onClick={() => setQuery(tip)}
                     className="text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded-md hover:bg-blue-100 transition-colors"
                   >
-                    "{tip}"
+                    &quot;{tip}&quot;
                   </button>
                 ))}
               </div>

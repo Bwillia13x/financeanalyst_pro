@@ -3,12 +3,12 @@
  * Import, export, database operations, and data quality tools
  */
 
-import { formatCurrency, formatPercentage, formatNumber } from '../../utils/dataTransformation';
+import { formatPercentage, formatNumber } from '../../utils/dataTransformation';
 import { dataFetchingService } from '../dataFetching';
 
 export const dataCommands = {
   EXPORT_JSON: {
-    execute: async(parsedCommand, context, processor) => {
+    execute: async(parsedCommand, _context, processor) => {
       const [dataType, filename] = parsedCommand.parameters;
 
       if (!dataType) {
@@ -27,7 +27,7 @@ export const dataCommands = {
             exportData = {
               type: 'watchlists',
               timestamp,
-              data: processor.getVariable('watchlists') || {}
+              data: processor?.getVariable('watchlists') || {}
             };
             break;
 
@@ -35,7 +35,7 @@ export const dataCommands = {
             exportData = {
               type: 'alerts',
               timestamp,
-              data: processor.getVariable('alerts') || []
+              data: processor?.getVariable('alerts') || []
             };
             break;
 
@@ -43,7 +43,7 @@ export const dataCommands = {
             exportData = {
               type: 'settings',
               timestamp,
-              data: processor.getAllSettings()
+              data: processor?.getAllSettings() || {}
             };
             break;
 
@@ -51,7 +51,7 @@ export const dataCommands = {
             exportData = {
               type: 'variables',
               timestamp,
-              data: processor.getAllVariables()
+              data: processor?.getAllVariables() || {}
             };
             break;
 
@@ -60,10 +60,10 @@ export const dataCommands = {
               type: 'complete_backup',
               timestamp,
               data: {
-                watchlists: processor.getVariable('watchlists') || {},
-                alerts: processor.getVariable('alerts') || [],
-                settings: processor.getAllSettings(),
-                variables: processor.getAllVariables()
+                watchlists: processor?.getVariable('watchlists') || {},
+                alerts: processor?.getVariable('alerts') || [],
+                settings: processor?.getAllSettings() || {},
+                variables: processor?.getAllVariables() || {}
               }
             };
             break;
@@ -105,7 +105,7 @@ export const dataCommands = {
   },
 
   CACHE_STATS: {
-    execute: async(parsedCommand, context, processor) => {
+    execute: async(_parsedCommand, _context, processor) => {
       try {
         // Get cache statistics from data fetching service
         const cacheSize = dataFetchingService.cache?.size || 0;
@@ -127,7 +127,7 @@ export const dataCommands = {
 
         const content = `💾 Cache Statistics\n\n📊 CACHE OVERVIEW:\n• Total Entries: ${formatNumber(cacheSize, 0)}\n• Cache Hit Rate: ${formatPercentage(hitRate)}\n• Average Response Time: ${formatNumber(avgResponseTime, 0)}ms\n• Estimated Memory Usage: ${formatNumber(estimatedMemory, 1)} KB\n\n📋 CACHE BREAKDOWN:\n${Object.entries(cacheTypes).map(([type, count]) =>
           `• ${type.toUpperCase()}: ${count} entries`
-        ).join('\n')}\n\n⚡ PERFORMANCE METRICS:\n• Cache Efficiency: ${hitRate > 0.8 ? 'Excellent' : hitRate > 0.6 ? 'Good' : 'Needs Improvement'}\n• Response Speed: ${avgResponseTime < 100 ? 'Fast' : avgResponseTime < 200 ? 'Moderate' : 'Slow'}\n• Memory Usage: ${estimatedMemory < 1000 ? 'Low' : estimatedMemory < 5000 ? 'Moderate' : 'High'}\n\n🔄 CACHE OPERATIONS:\n• Last Cleared: ${processor.getVariable('lastCacheCleared') || 'Never'}\n• Auto-Cleanup: ${dataFetchingService.demoMode ? 'Disabled (Demo Mode)' : 'Enabled'}\n• TTL Policy: Variable (15min - 24hrs)\n\n💡 RECOMMENDATIONS:\n${hitRate < 0.7 ? '• Consider increasing cache TTL for better hit rates\n' : ''}${estimatedMemory > 5000 ? '• Cache memory usage is high - consider clearing\n' : ''}${avgResponseTime > 200 ? '• Slow response times - check network connection\n' : ''}• Use "cache clear" command to reset cache if needed\n\n🛠️ CACHE COMMANDS:\n• cache clear - Clear all cached data\n• status - View overall system status\n• CACHE_STATS() - Refresh these statistics`;
+        ).join('\n') || '• No cache entries found'}\n\n⚡ PERFORMANCE METRICS:\n• Cache Efficiency: ${hitRate > 0.8 ? 'Excellent' : hitRate > 0.6 ? 'Good' : 'Needs Improvement'}\n• Response Speed: ${avgResponseTime < 100 ? 'Fast' : avgResponseTime < 200 ? 'Moderate' : 'Slow'}\n• Memory Usage: ${estimatedMemory < 1000 ? 'Low' : estimatedMemory < 5000 ? 'Moderate' : 'High'}\n\n🔄 CACHE OPERATIONS:\n• Last Cleared: ${processor?.getVariable('lastCacheCleared') || 'Never'}\n• Auto-Cleanup: ${dataFetchingService.demoMode ? 'Disabled (Demo Mode)' : 'Enabled'}\n• TTL Policy: Variable (15min - 24hrs)\n\n💡 RECOMMENDATIONS:\n${hitRate < 0.7 ? '• Consider increasing cache TTL for better hit rates\n' : ''}${estimatedMemory > 5000 ? '• Cache memory usage is high - consider clearing\n' : ''}${avgResponseTime > 200 ? '• Slow response times - check network connection\n' : ''}• Use "cache clear" command to reset cache if needed\n\n🛠️ CACHE COMMANDS:\n• cache clear - Clear all cached data\n• status - View overall system status\n• CACHE_STATS() - Refresh these statistics`;
 
         return {
           type: 'success',
@@ -158,7 +158,7 @@ export const dataCommands = {
   },
 
   DATA_QUALITY: {
-    execute: async(parsedCommand, context, processor) => {
+    execute: async(parsedCommand, _context, _processor) => {
       const [ticker] = parsedCommand.parameters;
 
       if (!ticker) {
@@ -232,7 +232,7 @@ export const dataCommands = {
   },
 
   BENCHMARK: {
-    execute: async(parsedCommand, context, processor) => {
+    execute: async(parsedCommand, _context, _processor) => {
       const [ticker, benchmark = 'SPY'] = parsedCommand.parameters;
 
       if (!ticker) {

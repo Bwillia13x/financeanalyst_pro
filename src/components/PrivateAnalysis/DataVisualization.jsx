@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { TrendingUp, BarChart3, PieChart as PieChartIcon, Activity, Eye, EyeOff } from 'lucide-react';
 import React, { useState, useMemo } from 'react';
 import {
-  LineChart, Line, BarChart, Bar, AreaChart, Area, PieChart, Pie, Cell,
+  LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
 } from 'recharts';
 
@@ -33,7 +33,7 @@ const DataVisualization = ({
     const data = [];
 
     // Add each year's contribution
-    dcfData.years.forEach((year, index) => {
+    dcfData.years.forEach((year, _index) => {
       const startValue = cumulativeValue;
       cumulativeValue += year.presentValue;
 
@@ -66,7 +66,7 @@ const DataVisualization = ({
   const cashFlowTrendData = useMemo(() => {
     if (!dcfData?.years) return [];
 
-    return dcfData.years.map((year, index) => ({
+    return dcfData.years.map((year, _index) => ({
       year: `Year ${year.year}`,
       freeCashFlow: year.freeCashFlow,
       presentValue: year.presentValue,
@@ -81,7 +81,7 @@ const DataVisualization = ({
   const sensitivityTornadoData = useMemo(() => {
     if (!sensitivityData) return [];
 
-    return Object.entries(sensitivityData).map(([variable, result]) => {
+    return Object.entries(sensitivityData).map(([_variable, result]) => {
       const maxUpside = Math.max(...result.dataPoints.map(d => d.changeFromBase));
       const maxDownside = Math.min(...result.dataPoints.map(d => d.changeFromBase));
 
@@ -108,7 +108,7 @@ const DataVisualization = ({
   }, [scenarioData]);
 
   // Custom tooltip for different chart types
-  const CustomTooltip = ({ active, payload, label, chartType }) => {
+  const CustomTooltip = ({ active, payload, label, chartType: _chartType }) => {
     if (!active || !payload || !payload.length) return null;
 
     const formatValue = (value, key) => {

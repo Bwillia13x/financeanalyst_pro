@@ -1,11 +1,11 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { BarChart3, TrendingUp, AlertTriangle, Play, Square, Settings, Download, FileText, Zap } from 'lucide-react';
 import React, { useState, useMemo, useCallback } from 'react';
-import { ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ScatterChart, Scatter, Cell, AreaChart, Area } from 'recharts';
+import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ScatterChart, Scatter, Cell, AreaChart, Area } from 'recharts';
 
 import { monteCarloEngine } from '../../services/monteCarloEngine.js';
 
-const MonteCarloSimulation = ({ data, onDataChange }) => {
+const MonteCarloSimulation = ({ data, onDataChange: _onDataChange }) => {
   const [activeTab, setActiveTab] = useState('setup');
   const [simulationResults, setSimulationResults] = useState(null);
   const [isRunning, setIsRunning] = useState(false);
@@ -169,7 +169,7 @@ const MonteCarloSimulation = ({ data, onDataChange }) => {
   const generateScatterData = useMemo(() => {
     if (!simulationResults?.results) return [];
 
-    return simulationResults.results.slice(0, 1000).map((result, i) => ({
+    return simulationResults.results.slice(0, 1000).map((result, _i) => ({
       x: result.inputs.revenueGrowthRate * 100,
       y: result.pricePerShare,
       upside: result.upside
@@ -185,7 +185,7 @@ const MonteCarloSimulation = ({ data, onDataChange }) => {
     }).format(value);
   };
 
-  const formatPercent = (value) => {
+  const _formatPercent = (value) => {
     return `${(value * 100).toFixed(2)}%`;
   };
 
@@ -249,8 +249,9 @@ const MonteCarloSimulation = ({ data, onDataChange }) => {
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <label className="block text-sm font-medium text-gray-200">Iterations</label>
+                      <label htmlFor="iterations" className="block text-sm font-medium text-gray-200">Iterations</label>
                       <input
+                        id="iterations"
                         type="number"
                         className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                         value={simulationSettings.iterations}
@@ -265,8 +266,9 @@ const MonteCarloSimulation = ({ data, onDataChange }) => {
                       <small className="text-gray-400">Leave empty for random</small>
                     </div>
                     <div className="space-y-2">
-                      <label className="block text-sm font-medium text-gray-200">Confidence Level</label>
+                      <label htmlFor="confidenceLevel" className="block text-sm font-medium text-gray-200">Confidence Level</label>
                       <select
+                        id="confidenceLevel"
                         className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                         value={simulationSettings.confidenceLevel}
                         onChange={(e) => setSimulationSettings(prev => ({
@@ -280,8 +282,9 @@ const MonteCarloSimulation = ({ data, onDataChange }) => {
                       </select>
                     </div>
                     <div className="space-y-2">
-                      <label className="block text-sm font-medium text-gray-200">Random Seed (Optional)</label>
+                      <label htmlFor="randomSeed" className="block text-sm font-medium text-gray-200">Random Seed (Optional)</label>
                       <input
+                        id="randomSeed"
                         type="number"
                         className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                         value={simulationSettings.randomSeed || ''}
@@ -330,19 +333,19 @@ const MonteCarloSimulation = ({ data, onDataChange }) => {
                         {dist.enabled && (
                           <div className="space-y-3">
                             <div className="space-y-2">
-                              <label className="block text-sm font-medium text-gray-200">Distribution Type</label>
+                              <label htmlFor="distributionType" className="block text-sm font-medium text-gray-200">Distribution Type</label>
                               <select
+                                id="distributionType"
                                 className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 value={dist.type}
                                 onChange={(e) => {
                                   const newType = e.target.value;
-                                  const typeConfig = distributionTypes.find(t => t.value === newType);
+                                  const _typeConfig = distributionTypes.find(t => t.value === newType);
                                   const newParameters = {};
 
                                   // Set default parameters for new type
                                   if (newType === 'normal') {
                                     newParameters.mean = 0.1;
-                                    newParameters.stdDev = 0.02;
                                   } else if (newType === 'triangular') {
                                     newParameters.min = 0.05;
                                     newParameters.mode = 0.1;
@@ -355,7 +358,7 @@ const MonteCarloSimulation = ({ data, onDataChange }) => {
                                   updateDistribution(variable, { type: newType, parameters: newParameters });
                                 }}
                               >
-                                {distributionTypes.map(type => (
+                                {distributionTypes.map((type, _index) => (
                                   <option key={type.value} value={type.value}>
                                     {type.label}
                                   </option>
@@ -408,7 +411,9 @@ const MonteCarloSimulation = ({ data, onDataChange }) => {
                           {Object.keys(distributions).map((variable, i) => (
                             <tr key={variable}>
                               <td className="font-medium text-gray-200 p-2 border border-gray-600">
-                                {distributions[variable].name}
+                                {distributions.map((dist, _index) => (
+                                  <span key={_index}>{dist.name}</span>
+                                ))}
                               </td>
                               {Object.keys(distributions).map((_, j) => (
                                 <td key={j} className="p-2 border border-gray-600">
@@ -575,7 +580,7 @@ const MonteCarloSimulation = ({ data, onDataChange }) => {
                           />
                           <YAxis />
                           <Tooltip
-                            formatter={(value, name) => [
+                            formatter={(value, _name) => [
                               `${(value * 100).toFixed(2)}%`,
                               'Frequency'
                             ]}

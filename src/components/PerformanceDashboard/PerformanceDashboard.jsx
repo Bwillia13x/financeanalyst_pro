@@ -314,10 +314,11 @@ const PerformanceDashboard = ({ isVisible = false, onClose }) => {
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Monitoring Settings</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="bg-white border border-gray-200 rounded-lg p-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="refresh-interval" className="block text-sm font-medium text-gray-700 mb-2">
                   Refresh Interval (seconds)
                 </label>
                 <select
+                  id="refresh-interval"
                   value={refreshInterval / 1000}
                   onChange={(e) => setRefreshInterval(parseInt(e.target.value) * 1000)}
                   className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
@@ -330,10 +331,11 @@ const PerformanceDashboard = ({ isVisible = false, onClose }) => {
               </div>
 
               <div className="bg-white border border-gray-200 rounded-lg p-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="alert-threshold" className="block text-sm font-medium text-gray-700 mb-2">
                   Accessibility Alert Threshold
                 </label>
                 <select
+                  id="alert-threshold"
                   value={alertThreshold}
                   onChange={(e) => setAlertThreshold(parseInt(e.target.value))}
                   className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"

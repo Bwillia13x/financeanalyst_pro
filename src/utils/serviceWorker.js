@@ -286,7 +286,7 @@ function isAutomatedEnvironment() {
       params.has('audit') ||
       params.get('pwa') === '0'
     );
-  } catch (e) {
+  } catch {
     return navigator.webdriver === true;
   }
 }

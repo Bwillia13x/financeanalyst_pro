@@ -1,6 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  X,
   Keyboard,
   Command,
   Navigation,
@@ -8,7 +7,8 @@ import {
   FileText,
   Eye,
   Zap,
-  HelpCircle
+  HelpCircle,
+  X
 } from 'lucide-react';
 // React not needed for JSX-only component
 
@@ -120,19 +120,19 @@ const CommandHelpModal = ({ isOpen, onClose }) => {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                     <div className="flex items-center gap-2 text-blue-700">
                       <span className="w-2 h-2 bg-blue-400 rounded-full" />
-                      "New DCF for AAPL"
+                      &quot;New DCF for AAPL&quot;
                     </div>
                     <div className="flex items-center gap-2 text-blue-700">
                       <span className="w-2 h-2 bg-blue-400 rounded-full" />
-                      "Run sensitivity on WACC"
+                      &quot;Run sensitivity on WACC&quot;
                     </div>
                     <div className="flex items-center gap-2 text-blue-700">
                       <span className="w-2 h-2 bg-blue-400 rounded-full" />
-                      "Export to PDF"
+                      &quot;Export to PDF&quot;
                     </div>
                     <div className="flex items-center gap-2 text-blue-700">
                       <span className="w-2 h-2 bg-blue-400 rounded-full" />
-                      "Find revenue data"
+                      &quot;Find revenue data&quot;
                     </div>
                   </div>
                 </div>

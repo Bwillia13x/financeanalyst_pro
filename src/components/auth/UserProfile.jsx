@@ -7,7 +7,6 @@ import {
   User,
   Settings,
   Shield,
-  Bell,
   Moon,
   Sun,
   Save,
@@ -64,7 +63,7 @@ const UserProfile = ({ onClose }) => {
       // Load storage statistics
       const storageStats = await financialDataStorage.getFinancialDataStats();
       setStats(storageStats);
-    } catch (error) {
+    } catch (_error) {
       console.error('Failed to load user data:', error);
     } finally {
       setIsLoading(false);
@@ -84,7 +83,7 @@ const UserProfile = ({ onClose }) => {
       });
 
       setTimeout(() => setSaveStatus(null), 3000);
-    } catch (error) {
+    } catch (_error) {
       setSaveStatus({
         type: 'error',
         message: 'Failed to save preferences'

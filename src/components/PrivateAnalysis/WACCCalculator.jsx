@@ -96,7 +96,7 @@ const WACCCalculator = ({ modelInputs, onModelInputChange, formatPercent }) => {
     onModelInputChange('dcf', 'wacc', updatedWACC);
   };
 
-  const updateBuildUpInput = (field, value) => {
+  const _updateBuildUpInput = (field, value) => {
     const updatedWACC = {
       ...waccInputs,
       ...modelInputs.dcf.wacc,
@@ -250,10 +250,11 @@ const WACCCalculator = ({ modelInputs, onModelInputChange, formatPercent }) => {
                 <h5 className="font-medium mb-4 text-blue-800">Cost of Equity (CAPM Method)</h5>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="riskFreeRate" className="block text-sm font-medium text-gray-700 mb-1">
                       Risk-Free Rate (%)
                     </label>
                     <input
+                      id="riskFreeRate"
                       type="number"
                       step="0.1"
                       value={modelInputs.dcf.wacc?.riskFreeRate || waccInputs.riskFreeRate}
@@ -264,10 +265,11 @@ const WACCCalculator = ({ modelInputs, onModelInputChange, formatPercent }) => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="marketRiskPremium" className="block text-sm font-medium text-gray-700 mb-1">
                       Market Risk Premium (%)
                     </label>
                     <input
+                      id="marketRiskPremium"
                       type="number"
                       step="0.1"
                       value={modelInputs.dcf.wacc?.marketRiskPremium || waccInputs.marketRiskPremium}
@@ -278,10 +280,11 @@ const WACCCalculator = ({ modelInputs, onModelInputChange, formatPercent }) => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="beta" className="block text-sm font-medium text-gray-700 mb-1">
                       Beta (β)
                     </label>
                     <input
+                      id="beta"
                       type="number"
                       step="0.1"
                       value={modelInputs.dcf.wacc?.beta || waccInputs.beta}
@@ -292,10 +295,11 @@ const WACCCalculator = ({ modelInputs, onModelInputChange, formatPercent }) => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="smallCompanyPremium" className="block text-sm font-medium text-gray-700 mb-1">
                       Small Company Premium (%)
                     </label>
                     <input
+                      id="smallCompanyPremium"
                       type="number"
                       step="0.1"
                       value={modelInputs.dcf.wacc?.smallCompanyPremium || waccInputs.smallCompanyPremium}
@@ -306,10 +310,11 @@ const WACCCalculator = ({ modelInputs, onModelInputChange, formatPercent }) => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="companySpecificRisk" className="block text-sm font-medium text-gray-700 mb-1">
                       Company-Specific Risk (%)
                     </label>
                     <input
+                      id="companySpecificRisk"
                       type="number"
                       step="0.1"
                       value={modelInputs.dcf.wacc?.companySpecificRisk || waccInputs.companySpecificRisk}
@@ -326,10 +331,11 @@ const WACCCalculator = ({ modelInputs, onModelInputChange, formatPercent }) => {
                 <h5 className="font-medium mb-4 text-purple-800">Capital Structure & Cost of Debt</h5>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="marketValueEquity" className="block text-sm font-medium text-gray-700 mb-1">
                       Market Value of Equity ($000s)
                     </label>
                     <input
+                      id="marketValueEquity"
                       type="number"
                       value={modelInputs.dcf.wacc?.marketValueEquity || waccInputs.marketValueEquity}
                       onChange={(e) => updateWACCInput('marketValueEquity', e.target.value)}
@@ -338,10 +344,11 @@ const WACCCalculator = ({ modelInputs, onModelInputChange, formatPercent }) => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="marketValueDebt" className="block text-sm font-medium text-gray-700 mb-1">
                       Market Value of Debt ($000s)
                     </label>
                     <input
+                      id="marketValueDebt"
                       type="number"
                       value={modelInputs.dcf.wacc?.marketValueDebt || waccInputs.marketValueDebt}
                       onChange={(e) => updateWACCInput('marketValueDebt', e.target.value)}
@@ -350,10 +357,11 @@ const WACCCalculator = ({ modelInputs, onModelInputChange, formatPercent }) => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="debtInterestRate" className="block text-sm font-medium text-gray-700 mb-1">
                       Pre-Tax Cost of Debt (%)
                     </label>
                     <input
+                      id="debtInterestRate"
                       type="number"
                       step="0.1"
                       value={modelInputs.dcf.wacc?.debtInterestRate || waccInputs.debtInterestRate}
@@ -364,10 +372,11 @@ const WACCCalculator = ({ modelInputs, onModelInputChange, formatPercent }) => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="taxRate" className="block text-sm font-medium text-gray-700 mb-1">
                       Tax Rate (%)
                     </label>
                     <input
+                      id="taxRate"
                       type="number"
                       step="0.1"
                       value={modelInputs.dcf.wacc?.taxRate || modelInputs.dcf.taxRate}

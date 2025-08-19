@@ -26,7 +26,7 @@ const EditableCell = ({
   autoFocus = true,
   showEditIcon = true,
   variant = 'default', // 'default', 'adjusted', 'formula'
-  ...props
+  ..._props
 }) => {
   const [editingValue, setEditingValue] = useState('');
   const [localError, setLocalError] = useState('');
@@ -41,7 +41,7 @@ const EditableCell = ({
     if (isNaN(numValue)) return '—';
 
     switch (type) {
-      case 'currency':
+      case 'currency': {
         const formatted = new Intl.NumberFormat(locale, {
           style: 'currency',
           currency,
@@ -63,6 +63,7 @@ const EditableCell = ({
           }).format(numValue);
         }
         return formatted.replace(/\.00$/, '');
+      }
 
       case 'percentage':
         return new Intl.NumberFormat(locale, {

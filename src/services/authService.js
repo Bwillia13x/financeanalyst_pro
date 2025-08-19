@@ -5,7 +5,6 @@
 
 import { apiLogger } from '../utils/apiLogger.js';
 
-import { storageService } from './storageService.js';
 
 // Authentication configuration
 const AUTH_CONFIG = {
@@ -384,7 +383,7 @@ class AuthService {
       const now = Math.floor(Date.now() / 1000);
 
       return payload.exp > now;
-    } catch (error) {
+    } catch {
       return false;
     }
   }
@@ -522,7 +521,7 @@ class AuthService {
       if (parts.length !== 3) return null;
 
       return JSON.parse(atob(parts[1]));
-    } catch (error) {
+    } catch {
       return null;
     }
   }

@@ -206,7 +206,7 @@ class ModelStore {
   /**
    * Bump model version
    */
-  bumpVersion(id, changeReason = '') {
+  bumpVersion(id, _changeReason = '') {
     const model = this.get(id);
     if (!model) return null;
 

@@ -1,4 +1,4 @@
-import { Layers, Plus, Play, BarChart3, TrendingUp, AlertTriangle, Zap } from 'lucide-react';
+import { Layers, Play, BarChart3, TrendingUp, AlertTriangle, Zap } from 'lucide-react';
 import React, { useState, useMemo } from 'react';
 
 import { computeModelOutputs } from '../../services/calculators';
@@ -121,10 +121,11 @@ const ScenarioCard = ({ scenario, onUpdate, onDelete, onRun, isRunning = false }
             {/* Basic settings */}
             <div className="grid grid-cols-3 gap-3">
               <div>
-                <label className="block text-[10px] font-medium text-slate-600 mb-1">
+                <label htmlFor={`scenario-name-${scenario.id}`} className="block text-[10px] font-medium text-slate-600 mb-1">
                   Scenario Name
                 </label>
                 <input
+                  id={`scenario-name-${scenario.id}`}
                   type="text"
                   value={scenario.name}
                   onChange={(e) => onUpdate(scenario.id, { name: e.target.value })}
@@ -132,10 +133,11 @@ const ScenarioCard = ({ scenario, onUpdate, onDelete, onRun, isRunning = false }
                 />
               </div>
               <div>
-                <label className="block text-[10px] font-medium text-slate-600 mb-1">
+                <label htmlFor={`scenario-type-${scenario.id}`} className="block text-[10px] font-medium text-slate-600 mb-1">
                   Type
                 </label>
                 <select
+                  id={`scenario-type-${scenario.id}`}
                   value={scenario.type}
                   onChange={(e) => onUpdate(scenario.id, { type: e.target.value })}
                   className="w-full text-[11px] px-2 py-1 border border-slate-200 rounded"
@@ -148,10 +150,11 @@ const ScenarioCard = ({ scenario, onUpdate, onDelete, onRun, isRunning = false }
                 </select>
               </div>
               <div>
-                <label className="block text-[10px] font-medium text-slate-600 mb-1">
+                <label htmlFor={`scenario-prob-${scenario.id}`} className="block text-[10px] font-medium text-slate-600 mb-1">
                   Probability (%)
                 </label>
                 <input
+                  id={`scenario-prob-${scenario.id}`}
                   type="number"
                   min="0"
                   max="100"
@@ -252,10 +255,11 @@ const ScenarioCard = ({ scenario, onUpdate, onDelete, onRun, isRunning = false }
             )}
 
             <div>
-              <label className="block text-[10px] font-medium text-slate-600 mb-1">
+              <label htmlFor={`scenario-desc-${scenario.id}`} className="block text-[10px] font-medium text-slate-600 mb-1">
                 Description
               </label>
               <textarea
+                id={`scenario-desc-${scenario.id}`}
                 value={scenario.description || ''}
                 onChange={(e) => onUpdate(scenario.id, { description: e.target.value })}
                 className="w-full text-[10px] px-2 py-1 border border-slate-200 rounded h-12 resize-none"

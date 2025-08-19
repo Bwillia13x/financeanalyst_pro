@@ -1,5 +1,12 @@
 import { motion } from 'framer-motion';
-import { Plus, Trash2, TrendingUp, TrendingDown, Minus, BarChart3 } from 'lucide-react';
+import {
+  TrendingUp,
+  TrendingDown,
+  BarChart3,
+  Plus,
+  Minus,
+  Trash2
+} from 'lucide-react';
 import React, { useState, useMemo } from 'react';
 
 const ScenarioModeling = ({ data, modelInputs, onModelInputChange, calculateDCF, formatCurrency, formatPercent }) => {
@@ -114,10 +121,11 @@ const ScenarioModeling = ({ data, modelInputs, onModelInputChange, calculateDCF,
     <div className="border rounded-lg p-4 bg-white">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor={`scenario-name-${index}`} className="block text-sm font-medium text-gray-700 mb-1">
             Scenario Name
           </label>
           <input
+            id={`scenario-name-${index}`}
             type="text"
             value={scenario.name}
             onChange={(e) => updateScenario(index, 'name', e.target.value)}
@@ -127,10 +135,11 @@ const ScenarioModeling = ({ data, modelInputs, onModelInputChange, calculateDCF,
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor={`scenario-probability-${index}`} className="block text-sm font-medium text-gray-700 mb-1">
             Probability (%)
           </label>
           <input
+            id={`scenario-probability-${index}`}
             type="number"
             min="0"
             max="100"
@@ -141,10 +150,11 @@ const ScenarioModeling = ({ data, modelInputs, onModelInputChange, calculateDCF,
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor={`scenario-revenueGrowth-${index}`} className="block text-sm font-medium text-gray-700 mb-1">
             Revenue Growth (%)
           </label>
           <input
+            id={`scenario-revenueGrowth-${index}`}
             type="number"
             step="0.1"
             value={scenario.revenueGrowth}
@@ -154,10 +164,11 @@ const ScenarioModeling = ({ data, modelInputs, onModelInputChange, calculateDCF,
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor={`scenario-marginImprovement-${index}`} className="block text-sm font-medium text-gray-700 mb-1">
             Margin Change (%)
           </label>
           <input
+            id={`scenario-marginImprovement-${index}`}
             type="number"
             step="0.1"
             value={scenario.marginImprovement}
@@ -348,7 +359,7 @@ const ScenarioModeling = ({ data, modelInputs, onModelInputChange, calculateDCF,
         <div className="text-center py-12 text-gray-500">
           <BarChart3 size={48} className="mx-auto mb-4 opacity-50" />
           <p>No scenarios created yet.</p>
-          <p className="text-sm mt-2">Click "Add Scenario" to get started with scenario modeling.</p>
+          <p className="text-sm mt-2">Click &ldquo;Add Scenario&rdquo; to get started with scenario modeling.</p>
         </div>
       )}
     </div>

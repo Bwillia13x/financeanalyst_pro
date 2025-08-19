@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef, Suspense } from 'react';
 import { trackFinancialComponentPerformance } from '../../utils/performanceMonitoring';
 
 // Enhanced lazy loading component for financial components
+
 const LazyLoader = ({
   children,
   fallback = null,
@@ -175,17 +176,17 @@ const LazyLoader = ({
 
 // Error boundary for lazy loaded components
 class ErrorBoundary extends React.Component {
-  constructor(props) {
+  constructor(props, _error) {
     super(props);
     this.state = { hasError: false };
   }
 
-  static getDerivedStateFromError(error) {
+  static getDerivedStateFromError(_error) {
     return { hasError: true };
   }
 
-  componentDidCatch(error, errorInfo) {
-    this.props.onError?.(error, errorInfo);
+  componentDidCatch(error, _errorInfo) {
+    this.props.onError?.(error, _errorInfo);
   }
 
   componentDidMount() {

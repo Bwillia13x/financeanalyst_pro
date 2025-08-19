@@ -741,7 +741,7 @@ export function initializeCommands() {
 
   // Register Utility Commands
   commandRegistry.register('HELP', {
-    execute: async(parsedCommand, context, processor) => {
+    execute: async(parsedCommand, _context, _processor) => {
       const [category] = parsedCommand.parameters;
 
       // Show ALL commands in detail
@@ -842,7 +842,7 @@ export function initializeCommands() {
   });
 
   commandRegistry.register('CLEAR', {
-    execute: async(parsedCommand, context, processor) => {
+    execute: async(_parsedCommand, _context, _processor) => {
       return {
         type: 'system',
         content: 'clear_terminal', // Special flag for terminal to clear

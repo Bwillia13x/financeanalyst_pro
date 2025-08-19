@@ -305,7 +305,7 @@ export const calculateSensitivityAnalysis = (inputs, waccRange = [-2, -1, 0, 1, 
           sharePrice: result?.impliedSharePrice || 0,
           equityValue: result?.equityValue || 0
         });
-      } catch (error) {
+      } catch {
         row.push({
           wacc: (baseWACC + (waccDelta / 100)) * 100,
           terminalGrowth: (baseTerminalGrowth + (terminalDelta / 100)) * 100,

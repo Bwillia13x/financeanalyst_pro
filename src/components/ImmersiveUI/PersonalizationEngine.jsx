@@ -6,24 +6,24 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  User,
+  // User,
   Brain,
-  Star,
-  Heart,
-  Eye,
-  Clock,
-  TrendingUp,
-  BarChart3,
-  Settings,
+  // Star,
+  // Heart,
+  // Eye,
+  // Clock,
+  // TrendingUp,
+  // BarChart3,
+  // Settings,
   Sparkles,
-  Target,
-  Bookmark,
-  Filter,
-  Layout,
-  Palette,
-  Zap,
-  ArrowUp,
-  ArrowDown,
+  // Target,
+  // Bookmark,
+  // Filter,
+  // Layout,
+  // Palette,
+  // Zap,
+  // ArrowUp,
+  // ArrowDown,
   MoreHorizontal
 } from 'lucide-react';
 import React, { useState, useEffect, useCallback } from 'react';
@@ -34,9 +34,9 @@ const PersonalizationEngine = ({
   onLayoutChange,
   children
 }) => {
-  const [userProfile, setUserProfile] = useState(null);
+  const [_userProfile, _setUserProfile] = useState(null);
   const [preferences, setPreferences] = useState({});
-  const [usagePatterns, setUsagePatterns] = useState({});
+  const [_usagePatterns, _setUsagePatterns] = useState({});
   const [adaptiveLayout, setAdaptiveLayout] = useState({});
   const [learningMode, setLearningMode] = useState(true);
   const [showPersonalizationPanel, setShowPersonalizationPanel] = useState(false);
@@ -382,7 +382,7 @@ const PersonalizationEngine = ({
                   <span className="text-sm font-medium text-purple-900">AI Insights</span>
                 </div>
                 <p className="text-xs text-purple-700">
-                  Based on your usage patterns, we've learned your preferences.
+                  Based on your usage patterns, we&apos;ve learned your preferences.
                 </p>
               </div>
 
@@ -424,8 +424,9 @@ const PersonalizationEngine = ({
           {activeTab === 'preferences' && (
             <div className="p-4 space-y-4">
               <div>
-                <label className="text-sm font-medium text-gray-700">Interface Theme</label>
+                <label htmlFor="interface-theme" className="text-sm font-medium text-gray-700">Interface Theme</label>
                 <select
+                  id="interface-theme"
                   value={preferences.interface?.theme || 'professional'}
                   onChange={(e) => setPreferences(prev => ({
                     ...prev,
@@ -441,8 +442,9 @@ const PersonalizationEngine = ({
               </div>
 
               <div>
-                <label className="text-sm font-medium text-gray-700">Density</label>
+                <label htmlFor="interface-density" className="text-sm font-medium text-gray-700">Density</label>
                 <select
+                  id="interface-density"
                   value={preferences.interface?.density || 'comfortable'}
                   onChange={(e) => setPreferences(prev => ({
                     ...prev,
@@ -457,8 +459,9 @@ const PersonalizationEngine = ({
               </div>
 
               <div>
-                <label className="text-sm font-medium text-gray-700">Default Chart Type</label>
+                <label htmlFor="default-chart-type" className="text-sm font-medium text-gray-700">Default Chart Type</label>
                 <select
+                  id="default-chart-type"
                   value={preferences.charts?.preferredTypes?.[0] || 'line'}
                   onChange={(e) => setDefaultChartType(e.target.value)}
                   className="mt-1 w-full text-sm border border-gray-300 rounded px-2 py-1"

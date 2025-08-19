@@ -11,8 +11,8 @@ const webVitalsData = {
 };
 
 // Performance observer for tracking metrics
-const performanceEntries = [];
-let performanceObserver;
+const _performanceEntries = [];
+let _performanceObserver;
 
 // Initialize performance monitoring
 export function initializePerformanceMonitoring() {

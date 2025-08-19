@@ -3,7 +3,6 @@
  * Provides specialized financial modeling templates and industry-specific analytics
  */
 
-import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Building2,
@@ -18,14 +17,12 @@ import {
   BookOpen,
   Target,
   BarChart3,
-  TrendingUp,
-  Info
+  TrendingUp
 } from 'lucide-react';
+import React, { useState } from 'react';
 import {
   LineChart,
   Line,
-  BarChart,
-  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -34,7 +31,7 @@ import {
   ResponsiveContainer
 } from 'recharts';
 
-const IndustrySpecificModules = ({ currentIndustry, modelData, onDataChange }) => {
+const IndustrySpecificModules = ({ currentIndustry, _modelData, _onDataChange }) => {
   const [selectedIndustry, setSelectedIndustry] = useState(currentIndustry || 'technology');
   const [activeModule, setActiveModule] = useState('overview');
 
@@ -120,30 +117,26 @@ const IndustrySpecificModules = ({ currentIndustry, modelData, onDataChange }) =
   const renderSaaSMetrics = () => (
     <div className="space-y-6">
       <h3 className="text-lg font-medium text-gray-900">SaaS Key Metrics</h3>
-      
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white border border-gray-200 rounded-lg p-4">
           <div className="text-2xl font-bold text-blue-600">$45.0M</div>
           <div className="text-sm text-gray-600">Annual Recurring Revenue</div>
           <div className="text-xs text-green-600 mt-1">+35% YoY</div>
         </div>
-        
         <div className="bg-white border border-gray-200 rounded-lg p-4">
           <div className="text-2xl font-bold text-purple-600">$3.8K</div>
           <div className="text-sm text-gray-600">Monthly Recurring Revenue</div>
           <div className="text-xs text-green-600 mt-1">+3.2% MoM</div>
         </div>
-        
         <div className="bg-white border border-gray-200 rounded-lg p-4">
           <div className="text-2xl font-bold text-green-600">7.7x</div>
           <div className="text-sm text-gray-600">LTV:CAC Ratio</div>
-          <div className="text-xs text-gray-500 mt-1">Target: >3x</div>
+          <div className="text-xs text-gray-500 mt-1">Target: &gt;3x</div>
         </div>
-        
         <div className="bg-white border border-gray-200 rounded-lg p-4">
           <div className="text-2xl font-bold text-orange-600">5.0%</div>
           <div className="text-sm text-gray-600">Monthly Churn Rate</div>
-          <div className="text-xs text-red-600 mt-1">Target: <5%</div>
+          <div className="text-xs text-red-600 mt-1">Target: &lt;5%</div>
         </div>
       </div>
 
@@ -157,8 +150,22 @@ const IndustrySpecificModules = ({ currentIndustry, modelData, onDataChange }) =
             <YAxis yAxisId="right" orientation="right" />
             <Tooltip />
             <Legend />
-            <Line yAxisId="left" type="monotone" dataKey="arr" stroke="#3B82F6" strokeWidth={2} name="ARR ($M)" />
-            <Line yAxisId="right" type="monotone" dataKey="customers" stroke="#10B981" strokeWidth={2} name="Customers" />
+            <Line
+              yAxisId="left"
+              type="monotone"
+              dataKey="arr"
+              stroke="#3B82F6"
+              strokeWidth={2}
+              name="ARR ($M)"
+            />
+            <Line
+              yAxisId="right"
+              type="monotone"
+              dataKey="customers"
+              stroke="#10B981"
+              strokeWidth={2}
+              name="Customers"
+            />
           </LineChart>
         </ResponsiveContainer>
       </div>
@@ -192,8 +199,7 @@ const IndustrySpecificModules = ({ currentIndustry, modelData, onDataChange }) =
                 <div key={index} className="flex items-center text-sm">
                   <div className="w-2 h-2 bg-blue-600 rounded-full mr-2" />
                   {metric}
-                </div>
-              ))}
+                </div>))}
             </div>
           </div>
 
@@ -207,8 +213,7 @@ const IndustrySpecificModules = ({ currentIndustry, modelData, onDataChange }) =
                 <div key={index} className="flex items-center text-sm">
                   <div className="w-2 h-2 bg-green-600 rounded-full mr-2" />
                   {multiple}
-                </div>
-              ))}
+                </div>))}
             </div>
           </div>
 
@@ -222,8 +227,7 @@ const IndustrySpecificModules = ({ currentIndustry, modelData, onDataChange }) =
                 <div key={index} className="flex items-center text-sm">
                   <div className="w-2 h-2 bg-purple-600 rounded-full mr-2" />
                   {feature}
-                </div>
-              ))}
+                </div>))}
             </div>
           </div>
         </div>
@@ -280,7 +284,7 @@ const IndustrySpecificModules = ({ currentIndustry, modelData, onDataChange }) =
               </button>
             </div>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {industries.map((industry) => {
               const Icon = industry.icon;
@@ -298,13 +302,11 @@ const IndustrySpecificModules = ({ currentIndustry, modelData, onDataChange }) =
                   <div className="flex items-center mb-3">
                     <div className={`${industry.color} p-2 rounded-lg mr-3`}>
                       <Icon className="w-5 h-5 text-white" />
-                    </div>
-                    <div>
+                    </div>            <div>
                       <h4 className="font-medium text-gray-900">{industry.name}</h4>
                       <p className="text-xs text-gray-600">{industry.description}</p>
                     </div>
-                  </div>
-                  <div className="text-xs text-gray-500">
+                  </div>          <div className="text-xs text-gray-500">
                     {industry.modules.length} specialized modules
                   </div>
                 </motion.div>
@@ -352,26 +354,23 @@ const IndustrySpecificModules = ({ currentIndustry, modelData, onDataChange }) =
               transition={{ duration: 0.2 }}
             >
               {activeModule === 'overview' && renderIndustryOverview()}
-              
               {activeModule === 'metrics' && selectedIndustry === 'technology' && renderSaaSMetrics()}
-              
-              {((activeModule === 'metrics' || activeModule === 'analysis') && selectedIndustry !== 'technology') || 
+
+              {((activeModule === 'metrics' || activeModule === 'analysis') && selectedIndustry !== 'technology') ||
                (activeModule === 'benchmarks') && (
-                <div className="text-center py-12">
-                  <div className={`w-16 h-16 ${currentIndustryData?.color} rounded-full flex items-center justify-center mx-auto mb-4`}>
-                    {currentIndustryData && React.createElement(currentIndustryData.icon, { className: "w-8 h-8 text-white" })}
-                  </div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">
-                    {currentIndustryData?.name} Module Coming Soon
-                  </h3>
-                  <p className="text-gray-600 mb-4">
-                    Specialized {activeModule} for the {currentIndustryData?.name.toLowerCase()} industry are in development.
-                  </p>
-                  <button className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg font-medium">
-                    Request Early Access
-                  </button>
-                </div>
-              )}
+                 <div className="text-center py-12">
+                   <div className={`w-16 h-16 ${currentIndustryData?.color} rounded-full flex items-center justify-center mx-auto mb-4`}>
+                     {currentIndustryData && React.createElement(currentIndustryData.icon, { className: 'w-8 h-8 text-white' })}
+                   </div>           <h3 className="text-lg font-medium text-gray-900 mb-2">
+                     {currentIndustryData?.name} Module Coming Soon
+                   </h3>
+                   <p className="text-gray-600 mb-4">
+                     Specialized {activeModule} for the {currentIndustryData?.name.toLowerCase()} industry are in development.
+                   </p>
+                   <button className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg font-medium">
+                     Request Early Access
+                   </button>
+                 </div>)}
             </motion.div>
           </AnimatePresence>
         </div>

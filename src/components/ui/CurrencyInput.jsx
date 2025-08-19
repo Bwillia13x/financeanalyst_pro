@@ -73,7 +73,7 @@ const CurrencyInput = React.forwardRef(({
     const numValue = typeof val === 'string' ? parseFloat(val) : val;
     if (isNaN(numValue)) return '';
 
-    const { forDisplay = false, abbreviated = false } = options;
+    const { abbreviated = false } = options;
 
     // Handle abbreviation for large numbers
     if (abbreviated && abbreviateDisplay && Math.abs(numValue) >= 1000) {
@@ -96,7 +96,7 @@ const CurrencyInput = React.forwardRef(({
         minimumFractionDigits: effectiveDecimals,
         maximumFractionDigits: effectiveDecimals
       }).format(numValue);
-    } catch (error) {
+    } catch (_error) {
       // Fallback formatting
       const formatted = numValue.toFixed(effectiveDecimals);
       return `${currencyConfig.symbol}${formatted}`;
@@ -182,7 +182,7 @@ const CurrencyInput = React.forwardRef(({
   }, [value, currency, locale, effectiveDecimals, isFocused, abbreviateDisplay]);
 
   // Handle focus
-  const handleFocus = (e) => {
+  const handleFocus = (_e) => {
     setIsFocused(true);
     // Show raw number for editing
     const rawValue = value ? value.toString() : '';

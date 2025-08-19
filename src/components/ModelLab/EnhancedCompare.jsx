@@ -1,4 +1,4 @@
-import { Download, RotateCcw, DollarSign, Globe } from 'lucide-react';
+import { RotateCcw, Download } from 'lucide-react';
 import React, { useState, useMemo } from 'react';
 
 const Card = ({ title, right, children, className = '' }) => (
@@ -307,7 +307,7 @@ const EnhancedCompare = ({ models = [] }) => {
             </tr>
           </thead>
           <tbody>
-            {sortedModels.map((model, i) => (
+            {sortedModels.map((model, _i) => (
               <tr key={model.id} className="border-b border-slate-100 hover:bg-slate-50">
                 <td className="py-2 px-2">
                   <div className="flex items-center gap-2">

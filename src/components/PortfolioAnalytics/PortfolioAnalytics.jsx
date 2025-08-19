@@ -1,15 +1,12 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { 
-  BarChart3, 
-  TrendingUp, 
-  TrendingDown, 
-  AlertTriangle, 
-  Shield, 
-  Target, 
-  Activity, 
+import {
+  TrendingUp,
+  Shield,
+  Target,
+  Activity,
   Download,
   RefreshCw
 } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   LineChart,
   Line,
@@ -25,12 +22,12 @@ import {
 import { portfolioCommands } from '../../services/commands/portfolioCommands';
 import { formatCurrency, formatPercentage, formatNumber } from '../../utils/formatters';
 
-const PortfolioAnalytics = ({ 
-  portfolio, 
-  metrics, 
-  selectedTimeframe, 
-  onTimeframeChange, 
-  timeframeOptions 
+const PortfolioAnalytics = ({
+  portfolio,
+  metrics,
+  selectedTimeframe,
+  onTimeframeChange,
+  timeframeOptions
 }) => {
   const [analyticsData, setAnalyticsData] = useState({
     riskMetrics: null,
@@ -44,10 +41,10 @@ const PortfolioAnalytics = ({
     performance: false
   });
   const [activeChart, setActiveChart] = useState('performance');
-  const [riskTimeframe, setRiskTimeframe] = useState('252');
+  const [riskTimeframe, _setRiskTimeframe] = useState('252');
 
   // Calculate portfolio risk metrics using existing portfolio commands
-  const calculateRiskMetrics = useCallback(async () => {
+  const calculateRiskMetrics = useCallback(async() => {
     if (!portfolio || !portfolio.holdings.length || loading.risk) return;
 
     setLoading(prev => ({ ...prev, risk: true }));
@@ -56,7 +53,7 @@ const PortfolioAnalytics = ({
       const weights = portfolio.holdings.map(h => (h.allocation || 0) / 100);
 
       // Calculate individual stock risk metrics
-      const individualRiskPromises = symbols.map(async (symbol) => {
+      const individualRiskPromises = symbols.map(async(symbol) => {
         try {
           const riskCommand = portfolioCommands.RISK_METRICS;
           const mockCommand = { parameters: [symbol, parseInt(riskTimeframe)] };
@@ -87,9 +84,9 @@ const PortfolioAnalytics = ({
         })).filter(item => item.symbol)
       };
 
-      setAnalyticsData(prev => ({ 
-        ...prev, 
-        riskMetrics: aggregatedMetrics 
+      setAnalyticsData(prev => ({
+        ...prev,
+        riskMetrics: aggregatedMetrics
       }));
 
     } catch (error) {
@@ -100,16 +97,16 @@ const PortfolioAnalytics = ({
   }, [portfolio, loading.risk, riskTimeframe]);
 
   // Calculate correlation matrix
-  const calculateCorrelationMatrix = useCallback(async () => {
+  const calculateCorrelationMatrix = useCallback(async() => {
     if (!portfolio || !portfolio.holdings.length || loading.correlation) return;
 
     setLoading(prev => ({ ...prev, correlation: true }));
     try {
       const symbols = portfolio.holdings.map(h => h.symbol);
-      
+
       if (symbols.length < 2) {
-        setAnalyticsData(prev => ({ 
-          ...prev, 
+        setAnalyticsData(prev => ({
+          ...prev,
           correlationMatrix: { message: 'Need at least 2 holdings for correlation analysis' }
         }));
         return;
@@ -120,9 +117,9 @@ const PortfolioAnalytics = ({
       const result = await correlationCommand.execute(mockCommand, {}, null);
 
       if (result.type === 'success') {
-        setAnalyticsData(prev => ({ 
-          ...prev, 
-          correlationMatrix: result.data 
+        setAnalyticsData(prev => ({
+          ...prev,
+          correlationMatrix: result.data
         }));
       }
 
@@ -140,15 +137,15 @@ const PortfolioAnalytics = ({
     const days = getDaysFromTimeframe(selectedTimeframe);
     const data = [];
     const startValue = metrics.totalValue * 0.9;
-    
+
     for (let i = 0; i < days; i++) {
       const date = new Date();
       date.setDate(date.getDate() - (days - i));
-      
+
       const trend = i / days;
       const volatility = Math.sin(i * 0.1) * 0.02 + Math.random() * 0.01 - 0.005;
       const value = startValue * (1 + trend * 0.15 + volatility);
-      
+
       data.push({
         date: date.toISOString().split('T')[0],
         portfolioValue: value,
@@ -156,9 +153,9 @@ const PortfolioAnalytics = ({
       });
     }
 
-    setAnalyticsData(prev => ({ 
-      ...prev, 
-      historicalPerformance: data 
+    setAnalyticsData(prev => ({
+      ...prev,
+      historicalPerformance: data
     }));
   }, [metrics, selectedTimeframe]);
 
@@ -180,9 +177,9 @@ const PortfolioAnalytics = ({
 
     attribution.sort((a, b) => Math.abs(b.contribution) - Math.abs(a.contribution));
 
-    setAnalyticsData(prev => ({ 
-      ...prev, 
-      performanceAttribution: attribution 
+    setAnalyticsData(prev => ({
+      ...prev,
+      performanceAttribution: attribution
     }));
   }, [portfolio, metrics]);
 
@@ -206,7 +203,7 @@ const PortfolioAnalytics = ({
   if (!portfolio || !metrics) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
       </div>
     );
   }
@@ -239,8 +236,9 @@ const PortfolioAnalytics = ({
 
         <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-2">
-            <label className="text-sm font-medium text-gray-600">Timeframe:</label>
+            <label htmlFor="timeframe-select" className="text-sm font-medium text-gray-600">Timeframe:</label>
             <select
+              id="timeframe-select"
               value={selectedTimeframe}
               onChange={(e) => onTimeframeChange(e.target.value)}
               className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -266,38 +264,43 @@ const PortfolioAnalytics = ({
           <div className="lg:col-span-2">
             <div className="bg-white rounded-xl shadow-sm border p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-6">Portfolio Performance</h3>
-              
+
               {analyticsData.historicalPerformance && (
                 <ResponsiveContainer width="100%" height={300}>
                   <LineChart data={analyticsData.historicalPerformance}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                    <XAxis 
-                      dataKey="date" 
+                    <XAxis
+                      dataKey="date"
                       stroke="#6b7280"
                       fontSize={12}
                       tickFormatter={(value) => new Date(value).toLocaleDateString()}
                     />
-                    <YAxis 
+                    <YAxis
                       stroke="#6b7280"
                       fontSize={12}
-                      tickFormatter={(value) => formatCurrency(value, 0)}
+                      tickFormatter={(value) => {
+                        const _formatCurrency = (value) => {
+                          return formatCurrency(value, 0);
+                        };
+                        return _formatCurrency(value);
+                      }}
                     />
-                    <Tooltip 
+                    <Tooltip
                       formatter={(value, name) => [formatCurrency(value), name === 'portfolioValue' ? 'Portfolio' : 'Benchmark']}
                       labelFormatter={(value) => new Date(value).toLocaleDateString()}
                     />
-                    <Line 
-                      type="monotone" 
-                      dataKey="portfolioValue" 
-                      stroke="#3B82F6" 
+                    <Line
+                      type="monotone"
+                      dataKey="portfolioValue"
+                      stroke="#3B82F6"
                       strokeWidth={2}
                       dot={false}
                       name="Portfolio"
                     />
-                    <Line 
-                      type="monotone" 
-                      dataKey="benchmark" 
-                      stroke="#10B981" 
+                    <Line
+                      type="monotone"
+                      dataKey="benchmark"
+                      stroke="#10B981"
                       strokeWidth={2}
                       strokeDasharray="5 5"
                       dot={false}
@@ -335,7 +338,7 @@ const PortfolioAnalytics = ({
               <RefreshCw className="w-4 h-4 text-gray-400 animate-spin" />
             )}
           </div>
-          
+
           {analyticsData.correlationMatrix && (
             <CorrelationMatrix data={analyticsData.correlationMatrix} />
           )}
@@ -414,7 +417,7 @@ const RiskMetricsCard = ({ riskMetrics, loading }) => (
       <h3 className="text-lg font-semibold text-gray-900">Risk Metrics</h3>
       {loading && <RefreshCw className="w-4 h-4 text-gray-400 animate-spin" />}
     </div>
-    
+
     <div className="grid grid-cols-2 gap-4">
       <div className="text-center p-4 bg-blue-50 rounded-lg">
         <div className="text-2xl font-bold text-blue-600">

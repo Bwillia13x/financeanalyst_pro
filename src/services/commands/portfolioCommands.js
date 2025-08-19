@@ -8,7 +8,7 @@ import { dataFetchingService } from '../dataFetching';
 
 export const portfolioCommands = {
   PORTFOLIO: {
-    execute: async(parsedCommand, context, processor) => {
+    execute: async(parsedCommand, _context, _processor) => {
       const [tickers, weights] = parsedCommand.parameters;
 
       if (!tickers || !weights) {
@@ -99,7 +99,7 @@ export const portfolioCommands = {
   },
 
   RISK_METRICS: {
-    execute: async(parsedCommand, context, processor) => {
+    execute: async(parsedCommand, _context, _processor) => {
       const [ticker, period = 252] = parsedCommand.parameters;
 
       if (!ticker) {
@@ -112,7 +112,7 @@ export const portfolioCommands = {
       try {
         // Fetch historical data and calculate risk metrics
         const profile = await dataFetchingService.fetchCompanyProfile(ticker.toUpperCase());
-        const marketData = await dataFetchingService.fetchMarketData(ticker.toUpperCase());
+        const _marketData = await dataFetchingService.fetchMarketData(ticker);
 
         // Mock risk calculations (in real implementation, would use historical price data)
         const volatility = profile.beta * 0.16; // Approximate volatility based on beta
@@ -156,7 +156,7 @@ export const portfolioCommands = {
   },
 
   CORRELATION_MATRIX: {
-    execute: async(parsedCommand, context, processor) => {
+    execute: async(parsedCommand, _context, _processor) => {
       const [tickers] = parsedCommand.parameters;
 
       if (!tickers || !Array.isArray(tickers)) {
@@ -271,7 +271,7 @@ export const portfolioCommands = {
   },
 
   EFFICIENT_FRONTIER: {
-    execute: async(parsedCommand, context, processor) => {
+    execute: async(parsedCommand, _context, _processor) => {
       const [tickers] = parsedCommand.parameters;
 
       if (!tickers || !Array.isArray(tickers)) {
@@ -367,7 +367,7 @@ export const portfolioCommands = {
   },
 
   DRAWDOWN: {
-    execute: async(parsedCommand, context, processor) => {
+    execute: async(parsedCommand, _context, _processor) => {
       const [ticker, period = 252] = parsedCommand.parameters;
 
       if (!ticker) {

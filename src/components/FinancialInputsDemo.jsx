@@ -310,8 +310,9 @@ const FinancialInputsDemo = () => {
                 <h4 className="text-sm font-medium text-slate-700">Field Validation</h4>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700">Test Validation</label>
+                  <label htmlFor="test-validation" className="text-sm font-medium text-slate-700">Test Validation</label>
                   <input
+                    id="test-validation"
                     type="number"
                     value={-50}
                     onChange={(e) => validateInput(parseFloat(e.target.value), 0, 1000)}

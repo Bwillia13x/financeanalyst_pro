@@ -134,7 +134,9 @@ describe('cn utility function', () => {
 
   describe('Type safety and validation', () => {
     it('should handle boolean values correctly', () => {
-      expect(cn(true && 'truthy-class', false && 'falsy-class')).toBe('truthy-class');
+      const isTruthy = true;
+      const isFalsy = false;
+      expect(cn(isTruthy && 'truthy-class', isFalsy && 'falsy-class')).toBe('truthy-class');
     });
 
     it('should handle function results', () => {

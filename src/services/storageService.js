@@ -410,7 +410,7 @@ class StorageService {
             localStorage.removeItem(key);
             cleanedCount++;
           }
-        } catch (error) {
+        } catch {
           // Remove corrupted data
           localStorage.removeItem(key);
           cleanedCount++;

@@ -1,4 +1,4 @@
-import { apiLogger } from '../utils/apiLogger.js';
+// import { apiLogger } from '../utils/apiLogger.js';
 
 /**
  * Advanced Financial Modeling Engine
@@ -59,11 +59,11 @@ class FinancialModelingEngine {
     const {
       symbol,
       companyName,
-      currentRevenue,
-      historicalGrowthRates = [],
-      margins = {},
-      balanceSheetData = {},
-      marketData = {},
+      currentRevenue: _currentRevenue,
+      historicalGrowthRates: _historicalGrowthRates = [],
+      margins: _margins = {},
+      balanceSheetData: _balanceSheetData = {},
+      marketData: _marketData = {},
       assumptions = {}
     } = inputs;
 
@@ -223,7 +223,7 @@ class FinancialModelingEngine {
    * @returns {Array} Operating projections
    */
   projectOperatingMetrics(revenueProjections, assumptions) {
-    return revenueProjections.map((projection, index) => {
+    return revenueProjections.map((projection, _index) => {
       const ebitdaMargin = assumptions.ebitdaMargin || 0.2;
       const ebitda = projection.revenue * ebitdaMargin;
       const depreciation = projection.revenue * assumptions.depreciationAsPercentOfRevenue;
@@ -338,7 +338,7 @@ class FinancialModelingEngine {
     }
 
     // Multiple terminal value methods
-    const { method = 'gordon', exitMultiple = null, fadeToGrowth = false } = options;
+    const { method = 'gordon', exitMultiple = null, fadeToGrowth: _fadeToGrowth = false } = options;
 
     switch (method) {
       case 'gordon':
@@ -351,7 +351,7 @@ class FinancialModelingEngine {
         }
         return (finalFCF * (1 + terminalGrowthRate)) / (discountRate - terminalGrowthRate);
 
-      case 'fade_to_growth':
+      case 'fade_to_growth': {
         // Implement fade-to-growth model where high growth fades to long-term rate
         const fadeYears = options.fadeYears || 5;
         const longTermGrowth = options.longTermGrowth || 0.025;
@@ -370,6 +370,7 @@ class FinancialModelingEngine {
         terminalValue += perpetualValue / Math.pow(1 + discountRate, fadeYears);
 
         return terminalValue;
+      }
 
       default:
         return (finalFCF * (1 + terminalGrowthRate)) / (discountRate - terminalGrowthRate);

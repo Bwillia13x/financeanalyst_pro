@@ -8,7 +8,7 @@ import { dataFetchingService } from '../dataFetching';
 
 export const valuationCommands = {
   DDM: {
-    execute: async(parsedCommand, context, processor) => {
+    execute: async(parsedCommand, _context, _processor) => {
       const [ticker] = parsedCommand.parameters;
 
       if (!ticker) {
@@ -20,7 +20,7 @@ export const valuationCommands = {
 
       try {
         const profile = await dataFetchingService.fetchCompanyProfile(ticker.toUpperCase());
-        const financials = await dataFetchingService.fetchFinancialStatements(ticker.toUpperCase(), 'income-statement');
+        const _financials = await dataFetchingService.fetchFinancialStatements(ticker.toUpperCase(), 'income-statement');
 
         // DDM calculations
         const currentDividend = profile.dividendYield * profile.price || 0;
@@ -93,7 +93,7 @@ export const valuationCommands = {
   },
 
   RESIDUAL_INCOME: {
-    execute: async(parsedCommand, context, processor) => {
+    execute: async(parsedCommand, _context, _processor) => {
       const [ticker] = parsedCommand.parameters;
 
       if (!ticker) {
@@ -105,13 +105,13 @@ export const valuationCommands = {
 
       try {
         const profile = await dataFetchingService.fetchCompanyProfile(ticker.toUpperCase());
-        const financials = await dataFetchingService.fetchFinancialStatements(ticker.toUpperCase(), 'income-statement');
+        const _financials = await dataFetchingService.fetchFinancialStatements(ticker.toUpperCase(), 'income-statement');
 
         // Residual Income calculations
         const bookValue = profile.bookValue || profile.mktCap / 2; // Fallback estimate
         const roe = profile.returnOnEquityTTM || 0.15; // Fallback 15%
         const costOfEquity = (profile.beta || 1.0) * 0.06 + 0.03; // CAPM
-        const netIncome = financials[0]?.netIncome || profile.mktCap * 0.08; // Fallback estimate
+        const netIncome = _financials[0]?.netIncome || profile.mktCap * 0.08; // Fallback estimate
 
         // Calculate residual income
         const normalIncome = bookValue * costOfEquity;
@@ -181,7 +181,7 @@ export const valuationCommands = {
   },
 
   ASSET_BASED: {
-    execute: async(parsedCommand, context, processor) => {
+    execute: async(parsedCommand, _context, _processor) => {
       const [ticker] = parsedCommand.parameters;
 
       if (!ticker) {

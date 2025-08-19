@@ -8,7 +8,7 @@ import { dataFetchingService } from '../dataFetching';
 
 export const automationCommands = {
   WATCHLIST: {
-    execute: async(parsedCommand, context, processor) => {
+    execute: async(parsedCommand, _context, processor) => {
       const [action, name, tickers] = parsedCommand.parameters;
 
       if (!action) {
@@ -96,7 +96,7 @@ export const automationCommands = {
                   marketCap: profile.mktCap,
                   pe: profile.pe
                 };
-              } catch (error) {
+              } catch {
                 return {
                   ticker,
                   name: 'Error loading',
@@ -143,6 +143,7 @@ export const automationCommands = {
           const watchlist = watchlists[name];
 
           // Perform quick analysis on all stocks
+          const _analysisType = parsedCommand.parameters[0] || 'full';
           const analysisResults = await Promise.all(
             watchlist.tickers.slice(0, 5).map(async(ticker) => { // Limit to 5 for demo
               try {
@@ -156,11 +157,12 @@ export const automationCommands = {
                   beta: profile.beta,
                   recommendation: profile.pe < 20 && profile.pb < 3 ? 'Attractive' : profile.pe > 30 ? 'Expensive' : 'Fair Value'
                 };
-              } catch (error) {
+              } catch {
                 return {
                   ticker,
                   name: 'Error',
-                  recommendation: 'Unable to analyze'
+                  recommendation: 'Unable to analyze',
+                  error: 'Data fetch failed'
                 };
               }
             })
@@ -200,7 +202,7 @@ export const automationCommands = {
   },
 
   ALERT: {
-    execute: async(parsedCommand, context, processor) => {
+    execute: async(parsedCommand, _context, processor) => {
       const [ticker, condition, value] = parsedCommand.parameters;
 
       if (!ticker || !condition || value === undefined) {
@@ -299,7 +301,7 @@ export const automationCommands = {
             }
           };
 
-        } catch (error) {
+        } catch {
           return {
             type: 'success',
             content: `🚨 Alert Created for ${ticker.toUpperCase()}\n\n📋 ALERT DETAILS:\n• Condition: ${condition.replace('_', ' ')} ${value}\n• Status: 🟢 Monitoring\n• Created: ${newAlert.created}\n\n✅ Alert is now active. Unable to check current status due to data fetch error.\n\n💡 Use ALERT(list) to see all alerts`
@@ -320,7 +322,7 @@ export const automationCommands = {
   },
 
   BATCH_ANALYSIS: {
-    execute: async(parsedCommand, context, processor) => {
+    execute: async(parsedCommand, _context, processor) => {
       const [tickers, analysisType = 'quick'] = parsedCommand.parameters;
 
       if (!tickers || !Array.isArray(tickers)) {
@@ -365,13 +367,13 @@ export const automationCommands = {
                 score,
                 rating: score >= 80 ? 'Strong Buy' : score >= 60 ? 'Buy' : score >= 40 ? 'Hold' : score >= 20 ? 'Weak Hold' : 'Sell'
               };
-            } catch (error) {
+            } catch {
               return {
                 ticker: ticker.toUpperCase(),
                 name: 'Error loading data',
                 score: 0,
                 rating: 'Unable to analyze',
-                error: error.message
+                error: 'Data fetch failed'
               };
             }
           })

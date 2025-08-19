@@ -148,7 +148,7 @@ const WorkflowNavigation = ({
     return <Icon size={20} className={isActive ? 'text-white' : getStatusColor(status)} />;
   };
 
-  const renderProgressRing = (progress, status) => {
+  const renderProgressRing = (progress, _status) => {
     const radius = 18;
     const circumference = 2 * Math.PI * radius;
     const strokeDasharray = circumference;

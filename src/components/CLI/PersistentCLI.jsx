@@ -3,7 +3,6 @@
  * Professional financial terminal interface that stays visible across all pages
  */
 
-import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Terminal,
@@ -12,20 +11,15 @@ import {
   Minimize2,
   Maximize2,
   X,
-  Copy,
   Download,
-  History,
-  Settings,
-  Zap,
-  Search,
-  ArrowUp,
-  ArrowDown
+  Zap
 } from 'lucide-react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 
 import { CLICommandProcessor } from '../../services/cliCommandProcessor';
-import { formatCurrency, formatPercentage, formatNumber } from '../../utils/formatters';
+import { formatCurrency, formatPercentage } from '../../utils/formatters';
 
-const PersistentCLI = ({ 
+const PersistentCLI = ({
   currentContext = {},
   portfolioData = null,
   marketData = null,
@@ -43,7 +37,7 @@ const PersistentCLI = ({
     },
     {
       id: 2,
-      type: 'info', 
+      type: 'info',
       content: 'Connected to secure backend API • Market data live • Ready for commands',
       timestamp: new Date()
     }
@@ -92,7 +86,7 @@ const PersistentCLI = ({
     setOutput(prev => [...prev, newOutput]);
   }, []);
 
-  const handleCommand = async (command) => {
+  const handleCommand = async(command) => {
     if (!command.trim()) return;
 
     // Add command to history
@@ -105,7 +99,7 @@ const PersistentCLI = ({
 
     try {
       const result = await cliProcessor.current.processCommand(command);
-      
+
       if (result.success) {
         if (result.output) {
           addOutput(result.output, result.type || 'output');
@@ -144,50 +138,50 @@ const PersistentCLI = ({
 
   const formatTable = (data) => {
     if (!Array.isArray(data) || data.length === 0) return 'No data';
-    
+
     const headers = Object.keys(data[0]);
-    const maxWidths = headers.map(header => 
+    const maxWidths = headers.map(header =>
       Math.max(header.length, ...data.map(row => String(row[header] || '').length))
     );
-    
+
     const headerRow = headers.map((header, i) => header.padEnd(maxWidths[i])).join(' | ');
     const separator = maxWidths.map(width => '-'.repeat(width)).join('-|-');
-    const dataRows = data.map(row => 
+    const dataRows = data.map(row =>
       headers.map((header, i) => String(row[header] || '').padEnd(maxWidths[i])).join(' | ')
     );
-    
+
     return [headerRow, separator, ...dataRows].join('\n');
   };
 
   const formatPortfolioData = (data) => {
     if (!data) return 'No portfolio data available';
-    
+
     let output = '📊 PORTFOLIO OVERVIEW\n';
-    output += `═══════════════════════════════════════\n`;
+    output += '═══════════════════════════════════════\n';
     output += `Total Value: ${formatCurrency(data.totalValue || 0)}\n`;
     output += `Total Return: ${formatPercentage(data.totalReturn || 0)}\n`;
     output += `Holdings: ${data.holdings?.length || 0}\n\n`;
-    
+
     if (data.holdings && data.holdings.length > 0) {
       output += 'HOLDINGS:\n';
       data.holdings.forEach(holding => {
         output += `${holding.symbol.padEnd(6)} ${formatCurrency(holding.value || 0).padStart(12)} ${formatPercentage(holding.weight || 0).padStart(8)}\n`;
       });
     }
-    
+
     return output;
   };
 
   const formatMarketData = (data) => {
     if (!data) return 'No market data available';
-    
+
     let output = '📈 MARKET DATA\n';
-    output += `═══════════════════════════════════════\n`;
-    
+    output += '═══════════════════════════════════════\n';
+
     Object.entries(data).forEach(([key, value]) => {
       output += `${key.toUpperCase().padEnd(15)} ${String(value).padStart(12)}\n`;
     });
-    
+
     return output;
   };
 
@@ -228,7 +222,7 @@ const PersistentCLI = ({
   const handleInputChange = (e) => {
     const value = e.target.value;
     setInput(value);
-    
+
     // Generate suggestions
     if (value.trim()) {
       const newSuggestions = cliProcessor.current.getSuggestions(value);
@@ -244,10 +238,10 @@ const PersistentCLI = ({
   };
 
   const exportOutput = () => {
-    const exportText = output.map(item => 
+    const exportText = output.map(item =>
       `[${item.timestamp.toLocaleTimeString()}] ${item.content}`
     ).join('\n');
-    
+
     const blob = new Blob([exportText], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -275,9 +269,18 @@ const PersistentCLI = ({
   return (
     <div className="fixed bottom-0 left-0 right-0 z-30">
       {/* CLI Header Bar */}
-      <div 
+      <div
         className="bg-gray-900 border-t border-gray-700 px-4 py-2 flex items-center justify-between cursor-pointer select-none"
         onClick={() => setIsExpanded(!isExpanded)}
+        role="button"
+        tabIndex={0}
+        aria-label={`${isExpanded ? 'Collapse' : 'Expand'} terminal`}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            setIsExpanded(!isExpanded);
+          }
+        }}
       >
         <div className="flex items-center space-x-3">
           <Terminal className="w-5 h-5 text-green-400" />
@@ -285,11 +288,11 @@ const PersistentCLI = ({
             FinanceAnalyst Pro Terminal
           </span>
           <div className="flex items-center space-x-2">
-            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
             <span className="text-xs text-gray-500">Live</span>
           </div>
         </div>
-        
+
         <div className="flex items-center space-x-2">
           {!isMinimized && (
             <>
@@ -326,7 +329,7 @@ const PersistentCLI = ({
           </button>
           <button
             className="p-1 hover:bg-gray-800 rounded text-gray-400 hover:text-gray-300"
-            title={isExpanded ? "Collapse" : "Expand"}
+            title={isExpanded ? 'Collapse' : 'Expand'}
           >
             {isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
           </button>
@@ -340,12 +343,12 @@ const PersistentCLI = ({
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 400, opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
             className="bg-gray-900 border-t border-gray-700 overflow-hidden"
           >
             <div className="h-full flex flex-col">
               {/* Output Area */}
-              <div 
+              <div
                 ref={outputRef}
                 className="flex-1 overflow-y-auto p-4 font-mono text-sm space-y-1"
                 style={{ maxHeight: '320px' }}
@@ -361,10 +364,10 @@ const PersistentCLI = ({
                     )}
                   </div>
                 ))}
-                
+
                 {isProcessing && (
                   <div className="text-yellow-400 flex items-center space-x-2">
-                    <div className="animate-spin w-3 h-3 border border-yellow-400 border-t-transparent rounded-full"></div>
+                    <div className="animate-spin w-3 h-3 border border-yellow-400 border-t-transparent rounded-full" />
                     <span>Processing...</span>
                   </div>
                 )}
@@ -412,10 +415,10 @@ const PersistentCLI = ({
                     </div>
                   )}
                 </div>
-                
+
                 <div className="mt-2 text-xs text-gray-500 flex items-center justify-between">
                   <span>
-                    Use ↑↓ for history • Tab for autocomplete • Type "help" for commands
+                    Use ↑↓ for history • Tab for autocomplete • Type &quot;help&quot; for commands
                   </span>
                   <span>
                     {commandHistory.length} commands in history

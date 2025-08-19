@@ -8,15 +8,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Focus,
   Minimize2,
-  Maximize2,
-  Eye,
-  EyeOff,
-  Settings,
-  Layers,
   Moon,
   Sun,
-  Zap,
-  Target,
   Wind,
   Feather
 } from 'lucide-react';
@@ -27,7 +20,7 @@ const FocusMode = ({ children, onFocusChange }) => {
   const [focusLevel, setFocusLevel] = useState('moderate'); // minimal, moderate, deep
   const [zenMode, setZenMode] = useState(false);
   const [breathingMode, setBreathingMode] = useState(false);
-  const [autoFocusContext, setAutoFocusContext] = useState(null);
+  const [_autoFocusContext, _setAutoFocusContext] = useState(null);
   const [userActivity, setUserActivity] = useState(Date.now());
 
   const focusLevels = {
@@ -310,7 +303,7 @@ const FocusMode = ({ children, onFocusChange }) => {
       </motion.div>
 
       {/* Focus Mode CSS Injection */}
-      <style jsx global>{`
+      <style>{`
         .focus-mode {
           overflow: hidden !important;
         }

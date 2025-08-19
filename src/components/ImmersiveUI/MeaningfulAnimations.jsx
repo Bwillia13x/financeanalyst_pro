@@ -6,29 +6,24 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Zap,
   TrendingUp,
   TrendingDown,
-  ArrowRight,
-  ArrowDown,
-  Target,
-  AlertCircle,
-  CheckCircle,
-  Ripple,
   Activity
+  // AlertCircle,
+  // CheckCircle
 } from 'lucide-react';
 import React, { useState, useEffect, useRef } from 'react';
 
 const MeaningfulAnimations = ({
   children,
   onAssumptionChange,
-  modelData,
-  dependencyMap
+  modelData: _modelData,
+  dependencyMap: _dependencyMap
 }) => {
   const [changedAssumptions, setChangedAssumptions] = useState(new Set());
   const [affectedOutputs, setAffectedOutputs] = useState(new Set());
-  const [animationQueue, setAnimationQueue] = useState([]);
-  const [isCalculating, setIsCalculating] = useState(false);
+  const [_animationQueue, _setAnimationQueue] = useState([]);
+  const [_isCalculating, _setIsCalculating] = useState(false);
   const animationRefs = useRef(new Map());
 
   // Animation configurations for different types of changes
@@ -66,7 +61,7 @@ const MeaningfulAnimations = ({
   };
 
   // Flow animation for showing data dependencies
-  const FlowArrow = ({ fromId, toId, type = 'data', delay = 0 }) => {
+  const _FlowArrow = ({ fromId, toId, type = 'data', delay = 0 }) => {
     const fromRef = animationRefs.current.get(fromId);
     const toRef = animationRefs.current.get(toId);
 
@@ -137,11 +132,11 @@ const MeaningfulAnimations = ({
   };
 
   // Ripple effect for showing impact propagation
-  const RippleEffect = ({ x, y, intensity = 1, type = 'assumption' }) => {
+  const _RippleEffect = ({ x, y, intensity: _intensity = 1, type = 'assumption' }) => {
     const rippleVariants = {
       initial: { scale: 0, opacity: 0.8 },
       animate: {
-        scale: 3 * intensity,
+        scale: 3 * _intensity,
         opacity: 0,
         transition: { duration: 1.5, ease: 'easeOut' }
       }
@@ -195,9 +190,10 @@ const MeaningfulAnimations = ({
     children,
     isHighlighted,
     type = 'assumption_change',
-    intensity = 1
+    intensity: _intensity = 1
   }) => {
     const config = animationTypes[type];
+    const _animationIntensity = _intensity || 1;
 
     return (
       <motion.div
@@ -225,7 +221,7 @@ const MeaningfulAnimations = ({
   const ValueChangeIndicator = ({
     oldValue,
     newValue,
-    format = 'number',
+    format: _format = 'number',
     isVisible = true
   }) => {
     const isIncrease = newValue > oldValue;
@@ -257,7 +253,7 @@ const MeaningfulAnimations = ({
   };
 
   // Chain reaction visualization
-  const ChainReaction = ({ assumptions, outputs, delay = 0 }) => {
+  const _ChainReaction = ({ assumptions, outputs: _outputs, delay = 0 }) => {
     return (
       <motion.div
         initial={{ opacity: 0 }}
@@ -371,7 +367,7 @@ const MeaningfulAnimations = ({
         GlowHighlight,
         ValueChangeIndicator,
         CalculationPulse,
-        isCalculating
+        isCalculating: _isCalculating
       });
     }
     return child;
@@ -383,16 +379,16 @@ const MeaningfulAnimations = ({
 
       {/* Animation overlays */}
       <AnimatePresence>
-        {isCalculating && (
+        {_isCalculating && (
           <RecalculationIndicator
-            isRecalculating={isCalculating}
+            isRecalculating={_isCalculating}
             progress={75} // This would come from actual calculation progress
           />
         )}
       </AnimatePresence>
 
       {/* CSS for meaningful animations */}
-      <style jsx global>{`
+      <style>{`
         .animate-glow {
           animation: meaningful-glow 2s ease-in-out infinite alternate;
         }
@@ -465,7 +461,7 @@ export const AssumptionInput = ({
   children
 }) => {
   const [localValue, setLocalValue] = useState(value);
-  const [previousValue, setPreviousValue] = useState(value);
+  const [_previousValue, _setPreviousValue] = useState(value);
   const inputRef = useRef(null);
 
   useEffect(() => {
@@ -479,7 +475,7 @@ export const AssumptionInput = ({
   }, [value]);
 
   const handleChange = (newValue) => {
-    setPreviousValue(localValue);
+    _setPreviousValue(localValue);
     setLocalValue(newValue);
 
     if (handleAssumptionChange) {
