@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useMemo } from 'react';
 import { AlertTriangle, CheckCircle, Calculator, TrendingUp, TrendingDown, Info } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
+
 import { cn } from '../../utils/cn';
 
 /**
@@ -150,7 +151,7 @@ const FinancialValidator = ({
           label: 'P/E Ratio',
           format: 'decimal'
         };
-        
+
         if (feedback.peRatio.value > 30) {
           feedback.peRatio.warning = 'High P/E ratio may indicate overvaluation';
         } else if (feedback.peRatio.value < 10) {
@@ -278,11 +279,11 @@ const FinancialValidator = ({
                 </div>
               );
             } else if (feedback.message) {
-              const Icon = feedback.type === 'success' ? CheckCircle : 
-                          feedback.type === 'warning' ? AlertTriangle : Info;
+              const Icon = feedback.type === 'success' ? CheckCircle :
+                feedback.type === 'warning' ? AlertTriangle : Info;
               const colorClass = feedback.type === 'success' ? 'text-green-600' :
-                               feedback.type === 'warning' ? 'text-yellow-600' : 'text-blue-600';
-              
+                feedback.type === 'warning' ? 'text-yellow-600' : 'text-blue-600';
+
               return (
                 <div key={key} className="flex items-center space-x-2 p-2 bg-slate-50 border border-slate-200 rounded-md">
                   <Icon className={`w-3 h-3 ${colorClass}`} />
@@ -325,10 +326,12 @@ const FinancialValidator = ({
             ) : parseFloat(value) < context.previousValue ? (
               <TrendingDown className="w-3 h-3 text-red-600" />
             ) : null}
-            <span className={`text-xs font-medium ${
-              parseFloat(value) > context.previousValue ? 'text-green-600' :
-              parseFloat(value) < context.previousValue ? 'text-red-600' : 'text-slate-600'
-            }`}>
+            <span
+              className={`text-xs font-medium ${
+                parseFloat(value) > context.previousValue ? 'text-green-600' :
+                  parseFloat(value) < context.previousValue ? 'text-red-600' : 'text-slate-600'
+              }`}
+            >
               {((parseFloat(value) - context.previousValue) / context.previousValue * 100).toFixed(1)}%
             </span>
           </div>

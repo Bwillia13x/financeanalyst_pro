@@ -2,6 +2,7 @@
  * Performance monitoring and bundle size optimization utilities
  * Tracks loading performance and provides insights for optimization
  */
+import React from 'react';
 
 class PerformanceMonitor {
   constructor() {
@@ -24,15 +25,15 @@ class PerformanceMonitor {
    */
   measureComponentLoad(componentName, loadPromise) {
     const startTime = performance.now();
-    
+
     return loadPromise.then(component => {
       const loadTime = performance.now() - startTime;
       this.metrics.loadTimes[componentName] = loadTime;
-      
+
       if (loadTime > this.thresholds.slowComponent) {
         console.warn(`Slow component load: ${componentName} took ${loadTime.toFixed(2)}ms`);
       }
-      
+
       return component;
     });
   }
@@ -44,13 +45,13 @@ class PerformanceMonitor {
     const startTime = performance.now();
     const result = renderFunction();
     const renderTime = performance.now() - startTime;
-    
+
     this.metrics.renderTimes[componentName] = renderTime;
-    
+
     if (renderTime > this.thresholds.slowComponent) {
       console.warn(`Slow render: ${componentName} took ${renderTime.toFixed(2)}ms to render`);
     }
-    
+
     return result;
   }
 
@@ -65,19 +66,19 @@ class PerformanceMonitor {
         total: performance.memory.totalJSHeapSize,
         limit: performance.memory.jsHeapSizeLimit
       };
-      
+
       this.metrics.memoryUsage.push(usage);
-      
+
       // Keep only last 100 measurements
       if (this.metrics.memoryUsage.length > 100) {
         this.metrics.memoryUsage = this.metrics.memoryUsage.slice(-100);
       }
-      
+
       // Check for memory leak warning
       if (usage.used > this.thresholds.memoryLeakWarning) {
         console.warn(`High memory usage: ${(usage.used / 1024 / 1024).toFixed(2)}MB`);
       }
-      
+
       return usage;
     }
     return null;
@@ -114,17 +115,17 @@ class PerformanceMonitor {
     };
 
     return Object.entries(combined)
-      .sort(([,a], [,b]) => b - a)
+      .sort(([, a], [, b]) => b - a)
       .slice(0, 5)
       .map(([name, time]) => ({ name, time: Math.round(time) }));
   }
 
   getMemoryTrend() {
     if (this.metrics.memoryUsage.length < 2) return 'insufficient_data';
-    
+
     const recent = this.metrics.memoryUsage.slice(-10);
     const trend = recent[recent.length - 1].used - recent[0].used;
-    
+
     if (trend > 5000000) return 'increasing'; // 5MB increase
     if (trend < -5000000) return 'decreasing';
     return 'stable';
@@ -132,7 +133,7 @@ class PerformanceMonitor {
 
   getOptimizationRecommendations() {
     const recommendations = [];
-    
+
     // Check for slow loading components
     Object.entries(this.metrics.loadTimes).forEach(([name, time]) => {
       if (time > this.thresholds.slowComponent) {
@@ -252,9 +253,9 @@ class PerformanceMonitor {
    * React component performance wrapper
    */
   withPerformanceTracking(WrappedComponent, componentName) {
-    return React.forwardRef((props, ref) => {
+    const Tracked = React.forwardRef((props, ref) => {
       const renderStart = performance.now();
-      
+
       React.useEffect(() => {
         const renderTime = performance.now() - renderStart;
         this.metrics.renderTimes[componentName] = renderTime;
@@ -262,6 +263,8 @@ class PerformanceMonitor {
 
       return React.createElement(WrappedComponent, { ...props, ref });
     });
+    Tracked.displayName = `WithPerformance(${componentName})`;
+    return Tracked;
   }
 
   /**
@@ -269,13 +272,13 @@ class PerformanceMonitor {
    */
   trackLazyLoad(importFunction, componentName) {
     const startTime = performance.now();
-    
+
     return importFunction().then(module => {
       const loadTime = performance.now() - startTime;
       this.metrics.loadTimes[componentName] = loadTime;
-      
+
       console.log(`Lazy loaded ${componentName} in ${loadTime.toFixed(2)}ms`);
-      
+
       return module;
     });
   }

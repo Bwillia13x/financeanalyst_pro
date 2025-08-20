@@ -1,9 +1,10 @@
+import { Globe, Activity, Settings } from 'lucide-react';
 import React, { useState } from 'react';
-import { TrendingUp, Globe, Activity, Settings } from 'lucide-react';
+
+import SEOHead from '../components/SEO/SEOHead';
+import Header from '../components/ui/Header';
 import LiveMarketDashboard from '../components/ui/LiveMarketDashboard';
 import LivePriceWidget from '../components/ui/LivePriceWidget';
-import Header from '../components/ui/Header';
-import SEOHead from '../components/SEO/SEOHead';
 
 /**
  * Market Analysis page with integrated real-time data streaming
@@ -31,7 +32,7 @@ const MarketAnalysis = () => {
         canonical="/market-analysis"
         keywords="real-time market data, live prices, market analysis, trading, stocks, forex, commodities"
       />
-      
+
       <Header />
 
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">

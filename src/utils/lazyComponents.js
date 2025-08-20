@@ -6,72 +6,72 @@ import { lazy } from 'react';
  */
 
 // Core Analysis Components
-export const LazyFinancialSpreadsheet = lazy(() => 
+export const LazyFinancialSpreadsheet = lazy(() =>
   import('../components/PrivateAnalysis/FinancialSpreadsheet')
 );
 
-export const LazyModelingTools = lazy(() => 
+export const LazyModelingTools = lazy(() =>
   import('../components/PrivateAnalysis/ModelingTools')
 );
 
-export const LazyAnalysisResults = lazy(() => 
+export const LazyAnalysisResults = lazy(() =>
   import('../components/PrivateAnalysis/AnalysisResults')
 );
 
 // Advanced Analysis Tools
-export const LazyAdvancedLBOTool = lazy(() => 
+export const LazyAdvancedLBOTool = lazy(() =>
   import('../components/PrivateAnalysis/AdvancedLBOTool')
 );
 
-export const LazyFinancialModelWorkspace = lazy(() => 
+export const LazyFinancialModelWorkspace = lazy(() =>
   import('../components/PrivateAnalysis/FinancialModelWorkspace')
 );
 
-export const LazyEnhancedScenarioAnalysis = lazy(() => 
+export const LazyEnhancedScenarioAnalysis = lazy(() =>
   import('../components/PrivateAnalysis/EnhancedScenarioAnalysis')
 );
 
-export const LazyEnhancedMarketDataDashboard = lazy(() => 
+export const LazyEnhancedMarketDataDashboard = lazy(() =>
   import('../components/PrivateAnalysis/EnhancedMarketDataDashboard')
 );
 
-export const LazyMonteCarloIntegrationHub = lazy(() => 
+export const LazyMonteCarloIntegrationHub = lazy(() =>
   import('../components/PrivateAnalysis/MonteCarloIntegrationHub')
 );
 
-export const LazyDataExportImport = lazy(() => 
+export const LazyDataExportImport = lazy(() =>
   import('../components/DataExportImport')
 );
 
 // Page Components
-export const LazyPortfolioManagement = lazy(() => 
+export const LazyPortfolioManagement = lazy(() =>
   import('../pages/PortfolioManagement')
 );
 
-export const LazyMarketAnalysis = lazy(() => 
+export const LazyMarketAnalysis = lazy(() =>
   import('../pages/MarketAnalysis')
 );
 
 // Chart and Visualization Components
-export const LazyAdvancedFinancialCharts = lazy(() => 
+export const LazyAdvancedFinancialCharts = lazy(() =>
   import('../components/ui/AdvancedFinancialCharts')
 );
 
-export const LazyVirtualizedTable = lazy(() => 
+export const LazyVirtualizedTable = lazy(() =>
   import('../components/ui/VirtualizedTable')
 );
 
-export const LazyVirtualizedFinancialSpreadsheet = lazy(() => 
+export const LazyVirtualizedFinancialSpreadsheet = lazy(() =>
   import('../components/PrivateAnalysis/VirtualizedFinancialSpreadsheet')
 );
 
 // Heavy UI Components
-export const LazyContextualInsightsSidebar = lazy(() => 
+export const LazyContextualInsightsSidebar = lazy(() =>
   import('../components/PrivateAnalysis/ContextualInsightsSidebar')
 );
 
 // Export-related components (heavy dependencies)
-export const LazyExportService = lazy(() => 
+export const LazyExportService = lazy(() =>
   import('../services/exportService').then(module => ({ default: module.default }))
 );
 

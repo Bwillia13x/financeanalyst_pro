@@ -1,15 +1,14 @@
-import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  Database, 
-  Activity, 
-  AlertCircle, 
-  CheckCircle, 
-  Clock, 
-  Settings, 
-  Plus, 
-  RefreshCw, 
-  Download, 
+import {
+  Database,
+  Activity,
+  AlertCircle,
+  CheckCircle,
+  Clock,
+  Settings,
+  Plus,
+  RefreshCw,
+  Download,
   Upload,
   FileText,
   TrendingUp,
@@ -17,10 +16,11 @@ import {
   Globe,
   Shield
 } from 'lucide-react';
+import React, { useState } from 'react';
 
-import Header from '../components/ui/Header';
-import { Card } from '../components/ui/Card';
 import Button from '../components/ui/Button';
+import { Card } from '../components/ui/Card';
+import Header from '../components/ui/Header';
 
 const Data = () => {
   const [activeTab, setActiveTab] = useState('sources');
@@ -33,7 +33,7 @@ const Data = () => {
       lastSync: '2 minutes ago',
       records: '1.2M',
       latency: '45ms',
-      icon: Globe,
+      icon: Globe
     },
     {
       id: 2,
@@ -43,7 +43,7 @@ const Data = () => {
       lastSync: '5 minutes ago',
       records: '850K',
       latency: '120ms',
-      icon: TrendingUp,
+      icon: TrendingUp
     },
     {
       id: 3,
@@ -53,7 +53,7 @@ const Data = () => {
       lastSync: '1 hour ago',
       records: '450K',
       latency: '200ms',
-      icon: FileText,
+      icon: FileText
     },
     {
       id: 4,
@@ -63,7 +63,7 @@ const Data = () => {
       lastSync: 'Failed',
       records: '0',
       latency: 'N/A',
-      icon: Database,
+      icon: Database
     },
     {
       id: 5,
@@ -73,16 +73,16 @@ const Data = () => {
       lastSync: '10 minutes ago',
       records: '320K',
       latency: '300ms',
-      icon: Activity,
-    },
+      icon: Activity
+    }
   ]);
 
-  const [systemHealth, setSystemHealth] = useState({
+  const [systemHealth, _setSystemHealth] = useState({
     overall: 'good',
     dataQuality: 95,
     uptime: 99.8,
     throughput: '45.2k req/min',
-    errorRate: 0.02,
+    errorRate: 0.02
   });
 
   const getStatusIcon = (status) => {
@@ -112,7 +112,7 @@ const Data = () => {
   };
 
   const handleRefreshAll = () => {
-    setDataSources(sources => 
+    setDataSources(sources =>
       sources.map(source => ({
         ...source,
         lastSync: source.status === 'connected' ? 'Syncing...' : source.lastSync
@@ -120,7 +120,7 @@ const Data = () => {
     );
 
     setTimeout(() => {
-      setDataSources(sources => 
+      setDataSources(sources =>
         sources.map(source => ({
           ...source,
           lastSync: source.status === 'connected' ? 'Just now' : source.lastSync
@@ -203,12 +203,12 @@ const Data = () => {
   const renderSystemHealth = () => (
     <div className="space-y-6">
       <h2 className="text-xl font-semibold text-gray-900">System Health</h2>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card className="p-6">
           <div className="flex items-center justify-between mb-2">
             <h3 className="font-medium text-gray-900">Overall Health</h3>
-            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+            <div className="w-3 h-3 bg-green-500 rounded-full" />
           </div>
           <p className="text-2xl font-bold text-green-600">Good</p>
           <p className="text-sm text-gray-600 mt-1">All systems operational</p>
@@ -249,28 +249,28 @@ const Data = () => {
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-600">Market Data Ingestion</span>
               <div className="flex items-center space-x-2">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <div className="w-2 h-2 bg-green-500 rounded-full" />
                 <span className="text-sm font-medium">Active</span>
               </div>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-600">Fundamental Data Processing</span>
               <div className="flex items-center space-x-2">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <div className="w-2 h-2 bg-green-500 rounded-full" />
                 <span className="text-sm font-medium">Active</span>
               </div>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-600">Real-time Updates</span>
               <div className="flex items-center space-x-2">
-                <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                <div className="w-2 h-2 bg-yellow-500 rounded-full" />
                 <span className="text-sm font-medium">Delayed</span>
               </div>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-600">Data Validation</span>
               <div className="flex items-center space-x-2">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <div className="w-2 h-2 bg-green-500 rounded-full" />
                 <span className="text-sm font-medium">Active</span>
               </div>
             </div>
@@ -281,28 +281,28 @@ const Data = () => {
           <h3 className="font-semibold text-gray-900 mb-4">Recent Activity</h3>
           <div className="space-y-3">
             <div className="flex items-center space-x-3">
-              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+              <div className="w-2 h-2 bg-green-500 rounded-full" />
               <div className="flex-1">
                 <p className="text-sm font-medium">Bloomberg data sync completed</p>
                 <p className="text-xs text-gray-600">2 minutes ago</p>
               </div>
             </div>
             <div className="flex items-center space-x-3">
-              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+              <div className="w-2 h-2 bg-blue-500 rounded-full" />
               <div className="flex-1">
                 <p className="text-sm font-medium">Yahoo Finance API updated</p>
                 <p className="text-xs text-gray-600">5 minutes ago</p>
               </div>
             </div>
             <div className="flex items-center space-x-3">
-              <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+              <div className="w-2 h-2 bg-yellow-500 rounded-full" />
               <div className="flex-1">
                 <p className="text-sm font-medium">FactSet connection timeout</p>
                 <p className="text-xs text-gray-600">1 hour ago</p>
               </div>
             </div>
             <div className="flex items-center space-x-3">
-              <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+              <div className="w-2 h-2 bg-red-500 rounded-full" />
               <div className="flex-1">
                 <p className="text-sm font-medium">Refinitiv authentication failed</p>
                 <p className="text-xs text-gray-600">2 hours ago</p>
@@ -317,7 +317,7 @@ const Data = () => {
   const renderDataManagement = () => (
     <div className="space-y-6">
       <h2 className="text-xl font-semibold text-gray-900">Data Management</h2>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <Card className="p-6">
           <div className="flex items-center space-x-3 mb-4">
@@ -387,7 +387,7 @@ const Data = () => {
         </div>
         <div className="mt-6">
           <div className="w-full bg-gray-200 rounded-full h-2">
-            <div className="bg-blue-600 h-2 rounded-full" style={{ width: '70%' }}></div>
+            <div className="bg-blue-600 h-2 rounded-full" style={{ width: '70%' }} />
           </div>
           <p className="text-sm text-gray-600 mt-2">70% storage utilization</p>
         </div>
@@ -398,13 +398,13 @@ const Data = () => {
   const tabs = [
     { id: 'sources', label: 'Data Sources', component: renderDataSources },
     { id: 'health', label: 'System Health', component: renderSystemHealth },
-    { id: 'management', label: 'Data Management', component: renderDataManagement },
+    { id: 'management', label: 'Data Management', component: renderDataManagement }
   ];
 
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
-      
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

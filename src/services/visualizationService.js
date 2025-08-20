@@ -11,7 +11,7 @@ class VisualizationService {
     this.visualizations = new Map();
     this.themes = new Map();
     this.isInitialized = false;
-    
+
     this.initializeService();
   }
 
@@ -21,7 +21,7 @@ class VisualizationService {
       this.setupVisualizationThemes();
       this.setupDefaultWidgets();
       this.setupDashboardTemplates();
-      
+
       this.isInitialized = true;
       console.log('Visualization service initialized with advanced dashboard builder');
     } catch (error) {
@@ -380,7 +380,7 @@ class VisualizationService {
   createVisualization(config) {
     const visualizationId = config.id || `viz_${Date.now()}`;
     const template = this.chartTemplates.get(config.template);
-    
+
     if (!template && config.type !== 'custom') {
       throw new Error(`Chart template ${config.template} not found`);
     }
@@ -429,7 +429,7 @@ class VisualizationService {
 
   generateChart(visualizationConfig) {
     const theme = this.themes.get(visualizationConfig.theme || 'professional');
-    
+
     return {
       type: visualizationConfig.type,
       data: this.processChartData(visualizationConfig.data, visualizationConfig.config),
@@ -494,7 +494,7 @@ class VisualizationService {
     if (config.xAxis) {
       options.scales.x = this.generateAxisOptions(config.xAxis, theme, 'x');
     }
-    
+
     if (config.yAxis || config.yAxes) {
       const yAxes = config.yAxes || [config.yAxis];
       yAxes.forEach((axis, index) => {
@@ -588,7 +588,7 @@ class VisualizationService {
     return data.sort((a, b) => {
       const aVal = a[field];
       const bVal = b[field];
-      
+
       if (direction === 'desc') {
         return bVal - aVal;
       }
@@ -598,7 +598,7 @@ class VisualizationService {
 
   aggregateData(data, aggregationConfig) {
     const { groupBy, aggregations } = aggregationConfig;
-    
+
     const groups = data.reduce((acc, item) => {
       const key = item[groupBy];
       if (!acc[key]) acc[key] = [];
@@ -608,10 +608,10 @@ class VisualizationService {
 
     return Object.entries(groups).map(([key, items]) => {
       const result = { [groupBy]: key };
-      
+
       Object.entries(aggregations).forEach(([field, operation]) => {
         const values = items.map(item => item[field]).filter(v => v !== undefined);
-        
+
         switch (operation) {
           case 'sum':
             result[field] = values.reduce((sum, val) => sum + val, 0);
@@ -630,7 +630,7 @@ class VisualizationService {
             break;
         }
       });
-      
+
       return result;
     });
   }
@@ -643,23 +643,22 @@ class VisualizationService {
   drawTrendLine(chart) {
     // Implementation for drawing trend line
     const ctx = chart.ctx;
-    const chartArea = chart.chartArea;
-    
+
     ctx.save();
     ctx.strokeStyle = '#10b981';
     ctx.lineWidth = 2;
     ctx.setLineDash([5, 5]);
-    
+
     // Draw trend line logic here
-    
+
     ctx.restore();
   }
 
   drawAnnotations(chart, annotations) {
     // Implementation for drawing annotations
     const ctx = chart.ctx;
-    
-    annotations.forEach(annotation => {
+
+    annotations.forEach(_annotation => {
       ctx.save();
       // Draw annotation logic here
       ctx.restore();

@@ -1,41 +1,40 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { 
-  Users, 
-  Share2, 
-  MessageCircle, 
-  Eye, 
-  Edit3, 
-  Crown, 
-  UserPlus, 
-  Settings,
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  Users,
+  Share2,
+  MessageCircle,
+  Eye,
+  Edit3,
+  Crown,
   Copy,
   Check,
   Clock,
   Activity
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import Button from '../ui/Button';
+import React, { useState, useEffect, useRef } from 'react';
+
 import collaborationService from '../../services/collaborationService';
+import Button from '../ui/Button';
 
 /**
  * Real-time collaborative workspace for financial analysis
  * Supports live sharing, real-time cursors, annotations, and multi-user editing
  */
 
-const WorkspaceCollaboration = ({ 
-  workspaceId, 
-  modelData, 
+const WorkspaceCollaboration = ({
+  workspaceId,
+  modelData,
   onModelUpdate,
-  className = '' 
+  className = ''
 }) => {
-  const [workspace, setWorkspace] = useState(null);
+  const [_workspace, setWorkspace] = useState(null);
   const [members, setMembers] = useState([]);
   const [annotations, setAnnotations] = useState([]);
   const [cursors, setCursors] = useState(new Map());
   const [connectionStatus, setConnectionStatus] = useState({ online: false, connected: false });
   const [showShareModal, setShowShareModal] = useState(false);
   const [showMembersPanel, setShowMembersPanel] = useState(false);
-  const [inviteEmail, setInviteEmail] = useState('');
+  const [_inviteEmail, _setInviteEmail] = useState('');
   const [sharePermissions, setSharePermissions] = useState({
     canEdit: false,
     canComment: true,
@@ -46,7 +45,7 @@ const WorkspaceCollaboration = ({
 
   useEffect(() => {
     // Initialize collaboration service
-    const initializeCollaboration = async () => {
+    const initializeCollaboration = async() => {
       try {
         await collaborationService.initialize('current-user-id', {
           name: 'Current User',
@@ -128,7 +127,7 @@ const WorkspaceCollaboration = ({
     }
   }, [workspaceId]);
 
-  const handleShareModel = async () => {
+  const handleShareModel = async() => {
     try {
       await collaborationService.shareModel(
         workspaceId,
@@ -142,7 +141,7 @@ const WorkspaceCollaboration = ({
     }
   };
 
-  const handleAddAnnotation = async (position, content) => {
+  const _handleAddAnnotation = async(position, content) => {
     try {
       await collaborationService.addAnnotation(workspaceId, 'main-model', {
         content,
@@ -354,11 +353,12 @@ const WorkspaceCollaboration = ({
 
                 {/* Share Link */}
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                  <label htmlFor="share-link" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                     Share Link
                   </label>
                   <div className="flex items-center space-x-2">
                     <input
+                      id="share-link"
                       type="text"
                       value={`${window.location.origin}/workspace/${workspaceId}`}
                       readOnly
@@ -377,7 +377,7 @@ const WorkspaceCollaboration = ({
 
                 {/* Permissions */}
                 <div className="mb-6">
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                  <label htmlFor="permissions" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                     Permissions
                   </label>
                   <div className="space-y-2">

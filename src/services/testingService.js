@@ -10,7 +10,7 @@ class TestingService {
     this.performanceMetrics = new Map();
     this.benchmarks = new Map();
     this.isInitialized = false;
-    
+
     this.initializeService();
   }
 
@@ -20,7 +20,7 @@ class TestingService {
       this.setupPerformanceBenchmarks();
       this.initializeMockData();
       this.startPerformanceMonitoring();
-      
+
       this.isInitialized = true;
       console.log('Testing service initialized with comprehensive test suites');
     } catch (error) {
@@ -195,7 +195,7 @@ class TestingService {
       for (const test of suite.tests) {
         const result = await this.runSingleTest(test);
         testRun.results.push(result);
-        
+
         if (result.status === 'passed') {
           testRun.summary.passed++;
         } else if (result.status === 'failed') {
@@ -208,7 +208,7 @@ class TestingService {
       testRun.status = testRun.summary.failed === 0 ? 'passed' : 'failed';
       testRun.endTime = new Date().toISOString();
       testRun.duration = new Date(testRun.endTime) - new Date(testRun.startTime);
-      
+
       this.testResults.set(testRun.id, testRun);
       return testRun;
 
@@ -287,7 +287,7 @@ class TestingService {
 
     const assumptions = { revenueGrowthRate: 0.05, discountRate: 0.10 };
     const result = this.simulateDCFCalculation(mockData, assumptions);
-    
+
     if (result.enterpriseValue <= 0) {
       throw new Error('Enterprise value must be positive');
     }
@@ -439,7 +439,7 @@ class TestingService {
 
   simulateDataValidation(data) {
     try {
-      if (typeof data.assumptions?.revenueGrowth === 'number' && 
+      if (typeof data.assumptions?.revenueGrowth === 'number' &&
           typeof data.assumptions?.discountRate === 'number' &&
           data.assumptions.discountRate > 0 &&
           typeof data.currency === 'string') {
@@ -451,7 +451,7 @@ class TestingService {
     }
   }
 
-  async simulateAPICall(endpoint) {
+  async simulateAPICall(_endpoint) {
     await new Promise(resolve => setTimeout(resolve, Math.random() * 500 + 100));
     return {
       status: 200,
@@ -509,7 +509,7 @@ class TestingService {
 
   evaluateBenchmarks(metrics, benchmarks) {
     const results = { passed: 0, failed: 0, details: {} };
-    
+
     Object.entries(benchmarks).forEach(([key, threshold]) => {
       const actualValue = metrics[key];
       if (actualValue !== undefined) {
@@ -557,7 +557,7 @@ class TestingService {
   generateTestReport() {
     const results = this.getTestResults();
     const performance = this.getPerformanceMetrics();
-    
+
     return {
       summary: {
         totalRuns: results.length,

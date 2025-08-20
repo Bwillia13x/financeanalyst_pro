@@ -1,8 +1,9 @@
+import { FileText } from 'lucide-react';
 import React from 'react';
-import { FileText, TrendingUp } from 'lucide-react';
-import Header from '../components/ui/Header';
-import SEOHead from '../components/SEO/SEOHead';
+
 import ReportBuilder from '../components/Reporting/ReportBuilder';
+import SEOHead from '../components/SEO/SEOHead';
+import Header from '../components/ui/Header';
 
 const Reports = () => {
   return (
@@ -13,7 +14,7 @@ const Reports = () => {
         canonical="/reports"
         keywords="investment reports, IC memos, financial analysis reports, PDF export, investment committee, due diligence reports"
       />
-      
+
       <Header />
 
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -26,14 +27,14 @@ const Reports = () => {
             </h1>
           </div>
           <p className="text-slate-600 dark:text-slate-400 max-w-3xl">
-            Generate professional investment reports and IC memos with customizable templates, 
+            Generate professional investment reports and IC memos with customizable templates,
             automated data integration, and one-click PDF/DOCX export capabilities.
           </p>
         </div>
 
         {/* Report Builder */}
         <div className="bg-white dark:bg-slate-800 rounded-lg shadow-lg">
-          <ReportBuilder 
+          <ReportBuilder
             onReportGenerated={(report) => {
               console.log('Report generated:', report);
               // Handle report generation success

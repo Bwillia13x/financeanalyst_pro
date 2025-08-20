@@ -251,7 +251,7 @@ const ModelingTools = ({ data, adjustedValues, onDataChange }) => {
   return (
     <div className="h-full bg-gray-900 text-white p-6">
       {/* Advanced Analytics Integration */}
-      <AdvancedAnalyticsIntegration 
+      <AdvancedAnalyticsIntegration
         onOpenOptions={handleOpenOptions}
         onOpenBonds={handleOpenBonds}
         onOpenCredit={handleOpenCredit}

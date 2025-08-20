@@ -1,5 +1,5 @@
+import { Plus, Calculator, Edit2, TrendingUp } from 'lucide-react';
 import React, { useState, useMemo, useCallback } from 'react';
-import { Plus, FileText, Calculator, Edit2, TrendingUp } from 'lucide-react';
 
 import VirtualizedTable from '../ui/VirtualizedTable';
 
@@ -7,14 +7,14 @@ import VirtualizedTable from '../ui/VirtualizedTable';
  * Performance-optimized financial spreadsheet using virtualization
  * Handles 10,000+ rows without performance degradation
  */
-const VirtualizedFinancialSpreadsheet = ({ 
-  data, 
-  onDataChange, 
-  onAdjustedValuesChange,
-  maxRows = 10000 
+const VirtualizedFinancialSpreadsheet = ({
+  data,
+  onDataChange,
+  _onAdjustedValuesChange,
+  maxRows = 10000
 }) => {
   const [activeStatement, setActiveStatement] = useState('incomeStatement');
-  const [adjustedValues, setAdjustedValues] = useState({});
+  const [_adjustedValues, _setAdjustedValues] = useState({});
   const [sortConfig, setSortConfig] = useState(null);
   const [selectedRows, setSelectedRows] = useState([]);
 
@@ -104,11 +104,13 @@ const VirtualizedFinancialSpreadsheet = ({
       </div>
     ),
     type: (value, row) => (
-      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
-        row.isCalculated 
-          ? 'bg-blue-100 text-blue-800 border border-blue-200' 
-          : 'bg-slate-100 text-slate-700 border border-slate-200'
-      }`}>
+      <span
+        className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
+          row.isCalculated
+            ? 'bg-blue-100 text-blue-800 border border-blue-200'
+            : 'bg-slate-100 text-slate-700 border border-slate-200'
+        }`}
+      >
         {row.isCalculated ? (
           <>
             <Calculator size={10} className="mr-1" />
@@ -145,22 +147,22 @@ const VirtualizedFinancialSpreadsheet = ({
     if (periodMatch) {
       const periodIndex = parseInt(periodMatch[1]);
       const numericValue = parseFloat(newValue) || 0;
-      
+
       // Update the data through the parent component
       if (onDataChange) {
         const updatedData = { ...data };
         const statement = updatedData[activeStatement];
-        
+
         // Navigate to the specific item and update its value
-        const updateNestedValue = (obj, path, value) => {
+        const updateNestedValue = (obj, path, _value) => {
           const keys = path.split('_');
           let current = obj;
-          
+
           for (let i = 0; i < keys.length - 1; i++) {
             if (!current[keys[i]]) return;
             current = current[keys[i]];
           }
-          
+
           const finalKey = keys[keys.length - 1];
           if (current[finalKey] && current[finalKey].values) {
             current[finalKey].values[periodIndex] = numericValue;
@@ -188,16 +190,16 @@ const VirtualizedFinancialSpreadsheet = ({
     return [...tableData].sort((a, b) => {
       const aValue = a[sortConfig.key];
       const bValue = b[sortConfig.key];
-      
+
       // Handle numeric values
       if (typeof aValue === 'number' && typeof bValue === 'number') {
         return sortConfig.direction === 'asc' ? aValue - bValue : bValue - aValue;
       }
-      
+
       // Handle string values
       const aStr = String(aValue).toLowerCase();
       const bStr = String(bValue).toLowerCase();
-      
+
       if (sortConfig.direction === 'asc') {
         return aStr.localeCompare(bStr);
       } else {
@@ -213,8 +215,8 @@ const VirtualizedFinancialSpreadsheet = ({
       setSelectedRows(isSelected ? rowIndices : []);
     } else {
       // Select/deselect individual row
-      setSelectedRows(prev => 
-        isSelected 
+      setSelectedRows(prev =>
+        isSelected
           ? [...prev, rowIndices]
           : prev.filter(index => index !== rowIndices)
       );
@@ -223,14 +225,14 @@ const VirtualizedFinancialSpreadsheet = ({
 
   // Add new period
   const addPeriod = useCallback(() => {
-    const currentYear = new Date().getFullYear();
+    const _currentYear = new Date().getFullYear();
     const newPeriodName = `Year ${data.periods.length + 1}`;
-    
+
     const updatedData = {
       ...data,
       periods: [...data.periods, newPeriodName]
     };
-    
+
     onDataChange?.(updatedData);
   }, [data, onDataChange]);
 
@@ -252,7 +254,7 @@ const VirtualizedFinancialSpreadsheet = ({
               </p>
             </div>
           </div>
-          
+
           <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
             <button
               onClick={addPeriod}
@@ -262,7 +264,7 @@ const VirtualizedFinancialSpreadsheet = ({
               <span className="hidden sm:inline">Add Period</span>
               <span className="sm:hidden">Add</span>
             </button>
-            
+
             <select
               value={activeStatement}
               onChange={(e) => setActiveStatement(e.target.value)}
@@ -274,7 +276,7 @@ const VirtualizedFinancialSpreadsheet = ({
             </select>
           </div>
         </div>
-        
+
         {/* Performance Stats */}
         <div className="mt-4 flex items-center gap-4 text-xs text-slate-400">
           <span>Rows: {sortedData.length.toLocaleString()}</span>

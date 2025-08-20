@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+
 import realTimeDataService from '../services/realTimeDataService';
 
 /**
@@ -11,7 +12,7 @@ export const useRealTimeData = (dataType, symbol, options = {}) => {
   const [isConnected, setIsConnected] = useState(false);
   const [error, setError] = useState(null);
   const [lastUpdated, setLastUpdated] = useState(null);
-  
+
   const unsubscribeRef = useRef(null);
   const reconnectTimeoutRef = useRef(null);
   const optionsRef = useRef(options);
@@ -26,7 +27,7 @@ export const useRealTimeData = (dataType, symbol, options = {}) => {
     setData(newData);
     setLastUpdated(new Date());
     setError(null);
-    
+
     if (!isConnected) {
       setIsConnected(true);
     }
@@ -41,7 +42,7 @@ export const useRealTimeData = (dataType, symbol, options = {}) => {
   const handleError = useCallback((err) => {
     setError(err);
     setIsConnected(false);
-    
+
     if (optionsRef.current.onError) {
       optionsRef.current.onError(err);
     }
@@ -80,12 +81,12 @@ export const useRealTimeData = (dataType, symbol, options = {}) => {
       unsubscribeRef.current();
       unsubscribeRef.current = null;
     }
-    
+
     if (reconnectTimeoutRef.current) {
       clearTimeout(reconnectTimeoutRef.current);
       reconnectTimeoutRef.current = null;
     }
-    
+
     setIsConnected(false);
   }, []);
 
@@ -123,7 +124,7 @@ export const useMultipleRealTimeData = (subscriptions = []) => {
   const [dataMap, setDataMap] = useState(new Map());
   const [connectionStates, setConnectionStates] = useState(new Map());
   const [errors, setErrors] = useState(new Map());
-  
+
   const unsubscribeRef = useRef(null);
 
   const updateData = useCallback((key, data) => {
@@ -149,7 +150,7 @@ export const useMultipleRealTimeData = (subscriptions = []) => {
         updateData(key, data);
         updateConnectionState(key, true);
         updateError(key, null);
-        
+
         if (options.onUpdate) {
           options.onUpdate(data);
         }
@@ -158,7 +159,7 @@ export const useMultipleRealTimeData = (subscriptions = []) => {
 
     try {
       unsubscribeRef.current = realTimeDataService.subscribeMultiple(subscriptionConfigs);
-      
+
       // Initialize connection states
       subscriptions.forEach(({ dataType, symbol }) => {
         const key = `${dataType}_${symbol}`;

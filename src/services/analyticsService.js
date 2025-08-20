@@ -13,7 +13,7 @@ class AnalyticsService {
     this.isInitialized = false;
     this.currentSession = null;
     this.trackingEnabled = true;
-    
+
     // Configuration
     this.config = {
       sessionTimeout: 30 * 60 * 1000, // 30 minutes
@@ -39,22 +39,22 @@ class AnalyticsService {
     try {
       // Load stored data
       this.loadStoredData();
-      
+
       // Start new session
       this.startSession();
-      
+
       // Set up periodic data flushing
       this.startFlushTimer();
-      
+
       // Set up page visibility tracking
       this.setupVisibilityTracking();
-      
+
       // Set up performance monitoring
       this.setupPerformanceMonitoring();
-      
+
       this.isInitialized = true;
       this.trackEvent('analytics_initialized', { timestamp: Date.now() });
-      
+
       console.log('AnalyticsService initialized successfully');
     } catch (error) {
       console.error('Failed to initialize AnalyticsService:', error);
@@ -71,12 +71,12 @@ class AnalyticsService {
       const stored = localStorage.getItem(this.config.storageKey);
       if (stored) {
         const data = JSON.parse(stored);
-        
+
         // Restore feature usage data
         if (data.featureUsage) {
           this.featureUsage = new Map(Object.entries(data.featureUsage));
         }
-        
+
         // Restore user behavior data
         if (data.userBehavior) {
           this.userBehavior = new Map(Object.entries(data.userBehavior));
@@ -99,7 +99,7 @@ class AnalyticsService {
         userBehavior: Object.fromEntries(this.userBehavior),
         lastSaved: Date.now()
       };
-      
+
       localStorage.setItem(this.config.storageKey, JSON.stringify(data));
     } catch (error) {
       console.error('Failed to save analytics data:', error);
@@ -111,7 +111,7 @@ class AnalyticsService {
    */
   startSession() {
     const sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    
+
     this.currentSession = {
       id: sessionId,
       startTime: Date.now(),
@@ -126,7 +126,7 @@ class AnalyticsService {
         scrollDepth: 0
       }
     };
-    
+
     this.userSessions.set(sessionId, this.currentSession);
     this.trackEvent('session_started', { sessionId });
   }
@@ -138,7 +138,7 @@ class AnalyticsService {
     if (!this.currentSession) return;
 
     const sessionDuration = Date.now() - this.currentSession.startTime;
-    
+
     this.trackEvent('session_ended', {
       sessionId: this.currentSession.id,
       duration: sessionDuration,
@@ -172,7 +172,7 @@ class AnalyticsService {
 
     // Add to event queue
     this.eventQueue.push(event);
-    
+
     // Add to current session
     if (this.currentSession) {
       this.currentSession.events.push(event);
@@ -215,7 +215,7 @@ class AnalyticsService {
    */
   trackFeatureUsage(feature, action = 'used', properties = {}) {
     const key = `${feature}_${action}`;
-    
+
     // Update feature usage stats
     const usage = this.featureUsage.get(key) || {
       feature,
@@ -230,7 +230,7 @@ class AnalyticsService {
 
     usage.count++;
     usage.lastUsed = Date.now();
-    
+
     if (this.currentSession) {
       usage.sessions.add(this.currentSession.id);
       this.currentSession.features.add(feature);
@@ -300,8 +300,8 @@ class AnalyticsService {
    */
   processFeatureUsage(eventName, properties) {
     if (eventName === 'feature_usage') {
-      const { feature, action } = properties;
-      
+      const { feature, action: _action } = properties;
+
       // Track feature adoption over time
       const adoptionKey = `adoption_${feature}`;
       const adoption = this.userBehavior.get(adoptionKey) || {
@@ -404,7 +404,7 @@ class AnalyticsService {
   /**
    * Track time-based usage patterns
    */
-  trackTimePattern(eventName) {
+  trackTimePattern(_eventName) {
     const timeKey = 'time_pattern';
     const pattern = this.userBehavior.get(timeKey) || {
       type: 'time_usage',
@@ -452,7 +452,7 @@ class AnalyticsService {
         const timing = performance.timing;
         const loadTime = timing.loadEventEnd - timing.navigationStart;
         const domReady = timing.domContentLoadedEventEnd - timing.navigationStart;
-        
+
         this.trackPerformance('page_load_time', loadTime);
         this.trackPerformance('dom_ready_time', domReady);
       });
@@ -472,7 +472,7 @@ class AnalyticsService {
           });
         });
         observer.observe({ entryTypes: ['longtask'] });
-      } catch (e) {
+      } catch {
         // PerformanceObserver not supported
       }
     }
@@ -602,7 +602,7 @@ class AnalyticsService {
    */
   getPerformanceMetrics() {
     const metrics = Array.from(this.performanceMetrics.values());
-    
+
     return {
       averageLoadTime: this.calculateAverageMetric(metrics, 'page_load_time'),
       averageDomReady: this.calculateAverageMetric(metrics, 'dom_ready_time'),
@@ -616,7 +616,7 @@ class AnalyticsService {
    */
   getSessionMetrics() {
     const sessions = Array.from(this.userSessions.values());
-    
+
     return {
       totalSessions: sessions.length,
       averageDuration: this.getAverageSessionLength(),
@@ -630,7 +630,6 @@ class AnalyticsService {
    * Get trend analysis
    */
   getTrendAnalysis() {
-    const now = Date.now();
     const oneDay = 24 * 60 * 60 * 1000;
     const oneWeek = 7 * oneDay;
 
@@ -646,20 +645,20 @@ class AnalyticsService {
   getAverageSessionLength() {
     const sessions = Array.from(this.userSessions.values());
     if (sessions.length === 0) return 0;
-    
+
     const totalDuration = sessions.reduce((sum, session) => {
       const duration = session.lastActivity - session.startTime;
       return sum + duration;
     }, 0);
-    
+
     return totalDuration / sessions.length;
   }
 
   getMostUsedFeature() {
     const features = Array.from(this.featureUsage.values());
     if (features.length === 0) return null;
-    
-    return features.reduce((max, feature) => 
+
+    return features.reduce((max, feature) =>
       feature.count > max.count ? feature : max
     );
   }
@@ -680,11 +679,11 @@ class AnalyticsService {
   calculateAverageMetric(metrics, metricName) {
     const filtered = metrics.filter(m => m.metric === metricName);
     if (filtered.length === 0) return 0;
-    
+
     return filtered.reduce((sum, m) => sum + m.value, 0) / filtered.length;
   }
 
-  getPerformanceTrends(metrics) {
+  getPerformanceTrends(_metrics) {
     // This would analyze performance trends over time
     return {
       loadTimetrend: 'stable',
@@ -707,7 +706,7 @@ class AnalyticsService {
     sessions.forEach(session => {
       const duration = session.lastActivity - session.startTime;
       const minutes = duration / (60 * 1000);
-      
+
       if (minutes < 1) distribution.short++;
       else if (minutes < 10) distribution.medium++;
       else distribution.long++;
@@ -716,7 +715,7 @@ class AnalyticsService {
     return distribution;
   }
 
-  calculateGrowthRate(timeframe) {
+  calculateGrowthRate(_timeframe) {
     // This would calculate growth rate over the specified timeframe
     return Math.random() * 20 - 10; // Placeholder: -10% to +10%
   }
@@ -753,11 +752,11 @@ class AnalyticsService {
     this.performanceMetrics.clear();
     this.userBehavior.clear();
     this.eventQueue = [];
-    
+
     if (this.config.enableLocalStorage) {
       localStorage.removeItem(this.config.storageKey);
     }
-    
+
     this.trackEvent('analytics_data_cleared');
   }
 
@@ -768,11 +767,11 @@ class AnalyticsService {
     if (this.flushTimer) {
       clearInterval(this.flushTimer);
     }
-    
+
     this.endSession();
     this.flushEvents();
     this.saveData();
-    
+
     console.log('AnalyticsService cleaned up');
   }
 }

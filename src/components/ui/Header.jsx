@@ -1,16 +1,15 @@
+import { Menu, X } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X } from 'lucide-react';
 
-import { cn } from '../../utils/cn';
-import Button from './Button';
-import LiveMarketTicker from './LiveMarketTicker';
-import SkipLink from './SkipLink';
 import Icon from '../AppIcon';
-import { motion } from 'framer-motion';
-import SecondaryNav from './SecondaryNav';
 import BusinessIntelligenceDashboard from '../BusinessIntelligence/BusinessIntelligenceDashboard';
+
+import Button from './Button';
 import { useKeyboardShortcutsContext } from './KeyboardShortcutsProvider';
+import SecondaryNav from './SecondaryNav';
+import SkipLink from './SkipLink';
+
 
 const Header = () => {
   const location = useLocation();
@@ -170,7 +169,7 @@ const Header = () => {
       route: location.pathname,
       activeTab: _activeTab?.id || null
     });
-  }, [location.pathname, _activeTab?.id, updateCommandContext]);
+  }, [location.pathname, _activeTab?.id]); // Removed updateCommandContext dependency to prevent infinite re-renders
 
   return (
     <>
@@ -182,7 +181,10 @@ const Header = () => {
           <div className="flex items-center">
             <div className="flex items-center space-x-2">
               <div className="w-6 h-6 sm:w-8 sm:h-8 bg-primary rounded-lg flex items-center justify-center">
-                <Icon name="TrendingUp" size={16} color="white" className="sm:w-5 sm:h-5" />
+                <Icon
+                  name="TrendingUp" size={16} color="white"
+                  className="sm:w-5 sm:h-5"
+                />
               </div>
               <span className="text-lg sm:text-xl font-semibold text-foreground">
                 <span className="hidden sm:inline">FinanceAnalyst Pro</span>
@@ -368,10 +370,10 @@ const Header = () => {
                     className={`
                       block px-4 py-3 text-sm font-medium rounded-lg transition-smooth focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2
                       ${
-                        location.pathname === tab.path
-                          ? 'bg-primary text-primary-foreground'
-                          : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-                      }
+                  location.pathname === tab.path
+                    ? 'bg-primary text-primary-foreground'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                  }
                     `}
                     aria-current={location.pathname === tab.path ? 'page' : undefined}
                   >
@@ -383,7 +385,9 @@ const Header = () => {
               {/* Command Palette Quick Access */}
               <div className="mt-3">
                 <button
-                  onClick={() => { setIsMobileMenuOpen(false); showCommandPalette(); }}
+                  onClick={() => {
+                    setIsMobileMenuOpen(false); showCommandPalette();
+                  }}
                   className="w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-smooth text-foreground bg-muted hover:bg-muted/80 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
                 >
                   <Icon name="Command" size={16} className="mr-2" />
@@ -404,10 +408,10 @@ const Header = () => {
                       className={`
                         block px-4 py-3 text-sm font-medium rounded-lg transition-smooth focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2
                         ${
-                          location.pathname === item.path
-                            ? 'bg-muted text-foreground'
-                            : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-                        }
+                    location.pathname === item.path
+                      ? 'bg-muted text-foreground'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                    }
                       `}
                       aria-current={location.pathname === item.path ? 'page' : undefined}
                       title={item.tooltip}
@@ -417,7 +421,7 @@ const Header = () => {
                   ))}
                 </div>
               </div>
-              
+
               {/* Mobile Status Indicators */}
               <div className="mt-4 pt-4 border-t border-border space-y-3">
                 <div className="flex items-center justify-between px-4 py-2 bg-muted rounded-lg">
@@ -427,14 +431,16 @@ const Header = () => {
                     <span className="text-xs font-mono text-muted-foreground">{modelState.name}</span>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center justify-between px-4 py-2 bg-muted rounded-lg">
                   <span className="text-xs text-muted-foreground">Data Sync</span>
                   <div className="flex items-center space-x-2">
-                    <div className={`w-2 h-2 rounded-full ${
-                      dataSyncStatus.status === 'connected' ? 'bg-success' : 
-                      dataSyncStatus.status === 'warning' ? 'bg-warning' : 'bg-error'
-                    }`} />
+                    <div
+                      className={`w-2 h-2 rounded-full ${
+                        dataSyncStatus.status === 'connected' ? 'bg-success' :
+                          dataSyncStatus.status === 'warning' ? 'bg-warning' : 'bg-error'
+                      }`}
+                    />
                     <span className="text-xs text-muted-foreground">{dataSyncStatus.lastUpdate}</span>
                   </div>
                 </div>

@@ -5,8 +5,16 @@ import { reportPerformanceMetric } from '../utils/performanceMonitoring';
 
 // React hook for accessibility testing
 export function useAccessibility(options = {}) {
+  // Disable accessibility testing during E2E tests to prevent interference
+  const isTestEnvironment = typeof window !== 'undefined' && (
+    window.navigator?.webdriver === true ||
+    window.location?.search?.includes('lhci') ||
+    window.location?.search?.includes('ci') ||
+    window.location?.search?.includes('audit')
+  );
+
   const {
-    enabled = import.meta.env.DEV,
+    enabled = import.meta.env.DEV && !isTestEnvironment,
     autoTest = false,
     testInterval = null,
     componentType = 'generic',

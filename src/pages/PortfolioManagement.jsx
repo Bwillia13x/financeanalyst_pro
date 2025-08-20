@@ -1,14 +1,12 @@
 import {
-  Eye,
   Plus,
   TrendingUp,
   TrendingDown,
   PieChart,
   DollarSign,
-  Target,
-  BarChart3
+  Target
 } from 'lucide-react';
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 import PortfolioAnalytics from '../components/PortfolioAnalytics/PortfolioAnalytics';
 import PortfolioBuilder from '../components/PortfolioBuilder/PortfolioBuilder';
@@ -18,10 +16,7 @@ import secureApiClient from '../services/secureApiClient';
 import { formatCurrency, formatPercentage, formatNumber } from '../utils/formatters';
 
 const PortfolioManagement = () => {
-  const [_portfolios] = useState([]);
   const [activePortfolio, setActivePortfolio] = useState(null);
-  const [_portfolioPerformance, _setPortfolioPerformance] = useState({});
-  const [_riskMetrics, _setRiskMetrics] = useState({});
   const [marketData, setMarketData] = useState({});
   const [loading, setLoading] = useState({
     portfolios: false,
@@ -29,7 +24,6 @@ const PortfolioManagement = () => {
     risk: false,
     market: false
   });
-  const [_showCreateModal] = useState(false);
   const [selectedTimeframe, setSelectedTimeframe] = useState('1M');
   const [viewMode, setViewMode] = useState('overview'); // overview, builder, analytics
 
@@ -85,59 +79,6 @@ const PortfolioManagement = () => {
   }, [activePortfolio, loading.market]);
 
   // Calculate portfolio performance metrics
-  const _portfolioMetrics = useMemo(() => {
-    if (!activePortfolio || !marketData) return null;
-
-    let totalValue = activePortfolio.cash || 0;
-    let totalCostBasis = 0;
-    let dailyChange = 0;
-    let dividendYield = 0;
-
-    const updatedHoldings = activePortfolio.holdings.map(holding => {
-      const marketQuote = marketData[holding.symbol];
-      const currentPrice = marketQuote?.currentPrice || holding.currentPrice;
-      const previousClose = marketQuote?.previousClose || holding.currentPrice;
-      const change = marketQuote?.change || 0;
-
-      const currentValue = holding.shares * currentPrice;
-      const costBasisValue = holding.shares * holding.costBasis;
-      const holdingDailyChange = holding.shares * change;
-
-      totalValue += currentValue;
-      totalCostBasis += costBasisValue;
-      dailyChange += holdingDailyChange;
-      dividendYield += (marketQuote?.dividendYield || 0) * (currentValue / 100000); // Weighted by portfolio allocation
-
-      return {
-        ...holding,
-        currentPrice,
-        previousClose,
-        change,
-        value: currentValue,
-        costBasisValue,
-        gainLoss: currentValue - costBasisValue,
-        gainLossPercent: ((currentValue - costBasisValue) / costBasisValue) * 100,
-        allocation: (currentValue / totalValue) * 100,
-        dayChange: holdingDailyChange
-      };
-    });
-
-    const totalGainLoss = totalValue - totalCostBasis;
-    const totalGainLossPercent = (totalGainLoss / totalCostBasis) * 100;
-    const dailyChangePercent = (dailyChange / (totalValue - dailyChange)) * 100;
-
-    return {
-      totalValue,
-      totalCostBasis,
-      totalGainLoss,
-      totalGainLossPercent,
-      dailyChange,
-      dailyChangePercent,
-      dividendYield,
-      holdings: updatedHoldings,
-      cashAllocation: ((activePortfolio.cash || 0) / totalValue) * 100
-    };
-  }, [activePortfolio, marketData]);
 
   // Fetch market data when active portfolio changes
   useEffect(() => {
@@ -200,7 +141,7 @@ const PortfolioManagement = () => {
 
             <div className="flex items-center space-x-4">
               {/* Portfolio Management Navigation */}
-              <SecondaryNav 
+              <SecondaryNav
                 variant="horizontal"
                 items={[
                   { id: 'overview', label: 'Overview', icon: 'Eye' },
@@ -258,7 +199,7 @@ const PortfolioManagement = () => {
 };
 
 // Portfolio Overview Component
-const PortfolioCard = ({ portfolio, marketData: _marketData, selectedTimeframe: _selectedTimeframe, onTimeframeChange: _onTimeframeChange, timeframeOptions: _timeframeOptions }) => {
+const PortfolioCard = ({ portfolio }) => {
   return (
     <div className="space-y-6">
       {/* Portfolio Summary Cards */}
@@ -356,8 +297,8 @@ const PortfolioCard = ({ portfolio, marketData: _marketData, selectedTimeframe: 
         </div>
 
         <div className="overflow-x-auto">
-          <table 
-            className="w-full" 
+          <table
+            className="w-full"
             role="table"
             aria-label="Portfolio holdings table"
           >
@@ -398,42 +339,42 @@ const PortfolioCard = ({ portfolio, marketData: _marketData, selectedTimeframe: 
                       <div className="text-sm text-gray-500">{holding.name}</div>
                     </div>
                   </th>
-                  <td 
-                    className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset" 
+                  <td
+                    className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset"
                     tabIndex="0"
                     aria-label={`Shares: ${formatNumber(holding.shares)}`}
                   >
                     {formatNumber(holding.shares)}
                   </td>
-                  <td 
-                    className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset" 
+                  <td
+                    className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset"
                     tabIndex="0"
                     aria-label={`Price: ${formatCurrency(holding.currentPrice)}`}
                   >
                     {formatCurrency(holding.currentPrice)}
                   </td>
-                  <td 
-                    className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset" 
+                  <td
+                    className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset"
                     tabIndex="0"
                     aria-label={`Market Value: ${formatCurrency(holding.value)}`}
                   >
                     {formatCurrency(holding.value)}
                   </td>
-                  <td 
-                    className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset" 
+                  <td
+                    className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset"
                     tabIndex="0"
                     aria-label={`Allocation: ${formatPercentage(holding.allocation)}`}
                   >
                     {formatPercentage(holding.allocation)}
                   </td>
-                  <td 
+                  <td
                     className={`px-6 py-4 whitespace-nowrap text-right text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset ${holding.dayChange >= 0 ? 'text-green-600' : 'text-red-600'}`}
                     tabIndex="0"
                     aria-label={`Day Change: ${formatCurrency(holding.dayChange)} ${holding.dayChange >= 0 ? 'positive' : 'negative'}`}
                   >
                     {formatCurrency(holding.dayChange)}
                   </td>
-                  <td 
+                  <td
                     className={`px-6 py-4 whitespace-nowrap text-right text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset ${holding.gainLoss >= 0 ? 'text-green-600' : 'text-red-600'}`}
                     tabIndex="0"
                     aria-label={`Total Gain Loss: ${formatCurrency(holding.gainLoss)} ${holding.gainLossPercent >= 0 ? 'positive' : 'negative'} ${formatPercentage(holding.gainLossPercent)} percent`}
@@ -455,14 +396,14 @@ const PortfolioCard = ({ portfolio, marketData: _marketData, selectedTimeframe: 
                   </th>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900" aria-label="Shares: Not applicable">-</td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900" aria-label="Price: Not applicable">-</td>
-                  <td 
-                    className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset" 
+                  <td
+                    className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset"
                     tabIndex="0"
                     aria-label={`Cash Value: ${formatCurrency(portfolio.cash)}`}
                   >
                     {formatCurrency(portfolio.cash)}
                   </td>
-                  <td 
+                  <td
                     className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900"
                     aria-label="Cash Allocation: 0.1 percent"
                   >

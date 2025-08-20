@@ -1,9 +1,10 @@
 import { useState, useMemo } from 'react';
+import { XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
+
 import { Card } from '../ui/Card';
-import Button from '../ui/Button';
 import Input from '../ui/Input';
 import Select from '../ui/Select';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
+
 
 const CreditModeling = () => {
   const [inputs, setInputs] = useState({
@@ -28,14 +29,14 @@ const CreditModeling = () => {
 
   // Credit risk calculations
   const creditRiskMetrics = useMemo(() => {
-    const { exposureAmount: EAD, lgd: LGD, pd: PD, timeHorizon, correlationFactor, confidenceLevel } = inputs;
-    
+    const { exposureAmount: EAD, lgd: LGD, pd: PD, timeHorizon, confidenceLevel } = inputs;
+
     // Expected Loss
     const expectedLoss = EAD * PD * LGD;
-    
+
     // Unexpected Loss (single asset)
     const unexpectedLoss = EAD * LGD * Math.sqrt(PD * (1 - PD));
-    
+
     // Economic Capital (using normal approximation)
     const normalInverse = (p) => {
       // Approximation of inverse normal CDF
@@ -45,24 +46,24 @@ const CreditModeling = () => {
       const d1 = 1.432788;
       const d2 = 0.189269;
       const d3 = 0.001308;
-      
+
       const t = Math.sqrt(-2 * Math.log(1 - p));
       return t - (c0 + c1 * t + c2 * t * t) / (1 + d1 * t + d2 * t * t + d3 * t * t * t);
     };
-    
+
     const economicCapital = normalInverse(confidenceLevel) * unexpectedLoss;
-    
+
     // Value at Risk
     const valueAtRisk = expectedLoss + economicCapital;
-    
+
     // RAROC (Risk-Adjusted Return on Capital)
     const assumedSpread = 0.025; // 250 bps spread
     const revenue = EAD * assumedSpread;
     const raroc = (revenue - expectedLoss) / economicCapital;
-    
+
     // Cumulative default probability over time horizon
     const cumulativePD = 1 - Math.pow(1 - PD, timeHorizon);
-    
+
     return {
       expectedLoss,
       unexpectedLoss,
@@ -78,59 +79,59 @@ const CreditModeling = () => {
   // Credit scorecard calculation
   const creditScore = useMemo(() => {
     const { revenue, debt, ebitda, currentRatio, quickRatio, industryRisk, managementQuality, marketPosition } = scorecardInputs;
-    
+
     let score = 0;
     let maxScore = 0;
-    
+
     // Financial ratios (60% weight)
     const debtToEbitda = debt / ebitda;
     const ebitdaMargin = ebitda / revenue;
-    
+
     // Debt/EBITDA scoring (20 points)
     maxScore += 20;
     if (debtToEbitda < 1) score += 20;
     else if (debtToEbitda < 2) score += 15;
     else if (debtToEbitda < 3) score += 10;
     else if (debtToEbitda < 4) score += 5;
-    
+
     // EBITDA Margin scoring (20 points)
     maxScore += 20;
     if (ebitdaMargin > 0.20) score += 20;
     else if (ebitdaMargin > 0.15) score += 15;
     else if (ebitdaMargin > 0.10) score += 10;
     else if (ebitdaMargin > 0.05) score += 5;
-    
+
     // Current Ratio scoring (10 points)
     maxScore += 10;
     if (currentRatio > 2) score += 10;
     else if (currentRatio > 1.5) score += 8;
     else if (currentRatio > 1.2) score += 6;
     else if (currentRatio > 1) score += 4;
-    
+
     // Quick Ratio scoring (10 points)
     maxScore += 10;
     if (quickRatio > 1.5) score += 10;
     else if (quickRatio > 1.2) score += 8;
     else if (quickRatio > 1) score += 6;
     else if (quickRatio > 0.8) score += 4;
-    
+
     // Industry Risk (15 points)
     maxScore += 15;
     const industryScores = { low: 15, medium: 10, high: 5 };
     score += industryScores[industryRisk] || 0;
-    
+
     // Management Quality (15 points)
     maxScore += 15;
     const mgmtScores = { excellent: 15, good: 12, fair: 8, poor: 3 };
     score += mgmtScores[managementQuality] || 0;
-    
+
     // Market Position (10 points)
     maxScore += 10;
     const marketScores = { dominant: 10, strong: 8, competitive: 6, weak: 3 };
     score += marketScores[marketPosition] || 0;
-    
+
     const scorePercentage = (score / maxScore) * 100;
-    
+
     // Convert to rating
     let rating;
     if (scorePercentage >= 90) rating = 'AAA';
@@ -141,13 +142,13 @@ const CreditModeling = () => {
     else if (scorePercentage >= 55) rating = 'B';
     else if (scorePercentage >= 45) rating = 'CCC';
     else rating = 'D';
-    
+
     // Estimate PD based on rating
     const ratingPDs = {
       'AAA': 0.0001, 'AA': 0.0005, 'A': 0.002, 'BBB': 0.01,
       'BB': 0.04, 'B': 0.12, 'CCC': 0.35, 'D': 1.0
     };
-    
+
     return {
       score,
       maxScore,
@@ -160,10 +161,9 @@ const CreditModeling = () => {
   }, [scorecardInputs]);
 
   // Portfolio risk simulation data
-  const portfolioRiskData = useMemo(() => {
+  const _portfolioRiskData = useMemo(() => {
     const scenarios = [];
-    const numScenarios = 1000;
-    
+
     for (let i = 0; i < 50; i++) { // Show 50 sample scenarios
       const randomPD = Math.random() * 0.1; // 0-10% PD range
       const loss = inputs.exposureAmount * randomPD * inputs.lgd;
@@ -174,7 +174,7 @@ const CreditModeling = () => {
         lossPercentage: (loss / inputs.exposureAmount) * 100
       });
     }
-    
+
     return scenarios.sort((a, b) => a.loss - b.loss);
   }, [inputs]);
 
@@ -208,13 +208,14 @@ const CreditModeling = () => {
         <Card className="lg:col-span-1">
           <div className="p-6">
             <h3 className="text-lg font-semibold mb-4">Credit Risk Parameters</h3>
-            
+
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="exposureAmount" className="block text-sm font-medium text-gray-700 mb-1">
                   Exposure Amount ($)
                 </label>
                 <Input
+                  id="exposureAmount"
                   type="number"
                   step="1000"
                   value={inputs.exposureAmount}
@@ -223,10 +224,11 @@ const CreditModeling = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="pd" className="block text-sm font-medium text-gray-700 mb-1">
                   Probability of Default (%)
                 </label>
                 <Input
+                  id="pd"
                   type="number"
                   step="0.001"
                   value={inputs.pd * 100}
@@ -235,10 +237,11 @@ const CreditModeling = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="lgd" className="block text-sm font-medium text-gray-700 mb-1">
                   Loss Given Default (%)
                 </label>
                 <Input
+                  id="lgd"
                   type="number"
                   step="0.01"
                   value={inputs.lgd * 100}
@@ -247,10 +250,11 @@ const CreditModeling = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="timeHorizon" className="block text-sm font-medium text-gray-700 mb-1">
                   Time Horizon (Years)
                 </label>
                 <Input
+                  id="timeHorizon"
                   type="number"
                   step="0.25"
                   value={inputs.timeHorizon}
@@ -259,10 +263,11 @@ const CreditModeling = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="confidenceLevel" className="block text-sm font-medium text-gray-700 mb-1">
                   Confidence Level (%)
                 </label>
                 <Input
+                  id="confidenceLevel"
                   type="number"
                   step="0.001"
                   value={inputs.confidenceLevel * 100}
@@ -276,7 +281,7 @@ const CreditModeling = () => {
         <Card className="lg:col-span-2">
           <div className="p-6">
             <h3 className="text-lg font-semibold mb-4">Credit Risk Metrics</h3>
-            
+
             {creditRiskMetrics && (
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                 <div className="bg-red-50 p-4 rounded-lg">
@@ -285,49 +290,49 @@ const CreditModeling = () => {
                     ${creditRiskMetrics.expectedLoss?.toLocaleString() || 'N/A'}
                   </div>
                 </div>
-                
+
                 <div className="bg-orange-50 p-4 rounded-lg">
                   <div className="text-sm text-gray-600">Unexpected Loss</div>
                   <div className="text-lg font-semibold text-orange-600">
                     ${creditRiskMetrics.unexpectedLoss?.toLocaleString() || 'N/A'}
                   </div>
                 </div>
-                
+
                 <div className="bg-blue-50 p-4 rounded-lg">
                   <div className="text-sm text-gray-600">Economic Capital</div>
                   <div className="text-lg font-semibold text-blue-600">
                     ${creditRiskMetrics.economicCapital?.toLocaleString() || 'N/A'}
                   </div>
                 </div>
-                
+
                 <div className="bg-purple-50 p-4 rounded-lg">
                   <div className="text-sm text-gray-600">Value at Risk</div>
                   <div className="text-lg font-semibold text-purple-600">
                     ${creditRiskMetrics.valueAtRisk?.toLocaleString() || 'N/A'}
                   </div>
                 </div>
-                
+
                 <div className="bg-green-50 p-4 rounded-lg">
                   <div className="text-sm text-gray-600">RAROC</div>
                   <div className="text-lg font-semibold text-green-600">
                     {(creditRiskMetrics.raroc * 100)?.toFixed(1) || 'N/A'}%
                   </div>
                 </div>
-                
+
                 <div className="bg-yellow-50 p-4 rounded-lg">
                   <div className="text-sm text-gray-600">Cumulative PD</div>
                   <div className="text-lg font-semibold text-yellow-600">
                     {(creditRiskMetrics.cumulativePD * 100)?.toFixed(3) || 'N/A'}%
                   </div>
                 </div>
-                
+
                 <div className="bg-indigo-50 p-4 rounded-lg">
                   <div className="text-sm text-gray-600">Loss Rate</div>
                   <div className="text-lg font-semibold text-indigo-600">
                     {(creditRiskMetrics.lossRate * 100)?.toFixed(3) || 'N/A'}%
                   </div>
                 </div>
-                
+
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <div className="text-sm text-gray-600">Capital Ratio</div>
                   <div className="text-lg font-semibold text-gray-600">
@@ -344,48 +349,53 @@ const CreditModeling = () => {
         <Card>
           <div className="p-6">
             <h3 className="text-lg font-semibold mb-4">Credit Scorecard</h3>
-            
+
             <div className="grid grid-cols-2 gap-4 mb-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Revenue ($)</label>
+                <label htmlFor="revenue" className="block text-sm font-medium text-gray-700 mb-1">Revenue ($)</label>
                 <Input
+                  id="revenue"
                   type="number"
                   value={scorecardInputs.revenue}
                   onChange={(e) => handleScorecardChange('revenue', e.target.value)}
                 />
               </div>
-              
+
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Total Debt ($)</label>
+                <label htmlFor="debt" className="block text-sm font-medium text-gray-700 mb-1">Total Debt ($)</label>
                 <Input
+                  id="debt"
                   type="number"
                   value={scorecardInputs.debt}
                   onChange={(e) => handleScorecardChange('debt', e.target.value)}
                 />
               </div>
-              
+
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">EBITDA ($)</label>
+                <label htmlFor="ebitda" className="block text-sm font-medium text-gray-700 mb-1">EBITDA ($)</label>
                 <Input
+                  id="ebitda"
                   type="number"
                   value={scorecardInputs.ebitda}
                   onChange={(e) => handleScorecardChange('ebitda', e.target.value)}
                 />
               </div>
-              
+
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Current Ratio</label>
+                <label htmlFor="currentRatio" className="block text-sm font-medium text-gray-700 mb-1">Current Ratio</label>
                 <Input
+                  id="currentRatio"
                   type="number"
                   step="0.1"
                   value={scorecardInputs.currentRatio}
                   onChange={(e) => handleScorecardChange('currentRatio', e.target.value)}
                 />
               </div>
-              
+
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Industry Risk</label>
+                <label htmlFor="industryRisk" className="block text-sm font-medium text-gray-700 mb-1">Industry Risk</label>
                 <Select
+                  id="industryRisk"
                   value={scorecardInputs.industryRisk}
                   onChange={(e) => handleScorecardChange('industryRisk', e.target.value)}
                   options={[
@@ -395,10 +405,11 @@ const CreditModeling = () => {
                   ]}
                 />
               </div>
-              
+
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Management Quality</label>
+                <label htmlFor="managementQuality" className="block text-sm font-medium text-gray-700 mb-1">Management Quality</label>
                 <Select
+                  id="managementQuality"
                   value={scorecardInputs.managementQuality}
                   onChange={(e) => handleScorecardChange('managementQuality', e.target.value)}
                   options={[
@@ -438,7 +449,7 @@ const CreditModeling = () => {
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="range" />
                 <YAxis />
-                <Tooltip 
+                <Tooltip
                   formatter={(value, name) => [
                     name === 'count' ? `${value} scenarios` : `${(value * 100).toFixed(1)}%`,
                     name === 'count' ? 'Scenarios' : 'Probability'
@@ -447,7 +458,7 @@ const CreditModeling = () => {
                 <Bar dataKey="count" fill="#3b82f6" />
               </BarChart>
             </ResponsiveContainer>
-            
+
             <div className="mt-4">
               <h4 className="text-sm font-semibold mb-2">Risk Concentration</h4>
               <ResponsiveContainer width="100%" height={200}>

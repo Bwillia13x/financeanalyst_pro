@@ -480,21 +480,20 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
     const borderColor = level === 0 ? 'border-slate-200' : 'border-slate-100';
 
     // Screen reader context
-    const ariaLabel = level === 0 
-      ? `${label}, total or summary line item${formula ? ', calculated automatically' : ''}` 
+    const ariaLabel = level === 0
+      ? `${label}, total or summary line item${formula ? ', calculated automatically' : ''}`
       : `${label}, detail line item${formula ? ', calculated automatically' : ', editable'}`;
 
     return (
-      <tr 
-        key={key} 
+      <tr
+        key={key}
         className={`${rowBg} border-b ${borderColor} hover:bg-slate-50 transition-all duration-150 group`}
         role="row"
         aria-label={ariaLabel}
       >
         {/* Account Name Column */}
-        <td 
+        <td
           className={`px-6 py-4 ${indentClass} ${textWeight} ${textSize} ${textColor}`}
-          scope={level === 0 ? 'rowgroup' : 'row'}
           headers="account-header"
           aria-describedby={formula ? 'formula-description' : 'manual-description'}
         >
@@ -519,7 +518,7 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
         </td>
 
         {/* Units Column */}
-        <td 
+        <td
           className="px-4 py-4 text-center"
           headers="units-header"
           aria-label="Values are in thousands of dollars"
@@ -534,82 +533,82 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
           const cellValue = data.statements.incomeStatement[key]?.[periodIndex];
           const formattedValue = formatNumber(cellValue);
           const cellAriaLabel = `${label} for ${period}: ${formattedValue || 'no value'} thousand dollars${formula ? ', calculated automatically' : ', click to edit'}`;
-          
+
           return (
-          <td 
-            key={periodIndex} 
-            className="px-4 py-4 text-right"
-            headers={`period-${periodIndex}-header account-header`}
-            aria-label={cellAriaLabel}
-          >
-            {editingCell?.rowKey === key && editingCell?.periodIndex === periodIndex && !editingCell?.isAdjusted ? (
-              <div className="relative">
-                <input
-                  ref={inputRef}
-                  type="text"
-                  value={cellValue}
-                  onChange={(e) => {
-                    const newValue = e.target.value;
-                    if (validateNumericInput(newValue)) {
-                      setCellValue(newValue);
+            <td
+              key={periodIndex}
+              className="px-4 py-4 text-right"
+              headers={`period-${periodIndex}-header account-header`}
+              aria-label={cellAriaLabel}
+            >
+              {editingCell?.rowKey === key && editingCell?.periodIndex === periodIndex && !editingCell?.isAdjusted ? (
+                <div className="relative">
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    value={cellValue}
+                    onChange={(e) => {
+                      const newValue = e.target.value;
+                      if (validateNumericInput(newValue)) {
+                        setCellValue(newValue);
+                      }
+                    }}
+                    onBlur={handleCellBlur}
+                    onKeyDown={handleKeyPress}
+                    className="w-full px-3 py-2.5 bg-white border-2 border-blue-400 rounded-lg text-slate-900 text-right font-mono text-sm focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 shadow-lg"
+                    placeholder="0.00"
+                  />
+                  <div className="absolute -top-2 -right-2 flex gap-1">
+                    <button
+                      onClick={handleCellBlur}
+                      className="w-5 h-5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full flex items-center justify-center text-xs transition-colors"
+                    >
+                      ✓
+                    </button>
+                    <button
+                      onClick={() => {
+                        setEditingCell(null);
+                        setCellValue('');
+                      }}
+                      className="w-5 h-5 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center text-xs transition-colors"
+                    >
+                      ×
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div
+                  onClick={() => !formula && handleCellClick(key, periodIndex)}
+                  className={`px-3 py-2.5 rounded-lg font-mono text-sm transition-all duration-200 min-h-[40px] flex items-center justify-end ${
+                    formula
+                      ? 'bg-gradient-to-r from-blue-50 to-blue-100 text-blue-800 font-semibold border border-blue-200 shadow-sm'
+                      : 'hover:bg-slate-100 text-slate-800 cursor-pointer border border-transparent hover:border-slate-200 hover:shadow-sm group-hover:bg-slate-50'
+                  }`}
+                  role={formula ? 'cell' : 'button'}
+                  tabIndex={formula ? -1 : 0}
+                  aria-label={cellAriaLabel}
+                  aria-readonly={formula}
+                  onKeyDown={(e) => {
+                    if ((e.key === 'Enter' || e.key === ' ') && !formula) {
+                      e.preventDefault();
+                      handleCellClick(key, periodIndex);
                     }
                   }}
-                  onBlur={handleCellBlur}
-                  onKeyDown={handleKeyPress}
-                  className="w-full px-3 py-2.5 bg-white border-2 border-blue-400 rounded-lg text-slate-900 text-right font-mono text-sm focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 shadow-lg"
-                  placeholder="0.00"
-                />
-                <div className="absolute -top-2 -right-2 flex gap-1">
-                  <button
-                    onClick={handleCellBlur}
-                    className="w-5 h-5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full flex items-center justify-center text-xs transition-colors"
-                  >
-                    ✓
-                  </button>
-                  <button
-                    onClick={() => {
-                      setEditingCell(null);
-                      setCellValue('');
-                    }}
-                    className="w-5 h-5 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center text-xs transition-colors"
-                  >
-                    ×
-                  </button>
+                >
+                  <span className={formula ? 'text-blue-900' : 'text-slate-700'}>
+                    {formatNumber(data.statements.incomeStatement[key]?.[periodIndex]) || '—'}
+                  </span>
+                  {!formula && (
+                    <Edit2 size={12} className="ml-2 opacity-0 group-hover:opacity-40 text-slate-400 transition-opacity" />
+                  )}
                 </div>
-              </div>
-            ) : (
-              <div
-                onClick={() => !formula && handleCellClick(key, periodIndex)}
-                className={`px-3 py-2.5 rounded-lg font-mono text-sm transition-all duration-200 min-h-[40px] flex items-center justify-end ${
-                  formula
-                    ? 'bg-gradient-to-r from-blue-50 to-blue-100 text-blue-800 font-semibold border border-blue-200 shadow-sm'
-                    : 'hover:bg-slate-100 text-slate-800 cursor-pointer border border-transparent hover:border-slate-200 hover:shadow-sm group-hover:bg-slate-50'
-                }`}
-                role={formula ? 'cell' : 'button'}
-                tabIndex={formula ? -1 : 0}
-                aria-label={cellAriaLabel}
-                aria-readonly={formula}
-                onKeyDown={(e) => {
-                  if ((e.key === 'Enter' || e.key === ' ') && !formula) {
-                    e.preventDefault();
-                    handleCellClick(key, periodIndex);
-                  }
-                }}
-              >
-                <span className={formula ? 'text-blue-900' : 'text-slate-700'}>
-                  {formatNumber(data.statements.incomeStatement[key]?.[periodIndex]) || '—'}
-                </span>
-                {!formula && (
-                  <Edit2 size={12} className="ml-2 opacity-0 group-hover:opacity-40 text-slate-400 transition-opacity" />
-                )}
-              </div>
-            )}
-          </td>
+              )}
+            </td>
           );
         })}
 
         {/* Adjusted Column */}
-        <td 
+        <td
           className="px-4 py-4 text-right bg-gradient-to-r from-amber-50 to-yellow-50 border-l-2 border-amber-300"
           headers="adjusted-header account-header"
           aria-label={`${label} adjusted value: ${formatNumber(adjustedValues[key] || 0) || 'no value'} thousand dollars${formula ? ', calculated automatically' : ', click to edit'}`}
@@ -679,34 +678,7 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
         </td>
 
         {/* Type Column */}
-        <td 
-          className="px-4 py-4 text-center"
-          headers="type-header"
-          aria-label={`${label} is ${formula ? 'automatically calculated' : 'manually editable'}`}
-        >
-          <span
-            className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
-              formula
-                ? 'bg-blue-100 text-blue-800 border border-blue-200'
-                : 'bg-slate-100 text-slate-700 border border-slate-200'
-            }`}
-          >
-            {formula ? (
-              <>
-                <Calculator size={10} className="mr-1" />
-                Auto
-              </>
-            ) : (
-              <>
-                <Edit2 size={10} className="mr-1" />
-                Manual
-              </>
-            )}
-          </span>
-        </td>
-
-        {/* Type Column */}
-        <td 
+        <td
           className="px-4 py-4 text-center"
           headers="type-header"
           aria-label={`${label} is ${formula ? 'automatically calculated' : 'manually editable'}`}
@@ -767,7 +739,7 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
       <div className="max-w-full mx-auto p-4 sm:p-6 lg:p-8">
         <div className="bg-white rounded-xl border border-slate-200 shadow-lg">
           <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
-            <table 
+            <table
               className="w-full"
               role="table"
               aria-label={`Financial ${activeStatement === 'incomeStatement' ? 'Income Statement' : activeStatement === 'balanceSheet' ? 'Balance Sheet' : 'Cash Flow Statement'} with editable cells`}
@@ -777,14 +749,14 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
                 <tr className="sr-only">
                   <td colSpan={data.periods.length + 4}>
                     <div className="p-2 text-sm">
-                      Financial spreadsheet table. Use arrow keys to navigate between cells. 
-                      Press Enter or Space to edit values. Press Tab to move to next editable cell. 
+                      Financial spreadsheet table. Use arrow keys to navigate between cells.
+                      Press Enter or Space to edit values. Press Tab to move to next editable cell.
                       Formula cells are calculated automatically and cannot be edited.
                     </div>
                   </td>
                 </tr>
                 <tr role="row">
-                  <th 
+                  <th
                     className="min-w-[320px] px-6 py-4 text-left text-sm font-semibold tracking-wider"
                     scope="col"
                     id="account-header"
@@ -795,7 +767,7 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
                       Account Description
                     </div>
                   </th>
-                  <th 
+                  <th
                     className="w-20 px-4 py-4 text-center text-sm font-semibold"
                     scope="col"
                     id="units-header"
@@ -804,8 +776,8 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
                     Units
                   </th>
                   {data.periods.map((period, index) => (
-                    <th 
-                      key={index} 
+                    <th
+                      key={index}
                       className="min-w-[140px] px-4 py-4 text-center text-sm font-semibold"
                       scope="col"
                       id={`period-${index}-header`}
@@ -817,7 +789,7 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
                       </div>
                     </th>
                   ))}
-                  <th 
+                  <th
                     className="min-w-[140px] px-4 py-4 text-center text-sm font-semibold bg-gradient-to-r from-amber-600 to-yellow-600 border-l-2 border-amber-400"
                     scope="col"
                     id="adjusted-header"
@@ -828,7 +800,7 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
                       <span className="text-xs text-amber-100 font-normal">Modified</span>
                     </div>
                   </th>
-                  <th 
+                  <th
                     className="w-28 px-4 py-4 text-center text-sm font-semibold"
                     scope="col"
                     id="type-header"
@@ -846,10 +818,15 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
                 {Object.entries(currentTemplate).map(([sectionKey, section]) => (
                   <React.Fragment key={sectionKey}>
                     {/* Enhanced Section Header */}
-                    <tr 
+                    <tr
+                      key={`${sectionKey}-header`}
                       className={`${section.headerBg || 'bg-slate-600'} border-b-2 border-slate-300`}
                       role="rowheader"
                       aria-label={`${section.title} section header`}
+                      data-tour={
+                        sectionKey === 'revenue' ? 'revenue-section' :
+                          sectionKey === 'operatingExpenses' ? 'expense-section' : undefined
+                      }
                     >
                       <td colSpan={data.periods.length + 4} className="py-4 px-6">
                         <div className="flex items-center gap-3 text-white w-full text-left group">

@@ -3,8 +3,8 @@
  * Supports Excel, PDF, CSV exports with financial formatting
  */
 
-import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
+import * as XLSX from 'xlsx';
 import 'jspdf-autotable';
 
 class ExportService {
@@ -12,9 +12,8 @@ class ExportService {
     this.defaultStyles = {
       excel: {
         headerStyle: {
-          font: { bold: true, size: 12 },
+          font: { bold: true, size: 12, color: { rgb: 'FFFFFF' } },
           fill: { fgColor: { rgb: '4F81BD' } },
-          font: { color: { rgb: 'FFFFFF' } },
           alignment: { horizontal: 'center' },
           border: {
             top: { style: 'thin' },
@@ -54,13 +53,13 @@ class ExportService {
     const {
       filename = 'financial-analysis',
       sheetName = 'Financial Data',
-      includeCharts = false,
+      _includeCharts = false,
       includeFormatting = true
     } = options;
 
     try {
       const workbook = XLSX.utils.book_new();
-      
+
       // Create main data sheet
       const worksheet = this.createFinancialWorksheet(data, includeFormatting);
       XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
@@ -78,12 +77,12 @@ class ExportService {
       }
 
       // Generate file
-      const excelBuffer = XLSX.write(workbook, { 
-        bookType: 'xlsx', 
+      const excelBuffer = XLSX.write(workbook, {
+        bookType: 'xlsx',
         type: 'array',
         cellStyles: includeFormatting
       });
-      
+
       this.downloadFile(
         new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }),
         `${filename}.xlsx`
@@ -119,7 +118,7 @@ class ExportService {
 
       // Header
       yPosition = this.addPDFHeader(doc, companyInfo, yPosition);
-      
+
       // Financial data tables
       if (data.financialData) {
         yPosition = this.addFinancialDataToPDF(doc, data.financialData, yPosition);
@@ -132,7 +131,7 @@ class ExportService {
 
       // Charts (placeholders for now)
       if (includeCharts && data.charts) {
-        yPosition = this.addChartsToPDF(doc, data.charts, yPosition);
+        this.addChartsToPDF(doc, data.charts, yPosition);
       }
 
       // Footer
@@ -161,7 +160,7 @@ class ExportService {
 
     try {
       let csvContent = '';
-      
+
       if (Array.isArray(data)) {
         // Simple array export
         csvContent = this.arrayToCSV(data, { delimiter, includeHeaders });
@@ -188,7 +187,7 @@ class ExportService {
    */
   createFinancialWorksheet(data, includeFormatting = true) {
     const { periods = [], incomeStatement = {}, balanceSheet = {}, cashFlow = {} } = data;
-    
+
     const worksheetData = [];
     let rowIndex = 0;
 
@@ -233,7 +232,7 @@ class ExportService {
     let rowIndex = startRow;
 
     const processItems = (items, level = 0) => {
-      Object.entries(items).forEach(([key, item]) => {
+      Object.entries(items).forEach(([_key, item]) => {
         if (typeof item === 'object' && item.label) {
           const indent = '  '.repeat(level);
           const row = [
@@ -257,9 +256,9 @@ class ExportService {
   /**
    * Apply Excel formatting
    */
-  applyExcelFormatting(worksheet, data) {
+  applyExcelFormatting(worksheet, _data) {
     const range = XLSX.utils.decode_range(worksheet['!ref']);
-    
+
     // Format headers
     for (let col = range.s.c; col <= range.e.c; col++) {
       const cellRef = XLSX.utils.encode_cell({ r: 0, c: col });
@@ -287,8 +286,8 @@ class ExportService {
       ['Financial Summary', ''],
       ['', ''],
       ['Key Metrics', 'Value'],
-      ...Object.entries(summaryData).map(([key, value]) => [
-        this.formatMetricName(key),
+      ...Object.entries(summaryData).map(([_key, value]) => [
+        this.formatMetricName(_key),
         this.formatMetricValue(value)
       ])
     ];
@@ -322,11 +321,11 @@ class ExportService {
     doc.setFontSize(20);
     doc.setTextColor(64, 64, 64);
     doc.text(companyInfo.name || 'Financial Analysis Report', 20, yPosition);
-    
+
     yPosition += 10;
     doc.setFontSize(12);
     doc.text(`Generated: ${new Date().toLocaleDateString()}`, 20, yPosition);
-    
+
     if (companyInfo.period) {
       doc.text(`Period: ${companyInfo.period}`, 120, yPosition);
     }
@@ -346,7 +345,7 @@ class ExportService {
       yPosition += 10;
 
       const tableData = this.prepareTableDataForPDF(incomeStatement, periods);
-      
+
       doc.autoTable({
         head: [['Account', ...periods]],
         body: tableData,
@@ -397,7 +396,7 @@ class ExportService {
   /**
    * Add charts placeholder to PDF
    */
-  addChartsToPDF(doc, chartsData, yPosition) {
+  addChartsToPDF(doc, _chartsData, yPosition) {
     doc.setFontSize(14);
     doc.text('Charts & Visualizations', 20, yPosition);
     yPosition += 10;
@@ -415,7 +414,7 @@ class ExportService {
    */
   addPDFFooter(doc) {
     const pageCount = doc.internal.getNumberOfPages();
-    
+
     for (let i = 1; i <= pageCount; i++) {
       doc.setPage(i);
       doc.setFontSize(8);
@@ -443,9 +442,9 @@ class ExportService {
 
     const processSection = (section, sectionName) => {
       csvContent += `\n${sectionName}\n`;
-      
+
       const processItems = (items, level = 0) => {
-        Object.entries(items).forEach(([key, item]) => {
+        Object.entries(items).forEach(([_key, item]) => {
           if (typeof item === 'object' && item.label) {
             const indent = flattenData ? '' : '  '.repeat(level);
             const row = [
@@ -477,7 +476,7 @@ class ExportService {
    */
   arrayToCSV(data, options) {
     const { delimiter, includeHeaders } = options;
-    
+
     if (data.length === 0) return '';
 
     const headers = Object.keys(data[0]);
@@ -492,8 +491,8 @@ class ExportService {
         const value = row[header];
         // Escape quotes and wrap in quotes if contains delimiter
         const stringValue = String(value || '');
-        return stringValue.includes(delimiter) || stringValue.includes('"') 
-          ? `"${stringValue.replace(/"/g, '""')}"` 
+        return stringValue.includes(delimiter) || stringValue.includes('"')
+          ? `"${stringValue.replace(/"/g, '""')}"`
           : stringValue;
       });
       csvContent += values.join(delimiter) + '\n';
@@ -535,9 +534,9 @@ class ExportService {
 
   prepareTableDataForPDF(data, periods) {
     const tableData = [];
-    
+
     const processItems = (items, level = 0) => {
-      Object.entries(items).forEach(([key, item]) => {
+      Object.entries(items).forEach(([_key, item]) => {
         if (typeof item === 'object' && item.label) {
           const indent = '  '.repeat(level);
           const row = [

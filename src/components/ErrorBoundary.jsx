@@ -1,7 +1,6 @@
 import React from 'react';
 
 import Icon from './AppIcon';
-import monitoring from '../utils/monitoring';
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -16,11 +15,30 @@ class ErrorBoundary extends React.Component {
   componentDidCatch(error, errorInfo) {
     error.__ErrorBoundary = true;
     window.__COMPONENT_ERROR__?.(error, errorInfo);
-    // Report to monitoring/Sentry
+
+    // Report to monitoring/Sentry only if not in automated test environment
     try {
-      monitoring.trackError(error, 'react_error', {
-        componentStack: errorInfo?.componentStack
-      });
+      const isAutomatedEnv = (
+        navigator.webdriver === true ||
+        new URLSearchParams(window.location.search).has('lhci') ||
+        new URLSearchParams(window.location.search).has('ci') ||
+        new URLSearchParams(window.location.search).has('audit')
+      );
+
+      if (!isAutomatedEnv) {
+        // Dynamically import monitoring to avoid side effects during tests
+        import('../utils/monitoring')
+          .then((mod) => {
+            if (mod?.default?.trackError) {
+              mod.default.trackError(error, 'react_error', {
+                componentStack: errorInfo?.componentStack
+              });
+            }
+          })
+          .catch(() => {
+            // Fail silently if monitoring unavailable
+          });
+      }
     } catch (_) {
       // noop
     }

@@ -16,7 +16,7 @@ class SecurityService {
     this.encryptionKeys = new Map();
     this.securityEvents = [];
     this.isInitialized = false;
-    
+
     this.initializeService();
   }
 
@@ -29,7 +29,7 @@ class SecurityService {
       this.setupComplianceRules();
       this.initializeEncryption();
       this.startSecurityMonitoring();
-      
+
       this.isInitialized = true;
       console.log('Security service initialized with enterprise-grade protection');
     } catch (error) {
@@ -161,7 +161,7 @@ class SecurityService {
   initializeEncryption() {
     // Generate master encryption key if not exists
     if (!localStorage.getItem('financeanalyst_master_key')) {
-      const masterKey = CryptoJS.lib.WordArray.random(256/8).toString();
+      const masterKey = CryptoJS.lib.WordArray.random(256 / 8).toString();
       this.encryptionKeys.set('master', masterKey);
       localStorage.setItem('financeanalyst_master_key', masterKey);
     } else {
@@ -176,7 +176,7 @@ class SecurityService {
    * Generate new session encryption key
    */
   generateSessionKey() {
-    const sessionKey = CryptoJS.lib.WordArray.random(256/8).toString();
+    const sessionKey = CryptoJS.lib.WordArray.random(256 / 8).toString();
     this.encryptionKeys.set('session', sessionKey);
     return sessionKey;
   }
@@ -257,7 +257,7 @@ class SecurityService {
       const session = await this.createSecureSession(credentials.username);
       attempt.success = true;
       attempt.sessionId = session.id;
-      
+
       this.logSecurityEvent('login_success', attempt);
       return session;
 
@@ -271,7 +271,7 @@ class SecurityService {
    * Create secure session
    */
   async createSecureSession(username) {
-    const sessionId = CryptoJS.lib.WordArray.random(256/8).toString();
+    const sessionId = CryptoJS.lib.WordArray.random(256 / 8).toString();
     const session = {
       id: sessionId,
       username,
@@ -284,10 +284,10 @@ class SecurityService {
     };
 
     this.sessions.set(sessionId, session);
-    
+
     // Set secure session cookie
     this.setSecureSessionCookie(sessionId);
-    
+
     return session;
   }
 
@@ -361,12 +361,12 @@ class SecurityService {
    * Hash sensitive information
    */
   hashData(data, salt = null) {
-    const saltToUse = salt || CryptoJS.lib.WordArray.random(128/8).toString();
+    const saltToUse = salt || CryptoJS.lib.WordArray.random(128 / 8).toString();
     const hash = CryptoJS.PBKDF2(data, saltToUse, {
-      keySize: 256/32,
+      keySize: 256 / 32,
       iterations: 10000
     });
-    
+
     return {
       hash: hash.toString(),
       salt: saltToUse
@@ -378,7 +378,7 @@ class SecurityService {
    */
   logSecurityEvent(type, details) {
     const event = {
-      id: CryptoJS.lib.WordArray.random(128/8).toString(),
+      id: CryptoJS.lib.WordArray.random(128 / 8).toString(),
       type,
       timestamp: new Date().toISOString(),
       details: { ...details },
@@ -404,13 +404,13 @@ class SecurityService {
   checkSecurityThreats() {
     // Check for unusual access patterns
     this.detectAnomalousAccess();
-    
+
     // Check for brute force attempts
     this.detectBruteForceAttacks();
-    
+
     // Check for data exfiltration
     this.detectDataExfiltration();
-    
+
     // Check for privilege escalation
     this.detectPrivilegeEscalation();
   }
@@ -498,7 +498,7 @@ class SecurityService {
     // Generate compliance report
     const report = this.generateComplianceReport(results);
     this.logSecurityEvent('compliance_check', {
-      regulations: regulations,
+      regulations,
       overallStatus: this.getOverallComplianceStatus(results)
     });
 
@@ -546,22 +546,22 @@ class SecurityService {
     return '127.0.0.1';
   }
 
-  validatePassword(username, password) {
+  validatePassword(_username, password) {
     // Mock password validation
     return password && password.length >= 8;
   }
 
-  requiresMFA(username) {
+  requiresMFA(_username) {
     const policy = this.securityPolicies.get('dataAccess');
     return policy.requireMFA;
   }
 
-  validateMFA(username, code) {
+  validateMFA(_username, code) {
     // Mock MFA validation
     return code && code.length === 6;
   }
 
-  isAccountLocked(username) {
+  isAccountLocked(_username) {
     // Check if account is locked due to failed attempts
     return false; // Mock implementation
   }
@@ -571,14 +571,14 @@ class SecurityService {
     console.log('Failed login attempt for:', username);
   }
 
-  getUserPermissions(username) {
+  getUserPermissions(_username) {
     // Return user permissions
     return ['read', 'write', 'analyze'];
   }
 
   setSecureSessionCookie(sessionId) {
     const policy = this.securityPolicies.get('session');
-    document.cookie = `session=${sessionId}; secure; httponly; samesite=strict; max-age=${policy.maxDuration/1000}`;
+    document.cookie = `session=${sessionId}; secure; httponly; samesite=strict; max-age=${policy.maxDuration / 1000}`;
   }
 
   terminateSession(sessionId, reason) {
@@ -587,7 +587,7 @@ class SecurityService {
       session.isActive = false;
       session.terminatedAt = new Date().toISOString();
       session.terminationReason = reason;
-      
+
       this.logSecurityEvent('session_terminated', {
         sessionId,
         reason,
@@ -621,7 +621,7 @@ class SecurityService {
       if (this.auditLog.length > maxEvents) {
         this.auditLog = this.auditLog.slice(-maxEvents);
       }
-      
+
       // In production, this would persist to secure storage
       localStorage.setItem('financeanalyst_audit_log', JSON.stringify(this.auditLog.slice(-1000)));
     } catch (error) {
@@ -645,7 +645,7 @@ class SecurityService {
     return 0.98; // Mock 98% coverage
   }
 
-  checkDataRetention(period) {
+  checkDataRetention(_period) {
     return true; // Mock compliance
   }
 
@@ -676,7 +676,7 @@ class SecurityService {
     return Array.from(this.sessions.values()).filter(s => s.isActive);
   }
 
-  analyzeThreatLandscape(events) {
+  analyzeThreatLandscape(_events) {
     return {
       topThreats: ['brute_force', 'anomalous_access'],
       riskLevel: 'medium',
@@ -684,7 +684,7 @@ class SecurityService {
     };
   }
 
-  generateSecurityRecommendations(events) {
+  generateSecurityRecommendations(_events) {
     return [
       'Enable multi-factor authentication for all users',
       'Regular security awareness training',
@@ -704,12 +704,12 @@ class SecurityService {
   cleanupExpiredData() {
     const now = new Date();
     const retentionPeriod = 90 * 24 * 60 * 60 * 1000; // 90 days
-    
+
     // Clean up old security events
     this.securityEvents = this.securityEvents.filter(
       event => now - new Date(event.timestamp) < retentionPeriod
     );
-    
+
     // Clean up old audit log entries
     this.auditLog = this.auditLog.filter(
       entry => now - new Date(entry.timestamp) < retentionPeriod

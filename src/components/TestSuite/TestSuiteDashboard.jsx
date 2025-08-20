@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Play,
@@ -15,6 +14,7 @@ import {
   Settings,
   Info
 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 
 import testingService from '../../services/testingService';
 import Button from '../ui/Button';
@@ -33,7 +33,7 @@ const TestSuiteDashboard = ({ isVisible, onClose }) => {
     }
   }, [isVisible]);
 
-  const loadTestData = async () => {
+  const loadTestData = async() => {
     try {
       const suites = testingService.getTestSuites();
       const results = testingService.getTestResults();
@@ -47,13 +47,13 @@ const TestSuiteDashboard = ({ isVisible, onClose }) => {
     }
   };
 
-  const runTestSuite = async (suiteId) => {
+  const runTestSuite = async(suiteId) => {
     setRunningTests(prev => new Set([...prev, suiteId]));
-    
+
     try {
       const result = await testingService.runTestSuite(suiteId);
       setTestResults(prev => [result, ...prev]);
-      
+
       // Refresh test data
       await loadTestData();
     } catch (error) {
@@ -67,10 +67,10 @@ const TestSuiteDashboard = ({ isVisible, onClose }) => {
     }
   };
 
-  const runAllTests = async () => {
+  const runAllTests = async() => {
     const allSuiteIds = testSuites.map(suite => suite.id);
     setRunningTests(new Set(allSuiteIds));
-    
+
     try {
       await testingService.runAllTests();
       await loadTestData();
@@ -118,10 +118,10 @@ const TestSuiteDashboard = ({ isVisible, onClose }) => {
   const generateReport = () => {
     const report = testingService.generateTestReport();
     const dataStr = JSON.stringify(report, null, 2);
-    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-    
+    const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+
     const exportFileDefaultName = `test-report-${new Date().toISOString().split('T')[0]}.json`;
-    
+
     const linkElement = document.createElement('a');
     linkElement.setAttribute('href', dataUri);
     linkElement.setAttribute('download', exportFileDefaultName);
@@ -318,7 +318,7 @@ const TestSuiteDashboard = ({ isVisible, onClose }) => {
                         {new Date(result.startTime).toLocaleString()}
                       </span>
                     </div>
-                    
+
                     <div className="flex space-x-6 text-sm">
                       <span className="text-green-400">✓ {result.summary.passed}</span>
                       <span className="text-red-400">✗ {result.summary.failed}</span>
@@ -351,7 +351,7 @@ const TestSuiteDashboard = ({ isVisible, onClose }) => {
                           {new Date(metric.timestamp).toLocaleTimeString()}
                         </span>
                       </div>
-                      
+
                       {metric.memory && (
                         <div className="space-y-2 text-sm">
                           <div className="flex justify-between">
@@ -402,9 +402,9 @@ const TestSuiteDashboard = ({ isVisible, onClose }) => {
                     ×
                   </button>
                 </div>
-                
+
                 <p className="text-slate-300 mb-4">{selectedSuite.description}</p>
-                
+
                 <div className="space-y-3">
                   <h4 className="font-medium text-white">Test Cases:</h4>
                   {selectedSuite.tests.map(test => (

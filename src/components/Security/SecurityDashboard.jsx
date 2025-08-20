@@ -1,22 +1,18 @@
-import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Shield, 
-  AlertTriangle, 
-  Lock, 
-  Eye, 
-  Users, 
+import {
+  Shield,
+  AlertTriangle,
+  Eye,
+  Users,
   Activity,
   CheckCircle,
   XCircle,
   Clock,
   Download,
-  RefreshCw,
-  Settings,
-  TrendingUp,
-  TrendingDown,
-  Minus
+  RefreshCw
 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+
 import securityService from '../../services/securityService';
 
 const SecurityDashboard = () => {
@@ -30,23 +26,23 @@ const SecurityDashboard = () => {
 
   useEffect(() => {
     loadSecurityData();
-    
+
     // Auto-refresh every 5 minutes
     const interval = setInterval(loadSecurityData, 300000);
     return () => clearInterval(interval);
   }, [selectedTimeframe]);
 
-  const loadSecurityData = async () => {
+  const loadSecurityData = async() => {
     setIsLoading(true);
     try {
       // Load security report
       const report = await securityService.generateSecurityReport(selectedTimeframe);
       setSecurityReport(report);
-      
+
       // Load compliance status
       const compliance = await securityService.runComplianceCheck();
       setComplianceStatus(compliance);
-      
+
       // Get active sessions (mock data for demo)
       const sessions = [
         {
@@ -129,8 +125,8 @@ const SecurityDashboard = () => {
   };
 
   const getComplianceColor = (status) => {
-    return status === 'compliant' 
-      ? 'text-green-600 bg-green-100' 
+    return status === 'compliant'
+      ? 'text-green-600 bg-green-100'
       : 'text-red-600 bg-red-100';
   };
 
@@ -143,7 +139,7 @@ const SecurityDashboard = () => {
       activeSessions,
       securityEvents
     };
-    
+
     const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -161,7 +157,7 @@ const SecurityDashboard = () => {
           <Shield className="mr-2" size={24} />
           Security Metrics
         </h3>
-        
+
         {securityReport && (
           <div className="grid grid-cols-2 gap-4">
             <div className="text-center p-4 bg-blue-50 rounded-lg">
@@ -198,7 +194,7 @@ const SecurityDashboard = () => {
           <CheckCircle className="mr-2" size={24} />
           Compliance Status
         </h3>
-        
+
         {complianceStatus.details && (
           <div className="space-y-3">
             {complianceStatus.details.map((compliance) => {
@@ -226,7 +222,7 @@ const SecurityDashboard = () => {
           <Activity className="mr-2" size={24} />
           Recent Security Events
         </h3>
-        
+
         <div className="overflow-hidden">
           <div className="space-y-3">
             {securityEvents.slice(0, 5).map((event) => {
@@ -269,7 +265,7 @@ const SecurityDashboard = () => {
           Active Sessions ({activeSessions.length})
         </h3>
       </div>
-      
+
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead className="bg-gray-50">
@@ -340,7 +336,7 @@ const SecurityDashboard = () => {
           Security Events ({securityEvents.length})
         </h3>
       </div>
-      
+
       <div className="divide-y divide-gray-200">
         {securityEvents.map((event) => {
           const SeverityIcon = getSeverityIcon(event.severity);
@@ -393,7 +389,7 @@ const SecurityDashboard = () => {
             Monitor security events, compliance status, and system access
           </p>
         </div>
-        
+
         <div className="flex items-center space-x-3">
           <select
             value={selectedTimeframe}
@@ -405,7 +401,7 @@ const SecurityDashboard = () => {
             <option value="7d">Last 7 Days</option>
             <option value="30d">Last 30 Days</option>
           </select>
-          
+
           <button
             onClick={loadSecurityData}
             className="flex items-center space-x-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
@@ -413,7 +409,7 @@ const SecurityDashboard = () => {
             <RefreshCw size={16} />
             <span>Refresh</span>
           </button>
-          
+
           <button
             onClick={exportSecurityReport}
             className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"

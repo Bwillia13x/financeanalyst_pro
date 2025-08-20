@@ -3,15 +3,16 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
 import { cn } from '../../utils/cn';
+
 import Button from './Button';
 
 /**
  * Secondary Navigation Component for tools and advanced features
  * Appears below primary navigation or within page contexts
  */
-const SecondaryNav = ({ 
-  items = [], 
-  className, 
+const SecondaryNav = ({
+  items = [],
+  className,
   variant = 'horizontal', // 'horizontal' | 'vertical' | 'dropdown'
   showMoreButton = false,
   maxVisibleItems = 4,
@@ -22,12 +23,12 @@ const SecondaryNav = ({
 }) => {
   const location = useLocation();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  
+  const [_isMobileMenuOpen, _setIsMobileMenuOpen] = useState(false);
+
   const visibleItems = showMoreButton && items.length > maxVisibleItems
     ? items.slice(0, maxVisibleItems)
     : items;
-  
+
   const hiddenItems = showMoreButton && items.length > maxVisibleItems
     ? items.slice(maxVisibleItems)
     : [];
@@ -36,9 +37,9 @@ const SecondaryNav = ({
   const getNavigationItems = () => {
     if (navigation === 'analysisTools') {
       return [
-        { id: 'spreadsheet', label: 'Financial Spreadsheet', icon: '📊' },
-        { id: 'modeling', label: 'Financial Modeling', icon: '🧮' },
-        { id: 'analysis', label: 'Analysis & Results', icon: '📈' }
+        { id: 'spreadsheet', label: 'Financial Spreadsheet', icon: '📊', 'data-tour': 'financial-spreadsheet-tab' },
+        { id: 'modeling', label: 'Financial Modeling', icon: '🧮', 'data-tour': 'financial-modeling-tab' },
+        { id: 'analysis', label: 'Analysis & Results', icon: '📈', 'data-tour': 'analysis-results-tab' }
       ];
     }
     if (navigation === 'portfolioViews') {
@@ -56,26 +57,31 @@ const SecondaryNav = ({
   const renderNavItem = (item, index) => {
     const isActive = activeItem ? activeItem === item.id : location.pathname === item.path;
     const handleClick = onItemClick ? () => onItemClick(item.id) : undefined;
-    
+
     const content = (
-      <div className={cn(
-        'relative px-3 py-2 sm:px-4 sm:py-2 text-sm font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 cursor-pointer',
-        isActive
-          ? 'bg-primary/10 text-primary border border-primary/20'
-          : 'text-muted-foreground hover:text-foreground hover:bg-muted/50',
-        variant === 'vertical' && 'block w-full text-left',
-        item.className
-      )}
-      onClick={handleClick}
-      aria-current={isActive ? 'page' : undefined}
-      title={item.tooltip}
-    >
-      {item.icon && (
-        <span className="mr-2 text-sm" aria-hidden="true">{item.icon}</span>
-      )}
-      <span className="hidden sm:inline">{item.label}</span>
-      <span className="sm:hidden">{item.label.split(' ')[0]}</span>
-    </div>
+      <div
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => e.key === 'Enter' && handleClick?.()}
+        className={cn(
+          'relative px-3 py-2 sm:px-4 sm:py-2 text-sm font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 cursor-pointer',
+          isActive
+            ? 'bg-primary/10 text-primary border border-primary/20'
+            : 'text-muted-foreground hover:text-foreground hover:bg-muted/50',
+          variant === 'vertical' && 'block w-full text-left',
+          item.className
+        )}
+        onClick={handleClick}
+        aria-current={isActive ? 'page' : undefined}
+        title={item.tooltip}
+        data-tour={item['data-tour']}
+      >
+        {item.icon && (
+          <span className="mr-2 text-sm" aria-hidden="true">{item.icon}</span>
+        )}
+        <span className="hidden sm:inline">{item.label}</span>
+        <span className="sm:hidden">{item.label.split(' ')[0]}</span>
+      </div>
     );
 
     if (item.path && !onItemClick) {
@@ -85,7 +91,7 @@ const SecondaryNav = ({
         </Link>
       );
     }
-    
+
     return (
       <div key={item.id || index}>
         {content}
@@ -105,10 +111,12 @@ const SecondaryNav = ({
           aria-haspopup="true"
         >
           Advanced Tools
-          <ChevronDown className={cn('w-4 h-4 ml-1 transition-transform', 
-            isDropdownOpen && 'rotate-180')} />
+          <ChevronDown
+            className={cn('w-4 h-4 ml-1 transition-transform',
+              isDropdownOpen && 'rotate-180')}
+          />
         </Button>
-        
+
         {isDropdownOpen && (
           <div className="absolute top-full left-0 mt-2 w-56 bg-popover border border-border rounded-lg shadow-elevation-2 py-2 z-50">
             <nav role="navigation" aria-label={ariaLabel}>
@@ -145,7 +153,7 @@ const SecondaryNav = ({
 
   if (variant === 'horizontal') {
     return (
-      <nav 
+      <nav
         className={cn(
           'flex items-center space-x-1 p-3 sm:p-2 bg-muted/30 rounded-lg overflow-x-auto scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent',
           className
@@ -156,7 +164,7 @@ const SecondaryNav = ({
         <div className="flex items-center space-x-1 min-w-max">
           {navigationItems.map(renderNavItem)}
         </div>
-        
+
         {hiddenItems.length > 0 && (
           <div className="relative">
             <Button
@@ -169,7 +177,7 @@ const SecondaryNav = ({
             >
               <MoreHorizontal className="w-4 h-4" />
             </Button>
-            
+
             {isDropdownOpen && (
               <div className="absolute right-0 top-full mt-1 w-48 bg-background border border-border rounded-md shadow-lg z-50">
                 <div className="py-1">
@@ -194,7 +202,7 @@ const SecondaryNav = ({
       aria-label={ariaLabel}
     >
       {visibleItems.map(renderNavItem)}
-      
+
       {showMoreButton && hiddenItems.length > 0 && (
         <div className="relative">
           <Button
@@ -208,7 +216,7 @@ const SecondaryNav = ({
           >
             <MoreHorizontal className="w-4 h-4" />
           </Button>
-          
+
           {isDropdownOpen && (
             <div className="absolute top-full right-0 mt-2 w-48 bg-popover border border-border rounded-lg shadow-elevation-2 py-2 z-50">
               {hiddenItems.map(renderNavItem)}

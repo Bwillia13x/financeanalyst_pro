@@ -4,6 +4,7 @@ import Icon from '../../components/AppIcon';
 import SEOHead from '../../components/SEO/SEOHead';
 import Button from '../../components/ui/Button';
 import Header from '../../components/ui/Header';
+import { useKeyboardShortcutsContext } from '../../components/ui/KeyboardShortcutsProvider';
 
 import AuditTrail from './components/AuditTrail';
 import CalculationResults from './components/CalculationResults';
@@ -11,13 +12,12 @@ import FormulaBuilder from './components/FormulaBuilder';
 import ModelTemplates from './components/ModelTemplates';
 import TerminalInterface from './components/TerminalInterface';
 import VariableInputs from './components/VariableInputs';
-import { useKeyboardShortcutsContext } from '../../components/ui/KeyboardShortcutsProvider';
 
 const FinancialModelWorkspace = () => {
   const [activeLayout, setActiveLayout] = useState('dual-pane');
   const [leftPanelContent, setLeftPanelContent] = useState('terminal');
   const [rightPanelContent, setRightPanelContent] = useState('results');
-  const [modelState, _setModelState] = useState({
+  const [modelState] = useState({
     name: 'DCF_Analysis_v2.3',
     saved: true,
     calculating: false,

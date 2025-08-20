@@ -32,10 +32,10 @@ export const useFocusManagement = (options = {}) => {
   // Set initial focus
   useEffect(() => {
     if (initialFocus) {
-      const element = typeof initialFocus === 'string' 
+      const element = typeof initialFocus === 'string'
         ? document.querySelector(initialFocus)
         : initialFocus.current;
-      
+
       if (element?.focus) {
         setTimeout(() => element.focus(), 0);
       }
@@ -59,8 +59,8 @@ export const useFocusManagement = (options = {}) => {
 
     return Array.from(container.querySelectorAll(focusableSelectors))
       .filter(element => {
-        return element.offsetWidth > 0 && 
-               element.offsetHeight > 0 && 
+        return element.offsetWidth > 0 &&
+               element.offsetHeight > 0 &&
                getComputedStyle(element).visibility !== 'hidden';
       });
   }, []);
@@ -103,16 +103,16 @@ export const useFocusManagement = (options = {}) => {
   const handleArrowKeyNavigation = useCallback((event) => {
     const { key, target } = event;
     const isInTable = target.closest('table');
-    
+
     if (!isInTable) return;
 
     const cell = target.closest('td, th');
     if (!cell) return;
 
     event.preventDefault();
-    
+
     let nextCell = null;
-    
+
     switch (key) {
       case 'ArrowRight':
         nextCell = cell.nextElementSibling;
@@ -120,18 +120,20 @@ export const useFocusManagement = (options = {}) => {
       case 'ArrowLeft':
         nextCell = cell.previousElementSibling;
         break;
-      case 'ArrowDown':
+      case 'ArrowDown': {
         const rowIndex = cell.parentElement.rowIndex;
         const cellIndex = cell.cellIndex;
         const nextRow = isInTable.rows[rowIndex + 1];
         nextCell = nextRow?.cells[cellIndex];
         break;
-      case 'ArrowUp':
+      }
+      case 'ArrowUp': {
         const currentRowIndex = cell.parentElement.rowIndex;
         const currentCellIndex = cell.cellIndex;
         const prevRow = isInTable.rows[currentRowIndex - 1];
         nextCell = prevRow?.cells[currentCellIndex];
         break;
+      }
     }
 
     if (nextCell) {
@@ -144,7 +146,7 @@ export const useFocusManagement = (options = {}) => {
   useEffect(() => {
     if (trapFocus && containerRef.current) {
       containerRef.current.addEventListener('keydown', handleKeyDown);
-      
+
       return () => {
         if (containerRef.current) {
           containerRef.current.removeEventListener('keydown', handleKeyDown);

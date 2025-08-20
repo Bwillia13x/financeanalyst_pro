@@ -1,5 +1,6 @@
-import React from 'react';
 import { AlertTriangle, RefreshCw, Home, Bug, ExternalLink } from 'lucide-react';
+import React from 'react';
+
 import Button from './Button';
 
 /**
@@ -17,7 +18,7 @@ class ErrorBoundary extends React.Component {
     };
   }
 
-  static getDerivedStateFromError(error) {
+  static getDerivedStateFromError(_error) {
     // Update state so the next render will show the fallback UI
     return {
       hasError: true,
@@ -65,7 +66,7 @@ class ErrorBoundary extends React.Component {
       }).catch(() => {
         // Fail silently if error reporting fails
       });
-    } catch (e) {
+    } catch (_e) {
       // Fail silently
     }
   };
@@ -82,7 +83,7 @@ class ErrorBoundary extends React.Component {
 
   handleReportError = () => {
     const { error, errorInfo, errorId } = this.state;
-    const bugReport = {
+    const _bugReport = {
       errorId,
       message: error?.message,
       stack: error?.stack,
@@ -94,7 +95,7 @@ class ErrorBoundary extends React.Component {
     // Create mailto link with error details
     const subject = encodeURIComponent(`FinanceAnalyst Pro Error Report - ${errorId}`);
     const body = encodeURIComponent(
-      `Error Details:\n\n` +
+      'Error Details:\n\n' +
       `Error ID: ${errorId}\n` +
       `Message: ${error?.message}\n` +
       `Timestamp: ${new Date().toISOString()}\n` +
@@ -102,7 +103,7 @@ class ErrorBoundary extends React.Component {
       `Technical Details:\n${error?.stack}\n\n` +
       `Component Stack:\n${errorInfo?.componentStack}`
     );
-    
+
     window.open(`mailto:support@financeanalystpro.com?subject=${subject}&body=${body}`);
   };
 
@@ -154,8 +155,8 @@ class ErrorBoundary extends React.Component {
                 </h4>
                 <p className="text-sm text-red-700 mb-2">
                   {isNetworkError ? 'Check your internet connection and try again.' :
-                   isDataError ? 'There was an issue with the data format.' :
-                   'An unexpected error occurred.'}
+                    isDataError ? 'There was an issue with the data format.' :
+                      'An unexpected error occurred.'}
                 </p>
                 <div className="flex items-center space-x-2">
                   <Button
@@ -221,7 +222,7 @@ class ErrorBoundary extends React.Component {
                   Try Again
                 </Button>
               )}
-              
+
               <Button
                 onClick={() => window.location.href = '/'}
                 variant="outline"
@@ -245,8 +246,8 @@ class ErrorBoundary extends React.Component {
             <div className="mt-6 pt-6 border-t border-slate-200 text-sm text-slate-500">
               <p>
                 Need immediate help?{' '}
-                <a 
-                  href="mailto:support@financeanalystpro.com" 
+                <a
+                  href="mailto:support@financeanalystpro.com"
                   className="text-blue-600 hover:text-blue-800 inline-flex items-center"
                 >
                   Contact Support

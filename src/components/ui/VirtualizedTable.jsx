@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { FixedSizeList as List } from 'react-window';
+
 import { cn } from '../../utils/cn';
 
 /**
@@ -29,7 +30,7 @@ const VirtualizedTable = ({
   onRowSelect,
   editableColumns = [],
   formatters = {},
-  ariaLabel = "Financial data table"
+  ariaLabel = 'Financial data table'
 }) => {
   const [hoveredRowIndex, setHoveredRowIndex] = useState(null);
   const [editingCell, setEditingCell] = useState(null);
@@ -52,14 +53,14 @@ const VirtualizedTable = ({
     editableColumns,
     formatters
   }), [
-    data, 
-    columns, 
-    onRowClick, 
-    onCellEdit, 
-    hoveredRowIndex, 
-    editingCell, 
-    selectedRows, 
-    onRowSelect, 
+    data,
+    columns,
+    onRowClick,
+    onCellEdit,
+    hoveredRowIndex,
+    editingCell,
+    selectedRows,
+    onRowSelect,
     selectable,
     editableColumns,
     formatters
@@ -68,17 +69,17 @@ const VirtualizedTable = ({
   // Handle keyboard navigation
   const handleKeyDown = useCallback((event) => {
     if (!editingCell) return;
-    
+
     const { rowIndex, columnKey } = editingCell;
     const currentColumnIndex = columns.findIndex(col => col.key === columnKey);
-    
+
     switch (event.key) {
-      case 'Tab':
+      case 'Tab': {
         event.preventDefault();
-        const nextColumnIndex = event.shiftKey 
+        const nextColumnIndex = event.shiftKey
           ? Math.max(0, currentColumnIndex - 1)
           : Math.min(columns.length - 1, currentColumnIndex + 1);
-        
+
         if (nextColumnIndex !== currentColumnIndex) {
           setEditingCell({
             rowIndex,
@@ -86,8 +87,9 @@ const VirtualizedTable = ({
           });
         }
         break;
-        
-      case 'Enter':
+
+      }
+      case 'Enter': {
         event.preventDefault();
         const nextRowIndex = Math.min(data.length - 1, rowIndex + 1);
         setEditingCell({
@@ -95,10 +97,12 @@ const VirtualizedTable = ({
           columnKey
         });
         break;
-        
-      case 'Escape':
+
+      }
+      case 'Escape': {
         setEditingCell(null);
         break;
+      }
     }
   }, [editingCell, columns, data.length]);
 
@@ -116,11 +120,11 @@ const VirtualizedTable = ({
 
   // Row component for virtualization
   const Row = React.memo(({ index, style, data: rowData }) => {
-    const { 
-      items, 
-      columns, 
-      onRowClick, 
-      hoveredRowIndex, 
+    const {
+      items,
+      columns,
+      onRowClick,
+      hoveredRowIndex,
       setHoveredRowIndex,
       editingCell,
       setEditingCell,
@@ -130,7 +134,7 @@ const VirtualizedTable = ({
       editableColumns,
       formatters
     } = rowData;
-    
+
     const row = items[index];
     const isSelected = selectedRows.includes(index);
     const isHovered = hoveredRowIndex === index;
@@ -138,6 +142,8 @@ const VirtualizedTable = ({
     return (
       <div
         style={style}
+        role="row"
+        tabIndex={0}
         className={cn(
           'flex items-center border-b border-slate-200 transition-colors',
           isHovered && 'bg-slate-50',
@@ -146,7 +152,6 @@ const VirtualizedTable = ({
         onMouseEnter={() => setHoveredRowIndex(index)}
         onMouseLeave={() => setHoveredRowIndex(null)}
         onClick={() => onRowClick?.(row, index)}
-        role="row"
         aria-rowindex={index + 2} // +2 for 1-based indexing and header
         aria-selected={isSelected}
       >
@@ -161,7 +166,7 @@ const VirtualizedTable = ({
             />
           </div>
         )}
-        
+
         {columns.map((column) => {
           const cellValue = row[column.key];
           const isEditing = editingCell?.rowIndex === index && editingCell?.columnKey === column.key;
@@ -179,7 +184,7 @@ const VirtualizedTable = ({
                 isEditable && 'cursor-pointer hover:bg-blue-50',
                 isEditing && 'bg-blue-100 border border-blue-300 rounded'
               )}
-              style={{ 
+              style={{
                 width: column.width || 'auto',
                 minWidth: column.minWidth || 100,
                 maxWidth: column.maxWidth || 300
@@ -204,11 +209,13 @@ const VirtualizedTable = ({
                   autoFocus
                 />
               ) : (
-                <span className={cn(
-                  column.className,
-                  cellValue < 0 && column.key.includes('amount') && 'text-red-600',
-                  cellValue > 0 && column.key.includes('amount') && 'text-green-600'
-                )}>
+                <span
+                  className={cn(
+                    column.className,
+                    cellValue < 0 && column.key.includes('amount') && 'text-red-600',
+                    cellValue > 0 && column.key.includes('amount') && 'text-green-600'
+                  )}
+                >
                   {displayValue}
                 </span>
               )}
@@ -218,6 +225,8 @@ const VirtualizedTable = ({
       </div>
     );
   });
+
+  Row.displayName = 'VirtualizedTableRow';
 
   // Loading skeleton rows
   const LoadingSkeleton = () => (
@@ -230,20 +239,20 @@ const VirtualizedTable = ({
         >
           {selectable && (
             <div className="w-12 px-2">
-              <div className="w-4 h-4 bg-slate-200 rounded"></div>
+              <div className="w-4 h-4 bg-slate-200 rounded" />
             </div>
           )}
           {columns.map((column, colIndex) => (
             <div
               key={`skeleton-${index}-${colIndex}`}
               className="px-4 py-2"
-              style={{ 
+              style={{
                 width: column.width || 'auto',
                 minWidth: column.minWidth || 100,
                 maxWidth: column.maxWidth || 300
               }}
             >
-              <div className="h-4 bg-slate-200 rounded w-3/4"></div>
+              <div className="h-4 bg-slate-200 rounded w-3/4" />
             </div>
           ))}
         </div>
@@ -277,7 +286,7 @@ const VirtualizedTable = ({
           />
         </div>
       )}
-      
+
       {columns.map((column) => (
         <div
           key={column.key}
@@ -287,7 +296,7 @@ const VirtualizedTable = ({
             column.align === 'center' && 'justify-center',
             sortable && 'select-none'
           )}
-          style={{ 
+          style={{
             width: column.width || 'auto',
             minWidth: column.minWidth || 100,
             maxWidth: column.maxWidth || 300
@@ -295,7 +304,7 @@ const VirtualizedTable = ({
           onClick={() => sortable && onSort?.(column.key)}
           role="columnheader"
           aria-sort={
-            sortConfig?.key === column.key 
+            sortConfig?.key === column.key
               ? (sortConfig.direction === 'asc' ? 'ascending' : 'descending')
               : 'none'
           }
@@ -315,8 +324,8 @@ const VirtualizedTable = ({
   return (
     <div className={cn('border border-slate-200 rounded-lg overflow-hidden', className)}>
       <TableHeader />
-      
-      <div 
+
+      <div
         className="relative"
         role="grid"
         aria-label={ariaLabel}
@@ -339,7 +348,7 @@ const VirtualizedTable = ({
           </List>
         )}
       </div>
-      
+
       {!loading && data.length === 0 && (
         <div className="flex items-center justify-center py-12 text-slate-500">
           <div className="text-center">

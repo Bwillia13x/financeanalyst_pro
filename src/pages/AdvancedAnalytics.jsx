@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Card } from '../components/ui/Card';
-import Button from '../components/ui/Button';
-import ProductionErrorBoundary from '../components/ErrorBoundary/ProductionErrorBoundary';
-import OptionsPricing from '../components/AdvancedAnalytics/OptionsPricing';
-import FixedIncomeAnalytics from '../components/AdvancedAnalytics/FixedIncomeAnalytics';
+
 import CreditModeling from '../components/AdvancedAnalytics/CreditModeling';
 import DerivativesModeling from '../components/AdvancedAnalytics/DerivativesModeling';
+import FixedIncomeAnalytics from '../components/AdvancedAnalytics/FixedIncomeAnalytics';
+import OptionsPricing from '../components/AdvancedAnalytics/OptionsPricing';
+import ProductionErrorBoundary from '../components/ErrorBoundary/ProductionErrorBoundary';
+import Button from '../components/ui/Button';
+import { Card } from '../components/ui/Card';
 
 const AdvancedAnalytics = () => {
   const [activeTab, setActiveTab] = useState('options');

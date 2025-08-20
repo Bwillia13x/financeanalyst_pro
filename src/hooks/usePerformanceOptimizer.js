@@ -4,6 +4,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+
 import performanceOptimizer from '../services/performanceOptimizer';
 
 export function usePerformanceOptimizer() {
@@ -13,7 +14,7 @@ export function usePerformanceOptimizer() {
 
   useEffect(() => {
     // Initialize performance optimizer
-    const init = async () => {
+    const init = async() => {
       if (performanceOptimizer.isInitialized) {
         setIsInitialized(true);
       } else {
@@ -21,7 +22,7 @@ export function usePerformanceOptimizer() {
         setIsInitialized(true);
       }
     };
-    
+
     init();
 
     // Setup metrics collection
@@ -39,22 +40,22 @@ export function usePerformanceOptimizer() {
     };
   }, []);
 
-  const getCached = useCallback(async (cacheId, key, fallbackFn) => {
+  const getCached = useCallback(async(cacheId, key, fallbackFn) => {
     if (!isInitialized) return fallbackFn ? await fallbackFn() : null;
     return performanceOptimizer.get(cacheId, key, fallbackFn);
   }, [isInitialized]);
 
-  const setCached = useCallback(async (cacheId, key, value, options) => {
+  const setCached = useCallback(async(cacheId, key, value, options) => {
     if (!isInitialized) return false;
     return performanceOptimizer.set(cacheId, key, value, options);
   }, [isInitialized]);
 
-  const lazyLoad = useCallback(async (componentId, loader, options) => {
+  const lazyLoad = useCallback(async(componentId, loader, options) => {
     if (!isInitialized) return loader();
     return performanceOptimizer.lazyLoad(componentId, loader, options);
   }, [isInitialized]);
 
-  const batchLoad = useCallback(async (requests, options) => {
+  const batchLoad = useCallback(async(requests, options) => {
     if (!isInitialized) {
       return Promise.allSettled(requests.map(req => req.loader()));
     }
@@ -83,7 +84,7 @@ export function usePerformanceOptimizer() {
   };
 }
 
-export function useCachedData(cacheId, key, loader, options = {}) {
+export function useCachedData(cacheId, key, loader, _options = {}) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -92,12 +93,12 @@ export function useCachedData(cacheId, key, loader, options = {}) {
   useEffect(() => {
     let isMounted = true;
 
-    const fetchData = async () => {
+    const fetchData = async() => {
       try {
         setLoading(true);
         setError(null);
 
-        const cachedData = await getCached(cacheId, key, async () => {
+        const cachedData = await getCached(cacheId, key, async() => {
           return await loader();
         });
 
@@ -132,7 +133,7 @@ export function useLazyComponent(componentId, loader, options = {}) {
   const { lazyLoad } = usePerformanceOptimizer();
   const elementRef = useRef(null);
 
-  const loadComponent = useCallback(async () => {
+  const loadComponent = useCallback(async() => {
     if (Component) return Component;
 
     try {

@@ -4,27 +4,27 @@ import { Link, useLocation } from 'react-router-dom';
 
 import { cn } from '../../utils/cn';
 
-const Breadcrumb = ({ items, className, separator = ChevronRight }) => {
+const Breadcrumb = ({ items, className }) => {
   const location = useLocation();
 
   // Auto-generate breadcrumbs if items not provided
   const breadcrumbItems = items || generateBreadcrumbsFromPath(location.pathname);
 
   return (
-    <nav 
-      aria-label="Breadcrumb" 
-      className={cn("flex items-center space-x-2 text-sm", className)}
+    <nav
+      aria-label="Breadcrumb"
+      className={cn('flex items-center space-x-2 text-sm', className)}
     >
-      <ol className="flex items-center space-x-2" role="list">
+      <ol className="flex items-center space-x-2">
         {breadcrumbItems.map((item, index) => (
           <li key={item.path || index} className="flex items-center">
             {index > 0 && (
-              <ChevronRight 
-                className="w-4 h-4 text-muted-foreground mx-2" 
+              <ChevronRight
+                className="w-4 h-4 text-muted-foreground mx-2"
                 aria-hidden="true"
               />
             )}
-            
+
             {item.path && index < breadcrumbItems.length - 1 ? (
               <Link
                 to={item.path}
@@ -37,7 +37,7 @@ const Breadcrumb = ({ items, className, separator = ChevronRight }) => {
                 {item.label}
               </Link>
             ) : (
-              <span 
+              <span
                 className="text-foreground font-medium"
                 aria-current="page"
               >
@@ -77,7 +77,7 @@ const generateBreadcrumbsFromPath = (pathname) => {
   pathSegments.forEach((segment) => {
     currentPath += `/${segment}`;
     const label = pathLabels[segment] || segment.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-    
+
     breadcrumbs.push({
       label,
       path: currentPath

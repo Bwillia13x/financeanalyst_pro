@@ -3,22 +3,23 @@
  * Comprehensive testing of all Phase 3 features working together
  */
 
-import { describe, it, expect, beforeAll, afterAll, beforeEach } from '@jest/globals';
-import testingService from '../../services/testingService';
-import collaborationService from '../../services/collaborationService';
+import { describe, it, expect, beforeAll, afterAll, beforeEach, vi } from 'vitest';
+
 import aiInsightsService from '../../services/aiInsightsService';
 import analyticsService from '../../services/analyticsService';
 import apiIntegrationService from '../../services/apiIntegrationService';
+import collaborationService from '../../services/collaborationService';
 import reportingEngine from '../../services/reportingEngine';
-import userPreferencesService from '../../services/userPreferencesService';
 import securityService from '../../services/securityService';
+import testingService from '../../services/testingService';
+import userPreferencesService from '../../services/userPreferencesService';
 import visualizationService from '../../services/visualizationService';
 
 describe('Phase 3 Integration Tests', () => {
   let testUser;
   let mockFinancialData;
 
-  beforeAll(async () => {
+  beforeAll(async() => {
     // Initialize test user and data
     testUser = {
       id: 'test_user_123',
@@ -61,7 +62,7 @@ describe('Phase 3 Integration Tests', () => {
     ]);
   });
 
-  afterAll(async () => {
+  afterAll(async() => {
     // Cleanup test data
     if (collaborationService.disconnect) {
       await collaborationService.disconnect();
@@ -69,7 +70,7 @@ describe('Phase 3 Integration Tests', () => {
   });
 
   describe('Real-time Data & Collaboration Integration', () => {
-    it('should sync financial data updates across collaborative sessions', async () => {
+    it('should sync financial data updates across collaborative sessions', async() => {
       // Create a workspace
       const workspaceId = 'test_workspace_integration';
       await collaborationService.joinWorkspace(workspaceId, {
@@ -94,15 +95,15 @@ describe('Phase 3 Integration Tests', () => {
       // Verify data synchronization
       const sharedModels = await collaborationService.getWorkspaceModels(workspaceId);
       const updatedModel = sharedModels.find(m => m.id === modelId);
-      
+
       expect(updatedModel).toBeDefined();
       expect(updatedModel.data.assumptions.revenueGrowthRate).toBe(0.07);
     });
 
-    it('should generate AI insights on collaborative data changes', async () => {
+    it('should generate AI insights on collaborative data changes', async() => {
       // Generate AI insights for the financial data
       const insights = await aiInsightsService.generateInsights(mockFinancialData);
-      
+
       expect(insights).toBeDefined();
       expect(insights.recommendations).toBeInstanceOf(Array);
       expect(insights.risks).toBeInstanceOf(Array);
@@ -112,7 +113,7 @@ describe('Phase 3 Integration Tests', () => {
   });
 
   describe('Analytics & User Tracking Integration', () => {
-    it('should track user interactions across all Phase 3 features', async () => {
+    it('should track user interactions across all Phase 3 features', async() => {
       // Simulate user interactions
       analyticsService.trackEvent('collaboration_join', { workspaceId: 'test_workspace' });
       analyticsService.trackEvent('ai_insights_generated', { insightCount: 5 });
@@ -121,14 +122,14 @@ describe('Phase 3 Integration Tests', () => {
 
       // Get analytics summary
       const analytics = await analyticsService.getAnalytics();
-      
+
       expect(analytics.sessionData).toBeDefined();
       expect(analytics.featureUsage).toBeDefined();
       expect(analytics.events).toBeInstanceOf(Array);
       expect(analytics.events.length).toBeGreaterThan(0);
     });
 
-    it('should integrate user preferences with analytics tracking', async () => {
+    it('should integrate user preferences with analytics tracking', async() => {
       // Update user preferences
       const preferences = userPreferencesService.updatePreferences({
         theme: 'professional',
@@ -144,14 +145,14 @@ describe('Phase 3 Integration Tests', () => {
 
       const analytics = await analyticsService.getAnalytics();
       const prefEvent = analytics.events.find(e => e.eventType === 'preferences_updated');
-      
+
       expect(prefEvent).toBeDefined();
       expect(prefEvent.data.theme).toBe('professional');
     });
   });
 
   describe('API Integration & Security Integration', () => {
-    it('should securely authenticate API requests', async () => {
+    it('should securely authenticate API requests', async() => {
       // Test API authentication flow
       const credentials = {
         username: testUser.email,
@@ -160,7 +161,7 @@ describe('Phase 3 Integration Tests', () => {
       };
 
       // Mock authentication
-      const mockAuth = jest.spyOn(securityService, 'authenticateUser')
+      const mockAuth = vi.spyOn(securityService, 'authenticateUser')
         .mockResolvedValue({
           sessionId: 'test_session_123',
           user: testUser,
@@ -168,7 +169,7 @@ describe('Phase 3 Integration Tests', () => {
         });
 
       const session = await securityService.authenticateUser(credentials);
-      
+
       expect(session).toBeDefined();
       expect(session.sessionId).toBeDefined();
       expect(session.user.id).toBe(testUser.id);
@@ -176,7 +177,7 @@ describe('Phase 3 Integration Tests', () => {
       mockAuth.mockRestore();
     });
 
-    it('should encrypt sensitive data in API integrations', async () => {
+    it('should encrypt sensitive data in API integrations', async() => {
       const sensitiveData = {
         apiKey: 'secret_api_key_123',
         userData: mockFinancialData
@@ -194,7 +195,7 @@ describe('Phase 3 Integration Tests', () => {
   });
 
   describe('Reporting Engine Integration', () => {
-    it('should generate reports using data from multiple Phase 3 services', async () => {
+    it('should generate reports using data from multiple Phase 3 services', async() => {
       // Prepare comprehensive report data
       const reportData = {
         ...mockFinancialData,
@@ -216,7 +217,7 @@ describe('Phase 3 Integration Tests', () => {
       expect(report.sections.length).toBeGreaterThan(0);
     });
 
-    it('should export reports with visualization data', async () => {
+    it('should export reports with visualization data', async() => {
       // Create a visualization
       const visualization = visualizationService.createVisualization({
         name: 'Revenue Trend',
@@ -242,7 +243,7 @@ describe('Phase 3 Integration Tests', () => {
   });
 
   describe('Dashboard & Visualization Integration', () => {
-    it('should create interactive dashboards with real-time data', async () => {
+    it('should create interactive dashboards with real-time data', async() => {
       // Create custom dashboard
       const dashboard = visualizationService.createDashboard({
         name: 'Integration Test Dashboard',
@@ -270,7 +271,7 @@ describe('Phase 3 Integration Tests', () => {
       expect(updatedDashboard.layout.widgets.length).toBe(1);
     });
 
-    it('should integrate user preferences with dashboard themes', async () => {
+    it('should integrate user preferences with dashboard themes', async() => {
       // Update user preferences
       userPreferencesService.updatePreferences({
         theme: 'dark',
@@ -289,7 +290,7 @@ describe('Phase 3 Integration Tests', () => {
   });
 
   describe('Performance & Testing Integration', () => {
-    it('should run automated tests on integrated components', async () => {
+    it('should run automated tests on integrated components', async() => {
       // Run comprehensive test suite
       const testResults = await testingService.runAllTests({
         categories: ['unit', 'integration', 'performance']
@@ -300,13 +301,13 @@ describe('Phase 3 Integration Tests', () => {
       expect(testResults.summary.totalTests).toBeGreaterThan(0);
     });
 
-    it('should monitor performance across all Phase 3 features', async () => {
+    it('should monitor performance across all Phase 3 features', async() => {
       // Collect performance metrics
       testingService.collectPerformanceMetrics();
-      
+
       const metrics = testingService.getPerformanceMetrics();
       expect(metrics).toBeInstanceOf(Array);
-      
+
       if (metrics.length > 0) {
         const latestMetrics = metrics[metrics.length - 1];
         expect(latestMetrics.timestamp).toBeDefined();
@@ -316,15 +317,15 @@ describe('Phase 3 Integration Tests', () => {
   });
 
   describe('Security & Compliance Integration', () => {
-    it('should maintain security across all integrated features', async () => {
+    it('should maintain security across all integrated features', async() => {
       // Run security compliance check
       const complianceReport = await securityService.runComplianceCheck();
-      
+
       expect(complianceReport).toBeDefined();
       expect(complianceReport.summary).toBeDefined();
     });
 
-    it('should audit all Phase 3 feature interactions', async () => {
+    it('should audit all Phase 3 feature interactions', async() => {
       // Simulate various user actions that should be audited
       securityService.logSecurityEvent('data_access', {
         userId: testUser.id,
@@ -340,7 +341,7 @@ describe('Phase 3 Integration Tests', () => {
 
       // Generate security report
       const securityReport = await securityService.generateSecurityReport('24h');
-      
+
       expect(securityReport).toBeDefined();
       expect(securityReport.summary).toBeDefined();
       expect(securityReport.summary.totalEvents).toBeGreaterThan(0);
@@ -348,7 +349,7 @@ describe('Phase 3 Integration Tests', () => {
   });
 
   describe('End-to-End Workflow Integration', () => {
-    it('should complete full analysis workflow using all Phase 3 features', async () => {
+    it('should complete full analysis workflow using all Phase 3 features', async() => {
       const workflowResults = {};
 
       // 1. User authentication and preferences

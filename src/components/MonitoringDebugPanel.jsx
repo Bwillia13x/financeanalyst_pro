@@ -1,6 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import monitoring from '../utils/monitoring';
 
 const isProd = import.meta.env.VITE_APP_ENV === 'production';
 
@@ -17,7 +16,7 @@ export default function MonitoringDebugPanel() {
     VITE_PERFORMANCE_MONITORING: import.meta.env.VITE_PERFORMANCE_MONITORING,
     VITE_GA_TRACKING_ID: import.meta.env.VITE_GA_TRACKING_ID,
     VITE_HOTJAR_ID: import.meta.env.VITE_HOTJAR_ID,
-    VITE_SENTRY_DSN: Boolean(import.meta.env.VITE_SENTRY_DSN) ? 'SET' : 'MISSING'
+    VITE_SENTRY_DSN: import.meta.env.VITE_SENTRY_DSN ? 'SET' : 'MISSING'
   }), []);
 
   const addLog = useCallback((msg) => {
@@ -26,8 +25,17 @@ export default function MonitoringDebugPanel() {
 
   const triggerPageview = useCallback(() => {
     const testPath = `/debug-path-${Date.now()}?from=monitoring-panel`;
-    monitoring.trackPageView(testPath);
-    addLog(`Called monitoring.trackPageView('${testPath}')`);
+    // Dynamically import monitoring to avoid side effects
+    import('../utils/monitoring')
+      .then((mod) => {
+        if (mod?.default?.trackPageView) {
+          mod.default.trackPageView(testPath);
+          addLog(`Called monitoring.trackPageView('${testPath}')`);
+        }
+      })
+      .catch(() => {
+        addLog('Failed to load monitoring service');
+      });
   }, [addLog]);
 
   const navigateAndTrack = useCallback(() => {
@@ -40,8 +48,17 @@ export default function MonitoringDebugPanel() {
     try {
       throw new Error(`Sentry test error @ ${new Date().toISOString()}`);
     } catch (e) {
-      monitoring.trackError(e, 'debug_panel_capture');
-      addLog('Sent error via monitoring.trackError(...)');
+      // Dynamically import monitoring to avoid side effects
+      import('../utils/monitoring')
+        .then((mod) => {
+          if (mod?.default?.trackError) {
+            mod.default.trackError(e, 'debug_panel_capture');
+            addLog('Sent error via monitoring.trackError(...)');
+          }
+        })
+        .catch(() => {
+          addLog('Failed to load monitoring service for error tracking');
+        });
     }
   }, [addLog]);
 
@@ -119,7 +136,7 @@ export default function MonitoringDebugPanel() {
       <div className="mt-6 text-sm text-neutral-600">
         Tips:
         <ul className="list-disc ml-6 mt-2 space-y-1">
-          <li>Open DevTools Network tab and filter by "collect" to see GA hits.</li>
+          <li>Open DevTools Network tab and filter by &quot;collect&quot; to see GA hits.</li>
           <li>Look for WebSocket to <code>wss://*.hotjar.com</code> and requests to <code>in.hotjar.com</code>.</li>
           <li>Confirm Sentry events arrive in your project dashboard.</li>
         </ul>

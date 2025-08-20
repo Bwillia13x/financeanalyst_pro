@@ -15,7 +15,38 @@ export default [
       'coverage/**',
       '*.config.js',
       '*.config.mjs',
-      'public/**'
+      'public/**',
+      // All major component subtrees have been enabled and verified clean
+      '!src/components/SEO/**',
+      '!src/components/ui/**',
+      '!src/components/AI/**',
+      '!src/components/ValuationWorkbench/**',
+      '!src/components/ErrorBoundary/**',
+      '!src/components/Collaboration/**',
+      '!src/components/CommandPalette/**',
+      '!src/components/Charts/**',
+      '!src/components/Reporting/**',
+      '!src/components/Settings/**',
+      '!src/components/Security/**',
+      '!src/components/TestSuite/**',
+      '!src/components/Analytics/**',
+      '!src/components/Visualization/**',
+      '!src/components/AdvancedAnalytics/**',
+      '!src/components/ValuationTool/**',
+      '!src/components/PerformanceDashboard/**',
+      '!src/components/LazyLoader/**',
+      '!src/components/auth/**',
+      '!src/components/AIAnalytics/**',
+      '!src/components/AIAssistant/**',
+      '!src/components/BusinessIntelligence/**',
+      '!src/components/CLI/**',
+      '!src/components/AnalysisCanvas/**',
+      '!src/components/PortfolioAnalytics/**',
+      '!src/components/PortfolioBuilder/**',
+      '!src/components/PresentationSuite/**',
+      '!src/components/ImmersiveUI/**',
+      '!src/components/ModelLab/**',
+      '!src/components/PrivateAnalysis/**'
     ]
   },
   {
@@ -48,7 +79,9 @@ export default [
       'no-debugger': 'error',
       'no-unused-vars': ['error', { 
         argsIgnorePattern: '^_',
-        varsIgnorePattern: '^(React|_)'
+        varsIgnorePattern: '^(React|_)',
+        caughtErrors: 'all',
+        caughtErrorsIgnorePattern: '^_'
       }],
       'no-var': 'error',
       'prefer-const': 'error',
@@ -181,8 +214,9 @@ export default [
     files: ['**/*.test.{js,jsx}', '**/*.spec.{js,jsx}'],
     languageOptions: {
       globals: {
-        ...globals.jest,
+        // Vitest globals
         vi: 'readonly',
+        test: 'readonly',
         expect: 'readonly',
         describe: 'readonly',
         it: 'readonly',
@@ -195,7 +229,10 @@ export default [
     rules: {
       'no-console': 'off',
       'react/prop-types': 'off',
-      'no-unused-vars': 'off'
+      'no-unused-vars': 'off',
+      'import/order': 'off',
+      'comma-dangle': 'off',
+      'space-before-function-paren': 'off'
     }
   }
 ];

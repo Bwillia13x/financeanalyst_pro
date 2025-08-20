@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import Header from '../components/ui/Header';
 
 const PrivateAnalysisMinimal = () => {
-  const [activeTab, _setActiveTab] = useState('spreadsheet');
+  const [activeTab] = useState('spreadsheet');
 
   console.log('PrivateAnalysisMinimal component initializing...');
 

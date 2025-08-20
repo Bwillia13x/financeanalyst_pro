@@ -152,21 +152,21 @@ export const FEATURE_INTRODUCTIONS = {
     trigger: 'first-validation-error',
     dismissible: true
   },
-  
+
   virtualizedTable: {
     title: 'High-Performance Tables',
     content: 'Handle large datasets efficiently with our virtualized table system. Scroll through thousands of rows without performance issues.',
     trigger: 'first-large-dataset',
     dismissible: true
   },
-  
+
   advancedCharts: {
     title: 'Interactive Financial Charts',
     content: 'Create professional charts and visualizations. Click chart types to switch views and hover for detailed information.',
     trigger: 'chart-creation',
     dismissible: true
   },
-  
+
   exportCapabilities: {
     title: 'Data Export Options',
     content: 'Export your analysis to Excel, PDF, or CSV formats. Perfect for presentations and further analysis.',
@@ -187,18 +187,18 @@ export const getTourByFeature = (feature) => {
     'portfolio': 'portfolioManagement',
     'market-data': 'marketAnalysis'
   };
-  
+
   return ONBOARDING_TOURS[tourMap[feature]];
 };
 
 export const shouldShowIntroduction = (featureId, userPreferences = {}) => {
   const feature = FEATURE_INTRODUCTIONS[featureId];
   if (!feature) return false;
-  
+
   // Check if user has dismissed this introduction
   const dismissed = userPreferences.dismissedIntroductions || [];
   if (dismissed.includes(featureId)) return false;
-  
+
   return true;
 };
 
@@ -207,7 +207,7 @@ export const markIntroductionSeen = (featureId, userPreferences = {}) => {
   if (!dismissed.includes(featureId)) {
     dismissed.push(featureId);
   }
-  
+
   return {
     ...userPreferences,
     dismissedIntroductions: dismissed

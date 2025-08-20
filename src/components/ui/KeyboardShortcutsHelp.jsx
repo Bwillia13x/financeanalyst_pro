@@ -1,6 +1,7 @@
+import { X, Command, Search, Zap, KeyboardIcon } from 'lucide-react';
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Command, Search, Zap, KeyboardIcon } from 'lucide-react';
+
 import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts';
 import { cn } from '../../utils/cn';
 
@@ -12,11 +13,11 @@ import { cn } from '../../utils/cn';
 export const KeyboardShortcutsHelp = ({ isOpen, onClose }) => {
   const [activeCategory, setActiveCategory] = useState('general');
   const { getShortcutsByCategory, formatKeyCombo } = useKeyboardShortcuts();
-  
+
   if (!isOpen) return null;
 
   const shortcuts = getShortcutsByCategory();
-  
+
   const categories = [
     { id: 'general', label: 'General', icon: Command },
     { id: 'navigation', label: 'Navigation', icon: Search },
@@ -52,7 +53,7 @@ export const KeyboardShortcutsHelp = ({ isOpen, onClose }) => {
                 {categories.map(category => {
                   const Icon = category.icon;
                   const shortcutCount = shortcuts[category.id]?.length || 0;
-                  
+
                   return (
                     <button
                       key={category.id}

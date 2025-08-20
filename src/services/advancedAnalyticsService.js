@@ -9,7 +9,7 @@ export class CurveBuilder {
    */
   static buildYieldCurve(marketData) {
     const { instruments, rates, maturities } = marketData;
-    
+
     // Sort by maturity
     const sortedData = instruments.map((instrument, index) => ({
       instrument,
@@ -18,7 +18,7 @@ export class CurveBuilder {
     })).sort((a, b) => a.maturity - b.maturity);
 
     const curve = [];
-    
+
     sortedData.forEach((point, index) => {
       if (index === 0) {
         // First point - direct rate
@@ -32,7 +32,7 @@ export class CurveBuilder {
         const rate = this.bootstrapRate(curve, point);
         curve.push({
           maturity: point.maturity,
-          rate: rate,
+          rate,
           discountFactor: Math.exp(-rate * point.maturity)
         });
       }
@@ -56,7 +56,7 @@ export class CurveBuilder {
     if (maturity <= curve[0].maturity) {
       return curve[0].rate;
     }
-    
+
     if (maturity >= curve[curve.length - 1].maturity) {
       return curve[curve.length - 1].rate;
     }
@@ -79,15 +79,15 @@ export class PricingEngines {
    */
   static blackScholes(params) {
     const { S, K, T, r, sigma, optionType = 'call', q = 0 } = params;
-    
+
     if (T <= 0) return { price: Math.max(optionType === 'call' ? S - K : K - S, 0) };
 
     const d1 = (Math.log(S / K) + (r - q + 0.5 * sigma * sigma) * T) / (sigma * Math.sqrt(T));
     const d2 = d1 - sigma * Math.sqrt(T);
 
     const N = this.normalCDF;
-    
-    let price, delta, gamma, theta, vega, rho;
+
+    let price, delta, rho;
 
     if (optionType === 'call') {
       price = S * Math.exp(-q * T) * N(d1) - K * Math.exp(-r * T) * N(d2);
@@ -100,11 +100,11 @@ export class PricingEngines {
     }
 
     const nPrime = this.normalPDF;
-    gamma = Math.exp(-q * T) * nPrime(d1) / (S * sigma * Math.sqrt(T));
-    theta = (-S * Math.exp(-q * T) * nPrime(d1) * sigma / (2 * Math.sqrt(T)) 
+    const gamma = Math.exp(-q * T) * nPrime(d1) / (S * sigma * Math.sqrt(T));
+    const theta = (-S * Math.exp(-q * T) * nPrime(d1) * sigma / (2 * Math.sqrt(T))
             - r * K * Math.exp(-r * T) * (optionType === 'call' ? N(d2) : N(-d2))
             + q * S * Math.exp(-q * T) * (optionType === 'call' ? N(d1) : N(-d1))) / 365;
-    vega = S * Math.exp(-q * T) * nPrime(d1) * Math.sqrt(T) / 100;
+    const vega = S * Math.exp(-q * T) * nPrime(d1) * Math.sqrt(T) / 100;
 
     return { price, delta, gamma, theta, vega, rho };
   }
@@ -114,7 +114,7 @@ export class PricingEngines {
    */
   static binomialTree(params) {
     const { S, K, T, r, sigma, optionType = 'call', steps = 100 } = params;
-    
+
     const dt = T / steps;
     const u = Math.exp(sigma * Math.sqrt(dt));
     const d = 1 / u;
@@ -122,11 +122,11 @@ export class PricingEngines {
 
     // Build tree
     const tree = Array(steps + 1).fill(null).map(() => Array(steps + 1).fill(0));
-    
+
     // Terminal payoffs
     for (let i = 0; i <= steps; i++) {
       const ST = S * Math.pow(u, 2 * i - steps);
-      tree[steps][i] = optionType === 'call' 
+      tree[steps][i] = optionType === 'call'
         ? Math.max(ST - K, 0)
         : Math.max(K - ST, 0);
     }
@@ -146,7 +146,7 @@ export class PricingEngines {
    */
   static bondPrice(params) {
     const { faceValue, couponRate, maturity, frequency, marketYield } = params;
-    
+
     const periodsPerYear = frequency;
     const totalPeriods = maturity * periodsPerYear;
     const couponPayment = (couponRate * faceValue) / periodsPerYear;
@@ -198,22 +198,22 @@ export class PricingEngines {
    */
   static swapValuation(params) {
     const { notional, maturity, fixedRate, floatingRate, frequency } = params;
-    
+
     const periodsPerYear = frequency;
     const totalPeriods = maturity * periodsPerYear;
     const fixedPayment = (fixedRate * notional) / periodsPerYear;
-    
+
     // Simplified: assume flat curve at floating rate
     const discountRate = floatingRate;
-    
+
     let pvFixedLeg = 0;
     for (let i = 1; i <= totalPeriods; i++) {
       pvFixedLeg += fixedPayment / Math.pow(1 + discountRate / periodsPerYear, i);
     }
-    
+
     // Floating leg PV (simplified)
     const pvFloatingLeg = notional - notional / Math.pow(1 + discountRate / periodsPerYear, totalPeriods);
-    
+
     return {
       swapValue: pvFixedLeg - pvFloatingLeg,
       pvFixedLeg,
@@ -245,13 +245,13 @@ export class PricingEngines {
     const a4 = -1.453152027;
     const a5 =  1.061405429;
     const p  =  0.3275911;
-    
+
     const sign = x < 0 ? -1 : 1;
     x = Math.abs(x);
-    
+
     const t = 1.0 / (1.0 + p * x);
     const y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
-    
+
     return sign * y;
   }
 }
@@ -281,7 +281,7 @@ export class RiskMetrics {
    */
   static calculateCorrelationMatrix(dataMatrix) {
     const n = dataMatrix.length;
-    const m = dataMatrix[0].length;
+    const _columns = dataMatrix[0].length;
     const correlationMatrix = Array(n).fill(null).map(() => Array(n).fill(0));
 
     for (let i = 0; i < n; i++) {

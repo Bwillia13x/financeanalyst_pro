@@ -11,7 +11,7 @@ class PerformanceOptimizer {
     this.resourcePool = new Map();
     this.loadingStates = new Map();
     this.isInitialized = false;
-    
+
     this.initializeOptimizer();
   }
 
@@ -21,7 +21,7 @@ class PerformanceOptimizer {
       this.setupLazyLoadingRules();
       this.setupResourcePooling();
       this.startPerformanceMonitoring();
-      
+
       this.isInitialized = true;
       console.log('Performance optimizer initialized with enterprise-grade caching');
     } catch (error) {
@@ -170,14 +170,14 @@ class PerformanceOptimizer {
         metadata.lastAccessed = now;
         metadata.accessCount = (metadata.accessCount || 0) + 1;
         cache.stats.hits++;
-        
+
         let value = cache.data.get(key);
-        
+
         // Decompress if needed
         if (cache.config.compression && metadata.compressed) {
           value = await this.decompress(value);
         }
-        
+
         return value;
       } else {
         // Remove expired entry
@@ -210,7 +210,7 @@ class PerformanceOptimizer {
 
     const now = Date.now();
     const ttl = options.ttl || cache.config.ttl;
-    
+
     let processedValue = value;
     let compressed = false;
 
@@ -258,22 +258,22 @@ class PerformanceOptimizer {
     switch (cache.config.strategy) {
       case 'lru': // Least Recently Used
         toEvict = entries
-          .sort(([,a], [,b]) => a.lastAccessed - b.lastAccessed)
+          .sort(([, a], [, b]) => a.lastAccessed - b.lastAccessed)
           .slice(0, count);
         break;
-      
+
       case 'lfu': // Least Frequently Used
         toEvict = entries
-          .sort(([,a], [,b]) => a.accessCount - b.accessCount)
+          .sort(([, a], [, b]) => a.accessCount - b.accessCount)
           .slice(0, count);
         break;
-      
+
       case 'fifo': // First In, First Out
         toEvict = entries
-          .sort(([,a], [,b]) => a.createdAt - b.createdAt)
+          .sort(([, a], [, b]) => a.createdAt - b.createdAt)
           .slice(0, count);
         break;
-      
+
       default:
         toEvict = entries.slice(0, count);
     }
@@ -308,7 +308,7 @@ class PerformanceOptimizer {
 
   async lazyLoad(componentId, loader, options = {}) {
     const loadingKey = `${componentId}_${options.key || 'default'}`;
-    
+
     // Return cached loading promise if already loading
     if (this.loadingStates.has(loadingKey)) {
       return this.loadingStates.get(loadingKey);
@@ -336,13 +336,13 @@ class PerformanceOptimizer {
           await this.waitForViewport(options.element);
         }
         break;
-      
+
       case 'interaction':
         if (!options.triggered) {
           await this.waitForInteraction(options.element);
         }
         break;
-      
+
       case 'demand':
         // Load only when explicitly requested
         break;
@@ -354,29 +354,29 @@ class PerformanceOptimizer {
   async batchLoad(requests, options = {}) {
     const batchSize = options.batchSize || 5;
     const results = [];
-    
+
     for (let i = 0; i < requests.length; i += batchSize) {
       const batch = requests.slice(i, i + batchSize);
-      const batchPromises = batch.map(request => 
+      const batchPromises = batch.map(request =>
         this.loadWithRetry(request.loader, request.options)
       );
-      
+
       const batchResults = await Promise.allSettled(batchPromises);
       results.push(...batchResults);
-      
+
       // Small delay between batches to prevent overwhelming
       if (i + batchSize < requests.length) {
         await this.delay(options.batchDelay || 10);
       }
     }
-    
+
     return results;
   }
 
   async loadWithRetry(loader, options = {}) {
     const maxRetries = options.maxRetries || 3;
     const retryDelay = options.retryDelay || 1000;
-    
+
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
         return await loader();
@@ -566,7 +566,7 @@ class PerformanceOptimizer {
       const cache = this.caches.get(cacheId);
       return cache ? cache.stats : null;
     }
-    
+
     const stats = {};
     for (const [id, cache] of this.caches) {
       stats[id] = cache.stats;

@@ -1,16 +1,14 @@
-import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Settings, 
-  Palette, 
-  Layout, 
-  Database, 
-  Bell, 
-  Calculator, 
-  Users, 
-  Zap, 
+import {
+  Settings,
+  Palette,
+  Layout,
+  Database,
+  Bell,
+  Calculator,
+  Users,
+  Zap,
   Navigation,
-  Check,
   X,
   RefreshCw,
   Download,
@@ -18,6 +16,8 @@ import {
   RotateCcw,
   Save
 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+
 import userPreferencesService from '../../services/userPreferencesService';
 
 const UserPreferences = ({ isOpen, onClose }) => {
@@ -35,13 +35,13 @@ const UserPreferences = ({ isOpen, onClose }) => {
     }
   }, [isOpen]);
 
-  const loadPreferences = async () => {
+  const loadPreferences = async() => {
     setIsLoading(true);
     try {
       const prefs = userPreferencesService.getPreferences();
       const cats = userPreferencesService.getPreferenceCategories();
       const availableThemes = userPreferencesService.getThemes();
-      
+
       setPreferences(prefs);
       setCategories(cats);
       setThemes(availableThemes);
@@ -59,12 +59,12 @@ const UserPreferences = ({ isOpen, onClose }) => {
     setHasChanges(true);
   };
 
-  const savePreferences = async () => {
+  const savePreferences = async() => {
     setIsSaving(true);
     try {
       await userPreferencesService.updatePreferences(preferences);
       setHasChanges(false);
-      
+
       // Show success notification
       window.dispatchEvent(new CustomEvent('showNotification', {
         detail: {
@@ -87,13 +87,13 @@ const UserPreferences = ({ isOpen, onClose }) => {
     }
   };
 
-  const resetPreferences = async () => {
+  const resetPreferences = async() => {
     if (window.confirm('Reset all preferences to default? This action cannot be undone.')) {
       try {
         const reset = await userPreferencesService.resetPreferences();
         setPreferences(reset);
         setHasChanges(false);
-        
+
         window.dispatchEvent(new CustomEvent('showNotification', {
           detail: {
             type: 'success',
@@ -127,7 +127,7 @@ const UserPreferences = ({ isOpen, onClose }) => {
       try {
         const settings = JSON.parse(e.target.result);
         const success = userPreferencesService.importSettings(settings);
-        
+
         if (success) {
           loadPreferences();
           window.dispatchEvent(new CustomEvent('showNotification', {
@@ -170,7 +170,7 @@ const UserPreferences = ({ isOpen, onClose }) => {
 
   const renderPreferenceInput = (key, value) => {
     const inputProps = {
-      className: "w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent",
+      className: 'w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent',
       value: value || '',
       onChange: (e) => updatePreference(key, e.target.value)
     };
@@ -184,7 +184,7 @@ const UserPreferences = ({ isOpen, onClose }) => {
             ))}
           </select>
         );
-      
+
       case 'fontSize':
         return (
           <select {...inputProps} onChange={(e) => updatePreference(key, e.target.value)}>
@@ -194,7 +194,7 @@ const UserPreferences = ({ isOpen, onClose }) => {
             <option value="extra_large">Extra Large</option>
           </select>
         );
-      
+
       case 'density':
         return (
           <select {...inputProps} onChange={(e) => updatePreference(key, e.target.value)}>
@@ -203,7 +203,7 @@ const UserPreferences = ({ isOpen, onClose }) => {
             <option value="spacious">Spacious</option>
           </select>
         );
-      
+
       case 'colorScheme':
         return (
           <select {...inputProps} onChange={(e) => updatePreference(key, e.target.value)}>
@@ -212,7 +212,7 @@ const UserPreferences = ({ isOpen, onClose }) => {
             <option value="auto">Auto</option>
           </select>
         );
-      
+
       case 'currency':
         return (
           <select {...inputProps} onChange={(e) => updatePreference(key, e.target.value)}>
@@ -223,7 +223,7 @@ const UserPreferences = ({ isOpen, onClose }) => {
             <option value="CAD">CAD - Canadian Dollar</option>
           </select>
         );
-      
+
       case 'dateFormat':
         return (
           <select {...inputProps} onChange={(e) => updatePreference(key, e.target.value)}>
@@ -233,7 +233,7 @@ const UserPreferences = ({ isOpen, onClose }) => {
             <option value="MMM DD, YYYY">MMM DD, YYYY</option>
           </select>
         );
-      
+
       case 'numberFormat':
         return (
           <select {...inputProps} onChange={(e) => updatePreference(key, e.target.value)}>
@@ -472,9 +472,9 @@ const UserPreferences = ({ isOpen, onClose }) => {
                     >
                       <div>
                         <h3 className="text-xl font-semibold text-gray-900 flex items-center">
-                          {React.createElement(getCategoryIcon(activeCategory), { 
-                            size: 24, 
-                            className: "mr-2" 
+                          {React.createElement(getCategoryIcon(activeCategory), {
+                            size: 24,
+                            className: 'mr-2'
                           })}
                           {categories[activeCategory].name}
                         </h3>

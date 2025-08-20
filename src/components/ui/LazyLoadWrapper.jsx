@@ -1,18 +1,20 @@
 import React, { Suspense } from 'react';
-import { LoadingSkeleton } from './LoadingSkeleton';
+
 import { trackLazyLoad } from '../../utils/performanceMonitor';
+
+import { LoadingSkeleton } from './LoadingSkeleton';
 
 /**
  * Wrapper component for lazy-loaded components with performance tracking
  * Provides consistent loading states and error boundaries
  */
 
-const LazyLoadWrapper = ({ 
-  children, 
-  fallback = null, 
+const LazyLoadWrapper = ({
+  children,
+  fallback = null,
   skeletonType = 'table',
   componentName = 'Unknown',
-  ...props 
+  ..._props
 }) => {
   const getSkeletonComponent = () => {
     switch (skeletonType) {
@@ -49,16 +51,16 @@ const LazyLoadWrapper = ({
  * Higher-order component for creating lazy-loaded components with tracking
  */
 export const withLazyLoading = (importFunction, componentName, skeletonType = 'table') => {
-  const LazyComponent = React.lazy(() => 
+  const LazyComponent = React.lazy(() =>
     trackLazyLoad(importFunction, componentName)
   );
 
-  return React.forwardRef((props, ref) => (
-    <LazyLoadWrapper 
+  return React.forwardRef((_props, ref) => (
+    <LazyLoadWrapper
       skeletonType={skeletonType}
       componentName={componentName}
     >
-      <LazyComponent {...props} ref={ref} />
+      <LazyComponent {..._props} ref={ref} />
     </LazyLoadWrapper>
   ));
 };

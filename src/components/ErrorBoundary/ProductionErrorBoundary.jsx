@@ -1,5 +1,6 @@
-import React from 'react';
 import { AlertTriangle, RefreshCw, Home, MessageCircle } from 'lucide-react';
+import React from 'react';
+
 import Button from '../ui/Button';
 
 class ProductionErrorBoundary extends React.Component {
@@ -13,13 +14,13 @@ class ProductionErrorBoundary extends React.Component {
     };
   }
 
-  static getDerivedStateFromError(error) {
+  static getDerivedStateFromError(_error) {
     return { hasError: true };
   }
 
   componentDidCatch(error, errorInfo) {
     const errorId = this.generateErrorId();
-    
+
     this.setState({
       error,
       errorInfo,
@@ -60,7 +61,7 @@ class ProductionErrorBoundary extends React.Component {
       fetch('/api/errors', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           errorId,
@@ -109,8 +110,8 @@ Time: ${new Date().toISOString()}
 Please describe what you were doing when this error occurred:
 [Your description here]
     `);
-    
-    window.open(`mailto:support@financeanalystpro.com?subject=${subject}&body=${body}`);
+
+    window.open(`mailto:support@financeanalystpro.com?subject=${subject}&amp;body=${body}`);
   };
 
   render() {
@@ -140,7 +141,7 @@ Please describe what you were doing when this error occurred:
                   Component Error
                 </h3>
                 <p className="text-sm text-red-600 mt-1">
-                  This component encountered an error and couldn't be displayed.
+                  This component encountered an error and couldn&apos;t be displayed.
                 </p>
                 <div className="mt-3 flex space-x-3">
                   <Button
@@ -167,11 +168,11 @@ Please describe what you were doing when this error occurred:
               <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <AlertTriangle className="w-8 h-8 text-red-500" />
               </div>
-              
+
               <h1 className="text-xl font-semibold text-gray-900 mb-2">
                 Something went wrong
               </h1>
-              
+
               <p className="text-gray-600 mb-6">
                 We apologize for the inconvenience. An unexpected error occurred while loading this page.
               </p>

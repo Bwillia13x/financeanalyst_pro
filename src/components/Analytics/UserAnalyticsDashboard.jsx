@@ -1,37 +1,30 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  BarChart3, 
-  TrendingUp, 
-  Users, 
-  Clock, 
-  Activity, 
+import { motion } from 'framer-motion';
+import {
+  BarChart3,
+  Users,
+  Clock,
+  Activity,
   Target,
   Eye,
-  MousePointer,
   Zap,
-  AlertTriangle,
-  CheckCircle,
-  Calendar,
-  Globe,
-  Smartphone
+  Calendar
 } from 'lucide-react';
-import { motion } from 'framer-motion';
-import { 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
+import React, { useState, useEffect } from 'react';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
   ResponsiveContainer,
-  LineChart,
-  Line,
   PieChart,
   Pie,
   Cell,
   Area,
   AreaChart
 } from 'recharts';
+
 import analyticsService from '../../services/analyticsService';
 
 /**
@@ -41,12 +34,11 @@ import analyticsService from '../../services/analyticsService';
 const UserAnalyticsDashboard = ({ className = '' }) => {
   const [dashboardData, setDashboardData] = useState(null);
   const [selectedTimeframe, setSelectedTimeframe] = useState('7d');
-  const [selectedMetric, setSelectedMetric] = useState('overview');
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     loadDashboardData();
-    
+
     // Set up auto-refresh
     const interval = setInterval(loadDashboardData, 30000); // Refresh every 30 seconds
     return () => clearInterval(interval);
@@ -54,7 +46,7 @@ const UserAnalyticsDashboard = ({ className = '' }) => {
 
   const loadDashboardData = () => {
     setIsLoading(true);
-    
+
     // Simulate loading delay for real-world feel
     setTimeout(() => {
       const data = analyticsService.getDashboardData();
@@ -83,7 +75,7 @@ const UserAnalyticsDashboard = ({ className = '' }) => {
 
   const generateFeatureUsageChart = () => {
     if (!dashboardData?.featureUsage?.topFeatures) return [];
-    
+
     return dashboardData.featureUsage.topFeatures.slice(0, 8).map(feature => ({
       name: feature.feature.replace('_', ' ').toUpperCase(),
       usage: feature.count,
@@ -93,7 +85,7 @@ const UserAnalyticsDashboard = ({ className = '' }) => {
 
   const generateTimePatternChart = () => {
     if (!dashboardData?.userBehavior?.timePattern?.hourlyActivity) return [];
-    
+
     return dashboardData.userBehavior.timePattern.hourlyActivity.map((activity, hour) => ({
       hour: `${hour}:00`,
       activity
@@ -102,7 +94,7 @@ const UserAnalyticsDashboard = ({ className = '' }) => {
 
   const generateSessionDistributionChart = () => {
     if (!dashboardData?.sessions?.sessionDistribution) return [];
-    
+
     const dist = dashboardData.sessions.sessionDistribution;
     return [
       { name: 'Short (< 1m)', value: dist.short, color: '#ef4444' },
@@ -115,13 +107,13 @@ const UserAnalyticsDashboard = ({ className = '' }) => {
     return (
       <div className={`bg-white dark:bg-slate-800 rounded-lg shadow-lg p-6 ${className}`}>
         <div className="animate-pulse">
-          <div className="h-6 bg-slate-200 dark:bg-slate-700 rounded mb-4"></div>
+          <div className="h-6 bg-slate-200 dark:bg-slate-700 rounded mb-4" />
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="h-24 bg-slate-200 dark:bg-slate-700 rounded"></div>
+              <div key={i} className="h-24 bg-slate-200 dark:bg-slate-700 rounded" />
             ))}
           </div>
-          <div className="h-64 bg-slate-200 dark:bg-slate-700 rounded"></div>
+          <div className="h-64 bg-slate-200 dark:bg-slate-700 rounded" />
         </div>
       </div>
     );
@@ -281,16 +273,16 @@ const UserAnalyticsDashboard = ({ className = '' }) => {
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={generateFeatureUsageChart()}>
                 <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-                <XAxis 
-                  dataKey="name" 
+                <XAxis
+                  dataKey="name"
                   tick={{ fontSize: 12 }}
                   angle={-45}
                   textAnchor="end"
                   height={80}
                 />
                 <YAxis tick={{ fontSize: 12 }} />
-                <Tooltip 
-                  contentStyle={{ 
+                <Tooltip
+                  contentStyle={{
                     backgroundColor: 'rgba(15, 23, 42, 0.9)',
                     border: 'none',
                     borderRadius: '8px',
@@ -341,19 +333,19 @@ const UserAnalyticsDashboard = ({ className = '' }) => {
               <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
               <XAxis dataKey="hour" tick={{ fontSize: 12 }} />
               <YAxis tick={{ fontSize: 12 }} />
-              <Tooltip 
-                contentStyle={{ 
+              <Tooltip
+                contentStyle={{
                   backgroundColor: 'rgba(15, 23, 42, 0.9)',
                   border: 'none',
                   borderRadius: '8px',
                   color: 'white'
                 }}
               />
-              <Area 
-                type="monotone" 
-                dataKey="activity" 
-                stroke="#8b5cf6" 
-                fill="#8b5cf6" 
+              <Area
+                type="monotone"
+                dataKey="activity"
+                stroke="#8b5cf6"
+                fill="#8b5cf6"
                 fillOpacity={0.3}
               />
             </AreaChart>

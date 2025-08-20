@@ -43,7 +43,7 @@ class BusinessIntelligenceService extends EventEmitter {
     try {
       if (this.isInitialized) {
         console.warn('BusinessIntelligenceService already initialized');
-        return;
+        return this;
       }
 
       this.config = {
@@ -654,12 +654,24 @@ class BusinessIntelligenceService extends EventEmitter {
       await this.processBatch('performance');
 
       // Clear data
-      this.analytics.clear();
-      this.userBehavior.clear();
-      this.performanceMetrics.clear();
-      this.marketIntelligence.clear();
-      this.automatedReports.clear();
-      this.insights.clear();
+      if (this.analytics && typeof this.analytics.clear === 'function') {
+        this.analytics.clear();
+      }
+      if (this.userBehavior && typeof this.userBehavior.clear === 'function') {
+        this.userBehavior.clear();
+      }
+      if (this.performanceMetrics && typeof this.performanceMetrics.clear === 'function') {
+        this.performanceMetrics.clear();
+      }
+      if (this.marketIntelligence && typeof this.marketIntelligence.clear === 'function') {
+        this.marketIntelligence.clear();
+      }
+      if (this.automatedReports && typeof this.automatedReports.clear === 'function') {
+        this.automatedReports.clear();
+      }
+      if (this.insights && typeof this.insights.clear === 'function') {
+        this.insights.clear();
+      }
 
       this.isInitialized = false;
       this.emit('cleanup');

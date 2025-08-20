@@ -1,14 +1,12 @@
-import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  Zap, 
-  Settings, 
-  Plus, 
-  CheckCircle, 
-  AlertTriangle, 
-  Clock, 
+import {
+  Zap,
+  Settings,
+  Plus,
+  CheckCircle,
+  AlertTriangle,
+  Clock,
   ExternalLink,
-  Shield,
   Globe,
   Database,
   BarChart3,
@@ -17,25 +15,24 @@ import {
   Code,
   Webhook,
   Key,
-  Link as LinkIcon,
-  Download,
-  Upload
+  Link as LinkIcon
 } from 'lucide-react';
+import React, { useState } from 'react';
 
-import Header from '../components/ui/Header';
-import { Card } from '../components/ui/Card';
 import Button from '../components/ui/Button';
+import { Card } from '../components/ui/Card';
+import Header from '../components/ui/Header';
 
 const Integrations = () => {
   const [activeCategory, setActiveCategory] = useState('all');
-  
+
   const categories = [
     { id: 'all', label: 'All Integrations' },
     { id: 'data', label: 'Data Providers' },
     { id: 'trading', label: 'Trading Platforms' },
     { id: 'analytics', label: 'Analytics Tools' },
     { id: 'reporting', label: 'Reporting' },
-    { id: 'api', label: 'APIs & Webhooks' },
+    { id: 'api', label: 'APIs & Webhooks' }
   ];
 
   const integrations = [
@@ -50,7 +47,7 @@ const Integrations = () => {
       color: 'bg-orange-500',
       features: ['Real-time market data', 'Historical data', 'News feeds', 'Analytics'],
       pricing: 'Enterprise',
-      lastSync: '2 minutes ago',
+      lastSync: '2 minutes ago'
     },
     {
       id: 2,
@@ -63,7 +60,7 @@ const Integrations = () => {
       color: 'bg-blue-500',
       features: ['Portfolio tracking', 'Order execution', 'Account data', 'Risk management'],
       pricing: 'Free with account',
-      lastSync: null,
+      lastSync: null
     },
     {
       id: 3,
@@ -76,7 +73,7 @@ const Integrations = () => {
       color: 'bg-indigo-500',
       features: ['Market data', 'Company fundamentals', 'ESG data', 'Research'],
       pricing: 'Subscription',
-      lastSync: 'Failed 2 hours ago',
+      lastSync: 'Failed 2 hours ago'
     },
     {
       id: 4,
@@ -89,7 +86,7 @@ const Integrations = () => {
       color: 'bg-green-500',
       features: ['Stock prices', 'Technical indicators', 'Forex data', 'Crypto data'],
       pricing: 'Freemium',
-      lastSync: '10 minutes ago',
+      lastSync: '10 minutes ago'
     },
     {
       id: 5,
@@ -102,7 +99,7 @@ const Integrations = () => {
       color: 'bg-purple-500',
       features: ['Alert notifications', 'Report sharing', 'Team collaboration', 'Bot integration'],
       pricing: 'Free/Paid',
-      lastSync: '5 minutes ago',
+      lastSync: '5 minutes ago'
     },
     {
       id: 6,
@@ -115,7 +112,7 @@ const Integrations = () => {
       color: 'bg-cyan-500',
       features: ['Data visualization', 'Dashboard creation', 'Advanced analytics', 'Reporting'],
       pricing: 'Subscription',
-      lastSync: null,
+      lastSync: null
     },
     {
       id: 7,
@@ -128,7 +125,7 @@ const Integrations = () => {
       color: 'bg-gray-500',
       features: ['Real-time updates', 'Custom triggers', 'Data streaming', 'Event notifications'],
       pricing: 'Free',
-      lastSync: 'Continuous',
+      lastSync: 'Continuous'
     },
     {
       id: 8,
@@ -141,8 +138,8 @@ const Integrations = () => {
       color: 'bg-emerald-500',
       features: ['Data export', 'Model templates', 'Live data feeds', 'Automated reports'],
       pricing: 'Office 365',
-      lastSync: '1 hour ago',
-    },
+      lastSync: '1 hour ago'
+    }
   ];
 
   const getStatusInfo = (status) => {
@@ -160,14 +157,14 @@ const Integrations = () => {
     }
   };
 
-  const filteredIntegrations = activeCategory === 'all' 
-    ? integrations 
+  const filteredIntegrations = activeCategory === 'all'
+    ? integrations
     : integrations.filter(integration => integration.category === activeCategory);
 
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
-      
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -255,7 +252,7 @@ const Integrations = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredIntegrations.map((integration) => {
               const statusInfo = getStatusInfo(integration.status);
-              
+
               return (
                 <motion.div
                   key={integration.id}
@@ -357,7 +354,7 @@ const Integrations = () => {
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-2">Need a Custom Integration?</h3>
               <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
-                We can help you build custom integrations with your specific data sources, 
+                We can help you build custom integrations with your specific data sources,
                 trading platforms, or internal systems. Contact our integration team to discuss your requirements.
               </p>
               <div className="flex justify-center space-x-4">

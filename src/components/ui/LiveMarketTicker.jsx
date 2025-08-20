@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
 import { TrendingUp, TrendingDown, Wifi, WifiOff, RefreshCw } from 'lucide-react';
+import React, { useState } from 'react';
+
 import { useMultipleRealTimeData } from '../../hooks/useRealTimeData';
 import { cn } from '../../utils/cn';
 
@@ -18,15 +19,15 @@ const DEFAULT_SYMBOLS = [
   { dataType: 'commodity_prices', symbol: 'GOLD', name: 'Gold' }
 ];
 
-export const LiveMarketTicker = ({ 
+export const LiveMarketTicker = ({
   symbols = DEFAULT_SYMBOLS,
   className,
   speed = 'normal',
   showConnectionStatus = true,
-  onTickerClick 
+  onTickerClick
 }) => {
   const [isVisible, setIsVisible] = useState(true);
-  
+
   const subscriptions = symbols.map(({ dataType, symbol }) => ({
     dataType,
     symbol,
@@ -36,8 +37,7 @@ export const LiveMarketTicker = ({
   const {
     getData,
     getConnectionState,
-    isAllConnected,
-    hasAnyErrors
+    isAllConnected
   } = useMultipleRealTimeData(subscriptions);
 
   const speedClasses = {
@@ -48,7 +48,7 @@ export const LiveMarketTicker = ({
 
   const formatValue = (dataType, data) => {
     if (!data) return '---';
-    
+
     switch (dataType) {
       case 'stock_price':
         return `$${data.price?.toFixed(2)}`;
@@ -67,9 +67,9 @@ export const LiveMarketTicker = ({
 
   const formatChange = (dataType, data) => {
     if (!data) return null;
-    
+
     let change, changePercent;
-    
+
     switch (dataType) {
       case 'stock_price':
         change = data.change;
@@ -83,9 +83,9 @@ export const LiveMarketTicker = ({
       default:
         return null;
     }
-    
+
     if (change === undefined) return null;
-    
+
     const isPositive = change >= 0;
     return {
       value: Math.abs(change),
@@ -109,10 +109,12 @@ export const LiveMarketTicker = ({
   }
 
   return (
-    <div className={cn(
-      'bg-slate-900 border-b border-slate-700 overflow-hidden relative',
-      className
-    )}>
+    <div
+      className={cn(
+        'bg-slate-900 border-b border-slate-700 overflow-hidden relative',
+        className
+      )}
+    >
       {/* Connection Status */}
       {showConnectionStatus && (
         <div className="absolute right-4 top-1/2 transform -translate-y-1/2 z-10 flex items-center space-x-2">
@@ -127,7 +129,7 @@ export const LiveMarketTicker = ({
               <span className="text-xs">Disconnected</span>
             </div>
           )}
-          
+
           <button
             onClick={() => setIsVisible(false)}
             className="text-slate-400 hover:text-white text-xs"
@@ -138,15 +140,17 @@ export const LiveMarketTicker = ({
       )}
 
       {/* Scrolling Content */}
-      <div className={cn(
-        'flex whitespace-nowrap py-2',
-        speedClasses[speed] || speedClasses.normal
-      )}>
-        {symbols.map(({ dataType, symbol, name }, index) => {
+      <div
+        className={cn(
+          'flex whitespace-nowrap py-2',
+          speedClasses[speed] || speedClasses.normal
+        )}
+      >
+        {symbols.map(({ dataType, symbol }, index) => {
           const data = getData(dataType, symbol);
           const isConnected = getConnectionState(dataType, symbol);
           const change = formatChange(dataType, data);
-          
+
           return (
             <div
               key={`${dataType}_${symbol}_${index}`}
@@ -155,37 +159,42 @@ export const LiveMarketTicker = ({
                 !isConnected && 'opacity-50'
               )}
               onClick={() => onTickerClick?.(dataType, symbol, data)}
+              onKeyDown={(e) => e.key === 'Enter' && onTickerClick?.(dataType, symbol, data)}
+              role="button"
+              tabIndex={0}
             >
               {/* Symbol */}
               <span className="text-white font-semibold text-sm">
                 {symbol}
               </span>
-              
+
               {/* Value */}
               <span className="text-slate-300 text-sm">
                 {formatValue(dataType, data)}
               </span>
-              
+
               {/* Change */}
               {change && (
-                <div className={cn(
-                  'flex items-center space-x-1 text-xs',
-                  change.isPositive ? 'text-green-400' : 'text-red-400'
-                )}>
+                <div
+                  className={cn(
+                    'flex items-center space-x-1 text-xs',
+                    change.isPositive ? 'text-green-400' : 'text-red-400'
+                  )}
+                >
                   {change.isPositive ? (
                     <TrendingUp className="w-3 h-3" />
                   ) : (
                     <TrendingDown className="w-3 h-3" />
                   )}
                   <span>
-                    {dataType === 'stock_price' 
+                    {dataType === 'stock_price'
                       ? `${change.percent.toFixed(2)}%`
                       : `${change.value.toFixed(2)}%`
                     }
                   </span>
                 </div>
               )}
-              
+
               {/* Connection indicator */}
               {!isConnected && (
                 <RefreshCw className="w-3 h-3 text-slate-500 animate-spin" />
@@ -193,13 +202,13 @@ export const LiveMarketTicker = ({
             </div>
           );
         })}
-        
+
         {/* Duplicate content for seamless scrolling */}
-        {symbols.map(({ dataType, symbol, name }, index) => {
+        {symbols.map(({ dataType, symbol }, index) => {
           const data = getData(dataType, symbol);
           const isConnected = getConnectionState(dataType, symbol);
           const change = formatChange(dataType, data);
-          
+
           return (
             <div
               key={`${dataType}_${symbol}_${index}_dup`}
@@ -208,21 +217,26 @@ export const LiveMarketTicker = ({
                 !isConnected && 'opacity-50'
               )}
               onClick={() => onTickerClick?.(dataType, symbol, data)}
+              onKeyDown={(e) => e.key === 'Enter' && onTickerClick?.(dataType, symbol, data)}
+              role="button"
+              tabIndex={0}
             >
               <span className="text-white font-semibold text-sm">{symbol}</span>
               <span className="text-slate-300 text-sm">{formatValue(dataType, data)}</span>
               {change && (
-                <div className={cn(
-                  'flex items-center space-x-1 text-xs',
-                  change.isPositive ? 'text-green-400' : 'text-red-400'
-                )}>
+                <div
+                  className={cn(
+                    'flex items-center space-x-1 text-xs',
+                    change.isPositive ? 'text-green-400' : 'text-red-400'
+                  )}
+                >
                   {change.isPositive ? (
                     <TrendingUp className="w-3 h-3" />
                   ) : (
                     <TrendingDown className="w-3 h-3" />
                   )}
                   <span>
-                    {dataType === 'stock_price' 
+                    {dataType === 'stock_price'
                       ? `${change.percent.toFixed(2)}%`
                       : `${change.value.toFixed(2)}%`
                     }

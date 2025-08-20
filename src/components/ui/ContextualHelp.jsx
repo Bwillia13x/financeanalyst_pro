@@ -1,6 +1,7 @@
+import { HelpCircle, X, BookOpen, Calculator, TrendingUp, AlertCircle, ChevronRight, ExternalLink } from 'lucide-react';
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { HelpCircle, X, BookOpen, Calculator, TrendingUp, AlertCircle, ChevronRight, ExternalLink } from 'lucide-react';
+
 import { cn } from '../../utils/cn';
 
 /**
@@ -119,12 +120,12 @@ const helpContent = {
 };
 
 // Tooltip component
-export const FinancialTooltip = ({ 
-  content, 
+export const FinancialTooltip = ({
+  content,
   position = 'top',
   trigger = 'hover',
   className,
-  children 
+  children
 }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
@@ -177,7 +178,7 @@ export const FinancialTooltip = ({
     }
   }, [isVisible, position]);
 
-  const triggerProps = trigger === 'hover' 
+  const triggerProps = trigger === 'hover'
     ? { onMouseEnter: showTooltip, onMouseLeave: hideTooltip }
     : { onClick: () => setIsVisible(!isVisible) };
 
@@ -186,7 +187,7 @@ export const FinancialTooltip = ({
       <span ref={triggerRef} className={className} {...triggerProps}>
         {children}
       </span>
-      
+
       {isVisible && createPortal(
         <div
           ref={tooltipRef}
@@ -306,7 +307,7 @@ export const HelpPanel = ({ helpKey, isOpen, onClose }) => {
               <ul className="space-y-2">
                 {help.tips.map((tip, index) => (
                   <li key={index} className="flex items-start space-x-2">
-                    <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-2 flex-shrink-0"></div>
+                    <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-2 flex-shrink-0" />
                     <span className="text-slate-700">{tip}</span>
                   </li>
                 ))}
@@ -352,11 +353,31 @@ export const OnboardingTour = ({ steps, isActive, onComplete, onSkip }) => {
         element.style.zIndex = '1001';
         element.style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.5)';
 
-        // Position tooltip
-        setTooltipPosition({
-          top: rect.bottom + scrollTop + 8,
-          left: rect.left + scrollLeft
-        });
+        // Position tooltip with strict viewport constraints
+        const tooltipWidth = 320;
+        const tooltipHeight = 250; // increased to account for buttons
+        const padding = 20;
+        
+        let top = rect.bottom + scrollTop + 12;
+        let left = rect.left + scrollLeft;
+        
+        // Ensure tooltip stays within horizontal bounds
+        const maxLeft = window.innerWidth - tooltipWidth - padding;
+        const minLeft = padding;
+        left = Math.max(minLeft, Math.min(left, maxLeft));
+        
+        // Ensure tooltip stays within vertical bounds
+        const maxTop = window.innerHeight + scrollTop - tooltipHeight - padding;
+        const minTop = scrollTop + padding;
+        
+        if (top > maxTop) {
+          // Position above target if no room below
+          top = Math.max(rect.top + scrollTop - tooltipHeight - 12, minTop);
+        }
+        
+        top = Math.max(minTop, Math.min(top, maxTop));
+        
+        setTooltipPosition({ top, left });
       }
     }
 
@@ -379,10 +400,21 @@ export const OnboardingTour = ({ steps, isActive, onComplete, onSkip }) => {
   const isLastStep = currentStep === steps.length - 1;
 
   const nextStep = () => {
-    if (isLastStep) {
-      onComplete();
-    } else {
-      setCurrentStep(currentStep + 1);
+    try {
+      if (isLastStep) {
+        // Delay completion to ensure UI is stable
+        setTimeout(() => {
+          try {
+            onComplete();
+          } catch (error) {
+            console.error('Error in onComplete:', error);
+          }
+        }, 100);
+      } else {
+        setCurrentStep(currentStep + 1);
+      }
+    } catch (error) {
+      console.error('Error in nextStep:', error);
     }
   };
 
@@ -395,12 +427,16 @@ export const OnboardingTour = ({ steps, isActive, onComplete, onSkip }) => {
   return createPortal(
     <>
       {/* Overlay */}
-      <div className="fixed inset-0 bg-black bg-opacity-50 z-1000" />
-      
+      <div className="fixed inset-0 bg-black bg-opacity-50" style={{ zIndex: 1000 }} />
+
       {/* Tooltip */}
       <div
-        className="fixed z-1002 max-w-sm bg-white rounded-lg shadow-xl border border-slate-200"
-        style={{ top: tooltipPosition.top, left: tooltipPosition.left }}
+        className="fixed max-w-sm bg-white rounded-lg shadow-xl border border-slate-200"
+        style={{ 
+          top: tooltipPosition.top, 
+          left: tooltipPosition.left,
+          zIndex: 1002
+        }}
       >
         <div className="p-4">
           <div className="flex items-start justify-between mb-3">
@@ -412,9 +448,9 @@ export const OnboardingTour = ({ steps, isActive, onComplete, onSkip }) => {
               <X className="w-4 h-4" />
             </button>
           </div>
-          
+
           <p className="text-sm text-slate-700 mb-4">{step.content}</p>
-          
+
           {step.tip && (
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
               <div className="flex items-start space-x-2">
@@ -423,7 +459,7 @@ export const OnboardingTour = ({ steps, isActive, onComplete, onSkip }) => {
               </div>
             </div>
           )}
-          
+
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-1">
               {steps.map((_, index) => (
@@ -436,7 +472,7 @@ export const OnboardingTour = ({ steps, isActive, onComplete, onSkip }) => {
                 />
               ))}
             </div>
-            
+
             <div className="flex items-center space-x-2">
               {currentStep > 0 && (
                 <button
@@ -449,6 +485,7 @@ export const OnboardingTour = ({ steps, isActive, onComplete, onSkip }) => {
               <button
                 onClick={nextStep}
                 className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700"
+                aria-label={isLastStep ? 'Finish' : 'Next'}
               >
                 {isLastStep ? 'Finish' : 'Next'}
               </button>

@@ -11,7 +11,7 @@ class UserPreferencesService {
     this.layouts = new Map();
     this.shortcuts = new Map();
     this.isInitialized = false;
-    
+
     this.defaultPreferences = {
       // Appearance
       theme: 'professional',
@@ -19,14 +19,14 @@ class UserPreferencesService {
       density: 'comfortable',
       colorScheme: 'light',
       animations: true,
-      
+
       // Dashboard & Layout
       defaultView: 'dashboard',
       sidebarCollapsed: false,
       gridSize: 'medium',
       widgetAnimations: true,
       autoSaveInterval: 30000, // 30 seconds
-      
+
       // Data & Analysis
       currency: 'USD',
       dateFormat: 'MM/DD/YYYY',
@@ -34,39 +34,39 @@ class UserPreferencesService {
       precision: 2,
       autoRefreshData: true,
       refreshInterval: 300000, // 5 minutes
-      
+
       // Notifications
       enableNotifications: true,
       emailNotifications: false,
       soundEffects: true,
       pushNotifications: true,
-      
+
       // Analysis & Modeling
       defaultTimeHorizon: '5Y',
       riskFreeRate: 0.03,
       marketRiskPremium: 0.07,
       defaultDiscountRate: 0.10,
       confidenceLevel: 0.95,
-      
+
       // Collaboration
       shareByDefault: false,
       allowComments: true,
       trackChanges: true,
       notifyOnChanges: true,
-      
+
       // Performance & Data
       enableCaching: true,
       offlineMode: false,
       dataValidation: true,
       autoBackup: true,
-      
+
       // Keyboard & Navigation
       keyboardShortcuts: true,
       mouseNavigation: true,
       touchGestures: true,
       commandPalette: true
     };
-    
+
     this.initializeService();
   }
 
@@ -80,7 +80,7 @@ class UserPreferencesService {
       await this.initializeThemes();
       await this.initializeLayouts();
       await this.setupAutoSave();
-      
+
       this.isInitialized = true;
       console.log('User preferences service initialized');
     } catch (error) {
@@ -126,7 +126,7 @@ class UserPreferencesService {
           this.workspaces.set(id, workspace);
         });
       }
-      
+
       // Ensure default workspace exists
       if (!this.workspaces.has('default')) {
         this.createDefaultWorkspace();
@@ -298,11 +298,11 @@ class UserPreferencesService {
       ...updates,
       lastUpdated: new Date().toISOString()
     };
-    
+
     this.preferences.set('current', updated);
     this.saveToStorage();
     this.applyPreferences(updated);
-    
+
     return updated;
   }
 
@@ -315,11 +315,11 @@ class UserPreferencesService {
       createdAt: new Date().toISOString(),
       lastUpdated: new Date().toISOString()
     };
-    
+
     this.preferences.set('current', reset);
     this.saveToStorage();
     this.applyPreferences(reset);
-    
+
     return reset;
   }
 
@@ -347,7 +347,7 @@ class UserPreferencesService {
       createdAt: new Date().toISOString(),
       lastAccessed: new Date().toISOString()
     };
-    
+
     this.workspaces.set('default', defaultWorkspace);
   }
 
@@ -367,10 +367,10 @@ class UserPreferencesService {
       createdAt: new Date().toISOString(),
       lastAccessed: new Date().toISOString()
     };
-    
+
     this.workspaces.set(id, workspace);
     this.saveToStorage();
-    
+
     return workspace;
   }
 
@@ -382,16 +382,16 @@ class UserPreferencesService {
     if (!workspace) {
       throw new Error(`Workspace ${id} not found`);
     }
-    
+
     const updated = {
       ...workspace,
       ...updates,
       lastAccessed: new Date().toISOString()
     };
-    
+
     this.workspaces.set(id, updated);
     this.saveToStorage();
-    
+
     return updated;
   }
 
@@ -402,7 +402,7 @@ class UserPreferencesService {
     if (id === 'default') {
       throw new Error('Cannot delete default workspace');
     }
-    
+
     this.workspaces.delete(id);
     this.saveToStorage();
   }
@@ -429,14 +429,14 @@ class UserPreferencesService {
     if (!workspace) {
       throw new Error(`Workspace ${id} not found`);
     }
-    
+
     // Update last accessed
     workspace.lastAccessed = new Date().toISOString();
     this.workspaces.set(id, workspace);
-    
+
     // Update current workspace preference
     this.updatePreferences({ currentWorkspace: id });
-    
+
     return workspace;
   }
 
@@ -474,18 +474,18 @@ class UserPreferencesService {
   applyPreferences(preferences) {
     // Apply theme
     this.applyTheme(preferences.theme);
-    
+
     // Apply font size
     this.applyFontSize(preferences.fontSize);
-    
+
     // Apply animations setting
     this.applyAnimationSettings(preferences.animations);
-    
+
     // Apply keyboard shortcuts
     if (preferences.keyboardShortcuts) {
       this.enableKeyboardShortcuts();
     }
-    
+
     // Trigger preference change event
     window.dispatchEvent(new CustomEvent('preferencesChanged', {
       detail: preferences
@@ -498,14 +498,14 @@ class UserPreferencesService {
   applyTheme(themeId) {
     const theme = this.themes.get(themeId);
     if (!theme) return;
-    
+
     const root = document.documentElement;
-    
+
     // Apply CSS custom properties
     Object.entries(theme.colors).forEach(([key, value]) => {
       root.style.setProperty(`--color-${key}`, value);
     });
-    
+
     // Apply theme class
     document.body.className = document.body.className.replace(/theme-\w+/g, '');
     document.body.classList.add(`theme-${themeId}`);
@@ -522,17 +522,17 @@ class UserPreferencesService {
       large: '18px',
       extra_large: '20px'
     };
-    
+
     root.style.setProperty('--base-font-size', sizes[size] || sizes.medium);
     document.body.classList.remove('text-sm', 'text-base', 'text-lg', 'text-xl');
-    
+
     const classList = {
       small: 'text-sm',
       medium: 'text-base',
       large: 'text-lg',
       extra_large: 'text-xl'
     };
-    
+
     document.body.classList.add(classList[size] || 'text-base');
   }
 
@@ -541,7 +541,7 @@ class UserPreferencesService {
    */
   applyAnimationSettings(enabled) {
     document.body.classList.toggle('reduce-motion', !enabled);
-    
+
     if (!enabled) {
       document.body.style.setProperty('--animation-duration', '0ms');
       document.body.style.setProperty('--transition-duration', '0ms');
@@ -569,14 +569,14 @@ class UserPreferencesService {
       if (prefs) {
         localStorage.setItem('financeanalyst_user_preferences', JSON.stringify(prefs));
       }
-      
+
       // Save workspaces
       const workspacesObj = {};
       this.workspaces.forEach((workspace, id) => {
         workspacesObj[id] = workspace;
       });
       localStorage.setItem('financeanalyst_workspaces', JSON.stringify(workspacesObj));
-      
+
     } catch (error) {
       console.error('Error saving to storage:', error);
     }
@@ -592,7 +592,7 @@ class UserPreferencesService {
       exportedAt: new Date().toISOString(),
       version: '1.0'
     };
-    
+
     return settings;
   }
 
@@ -608,16 +608,16 @@ class UserPreferencesService {
           lastUpdated: new Date().toISOString()
         });
       }
-      
+
       if (settings.workspaces) {
         settings.workspaces.forEach(workspace => {
           this.workspaces.set(workspace.id, workspace);
         });
       }
-      
+
       this.saveToStorage();
       this.applyPreferences(this.getPreferences());
-      
+
       return true;
     } catch (error) {
       console.error('Error importing settings:', error);

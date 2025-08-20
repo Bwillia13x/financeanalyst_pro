@@ -9,21 +9,11 @@ import {
   Save,
   Settings,
   HelpCircle,
-  Users,
-  Zap,
-  Globe,
   PieChart,
   LineChart,
   Activity,
   Target,
-  ArrowRight,
-  RefreshCw,
-  Filter,
-  Eye,
-  Edit,
-  Copy,
-  Trash2,
-  Plus
+  Eye
 } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 

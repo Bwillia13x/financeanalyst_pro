@@ -5,6 +5,10 @@
 
 import secureApiClient from './secureApiClient';
 
+const ALLOW_DIRECT_FETCH = (import.meta && import.meta.env && import.meta.env.VITE_ALLOW_DIRECT_FETCH === 'true')
+  || (typeof process !== 'undefined' && process.env && process.env.VITE_ALLOW_DIRECT_FETCH === 'true');
+
+
 export class ProductionDataManager {
   constructor() {
     this.providers = [
@@ -45,7 +49,7 @@ export class ProductionDataManager {
     this.cache = new Map();
     this.cacheExpiry = 30000; // 30 seconds for real-time data
     this.requestQueue = new Map();
-    
+
     // Initialize rate limiting
     this.resetRateLimits();
   }
@@ -62,7 +66,7 @@ export class ProductionDataManager {
   async getQuote(symbol) {
     const cacheKey = `quote_${symbol}`;
     const cached = this.getFromCache(cacheKey);
-    
+
     if (cached) {
       return cached;
     }
@@ -87,7 +91,7 @@ export class ProductionDataManager {
   async getHistoricalData(symbol, period = '1y', interval = '1d') {
     const cacheKey = `historical_${symbol}_${period}_${interval}`;
     const cached = this.getFromCache(cacheKey, 300000); // 5 minutes for historical data
-    
+
     if (cached) {
       return cached;
     }
@@ -111,7 +115,7 @@ export class ProductionDataManager {
   async getMultipleQuotes(symbols) {
     const promises = symbols.map(symbol => this.getQuote(symbol));
     const results = await Promise.allSettled(promises);
-    
+
     return symbols.reduce((acc, symbol, index) => {
       const result = results[index];
       if (result.status === 'fulfilled') {
@@ -212,10 +216,10 @@ export class ProductionDataManager {
   async _fetchAlphaVantageQuote(symbol) {
     const apiKey = process.env.VITE_ALPHA_VANTAGE_API_KEY;
     const url = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${symbol}&apikey=${apiKey}`;
-    
+
     const response = await fetch(url);
     const data = await response.json();
-    
+
     if (data['Error Message'] || data['Note']) {
       throw new Error(data['Error Message'] || data['Note']);
     }
@@ -227,10 +231,10 @@ export class ProductionDataManager {
     const apiKey = process.env.VITE_ALPHA_VANTAGE_API_KEY;
     const functionName = interval.includes('d') ? 'TIME_SERIES_DAILY' : 'TIME_SERIES_INTRADAY';
     const url = `https://www.alphavantage.co/query?function=${functionName}&symbol=${symbol}&apikey=${apiKey}`;
-    
+
     const response = await fetch(url);
     const data = await response.json();
-    
+
     if (data['Error Message'] || data['Note']) {
       throw new Error(data['Error Message'] || data['Note']);
     }
@@ -242,14 +246,17 @@ export class ProductionDataManager {
   // Yahoo Finance implementation (through proxy)
   async _fetchYahooQuote(symbol) {
     try {
-      const response = await secureApiClient.get(`/api/market-data/yahoo/quote/${symbol}`);
+      const response = await secureApiClient.get(`/market-data/quote/${symbol}`);
       return response.data;
     } catch (error) {
-      // Fallback to direct CORS proxy
+      if (!ALLOW_DIRECT_FETCH) {
+        throw error;
+      }
+      // Fallback to direct CORS proxy (guarded by flag)
       const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}`;
       const response = await fetch(url);
       const data = await response.json();
-      
+
       if (data.chart.error) {
         throw new Error(data.chart.error.description);
       }
@@ -260,14 +267,17 @@ export class ProductionDataManager {
 
   async _fetchYahooHistorical(symbol, period, interval) {
     try {
-      const response = await secureApiClient.get(`/api/market-data/yahoo/historical/${symbol}?period=${period}&interval=${interval}`);
+      const response = await secureApiClient.get(`/market-data/historical/${symbol}?range=${period}&interval=${interval}`);
       return response.data;
     } catch (error) {
-      // Fallback to direct fetch with CORS proxy
+      if (!ALLOW_DIRECT_FETCH) {
+        throw error;
+      }
+      // Fallback to direct fetch with CORS proxy (guarded by flag)
       const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?period1=0&period2=9999999999&interval=${interval}`;
       const response = await fetch(url);
       const data = await response.json();
-      
+
       if (data.chart.error) {
         throw new Error(data.chart.error.description);
       }
@@ -280,25 +290,25 @@ export class ProductionDataManager {
   async _fetchIEXQuote(symbol) {
     const token = process.env.VITE_IEX_CLOUD_TOKEN;
     const url = `https://cloud.iexapis.com/stable/stock/${symbol}/quote?token=${token}`;
-    
+
     const response = await fetch(url);
     if (!response.ok) {
       throw new Error(`IEX API error: ${response.statusText}`);
     }
-    
+
     return await response.json();
   }
 
-  async _fetchIEXHistorical(symbol, period, interval) {
+  async _fetchIEXHistorical(symbol, period, _interval) {
     const token = process.env.VITE_IEX_CLOUD_TOKEN;
     const range = this.convertPeriodToIEXRange(period);
     const url = `https://cloud.iexapis.com/stable/stock/${symbol}/chart/${range}?token=${token}`;
-    
+
     const response = await fetch(url);
     if (!response.ok) {
       throw new Error(`IEX API error: ${response.statusText}`);
     }
-    
+
     return await response.json();
   }
 
@@ -306,14 +316,14 @@ export class ProductionDataManager {
   async _fetchFinnhubQuote(symbol) {
     const apiKey = process.env.VITE_FINNHUB_API_KEY;
     const url = `https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${apiKey}`;
-    
+
     const response = await fetch(url);
     const data = await response.json();
-    
+
     if (data.error) {
       throw new Error(data.error);
     }
-    
+
     return data;
   }
 
@@ -321,16 +331,16 @@ export class ProductionDataManager {
     const apiKey = process.env.VITE_FINNHUB_API_KEY;
     const { from, to } = this.convertPeriodToTimestamp(period);
     const resolution = this.convertIntervalToFinnhub(interval);
-    
+
     const url = `https://finnhub.io/api/v1/stock/candle?symbol=${symbol}&resolution=${resolution}&from=${from}&to=${to}&token=${apiKey}`;
-    
+
     const response = await fetch(url);
     const data = await response.json();
-    
+
     if (data.s !== 'ok') {
       throw new Error('Finnhub API error');
     }
-    
+
     return data;
   }
 
@@ -346,13 +356,13 @@ export class ProductionDataManager {
           volume: parseInt(data['06. volume']),
           timestamp: data['07. latest trading day']
         };
-      
-      case 'yahoo_finance':
+
+      case 'yahoo_finance': {
         const meta = data.meta;
         const indicators = data.indicators.quote[0];
         const current = indicators.close[indicators.close.length - 1];
         const previous = indicators.close[indicators.close.length - 2];
-        
+
         return {
           symbol: meta.symbol,
           price: current,
@@ -361,7 +371,8 @@ export class ProductionDataManager {
           volume: indicators.volume[indicators.volume.length - 1],
           timestamp: new Date().toISOString()
         };
-      
+      }
+
       case 'iex_cloud':
         return {
           symbol: data.symbol,
@@ -371,7 +382,7 @@ export class ProductionDataManager {
           volume: data.latestVolume,
           timestamp: data.latestUpdate
         };
-      
+
       case 'finnhub':
         return {
           symbol: data.symbol,
@@ -381,7 +392,7 @@ export class ProductionDataManager {
           volume: null, // Not provided in quote endpoint
           timestamp: new Date().toISOString()
         };
-      
+
       default:
         return data;
     }
@@ -398,11 +409,11 @@ export class ProductionDataManager {
           close: parseFloat(values['4. close']),
           volume: parseInt(values['5. volume'])
         }));
-      
-      case 'yahoo_finance':
+
+      case 'yahoo_finance': {
         const timestamps = data.timestamp;
         const indicators = data.indicators.quote[0];
-        
+
         return timestamps.map((timestamp, index) => ({
           timestamp: new Date(timestamp * 1000).toISOString(),
           open: indicators.open[index],
@@ -411,7 +422,8 @@ export class ProductionDataManager {
           close: indicators.close[index],
           volume: indicators.volume[index]
         }));
-      
+      }
+
       case 'iex_cloud':
         return data.map(item => ({
           timestamp: item.date,
@@ -421,7 +433,7 @@ export class ProductionDataManager {
           close: item.close,
           volume: item.volume
         }));
-      
+
       case 'finnhub':
         return data.t.map((timestamp, index) => ({
           timestamp: new Date(timestamp * 1000).toISOString(),
@@ -431,7 +443,7 @@ export class ProductionDataManager {
           close: data.c[index],
           volume: data.v[index]
         }));
-      
+
       default:
         return data;
     }
@@ -441,11 +453,11 @@ export class ProductionDataManager {
   canMakeRequest(provider) {
     const now = Date.now();
     const timeSinceReset = now - provider.lastCall;
-    
+
     if (timeSinceReset > provider.rateLimits.period) {
       provider.callCount = 0;
     }
-    
+
     return provider.callCount < provider.rateLimits.calls;
   }
 
@@ -499,7 +511,7 @@ export class ProductionDataManager {
       '2y': 63072000,
       '5y': 157680000
     };
-    
+
     const seconds = periodMap[period] || 31536000;
     return {
       from: now - seconds,
@@ -545,7 +557,7 @@ export class ProductionDataManager {
     let currentPrice = basePrice;
 
     const intervals = this.getIntervalsForPeriod(period);
-    
+
     for (let i = 0; i < intervals; i++) {
       const change = (Math.random() - 0.5) * 5;
       currentPrice += change;

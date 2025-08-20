@@ -1,15 +1,16 @@
-import React, { useState, useEffect } from 'react';
 import { Brain, Sparkles, TrendingUp, Target } from 'lucide-react';
-import Header from '../components/ui/Header';
-import SEOHead from '../components/SEO/SEOHead';
+import React, { useState, useEffect } from 'react';
+
 import AIInsightsPanel from '../components/AI/AIInsightsPanel';
 import AIFinancialAssistant from '../components/AIAssistant/AIFinancialAssistant';
+import SEOHead from '../components/SEO/SEOHead';
 import { Card } from '../components/ui/Card';
+import Header from '../components/ui/Header';
 import { useKeyboardShortcutsContext } from '../components/ui/KeyboardShortcutsProvider';
 
 const AIInsights = () => {
-  const [selectedAsset, setSelectedAsset] = useState(null);
-  const [financialData, setFinancialData] = useState({
+  const [selectedAsset, _setSelectedAsset] = useState(null);
+  const [financialData, _setFinancialData] = useState({
     revenue: 1250000000,
     netIncome: 187500000,
     totalAssets: 2100000000,
@@ -43,7 +44,7 @@ const AIInsights = () => {
         canonical="/ai-insights"
         keywords="AI financial analysis, automated insights, machine learning finance, intelligent recommendations, AI-powered valuation"
       />
-      
+
       <Header />
 
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -56,7 +57,7 @@ const AIInsights = () => {
             </h1>
           </div>
           <p className="text-slate-600 dark:text-slate-400 max-w-3xl">
-            Harness the power of artificial intelligence for advanced financial analysis, 
+            Harness the power of artificial intelligence for advanced financial analysis,
             automated pattern recognition, and intelligent investment recommendations.
           </p>
         </div>

@@ -8,23 +8,15 @@ import {
   BarChart3,
   BarChart,
   LineChart,
-  PieChart,
-  TrendingUp,
-  TrendingDown,
   Activity,
   Target,
   Layers,
   Grid3X3,
   Download,
-  Settings,
   RefreshCw,
   Play,
   Pause,
-  Filter,
-  Calendar,
-  Search,
   Plus,
-  Zap,
   X
 } from 'lucide-react';
 import React, { useState, useEffect, useRef } from 'react';
@@ -111,7 +103,34 @@ const AdvancedCharting = () => {
         try {
           const [quote, historical] = await Promise.all([
             secureApiClient.get(`/market-data/quote/${symbol}`),
-            secureApiClient.get(`/market-data/historical/${symbol}?period=${selectedTimeframe}`)
+            (() => {
+              const mapTimeframe = (tf) => {
+                switch (tf) {
+                  case '1D':
+                    return { range: '1d', interval: '5m' };
+                  case '5D':
+                    return { range: '5d', interval: '15m' };
+                  case '1M':
+                    return { range: '1mo', interval: '1d' };
+                  case '3M':
+                    return { range: '3mo', interval: '1d' };
+                  case '6M':
+                    return { range: '6mo', interval: '1d' };
+                  case '1Y':
+                    return { range: '1y', interval: '1d' };
+                  case '2Y':
+                    return { range: '2y', interval: '1d' };
+                  case '5Y':
+                    return { range: '5y', interval: '1wk' };
+                  case 'MAX':
+                    return { range: '5y', interval: '1wk' };
+                  default:
+                    return { range: '1mo', interval: '1d' };
+                }
+              };
+              const { range, interval } = mapTimeframe(selectedTimeframe);
+              return secureApiClient.get(`/market-data/historical/${symbol}?range=${range}&interval=${interval}`);
+            })()
           ]);
 
           return {

@@ -60,7 +60,7 @@ export function useBusinessIntelligence(config = {}) {
         initialized.current = false;
       }
     };
-  }, [config]);
+  }, []); // Remove config dependency to prevent re-initialization
 
   // Set up event listeners
   useEffect(() => {

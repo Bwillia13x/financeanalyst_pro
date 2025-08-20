@@ -16,21 +16,22 @@ const mockData = {
 describe('FinancialSpreadsheet', () => {
   test('renders the component with initial data', () => {
     render(<FinancialSpreadsheet data={mockData} onDataChange={() => {}} />);
-    expect(screen.getByText('Financial Spreadsheet')).toBeInTheDocument();
+    expect(screen.getByText('Financial Statements')).toBeInTheDocument();
     expect(screen.getByText('Energy Devices')).toBeInTheDocument();
-    expect(screen.getByText('100.00')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('100')).toBeInTheDocument();
   });
 
   test('allows editing a cell', () => {
     const onDataChange = vi.fn();
     render(<FinancialSpreadsheet data={mockData} onDataChange={onDataChange} />);
 
-    const cell = screen.getByText('100.00');
+    // Find the cell by its display value and click it
+    const cell = screen.getByDisplayValue('100');
     fireEvent.click(cell);
 
-    const input = screen.getByRole('textbox');
-    fireEvent.change(input, { target: { value: '120' } });
-    fireEvent.blur(input);
+    // Change the value and blur to save
+    fireEvent.change(cell, { target: { value: '120' } });
+    fireEvent.blur(cell);
 
     expect(onDataChange).toHaveBeenCalled();
   });
@@ -50,7 +51,9 @@ describe('FinancialSpreadsheet', () => {
   test('toggles a section', () => {
     render(<FinancialSpreadsheet data={mockData} onDataChange={() => {}} />);
     expect(screen.getByText('Energy Devices')).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: /Revenue/ }));
+    // Find the Revenue section button and click to collapse
+    const revenueButton = screen.getByText('Revenue');
+    fireEvent.click(revenueButton);
     expect(screen.queryByText('Energy Devices')).not.toBeInTheDocument();
   });
 });

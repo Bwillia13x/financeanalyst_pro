@@ -11,7 +11,7 @@ class APIIntegrationService {
     this.rateLimits = new Map();
     this.requestQueue = [];
     this.isInitialized = false;
-    
+
     // Configuration
     this.config = {
       baseUrl: import.meta.env.VITE_API_BASE_URL || 'https://api.financeanalyst.pro',
@@ -196,26 +196,26 @@ class APIIntegrationService {
     try {
       // Validate credentials based on authentication type
       await this.validateCredentials(integration, credentials);
-      
+
       // Store encrypted credentials
       this.storeCredentials(integrationId, credentials);
-      
+
       // Test connection
       await this.testConnection(integrationId);
-      
+
       // Mark as connected
       integration.connected = true;
       integration.status = 'connected';
       integration.connectedAt = new Date().toISOString();
-      
+
       // Set up webhooks if supported
       if (integration.webhookSupport && this.config.enableWebhooks) {
         await this.setupWebhook(integrationId);
       }
-      
+
       console.log(`Successfully connected to ${integration.name}`);
       return { success: true, integration: integrationId };
-      
+
     } catch (error) {
       integration.status = 'error';
       integration.lastError = error.message;
@@ -238,18 +238,18 @@ class APIIntegrationService {
       if (integration.webhookSupport) {
         await this.removeWebhook(integrationId);
       }
-      
+
       // Clear stored credentials
       this.clearCredentials(integrationId);
-      
+
       // Update status
       integration.connected = false;
       integration.status = 'available';
       integration.disconnectedAt = new Date().toISOString();
-      
+
       console.log(`Disconnected from ${integration.name}`);
       return { success: true };
-      
+
     } catch (error) {
       console.error(`Error disconnecting from ${integration.name}:`, error);
       throw error;
@@ -267,11 +267,11 @@ class APIIntegrationService {
 
     // Check rate limits
     await this.checkRateLimit(integrationId);
-    
+
     try {
       const credentials = this.getCredentials(integrationId);
       const url = this.buildUrl(integration, endpoint);
-      
+
       const requestOptions = {
         method: options.method || 'GET',
         headers: {
@@ -288,13 +288,13 @@ class APIIntegrationService {
       }
 
       const response = await this.makeHttpRequest(url, requestOptions);
-      
+
       // Update request count
       integration.requestCount++;
       this.updateRateLimit(integrationId);
-      
+
       return response;
-      
+
     } catch (error) {
       integration.errorCount++;
       console.error(`API request failed for ${integrationId}:`, error);
@@ -313,14 +313,14 @@ class APIIntegrationService {
 
     const results = [];
     for (const batch of batches) {
-      const batchPromises = batch.map(req => 
+      const batchPromises = batch.map(req =>
         this.makeRequest(req.integrationId, req.endpoint, req.options)
           .catch(error => ({ error: error.message, request: req }))
       );
-      
+
       const batchResults = await Promise.all(batchPromises);
       results.push(...batchResults);
-      
+
       // Small delay between batches to respect rate limits
       if (batches.length > 1) {
         await new Promise(resolve => setTimeout(resolve, 100));
@@ -382,7 +382,7 @@ class APIIntegrationService {
 
     // Process webhook payload
     this.processWebhookPayload(integrationId, payload);
-    
+
     return { success: true };
   }
 
@@ -452,7 +452,7 @@ class APIIntegrationService {
       if (integration.connected) status.connectedIntegrations++;
       status.totalRequests += integration.requestCount || 0;
       status.totalErrors += integration.errorCount || 0;
-      
+
       status.integrations[id] = {
         name: integration.name,
         type: integration.type,
@@ -523,10 +523,10 @@ class APIIntegrationService {
 
   async makeHttpRequest(url, options) {
     const mockMode = false; // Set to false to enable live API calls
-    
+
     if (mockMode) {
       // Mock mode for development/testing
-      return new Promise((resolve, reject) => {
+      return new Promise((resolve, _reject) => {
         setTimeout(() => {
           resolve({
             data: { message: 'Mock API response' },
@@ -536,31 +536,31 @@ class APIIntegrationService {
         }, Math.random() * 1000);
       });
     }
-    
+
     // Live API calls using fetch
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), options.timeout || this.config.timeout);
-      
+
       const response = await fetch(url, {
         ...options,
         signal: controller.signal
       });
-      
+
       clearTimeout(timeoutId);
-      
+
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
-      
+
       const data = await response.json();
-      
+
       return {
         data,
         status: response.status,
         headers: Object.fromEntries(response.headers.entries())
       };
-      
+
     } catch (error) {
       if (error.name === 'AbortError') {
         throw new Error('Request timeout');
@@ -572,7 +572,7 @@ class APIIntegrationService {
   async testConnection(integrationId) {
     const integration = this.integrations.get(integrationId);
     const testEndpoint = integration.endpoints.test || Object.values(integration.endpoints)[0];
-    
+
     try {
       await this.makeRequest(integrationId, testEndpoint, { method: 'GET' });
       return true;
@@ -584,7 +584,7 @@ class APIIntegrationService {
   async checkRateLimit(integrationId) {
     const integration = this.integrations.get(integrationId);
     const rateLimit = this.rateLimits.get(integrationId);
-    
+
     if (!rateLimit) {
       this.rateLimits.set(integrationId, {
         requests: 0,
@@ -595,13 +595,13 @@ class APIIntegrationService {
 
     const now = Date.now();
     const windowDuration = integration.rateLimit.window;
-    
+
     // Reset window if expired
     if (now - rateLimit.windowStart > windowDuration) {
       rateLimit.requests = 0;
       rateLimit.windowStart = now;
     }
-    
+
     // Check if limit exceeded
     if (rateLimit.requests >= integration.rateLimit.requests) {
       const waitTime = windowDuration - (now - rateLimit.windowStart);
@@ -659,7 +659,7 @@ class APIIntegrationService {
       } catch (error) {
         console.error('Failed to remove webhook:', error);
       }
-      
+
       this.webhooks.delete(integrationId);
     }
   }

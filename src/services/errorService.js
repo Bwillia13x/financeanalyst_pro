@@ -9,7 +9,7 @@ class ErrorService {
     this.errorQueue = [];
     this.maxQueueSize = 100;
     this.flushInterval = 30000; // 30 seconds
-    
+
     // Start periodic error flushing in production
     if (this.isProduction) {
       this.startPeriodicFlush();
@@ -39,7 +39,7 @@ class ErrorService {
 
     // Add to queue for batch processing
     this.errorQueue.push(errorEntry);
-    
+
     // Trim queue if too large
     if (this.errorQueue.length > this.maxQueueSize) {
       this.errorQueue = this.errorQueue.slice(-this.maxQueueSize);
@@ -137,16 +137,16 @@ class ErrorService {
    */
   sanitizeFinancialData(data) {
     if (!data || typeof data !== 'object') return data;
-    
+
     const sanitized = { ...data };
     const sensitiveFields = ['ssn', 'accountNumber', 'routingNumber', 'taxId'];
-    
+
     sensitiveFields.forEach(field => {
       if (sanitized[field]) {
         sanitized[field] = '[REDACTED]';
       }
     });
-    
+
     return sanitized;
   }
 
@@ -173,7 +173,7 @@ class ErrorService {
     try {
       // In a real implementation, send to your monitoring service
       // await this.sendToMonitoringService(errorsToFlush);
-      
+
       // For now, just log in production
       if (this.isProduction) {
         console.warn('Errors would be sent to monitoring service:', errorsToFlush);
@@ -239,24 +239,24 @@ class ErrorService {
    */
   shouldRetry(error, retryCount = 0) {
     const maxRetries = 3;
-    
+
     if (retryCount >= maxRetries) return false;
-    
+
     // Retry network errors
     if (error.message?.includes('fetch') || error.message?.includes('network')) {
       return true;
     }
-    
+
     // Retry 5xx server errors
     if (error.status >= 500) {
       return true;
     }
-    
+
     // Retry timeout errors
     if (error.message?.includes('timeout')) {
       return true;
     }
-    
+
     return false;
   }
 
@@ -292,7 +292,7 @@ class ErrorService {
 const errorService = new ErrorService();
 
 // Export helper functions for common use cases
-export const logError = (error, context, severity) => 
+export const logError = (error, context, severity) =>
   errorService.logError(error, context, severity);
 
 export const logFinancialError = (error, calculationType, inputData) =>

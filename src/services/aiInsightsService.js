@@ -10,7 +10,7 @@ class AIInsightsService {
     this.modelPatterns = new Map();
     this.industryBenchmarks = new Map();
     this.isInitialized = false;
-    
+
     // Initialize insight generators
     this.initializeInsightGenerators();
     this.loadIndustryBenchmarks();
@@ -109,6 +109,7 @@ class AIInsightsService {
         industry = 'technology',
         analysisTypes = ['revenue', 'profitability', 'valuation', 'risk', 'growth'],
         includeRecommendations = true,
+        // eslint-disable-next-line no-unused-vars
         confidenceThreshold = 0.7
       } = options;
 
@@ -129,7 +130,7 @@ class AIInsightsService {
         if (generator) {
           const analysis = await generator.analyze(financialData);
           const suggestions = includeRecommendations ? await generator.suggest(financialData) : [];
-          
+
           insights.analyses[analysisType] = {
             analysis,
             suggestions,
@@ -141,10 +142,10 @@ class AIInsightsService {
 
       // Generate summary insights
       insights.summary = this.generateSummaryInsights(insights.analyses, industry);
-      
+
       // Extract recommendations, alerts, and opportunities
       this.categorizeInsights(insights);
-      
+
       // Calculate overall confidence
       insights.confidence = this.calculateOverallConfidence(insights.analyses);
 
@@ -164,7 +165,7 @@ class AIInsightsService {
    */
   analyzeRevenueTrends(data) {
     const revenues = this.extractTimeSeriesData(data, 'totalRevenue');
-    
+
     if (revenues.length < 2) {
       return {
         trend: 'insufficient_data',
@@ -178,9 +179,9 @@ class AIInsightsService {
     const growth = this.calculateGrowthRate(revenues);
     const pattern = this.identifyPattern(revenues);
     const seasonality = this.detectSeasonality(revenues);
-    
+
     const insights = [];
-    
+
     if (growth > 20) {
       insights.push('Strong revenue growth indicates healthy business expansion');
       insights.push('Consider investing in scalable infrastructure to support growth');
@@ -216,10 +217,10 @@ class AIInsightsService {
     const grossMargin = this.calculateMargin(data, 'gross');
     const operatingMargin = this.calculateMargin(data, 'operating');
     const netMargin = this.calculateMargin(data, 'net');
-    
+
     const insights = [];
     const trends = this.analyzeMarginTrends(data);
-    
+
     if (grossMargin > 70) {
       insights.push('Excellent gross margin indicates strong pricing power and cost control');
     } else if (grossMargin > 50) {
@@ -258,9 +259,9 @@ class AIInsightsService {
     const peRatio = this.calculatePERatio(data);
     const pbRatio = this.calculatePBRatio(data);
     const evEbitda = this.calculateEVEBITDA(data);
-    
+
     const insights = [];
-    
+
     if (peRatio < 15) {
       insights.push('Low P/E ratio may indicate undervaluation or growth concerns');
     } else if (peRatio < 25) {
@@ -295,10 +296,10 @@ class AIInsightsService {
     const leverageRisk = this.assessLeverageRisk(data);
     const concentrationRisk = this.assessConcentrationRisk(data);
     const marketRisk = this.assessMarketRisk(data);
-    
+
     const insights = [];
     const overallRisk = Math.max(liquidityRisk.score, leverageRisk.score, concentrationRisk.score, marketRisk.score);
-    
+
     if (overallRisk > 0.7) {
       insights.push('High risk profile requires careful monitoring and mitigation strategies');
     } else if (overallRisk > 0.4) {
@@ -326,9 +327,9 @@ class AIInsightsService {
     const profitGrowth = this.analyzeProfitGrowth(data);
     const assetGrowth = this.analyzeAssetGrowth(data);
     const sustainability = this.assessGrowthSustainability(data);
-    
+
     const insights = [];
-    
+
     if (revenueGrowth > profitGrowth + 5) {
       insights.push('Revenue growing faster than profit - monitor cost control');
     } else if (profitGrowth > revenueGrowth + 5) {
@@ -361,9 +362,9 @@ class AIInsightsService {
     const inventoryTurnover = this.calculateInventoryTurnover(data);
     const receivablesTurnover = this.calculateReceivablesTurnover(data);
     const employeeProductivity = this.calculateEmployeeProductivity(data);
-    
+
     const insights = [];
-    
+
     if (assetTurnover > 1.5) {
       insights.push('Strong asset utilization generates good returns');
     } else if (assetTurnover > 1.0) {
@@ -388,7 +389,7 @@ class AIInsightsService {
   suggestRevenueImprovements(data) {
     const suggestions = [];
     const currentGrowth = this.calculateGrowthRate(this.extractTimeSeriesData(data, 'totalRevenue'));
-    
+
     if (currentGrowth < 5) {
       suggestions.push({
         category: 'market_expansion',
@@ -438,7 +439,7 @@ class AIInsightsService {
     // Analyze overall health
     const healthScores = Object.values(analyses).map(a => a.confidence || 0.5);
     const avgHealth = healthScores.reduce((sum, score) => sum + score, 0) / healthScores.length;
-    
+
     if (avgHealth > 0.8) summary.overallHealth = 'excellent';
     else if (avgHealth > 0.6) summary.overallHealth = 'good';
     else if (avgHealth > 0.4) summary.overallHealth = 'fair';
@@ -469,7 +470,7 @@ class AIInsightsService {
    */
   extractTimeSeriesData(data, field) {
     if (!data?.statements?.income) return [];
-    
+
     return Object.keys(data.statements.income)
       .sort()
       .map(period => data.statements.income[period]?.[field] || 0)
@@ -510,15 +511,15 @@ class AIInsightsService {
 
   identifyPattern(values) {
     if (values.length < 3) return 'insufficient_data';
-    
+
     const diffs = [];
     for (let i = 1; i < values.length; i++) {
       diffs.push(values[i] - values[i - 1]);
     }
-    
+
     const avgDiff = diffs.reduce((sum, diff) => sum + diff, 0) / diffs.length;
     const variance = diffs.reduce((sum, diff) => sum + Math.pow(diff - avgDiff, 2), 0) / diffs.length;
-    
+
     if (variance < Math.abs(avgDiff) * 0.1) {
       return avgDiff > 0 ? 'steady_growth' : 'steady_decline';
     } else {
@@ -529,21 +530,20 @@ class AIInsightsService {
   detectSeasonality(values) {
     // Simple seasonality detection for quarterly data
     if (values.length < 8) return { isDetected: false, pattern: 'unknown' };
-    
+
     const quarters = [];
     for (let i = 0; i < 4; i++) {
       quarters[i] = [];
     }
-    
+
     values.forEach((value, index) => {
       quarters[index % 4].push(value);
     });
-    
+
     const avgByQuarter = quarters.map(q => q.reduce((sum, val) => sum + val, 0) / q.length);
-    const overallAvg = avgByQuarter.reduce((sum, avg) => sum + avg, 0) / 4;
-    
+
     const seasonalityScore = Math.max(...avgByQuarter) / Math.min(...avgByQuarter);
-    
+
     return {
       isDetected: seasonalityScore > 1.2,
       pattern: seasonalityScore > 1.2 ? 'quarterly' : 'none',
@@ -566,7 +566,7 @@ class AIInsightsService {
     const fcf = this.getLatestPeriod(data)?.freeCashFlow || 0;
     const growthRate = 0.05; // Assume 5% terminal growth
     const discountRate = 0.10; // Assume 10% WACC
-    
+
     return fcf > 0 ? fcf * (1 + growthRate) / (discountRate - growthRate) : 0;
   }
 
@@ -574,7 +574,7 @@ class AIInsightsService {
     const earnings = this.getLatestPeriod(data)?.netIncome || 0;
     const shares = data.assumptions?.sharesOutstanding || 1000000;
     const price = data.assumptions?.sharePrice || 50;
-    
+
     const eps = earnings / shares;
     return eps > 0 ? price / eps : 0;
   }
@@ -583,7 +583,7 @@ class AIInsightsService {
     const bookValue = this.getLatestPeriod(data)?.totalEquity || 0;
     const shares = data.assumptions?.sharesOutstanding || 1000000;
     const price = data.assumptions?.sharePrice || 50;
-    
+
     const bvps = bookValue / shares;
     return bvps > 0 ? price / bvps : 0;
   }
@@ -593,7 +593,7 @@ class AIInsightsService {
     const marketCap = (data.assumptions?.sharesOutstanding || 1000000) * (data.assumptions?.sharePrice || 50);
     const debt = this.getLatestPeriod(data)?.totalDebt || 0;
     const cash = this.getLatestPeriod(data)?.cash || 0;
-    
+
     const enterpriseValue = marketCap + debt - cash;
     return ebitda > 0 ? enterpriseValue / ebitda : 0;
   }
@@ -602,14 +602,14 @@ class AIInsightsService {
     const current = this.getLatestPeriod(data);
     const currentRatio = current?.currentRatio || 0;
     const quickRatio = current?.quickRatio || 0;
-    
+
     let score = 0;
     if (currentRatio < 1) score += 0.4;
     else if (currentRatio < 1.5) score += 0.2;
-    
+
     if (quickRatio < 0.5) score += 0.3;
     else if (quickRatio < 1) score += 0.1;
-    
+
     return { score, currentRatio, quickRatio };
   }
 
@@ -617,14 +617,14 @@ class AIInsightsService {
     const current = this.getLatestPeriod(data);
     const debtToEquity = current?.debtToEquity || 0;
     const interestCoverage = current?.interestCoverage || 0;
-    
+
     let score = 0;
     if (debtToEquity > 2) score += 0.4;
     else if (debtToEquity > 1) score += 0.2;
-    
+
     if (interestCoverage < 2) score += 0.4;
     else if (interestCoverage < 5) score += 0.2;
-    
+
     return { score, debtToEquity, interestCoverage };
   }
 
@@ -657,11 +657,11 @@ class AIInsightsService {
     const revenueGrowth = this.analyzeRevenueGrowth(data);
     const profitGrowth = this.analyzeProfitGrowth(data);
     const assetGrowth = this.analyzeAssetGrowth(data);
-    
+
     // Simple sustainability score based on growth consistency
     const consistency = 1 - Math.abs(revenueGrowth - profitGrowth) / 100;
     const efficiency = profitGrowth / Math.max(assetGrowth, 1);
-    
+
     return {
       score: Math.max(0, Math.min(1, (consistency + efficiency) / 2)),
       factors: { consistency, efficiency }
@@ -692,7 +692,7 @@ class AIInsightsService {
     return revenue / employees;
   }
 
-  analyzeMarginTrends(data) {
+  analyzeMarginTrends(_data) {
     // Simplified margin trend analysis
     return {
       gross: { trend: 'stable', change: 0 },
@@ -703,7 +703,7 @@ class AIInsightsService {
 
   compareToIndustry(analyses, industry) {
     const benchmarks = this.industryBenchmarks.get(industry) || this.industryBenchmarks.get('technology');
-    
+
     return {
       industry,
       comparison: 'analysis_not_available',

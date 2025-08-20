@@ -1,7 +1,7 @@
 import React, { useId } from 'react';
 
-import { cn } from '../../utils/cn';
 import { useFocusManagement } from '../../hooks/useFocusManagement';
+import { cn } from '../../utils/cn';
 
 /**
  * Accessible financial data table with screen reader optimization
@@ -22,7 +22,7 @@ const AccessibleTable = ({
   ...props
 }) => {
   const tableId = useId();
-  const { containerRef, handleKeyDown } = useFocusManagement({
+  const { containerRef, handleKeyDown: _handleKeyDown } = useFocusManagement({
     trapFocus: false
   });
 
@@ -30,7 +30,7 @@ const AccessibleTable = ({
     const cellValue = column.accessor ? item[column.accessor] : item;
     const isRowHeader = cellIndex === rowHeaderIndex;
     const CellComponent = isRowHeader ? 'th' : 'td';
-    
+
     // Format financial values for screen readers
     const getAriaLabel = () => {
       if (column.type === 'currency') {
@@ -40,12 +40,12 @@ const AccessibleTable = ({
           currency: 'USD'
         })} ${numericValue < 0 ? 'negative' : ''}`;
       }
-      
+
       if (column.type === 'percentage') {
         const numericValue = typeof cellValue === 'number' ? cellValue : parseFloat(cellValue) || 0;
         return `${column.header}: ${Math.abs(numericValue).toFixed(2)}% ${numericValue < 0 ? 'negative' : ''}`;
       }
-      
+
       return `${column.header}: ${cellValue}`;
     };
 
@@ -74,23 +74,26 @@ const AccessibleTable = ({
 
   const formatCellValue = (value, column) => {
     if (value === null || value === undefined) return '—';
-    
+
     switch (column.type) {
-      case 'currency':
+      case 'currency': {
         const numericValue = typeof value === 'number' ? value : parseFloat(value) || 0;
         return numericValue.toLocaleString('en-US', {
           style: 'currency',
           currency: 'USD'
         });
-      
-      case 'percentage':
+      }
+
+      case 'percentage': {
         const percentValue = typeof value === 'number' ? value : parseFloat(value) || 0;
         return `${percentValue.toFixed(2)}%`;
-      
-      case 'number':
+      }
+
+      case 'number': {
         const numberValue = typeof value === 'number' ? value : parseFloat(value) || 0;
         return numberValue.toLocaleString('en-US');
-      
+      }
+
       default:
         return value;
     }
@@ -98,19 +101,20 @@ const AccessibleTable = ({
 
   const handleSort = (column) => {
     if (!sortable || !onSort || !column.sortable) return;
-    
-    const newDirection = sortColumn === column.accessor 
+
+    const newDirection = sortColumn === column.accessor
       ? (sortDirection === 'asc' ? 'desc' : 'asc')
       : 'asc';
-    
+
     onSort(column.accessor, newDirection);
   };
 
   return (
-    <div 
+    <div
       ref={containerRef}
       className={cn('overflow-x-auto', className)}
-      onKeyDown={handleKeyDown}
+      role="region"
+      aria-label="Financial data table container"
     >
       <table
         id={tableId}
@@ -125,7 +129,7 @@ const AccessibleTable = ({
             {summary && ` - ${summary}`}
           </caption>
         )}
-        
+
         <thead>
           <tr className="border-b border-border bg-muted/30">
             {columns.map((column, index) => (
@@ -171,14 +175,13 @@ const AccessibleTable = ({
             ))}
           </tr>
         </thead>
-        
+
         <tbody className="divide-y divide-border">
           {data.length === 0 ? (
             <tr>
               <td
                 colSpan={columns.length}
                 className="px-4 py-8 text-center text-muted-foreground"
-                role="cell"
               >
                 No data available
               </td>
@@ -189,14 +192,14 @@ const AccessibleTable = ({
                 key={item.id || rowIndex}
                 className="hover:bg-muted/30 focus-within:bg-muted/50"
               >
-                {columns.map((column, cellIndex) => 
+                {columns.map((column, cellIndex) =>
                   renderCell(item, column, rowIndex, cellIndex)
                 )}
               </tr>
             ))
           )}
         </tbody>
-        
+
         {children}
       </table>
     </div>

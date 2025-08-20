@@ -13,6 +13,8 @@ import economicDataRoutes from './routes/economicData.js';
 import financialStatementsRoutes from './routes/financialStatements.js';
 import healthRoutes from './routes/health.js';
 import marketDataRoutes from './routes/marketData.js';
+import authRoutes from './routes/auth.js';
+import errorsRoutes from './routes/errors.js';
 
 // Load environment variables
 dotenv.config();
@@ -75,6 +77,8 @@ app.use('/api/financial-statements', financialStatementsRoutes);
 app.use('/api/company-data', companyDataRoutes);
 app.use('/api/economic-data', economicDataRoutes);
 app.use('/api/ai-assistant', aiAssistantRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/errors', errorsRoutes);
 
 // Root endpoint
 app.get('/', (req, res) => {

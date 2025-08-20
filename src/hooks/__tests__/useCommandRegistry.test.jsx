@@ -1,7 +1,8 @@
 // @vitest-environment jsdom
-import React, { useEffect } from 'react';
 import { render, cleanup } from '@testing-library/react';
+import React, { useEffect } from 'react';
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+
 import { useCommandRegistry } from '../useCommandRegistry.js';
 
 // Test harness to expose hook API to tests via callback
@@ -25,9 +26,15 @@ describe('useCommandRegistry', () => {
     cleanup();
   });
 
-  it('searchCommands returns relevant results for simple queries', async () => {
+  it('searchCommands returns relevant results for simple queries', async() => {
     let latestApi;
-    render(<HookHarness onAPI={(api) => { latestApi = api; }} />);
+    render(
+      <HookHarness
+        onAPI={(api) => {
+          latestApi = api;
+        }}
+      />
+    );
     // Wait a tick to ensure first effect runs
     await nextTick();
 
@@ -39,9 +46,15 @@ describe('useCommandRegistry', () => {
     expect(results2.map(r => r.id)).toContain('sensitivity-analysis');
   });
 
-  it('executeCommand runs command and increments usage', async () => {
+  it('executeCommand runs command and increments usage', async() => {
     let latestApi;
-    render(<HookHarness onAPI={(api) => { latestApi = api; }} />);
+    render(
+      <HookHarness
+        onAPI={(api) => {
+          latestApi = api;
+        }}
+      />
+    );
     await nextTick();
 
     const beforeUsage = latestApi.commandUsage['create-dcf'] || 0;
@@ -56,9 +69,16 @@ describe('useCommandRegistry', () => {
     expect((latestApi.commandUsage['create-dcf'] || 0)).toBe(beforeUsage + 1);
   });
 
-  it('getContextualCommands reflects activeTab context', async () => {
+  it('getContextualCommands reflects activeTab context', async() => {
     let latestApi;
-    render(<HookHarness context={{ activeTab: 'modeling' }} onAPI={(api) => { latestApi = api; }} />);
+    render(
+      <HookHarness
+        context={{ activeTab: 'modeling' }}
+        onAPI={(api) => {
+          latestApi = api;
+        }}
+      />
+    );
     await nextTick();
 
     const contextual = latestApi.getContextualCommands();

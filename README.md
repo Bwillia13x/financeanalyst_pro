@@ -198,6 +198,16 @@ src/
 │   │       └── ...         # Other workspace components
 │   └── ...
 └── components/             # Reusable UI components
+
+## 🧪 Local Dev Notes
+
+- Backend: `http://localhost:3001` (CORS allows `http://localhost:5173`).
+- Frontend (Vite): `http://localhost:5173`.
+- Auth mocks: `POST /api/auth/login`, `/api/auth/refresh`, `/api/auth/logout` (dev only).
+- Error reporting: `POST /api/errors` accepts JSON payload and returns 200.
+- Collaboration defaults: `VITE_ENABLE_COLLABORATION=false`, `VITE_COLLAB_WS_MOCK=true` in `.env.example`.
+- SEO base URL: configure via `VITE_SITE_URL` (defaults to `https://valor-ivx.com`).
+- External fetch fallbacks: gated by `VITE_ALLOW_DIRECT_FETCH` (default `false`).
 ```
 
 ## 🔧 Configuration

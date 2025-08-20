@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
 import { TrendingUp, TrendingDown, Activity, AlertCircle, RefreshCw } from 'lucide-react';
+import React, { useState } from 'react';
+
 import { useRealTimeData } from '../../hooks/useRealTimeData';
 import { cn } from '../../utils/cn';
 
@@ -18,33 +19,33 @@ export const LivePriceWidget = ({
 }) => {
   const [priceHistory, setPriceHistory] = useState([]);
   const [isFlashing, setIsFlashing] = useState(false);
-  
+
   const { data, isConnected, error, lastUpdated } = useRealTimeData(dataType, symbol, {
     onUpdate: (newData) => {
       // Trigger flash animation on price change
       setIsFlashing(true);
       setTimeout(() => setIsFlashing(false), 200);
-      
+
       // Update price history for mini chart
       setPriceHistory(prev => {
         const newHistory = [...prev, newData.price || newData.rate || newData.value].slice(-20);
         return newHistory;
       });
-      
+
       onPriceUpdate?.(newData);
     }
   });
 
   const getChangeDirection = () => {
     if (!data) return 'neutral';
-    
+
     const change = data.change || data.changePercent || 0;
     return change >= 0 ? 'positive' : 'negative';
   };
 
   const formatPrice = () => {
     if (!data) return '---';
-    
+
     switch (dataType) {
       case 'stock_price':
         return `$${data.price?.toFixed(2)}`;
@@ -62,10 +63,10 @@ export const LivePriceWidget = ({
 
   const formatChange = () => {
     if (!data) return null;
-    
+
     const change = data.change || 0;
     const changePercent = data.changePercent || change;
-    
+
     return {
       absolute: Math.abs(change).toFixed(2),
       percent: Math.abs(changePercent).toFixed(2),
@@ -101,28 +102,32 @@ export const LivePriceWidget = ({
   const direction = getChangeDirection();
 
   return (
-    <div className={cn(
-      'bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 transition-all duration-200',
-      sizeClasses[size],
-      isFlashing && direction === 'positive' && 'bg-green-50 dark:bg-green-900/20',
-      isFlashing && direction === 'negative' && 'bg-red-50 dark:bg-red-900/20',
-      !isConnected && 'opacity-75',
-      className
-    )}>
+    <div
+      className={cn(
+        'bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 transition-all duration-200',
+        sizeClasses[size],
+        isFlashing && direction === 'positive' && 'bg-green-50 dark:bg-green-900/20',
+        isFlashing && direction === 'negative' && 'bg-red-50 dark:bg-red-900/20',
+        !isConnected && 'opacity-75',
+        className
+      )}
+    >
       {/* Header */}
       <div className="flex items-center justify-between mb-2">
         <div>
-          <h3 className={cn(
-            'font-semibold text-slate-900 dark:text-white',
-            textSizeClasses[size].symbol
-          )}>
+          <h3
+            className={cn(
+              'font-semibold text-slate-900 dark:text-white',
+              textSizeClasses[size].symbol
+            )}
+          >
             {symbol}
           </h3>
           {name && (
             <p className="text-xs text-slate-500 dark:text-slate-400">{name}</p>
           )}
         </div>
-        
+
         {/* Connection Status */}
         <div className="flex items-center space-x-1">
           {isConnected ? (
@@ -138,20 +143,24 @@ export const LivePriceWidget = ({
       {/* Price Display */}
       <div className="flex items-center justify-between">
         <div>
-          <div className={cn(
-            'font-bold text-slate-900 dark:text-white',
-            textSizeClasses[size].price
-          )}>
+          <div
+            className={cn(
+              'font-bold text-slate-900 dark:text-white',
+              textSizeClasses[size].price
+            )}
+          >
             {formatPrice()}
           </div>
-          
+
           {/* Change Display */}
           {change && (
-            <div className={cn(
-              'flex items-center space-x-1 mt-1',
-              textSizeClasses[size].change,
-              direction === 'positive' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
-            )}>
+            <div
+              className={cn(
+                'flex items-center space-x-1 mt-1',
+                textSizeClasses[size].change,
+                direction === 'positive' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+              )}
+            >
               {direction === 'positive' ? (
                 <TrendingUp className="w-3 h-3" />
               ) : (
@@ -171,9 +180,9 @@ export const LivePriceWidget = ({
         {/* Mini Chart */}
         {showChart && priceHistory.length > 1 && (
           <div className="w-16 h-8">
-            <MiniChart 
-              data={priceHistory} 
-              color={direction === 'positive' ? '#10b981' : '#ef4444'} 
+            <MiniChart
+              data={priceHistory}
+              color={direction === 'positive' ? '#10b981' : '#ef4444'}
             />
           </div>
         )}

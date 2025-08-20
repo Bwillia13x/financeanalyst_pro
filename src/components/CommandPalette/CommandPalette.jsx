@@ -1,5 +1,4 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { createPortal } from 'react-dom';
 import {
   Search,
   Command,
@@ -19,6 +18,7 @@ import {
   HelpCircle
 } from 'lucide-react';
 import { useState, useEffect, useRef, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 
 import { useCommandRegistry } from '../../hooks/useCommandRegistry';
 import monitoring from '../../utils/monitoring';
@@ -373,7 +373,7 @@ const CommandPalette = ({
                           ? 'bg-blue-50 border-r-2 border-blue-500'
                           : 'hover:bg-slate-50'
                       }`}
-                      role="button"
+                      role="option"
                       tabIndex={0}
                       aria-selected={isSelected}
                       onClick={() => handleExecuteCommand(command)}

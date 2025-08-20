@@ -1,15 +1,12 @@
-import React, { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Link, useNavigate } from 'react-router-dom';
-import { 
-  Search, 
-  Calculator, 
-  PieChart, 
-  Database, 
-  Settings, 
-  BarChart3, 
-  TrendingUp, 
-  FileText, 
+import {
+  Search,
+  Calculator,
+  PieChart,
+  Database,
+  BarChart3,
+  TrendingUp,
+  FileText,
   Brain,
   Zap,
   Command,
@@ -18,10 +15,12 @@ import {
   Star,
   Activity
 } from 'lucide-react';
+import React, { useState, useCallback } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 
-import Header from '../components/ui/Header';
-import { Card } from '../components/ui/Card';
 import Button from '../components/ui/Button';
+import { Card } from '../components/ui/Card';
+import Header from '../components/ui/Header';
 import { useKeyboardShortcutsContext } from '../components/ui/KeyboardShortcutsProvider';
 
 const App = () => {
@@ -36,7 +35,7 @@ const App = () => {
       description: 'Start a discounted cash flow analysis',
       icon: Calculator,
       color: 'bg-blue-500',
-      action: () => navigate('/models?type=dcf'),
+      action: () => navigate('/models?type=dcf')
     },
     {
       id: 'portfolio-overview',
@@ -44,7 +43,7 @@ const App = () => {
       description: 'View your portfolio performance',
       icon: PieChart,
       color: 'bg-green-500',
-      action: () => navigate('/portfolio'),
+      action: () => navigate('/portfolio')
     },
     {
       id: 'market-data',
@@ -52,7 +51,7 @@ const App = () => {
       description: 'Access real-time market information',
       icon: TrendingUp,
       color: 'bg-purple-500',
-      action: () => navigate('/real-time-market-data-center'),
+      action: () => navigate('/real-time-market-data-center')
     },
     {
       id: 'data-sources',
@@ -60,15 +59,15 @@ const App = () => {
       description: 'Manage your data connections',
       icon: Database,
       color: 'bg-orange-500',
-      action: () => navigate('/data'),
-    },
+      action: () => navigate('/data')
+    }
   ];
 
   const recentActivity = [
     { id: 1, title: 'AAPL DCF Analysis', time: '2 hours ago', type: 'model' },
     { id: 2, title: 'Portfolio Rebalancing', time: '1 day ago', type: 'portfolio' },
     { id: 3, title: 'Tech Sector Report', time: '2 days ago', type: 'report' },
-    { id: 4, title: 'Market Data Sync', time: '3 days ago', type: 'data' },
+    { id: 4, title: 'Market Data Sync', time: '3 days ago', type: 'data' }
   ];
 
   const platforms = [
@@ -78,7 +77,7 @@ const App = () => {
       icon: Calculator,
       route: '/models',
       stats: '4 Model Types',
-      color: 'bg-blue-50 border-blue-200',
+      color: 'bg-blue-50 border-blue-200'
     },
     {
       title: 'Portfolio Management',
@@ -86,7 +85,7 @@ const App = () => {
       icon: PieChart,
       route: '/portfolio',
       stats: 'Live Tracking',
-      color: 'bg-green-50 border-green-200',
+      color: 'bg-green-50 border-green-200'
     },
     {
       title: 'Market Data Center',
@@ -94,7 +93,7 @@ const App = () => {
       icon: Activity,
       route: '/real-time-market-data-center',
       stats: 'Real-time',
-      color: 'bg-purple-50 border-purple-200',
+      color: 'bg-purple-50 border-purple-200'
     },
     {
       title: 'Valuation Workbench',
@@ -102,7 +101,7 @@ const App = () => {
       icon: BarChart3,
       route: '/valuation-workbench',
       stats: 'Pro Tools',
-      color: 'bg-orange-50 border-orange-200',
+      color: 'bg-orange-50 border-orange-200'
     },
     {
       title: 'AI Insights',
@@ -110,7 +109,7 @@ const App = () => {
       icon: Brain,
       route: '/ai-insights',
       stats: 'AI-Powered',
-      color: 'bg-indigo-50 border-indigo-200',
+      color: 'bg-indigo-50 border-indigo-200'
     },
     {
       title: 'Reports & Analytics',
@@ -118,8 +117,8 @@ const App = () => {
       icon: FileText,
       route: '/reports',
       stats: 'Custom Reports',
-      color: 'bg-pink-50 border-pink-200',
-    },
+      color: 'bg-pink-50 border-pink-200'
+    }
   ];
 
   const handleQuickAction = useCallback((action) => {
@@ -131,7 +130,7 @@ const App = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
-      
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -238,7 +237,7 @@ const App = () => {
                 <div className="space-y-3">
                   {recentActivity.map((item) => (
                     <div key={item.id} className="flex items-center space-x-3 py-2">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                      <div className="w-2 h-2 bg-blue-500 rounded-full" />
                       <div className="flex-1">
                         <p className="text-sm font-medium text-gray-900">{item.title}</p>
                         <p className="text-xs text-gray-600">{item.time}</p>
@@ -302,7 +301,7 @@ const App = () => {
           </div>
         </motion.div>
       </div>
-      
+
     </div>
   );
 };

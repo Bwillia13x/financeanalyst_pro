@@ -10,7 +10,7 @@ class ReportingEngine {
     this.themes = new Map();
     this.exportFormats = new Set(['pdf', 'docx', 'pptx', 'html', 'excel']);
     this.isInitialized = false;
-    
+
     this.initializeTemplates();
     this.initializeThemes();
   }
@@ -349,7 +349,7 @@ class ReportingEngine {
 
     const reportId = `report_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     const theme = this.themes.get(options.theme || 'professional');
-    
+
     const report = {
       id: reportId,
       templateId,
@@ -404,7 +404,7 @@ class ReportingEngine {
   /**
    * Generate a specific section
    */
-  async generateSection(sectionConfig, data, theme, options) {
+  async generateSection(sectionConfig, data, _theme, _options) {
     const section = {
       id: sectionConfig.id,
       name: sectionConfig.name,
@@ -448,7 +448,7 @@ class ReportingEngine {
   /**
    * Generate cover page content
    */
-  generateCoverPage(data, fields) {
+  generateCoverPage(data, _fields) {
     return {
       companyName: data.company?.name || 'Financial Analysis',
       reportTitle: data.reportTitle || 'Financial Analysis Report',
@@ -463,10 +463,10 @@ class ReportingEngine {
   /**
    * Generate key metrics grid
    */
-  generateMetricsGrid(data, fields) {
+  generateMetricsGrid(data, _fields) {
     const statements = data.financialData?.statements;
     const latest = statements?.incomeStatement ? Object.keys(statements.incomeStatement).sort().pop() : null;
-    
+
     return {
       revenue: {
         label: 'Revenue',
@@ -502,7 +502,7 @@ class ReportingEngine {
     const dcfValue = data.dcfResults?.enterpriseValue || 0;
     const marketValue = data.marketData?.marketCap || 0;
     const upside = marketValue > 0 ? ((dcfValue - marketValue) / marketValue) * 100 : 0;
-    
+
     return {
       dcfValue,
       marketValue,
@@ -579,9 +579,9 @@ class ReportingEngine {
   /**
    * Render a section into pages
    */
-  async renderSection(section, theme, layout) {
+  async renderSection(section, theme, _layout) {
     const pages = [];
-    
+
     // Create section title page if needed
     if (section.type !== 'cover') {
       pages.push({
@@ -638,7 +638,7 @@ class ReportingEngine {
 
     try {
       let exportedData;
-      
+
       switch (format) {
         case 'pdf':
           exportedData = await this.exportToPDF(report, options);
@@ -713,10 +713,10 @@ class ReportingEngine {
     if (!data) return 'neutral';
     const periods = Object.keys(data).sort();
     if (periods.length < 2) return 'neutral';
-    
+
     const latest = data[periods[periods.length - 1]]?.[field] || 0;
     const previous = data[periods[periods.length - 2]]?.[field] || 0;
-    
+
     if (latest > previous * 1.05) return 'positive';
     if (latest < previous * 0.95) return 'negative';
     return 'stable';
@@ -745,10 +745,10 @@ class ReportingEngine {
 
   formatIncomeStatement(data) {
     if (!data) return {};
-    
+
     const periods = Object.keys(data).sort();
     const formatted = { periods, rows: [] };
-    
+
     const fields = [
       { key: 'totalRevenue', label: 'Total Revenue' },
       { key: 'totalCostOfGoodsSold', label: 'Cost of Goods Sold' },
@@ -778,7 +778,7 @@ class ReportingEngine {
     return data || {};
   }
 
-  calculateFinancialRatios(statements) {
+  calculateFinancialRatios(_statements) {
     // Calculate comprehensive financial ratios
     return {
       profitability: {},
@@ -796,7 +796,7 @@ class ReportingEngine {
     ];
   }
 
-  generateSensitivityData(data) {
+  generateSensitivityData(_data) {
     return [
       { variable: 'Revenue Growth', impact: 25 },
       { variable: 'Discount Rate', impact: -20 },
@@ -805,27 +805,27 @@ class ReportingEngine {
     ];
   }
 
-  async exportToPDF(report, options) {
+  async exportToPDF(_report, _options) {
     // Mock PDF generation
     return new Uint8Array([37, 80, 68, 70]); // PDF header
   }
 
-  async exportToWord(report, options) {
+  async exportToWord(_report, _options) {
     // Mock Word generation
     return new Uint8Array([80, 75, 3, 4]); // ZIP header for DOCX
   }
 
-  async exportToPowerPoint(report, options) {
+  async exportToPowerPoint(_report, _options) {
     // Mock PowerPoint generation
     return new Uint8Array([80, 75, 3, 4]); // ZIP header for PPTX
   }
 
-  async exportToHTML(report, options) {
+  async exportToHTML(report, _options) {
     // Generate HTML report
     return `<!DOCTYPE html><html><head><title>${report.template}</title></head><body><h1>Report Generated</h1></body></html>`;
   }
 
-  async exportToExcel(report, options) {
+  async exportToExcel(_report, _options) {
     // Mock Excel generation
     return new Uint8Array([80, 75, 3, 4]); // ZIP header for XLSX
   }
@@ -845,7 +845,7 @@ class ReportingEngine {
     });
   }
 
-  generateCustomSection(customSection, data, theme, options) {
+  generateCustomSection(customSection, _data, _theme, _options) {
     return {
       id: customSection.id,
       name: customSection.name,
@@ -856,7 +856,7 @@ class ReportingEngine {
     };
   }
 
-  generateGenericSection(sectionConfig, data) {
+  generateGenericSection(sectionConfig, _data) {
     return {
       title: sectionConfig.name,
       content: 'Generic section content would be generated here based on available data.',
@@ -864,7 +864,7 @@ class ReportingEngine {
     };
   }
 
-  generateRiskMatrix(data) {
+  generateRiskMatrix(_data) {
     return {
       risks: [
         { category: 'Market Risk', level: 'Medium', description: 'General market volatility' },

@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
 import { Settings as SettingsIcon, User, Shield, Bell, Palette } from 'lucide-react';
-import Header from '../components/ui/Header';
+import React, { useState } from 'react';
+
+import SecurityDashboard from '../components/Security/SecurityDashboard';
 import SEOHead from '../components/SEO/SEOHead';
 import UserPreferences from '../components/Settings/UserPreferences';
-import SecurityDashboard from '../components/Security/SecurityDashboard';
 import { Card } from '../components/ui/Card';
+import Header from '../components/ui/Header';
 
 const Settings = () => {
   const [activeTab, setActiveTab] = useState('preferences');
@@ -24,7 +25,7 @@ const Settings = () => {
         canonical="/settings"
         keywords="user settings, security preferences, platform configuration, compliance settings, notifications, customization"
       />
-      
+
       <Header />
 
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">

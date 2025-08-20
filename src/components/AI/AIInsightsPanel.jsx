@@ -1,39 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  Brain, 
-  TrendingUp, 
-  AlertTriangle, 
-  Lightbulb, 
-  Target, 
-  Shield, 
-  Zap,
-  ChevronRight,
-  ChevronDown,
-  Sparkles,
-  BarChart3,
-  PieChart,
-  Activity,
-  RefreshCw
-} from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Button from '../ui/Button';
+import { Activity, AlertTriangle, BarChart3, Brain, ChevronDown, ChevronRight, Lightbulb, PieChart, RefreshCw, Shield, Sparkles, Target, TrendingUp, Zap } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+
 import aiInsightsService from '../../services/aiInsightsService';
+import Button from '../ui/Button';
 
 /**
  * AI-powered insights panel providing intelligent financial analysis
  */
 
-const AIInsightsPanel = ({ 
-  financialData, 
+const AIInsightsPanel = ({
+  financialData,
   industry = 'technology',
   onInsightClick,
-  className = '' 
+  className = ''
 }) => {
   const [insights, setInsights] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [expandedSections, setExpandedSections] = useState(new Set(['summary']));
-  const [selectedInsightType, setSelectedInsightType] = useState('all');
 
   useEffect(() => {
     if (financialData) {
@@ -41,10 +26,10 @@ const AIInsightsPanel = ({
     }
   }, [financialData, industry]);
 
-  const generateInsights = async () => {
+  const generateInsights = async() => {
     setIsLoading(true);
     setError(null);
-    
+
     try {
       const options = {
         industry,
@@ -52,7 +37,7 @@ const AIInsightsPanel = ({
         includeRecommendations: true,
         confidenceThreshold: 0.7
       };
-      
+
       const generatedInsights = await aiInsightsService.generateInsights(financialData, options);
       setInsights(generatedInsights);
     } catch (err) {
@@ -108,9 +93,9 @@ const AIInsightsPanel = ({
           </h3>
         </div>
         <div className="space-y-3">
-          <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded animate-pulse"></div>
-          <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded animate-pulse w-3/4"></div>
-          <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded animate-pulse w-1/2"></div>
+          <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+          <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded animate-pulse w-3/4" />
+          <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded animate-pulse w-1/2" />
         </div>
       </div>
     );
@@ -164,7 +149,7 @@ const AIInsightsPanel = ({
               </p>
             </div>
           </div>
-          
+
           <div className="flex items-center space-x-2">
             <div className={`flex items-center space-x-1 ${getConfidenceColor(insights.confidence)}`}>
               <Sparkles className="w-4 h-4" />
@@ -215,7 +200,7 @@ const AIInsightsPanel = ({
                     {insights.summary.overallHealth}
                   </span>
                 </div>
-                
+
                 <div className="bg-slate-50 dark:bg-slate-700 rounded-lg p-4">
                   <div className="flex items-center space-x-2 mb-2">
                     <Target className="w-4 h-4 text-green-600" />
@@ -259,7 +244,7 @@ const AIInsightsPanel = ({
                   </p>
                 </div>
               </div>
-              
+
               <div className="flex items-center space-x-2">
                 <span className={`text-xs px-2 py-1 rounded-full ${analysis.priority === 'high' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'}`}>
                   {analysis.priority}
@@ -301,9 +286,10 @@ const AIInsightsPanel = ({
                         Recommendations
                       </h6>
                       {analysis.suggestions.map((suggestion, index) => (
-                        <div
+                        <button
+                          type="button"
                           key={index}
-                          className="flex items-start space-x-3 p-3 bg-slate-50 dark:bg-slate-700 rounded-lg cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors"
+                          className="flex items-start space-x-3 w-full text-left p-3 bg-slate-50 dark:bg-slate-700 rounded-lg cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors"
                           onClick={() => onInsightClick?.(suggestion)}
                         >
                           {getImpactIcon(suggestion.impact)}
@@ -326,7 +312,7 @@ const AIInsightsPanel = ({
                               </span>
                             </div>
                           </div>
-                        </div>
+                        </button>
                       ))}
                     </div>
                   )}

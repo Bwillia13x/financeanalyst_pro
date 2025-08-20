@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { cn } from '../../utils/cn';
 
 /**
@@ -7,11 +8,11 @@ import { cn } from '../../utils/cn';
  */
 
 // Base skeleton component
-export const Skeleton = ({ 
-  className, 
-  animate = true, 
+export const Skeleton = ({
+  className,
+  animate = true,
   variant = 'default',
-  ...props 
+  ...props
 }) => (
   <div
     className={cn(
@@ -28,11 +29,11 @@ export const Skeleton = ({
 );
 
 // Financial table skeleton
-export const FinancialTableSkeleton = ({ 
-  rows = 8, 
+export const FinancialTableSkeleton = ({
+  rows = 8,
   columns = 5,
   showHeader = true,
-  className 
+  className
 }) => (
   <div className={cn('space-y-3', className)}>
     {showHeader && (
@@ -46,7 +47,7 @@ export const FinancialTableSkeleton = ({
         ))}
       </div>
     )}
-    
+
     <div className="space-y-2">
       {Array.from({ length: rows }).map((_, rowIndex) => (
         <div key={`row-${rowIndex}`} className="flex items-center space-x-4 p-4 border border-slate-200 rounded-lg">
@@ -67,10 +68,10 @@ export const FinancialTableSkeleton = ({
 );
 
 // Chart skeleton
-export const ChartSkeleton = ({ 
+export const ChartSkeleton = ({
   height = 300,
   showLegend = true,
-  className 
+  className
 }) => (
   <div className={cn('p-6 border border-slate-200 rounded-lg', className)}>
     {/* Chart title */}
@@ -78,11 +79,11 @@ export const ChartSkeleton = ({
       <Skeleton className="h-6 w-48 mb-2" />
       <Skeleton className="h-4 w-32" />
     </div>
-    
+
     {/* Chart area */}
     <div className="relative" style={{ height }}>
       <Skeleton className="w-full h-full rounded-lg" />
-      
+
       {/* Simulate chart elements */}
       <div className="absolute inset-4 flex flex-col justify-end">
         <div className="flex items-end space-x-2 h-full">
@@ -96,7 +97,7 @@ export const ChartSkeleton = ({
         </div>
       </div>
     </div>
-    
+
     {/* Legend */}
     {showLegend && (
       <div className="flex items-center justify-center space-x-4 mt-4">
@@ -122,7 +123,7 @@ export const DashboardCardSkeleton = ({ className }) => (
       </div>
       <Skeleton className="w-8 h-8 rounded-lg" />
     </div>
-    
+
     {/* Main content */}
     <div className="space-y-3">
       <Skeleton className="h-8 w-20" />
@@ -131,7 +132,7 @@ export const DashboardCardSkeleton = ({ className }) => (
         <Skeleton className="h-4 w-16" />
       </div>
     </div>
-    
+
     {/* Mini chart */}
     <div className="h-16 flex items-end space-x-1">
       {Array.from({ length: 12 }).map((_, index) => (
@@ -156,7 +157,7 @@ export const PortfolioHoldingsSkeleton = ({ rows = 5, className }) => (
         <Skeleton className="h-8 w-8 rounded" />
       </div>
     </div>
-    
+
     {/* Holdings list */}
     <div className="space-y-2">
       {Array.from({ length: rows }).map((_, index) => (
@@ -168,7 +169,7 @@ export const PortfolioHoldingsSkeleton = ({ rows = 5, className }) => (
               <Skeleton className="h-3 w-32" />
             </div>
           </div>
-          
+
           <div className="flex items-center space-x-6 text-right">
             <div className="space-y-1">
               <Skeleton className="h-4 w-12" />
@@ -201,13 +202,13 @@ export const MarketDataSkeleton = ({ className }) => (
       </div>
       <Skeleton className="w-6 h-6 rounded" />
     </div>
-    
+
     {/* Price and change */}
     <div className="space-y-2 mb-4">
       <Skeleton className="h-7 w-24" />
       <Skeleton className="h-4 w-20" />
     </div>
-    
+
     {/* Stats */}
     <div className="grid grid-cols-2 gap-3">
       {Array.from({ length: 4 }).map((_, index) => (
@@ -217,7 +218,7 @@ export const MarketDataSkeleton = ({ className }) => (
         </div>
       ))}
     </div>
-    
+
     {/* Sparkline */}
     <div className="mt-4 h-8 flex items-end space-x-0.5">
       {Array.from({ length: 20 }).map((_, index) => (
@@ -240,10 +241,10 @@ export const AnalysisResultsSkeleton = ({ className }) => (
         <DashboardCardSkeleton key={`summary-${index}`} />
       ))}
     </div>
-    
+
     {/* Main analysis chart */}
     <ChartSkeleton height={400} />
-    
+
     {/* Detailed breakdown */}
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <FinancialTableSkeleton rows={6} columns={3} />
@@ -253,12 +254,12 @@ export const AnalysisResultsSkeleton = ({ className }) => (
 );
 
 // Loading state wrapper component
-export const LoadingWrapper = ({ 
-  isLoading, 
-  skeleton, 
-  children, 
+export const LoadingWrapper = ({
+  isLoading,
+  skeleton,
+  children,
   className,
-  fallback = null 
+  fallback = null
 }) => {
   if (isLoading) {
     return (
@@ -267,24 +268,24 @@ export const LoadingWrapper = ({
       </div>
     );
   }
-  
+
   return children;
 };
 
 // Shimmer effect for enhanced loading animations
-export const ShimmerWrapper = ({ 
-  children, 
+export const ShimmerWrapper = ({
+  children,
   className,
   intensity = 'normal' // 'subtle', 'normal', 'intense'
 }) => (
-  <div 
+  <div
     className={cn(
       'relative overflow-hidden',
       className
     )}
   >
     {children}
-    <div 
+    <div
       className={cn(
         'absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite]',
         'bg-gradient-to-r from-transparent via-white/20 to-transparent',

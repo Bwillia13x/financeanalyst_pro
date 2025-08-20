@@ -27,6 +27,26 @@ class SecureApiClient {
   }
 
   // =============================================================================
+  // GENERIC HTTP METHODS (delegate to axios instance)
+  // =============================================================================
+
+  get(url, config = {}) {
+    return this.client.get(url, config);
+  }
+
+  post(url, data = {}, config = {}) {
+    return this.client.post(url, data, config);
+  }
+
+  put(url, data = {}, config = {}) {
+    return this.client.put(url, data, config);
+  }
+
+  delete(url, config = {}) {
+    return this.client.delete(url, config);
+  }
+
+  // =============================================================================
   // MARKET DATA METHODS
   // =============================================================================
 

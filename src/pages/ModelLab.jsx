@@ -158,9 +158,10 @@ const ModelLab = () => {
                     </div>
                     <div className="p-4">
                       <div className="grid grid-cols-2 gap-3 text-[13px]">
-                        <label className="flex items-center justify-between gap-3 text-[13px]">
+                        <label htmlFor="model-name" className="flex items-center justify-between gap-3 text-[13px]">
                           <span className="text-muted-foreground">Name</span>
                           <input
+                            id="model-name"
                             className="w-48 rounded-md border border-border bg-background px-2 py-1 text-right text-foreground"
                             value={active.name}
                             onChange={(e) => {

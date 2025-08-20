@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
 import { BarChart3, Activity, Eye, Users, TrendingUp } from 'lucide-react';
-import Header from '../components/ui/Header';
-import SEOHead from '../components/SEO/SEOHead';
+import React, { useState } from 'react';
+
 import UserAnalyticsDashboard from '../components/Analytics/UserAnalyticsDashboard';
 import PerformanceDashboard from '../components/PerformanceDashboard/PerformanceDashboard';
+import SEOHead from '../components/SEO/SEOHead';
 import { Card } from '../components/ui/Card';
+import Header from '../components/ui/Header';
 
 const Analytics = () => {
   const [activeTab, setActiveTab] = useState('usage');
@@ -24,7 +25,7 @@ const Analytics = () => {
         canonical="/analytics"
         keywords="platform analytics, usage metrics, performance monitoring, user insights, business intelligence, financial analytics"
       />
-      
+
       <Header />
 
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -37,7 +38,7 @@ const Analytics = () => {
             </h1>
           </div>
           <p className="text-slate-600 dark:text-slate-400 max-w-3xl">
-            Comprehensive analytics and insights into platform usage, performance metrics, 
+            Comprehensive analytics and insights into platform usage, performance metrics,
             and user engagement patterns to optimize your financial analysis workflow.
           </p>
         </div>
@@ -58,11 +59,13 @@ const Analytics = () => {
                         : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 dark:text-slate-400 dark:hover:text-slate-300'
                     }`}
                   >
-                    <Icon className={`-ml-0.5 mr-2 h-5 w-5 ${
-                      activeTab === tab.id
-                        ? 'text-emerald-500'
-                        : 'text-slate-400 group-hover:text-slate-500'
-                    }`} />
+                    <Icon
+                      className={`-ml-0.5 mr-2 h-5 w-5 ${
+                        activeTab === tab.id
+                          ? 'text-emerald-500'
+                          : 'text-slate-400 group-hover:text-slate-500'
+                      }`}
+                    />
                     {tab.label}
                   </button>
                 );
@@ -112,26 +115,26 @@ const Analytics = () => {
                   <div className="text-sm text-slate-600 dark:text-slate-400">Active Users</div>
                   <div className="text-xs text-green-600 mt-1">+12.3% from last month</div>
                 </div>
-                
+
                 <div className="bg-slate-50 dark:bg-slate-700 rounded-lg p-4">
                   <div className="text-2xl font-bold text-slate-900 dark:text-white">4.2</div>
                   <div className="text-sm text-slate-600 dark:text-slate-400">Avg Session Duration</div>
                   <div className="text-xs text-green-600 mt-1">+0.3 hours</div>
                 </div>
-                
+
                 <div className="bg-slate-50 dark:bg-slate-700 rounded-lg p-4">
                   <div className="text-2xl font-bold text-slate-900 dark:text-white">847</div>
                   <div className="text-sm text-slate-600 dark:text-slate-400">Models Created</div>
                   <div className="text-xs text-blue-600 mt-1">This week</div>
                 </div>
-                
+
                 <div className="bg-slate-50 dark:bg-slate-700 rounded-lg p-4">
                   <div className="text-2xl font-bold text-slate-900 dark:text-white">94.2%</div>
                   <div className="text-sm text-slate-600 dark:text-slate-400">User Satisfaction</div>
                   <div className="text-xs text-green-600 mt-1">+2.1% improvement</div>
                 </div>
               </div>
-              
+
               <div className="mt-6 text-center">
                 <div className="bg-slate-100 dark:bg-slate-700 rounded-lg p-8 text-slate-500 dark:text-slate-400">
                   <Users className="w-12 h-12 mx-auto mb-4 opacity-50" />
@@ -168,7 +171,7 @@ const Analytics = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 {/* Feature Usage */}
                 <div className="bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-900/20 dark:to-emerald-900/20 rounded-lg p-6">
                   <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">Feature Adoption</h3>
@@ -187,7 +190,7 @@ const Analytics = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 {/* Support Metrics */}
                 <div className="bg-gradient-to-br from-purple-50 to-violet-100 dark:from-purple-900/20 dark:to-violet-900/20 rounded-lg p-6">
                   <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">Support Quality</h3>

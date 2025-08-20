@@ -1,12 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  FileText, 
-  Download, 
-  Eye, 
-  Settings, 
-  ChevronRight, 
-  Check, 
+import { motion } from 'framer-motion';
+import {
+  FileText,
+  Download,
+  Eye,
+  Settings,
+  Check,
   Clock,
   AlertCircle,
   Palette,
@@ -14,6 +12,8 @@ import {
   Plus,
   Trash2
 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+
 import reportingEngine from '../../services/reportingEngine';
 
 const ReportBuilder = ({ financialData, onReportGenerated }) => {
@@ -36,14 +36,14 @@ const ReportBuilder = ({ financialData, onReportGenerated }) => {
     loadExistingReports();
   }, []);
 
-  const loadTemplatesAndThemes = async () => {
+  const loadTemplatesAndThemes = async() => {
     try {
       const availableTemplates = reportingEngine.getTemplates();
       const availableThemes = reportingEngine.getThemes();
-      
+
       setTemplates(availableTemplates);
       setThemes(availableThemes);
-      
+
       if (availableTemplates.length > 0 && !selectedTemplate) {
         setSelectedTemplate(availableTemplates[0]);
       }
@@ -52,7 +52,7 @@ const ReportBuilder = ({ financialData, onReportGenerated }) => {
     }
   };
 
-  const loadExistingReports = async () => {
+  const loadExistingReports = async() => {
     try {
       const reports = reportingEngine.listReports();
       setGeneratedReports(reports);
@@ -67,10 +67,10 @@ const ReportBuilder = ({ financialData, onReportGenerated }) => {
     const requiredSections = template.sections
       .filter(section => section.required)
       .map(section => section.id);
-    
+
     setReportOptions(prev => ({
       ...prev,
-      includedSections: [...requiredSections, ...prev.includedSections.filter(id => 
+      includedSections: [...requiredSections, ...prev.includedSections.filter(id =>
         !requiredSections.includes(id)
       )]
     }));
@@ -97,7 +97,7 @@ const ReportBuilder = ({ financialData, onReportGenerated }) => {
   };
 
   const updateCustomSection = (index, updates) => {
-    setCustomSections(prev => prev.map((section, i) => 
+    setCustomSections(prev => prev.map((section, i) =>
       i === index ? { ...section, ...updates } : section
     ));
   };
@@ -106,11 +106,11 @@ const ReportBuilder = ({ financialData, onReportGenerated }) => {
     setCustomSections(prev => prev.filter((_, i) => i !== index));
   };
 
-  const generateReport = async () => {
+  const generateReport = async() => {
     if (!selectedTemplate) return;
 
     setIsGenerating(true);
-    
+
     try {
       const reportData = {
         ...financialData,
@@ -131,7 +131,7 @@ const ReportBuilder = ({ financialData, onReportGenerated }) => {
 
       setGeneratedReports(prev => [report, ...prev]);
       onReportGenerated?.(report);
-      
+
     } catch (error) {
       console.error('Error generating report:', error);
       alert('Failed to generate report: ' + error.message);
@@ -140,20 +140,20 @@ const ReportBuilder = ({ financialData, onReportGenerated }) => {
     }
   };
 
-  const exportReport = async (reportId, format) => {
+  const exportReport = async(reportId, format) => {
     try {
       const exportedReport = await reportingEngine.exportReport(reportId, format);
-      
+
       // Create download link
-      const blob = new Blob([exportedReport.data], { 
-        type: getContentType(format) 
+      const blob = new Blob([exportedReport.data], {
+        type: getContentType(format)
       });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
       link.download = exportedReport.filename;
       link.click();
-      
+
       URL.revokeObjectURL(url);
     } catch (error) {
       console.error('Error exporting report:', error);
@@ -219,7 +219,7 @@ const ReportBuilder = ({ financialData, onReportGenerated }) => {
               <Layout className="mr-2" size={24} />
               Templates
             </h2>
-            
+
             <div className="space-y-3">
               {templates.map((template) => (
                 <motion.div
@@ -254,7 +254,7 @@ const ReportBuilder = ({ financialData, onReportGenerated }) => {
               <Palette className="mr-2" size={24} />
               Theme
             </h2>
-            
+
             <div className="grid grid-cols-1 gap-3">
               {themes.map((theme) => (
                 <motion.div
@@ -270,11 +270,11 @@ const ReportBuilder = ({ financialData, onReportGenerated }) => {
                   <div className="flex items-center justify-between">
                     <span className="font-medium">{theme.name}</span>
                     <div className="flex space-x-1">
-                      <div 
+                      <div
                         className="w-4 h-4 rounded-full border"
                         style={{ backgroundColor: theme.colors.primary }}
                       />
-                      <div 
+                      <div
                         className="w-4 h-4 rounded-full border"
                         style={{ backgroundColor: theme.colors.accent }}
                       />
@@ -340,7 +340,7 @@ const ReportBuilder = ({ financialData, onReportGenerated }) => {
                     <span>Add</span>
                   </button>
                 </div>
-                
+
                 <div className="space-y-3">
                   {customSections.map((section, index) => (
                     <div key={section.id} className="p-3 bg-gray-50 rounded-lg">
@@ -430,11 +430,11 @@ const ReportBuilder = ({ financialData, onReportGenerated }) => {
           {generatedReports.length > 0 && (
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
               <h2 className="text-xl font-semibold text-gray-900 mb-4">Generated Reports</h2>
-              
+
               <div className="space-y-3">
                 {generatedReports.map((report) => {
                   const StatusIcon = getStatusIcon(report.status);
-                  
+
                   return (
                     <motion.div
                       key={report.id}
@@ -453,7 +453,7 @@ const ReportBuilder = ({ financialData, onReportGenerated }) => {
                           </p>
                         </div>
                       </div>
-                      
+
                       {report.status === 'completed' && (
                         <div className="flex items-center space-x-2">
                           <button

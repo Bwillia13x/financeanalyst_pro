@@ -12,7 +12,7 @@ const SEOHead = ({
   publishedTime,
   modifiedTime
 }) => {
-  const siteUrl = 'https://valor-ivx.com';
+  const siteUrl = (import.meta?.env?.VITE_SITE_URL) || 'https://valor-ivx.com';
   const fullCanonical = canonical ? `${siteUrl}${canonical}` : siteUrl;
   const fullImage = image.startsWith('http') ? image : `${siteUrl}${image}`;
 

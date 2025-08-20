@@ -1,7 +1,9 @@
 import React, { useState, useCallback, createContext, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts';
 import CommandPalette from '../CommandPalette/CommandPalette';
+
 import KeyboardShortcutsHelp from './KeyboardShortcutsHelp';
 
 /**
@@ -105,7 +107,7 @@ export const KeyboardShortcutsProvider = ({ children }) => {
 
   // Handle post-execution from the canonical command palette
   // The canonical palette executes via useCommandRegistry. We only track recents here.
-  const handlePostExecute = useCallback((command /*, result */) => {
+  const handlePostExecute = useCallback((command /* , result */) => {
     setRecentCommands(prev => {
       const filtered = prev.filter(cmd => cmd.id !== command.id);
       return [command, ...filtered].slice(0, 5);
@@ -124,7 +126,7 @@ export const KeyboardShortcutsProvider = ({ children }) => {
   return (
     <KeyboardShortcutsContext.Provider value={contextValue}>
       {children}
-      
+
       {/* Command Palette */}
       <CommandPalette
         isOpen={showCommandPalette}
