@@ -7,9 +7,9 @@ export function useMobileAccessibility(options = {}) {
   const {
     enableTouchOptimization = true,
     enableVoiceOver = true,
-    enableHighContrast = false,
+    _enableHighContrast = false,
     minTouchTarget = 44, // 44px minimum as per WCAG
-    debugMode = process.env.NODE_ENV === 'development'
+    debugMode = import.meta.env.DEV
   } = options;
 
   const [isMobile, setIsMobile] = useState(false);

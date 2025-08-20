@@ -16,7 +16,7 @@ export function useBusinessIntelligence(config = {}) {
   const [analytics, setAnalytics] = useState({});
   const [insights, setInsights] = useState([]);
   const [reports, setReports] = useState([]);
-  const [benchmarks, setBenchmarks] = useState({});
+  const [benchmarks, _setBenchmarks] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 

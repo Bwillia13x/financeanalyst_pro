@@ -322,8 +322,8 @@ export const automationCommands = {
   },
 
   BATCH_ANALYSIS: {
-    execute: async(parsedCommand, _context, processor) => {
-      const [tickers, analysisType = 'quick'] = parsedCommand.parameters;
+    execute: async(parsedCommand, _context, _processor) => {
+      const [tickers, _analysisType = 'quick'] = parsedCommand.parameters;
 
       if (!tickers || !Array.isArray(tickers)) {
         return {

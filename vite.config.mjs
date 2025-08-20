@@ -18,9 +18,17 @@ export default defineConfig({
   resolve: {
     alias: {
       src: fileURLToPath(new URL('./src', import.meta.url))
-    }
+    },
+    // Avoid multiple React copies in dev which can cause invalid hook calls
+    dedupe: ['react', 'react-dom']
   },
   server: {
+    // Fix HMR/WebSocket port mismatch by pinning the dev server
+    port: 5173,
+    strictPort: true,
+    hmr: {
+      clientPort: 5173,
+    },
     fs: {
       allow: [
         '/Users/benjaminwilliams/Desktop/financeanalyst_pro',
@@ -51,6 +59,31 @@ export default defineConfig({
             return 'charts-vendor';
           }
           
+          // Advanced Analytics - separate chunk for new features
+          if (id.includes('AdvancedAnalytics') || id.includes('advancedAnalyticsService')) {
+            return 'advanced-analytics';
+          }
+          
+          // Export libraries - heavy dependencies
+          if (id.includes('xlsx') || id.includes('jspdf') || id.includes('jspdf-autotable')) {
+            return 'export-vendor';
+          }
+          
+          // Crypto and security libraries
+          if (id.includes('crypto-js') || id.includes('bcrypt')) {
+            return 'security-vendor';
+          }
+          
+          // OpenAI and AI libraries
+          if (id.includes('openai') || id.includes('ai')) {
+            return 'ai-vendor';
+          }
+          
+          // Virtualization libraries
+          if (id.includes('react-window') || id.includes('react-virtualized')) {
+            return 'virtualization-vendor';
+          }
+          
           // Animation and UI libraries
           if (id.includes('framer-motion') || id.includes('lucide-react')) {
             return 'ui-vendor';
@@ -66,19 +99,14 @@ export default defineConfig({
             return 'utils-vendor';
           }
           
-          // Helmet and SEO libraries
-          if (id.includes('helmet')) {
-            return 'seo-vendor';
-          }
-          
           // Redux and state management
           if (id.includes('redux') || id.includes('@reduxjs')) {
             return 'state-vendor';
           }
           
-          // Test and development libraries
-          if (id.includes('vitest') || id.includes('testing-library')) {
-            return 'test-vendor';
+          // Monitoring and error tracking
+          if (id.includes('sentry') || id.includes('@sentry')) {
+            return 'monitoring-vendor';
           }
           
           // Node modules that aren't specifically chunked
@@ -105,3 +133,4 @@ export default defineConfig({
     setupFiles: './src/test/setup.js',
   },
 })
+

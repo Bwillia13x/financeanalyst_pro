@@ -12,27 +12,27 @@ import {
   Settings,
   LogOut,
   Eye,
-  EyeOff,
+  _EyeOff,
   CheckCircle,
-  AlertCircle,
+  _AlertCircle,
   Users
 } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 
 import LoginForm from '../components/auth/LoginForm.jsx';
-import ProtectedRoute, { useAuth, PermissionGate } from '../components/auth/ProtectedRoute.jsx';
+import { useAuth, PermissionGate } from '../components/auth/ProtectedRoute.jsx';
 import UserProfile from '../components/auth/UserProfile.jsx';
 import { authService, USER_ROLES, PERMISSIONS } from '../services/authService.js';
 import { encryptionService } from '../services/encryptionService.js';
 import { userContextService } from '../services/userContextService.js';
 
 const AuthenticationIntegrationExample = () => {
-  const [currentView, setCurrentView] = useState('login');
+  const [_currentView, setCurrentView] = useState('login');
   const [showProfile, setShowProfile] = useState(false);
   const [contextStats, setContextStats] = useState(null);
   const [encryptionStatus, setEncryptionStatus] = useState(null);
 
-  const { user, isAuthenticated, hasPermission, hasRole, logout } = useAuth();
+  const { user, isAuthenticated, _hasPermission, _hasRole, logout } = useAuth();
 
   useEffect(() => {
     if (isAuthenticated) {

@@ -6,7 +6,7 @@ import { reportPerformanceMetric } from '../utils/performanceMonitoring';
 // React hook for accessibility testing
 export function useAccessibility(options = {}) {
   const {
-    enabled = process.env.NODE_ENV === 'development',
+    enabled = import.meta.env.DEV,
     autoTest = false,
     testInterval = null,
     componentType = 'generic',

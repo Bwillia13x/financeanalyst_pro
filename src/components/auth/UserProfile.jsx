@@ -63,7 +63,7 @@ const UserProfile = ({ onClose }) => {
       // Load storage statistics
       const storageStats = await financialDataStorage.getFinancialDataStats();
       setStats(storageStats);
-    } catch (_error) {
+    } catch (error) {
       console.error('Failed to load user data:', error);
     } finally {
       setIsLoading(false);
@@ -83,7 +83,7 @@ const UserProfile = ({ onClose }) => {
       });
 
       setTimeout(() => setSaveStatus(null), 3000);
-    } catch (_error) {
+    } catch {
       setSaveStatus({
         type: 'error',
         message: 'Failed to save preferences'
@@ -308,8 +308,9 @@ const UserProfile = ({ onClose }) => {
                   </label>
 
                   <div className="flex items-center space-x-4">
-                    <label className="text-sm text-gray-700">Default Currency:</label>
+                    <label htmlFor="defaultCurrency" className="text-sm text-gray-700">Default Currency:</label>
                     <select
+                      id="defaultCurrency"
                       value={preferences.defaultCurrency}
                       onChange={(e) => updatePreference('defaultCurrency', e.target.value)}
                       className="border border-gray-300 rounded px-2 py-1 text-sm"

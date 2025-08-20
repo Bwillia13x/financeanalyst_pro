@@ -3,7 +3,7 @@ import React, { useState, useRef } from 'react';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 
-const FormulaBuilder = ({ onFormulaCreate, variables }) => {
+const FormulaBuilder = ({ onFormulaCreate, variables: _variables }) => {
   const [selectedCategory, setSelectedCategory] = useState('valuation');
   const [draggedFunction, setDraggedFunction] = useState(null);
   const [currentFormula, setCurrentFormula] = useState('');
@@ -270,6 +270,14 @@ const FormulaBuilder = ({ onFormulaCreate, variables }) => {
                 key={index}
                 className="p-3 bg-background rounded-lg border border-border hover:bg-muted/50 transition-smooth cursor-pointer"
                 onClick={() => setCurrentFormula(formula.formula)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={e => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setCurrentFormula(formula.formula);
+                  }
+                }}
               >
                 <div className="flex items-center justify-between">
                   <span className="font-medium text-foreground">{formula.name}</span>

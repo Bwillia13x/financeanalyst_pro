@@ -96,7 +96,7 @@ const CurrencyInput = React.forwardRef(({
         minimumFractionDigits: effectiveDecimals,
         maximumFractionDigits: effectiveDecimals
       }).format(numValue);
-    } catch (_error) {
+    } catch {
       // Fallback formatting
       const formatted = numValue.toFixed(effectiveDecimals);
       return `${currencyConfig.symbol}${formatted}`;

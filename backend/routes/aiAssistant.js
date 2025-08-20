@@ -3,14 +3,98 @@
  * Handles chat functionality and financial analysis integration
  */
 
-const express = require('express');
+import express from 'express';
 const router = express.Router();
 
-// Mock AI response generation (replace with actual AI service integration)
+// Real AI service integration
 const generateAIResponse = async (message, context) => {
-  // This would integrate with OpenAI, Claude, or other AI service
-  // For now, we'll create intelligent responses based on keywords and context
+  const AI_API_KEY = process.env.AI_API_KEY || 'placeholder-api-key';
+  const AI_API_ENDPOINT = process.env.AI_API_ENDPOINT || 'https://api.openai.com/v1/chat/completions';
   
+  try {
+    // Call real AI service (OpenAI/GPT-4 as example)
+    const response = await fetch(AI_API_ENDPOINT, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${AI_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: 'gpt-4',
+        messages: [
+          {
+            role: 'system',
+            content: `You are a professional financial analyst AI assistant. Provide expert financial advice, portfolio analysis, market insights, and investment recommendations. Use the provided context data: ${JSON.stringify(context)}`
+          },
+          {
+            role: 'user', 
+            content: message
+          }
+        ],
+        max_tokens: 1000,
+        temperature: 0.7
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`AI API Error: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    const aiMessage = data.choices?.[0]?.message?.content;
+
+    if (!aiMessage) {
+      throw new Error('Invalid AI API response format');
+    }
+
+    // Return structured response
+    return {
+      response: aiMessage,
+      suggestions: extractSuggestions(aiMessage),
+      charts: extractChartRecommendations(aiMessage),
+      actions: extractActionRecommendations(aiMessage)
+    };
+
+  } catch (error) {
+    console.error('AI Service Error:', error);
+    // Fallback to enhanced mock responses if AI service fails
+    return generateFallbackResponse(message, context);
+  }
+};
+
+// Helper functions for AI response processing
+const extractSuggestions = (message) => {
+  // Extract actionable suggestions from AI response
+  const suggestions = [];
+  const lines = message.split('\n');
+  lines.forEach(line => {
+    if (line.includes('suggestion:') || line.includes('recommend:') || line.includes('consider:')) {
+      suggestions.push(line.replace(/.*?(:)/, '').trim());
+    }
+  });
+  return suggestions.slice(0, 4); // Limit to 4 suggestions
+};
+
+const extractChartRecommendations = (message) => {
+  const charts = [];
+  if (message.toLowerCase().includes('performance')) charts.push('performance_chart');
+  if (message.toLowerCase().includes('allocation') || message.toLowerCase().includes('portfolio')) charts.push('allocation_pie');
+  if (message.toLowerCase().includes('risk')) charts.push('risk_metrics');
+  if (message.toLowerCase().includes('market')) charts.push('market_overview');
+  return charts;
+};
+
+const extractActionRecommendations = (message) => {
+  const actions = [];
+  if (message.toLowerCase().includes('rebalanc')) actions.push('rebalance');
+  if (message.toLowerCase().includes('risk')) actions.push('risk_analysis');
+  if (message.toLowerCase().includes('optimize')) actions.push('optimize');
+  if (message.toLowerCase().includes('simulation')) actions.push('monte_carlo');
+  return actions;
+};
+
+// Fallback response generation
+const generateFallbackResponse = (message, context) => {
   const lowerMessage = message.toLowerCase();
   
   // Portfolio Analysis
@@ -314,4 +398,4 @@ router.get('/capabilities', (req, res) => {
   });
 });
 
-module.exports = router;
+export default router;

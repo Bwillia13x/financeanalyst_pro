@@ -3,9 +3,11 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { financialDataStorage } from '../financialDataStorage.js';
 
-// Mock the storage service
+import { financialDataStorage } from '../financialDataStorage.js';
+import { storageService } from '../storageService.js';
+
+// Mock localStorage service
 vi.mock('../storageService.js', () => ({
   storageService: {
     setItem: vi.fn(),
@@ -15,8 +17,6 @@ vi.mock('../storageService.js', () => ({
     getStorageStats: vi.fn()
   }
 }));
-
-import { storageService } from '../storageService.js';
 
 describe('FinancialDataStorage', () => {
   beforeEach(() => {

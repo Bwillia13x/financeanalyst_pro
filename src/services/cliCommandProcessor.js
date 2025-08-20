@@ -3,7 +3,7 @@
  * Core service for processing financial commands in the persistent CLI
  */
 
-import secureApiClient from './secureApiClient';
+import _secureApiClient from './secureApiClient';
 
 export class CLICommandProcessor {
   constructor() {
@@ -73,7 +73,7 @@ export class CLICommandProcessor {
         description: 'DCF valuation calculation',
         usage: 'dcf <symbol> [--growth=5] [--discount=10] [--terminal=2]',
         category: 'calculations',
-        handler: this.handleDCF.bind(this)
+        handler: this.handleDcf.bind(this)
       },
 
       // Navigation
@@ -221,7 +221,7 @@ export class CLICommandProcessor {
     return this.getCommandArgumentSuggestions(command, parts.slice(1));
   }
 
-  getCommandArgumentSuggestions(command, args) {
+  getCommandArgumentSuggestions(command, _args) {
     const suggestions = [];
 
     switch (command) {
@@ -249,37 +249,235 @@ export class CLICommandProcessor {
   }
 
   // Command Handlers
-  async handleDcf(_args, _flags) {
+  async handleHelp(args, _flags) {
     if (args.length > 0) {
       const commandName = this.resolveAlias(args[0]);
       const command = this.commands[commandName];
-
       if (command) {
-{{ ... }}
-      navigation: routes[page],
-      type: 'success'
+        return {
+          success: true,
+          output: `${commandName}: ${command.description}\nUsage: ${command.usage}\nCategory: ${command.category}`,
+          type: 'info'
+        };
+      } else {
+        return {
+          success: false,
+          output: `Command '${commandName}' not found.`,
+          type: 'error'
+        };
+      }
+    }
+
+    let output = '🔧 AVAILABLE COMMANDS\n';
+    output += '═══════════════════════════════════════\n\n';
+
+    const categories = {};
+    Object.entries(this.commands).forEach(([name, cmd]) => {
+      if (!categories[cmd.category]) categories[cmd.category] = [];
+      categories[cmd.category].push({ name, ...cmd });
+    });
+
+    Object.entries(categories).forEach(([category, commands]) => {
+      output += `${category.toUpperCase()}\n`;
+      commands.forEach(cmd => {
+        output += `  ${cmd.name.padEnd(15)} ${cmd.description}\n`;
+      });
+      output += '\n';
+    });
+
+    return { success: true, output, type: 'info' };
+  }
+
+  async handlePortfolio(args, _flags) {
+    const action = args[0] || 'show';
+    return {
+      success: true,
+      output: `Portfolio ${action} command is not implemented yet.`,
+      type: 'info'
+    };
+  }
+
+  async handleMarketData(args, _flags) {
+    const symbol = args[0] || 'SPY';
+    return {
+      success: true,
+      output: `Market data for ${symbol} command is not implemented yet.`,
+      type: 'info'
+    };
+  }
+
+  async handleQuote(args, _flags) {
+    const symbol = args[0];
+    if (!symbol) {
+      return {
+        success: false,
+        output: 'Usage: quote <symbol>',
+        type: 'error'
+      };
+    }
+    return {
+      success: true,
+      output: `Quote for ${symbol} command is not implemented yet.`,
+      type: 'info'
+    };
+  }
+
+  async handleCalculate(args, _flags) {
+    const calcType = args[0] || 'dcf';
+    return {
+      success: true,
+      output: `Calculate ${calcType} command is not implemented yet.`,
+      type: 'info'
+    };
+  }
+
+  async handleDcf(_args, _flags) {
+    return {
+      success: true,
+      output: 'DCF calculation command is not implemented yet.',
+      type: 'info'
+    };
+  }
+
+  async handleNavigate(args, _flags) {
+    const page = args[0];
+    if (!page) {
+      return {
+        success: false,
+        output: 'Usage: navigate <page>',
+        type: 'error'
+      };
+    }
+    return {
+      success: true,
+      output: `Navigate to ${page} command is not implemented yet.`,
+      type: 'info'
+    };
+  }
+
+  async handleList(args, _flags) {
+    const listType = args[0] || 'holdings';
+    return {
+      success: true,
+      output: `List ${listType} command is not implemented yet.`,
+      type: 'info'
+    };
+  }
+
+  async handleSearch(args, _flags) {
+    const query = args.join(' ');
+    if (!query) {
+      return {
+        success: false,
+        output: 'Usage: search <query>',
+        type: 'error'
+      };
+    }
+    return {
+      success: true,
+      output: `Search for "${query}" command is not implemented yet.`,
+      type: 'info'
+    };
+  }
+
+  async handleAnalyze(args, _flags) {
+    const target = args[0];
+    if (!target) {
+      return {
+        success: false,
+        output: 'Usage: analyze <symbol|portfolio>',
+        type: 'error'
+      };
+    }
+    return {
+      success: true,
+      output: `Analyze ${target} command is not implemented yet.`,
+      type: 'info'
+    };
+  }
+
+  async handleRisk(args, _flags) {
+    const target = args[0] || 'portfolio';
+    return {
+      success: true,
+      output: `Risk analysis for ${target} command is not implemented yet.`,
+      type: 'info'
+    };
+  }
+
+  async handleExport(args, _flags) {
+    const dataType = args[0];
+    if (!dataType) {
+      return {
+        success: false,
+        output: 'Usage: export <data-type>',
+        type: 'error'
+      };
+    }
+    return {
+      success: true,
+      output: `Export ${dataType} command is not implemented yet.`,
+      type: 'info'
+    };
+  }
+
+  async handleImport(args, _flags) {
+    const filePath = args[0];
+    if (!filePath) {
+      return {
+        success: false,
+        output: 'Usage: import <file-path>',
+        type: 'error'
+      };
+    }
+    return {
+      success: true,
+      output: `Import from ${filePath} command is not implemented yet.`,
+      type: 'info'
+    };
+  }
+
+  async handleStatus(_args, flags) {
+    const detailed = flags?.detailed || flags?.d;
+
+    let output = '🟢 SYSTEM STATUS\n';
+    output += '═══════════════════════════════════════\n';
+    output += 'Backend API:       🟡 Unknown\n';
+    output += 'Cache:             🟡 Unknown\n';
+    output += 'Watchlists:        ' + (this.context.watchlists ? '🟢 Available' : '🟡 Not available') + '\n';
+    output += 'Portfolio Data:    ' + (this.context.portfolioData ? '🟢 Loaded' : '🟡 Not loaded') + '\n';
+    output += 'AI Assistant:      🟢 Online\n';
+
+    if (detailed) {
+      output += '\nDETAILED STATUS:\n';
+      output += `Commands in history: ${this.commandHistory.length}\n`;
+      output += `Current page: ${this.context.currentContext?.path || 'Unknown'}\n`;
+      output += `Session start: ${new Date().toLocaleString()}\n`;
+    }
+
+    return {
+      success: true,
+      output,
+      type: 'info'
     };
   }
 
   async handleLbo(_args, _flags) {
-    const _type = args[0] || 'holdings';
-    const _detailed = _flags.detailed || _flags.d;
-
-    switch (_type) {
-      case 'holdings':
-{{ ... }}
-      output: `Import initiated: ${filePath} (${type})`,
-      type: 'success'
+    return {
+      success: true,
+      output: 'LBO analysis command is not implemented yet.',
+      type: 'info'
     };
   }
 
   async handleWatch(_args, _flags) {
-    const _detailed = flags.detailed;
+    const _detailed = _flags?.detailed || _flags?.d;
 
     let output = '🟢 SYSTEM STATUS\n';
     output += '═══════════════════════════════════════\n';
-    output += 'Backend API:       🟢 Connected\n';
-{{ ... }}
+    output += 'Backend API:       🟡 Unknown\n';
+    output += 'Cache:             🟡 Unknown\n';
+    output += 'Watchlists:        ' + (this.context.watchlists ? '🟢 Available' : '🟡 Not available') + '\n';
     output += 'Portfolio Data:    ' + (this.context.portfolioData ? '🟢 Loaded' : '🟡 Not loaded') + '\n';
     output += 'AI Assistant:      🟢 Online\n';
 
@@ -297,7 +495,7 @@ export class CLICommandProcessor {
     };
   }
 
-  async handleClear(args, flags) {
+  async handleClear(_args, _flags) {
     return {
       success: true,
       output: '',
@@ -305,7 +503,7 @@ export class CLICommandProcessor {
     };
   }
 
-  async handleVersion(args, flags) {
+  async handleVersion(_args, _flags) {
     return {
       success: true,
       output: 'FinanceAnalyst Pro v1.0.0\nBuild: 2025.08.18\nNode.js CLI Interface\nSecure Backend API Integration',

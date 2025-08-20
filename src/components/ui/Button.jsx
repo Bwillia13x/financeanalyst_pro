@@ -6,19 +6,21 @@ import { cn } from '../../utils/cn';
 import Icon from '../AppIcon';
 
 const buttonVariants = cva(
-  'inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
+  'inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-smooth focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-95',
   {
     variants: {
       variant: {
-        default: 'bg-primary text-primary-foreground hover:bg-primary/90',
-        destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
-        outline: 'border border-input bg-background hover:bg-accent hover:text-accent-foreground',
-        secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
-        ghost: 'hover:bg-accent hover:text-accent-foreground',
-        link: 'text-primary underline-offset-4 hover:underline',
-        success: 'bg-success text-success-foreground hover:bg-success/90',
-        warning: 'bg-warning text-warning-foreground hover:bg-warning/90',
-        danger: 'bg-error text-error-foreground hover:bg-error/90'
+        primary: 'bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm hover:shadow',
+        default: 'bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm hover:shadow',
+        destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-sm hover:shadow',
+        outline: 'border border-border bg-background hover:bg-muted hover:text-foreground shadow-sm',
+        secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/90 shadow-sm hover:shadow',
+        ghost: 'hover:bg-muted hover:text-foreground',
+        link: 'text-primary underline-offset-4 hover:underline p-0 h-auto',
+        success: 'bg-success text-success-foreground hover:bg-success/90 shadow-sm hover:shadow',
+        warning: 'bg-warning text-warning-foreground hover:bg-warning/90 shadow-sm hover:shadow',
+        danger: 'bg-error text-error-foreground hover:bg-error/90 shadow-sm hover:shadow',
+        minimal: 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
       },
       size: {
         default: 'h-10 px-4 py-2',

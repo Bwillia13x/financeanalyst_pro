@@ -13,7 +13,7 @@ const Select = React.forwardRef(
       className,
       options = [],
       value,
-      defaultValue,
+      _defaultValue,
       placeholder = 'Select an option',
       multiple = false,
       disabled = false,
@@ -217,12 +217,21 @@ const Select = React.forwardRef(
                   filteredOptions.map(option => (
                     <div
                       key={option.value}
+                      role="option"
+                      tabIndex={0}
+                      aria-selected={isSelected(option.value)}
                       className={cn(
                         'relative flex cursor-pointer select-none items-center rounded-sm px-3 py-2 text-sm outline-none hover:bg-accent hover:text-accent-foreground',
                         isSelected(option.value) && 'bg-primary text-primary-foreground',
                         option.disabled && 'pointer-events-none opacity-50'
                       )}
                       onClick={() => !option.disabled && handleOptionSelect(option)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          if (!option.disabled) handleOptionSelect(option);
+                        }
+                      }}
                     >
                       <span className="flex-1">{option.label}</span>
                       {multiple && isSelected(option.value) && <Check className="h-4 w-4" />}

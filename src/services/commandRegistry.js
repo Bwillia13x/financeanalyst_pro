@@ -237,7 +237,7 @@ export class CommandRegistry {
     const searchTerm = query.toLowerCase();
     const results = [];
 
-    for (const [name, command] of this.commands) {
+    for (const [_name, command] of this.commands) {
       const score = this.calculateSearchScore(command, searchTerm);
       if (score > 0) {
         results.push({ ...command, score });

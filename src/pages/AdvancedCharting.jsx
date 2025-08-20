@@ -3,9 +3,10 @@
  * Professional-grade financial charting and analytics dashboard
  */
 
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
   BarChart3,
+  BarChart,
   LineChart,
   PieChart,
   TrendingUp,
@@ -29,13 +30,13 @@ import {
 import React, { useState, useEffect, useRef } from 'react';
 
 import CandlestickChart from '../components/Charts/CandlestickChart';
-import CorrelationMatrix from '../components/Charts/CorrelationMatrix';
-import CustomizableChart from '../components/Charts/CustomizableChart';
-import HeatmapChart from '../components/Charts/HeatmapChart';
-import RealTimeChart from '../components/Charts/RealTimeChart';
+import _CorrelationMatrix from '../components/Charts/CorrelationMatrix';
+import _CustomizableChart from '../components/Charts/CustomizableChart';
+import _HeatmapChart from '../components/Charts/HeatmapChart';
+import _RealTimeChart from '../components/Charts/RealTimeChart';
 import SEOHead from '../components/SEO/SEOHead';
 import secureApiClient from '../services/secureApiClient';
-import { formatCurrency, formatPercentage, formatNumber } from '../utils/formatters';
+import { formatCurrency as _formatCurrency, formatPercentage as _formatPercentage, formatNumber as _formatNumber } from '../utils/formatters';
 
 const AdvancedCharting = () => {
   const [selectedTimeframe, setSelectedTimeframe] = useState('1D');
@@ -43,7 +44,7 @@ const AdvancedCharting = () => {
   const [chartLayout, setChartLayout] = useState('grid');
   const [isRealTime, setIsRealTime] = useState(true);
   const [marketData, setMarketData] = useState({});
-  const [portfolioData, setPortfolioData] = useState(null);
+  const [_portfolioData, setPortfolioData] = useState(null);
   const [loading, setLoading] = useState({
     charts: false,
     data: false,
@@ -143,7 +144,7 @@ const AdvancedCharting = () => {
       try {
         const portfolioResponse = await secureApiClient.get('/portfolio/current');
         setPortfolioData(portfolioResponse.data);
-      } catch (error) {
+      } catch {
         console.log('No portfolio data available');
       }
 
@@ -164,7 +165,7 @@ const AdvancedCharting = () => {
           try {
             const response = await secureApiClient.get(`/market-data/quote/${symbol}`);
             return { symbol, quote: response.data };
-          } catch (error) {
+          } catch {
             return { symbol, quote: generateMockQuote(symbol) };
           }
         });

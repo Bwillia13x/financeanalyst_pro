@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 
-const CalculationResults = ({ results, onExport }) => {
+const CalculationResults = ({ results: _results, onExport }) => {
   const [activeTab, setActiveTab] = useState('summary');
   const [expandedSections, setExpandedSections] = useState(new Set(['valuation']));
 
@@ -54,12 +54,12 @@ const CalculationResults = ({ results, onExport }) => {
     { id: 'multiples', label: 'Multiples', icon: 'Layers' }
   ];
 
-  const toggleSection = section => {
+  const _toggleSection = (sectionId) => {
     const newExpanded = new Set(expandedSections);
-    if (newExpanded.has(section)) {
-      newExpanded.delete(section);
+    if (newExpanded.has(sectionId)) {
+      newExpanded.delete(sectionId);
     } else {
-      newExpanded.add(section);
+      newExpanded.add(sectionId);
     }
     setExpandedSections(newExpanded);
   };

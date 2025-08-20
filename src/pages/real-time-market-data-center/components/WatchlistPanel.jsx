@@ -109,6 +109,14 @@ const WatchlistPanel = ({ watchlist, onRemoveFromWatchlist, onSelectSymbol }) =>
               key={item.symbol}
               className="flex items-center justify-between p-3 border-b border-border last:border-b-0 hover:bg-muted/50 cursor-pointer transition-smooth"
               onClick={() => onSelectSymbol(item)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={e => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  onSelectSymbol(item);
+                }
+              }}
             >
               <div className="flex-1">
                 <div className="flex items-center space-x-2">

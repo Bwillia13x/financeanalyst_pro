@@ -1,4 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
+import { createPortal } from 'react-dom';
 import {
   Search,
   Command,
@@ -20,6 +21,7 @@ import {
 import { useState, useEffect, useRef, useMemo } from 'react';
 
 import { useCommandRegistry } from '../../hooks/useCommandRegistry';
+import monitoring from '../../utils/monitoring';
 
 const CommandPalette = ({
   isOpen,
@@ -35,6 +37,8 @@ const CommandPalette = ({
   const [_commandHistory, setCommandHistory] = useState([]);
   const inputRef = useRef(null);
   const listRef = useRef(null);
+  const dialogRef = useRef(null);
+  const openTimestampRef = useRef(null);
 
   // Get command registry and search functionality
   const {
@@ -87,35 +91,77 @@ const CommandPalette = ({
       inputRef.current.focus();
       setQuery('');
       setSelectedIndex(0);
+      // Mark palette open time and emit telemetry
+      openTimestampRef.current = performance.now();
+      try {
+        monitoring.trackEvent('command_palette_open', {
+          page: currentContext?.page,
+          context: currentContext,
+          recentCount: recentCommands?.length || 0
+        });
+      } catch (e) {
+        console.warn('Monitoring: command_palette_open failed', e);
+      }
     }
   }, [isOpen]);
 
-  // Keyboard navigation
+  // Keyboard navigation and focus trap
   useEffect(() => {
     if (!isOpen) return;
 
     const handleKeyDown = (e) => {
-      switch (e.key) {
-        case 'ArrowDown':
+      // Arrow/Enter/Escape behavior
+      if (['ArrowDown', 'ArrowUp', 'Enter', 'Escape'].includes(e.key)) {
+        switch (e.key) {
+          case 'ArrowDown':
+            e.preventDefault();
+            setSelectedIndex(prev => Math.min(prev + 1, searchResults.length - 1));
+            break;
+          case 'ArrowUp':
+            e.preventDefault();
+            setSelectedIndex(prev => Math.max(prev - 1, 0));
+            break;
+          case 'Enter':
+            e.preventDefault();
+            if (searchResults[selectedIndex]) {
+              handleExecuteCommand(searchResults[selectedIndex]);
+            }
+            break;
+          case 'Escape':
+            e.preventDefault();
+            onClose();
+            break;
+          default:
+            break;
+        }
+        return;
+      }
+
+      // Focus trap for Tab/Shift+Tab inside dialog
+      if (e.key === 'Tab' && dialogRef.current) {
+        const focusableSelectors = [
+          'a[href]',
+          'button:not([disabled])',
+          'textarea:not([disabled])',
+          'input:not([disabled])',
+          'select:not([disabled])',
+          '[tabindex]:not([tabindex="-1"])'
+        ].join(',');
+        const focusables = Array.from(dialogRef.current.querySelectorAll(focusableSelectors))
+          .filter(el => !el.hasAttribute('disabled') && !el.getAttribute('aria-hidden'));
+        if (focusables.length === 0) return;
+
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+        const active = document.activeElement;
+
+        if (!e.shiftKey && active === last) {
           e.preventDefault();
-          setSelectedIndex(prev => Math.min(prev + 1, searchResults.length - 1));
-          break;
-        case 'ArrowUp':
+          first.focus();
+        } else if (e.shiftKey && active === first) {
           e.preventDefault();
-          setSelectedIndex(prev => Math.max(prev - 1, 0));
-          break;
-        case 'Enter':
-          e.preventDefault();
-          if (searchResults[selectedIndex]) {
-            handleExecuteCommand(searchResults[selectedIndex]);
-          }
-          break;
-        case 'Escape':
-          e.preventDefault();
-          onClose();
-          break;
-        default:
-          break;
+          last.focus();
+        }
       }
     };
 
@@ -133,7 +179,24 @@ const CommandPalette = ({
       learnFromUsage(command.id, query);
 
       // Execute the command
+      const execStart = performance.now();
       const result = await executeCommand(command.id, command.params);
+      const execEnd = performance.now();
+
+      // Emit telemetry for command execution
+      try {
+        const openedAt = openTimestampRef.current || execStart;
+        monitoring.trackEvent('command_execute', {
+          commandId: command.id,
+          query,
+          page: currentContext?.page,
+          context: currentContext,
+          latencyOpenMs: Math.max(0, Math.round(execStart - openedAt)),
+          execDurationMs: Math.max(0, Math.round(execEnd - execStart))
+        });
+      } catch (e) {
+        console.warn('Monitoring: command_execute failed', e);
+      }
 
       // Notify parent component
       if (onExecuteCommand) {
@@ -144,6 +207,11 @@ const CommandPalette = ({
       onClose();
     } catch (error) {
       console.error('Command execution failed:', error);
+      try {
+        monitoring.trackError(error, 'command_execution', { commandId: command?.id, page: currentContext?.page });
+      } catch (e) {
+        console.warn('Monitoring: trackError failed', e);
+      }
       // Could show error toast here
     }
   };
@@ -208,13 +276,13 @@ const CommandPalette = ({
 
   if (!isOpen) return null;
 
-  return (
+  return createPortal(
     <AnimatePresence>
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-start justify-center pt-20"
+        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[1200] flex items-start justify-center pt-20"
         onClick={onClose}
       >
         <motion.div
@@ -223,6 +291,10 @@ const CommandPalette = ({
           exit={{ opacity: 0, scale: 0.95, y: -20 }}
           transition={{ type: 'spring', duration: 0.3 }}
           className="bg-white rounded-xl shadow-2xl border border-slate-200 w-full max-w-2xl mx-4 overflow-hidden"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="command-palette-title"
+          ref={dialogRef}
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
@@ -231,7 +303,7 @@ const CommandPalette = ({
               <Command size={18} className="text-white" />
             </div>
             <div className="flex-1">
-              <h3 className="font-semibold text-slate-900">Command Palette</h3>
+              <h3 id="command-palette-title" className="font-semibold text-slate-900">Command Palette</h3>
               <p className="text-xs text-slate-500">Type to search commands, or use natural language</p>
             </div>
             <div className="flex items-center gap-1 text-xs text-slate-500">
@@ -301,7 +373,17 @@ const CommandPalette = ({
                           ? 'bg-blue-50 border-r-2 border-blue-500'
                           : 'hover:bg-slate-50'
                       }`}
+                      role="button"
+                      tabIndex={0}
+                      aria-selected={isSelected}
                       onClick={() => handleExecuteCommand(command)}
+                      onFocus={() => setSelectedIndex(index)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          handleExecuteCommand(command);
+                        }
+                      }}
                     >
                       {/* Category indicator */}
                       <div
@@ -412,7 +494,8 @@ const CommandPalette = ({
           </div>
         </motion.div>
       </motion.div>
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 };
 

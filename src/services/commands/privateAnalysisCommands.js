@@ -765,7 +765,7 @@ export const privateAnalysisCommands = {
         // Current metrics
         const revenue = statements.totalRevenue?.[latestIndex] || 0;
         const ebitda = (statements.operatingIncome?.[latestIndex] || 0) + (statements.depreciation?.[latestIndex] || 0);
-        const operatingIncome = statements.operatingIncome?.[latestIndex] || 0;
+        const _operatingIncome = statements.operatingIncome?.[latestIndex] || 0;
         const netIncome = statements.netIncome?.[latestIndex] || 0;
 
         // Industry multiples for medispa/healthcare services
@@ -1037,7 +1037,7 @@ export const privateAnalysisCommands = {
         const statements = data.statements.incomeStatement;
         const latestIndex = data.periods.length - 1;
 
-        const revenue = statements.totalRevenue?.[latestIndex] || 0;
+        const _revenue = statements.totalRevenue?.[latestIndex] || 0;
         const ebitda = (statements.operatingIncome?.[latestIndex] || 0) + (statements.depreciation?.[latestIndex] || 0);
 
         // LBO assumptions
@@ -1232,8 +1232,8 @@ export const privateAnalysisCommands = {
     execute: async(_parsedCommand, _context, _processor) => {
       try {
         const data = defaultFinancialData;
-        const statements = data.statements.incomeStatement;
-        const periods = data.periods;
+        const _statements = data.statements.incomeStatement;
+        const _periods = data.periods;
 
         // Workflow assessment
         const workflowSteps = [

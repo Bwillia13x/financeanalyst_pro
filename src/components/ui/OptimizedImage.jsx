@@ -188,7 +188,7 @@ const OptimizedImage = ({
 
 // Higher-order component for automatic optimization
 export const withImageOptimization = (WrappedComponent) => {
-  return React.forwardRef((props, ref) => {
+  const OptimizedComponent = React.forwardRef((props, ref) => {
     // Automatically optimize image props
     const optimizedProps = {
       ...props,
@@ -198,6 +198,10 @@ export const withImageOptimization = (WrappedComponent) => {
 
     return <WrappedComponent ref={ref} {...optimizedProps} />;
   });
+
+  OptimizedComponent.displayName = `withImageOptimization(${WrappedComponent.displayName || WrappedComponent.name || 'Component'})`;
+
+  return OptimizedComponent;
 };
 
 // Hook for responsive image sizes

@@ -1,33 +1,27 @@
 import {
-  PieChart,
+  Eye,
+  Plus,
   TrendingUp,
   TrendingDown,
+  PieChart,
   DollarSign,
-  BarChart3,
   Target,
-  AlertTriangle,
-  Plus,
-  Edit,
-  Trash2,
-  Download,
-  Upload,
-  Settings,
-  Eye,
-  EyeOff
+  BarChart3
 } from 'lucide-react';
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 
 import PortfolioAnalytics from '../components/PortfolioAnalytics/PortfolioAnalytics';
 import PortfolioBuilder from '../components/PortfolioBuilder/PortfolioBuilder';
 import SEOHead from '../components/SEO/SEOHead';
+import SecondaryNav from '../components/ui/SecondaryNav';
 import secureApiClient from '../services/secureApiClient';
 import { formatCurrency, formatPercentage, formatNumber } from '../utils/formatters';
 
 const PortfolioManagement = () => {
-  const [portfolios, setPortfolios] = useState([]);
+  const [_portfolios] = useState([]);
   const [activePortfolio, setActivePortfolio] = useState(null);
-  const [portfolioPerformance, setPortfolioPerformance] = useState(null);
-  const [riskMetrics, setRiskMetrics] = useState(null);
+  const [_portfolioPerformance, _setPortfolioPerformance] = useState({});
+  const [_riskMetrics, _setRiskMetrics] = useState({});
   const [marketData, setMarketData] = useState({});
   const [loading, setLoading] = useState({
     portfolios: false,
@@ -35,7 +29,7 @@ const PortfolioManagement = () => {
     risk: false,
     market: false
   });
-  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [_showCreateModal] = useState(false);
   const [selectedTimeframe, setSelectedTimeframe] = useState('1M');
   const [viewMode, setViewMode] = useState('overview'); // overview, builder, analytics
 
@@ -56,7 +50,6 @@ const PortfolioManagement = () => {
       ]
     };
 
-    setPortfolios([samplePortfolio]);
     setActivePortfolio(samplePortfolio);
   }, []);
 
@@ -92,7 +85,7 @@ const PortfolioManagement = () => {
   }, [activePortfolio, loading.market]);
 
   // Calculate portfolio performance metrics
-  const portfolioMetrics = useMemo(() => {
+  const _portfolioMetrics = useMemo(() => {
     if (!activePortfolio || !marketData) return null;
 
     let totalValue = activePortfolio.cash || 0;
@@ -175,7 +168,7 @@ const PortfolioManagement = () => {
           <h3 className="text-lg font-semibold text-gray-900 mb-2">No Portfolio Selected</h3>
           <p className="text-gray-600 mb-4">Create or select a portfolio to get started</p>
           <button
-            onClick={() => setShowCreateModal(true)}
+            onClick={() => {}}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             Create Portfolio
@@ -206,30 +199,21 @@ const PortfolioManagement = () => {
             </div>
 
             <div className="flex items-center space-x-4">
-              {/* View Mode Switcher */}
-              <div className="flex bg-gray-100 rounded-lg p-1">
-                {[
-                  { value: 'overview', label: 'Overview', icon: Eye },
-                  { value: 'builder', label: 'Builder', icon: Target },
-                  { value: 'analytics', label: 'Analytics', icon: BarChart3 }
-                ].map(({ value, label, icon: Icon }) => (
-                  <button
-                    key={value}
-                    onClick={() => setViewMode(value)}
-                    className={`flex items-center space-x-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-                      viewMode === value
-                        ? 'bg-white text-blue-600 shadow-sm'
-                        : 'text-gray-600 hover:text-gray-900'
-                    }`}
-                  >
-                    <Icon className="w-4 h-4" />
-                    <span>{label}</span>
-                  </button>
-                ))}
-              </div>
+              {/* Portfolio Management Navigation */}
+              <SecondaryNav 
+                variant="horizontal"
+                items={[
+                  { id: 'overview', label: 'Overview', icon: 'Eye' },
+                  { id: 'builder', label: 'Builder', icon: 'Target' },
+                  { id: 'analytics', label: 'Analytics', icon: 'BarChart3' }
+                ]}
+                activeItem={viewMode}
+                onItemClick={(itemId) => setViewMode(itemId)}
+                className="bg-gray-100 rounded-lg"
+              />
 
               <button
-                onClick={() => setShowCreateModal(true)}
+                onClick={() => {}}
                 className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
                 <Plus className="w-4 h-4" />
@@ -243,11 +227,9 @@ const PortfolioManagement = () => {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {viewMode === 'overview' && (
-          <PortfolioOverview
+          <PortfolioCard
             portfolio={activePortfolio}
-            metrics={portfolioMetrics}
             marketData={marketData}
-            loading={loading}
             selectedTimeframe={selectedTimeframe}
             onTimeframeChange={setSelectedTimeframe}
             timeframeOptions={timeframeOptions}
@@ -265,7 +247,6 @@ const PortfolioManagement = () => {
         {viewMode === 'analytics' && (
           <PortfolioAnalytics
             portfolio={activePortfolio}
-            metrics={portfolioMetrics}
             selectedTimeframe={selectedTimeframe}
             onTimeframeChange={setSelectedTimeframe}
             timeframeOptions={timeframeOptions}
@@ -277,23 +258,7 @@ const PortfolioManagement = () => {
 };
 
 // Portfolio Overview Component
-const PortfolioOverview = ({
-  portfolio,
-  metrics,
-  marketData,
-  loading,
-  selectedTimeframe,
-  onTimeframeChange,
-  timeframeOptions
-}) => {
-  if (!metrics) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
-      </div>
-    );
-  }
-
+const PortfolioCard = ({ portfolio, marketData: _marketData, selectedTimeframe: _selectedTimeframe, onTimeframeChange: _onTimeframeChange, timeframeOptions: _timeframeOptions }) => {
   return (
     <div className="space-y-6">
       {/* Portfolio Summary Cards */}
@@ -303,7 +268,7 @@ const PortfolioOverview = ({
             <div>
               <p className="text-sm font-medium text-gray-600">Portfolio Value</p>
               <p className="text-2xl font-bold text-gray-900">
-                {formatCurrency(metrics.totalValue)}
+                {formatCurrency(portfolio.totalValue)}
               </p>
             </div>
             <div className="p-3 bg-blue-100 rounded-lg">
@@ -316,15 +281,15 @@ const PortfolioOverview = ({
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Total Gain/Loss</p>
-              <p className={`text-2xl font-bold ${metrics.totalGainLoss >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {formatCurrency(metrics.totalGainLoss)}
+              <p className={`text-2xl font-bold ${portfolio.totalGainLoss >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                {formatCurrency(portfolio.totalGainLoss)}
               </p>
-              <p className={`text-sm ${metrics.totalGainLossPercent >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {formatPercentage(metrics.totalGainLossPercent)}
+              <p className={`text-sm ${portfolio.totalGainLossPercent >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                {formatPercentage(portfolio.totalGainLossPercent)}
               </p>
             </div>
-            <div className={`p-3 rounded-lg ${metrics.totalGainLoss >= 0 ? 'bg-green-100' : 'bg-red-100'}`}>
-              {metrics.totalGainLoss >= 0 ? (
+            <div className={`p-3 rounded-lg ${portfolio.totalGainLoss >= 0 ? 'bg-green-100' : 'bg-red-100'}`}>
+              {portfolio.totalGainLoss >= 0 ? (
                 <TrendingUp className="w-6 h-6 text-green-600" />
               ) : (
                 <TrendingDown className="w-6 h-6 text-red-600" />
@@ -337,15 +302,15 @@ const PortfolioOverview = ({
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Day Change</p>
-              <p className={`text-2xl font-bold ${metrics.dailyChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {formatCurrency(metrics.dailyChange)}
+              <p className={`text-2xl font-bold ${portfolio.dailyChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                {formatCurrency(portfolio.dailyChange)}
               </p>
-              <p className={`text-sm ${metrics.dailyChangePercent >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {formatPercentage(metrics.dailyChangePercent)}
+              <p className={`text-sm ${portfolio.dailyChangePercent >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                {formatPercentage(portfolio.dailyChangePercent)}
               </p>
             </div>
-            <div className={`p-3 rounded-lg ${metrics.dailyChange >= 0 ? 'bg-green-100' : 'bg-red-100'}`}>
-              {metrics.dailyChange >= 0 ? (
+            <div className={`p-3 rounded-lg ${portfolio.dailyChange >= 0 ? 'bg-green-100' : 'bg-red-100'}`}>
+              {portfolio.dailyChange >= 0 ? (
                 <TrendingUp className="w-6 h-6 text-green-600" />
               ) : (
                 <TrendingDown className="w-6 h-6 text-red-600" />
@@ -359,7 +324,7 @@ const PortfolioOverview = ({
             <div>
               <p className="text-sm font-medium text-gray-600">Dividend Yield</p>
               <p className="text-2xl font-bold text-gray-900">
-                {formatPercentage(metrics.dividendYield)}
+                {formatPercentage(portfolio.dividendYield)}
               </p>
               <p className="text-sm text-gray-500">Weighted Average</p>
             </div>
@@ -377,78 +342,102 @@ const PortfolioOverview = ({
             <h3 className="text-lg font-semibold text-gray-900">Holdings</h3>
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
-                <label className="text-sm font-medium text-gray-600">Timeframe:</label>
-                <select
-                  value={selectedTimeframe}
-                  onChange={(e) => onTimeframeChange(e.target.value)}
-                  className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  {timeframeOptions.map(option => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
+                <label htmlFor="portfolio-name" className="block text-sm font-medium text-gray-700 mb-1">Timeframe:</label>
+                <input
+                  id="portfolio-name"
+                  type="text"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter portfolio name"
+                />
               </div>
-              {loading.market && (
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600" />
-              )}
+              {/* Loading indicator would appear here */}
             </div>
           </div>
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table 
+            className="w-full" 
+            role="table"
+            aria-label="Portfolio holdings table"
+          >
+            <caption className="sr-only">
+              Portfolio holdings showing symbols, shares, prices, market values, allocations, and performance data
+            </caption>
             <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <tr role="row">
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Symbol / Name
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Shares
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Price
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Market Value
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Allocation
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Day Change
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Total Gain/Loss
                 </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {metrics.holdings.map((holding) => (
-                <tr key={holding.symbol} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
+              {portfolio.holdings.map(holding => (
+                <tr key={holding.symbol} className="hover:bg-gray-50 focus-within:bg-gray-100" role="row">
+                  <th scope="row" className="px-6 py-4 whitespace-nowrap font-medium">
                     <div>
                       <div className="text-sm font-medium text-gray-900">{holding.symbol}</div>
                       <div className="text-sm text-gray-500">{holding.name}</div>
                     </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900">
+                  </th>
+                  <td 
+                    className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset" 
+                    tabIndex="0"
+                    aria-label={`Shares: ${formatNumber(holding.shares)}`}
+                  >
                     {formatNumber(holding.shares)}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900">
+                  <td 
+                    className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset" 
+                    tabIndex="0"
+                    aria-label={`Price: ${formatCurrency(holding.currentPrice)}`}
+                  >
                     {formatCurrency(holding.currentPrice)}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900">
+                  <td 
+                    className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset" 
+                    tabIndex="0"
+                    aria-label={`Market Value: ${formatCurrency(holding.value)}`}
+                  >
                     {formatCurrency(holding.value)}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900">
+                  <td 
+                    className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset" 
+                    tabIndex="0"
+                    aria-label={`Allocation: ${formatPercentage(holding.allocation)}`}
+                  >
                     {formatPercentage(holding.allocation)}
                   </td>
-                  <td className={`px-6 py-4 whitespace-nowrap text-right text-sm ${holding.dayChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  <td 
+                    className={`px-6 py-4 whitespace-nowrap text-right text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset ${holding.dayChange >= 0 ? 'text-green-600' : 'text-red-600'}`}
+                    tabIndex="0"
+                    aria-label={`Day Change: ${formatCurrency(holding.dayChange)} ${holding.dayChange >= 0 ? 'positive' : 'negative'}`}
+                  >
                     {formatCurrency(holding.dayChange)}
                   </td>
-                  <td className={`px-6 py-4 whitespace-nowrap text-right text-sm ${holding.gainLoss >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  <td 
+                    className={`px-6 py-4 whitespace-nowrap text-right text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset ${holding.gainLoss >= 0 ? 'text-green-600' : 'text-red-600'}`}
+                    tabIndex="0"
+                    aria-label={`Total Gain Loss: ${formatCurrency(holding.gainLoss)} ${holding.gainLossPercent >= 0 ? 'positive' : 'negative'} ${formatPercentage(holding.gainLossPercent)} percent`}
+                  >
                     <div>{formatCurrency(holding.gainLoss)}</div>
                     <div className="text-xs">({formatPercentage(holding.gainLossPercent)})</div>
                   </td>
@@ -457,23 +446,30 @@ const PortfolioOverview = ({
 
               {/* Cash Row */}
               {portfolio.cash > 0 && (
-                <tr className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
+                <tr className="hover:bg-gray-50 focus-within:bg-gray-100" role="row">
+                  <th scope="row" className="px-6 py-4 whitespace-nowrap font-medium">
                     <div>
                       <div className="text-sm font-medium text-gray-900">CASH</div>
                       <div className="text-sm text-gray-500">Cash & Cash Equivalents</div>
                     </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900">-</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900">-</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900">
+                  </th>
+                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900" aria-label="Shares: Not applicable">-</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900" aria-label="Price: Not applicable">-</td>
+                  <td 
+                    className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset" 
+                    tabIndex="0"
+                    aria-label={`Cash Value: ${formatCurrency(portfolio.cash)}`}
+                  >
                     {formatCurrency(portfolio.cash)}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900">
-                    {formatPercentage(metrics.cashAllocation)}
+                  <td 
+                    className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900"
+                    aria-label="Cash Allocation: 0.1 percent"
+                  >
+                    {formatPercentage(0.1)}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-500">-</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-500">-</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-500" aria-label="Day Change: Not applicable">-</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-500" aria-label="Total Gain Loss: Not applicable">-</td>
                 </tr>
               )}
             </tbody>

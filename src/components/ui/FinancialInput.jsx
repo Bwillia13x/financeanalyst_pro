@@ -120,7 +120,7 @@ const FinancialInput = React.forwardRef(({
   }, [value, type, currency, locale, decimals, isFocused]);
 
   // Handle focus
-  const handleFocus = (e) => {
+  const handleFocus = (_e) => {
     setIsFocused(true);
     // Show raw number for editing
     const rawValue = value ? value.toString() : '';

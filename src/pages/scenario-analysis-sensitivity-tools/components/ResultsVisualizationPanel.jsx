@@ -46,7 +46,7 @@ const ResultsVisualizationPanel = ({ simulationResults, isSimulating }) => {
       { variable: 'CapEx Ratio', impact: -334.2, direction: 'negative' },
       { variable: 'Working Capital', impact: -187.9, direction: 'negative' }
     ],
-    scatter: Array.from({ length: 1000 }, (_, i) => ({
+    scatter: Array.from({ length: 1000 }, (_, _i) => ({
       revenueGrowth: 0.05 + Math.random() * 0.3,
       enterpriseValue: 1800 + Math.random() * 2000 + (Math.random() - 0.5) * 500
     })),
@@ -105,7 +105,7 @@ const ResultsVisualizationPanel = ({ simulationResults, isSimulating }) => {
             />
             <YAxis stroke="var(--color-muted-foreground)" fontSize={12} />
             <Tooltip
-              formatter={(value, name) => [`${value} simulations`, 'Frequency']}
+              formatter={(value, _name) => [`${value} simulations`, 'Frequency']}
               labelFormatter={value => `Value: $${(value / 1000).toFixed(1)}B`}
               contentStyle={{
                 backgroundColor: 'var(--color-popover)',
@@ -153,7 +153,7 @@ const ResultsVisualizationPanel = ({ simulationResults, isSimulating }) => {
               width={90}
             />
             <Tooltip
-              formatter={(value, name) => [`$${Math.abs(value).toFixed(1)}M`, 'Impact']}
+              formatter={(value, _name) => [`$${Math.abs(value).toFixed(1)}M`, 'Impact']}
               contentStyle={{
                 backgroundColor: 'var(--color-popover)',
                 border: '1px solid var(--color-border)',

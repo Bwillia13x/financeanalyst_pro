@@ -3,7 +3,7 @@
  * Demonstrates how to integrate the new storage services with financial modeling components
  */
 
-import { Save, FolderOpen, Download, Upload, Database } from 'lucide-react';
+import { Save, FolderOpen, _Download, _Upload, Database } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 
 import DataExportImport from '../components/DataExportImport.jsx';
@@ -153,7 +153,17 @@ const StorageIntegrationExample = () => {
                     }`}
                   >
                     <div className="flex items-center justify-between">
-                      <div onClick={() => handleLoadModel(model.id)}>
+                      <div
+                        onClick={() => handleLoadModel(model.id)}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            handleLoadModel(model.id);
+                          }
+                        }}
+                      >
                         <div className="font-medium text-sm">{model.symbol}</div>
                         <div className="text-xs text-gray-500">
                           Value: ${model.valuation?.intrinsicValue?.toFixed(2) || 'N/A'}
@@ -189,10 +199,11 @@ const StorageIntegrationExample = () => {
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="symbolInput" className="block text-sm font-medium text-gray-700 mb-1">
                   Symbol
                 </label>
                 <input
+                  id="symbolInput"
                   type="text"
                   value={modelData.symbol}
                   onChange={(e) => setModelData(prev => ({ ...prev, symbol: e.target.value.toUpperCase() }))}
@@ -201,10 +212,11 @@ const StorageIntegrationExample = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="revenueGrowthRate" className="block text-sm font-medium text-gray-700 mb-1">
                   Revenue Growth Rate
                 </label>
                 <input
+                  id="revenueGrowthRate"
                   type="number"
                   step="0.01"
                   value={modelData.assumptions.revenueGrowthRate}
@@ -214,10 +226,11 @@ const StorageIntegrationExample = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="discountRate" className="block text-sm font-medium text-gray-700 mb-1">
                   Discount Rate
                 </label>
                 <input
+                  id="discountRate"
                   type="number"
                   step="0.01"
                   value={modelData.assumptions.discountRate}
@@ -227,10 +240,11 @@ const StorageIntegrationExample = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="terminalGrowthRate" className="block text-sm font-medium text-gray-700 mb-1">
                   Terminal Growth Rate
                 </label>
                 <input
+                  id="terminalGrowthRate"
                   type="number"
                   step="0.01"
                   value={modelData.assumptions.terminalGrowthRate}

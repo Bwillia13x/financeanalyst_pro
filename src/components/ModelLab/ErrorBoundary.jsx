@@ -38,7 +38,7 @@ class ErrorBoundary extends Component {
     });
 
     // Log to external service in production
-    if (process.env.NODE_ENV === 'production') {
+    if (import.meta.env.PROD) {
       this.logToService(error, errorInfo, errorId);
     }
   }
@@ -54,7 +54,7 @@ class ErrorBoundary extends Component {
       userAgent: navigator.userAgent,
       timestamp: new Date().toISOString(),
       userId: 'anonymous', // Would be actual user ID in production
-      buildVersion: process.env.REACT_APP_VERSION || 'unknown'
+      buildVersion: import.meta.env.VITE_APP_VERSION || 'unknown'
     };
 
     // Example: Send to logging service
@@ -171,7 +171,7 @@ class ErrorBoundary extends Component {
               </div>
 
               {/* Development details */}
-              {process.env.NODE_ENV === 'development' && this.state.error && (
+              {import.meta.env.DEV && this.state.error && (
                 <details className="mt-4">
                   <summary className="text-xs font-medium text-slate-700 cursor-pointer flex items-center gap-2">
                     <Bug className="w-3 h-3" />

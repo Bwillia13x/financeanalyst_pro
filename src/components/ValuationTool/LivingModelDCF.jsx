@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 
 import { calculateDCF as _calculateDCF } from '../../utils/dcfCalculations';
-import { Button, Card, Input, Icon } from '../ui';
+import Icon from '../AppIcon';
+import { Button, Card, Input } from '../ui';
 
 import DynamicTimePeriodControl from './DynamicTimePeriodControl';
 

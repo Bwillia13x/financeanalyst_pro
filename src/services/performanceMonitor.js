@@ -319,7 +319,7 @@ class PerformanceMonitor {
 const performanceMonitor = new PerformanceMonitor();
 
 // Auto-start monitoring in development
-if (process.env.NODE_ENV === 'development') {
+if (import.meta.env.DEV) {
   performanceMonitor.startMonitoring();
 }
 

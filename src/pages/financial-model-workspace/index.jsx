@@ -11,18 +11,31 @@ import FormulaBuilder from './components/FormulaBuilder';
 import ModelTemplates from './components/ModelTemplates';
 import TerminalInterface from './components/TerminalInterface';
 import VariableInputs from './components/VariableInputs';
+import { useKeyboardShortcutsContext } from '../../components/ui/KeyboardShortcutsProvider';
 
 const FinancialModelWorkspace = () => {
   const [activeLayout, setActiveLayout] = useState('dual-pane');
   const [leftPanelContent, setLeftPanelContent] = useState('terminal');
   const [rightPanelContent, setRightPanelContent] = useState('results');
-  const [isCollaborationOpen, setIsCollaborationOpen] = useState(false);
-  const [modelState, setModelState] = useState({
+  const [modelState, _setModelState] = useState({
     name: 'DCF_Analysis_v2.3',
     saved: true,
     calculating: false,
     lastSaved: new Date()
   });
+  const { updateCommandContext } = useKeyboardShortcutsContext();
+
+  // Publish contextual data for the Financial Model Workspace
+  useEffect(() => {
+    updateCommandContext({
+      page: 'financial-model-workspace',
+      modelName: modelState.name,
+      modelSaved: modelState.saved,
+      layout: activeLayout,
+      leftPanel: leftPanelContent,
+      rightPanel: rightPanelContent
+    });
+  }, [updateCommandContext, modelState.name, modelState.saved, activeLayout, leftPanelContent, rightPanelContent]);
 
   const [calculationResults, setCalculationResults] = useState(null);
 

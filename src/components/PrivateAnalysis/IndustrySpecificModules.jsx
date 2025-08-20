@@ -302,11 +302,13 @@ const IndustrySpecificModules = ({ currentIndustry, _modelData, _onDataChange })
                   <div className="flex items-center mb-3">
                     <div className={`${industry.color} p-2 rounded-lg mr-3`}>
                       <Icon className="w-5 h-5 text-white" />
-                    </div>            <div>
+                    </div>
+                    <div>
                       <h4 className="font-medium text-gray-900">{industry.name}</h4>
                       <p className="text-xs text-gray-600">{industry.description}</p>
                     </div>
-                  </div>          <div className="text-xs text-gray-500">
+                  </div>
+                  <div className="text-xs text-gray-500">
                     {industry.modules.length} specialized modules
                   </div>
                 </motion.div>
@@ -361,7 +363,8 @@ const IndustrySpecificModules = ({ currentIndustry, _modelData, _onDataChange })
                  <div className="text-center py-12">
                    <div className={`w-16 h-16 ${currentIndustryData?.color} rounded-full flex items-center justify-center mx-auto mb-4`}>
                      {currentIndustryData && React.createElement(currentIndustryData.icon, { className: 'w-8 h-8 text-white' })}
-                   </div>           <h3 className="text-lg font-medium text-gray-900 mb-2">
+                   </div>
+                   <h3 className="text-lg font-medium text-gray-900 mb-2">
                      {currentIndustryData?.name} Module Coming Soon
                    </h3>
                    <p className="text-gray-600 mb-4">

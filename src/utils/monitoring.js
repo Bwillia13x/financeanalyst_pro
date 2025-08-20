@@ -9,6 +9,8 @@ class MonitoringService {
     this.enableAnalytics = import.meta.env.VITE_ENABLE_ANALYTICS === 'true';
     this.enableErrorReporting = import.meta.env.VITE_ENABLE_ERROR_REPORTING === 'true';
     this.enablePerformanceMonitoring = import.meta.env.VITE_PERFORMANCE_MONITORING === 'true';
+    this.gaTrackingId = null;
+    this.hotjarLoaded = false;
 
     this.initializeMonitoring();
   }
@@ -42,15 +44,14 @@ class MonitoringService {
 
     // Dynamically import Sentry to avoid bundle bloat
     import('@sentry/browser')
-      .then(({ init, configureScope }) => {
-        init({
+      .then(async(Sentry) => {
+        const integrations = [];
+
+        Sentry.init({
           dsn: sentryDsn,
           environment: import.meta.env.VITE_APP_ENV,
           release: import.meta.env.VITE_APP_VERSION,
-          integrations: [
-            // Add performance monitoring
-            // new BrowserTracing() // BrowserTracing not imported
-          ],
+          integrations,
           tracesSampleRate: this.isProduction ? 0.1 : 1.0,
           beforeSend: event => {
             // Filter out non-critical errors in production
@@ -61,13 +62,16 @@ class MonitoringService {
           }
         });
 
-        configureScope(scope => {
+        Sentry.configureScope(scope => {
           scope.setTag('component', 'financeanalyst-pro');
           scope.setContext('app', {
             version: import.meta.env.VITE_APP_VERSION,
             environment: import.meta.env.VITE_APP_ENV
           });
         });
+
+        // Expose globally for cases that call window.Sentry
+        window.Sentry = Sentry;
       })
       .catch(console.warn);
   }
@@ -97,6 +101,9 @@ class MonitoringService {
       page_title: document.title,
       page_location: window.location.href
     });
+
+    // store for route-change pageview updates
+    this.gaTrackingId = gaTrackingId;
   }
 
   /**
@@ -119,6 +126,8 @@ class MonitoringService {
       r.src = t + h._hjSettings.hjid + j + h._hjSettings.hjsv;
       a.appendChild(r);
     })(window, document, 'https://static.hotjar.com/c/hotjar-', '.js?sv=');
+
+    this.hotjarLoaded = true;
   }
 
   /**
@@ -372,6 +381,21 @@ class MonitoringService {
    * Track page views
    */
   trackPageView(pageName, additionalData = {}) {
+    // Update GA single-page-app page view
+    if (window.gtag && this.gaTrackingId) {
+      window.gtag('config', this.gaTrackingId, {
+        page_title: document.title,
+        page_path: pageName,
+        page_location: window.location.href
+      });
+    }
+
+    // Notify Hotjar of route change
+    if (typeof window.hj === 'function') {
+      window.hj('stateChange', pageName);
+    }
+
+    // Custom analytics event
     this.trackEvent('page_view', {
       page: pageName,
       title: document.title,

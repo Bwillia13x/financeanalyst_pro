@@ -3,7 +3,7 @@
   command = "npm run build"
 
 [build.environment]
-  NODE_VERSION = "18"
+  NODE_VERSION = "20.19.0"
 
 [[redirects]]
   from = "/*"
@@ -27,7 +27,7 @@
     X-XSS-Protection = "1; mode=block"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
-    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://api.financeanalyst.pro https://financeanalyst-pro-backend.onrender.com https://www.alphavantage.co https://financialmodelingprep.com https://data.sec.gov https://query1.finance.yahoo.com https://query2.finance.yahoo.com https://data.nasdaq.com https://fred.stlouisfed.org https://api.stlouisfed.org; font-src 'self' data:;"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://static.hotjar.com https://static.rocket.new; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https:; connect-src 'self' https://api.financeanalyst.pro https://financeanalyst-pro-backend.onrender.com https://www.alphavantage.co https://financialmodelingprep.com https://data.sec.gov https://query1.finance.yahoo.com https://query2.finance.yahoo.com https://data.nasdaq.com https://fred.stlouisfed.org https://api.stlouisfed.org https://www.google-analytics.com https://www.googletagmanager.com https://script.hotjar.com https://in.hotjar.com https://api.hotjar.com https://*.sentry.io https://*.ingest.sentry.io wss://*.hotjar.com; font-src 'self' https://fonts.gstatic.com data:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests; block-all-mixed-content;"
 
 # Cache static assets
 [[headers]]

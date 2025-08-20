@@ -2,7 +2,7 @@ import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import React from 'react';
 
 import { cn } from '../../../utils/cn';
-import { Card, CardContent, CardHeader, CardTitle } from '../Card';
+import { Card, CardContent } from '../Card';
 
 const MetricCard = ({
   title,

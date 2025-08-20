@@ -120,6 +120,16 @@ const DynamicTimePeriodControl = ({
               className="absolute top-2 w-6 h-6 bg-blue-500 rounded-full border-2 border-white shadow-lg cursor-ew-resize transform -translate-x-1/2 hover:bg-blue-400 transition-colors duration-200"
               style={{ left: `${(years / maxYears) * 100}%` }}
               onMouseDown={handleMouseDown}
+              role="slider"
+              tabIndex={0}
+              aria-valuenow={years}
+              aria-valuemin={1}
+              aria-valuemax={maxYears}
+              aria-label="Time period selector"
+              onKeyDown={(e) => {
+                if (e.key === 'ArrowLeft' && years > 1) setYears(years - 1);
+                if (e.key === 'ArrowRight' && years < maxYears) setYears(years + 1);
+              }}
             >
               <div className="absolute inset-0 rounded-full animate-pulse bg-blue-400 opacity-30" />
             </div>
@@ -178,7 +188,7 @@ const DynamicTimePeriodControl = ({
         </div>
       </div>
 
-      <style jsx>{`
+      <style>{`
         .slider::-webkit-slider-thumb {
           appearance: none;
           width: 20px;

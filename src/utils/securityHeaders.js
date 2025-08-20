@@ -43,7 +43,10 @@ export class CSPPolicyBuilder {
         "'self'",
         "'unsafe-inline'", // Will be replaced with nonces in production
         "'unsafe-eval'", // Required for some financial calculations
-        'https://static.rocket.new' // Third-party service
+        'https://static.rocket.new', // Third-party service
+        // Monitoring & Analytics
+        'https://www.googletagmanager.com',
+        'https://static.hotjar.com'
       ],
       'style-src': [
         "'self'",
@@ -68,7 +71,16 @@ export class CSPPolicyBuilder {
         'https://query1.finance.yahoo.com',
         'https://query2.finance.yahoo.com',
         'https://data.nasdaq.com',
-        'https://fred.stlouisfed.org'
+        'https://fred.stlouisfed.org',
+        // Monitoring & Analytics
+        'https://www.google-analytics.com',
+        'https://www.googletagmanager.com',
+        'https://script.hotjar.com',
+        'https://in.hotjar.com',
+        'https://api.hotjar.com',
+        'https://*.sentry.io',
+        'https://*.ingest.sentry.io',
+        'wss://*.hotjar.com'
       ],
       'frame-ancestors': ["'none'"],
       'base-uri': ["'self'"],
@@ -141,7 +153,7 @@ export const securityHeaders = {
     }
 
     // Add development-specific policies
-    if (process.env.NODE_ENV === 'development') {
+    if (import.meta.env.DEV) {
       builder
         .addSource('script-src', 'http://localhost:*')
         .addSource('connect-src', 'ws://localhost:*')
@@ -230,7 +242,7 @@ export function createSecureHeaders(nonce = null) {
   headers['Permissions-Policy'] = securityHeaders.getPermissionsPolicy();
 
   // Cross-Origin policies
-  if (process.env.NODE_ENV === 'production') {
+  if (import.meta.env.PROD) {
     headers['Cross-Origin-Embedder-Policy'] = securityHeaders.getCrossOriginEmbedderPolicy();
     headers['Cross-Origin-Opener-Policy'] = securityHeaders.getCrossOriginOpenerPolicy();
     headers['Cross-Origin-Resource-Policy'] = securityHeaders.getCrossOriginResourcePolicy();
@@ -299,7 +311,7 @@ export function setupCSPReporting() {
     console.warn('CSP Violation:', violation);
 
     // In production, send to monitoring service
-    if (process.env.NODE_ENV === 'production') {
+    if (import.meta.env.PROD) {
       sendCSPViolation(violation);
     }
   });

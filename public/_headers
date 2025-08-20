@@ -2,7 +2,7 @@
 
 /*
   # Content Security Policy with nonce support (nonce will be injected by server)
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-eval' https://static.rocket.new https://www.googletagmanager.com https://static.hotjar.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://api.financeanalyst.pro https://financeanalyst-pro-backend.onrender.com https://www.google-analytics.com https://www.googletagmanager.com https://script.hotjar.com https://in.hotjar.com https://api.hotjar.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests; block-all-mixed-content;
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-eval' https://static.rocket.new https://www.googletagmanager.com https://static.hotjar.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://api.financeanalyst.pro https://financeanalyst-pro-backend.onrender.com https://www.google-analytics.com https://www.googletagmanager.com https://script.hotjar.com https://in.hotjar.com https://api.hotjar.com https://*.sentry.io https://*.ingest.sentry.io wss://*.hotjar.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests; block-all-mixed-content;
   
   # Security Headers
   X-Frame-Options: DENY

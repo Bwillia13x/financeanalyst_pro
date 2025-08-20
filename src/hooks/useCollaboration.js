@@ -173,7 +173,7 @@ export function useModelSharing(workspaceId, modelId) {
   const [model, setModel] = useState(null);
   const [annotations, setAnnotations] = useState([]);
   const [isShared, setIsShared] = useState(false);
-  const [collaborators, setCollaborators] = useState([]);
+  const [collaborators, _setCollaborators] = useState([]);
   const [modelVersion, setModelVersion] = useState(0);
 
   useEffect(() => {

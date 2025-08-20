@@ -42,9 +42,18 @@ const BulkOperationsPanel = ({ selectedSymbols, onBulkExport, onBulkAlert, onBul
   return (
     <div className="bg-card border border-border rounded-lg shadow-elevation-1">
       {/* Header */}
-      <div
-        className="flex items-center justify-between p-4 cursor-pointer"
+      <button
+        type="button"
+        className="w-full flex items-center justify-between p-4 cursor-pointer text-left bg-transparent"
         onClick={() => setIsExpanded(!isExpanded)}
+        aria-expanded={isExpanded}
+        aria-controls="bulk-ops-panel-content"
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            setIsExpanded(prev => !prev);
+          }
+        }}
       >
         <div className="flex items-center space-x-3">
           <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
@@ -62,11 +71,11 @@ const BulkOperationsPanel = ({ selectedSymbols, onBulkExport, onBulkAlert, onBul
           size={20}
           className="text-muted-foreground"
         />
-      </div>
+      </button>
 
       {/* Expanded Content */}
       {isExpanded && (
-        <div className="border-t border-border">
+        <div className="border-t border-border" id="bulk-ops-panel-content">
           {/* Selected Symbols */}
           <div className="p-4 border-b border-border">
             <h4 className="text-sm font-medium text-foreground mb-2">Selected Symbols:</h4>

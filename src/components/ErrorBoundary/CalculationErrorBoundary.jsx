@@ -108,7 +108,7 @@ const CalculationErrorBoundary = ({ children, calculationType, onError }) => {
               </button>
             </div>
 
-            {process.env.NODE_ENV === 'development' && (
+            {import.meta.env.DEV && (
               <details className="mt-4">
                 <summary className="text-red-600 text-sm cursor-pointer">
                   Debug Information

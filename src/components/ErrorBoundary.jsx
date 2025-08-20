@@ -1,6 +1,7 @@
 import React from 'react';
 
 import Icon from './AppIcon';
+import monitoring from '../utils/monitoring';
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -15,6 +16,14 @@ class ErrorBoundary extends React.Component {
   componentDidCatch(error, errorInfo) {
     error.__ErrorBoundary = true;
     window.__COMPONENT_ERROR__?.(error, errorInfo);
+    // Report to monitoring/Sentry
+    try {
+      monitoring.trackError(error, 'react_error', {
+        componentStack: errorInfo?.componentStack
+      });
+    } catch (_) {
+      // noop
+    }
     // console.log("Error caught by ErrorBoundary:", error, errorInfo);
   }
 

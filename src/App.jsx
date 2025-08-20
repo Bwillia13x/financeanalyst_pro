@@ -32,18 +32,7 @@ function App() {
     });
   }, [window.location.pathname]);
 
-  // Global keyboard shortcut for AI Assistant (Cmd/Ctrl + K)
-  useEffect(() => {
-    const handleKeyPress = (e) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-        e.preventDefault();
-        setIsAIAssistantOpen(prev => !prev);
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyPress);
-    return () => document.removeEventListener('keydown', handleKeyPress);
-  }, []);
+  // Removed local Cmd/Ctrl+K handler to reserve it for the global command palette
 
   const handleNavigation = (route) => {
     window.location.href = route;

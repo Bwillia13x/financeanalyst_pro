@@ -1,5 +1,5 @@
 import React from 'react';
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Cell } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, ReferenceLine } from 'recharts';
 
 import { cn } from '../../../utils/cn';
 import { Card, CardContent, CardHeader, CardTitle } from '../Card';
@@ -55,7 +55,7 @@ const DCFWaterfall = ({
 
     return (
       <div className="bg-white border border-gray-200 rounded-md shadow-elevation-1 p-3 min-w-[160px]">
-        <p className="font-medium text-sm text-foreground mb-1">{label}</p>
+        <p className="font-medium text-sm text-foreground mb-1">{data.label}</p>
         <p className="text-sm text-muted-foreground">
           Value: <span className="font-mono font-medium">{formatValue(data.value)}</span>
         </p>

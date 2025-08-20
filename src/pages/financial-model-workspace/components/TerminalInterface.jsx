@@ -5,18 +5,10 @@ import { commandProcessor } from '../../../services/commandProcessor';
 import { commandRegistry } from '../../../services/commandRegistry';
 import { dataFetchingService } from '../../../services/dataFetching';
 import { persistenceManager } from '../../../services/persistence/PersistenceManager';
-import {
-  calculateDCFValuation,
-  calculateLBOReturns,
-  calculateComparableMetrics,
-  formatCurrency,
-  formatPercentage,
-  formatNumber
-} from '../../../utils/dataTransformation';
 // Import command initializer to ensure commands are registered
 import '../../../services/commandInitializer';
 
-const TerminalInterface = ({ onCommandExecute, calculationResults }) => {
+const TerminalInterface = ({ onCommandExecute, calculationResults: _calculationResults }) => {
   const [commands, setCommands] = useState([
     {
       id: 1,
@@ -217,6 +209,14 @@ const TerminalInterface = ({ onCommandExecute, calculationResults }) => {
         ref={terminalRef}
         className="flex-1 overflow-y-auto p-4 space-y-2"
         onClick={() => inputRef.current?.focus()}
+        role="button"
+        tabIndex={0}
+        onKeyDown={e => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            inputRef.current?.focus();
+          }
+        }}
       >
         {commands.map(command => (
           <div key={command.id} className="space-y-1">
@@ -290,6 +290,14 @@ const TerminalInterface = ({ onCommandExecute, calculationResults }) => {
                         : 'text-gray-300 hover:bg-gray-700'
                     }`}
                     onClick={() => selectSuggestion(suggestion)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        selectSuggestion(suggestion);
+                      }
+                    }}
                   >
                     {suggestion}
                   </div>

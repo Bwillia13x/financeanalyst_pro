@@ -264,6 +264,14 @@ const ModelTemplates = ({ onTemplateSelect, onTemplateCreate }) => {
                   key={template.id}
                   className="flex items-center justify-between p-3 bg-muted rounded-lg hover:bg-muted/80 transition-smooth cursor-pointer"
                   onClick={() => handleTemplateSelect(template)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleTemplateSelect(template);
+                    }
+                  }}
                 >
                   <div>
                     <span className="font-medium text-foreground">{template.name}</span>
@@ -283,6 +291,14 @@ const ModelTemplates = ({ onTemplateSelect, onTemplateCreate }) => {
               key={template.id}
               className="p-4 bg-background border border-border rounded-lg hover:border-primary/50 transition-smooth cursor-pointer group"
               onClick={() => handleTemplateSelect(template)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={e => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  handleTemplateSelect(template);
+                }
+              }}
             >
               <div className="flex items-start justify-between mb-3">
                 <div className="flex-1">
@@ -366,28 +382,30 @@ const ModelTemplates = ({ onTemplateSelect, onTemplateCreate }) => {
             </div>
             <div className="p-4 space-y-4">
               <div>
-                <label className="text-sm font-medium text-foreground mb-2 block">
+                <label htmlFor="template-name" className="text-sm font-medium text-foreground mb-2 block">
                   Template Name
                 </label>
                 <input
+                  id="template-name"
                   type="text"
                   placeholder="Enter template name..."
                   className="w-full px-3 py-2 bg-input border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
                 />
               </div>
               <div>
-                <label className="text-sm font-medium text-foreground mb-2 block">
+                <label htmlFor="template-description" className="text-sm font-medium text-foreground mb-2 block">
                   Description
                 </label>
                 <textarea
+                  id="template-description"
                   placeholder="Describe your template..."
                   rows={3}
                   className="w-full px-3 py-2 bg-input border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring resize-none"
                 />
               </div>
               <div>
-                <label className="text-sm font-medium text-foreground mb-2 block">Category</label>
-                <select className="w-full px-3 py-2 bg-input border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-ring">
+                <label htmlFor="template-category" className="text-sm font-medium text-foreground mb-2 block">Category</label>
+                <select id="template-category" className="w-full px-3 py-2 bg-input border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-ring">
                   <option value="valuation">Valuation Models</option>
                   <option value="lbo">LBO Models</option>
                   <option value="comps">Comparable Analysis</option>

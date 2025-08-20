@@ -92,7 +92,7 @@ const ReverseDCF = ({ _symbol, _onBack, _currentValuation }) => {
   const [targetMOS, setTargetMOS] = useState(0);
   const [solveFor, setSolveFor] = useState('growth');
   const [results, setResults] = useState(null);
-  const [assumptionsState, setAssumptions] = useState(assumptions);
+  const [_assumptionsState, setAssumptions] = useState(assumptions);
 
   const runReverseDCF = () => {
     try {

@@ -13,11 +13,11 @@ import secureApiClient from './secureApiClient.js';
 const DATA_SOURCES = {
   ALPHA_VANTAGE: {
     baseURL: 'https://www.alphavantage.co/query',
-    apiKey: process.env.VITE_ALPHA_VANTAGE_API_KEY || 'demo'
+    apiKey: import.meta.env.VITE_ALPHA_VANTAGE_API_KEY || 'demo'
   },
   FMP: {
     baseURL: 'https://financialmodelingprep.com/api/v3',
-    apiKey: process.env.VITE_FMP_API_KEY || 'demo'
+    apiKey: import.meta.env.VITE_FMP_API_KEY || 'demo'
   },
   SEC_EDGAR: {
     baseURL: 'https://data.sec.gov',

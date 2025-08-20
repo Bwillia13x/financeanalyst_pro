@@ -52,6 +52,31 @@
     /* Error Colors */
     --color-error: #e74c3c; /* red-600 */
     --color-error-foreground: #ffffff; /* white */
+
+    /* Financial Data Colors */
+    --color-revenue: #059669; /* emerald-600 */
+    --color-revenue-light: #d1fae5; /* emerald-50 */
+    --color-revenue-dark: #047857; /* emerald-700 */
+    
+    --color-expense: #dc2626; /* red-600 */
+    --color-expense-light: #fef2f2; /* red-50 */
+    --color-expense-dark: #b91c1c; /* red-700 */
+    
+    --color-asset: #2563eb; /* blue-600 */
+    --color-asset-light: #dbeafe; /* blue-50 */
+    --color-asset-dark: #1d4ed8; /* blue-700 */
+    
+    --color-liability: #ea580c; /* orange-600 */
+    --color-liability-light: #fff7ed; /* orange-50 */
+    --color-liability-dark: #c2410c; /* orange-700 */
+
+    /* Chart & Visualization Colors */
+    --color-chart-1: #3b82f6; /* blue-500 */
+    --color-chart-2: #10b981; /* emerald-500 */
+    --color-chart-3: #f59e0b; /* amber-500 */
+    --color-chart-4: #ef4444; /* red-500 */
+    --color-chart-5: #8b5cf6; /* violet-500 */
+    --color-chart-6: #06b6d4; /* cyan-500 */
   }
 }
 
@@ -97,4 +122,148 @@
   .hover-scale {
     transform: scale(1.02);
   }
+
+  /* Financial Data Styling Utilities */
+  .financial-revenue {
+    @apply bg-[--color-revenue-light] text-[--color-revenue-dark] border-[--color-revenue];
+  }
+
+  .financial-expense {
+    @apply bg-[--color-expense-light] text-[--color-expense-dark] border-[--color-expense];
+  }
+
+  .financial-asset {
+    @apply bg-[--color-asset-light] text-[--color-asset-dark] border-[--color-asset];
+  }
+
+  .financial-liability {
+    @apply bg-[--color-liability-light] text-[--color-liability-dark] border-[--color-liability];
+  }
+
+  .financial-header-revenue {
+    @apply bg-[--color-revenue] text-white;
+  }
+
+  .financial-header-expense {
+    @apply bg-[--color-expense] text-white;
+  }
+
+  .financial-header-asset {
+    @apply bg-[--color-asset] text-white;
+  }
+
+  .financial-header-liability {
+    @apply bg-[--color-liability] text-white;
+  }
+
+  .financial-positive {
+    @apply text-green-600 bg-green-50 border border-green-200;
+  }
+
+  .financial-negative {
+    @apply text-red-600 bg-red-50 border border-red-200;
+  }
+
+  .financial-neutral {
+    @apply text-slate-600 bg-slate-50 border border-slate-200;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    @apply bg-slate-400 dark:bg-slate-600;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    @apply bg-slate-500 dark:bg-slate-500;
+  }
+
+  /* Real-time market ticker animations */
+  @keyframes scroll {
+    0% {
+      transform: translateX(100%);
+    }
+    100% {
+      transform: translateX(-100%);
+    }
+  }
+
+  @keyframes scroll-slow {
+    0% {
+      transform: translateX(100%);
+    }
+    100% {
+      transform: translateX(-100%);
+    }
+  }
+
+  @keyframes scroll-fast {
+    0% {
+      transform: translateX(100%);
+    }
+    100% {
+      transform: translateX(-100%);
+    }
+  }
+
+  @keyframes pulse-green {
+    0%, 100% {
+      background-color: rgb(34 197 94 / 0.1);
+    }
+    50% {
+      background-color: rgb(34 197 94 / 0.3);
+    }
+  }
+
+  @keyframes pulse-red {
+    0%, 100% {
+      background-color: rgb(239 68 68 / 0.1);
+    }
+    50% {
+      background-color: rgb(239 68 68 / 0.3);
+    }
+  }
+
+  .animate-scroll {
+    animation: scroll 60s linear infinite;
+  }
+
+  .animate-scroll-slow {
+    animation: scroll-slow 90s linear infinite;
+  }
+
+  .animate-scroll-fast {
+    animation: scroll-fast 30s linear infinite;
+  }
+
+  .animate-pulse-green {
+    animation: pulse-green 0.3s ease-in-out;
+  }
+
+  .animate-pulse-red {
+    animation: pulse-red 0.3s ease-in-out;
+  }
+
+  /* Status Indicator Utilities */
+  .status-success {
+    @apply text-green-700 bg-green-100 border border-green-300;
+  }
+
+  .status-warning {
+    @apply text-yellow-700 bg-yellow-100 border border-yellow-300;
+  }
+
+  .status-error {
+    @apply text-red-700 bg-red-100 border border-red-300;
+  }
+
+  .status-info {
+    @apply text-blue-700 bg-blue-100 border border-blue-300;
+  }
+
+  /* Chart Color Utilities */
+  .chart-color-1 { color: var(--color-chart-1); }
+  .chart-color-2 { color: var(--color-chart-2); }
+  .chart-color-3 { color: var(--color-chart-3); }
+  .chart-color-4 { color: var(--color-chart-4); }
+  .chart-color-5 { color: var(--color-chart-5); }
+  .chart-color-6 { color: var(--color-chart-6); }
 }

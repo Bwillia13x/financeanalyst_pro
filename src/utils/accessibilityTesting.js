@@ -48,7 +48,7 @@ class AccessibilityTester {
       this.logResults(results);
 
       // Report violations in development
-      if (process.env.NODE_ENV === 'development') {
+      if (import.meta.env.DEV) {
         this.reportViolations(results.violations);
       }
 

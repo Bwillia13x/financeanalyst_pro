@@ -34,7 +34,7 @@ export function usePerformanceDashboard() {
 
   // Show dashboard automatically in development if there are performance issues
   useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
+    if (import.meta.env.DEV) {
       // Check for performance budget violations after page load
       const checkPerformanceIssues = () => {
         // This would integrate with your performance monitoring

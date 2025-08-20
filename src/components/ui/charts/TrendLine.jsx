@@ -51,13 +51,14 @@ const TrendLine = ({
 
     return (
       <div className="bg-white border border-gray-200 rounded-md shadow-elevation-1 p-3 min-w-[160px]">
-        <p className="font-medium text-sm text-foreground mb-1">{label}</p>
+        <p className="font-medium text-sm text-foreground mb-1">{data.name || data.label}</p>
         <p className="text-sm text-muted-foreground">
           Value: <span className="font-mono font-medium">{formatValue(data[dataKey])}</span>
         </p>
         {data.growth !== null && (
           <p className="text-sm text-muted-foreground">
-            Growth: <span
+            Growth:{' '}
+            <span
               className={cn(
                 'font-mono font-medium',
                 data.growth >= 0 ? 'text-success' : 'text-destructive'

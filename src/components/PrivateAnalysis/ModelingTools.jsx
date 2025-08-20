@@ -14,8 +14,51 @@ import MonteCarloSimulation from './MonteCarloSimulation.jsx';
 import ScenarioModeling from './ScenarioModeling.jsx';
 import SensitivityAnalysis from './SensitivityAnalysis.jsx';
 
+// Add contextual integration points for Advanced Analytics
+const AdvancedAnalyticsIntegration = ({ onOpenOptions, onOpenBonds, onOpenCredit }) => (
+  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+    <h4 className="font-semibold text-blue-900 mb-2">Advanced Analytics Tools</h4>
+    <p className="text-sm text-blue-700 mb-3">
+      Send your current analysis assumptions to advanced pricing models:
+    </p>
+    <div className="flex flex-wrap gap-2">
+      <button
+        onClick={onOpenOptions}
+        className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors"
+      >
+        Options Pricer
+      </button>
+      <button
+        onClick={onOpenBonds}
+        className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors"
+      >
+        Bond Analytics
+      </button>
+      <button
+        onClick={onOpenCredit}
+        className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors"
+      >
+        Credit Modeling
+      </button>
+    </div>
+  </div>
+);
+
 const ModelingTools = ({ data, adjustedValues, onDataChange }) => {
   const [activeModel, setActiveModel] = useState('dcf');
+
+  // Handlers for Advanced Analytics integration
+  const handleOpenOptions = () => {
+    window.dispatchEvent(new CustomEvent('open-options-pricer'));
+  };
+
+  const handleOpenBonds = () => {
+    window.dispatchEvent(new CustomEvent('open-bond-analytics'));
+  };
+
+  const handleOpenCredit = () => {
+    window.dispatchEvent(new CustomEvent('open-credit-modeling'));
+  };
   const [modelInputs, setModelInputs] = useState({
     dcf: {
       discountRate: 10,
@@ -207,6 +250,13 @@ const ModelingTools = ({ data, adjustedValues, onDataChange }) => {
 
   return (
     <div className="h-full bg-gray-900 text-white p-6">
+      {/* Advanced Analytics Integration */}
+      <AdvancedAnalyticsIntegration 
+        onOpenOptions={handleOpenOptions}
+        onOpenBonds={handleOpenBonds}
+        onOpenCredit={handleOpenCredit}
+      />
+
       {/* Streamlined Model Selection */}
       <div className="mb-8">
         <div className="flex items-center justify-between mb-6">

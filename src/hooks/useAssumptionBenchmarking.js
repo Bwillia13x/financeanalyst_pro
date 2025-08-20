@@ -322,7 +322,7 @@ export const useAssumptionBenchmarking = (industry = 'healthcare', companyMetric
   // Get contextual insights for assumptions
   const getAssumptionContext = (assumptionType, value) => {
     switch (assumptionType) {
-      case 'wacc':
+      case 'wacc': {
         const currentYear = new Date().getFullYear().toString();
         const historicalData = HISTORICAL_CONTEXT.wacc[currentYear] || HISTORICAL_CONTEXT.wacc['2024'];
         return {
@@ -333,6 +333,7 @@ export const useAssumptionBenchmarking = (industry = 'healthcare', companyMetric
             value > industryBenchmarks.metrics.wacc.p75 ? 'High discount rate - validate risk assumptions' :
               'Within reasonable industry range'
         };
+      }
 
       case 'terminalGrowth':
         return {

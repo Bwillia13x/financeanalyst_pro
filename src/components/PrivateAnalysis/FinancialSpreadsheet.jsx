@@ -479,10 +479,31 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
     const rowBg = level === 0 ? 'bg-slate-50/70' : 'bg-white';
     const borderColor = level === 0 ? 'border-slate-200' : 'border-slate-100';
 
+    // Screen reader context
+    const ariaLabel = level === 0 
+      ? `${label}, total or summary line item${formula ? ', calculated automatically' : ''}` 
+      : `${label}, detail line item${formula ? ', calculated automatically' : ', editable'}`;
+
     return (
-      <tr key={key} className={`${rowBg} border-b ${borderColor} hover:bg-slate-50 transition-all duration-150 group`}>
+      <tr 
+        key={key} 
+        className={`${rowBg} border-b ${borderColor} hover:bg-slate-50 transition-all duration-150 group`}
+        role="row"
+        aria-label={ariaLabel}
+      >
         {/* Account Name Column */}
-        <td className={`px-6 py-4 ${indentClass} ${textWeight} ${textSize} ${textColor}`}>
+        <td 
+          className={`px-6 py-4 ${indentClass} ${textWeight} ${textSize} ${textColor}`}
+          scope={level === 0 ? 'rowgroup' : 'row'}
+          headers="account-header"
+          aria-describedby={formula ? 'formula-description' : 'manual-description'}
+        >
+          <div id="formula-description" className="sr-only">
+            This is an automatically calculated field based on other line items
+          </div>
+          <div id="manual-description" className="sr-only">
+            This field can be edited by clicking or pressing Enter
+          </div>
           <div className="flex items-center gap-3">
             {level === 0 && (
               <div className="w-1.5 h-4 bg-gradient-to-b from-blue-500 to-blue-600 rounded-full flex-shrink-0 shadow-sm" />
@@ -498,15 +519,29 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
         </td>
 
         {/* Units Column */}
-        <td className="px-4 py-4 text-center">
+        <td 
+          className="px-4 py-4 text-center"
+          headers="units-header"
+          aria-label="Values are in thousands of dollars"
+        >
           <span className="text-xs font-medium text-slate-500 uppercase tracking-wide bg-slate-100 px-2 py-1 rounded-md">
             $ 000s
           </span>
         </td>
 
         {/* Period Columns */}
-        {data.periods.map((_, periodIndex) => (
-          <td key={periodIndex} className="px-4 py-4 text-right">
+        {data.periods.map((period, periodIndex) => {
+          const cellValue = data.statements.incomeStatement[key]?.[periodIndex];
+          const formattedValue = formatNumber(cellValue);
+          const cellAriaLabel = `${label} for ${period}: ${formattedValue || 'no value'} thousand dollars${formula ? ', calculated automatically' : ', click to edit'}`;
+          
+          return (
+          <td 
+            key={periodIndex} 
+            className="px-4 py-4 text-right"
+            headers={`period-${periodIndex}-header account-header`}
+            aria-label={cellAriaLabel}
+          >
             {editingCell?.rowKey === key && editingCell?.periodIndex === periodIndex && !editingCell?.isAdjusted ? (
               <div className="relative">
                 <input
@@ -550,8 +585,10 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
                     ? 'bg-gradient-to-r from-blue-50 to-blue-100 text-blue-800 font-semibold border border-blue-200 shadow-sm'
                     : 'hover:bg-slate-100 text-slate-800 cursor-pointer border border-transparent hover:border-slate-200 hover:shadow-sm group-hover:bg-slate-50'
                 }`}
-                role="button"
+                role={formula ? 'cell' : 'button'}
                 tabIndex={formula ? -1 : 0}
+                aria-label={cellAriaLabel}
+                aria-readonly={formula}
                 onKeyDown={(e) => {
                   if ((e.key === 'Enter' || e.key === ' ') && !formula) {
                     e.preventDefault();
@@ -568,10 +605,15 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
               </div>
             )}
           </td>
-        ))}
+          );
+        })}
 
         {/* Adjusted Column */}
-        <td className="px-4 py-4 text-right bg-gradient-to-r from-amber-50 to-yellow-50 border-l-2 border-amber-300">
+        <td 
+          className="px-4 py-4 text-right bg-gradient-to-r from-amber-50 to-yellow-50 border-l-2 border-amber-300"
+          headers="adjusted-header account-header"
+          aria-label={`${label} adjusted value: ${formatNumber(adjustedValues[key] || 0) || 'no value'} thousand dollars${formula ? ', calculated automatically' : ', click to edit'}`}
+        >
           {editingCell?.rowKey === key && editingCell?.isAdjusted ? (
             <div className="relative">
               <input
@@ -615,8 +657,10 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
                   ? 'bg-gradient-to-r from-amber-100 to-yellow-100 text-amber-800 font-semibold border border-amber-300 shadow-sm'
                   : 'hover:bg-amber-100 text-slate-800 cursor-pointer border border-transparent hover:border-amber-300 hover:shadow-sm'
               }`}
-              role="button"
+              role={formula ? 'cell' : 'button'}
               tabIndex={formula ? -1 : 0}
+              aria-label={`${label} adjusted value: ${formatNumber(adjustedValues[key] || 0) || 'no value'} thousand dollars${formula ? ', calculated automatically' : ', click to edit'}`}
+              aria-readonly={formula}
               onKeyDown={(e) => {
                 if ((e.key === 'Enter' || e.key === ' ') && !formula) {
                   e.preventDefault();
@@ -635,7 +679,38 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
         </td>
 
         {/* Type Column */}
-        <td className="px-4 py-4 text-center">
+        <td 
+          className="px-4 py-4 text-center"
+          headers="type-header"
+          aria-label={`${label} is ${formula ? 'automatically calculated' : 'manually editable'}`}
+        >
+          <span
+            className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
+              formula
+                ? 'bg-blue-100 text-blue-800 border border-blue-200'
+                : 'bg-slate-100 text-slate-700 border border-slate-200'
+            }`}
+          >
+            {formula ? (
+              <>
+                <Calculator size={10} className="mr-1" />
+                Auto
+              </>
+            ) : (
+              <>
+                <Edit2 size={10} className="mr-1" />
+                Manual
+              </>
+            )}
+          </span>
+        </td>
+
+        {/* Type Column */}
+        <td 
+          className="px-4 py-4 text-center"
+          headers="type-header"
+          aria-label={`${label} is ${formula ? 'automatically calculated' : 'manually editable'}`}
+        >
           <span
             className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
               formula
@@ -661,73 +736,104 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 pb-8">
-      {/* Header Section */}
-      <div className="bg-white border-b border-slate-200 shadow-sm">
-        <div className="max-w-full mx-auto px-8 py-6">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center gap-4">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <TrendingUp className="w-6 h-6 text-blue-600" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-slate-900">Financial Spreadsheet</h1>
-                <p className="text-sm text-slate-600 mt-1">Professional financial modeling workspace</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <button
-                onClick={addPeriod}
-                className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center gap-2 transition-all duration-200 shadow-sm hover:shadow-md font-medium"
-              >
-                <Plus size={16} />
-                Add Period
-              </button>
-              <select
-                value={activeStatement}
-                onChange={(e) => setActiveStatement(e.target.value)}
-                className="px-4 py-2.5 bg-white border border-slate-300 rounded-lg text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium shadow-sm"
-              >
-                <option value="incomeStatement">Income Statement</option>
-                <option value="balanceSheet">Balance Sheet</option>
-                <option value="cashFlow">Cash Flow Statement</option>
-              </select>
-            </div>
+    <div className="bg-slate-900 rounded-lg shadow-lg">
+      {/* Header */}
+      <div className="p-4 sm:p-6 border-b border-slate-700">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <h2 className="text-lg sm:text-xl font-semibold text-white">Financial Statements</h2>
+          <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
+            <button
+              onClick={addPeriod}
+              className="px-3 py-2 sm:px-4 sm:py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center gap-2 transition-all duration-200 shadow-sm hover:shadow-md font-medium text-sm sm:text-base"
+            >
+              <Plus size={14} className="sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline">Add Period</span>
+              <span className="sm:hidden">Add</span>
+            </button>
+            <select
+              value={activeStatement}
+              onChange={(e) => setActiveStatement(e.target.value)}
+              className="px-3 py-2 sm:px-4 sm:py-2.5 bg-white border border-slate-300 rounded-lg text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium shadow-sm text-sm sm:text-base"
+            >
+              <option value="incomeStatement">Income Statement</option>
+              <option value="balanceSheet">Balance Sheet</option>
+              <option value="cashFlow">Cash Flow Statement</option>
+            </select>
           </div>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="max-w-full mx-auto p-8">
+      <div className="max-w-full mx-auto p-4 sm:p-6 lg:p-8">
         <div className="bg-white rounded-xl border border-slate-200 shadow-lg">
-          <div className="overflow-x-auto">
-            <table className="w-full">
+          <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+            <table 
+              className="w-full"
+              role="table"
+              aria-label={`Financial ${activeStatement === 'incomeStatement' ? 'Income Statement' : activeStatement === 'balanceSheet' ? 'Balance Sheet' : 'Cash Flow Statement'} with editable cells`}
+            >
               {/* Enhanced Table Header */}
               <thead className="bg-gradient-to-r from-slate-800 to-slate-900 text-white">
-                <tr>
-                  <th className="min-w-[320px] px-6 py-4 text-left text-sm font-semibold tracking-wider">
+                <tr className="sr-only">
+                  <td colSpan={data.periods.length + 4}>
+                    <div className="p-2 text-sm">
+                      Financial spreadsheet table. Use arrow keys to navigate between cells. 
+                      Press Enter or Space to edit values. Press Tab to move to next editable cell. 
+                      Formula cells are calculated automatically and cannot be edited.
+                    </div>
+                  </td>
+                </tr>
+                <tr role="row">
+                  <th 
+                    className="min-w-[320px] px-6 py-4 text-left text-sm font-semibold tracking-wider"
+                    scope="col"
+                    id="account-header"
+                    aria-label="Financial account descriptions and line items"
+                  >
                     <div className="flex items-center gap-2">
                       <FileText size={16} className="text-slate-300" />
                       Account Description
                     </div>
                   </th>
-                  <th className="w-20 px-4 py-4 text-center text-sm font-semibold">Units</th>
+                  <th 
+                    className="w-20 px-4 py-4 text-center text-sm font-semibold"
+                    scope="col"
+                    id="units-header"
+                    aria-label="Units of measurement, typically thousands of dollars"
+                  >
+                    Units
+                  </th>
                   {data.periods.map((period, index) => (
-                    <th key={index} className="min-w-[140px] px-4 py-4 text-center text-sm font-semibold">
+                    <th 
+                      key={index} 
+                      className="min-w-[140px] px-4 py-4 text-center text-sm font-semibold"
+                      scope="col"
+                      id={`period-${index}-header`}
+                      aria-label={`Financial data for ${period}, actual values, editable`}
+                    >
                       <div className="flex flex-col">
                         <span>{period}</span>
                         <span className="text-xs text-slate-300 font-normal">Actual</span>
                       </div>
                     </th>
                   ))}
-                  <th className="min-w-[140px] px-4 py-4 text-center text-sm font-semibold bg-gradient-to-r from-amber-600 to-yellow-600 border-l-2 border-amber-400">
+                  <th 
+                    className="min-w-[140px] px-4 py-4 text-center text-sm font-semibold bg-gradient-to-r from-amber-600 to-yellow-600 border-l-2 border-amber-400"
+                    scope="col"
+                    id="adjusted-header"
+                    aria-label="Adjusted financial values, user-modified scenarios and projections, editable"
+                  >
                     <div className="flex flex-col">
                       <span>Adjusted</span>
                       <span className="text-xs text-amber-100 font-normal">Modified</span>
                     </div>
                   </th>
-                  <th className="w-28 px-4 py-4 text-center text-sm font-semibold">
+                  <th 
+                    className="w-28 px-4 py-4 text-center text-sm font-semibold"
+                    scope="col"
+                    id="type-header"
+                    aria-label="Cell type: manual entry or automatic calculation"
+                  >
                     <div className="flex items-center justify-center gap-1">
                       <Calculator size={14} />
                       Type
@@ -740,7 +846,11 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
                 {Object.entries(currentTemplate).map(([sectionKey, section]) => (
                   <React.Fragment key={sectionKey}>
                     {/* Enhanced Section Header */}
-                    <tr className={`${section.headerBg || 'bg-slate-600'} border-b-2 border-slate-300`}>
+                    <tr 
+                      className={`${section.headerBg || 'bg-slate-600'} border-b-2 border-slate-300`}
+                      role="rowheader"
+                      aria-label={`${section.title} section header`}
+                    >
                       <td colSpan={data.periods.length + 4} className="py-4 px-6">
                         <div className="flex items-center gap-3 text-white w-full text-left group">
                           <button

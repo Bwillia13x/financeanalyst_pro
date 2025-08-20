@@ -112,6 +112,14 @@ const SymbolSearch = ({ onSymbolSelect, watchlist, onAddToWatchlist }) => {
                 ${index === selectedIndex ? 'bg-muted' : 'hover:bg-muted'}
               `}
               onClick={() => handleSymbolSelect(item)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={e => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  handleSymbolSelect(item);
+                }
+              }}
             >
               <div className="flex-1">
                 <div className="flex items-center space-x-2">
@@ -148,7 +156,7 @@ const SymbolSearch = ({ onSymbolSelect, watchlist, onAddToWatchlist }) => {
         <div className="absolute top-full left-0 right-0 mt-1 bg-popover border border-border rounded-lg shadow-elevation-2 z-50 p-4 text-center">
           <div className="text-muted-foreground">
             <Icon name="Search" size={24} className="mx-auto mb-2" />
-            <p>No symbols found for "{searchTerm}"</p>
+            <p>No symbols found for &ldquo;{searchTerm}&rdquo;</p>
           </div>
         </div>
       )}

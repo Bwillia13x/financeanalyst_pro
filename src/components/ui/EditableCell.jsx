@@ -305,7 +305,15 @@ const EditableCell = ({
 
   return (
     <div
+      role="button"
+      tabIndex={0}
       onClick={handleEdit}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          handleEdit();
+        }
+      }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       className={cn(

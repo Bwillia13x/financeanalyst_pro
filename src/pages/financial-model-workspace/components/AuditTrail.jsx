@@ -3,10 +3,10 @@ import React, { useState } from 'react';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 
-const AuditTrail = ({ calculations, errors, warnings }) => {
+const AuditTrail = ({ calculations: _calculations, errors: _errors, warnings: _warnings }) => {
   const [activeTab, setActiveTab] = useState('calculations');
   const [expandedItems, setExpandedItems] = useState(new Set());
-  const [filterLevel, setFilterLevel] = useState('all');
+  const [_filterLevel, _setFilterLevel] = useState('all');
 
   const mockAuditData = {
     calculations: [

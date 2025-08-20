@@ -44,7 +44,7 @@ class ErrorBoundaryProvider extends Component {
     trackError(error, errorInfo);
 
     // Log to console in development
-    if (process.env.NODE_ENV === 'development') {
+    if (import.meta.env.DEV) {
       console.group('🚨 Error Boundary Caught Error');
       console.error('Error:', error);
       console.error('Error Info:', errorInfo);
@@ -157,7 +157,7 @@ class ErrorBoundaryProvider extends Component {
   reportErrorToService = async(enhancedError) => {
     try {
       // In production, send to your error monitoring service
-      if (process.env.NODE_ENV === 'production') {
+      if (import.meta.env.PROD) {
         await fetch('/api/errors', {
           method: 'POST',
           headers: {

@@ -419,7 +419,7 @@ class CollaborationService extends EventEmitter {
   /**
    * Update shared model data
    */
-  async updateModel(workspaceId, modelId, updates, options = {}) {
+  async updateModel(workspaceId, modelId, updates, _options = {}) {
     try {
       const workspace = this.workspaces.get(workspaceId);
       if (!workspace) {
