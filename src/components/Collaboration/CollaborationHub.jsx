@@ -1,23 +1,23 @@
 // Collaboration Hub - Phase 2 Integration
-import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Users, 
-  MessageSquare, 
-  GitBranch, 
-  Bell, 
-  Share2, 
+import {
+  Users,
+  MessageSquare,
+  GitBranch,
+  Bell,
+  Share2,
   FileText,
   Clock,
   User,
   ChevronDown,
   Settings
 } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
 
 // Import Phase 2 services
-import { versionControlService } from '../../services/collaboration/versionControl';
 import { commentingService } from '../../services/collaboration/commentingSystem';
 import { userPresenceService } from '../../services/collaboration/userPresenceSystem';
+import { versionControlService } from '../../services/collaboration/versionControl';
 import { notificationService } from '../../services/notifications/notificationSystem';
 
 export default function CollaborationHub({ analysisId, currentUser }) {
@@ -32,11 +32,11 @@ export default function CollaborationHub({ analysisId, currentUser }) {
   useEffect(() => {
     initializeCollaboration();
     setupEventListeners();
-    
+
     return () => cleanupEventListeners();
   }, [analysisId, currentUser]);
 
-  const initializeCollaboration = async () => {
+  const initializeCollaboration = async() => {
     try {
       // Initialize user presence
       await userPresenceService.joinSession(analysisId, {
@@ -85,7 +85,7 @@ export default function CollaborationHub({ analysisId, currentUser }) {
     notificationService.removeAllListeners();
   };
 
-  const loadActiveUsers = async () => {
+  const loadActiveUsers = async() => {
     try {
       const users = await userPresenceService.getActiveUsers(analysisId);
       setActiveUsers(users);
@@ -94,7 +94,7 @@ export default function CollaborationHub({ analysisId, currentUser }) {
     }
   };
 
-  const loadRecentComments = async () => {
+  const loadRecentComments = async() => {
     try {
       const comments = await commentingService.getComments(analysisId, {
         limit: 5,
@@ -107,7 +107,7 @@ export default function CollaborationHub({ analysisId, currentUser }) {
     }
   };
 
-  const loadVersionHistory = async () => {
+  const loadVersionHistory = async() => {
     try {
       const history = await versionControlService.getVersionHistory(analysisId, { limit: 5 });
       setVersionHistory(history);
@@ -116,7 +116,7 @@ export default function CollaborationHub({ analysisId, currentUser }) {
     }
   };
 
-  const loadNotifications = async () => {
+  const loadNotifications = async() => {
     try {
       const userNotifications = await notificationService.getNotifications(currentUser.id, {
         limit: 5,
@@ -138,7 +138,7 @@ export default function CollaborationHub({ analysisId, currentUser }) {
   };
 
   const handleUserUpdated = (userData) => {
-    setActiveUsers(prev => 
+    setActiveUsers(prev =>
       prev.map(user => user.id === userData.id ? { ...user, ...userData } : user)
     );
   };
@@ -148,7 +148,7 @@ export default function CollaborationHub({ analysisId, currentUser }) {
   };
 
   const handleCommentUpdated = (comment) => {
-    setRecentComments(prev => 
+    setRecentComments(prev =>
       prev.map(c => c.id === comment.id ? comment : c)
     );
   };
@@ -216,8 +216,8 @@ export default function CollaborationHub({ analysisId, currentUser }) {
               onClick={() => setIsExpanded(!isExpanded)}
               className="text-white hover:bg-white/20 p-1 rounded transition-colors"
             >
-              <ChevronDown 
-                className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-180' : 'rotate-90'}`} 
+              <ChevronDown
+                className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-180' : 'rotate-90'}`}
               />
             </button>
           </div>
@@ -240,8 +240,8 @@ export default function CollaborationHub({ analysisId, currentUser }) {
                       key={tab.id}
                       onClick={() => setActiveTab(tab.id)}
                       className={`flex-1 flex items-center justify-center p-3 text-sm font-medium transition-colors relative ${
-                        activeTab === tab.id 
-                          ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50' 
+                        activeTab === tab.id
+                          ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50'
                           : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
                       }`}
                     >
@@ -387,7 +387,7 @@ export default function CollaborationHub({ analysisId, currentUser }) {
                 )}
               </div>
             </div>
-            
+
             {/* Notification indicator */}
             {notifications.length > 0 && (
               <div className="flex justify-center">

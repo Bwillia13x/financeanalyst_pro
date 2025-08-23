@@ -76,7 +76,7 @@ describe('analysisSlice reducers', () => {
   describe('financial data management', () => {
     it('should set financial data', () => {
       store.dispatch(setFinancialData(mockFinancialData));
-      
+
       const state = store.getState().analysis;
       expect(state.financialData).toEqual(mockFinancialData);
     });
@@ -138,7 +138,7 @@ describe('analysisSlice reducers', () => {
         debtToEquity: 3,
         holdingPeriod: 5
       };
-      
+
       store.dispatch(setLboInputs(lboInputs));
 
       const state = store.getState().analysis;
@@ -151,7 +151,7 @@ describe('analysisSlice reducers', () => {
         moic: 2.5,
         totalReturns: 5000
       };
-      
+
       store.dispatch(setLboResults(lboResults));
 
       const state = store.getState().analysis;
@@ -167,9 +167,9 @@ describe('analysisSlice reducers', () => {
         name: 'Optimistic',
         assumptions: { revenueGrowth: 0.15 }
       };
-      
+
       store.dispatch(addScenario(scenario));
-      
+
       const state = store.getState().analysis;
       expect(state.scenarios.scenarios).toHaveLength(1);
       expect(state.scenarios.scenarios[0]).toEqual(scenario);
@@ -181,17 +181,17 @@ describe('analysisSlice reducers', () => {
         name: 'Optimistic',
         assumptions: { revenueGrowth: 0.15 }
       };
-      
+
       store.dispatch(addScenario(scenario));
-      
+
       const updatedScenario = {
         id: 'scenario-1',
         name: 'Very Optimistic',
         assumptions: { revenueGrowth: 0.20 }
       };
-      
+
       store.dispatch(updateScenario(updatedScenario));
-      
+
       const state = store.getState().analysis;
       expect(state.scenarios.scenarios).toHaveLength(1);
       expect(state.scenarios.scenarios[0].name).toBe('Very Optimistic');
@@ -201,11 +201,11 @@ describe('analysisSlice reducers', () => {
     it('should remove a scenario', () => {
       const scenario1 = { id: 'scenario-1', name: 'Optimistic' };
       const scenario2 = { id: 'scenario-2', name: 'Pessimistic' };
-      
+
       store.dispatch(addScenario(scenario1));
       store.dispatch(addScenario(scenario2));
       store.dispatch(removeScenario('scenario-1'));
-      
+
       const state = store.getState().analysis;
       expect(state.scenarios.scenarios).toHaveLength(1);
       expect(state.scenarios.scenarios[0].id).toBe('scenario-2');
@@ -219,9 +219,9 @@ describe('analysisSlice reducers', () => {
         confidenceLevel: 0.99,
         correlationsEnabled: false
       };
-      
+
       store.dispatch(setMonteCarloSettings(settings));
-      
+
       const state = store.getState().analysis;
       expect(state.monteCarlo.settings).toEqual({
         ...state.monteCarlo.settings,
@@ -237,9 +237,9 @@ describe('analysisSlice reducers', () => {
         confidenceInterval: [32.1, 58.3],
         percentiles: { p10: 34.2, p90: 56.1 }
       };
-      
+
       store.dispatch(setMonteCarloResults(results));
-      
+
       const state = store.getState().analysis;
       expect(state.monteCarlo.results).toEqual(results);
       expect(state.monteCarlo.status).toBe('succeeded');
@@ -250,10 +250,10 @@ describe('analysisSlice reducers', () => {
     it('should save analysis', () => {
       store.dispatch(setFinancialData(mockFinancialData));
       store.dispatch(setDCFInputs(mockDCFInputs));
-      
+
       const analysisName = 'Test Analysis';
       store.dispatch(saveAnalysis(analysisName));
-      
+
       const state = store.getState().analysis;
       expect(state.lastSaved).toBeDefined();
       expect(state.savedAnalyses).toHaveProperty(analysisName);
@@ -264,13 +264,13 @@ describe('analysisSlice reducers', () => {
       store.dispatch(setFinancialData(mockFinancialData));
       store.dispatch(setDCFInputs(mockDCFInputs));
       store.dispatch(saveAnalysis('Test Analysis'));
-      
+
       // Clear current state
       store.dispatch(clearAnalysis());
-      
+
       // Load the analysis
       store.dispatch(loadAnalysis('Test Analysis'));
-      
+
       const state = store.getState().analysis;
       expect(state.financialData).toEqual(mockFinancialData);
       expect(state.dcf.inputs).toEqual(mockDCFInputs);
@@ -280,7 +280,7 @@ describe('analysisSlice reducers', () => {
       store.dispatch(setFinancialData(mockFinancialData));
       store.dispatch(setDCFInputs(mockDCFInputs));
       store.dispatch(clearAnalysis());
-      
+
       const state = store.getState().analysis;
       expect(state.financialData).toBeNull();
       expect(state.adjustedValues).toEqual({});
@@ -303,7 +303,7 @@ describe('analysisStore selectors', () => {
 
   it('should select financial data', () => {
     store.dispatch(setFinancialData(mockFinancialData));
-    
+
     const state = store.getState();
     const financialData = selectFinancialData(state);
     expect(financialData).toEqual(mockFinancialData);
@@ -311,7 +311,7 @@ describe('analysisStore selectors', () => {
 
   it('should select DCF results', () => {
     store.dispatch(setDCFResults(mockDCFResults));
-    
+
     const state = store.getState();
     const dcfResults = selectDCFResults(state);
     expect(dcfResults).toEqual(mockDCFResults);
@@ -320,7 +320,7 @@ describe('analysisStore selectors', () => {
   it('should select scenarios', () => {
     const scenario = { id: 'test', name: 'Test Scenario' };
     store.dispatch(addScenario(scenario));
-    
+
     const state = store.getState();
     const scenarios = selectScenarios(state);
     expect(scenarios).toHaveLength(1);
@@ -329,7 +329,7 @@ describe('analysisStore selectors', () => {
 
   it('should calculate data completeness', () => {
     store.dispatch(setFinancialData(mockFinancialData));
-    
+
     const state = store.getState();
     const completeness = selectDataCompleteness(state);
     expect(completeness).toBeGreaterThan(0);
@@ -359,10 +359,10 @@ describe('data integrity and validation', () => {
     store.dispatch(setFinancialData(mockFinancialData));
     store.dispatch(setDCFInputs(mockDCFInputs));
     store.dispatch(setDCFResults(mockDCFResults));
-    
+
     const scenario = { id: 'test', name: 'Test' };
     store.dispatch(addScenario(scenario));
-    
+
     // Verify all data is present
     const state = store.getState().analysis;
     expect(state.financialData).toBeDefined();
@@ -374,7 +374,7 @@ describe('data integrity and validation', () => {
   it('should handle partial data gracefully', () => {
     // Set only some data
     store.dispatch(setDCFInputs(mockDCFInputs));
-    
+
     const state = store.getState().analysis;
     expect(state.dcf.inputs).toEqual(mockDCFInputs);
     expect(state.financialData).toBeNull();
@@ -383,17 +383,17 @@ describe('data integrity and validation', () => {
 
   it('should preserve timestamps for calculations', () => {
     store.dispatch(setDCFResults(mockDCFResults));
-    
+
     const state1 = store.getState().analysis;
     const timestamp1 = state1.dcf.lastCalculated;
-    
+
     // Wait a moment and calculate again
     setTimeout(() => {
       store.dispatch(setDCFResults({ ...mockDCFResults, presentValue: 2600 }));
-      
+
       const state2 = store.getState().analysis;
       const timestamp2 = state2.dcf.lastCalculated;
-      
+
       expect(timestamp2).not.toBe(timestamp1);
       expect(new Date(timestamp2)).toBeInstanceOf(Date);
     }, 10);

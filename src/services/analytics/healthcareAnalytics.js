@@ -77,20 +77,20 @@ class HealthcareAnalyticsService extends EventEmitter {
   async valuateProgram(program) {
     const therapeuticArea = this.therapeuticAreas[program.therapeutic_area] || this.therapeuticAreas.cardiovascular;
     const phases = this.buildClinicalTimeline(program);
-    
+
     // Calculate peak sales and market penetration
     const peakSales = this.calculatePeakSales(program);
     const salesProfile = this.buildSalesProfile(program, peakSales);
-    
+
     // Calculate development costs
     const developmentCosts = this.calculateDevelopmentCosts(phases);
-    
+
     // Calculate success probabilities
     const cumulativeProbability = this.calculateCumulativeSuccess(phases, therapeuticArea);
-    
+
     // Perform NPV calculation
     const npv = this.calculateProgramNPV(salesProfile, developmentCosts, program.discount_rate || 0.12);
-    
+
     return {
       program_id: program.id,
       indication: program.indication,
@@ -225,7 +225,7 @@ class HealthcareAnalyticsService extends EventEmitter {
   buildClinicalTimeline(program) {
     const currentPhase = program.current_phase;
     const phases = [];
-    
+
     Object.entries(this.clinicalTrialProbabilities).forEach(([phase, data]) => {
       if (this.isPhaseApplicable(phase, currentPhase)) {
         phases.push({
@@ -246,10 +246,10 @@ class HealthcareAnalyticsService extends EventEmitter {
     const marketSize = program.addressable_market || 1000000000; // $1B default
     const penetrationRate = program.market_penetration || 0.15; // 15% default
     const pricingPremium = program.pricing_premium || 1.0;
-    
+
     const therapeuticArea = this.therapeuticAreas[program.therapeutic_area];
     const marketPremium = therapeuticArea?.market_premium || 1.0;
-    
+
     return marketSize * penetrationRate * pricingPremium * marketPremium;
   }
 
@@ -260,7 +260,7 @@ class HealthcareAnalyticsService extends EventEmitter {
 
     for (let year = launchYear; year <= launchYear + 20; year++) {
       let sales = 0;
-      
+
       if (year < patentExpiry) {
         // Ramp-up phase
         const yearsFromLaunch = year - launchYear;
@@ -302,7 +302,7 @@ class HealthcareAnalyticsService extends EventEmitter {
 
   calculateProgramNPV(salesProfile, developmentCosts, discountRate) {
     let npv = -developmentCosts; // Initial investment
-    
+
     salesProfile.forEach(yearData => {
       const netCashFlow = yearData.sales * 0.6; // 60% margin assumption
       const presentValue = netCashFlow / Math.pow(1 + discountRate, yearData.year - salesProfile[0].year);
@@ -333,7 +333,7 @@ class HealthcareAnalyticsService extends EventEmitter {
   calculateDeviceROI(analysisData) {
     const benefits = analysisData.economic_impact.annual_savings;
     const costs = analysisData.implementation_costs.total_cost;
-    
+
     return {
       simple_roi: (benefits - costs) / costs,
       payback_period: costs / benefits,
@@ -343,11 +343,11 @@ class HealthcareAnalyticsService extends EventEmitter {
   }
 
   // Additional helper methods
-  isPhaseApplicable(phase, currentPhase) { 
+  isPhaseApplicable(phase, currentPhase) {
     const phaseOrder = { 'phase1': 1, 'phase2': 2, 'phase3': 3, 'regulatory': 4 };
     return phaseOrder[phase] >= phaseOrder[currentPhase];
   }
-  
+
   calculatePhaseCosts(program, phase, data) { /* Implementation */ }
   definePhaseMilestones(phase) { /* Implementation */ }
   calculateLaunchYear(program) { /* Implementation */ }

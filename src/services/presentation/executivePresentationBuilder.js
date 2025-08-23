@@ -236,7 +236,7 @@ export class ExecutivePresentationBuilder {
         title: templateSlide.title,
         layout: templateSlide.layout
       }, userId);
-      
+
       presentation.slides.push(slide.id);
     }
 
@@ -282,7 +282,7 @@ export class ExecutivePresentationBuilder {
     slide.content.elements = this.getDefaultElementsForLayout(slide.layout);
 
     this.slides.set(slide.id, slide);
-    
+
     if (slideConfig.order !== undefined) {
       presentation.slides.splice(slideConfig.order, 0, slide.id);
     } else {
@@ -464,10 +464,10 @@ export class ExecutivePresentationBuilder {
     }
 
     const pptxData = await this.generatePowerPointData(presentation, options);
-    
+
     // Track analytics
     presentation.analytics.downloads++;
-    
+
     return pptxData;
   }
 
@@ -542,7 +542,7 @@ export class ExecutivePresentationBuilder {
     });
 
     presentation.analytics.downloads++;
-    
+
     return {
       type: 'pdf',
       data: pdfBuffer,
@@ -657,7 +657,7 @@ export class ExecutivePresentationBuilder {
   // Utility Methods
   formatNumber(value, format) {
     if (typeof value !== 'number') return value;
-    
+
     switch (format) {
       case 'currency':
         return new Intl.NumberFormat('en-US', {
@@ -735,7 +735,7 @@ export class ExecutivePresentationBuilder {
 
   getTemplates(category = null) {
     let templates = Array.from(this.templates.values());
-    
+
     if (category) {
       templates = templates.filter(template => template.category === category);
     }

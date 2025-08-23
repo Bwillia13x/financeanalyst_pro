@@ -1,12 +1,11 @@
 // Interactive Dashboard Component - Phase 2 Integration
-import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Plus, 
-  Grid, 
-  BarChart3, 
-  LineChart, 
-  PieChart, 
+import {
+  Plus,
+  Grid,
+  BarChart3,
+  LineChart,
+  PieChart,
   Table,
   Settings,
   Download,
@@ -17,11 +16,12 @@ import {
   X,
   RefreshCw
 } from 'lucide-react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 
 // Import Phase 2 services
 import { interactiveDashboardService } from '../../services/dashboards/interactiveDashboards';
-import { dataVisualizationService } from '../../services/visualization/dataVisualizationComponents';
 import { exportSharingService } from '../../services/sharing/exportSharingService';
+import { dataVisualizationService } from '../../services/visualization/dataVisualizationComponents';
 
 export default function InteractiveDashboard({ analysisId, data, onDataChange }) {
   const [dashboard, setDashboard] = useState(null);
@@ -40,17 +40,17 @@ export default function InteractiveDashboard({ analysisId, data, onDataChange })
   useEffect(() => {
     initializeDashboard();
     setupEventListeners();
-    
+
     return () => cleanupEventListeners();
   }, [analysisId]);
 
-  const initializeDashboard = async () => {
+  const initializeDashboard = async() => {
     try {
       setIsLoading(true);
-      
+
       // Create or load dashboard
       let dashboardData = await interactiveDashboardService.getDashboard(analysisId);
-      
+
       if (!dashboardData) {
         dashboardData = await interactiveDashboardService.createDashboard({
           id: analysisId,
@@ -61,11 +61,11 @@ export default function InteractiveDashboard({ analysisId, data, onDataChange })
       }
 
       setDashboard(dashboardData);
-      
+
       // Load widgets
       const dashboardWidgets = await interactiveDashboardService.getWidgets(dashboardData.id);
       setWidgets(dashboardWidgets);
-      
+
       setIsLoading(false);
     } catch (error) {
       console.error('Failed to initialize dashboard:', error);
@@ -115,7 +115,7 @@ export default function InteractiveDashboard({ analysisId, data, onDataChange })
     });
   };
 
-  const addWidget = async (widgetType, config = {}) => {
+  const addWidget = async(widgetType, config = {}) => {
     try {
       const widgetConfig = {
         type: widgetType,
@@ -127,7 +127,7 @@ export default function InteractiveDashboard({ analysisId, data, onDataChange })
 
       const widget = await interactiveDashboardService.addWidget(dashboard.id, widgetConfig);
       setIsAddingWidget(false);
-      
+
       // If widget needs data, connect it
       if (data && widget.type !== 'text') {
         await connectWidgetData(widget.id, data);
@@ -140,7 +140,7 @@ export default function InteractiveDashboard({ analysisId, data, onDataChange })
     }
   };
 
-  const updateWidget = async (widgetId, updates) => {
+  const updateWidget = async(widgetId, updates) => {
     try {
       const widget = await interactiveDashboardService.updateWidget(widgetId, updates);
       return widget;
@@ -150,7 +150,7 @@ export default function InteractiveDashboard({ analysisId, data, onDataChange })
     }
   };
 
-  const deleteWidget = async (widgetId) => {
+  const deleteWidget = async(widgetId) => {
     try {
       await interactiveDashboardService.deleteWidget(widgetId);
     } catch (error) {
@@ -159,7 +159,7 @@ export default function InteractiveDashboard({ analysisId, data, onDataChange })
     }
   };
 
-  const refreshWidget = async (widgetId) => {
+  const refreshWidget = async(widgetId) => {
     try {
       const widget = widgets.find(w => w.id === widgetId);
       if (!widget) return;
@@ -171,7 +171,7 @@ export default function InteractiveDashboard({ analysisId, data, onDataChange })
     }
   };
 
-  const connectWidgetData = async (widgetId, widgetData) => {
+  const connectWidgetData = async(widgetId, widgetData) => {
     try {
       await interactiveDashboardService.connectDataSource(widgetId, {
         type: 'json',
@@ -201,13 +201,13 @@ export default function InteractiveDashboard({ analysisId, data, onDataChange })
             proposed.y >= item.y + item.h ||
             proposed.y + proposed.h <= item.y)
         );
-        
+
         if (!conflicts) {
           return { x, y };
         }
       }
     }
-    
+
     return { x: 0, y: widgets.length * 4 };
   };
 
@@ -220,11 +220,11 @@ export default function InteractiveDashboard({ analysisId, data, onDataChange })
       gauge: { width: 4, height: 4 },
       iframe: { width: 6, height: 6 }
     };
-    
+
     return sizes[widgetType] || { width: 4, height: 3 };
   };
 
-  const exportDashboard = async (format = 'pdf') => {
+  const exportDashboard = async(format = 'pdf') => {
     try {
       const dashboardData = {
         title: dashboard.name,
@@ -252,7 +252,7 @@ export default function InteractiveDashboard({ analysisId, data, onDataChange })
     }
   };
 
-  const shareDashboard = async () => {
+  const shareDashboard = async() => {
     try {
       const shareLink = await exportSharingService.createShareableLink(
         { dashboard, widgets },
@@ -265,7 +265,7 @@ export default function InteractiveDashboard({ analysisId, data, onDataChange })
 
       // Copy to clipboard
       await navigator.clipboard.writeText(shareLink.url);
-      
+
       // Show success notification
       alert(`Dashboard shared! Link copied to clipboard.\nExpires: ${shareLink.expirationDate.toLocaleDateString()}`);
     } catch (error) {
@@ -285,7 +285,7 @@ export default function InteractiveDashboard({ analysisId, data, onDataChange })
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-96">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
         <span className="ml-3 text-gray-600">Loading dashboard...</span>
       </div>
     );
@@ -296,7 +296,7 @@ export default function InteractiveDashboard({ analysisId, data, onDataChange })
       <div className="bg-red-50 border border-red-200 rounded-lg p-4">
         <h3 className="text-red-800 font-semibold">Dashboard Error</h3>
         <p className="text-red-600 mt-1">{error}</p>
-        <button 
+        <button
           onClick={initializeDashboard}
           className="mt-3 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
         >
@@ -317,8 +317,8 @@ export default function InteractiveDashboard({ analysisId, data, onDataChange })
               <button
                 onClick={() => setLayoutMode(layoutMode === 'view' ? 'edit' : 'view')}
                 className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
-                  layoutMode === 'edit' 
-                    ? 'bg-blue-600 text-white' 
+                  layoutMode === 'edit'
+                    ? 'bg-blue-600 text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
@@ -326,7 +326,7 @@ export default function InteractiveDashboard({ analysisId, data, onDataChange })
               </button>
             </div>
           </div>
-          
+
           <div className="flex items-center space-x-2">
             <button
               onClick={() => setIsAddingWidget(true)}
@@ -335,7 +335,7 @@ export default function InteractiveDashboard({ analysisId, data, onDataChange })
               <Plus className="w-4 h-4" />
               <span>Add Widget</span>
             </button>
-            
+
             <div className="flex items-center border border-gray-300 rounded-lg">
               <button
                 onClick={() => exportDashboard('pdf')}
@@ -365,7 +365,7 @@ export default function InteractiveDashboard({ analysisId, data, onDataChange })
 
       {/* Dashboard Grid */}
       <div className="p-6 h-full overflow-auto" ref={dashboardRef}>
-        <div 
+        <div
           ref={gridRef}
           className="grid grid-cols-12 gap-4 auto-rows-min"
           style={{ minHeight: '600px' }}
@@ -456,14 +456,14 @@ export default function InteractiveDashboard({ analysisId, data, onDataChange })
 }
 
 // Dashboard Widget Component
-function DashboardWidget({ 
-  widget, 
-  isEditMode, 
-  onUpdate, 
-  onDelete, 
-  onRefresh, 
-  onSelect, 
-  isSelected 
+function DashboardWidget({
+  widget,
+  isEditMode,
+  onUpdate,
+  onDelete,
+  onRefresh,
+  onSelect,
+  isSelected
 }) {
   const [isHovered, setIsHovered] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -489,7 +489,7 @@ function DashboardWidget({
             )}
           </div>
         );
-        
+
       case 'chart':
         return (
           <div className="h-full p-2">
@@ -501,7 +501,7 @@ function DashboardWidget({
             </div>
           </div>
         );
-        
+
       case 'table':
         return (
           <div className="h-full p-2 overflow-auto">
@@ -523,7 +523,7 @@ function DashboardWidget({
             </table>
           </div>
         );
-        
+
       case 'text':
         return (
           <div className="h-full p-4 overflow-auto">
@@ -532,7 +532,7 @@ function DashboardWidget({
             </div>
           </div>
         );
-        
+
       default:
         return (
           <div className="h-full flex items-center justify-center text-gray-400">
@@ -572,7 +572,7 @@ function DashboardWidget({
           >
             <RefreshCw className="w-3 h-3 text-gray-600" />
           </button>
-          
+
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -587,7 +587,7 @@ function DashboardWidget({
               <Maximize2 className="w-3 h-3 text-gray-600" />
             )}
           </button>
-          
+
           {isEditMode && (
             <button
               onClick={(e) => {

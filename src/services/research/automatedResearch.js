@@ -8,7 +8,7 @@ export class AutomatedResearchService {
       news: new NewsAnalysisModule(),
       peer: new PeerAnalysisModule()
     };
-    
+
     this.reportGenerator = new ResearchReportGenerator();
     this.cache = new Map();
     this.analysisQueue = [];
@@ -36,7 +36,7 @@ export class AutomatedResearchService {
     };
 
     // Execute research modules in parallel
-    const modulePromises = includeModules.map(async (moduleName) => {
+    const modulePromises = includeModules.map(async(moduleName) => {
       const module = this.researchModules[moduleName];
       if (module) {
         try {
@@ -74,7 +74,7 @@ export class AutomatedResearchService {
     // Financial health insights
     if (modules.fundamentals) {
       const { metrics, trends, ratios } = modules.fundamentals;
-      
+
       if (ratios.roe > 0.15) {
         insights.push({
           type: 'positive',
@@ -117,9 +117,9 @@ export class AutomatedResearchService {
           category: 'competitive',
           insight: 'Outpacing industry growth rate indicates market share gains',
           confidence: 0.85,
-          supporting_data: { 
+          supporting_data: {
             company_growth: modules.fundamentals.trends.revenue_growth,
-            industry_growth: industryGrowth 
+            industry_growth: industryGrowth
           }
         });
       }
@@ -152,7 +152,7 @@ export class AutomatedResearchService {
 
   generateRecommendations(modules, insights) {
     const recommendations = [];
-    
+
     // Scoring system
     let bullishSignals = 0;
     let bearishSignals = 0;
@@ -167,12 +167,12 @@ export class AutomatedResearchService {
     // Overall recommendation
     let overallRec = 'HOLD';
     let confidence = 0.5;
-    
+
     if (bullishSignals > bearishSignals + 1) {
       overallRec = 'BUY';
       confidence = Math.min(0.9, 0.5 + (bullishSignals - bearishSignals) * 0.1);
     } else if (bearishSignals > bullishSignals + 1) {
-      overallRec = 'SELL';  
+      overallRec = 'SELL';
       confidence = Math.min(0.9, 0.5 + (bearishSignals - bullishSignals) * 0.1);
     }
 
@@ -209,19 +209,19 @@ export class AutomatedResearchService {
   generateRationale(recommendation, insights) {
     const positives = insights.filter(i => i.type === 'positive');
     const negatives = insights.filter(i => i.type === 'negative');
-    
+
     let rationale = '';
-    
+
     if (recommendation === 'BUY') {
       rationale = `Buy recommendation supported by ${positives.length} positive factors including `;
       rationale += positives.slice(0, 2).map(i => i.category).join(' and ');
     } else if (recommendation === 'SELL') {
       rationale = `Sell recommendation based on ${negatives.length} risk factors including `;
-      rationale += negatives.slice(0, 2).map(i => i.category).join(' and ');  
+      rationale += negatives.slice(0, 2).map(i => i.category).join(' and ');
     } else {
       rationale = 'Hold recommendation reflects balanced risk-reward profile with mixed signals';
     }
-    
+
     return rationale;
   }
 
@@ -230,7 +230,7 @@ export class AutomatedResearchService {
 
     if (modules.fundamentals) {
       const { ratios, trends } = modules.fundamentals;
-      
+
       if (ratios.debt_to_equity > 0.7) {
         risks.push({
           category: 'financial',
@@ -269,7 +269,7 @@ export class AutomatedResearchService {
 
     if (modules.fundamentals) {
       const { trends } = modules.fundamentals;
-      
+
       if (trends.margin_trend > 0.05) {
         catalysts.push({
           type: 'operational',
@@ -300,7 +300,7 @@ export class AutomatedResearchService {
   generateExecutiveSummary(research) {
     const { symbol, recommendations, insights, riskFactors } = research;
     const overallRec = recommendations.find(r => r.type === 'overall');
-    
+
     return {
       recommendation: overallRec?.recommendation || 'HOLD',
       confidence: overallRec?.confidence || 0.5,
@@ -450,12 +450,12 @@ class PeerAnalysisModule {
 class ResearchReportGenerator {
   async generate(research) {
     const { symbol, executiveSummary, insights, recommendations, riskFactors } = research;
-    
+
     return {
       title: `Investment Research Report: ${symbol}`,
       date: new Date().toISOString().split('T')[0],
       executive_summary: executiveSummary,
-      
+
       sections: {
         investment_thesis: this.generateInvestmentThesis(insights),
         valuation: this.generateValuationSection(research.modules.fundamentals),
@@ -463,7 +463,7 @@ class ResearchReportGenerator {
         catalysts: this.generateCatalystSection(research.catalysts),
         recommendation: this.generateRecommendationSection(recommendations)
       },
-      
+
       appendices: {
         financial_data: research.modules.fundamentals,
         peer_comparison: research.modules.peer,
@@ -483,7 +483,7 @@ class ResearchReportGenerator {
 
   generateValuationSection(fundamentals) {
     if (!fundamentals) return { title: 'Valuation', content: 'Valuation data unavailable' };
-    
+
     return {
       title: 'Valuation Analysis',
       current_multiples: fundamentals.ratios,
@@ -503,7 +503,7 @@ class ResearchReportGenerator {
   generateCatalystSection(catalysts) {
     return {
       title: 'Potential Catalysts',
-      catalysts: catalysts,
+      catalysts,
       probability_weighted_impact: 'Medium positive'
     };
   }
@@ -522,7 +522,7 @@ class ResearchReportGenerator {
   calculateRiskRating(risks) {
     const highRisks = risks.filter(r => r.severity === 'high').length;
     const mediumRisks = risks.filter(r => r.severity === 'medium').length;
-    
+
     if (highRisks > 1) return 'High';
     if (highRisks === 1 || mediumRisks > 2) return 'Medium';
     return 'Low';

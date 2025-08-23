@@ -56,7 +56,7 @@ class BankingAnalyticsService extends EventEmitter {
   calculatePortfolioMetrics(portfolioData) {
     const loans = portfolioData.loans || [];
     const totalExposure = loans.reduce((sum, loan) => sum + loan.outstanding_balance, 0);
-    const weightedInterestRate = loans.reduce((sum, loan) => 
+    const weightedInterestRate = loans.reduce((sum, loan) =>
       sum + (loan.interest_rate * loan.outstanding_balance), 0) / totalExposure;
 
     return {
@@ -82,16 +82,16 @@ class BankingAnalyticsService extends EventEmitter {
 
     // Calculate PD, LGD, EAD for each segment
     const segments = [...new Set(loans.map(loan => loan.segment))];
-    
+
     for (const segment of segments) {
       const segmentLoans = loans.filter(loan => loan.segment === segment);
-      
+
       riskMetrics.probability_of_default[segment] = this.calculatePD(segmentLoans);
       riskMetrics.loss_given_default[segment] = this.calculateLGD(segmentLoans);
       riskMetrics.exposure_at_default[segment] = this.calculateEAD(segmentLoans);
-      riskMetrics.expected_loss[segment] = 
-        riskMetrics.probability_of_default[segment] * 
-        riskMetrics.loss_given_default[segment] * 
+      riskMetrics.expected_loss[segment] =
+        riskMetrics.probability_of_default[segment] *
+        riskMetrics.loss_given_default[segment] *
         riskMetrics.exposure_at_default[segment];
     }
 
@@ -143,7 +143,7 @@ class BankingAnalyticsService extends EventEmitter {
     });
 
     const totalCECL = Object.values(cecl).reduce((sum, segmentCECL) => sum + segmentCECL.allowance, 0);
-    
+
     return {
       segment_cecl: cecl,
       total_allowance: totalCECL,
@@ -230,7 +230,7 @@ class BankingAnalyticsService extends EventEmitter {
   calculateVaR(bookData, confidence = 0.99, horizon = 1) {
     const positions = bookData.positions || [];
     const returns = this.calculatePortfolioReturns(positions);
-    
+
     // Historical simulation method
     const sortedReturns = returns.sort((a, b) => a - b);
     const varIndex = Math.floor((1 - confidence) * sortedReturns.length);
@@ -255,7 +255,7 @@ class BankingAnalyticsService extends EventEmitter {
   // Helper methods
   calculateMaturityProfile(loans) {
     const buckets = { '0-1y': 0, '1-3y': 0, '3-5y': 0, '5-10y': 0, '10y+': 0 };
-    
+
     loans.forEach(loan => {
       const maturity = loan.maturity_years;
       if (maturity <= 1) buckets['0-1y'] += loan.outstanding_balance;
@@ -271,7 +271,7 @@ class BankingAnalyticsService extends EventEmitter {
   calculateSectorConcentration(loans) {
     const sectorExposure = {};
     const totalExposure = loans.reduce((sum, loan) => sum + loan.outstanding_balance, 0);
-    
+
     loans.forEach(loan => {
       sectorExposure[loan.sector] = (sectorExposure[loan.sector] || 0) + loan.outstanding_balance;
     });
@@ -340,16 +340,16 @@ class BankingAnalyticsService extends EventEmitter {
   calculateSegmentCECL(segmentLoans) {
     // Simplified CECL calculation using discounted cash flow approach
     const totalExposure = segmentLoans.reduce((sum, loan) => sum + loan.outstanding_balance, 0);
-    const averageLife = segmentLoans.reduce((sum, loan) => 
+    const averageLife = segmentLoans.reduce((sum, loan) =>
       sum + (loan.maturity_years * loan.outstanding_balance), 0) / totalExposure;
-    
+
     const pd = this.calculatePD(segmentLoans);
     const lgd = this.calculateLGD(segmentLoans);
     const discountRate = 0.05; // Risk-free rate + credit spread
 
     const lifetimeEL = totalExposure * pd * lgd * averageLife;
     const discountFactor = 1 / Math.pow(1 + discountRate, averageLife);
-    
+
     return {
       allowance: lifetimeEL * discountFactor,
       lifetime_expected_loss: lifetimeEL,
@@ -368,7 +368,7 @@ class BankingAnalyticsService extends EventEmitter {
     const stressedPDs = loans.map(loan => {
       const basePD = this.calculateBasePD(loan);
       // Stress PD based on economic factors
-      const stressFactor = 1 + (stressFactors.unemployment - 0.04) * 2 + 
+      const stressFactor = 1 + (stressFactors.unemployment - 0.04) * 2 +
                           (0.025 - stressFactors.gdp_growth) * 1.5;
       return Math.min(basePD * stressFactor, 1.0);
     });

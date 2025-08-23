@@ -11,7 +11,7 @@ export class IndustryTemplateService {
     this.registerTemplate('technology', 'marketplace', this.getMarketplaceTemplate());
     this.registerTemplate('technology', 'hardware', this.getHardwareTemplate());
 
-    // Healthcare Sector Templates  
+    // Healthcare Sector Templates
     this.registerTemplate('healthcare', 'biotech', this.getBiotechTemplate());
     this.registerTemplate('healthcare', 'medical_device', this.getMedicalDeviceTemplate());
 
@@ -50,7 +50,7 @@ export class IndustryTemplateService {
       name: 'SaaS Business Model',
       description: 'Software-as-a-Service revenue and growth modeling',
       category: 'Technology',
-      
+
       inputs: {
         arr: { label: 'Annual Recurring Revenue ($M)', value: 100, type: 'currency' },
         arr_growth_rate: { label: 'ARR Growth Rate (%)', value: 25, type: 'percentage' },
@@ -73,7 +73,7 @@ export class IndustryTemplateService {
       },
 
       keyMetrics: ['ARR', 'MRR', 'CAC', 'LTV', 'LTV/CAC Ratio', 'NRR', 'Churn Rate', 'Rule of 40'],
-      
+
       benchmarks: {
         arr_growth: { excellent: 40, good: 25, average: 15 },
         nrr: { excellent: 130, good: 110, average: 100 },
@@ -83,14 +83,14 @@ export class IndustryTemplateService {
     };
   }
 
-  // Technology - Marketplace Template  
+  // Technology - Marketplace Template
   getMarketplaceTemplate() {
     return {
       id: 'marketplace_model',
       name: 'Marketplace Business Model',
       description: 'Two-sided marketplace with network effects',
       category: 'Technology',
-      
+
       inputs: {
         gmv: { label: 'Gross Merchandise Value ($M)', value: 500, type: 'currency' },
         take_rate: { label: 'Take Rate (%)', value: 8, type: 'percentage' },
@@ -115,11 +115,11 @@ export class IndustryTemplateService {
   // Technology - Hardware Template
   getHardwareTemplate() {
     return {
-      id: 'hardware_model', 
+      id: 'hardware_model',
       name: 'Hardware Technology Model',
       description: 'Hardware manufacturing with R&D cycles',
       category: 'Technology',
-      
+
       inputs: {
         units_sold: { label: 'Units Sold (millions)', value: 50, type: 'number' },
         asp: { label: 'Average Selling Price', value: 800, type: 'currency' },
@@ -138,10 +138,10 @@ export class IndustryTemplateService {
   getBiotechTemplate() {
     return {
       id: 'biotech_model',
-      name: 'Biotechnology Company Model', 
+      name: 'Biotechnology Company Model',
       description: 'Drug development pipeline with clinical trials',
       category: 'Healthcare',
-      
+
       inputs: {
         phase1_assets: { label: 'Phase I Assets', value: 3, type: 'number' },
         phase2_assets: { label: 'Phase II Assets', value: 2, type: 'number' },
@@ -155,7 +155,7 @@ export class IndustryTemplateService {
       },
 
       calculations: {
-        overall_success_prob: (inputs) => (inputs.phase1_success/100) * (inputs.phase2_success/100) * (inputs.phase3_success/100),
+        overall_success_prob: (inputs) => (inputs.phase1_success / 100) * (inputs.phase2_success / 100) * (inputs.phase3_success / 100),
         risk_adjusted_npv: (inputs) => {
           const successProb = this.calculations.overall_success_prob(inputs);
           return (inputs.peak_sales * successProb) - inputs.development_cost;
@@ -173,7 +173,7 @@ export class IndustryTemplateService {
       name: 'Medical Device Company Model',
       description: 'Medical device manufacturing and regulatory',
       category: 'Healthcare',
-      
+
       inputs: {
         device_sales: { label: 'Device Sales Revenue ($M)', value: 500, type: 'currency' },
         consumable_sales: { label: 'Consumable Sales ($M)', value: 200, type: 'currency' },
@@ -194,7 +194,7 @@ export class IndustryTemplateService {
       name: 'Real Estate Investment Trust',
       description: 'REIT with property portfolio and dividends',
       category: 'Real Estate',
-      
+
       inputs: {
         total_properties: { label: 'Total Properties', value: 150, type: 'number' },
         occupancy_rate: { label: 'Occupancy Rate (%)', value: 92, type: 'percentage' },
@@ -223,7 +223,7 @@ export class IndustryTemplateService {
       name: 'Real Estate Development Model',
       description: 'Development project with construction phases',
       category: 'Real Estate',
-      
+
       inputs: {
         total_units: { label: 'Total Units', value: 200, type: 'number' },
         land_cost: { label: 'Land Cost ($M)', value: 15, type: 'currency' },
@@ -249,7 +249,7 @@ export class IndustryTemplateService {
       name: 'Oil & Gas Company Model',
       description: 'Oil & gas exploration and production',
       category: 'Energy',
-      
+
       inputs: {
         daily_production: { label: 'Daily Production (barrels)', value: 100000, type: 'number' },
         oil_price: { label: 'Oil Price per Barrel', value: 70, type: 'currency' },
@@ -269,14 +269,14 @@ export class IndustryTemplateService {
     };
   }
 
-  // Energy - Renewable Template  
+  // Energy - Renewable Template
   getRenewableTemplate() {
     return {
       id: 'renewable_model',
       name: 'Renewable Energy Model',
       description: 'Solar/wind renewable energy projects',
       category: 'Energy',
-      
+
       inputs: {
         installed_capacity: { label: 'Installed Capacity (MW)', value: 500, type: 'number' },
         capacity_factor: { label: 'Capacity Factor (%)', value: 35, type: 'percentage' },

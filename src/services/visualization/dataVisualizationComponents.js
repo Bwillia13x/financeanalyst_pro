@@ -448,7 +448,7 @@ export class DataVisualizationService {
         processed.push({
           row: i,
           col: j,
-          value: value,
+          value,
           rowLabel: data.rowLabels?.[i] || `Row ${i}`,
           colLabel: data.colLabels?.[j] || `Col ${j}`
         });
@@ -561,7 +561,7 @@ export class DataVisualizationService {
       type: 'financial_dashboard',
       containerId,
       config: { theme: 'financial', ...config },
-      data: data,
+      data,
       components: []
     };
 
@@ -653,7 +653,7 @@ export class DataVisualizationService {
       .on('mousemove', (event) => {
         const [mouseX] = d3.pointer(event);
         const date = xScale.invert(mouseX);
-        
+
         // Find closest data point
         const closestData = this.findClosestDataPoint(chart.data, date);
         if (closestData) {
@@ -709,10 +709,10 @@ export class DataVisualizationService {
 
   async processRenderQueue() {
     this.isProcessingQueue = true;
-    
+
     while (this.renderQueue.length > 0) {
       const chart = this.renderQueue.shift();
-      
+
       try {
         switch (chart.type) {
           case 'advanced_line':
@@ -731,15 +731,15 @@ export class DataVisualizationService {
             this.renderFinancialDashboard(chart);
             break;
         }
-        
+
         // Small delay to prevent blocking the UI
         await new Promise(resolve => setTimeout(resolve, 16));
-        
+
       } catch (error) {
         console.error(`Error rendering chart ${chart.id}:`, error);
       }
     }
-    
+
     this.isProcessingQueue = false;
   }
 

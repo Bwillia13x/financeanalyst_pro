@@ -157,7 +157,7 @@ export class RiskAssessmentService {
 
     this.covenantAnalyses.set(analysis.id, analysis);
     this.emit('covenant_analysis_completed', analysis);
-    
+
     return analysis;
   }
 
@@ -189,7 +189,7 @@ export class RiskAssessmentService {
       if (!result.isCompliant) {
         const breach = Math.abs(result.cushion);
         const thresholdPercent = breach / Math.abs(covenant.threshold);
-        
+
         if (thresholdPercent > 0.2) result.severity = 'high';
         else if (thresholdPercent > 0.1) result.severity = 'medium';
         else result.severity = 'low';
@@ -246,7 +246,7 @@ export class RiskAssessmentService {
 
     for (let period = 1; period <= periods; period++) {
       const projectedFinancials = projections[`period_${period}`] || projections.quarterly?.[period - 1];
-      
+
       if (projectedFinancials) {
         const periodResult = {
           period,
@@ -268,10 +268,10 @@ export class RiskAssessmentService {
   calculateCovenantCushions(financials, covenants) {
     return covenants.map(covenant => {
       const actualValue = this.calculateCovenantMetric(financials, covenant.type);
-      const cushion = covenant.direction === 'max' ? 
-        covenant.threshold - actualValue : 
+      const cushion = covenant.direction === 'max' ?
+        covenant.threshold - actualValue :
         actualValue - covenant.threshold;
-      
+
       const cushionPercent = Math.abs(cushion) / Math.abs(covenant.threshold || 1) * 100;
 
       return {
@@ -311,7 +311,7 @@ export class RiskAssessmentService {
 
     return {
       scenarios: stressResults,
-      worstCase: stressResults.reduce((worst, current) => 
+      worstCase: stressResults.reduce((worst, current) =>
         current.compliance.breachedCovenants.length > worst.compliance.breachedCovenants.length ? current : worst
       ),
       summary: this.summarizeStressTestResults(stressResults)
@@ -381,7 +381,7 @@ export class RiskAssessmentService {
     };
 
     const weights = { financial: 0.5, qualitative: 0.25, industry: 0.15, esg: 0.1 };
-    
+
     const totalScore = Object.entries(components).reduce((sum, [category, score]) => {
       return sum + (score.score * weights[category]);
     }, 0);
@@ -561,15 +561,15 @@ export class RiskAssessmentService {
     const cashConversionCycle = this.calculateCashConversionCycle(financials);
 
     let riskScore = 0;
-    
+
     // Liquidity ratio assessment
     if (liquidityRatio < 0.2) riskScore += 0.4;
     else if (liquidityRatio < 0.5) riskScore += 0.2;
-    
+
     // Quick ratio assessment
     if (quickRatio < 1) riskScore += 0.3;
     else if (quickRatio < 1.5) riskScore += 0.1;
-    
+
     // Operating cash flow assessment
     if (operatingCashFlow < 0) riskScore += 0.3;
 

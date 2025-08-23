@@ -71,6 +71,27 @@ jobs:
         name: codecov-umbrella
         fail_ci_if_error: false
 
+  # Backend Testing Job
+  backend-tests:
+    name: Backend Tests
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+
+    - name: Install backend dependencies
+      run: cd backend && npm ci
+
+    - name: Run backend tests
+      run: cd backend && npm test
+
   # Security Audit Job
   security-audit:
     name: Security Audit
@@ -134,14 +155,47 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: build-${{ matrix.environment }}
-        path: build/
+        path: dist/
         retention-days: 30
+
+  # E2E Testing Job
+  e2e-tests:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: build-staging
+        path: dist/
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Install Playwright Browsers
+      run: npm run e2e:install
+
+    - name: Run E2E tests
+      run: npm run e2e
+      env:
+        CI: true
 
   # Performance Testing Job
   performance-testing:
     name: Performance Testing
     runs-on: ubuntu-latest
-    needs: build
+    needs: e2e-tests
     if: github.ref == 'refs/heads/main'
     
     steps:
@@ -152,7 +206,7 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: build-staging
-        path: build/
+        path: dist/
         
     - name: Setup Node.js
       uses: actions/setup-node@v4
@@ -171,7 +225,7 @@ jobs:
   deploy-staging:
     name: Deploy to Staging
     runs-on: ubuntu-latest
-    needs: build
+    needs: e2e-tests
     if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main'
     environment: staging
     
@@ -180,7 +234,7 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: build-staging
-        path: build/
+        path: dist/
         
     - name: Deploy to staging
       run: |
@@ -193,11 +247,33 @@ jobs:
         echo "Running smoke tests on staging..."
         # Add smoke test commands here
 
+  # Deploy Backend to Production
+  deploy-backend-production:
+    name: Deploy Backend to Production
+    runs-on: ubuntu-latest
+    needs: [backend-tests]
+    if: github.ref == 'refs/heads/main'
+    environment: production
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install Render CLI
+      run: npm install -g render-cli
+
+    - name: Deploy to Render
+      run: chmod +x backend/deploy-production.sh && backend/deploy-production.sh
+      env:
+        RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+        RENDER_SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }}
+        PRODUCTION_BACKEND_URL: ${{ vars.PRODUCTION_BACKEND_URL }}
+
   # Deploy to Production
   deploy-production:
     name: Deploy to Production
     runs-on: ubuntu-latest
-    needs: [build, performance-testing, deploy-staging]
+    needs: [build, performance-testing, deploy-staging, deploy-backend-production]
     if: github.ref == 'refs/heads/main'
     environment: production
     
@@ -206,12 +282,16 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: build-production
-        path: build/
+        path: dist/
         
-    - name: Deploy to production
-      run: |
-        echo "Deploying to production environment..."
-        # Add your production deployment commands here
+    - name: Install Netlify CLI
+      run: npm install -g netlify-cli
+
+    - name: Deploy to Netlify
+      run: netlify deploy --prod --dir=dist --auth $NETLIFY_AUTH_TOKEN --site $NETLIFY_SITE_ID
+      env:
+        NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+        NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
         
     - name: Run post-deployment tests
       run: |

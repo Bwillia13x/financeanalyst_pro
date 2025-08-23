@@ -1,6 +1,6 @@
 // Export & Sharing Features - Phase 2 Implementation
-import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 import * as XLSX from 'xlsx';
 
 export class ExportSharingService {
@@ -104,7 +104,7 @@ export class ExportSharingService {
 
       // Generate the PDF blob
       const pdfBlob = pdf.output('blob');
-      
+
       // Create download link
       const url = URL.createObjectURL(pdfBlob);
       const link = document.createElement('a');
@@ -116,7 +116,7 @@ export class ExportSharingService {
       setTimeout(() => URL.revokeObjectURL(url), 1000);
 
       this.emit('export:completed', { jobId, type: 'pdf', filename: finalConfig.filename });
-      
+
       return {
         success: true,
         jobId,
@@ -178,7 +178,7 @@ export class ExportSharingService {
     // Company logo placeholder
     pdf.setFillColor(240, 240, 240);
     pdf.rect(pageWidth / 2 - 30, 40, 60, 20, 'F');
-    
+
     // Title
     pdf.setFontSize(28);
     pdf.setFont('helvetica', 'bold');
@@ -238,21 +238,21 @@ export class ExportSharingService {
       const lines = pdf.splitTextToSize(sectionData, contentWidth);
       pdf.setFontSize(11);
       pdf.setFont('helvetica', 'normal');
-      
+
       lines.forEach(line => {
         pdf.text(line, config.margins.left, yPos);
         yPos += 6;
       });
-      
+
     } else if (sectionData.type === 'chart') {
       // Chart content
       await this.addChartToPDF(pdf, sectionData, config.margins.left, yPos, contentWidth);
       yPos += 120; // Chart height
-      
+
     } else if (sectionData.type === 'table') {
       // Table content
       yPos = this.addTableToPDF(pdf, sectionData.data, config.margins.left, yPos, contentWidth);
-      
+
     } else if (sectionData.type === 'metrics') {
       // Key metrics grid
       yPos = this.addMetricsGrid(pdf, sectionData.metrics, config.margins.left, yPos, contentWidth);
@@ -266,7 +266,7 @@ export class ExportSharingService {
     // This is a placeholder for chart rendering logic
     pdf.setFillColor(245, 245, 245);
     pdf.rect(x, y, width, 80, 'F');
-    
+
     pdf.setFontSize(10);
     pdf.setFont('helvetica', 'italic');
     pdf.text(`[Chart: ${chartData.title || 'Untitled Chart'}]`, x + 10, y + 45);
@@ -280,14 +280,14 @@ export class ExportSharingService {
     // Headers
     pdf.setFillColor(240, 240, 240);
     pdf.rect(x, yPos, maxWidth, rowHeight, 'F');
-    
+
     pdf.setFontSize(9);
     pdf.setFont('helvetica', 'bold');
-    
+
     tableData.headers.forEach((header, index) => {
       pdf.text(header, x + (index * colWidth) + 5, yPos + 5);
     });
-    
+
     yPos += rowHeight;
 
     // Data rows
@@ -297,11 +297,11 @@ export class ExportSharingService {
         pdf.setFillColor(250, 250, 250);
         pdf.rect(x, yPos, maxWidth, rowHeight, 'F');
       }
-      
+
       row.forEach((cell, colIndex) => {
         pdf.text(String(cell), x + (colIndex * colWidth) + 5, yPos + 5);
       });
-      
+
       yPos += rowHeight;
     });
 
@@ -309,7 +309,7 @@ export class ExportSharingService {
   }
 
   addMetricsGrid(pdf, metrics, x, startY, maxWidth) {
-    let yPos = startY;
+    const yPos = startY;
     const cols = 2;
     const colWidth = maxWidth / cols;
     const rowHeight = 25;
@@ -342,7 +342,7 @@ export class ExportSharingService {
 
   addPageNumbers(pdf, totalPages) {
     const pageWidth = pdf.internal.pageSize.getWidth();
-    
+
     for (let i = 1; i <= totalPages; i++) {
       pdf.setPage(i);
       pdf.setFontSize(10);
@@ -353,14 +353,14 @@ export class ExportSharingService {
 
   addWatermark(pdf, watermark) {
     const totalPages = pdf.internal.pages.length - 1;
-    
+
     for (let i = 1; i <= totalPages; i++) {
       pdf.setPage(i);
       pdf.setTextColor(200, 200, 200);
       pdf.setFontSize(50);
-      pdf.text(watermark.text, 100, 150, { 
-        angle: 45, 
-        align: 'center' 
+      pdf.text(watermark.text, 100, 150, {
+        angle: 45,
+        align: 'center'
       });
     }
   }
@@ -395,17 +395,17 @@ export class ExportSharingService {
       }
 
       // Generate Excel file
-      const excelBuffer = XLSX.write(workbook, { 
-        bookType: 'xlsx', 
+      const excelBuffer = XLSX.write(workbook, {
+        bookType: 'xlsx',
         type: 'array',
         cellStyles: finalConfig.includeFormatting
       });
 
       // Create download
-      const blob = new Blob([excelBuffer], { 
-        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+      const blob = new Blob([excelBuffer], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
       });
-      
+
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
@@ -415,7 +415,7 @@ export class ExportSharingService {
       setTimeout(() => URL.revokeObjectURL(url), 1000);
 
       this.emit('export:completed', { jobId, type: 'excel', filename: finalConfig.filename });
-      
+
       return {
         success: true,
         jobId,
@@ -473,10 +473,10 @@ export class ExportSharingService {
 
     const shareUrl = `${this.baseUrl}/shared/${linkId}`;
 
-    this.emit('share:created', { 
-      linkId, 
-      url: shareUrl, 
-      config: finalConfig 
+    this.emit('share:created', {
+      linkId,
+      url: shareUrl,
+      config: finalConfig
     });
 
     return {
@@ -489,7 +489,7 @@ export class ExportSharingService {
 
   async accessSharedLink(linkId, password = null) {
     const shareData = this.shareLinks.get(linkId);
-    
+
     if (!shareData) {
       throw new Error('Share link not found');
     }
@@ -504,7 +504,7 @@ export class ExportSharingService {
     }
 
     const permissions = this.permissions.get(linkId);
-    
+
     if (permissions.password && permissions.password !== password) {
       throw new Error('Invalid password');
     }
@@ -518,9 +518,9 @@ export class ExportSharingService {
       ip: 'client-side' // Would be populated server-side
     });
 
-    this.emit('share:accessed', { 
-      linkId, 
-      views: shareData.views 
+    this.emit('share:accessed', {
+      linkId,
+      views: shareData.views
     });
 
     return {
@@ -605,10 +605,10 @@ export class ExportSharingService {
 
     for (let i = 0; i < exports.length; i++) {
       const exportConfig = exports[i];
-      
+
       try {
         let result;
-        
+
         switch (exportConfig.type) {
           case 'pdf':
             result = await this.exportToPDF(exportConfig.content, exportConfig.config);
@@ -621,12 +621,12 @@ export class ExportSharingService {
         }
 
         results.push({ index: i, success: true, result });
-        
+
       } catch (error) {
-        results.push({ 
-          index: i, 
-          success: false, 
-          error: error.message 
+        results.push({
+          index: i,
+          success: false,
+          error: error.message
         });
       }
 
@@ -636,10 +636,10 @@ export class ExportSharingService {
       }
     }
 
-    this.emit('batch_export:completed', { 
-      batchId, 
-      results, 
-      successCount: results.filter(r => r.success).length 
+    this.emit('batch_export:completed', {
+      batchId,
+      results,
+      successCount: results.filter(r => r.success).length
     });
 
     return results;
@@ -652,7 +652,7 @@ export class ExportSharingService {
       createdAt: new Date(),
       customTemplate: true
     });
-    
+
     this.emit('template:created', { name, template });
     return true;
   }

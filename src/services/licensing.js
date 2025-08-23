@@ -8,7 +8,7 @@ export class LicensingService {
   // License Types
   static LICENSE_TYPES = {
     TRIAL: 'trial',
-    PROFESSIONAL: 'professional', 
+    PROFESSIONAL: 'professional',
     ENTERPRISE: 'enterprise',
     ACADEMIC: 'academic'
   };
@@ -64,7 +64,7 @@ export class LicensingService {
   // User Roles and Permissions
   static ROLES = {
     VIEWER: 'viewer',
-    ANALYST: 'analyst', 
+    ANALYST: 'analyst',
     SENIOR_ANALYST: 'senior_analyst',
     ADMIN: 'admin',
     SUPER_ADMIN: 'super_admin'
@@ -166,14 +166,14 @@ export class LicensingService {
     const license = await this.getCurrentLicense();
     const features = LicensingService.FEATURES[license.type] || {};
     const limit = features[`${limitType}Limit`];
-    
+
     if (limit === -1) return { allowed: true, unlimited: true };
-    
+
     const currentUsage = await this.getCurrentUsage(limitType);
     return {
       allowed: currentUsage < limit,
       current: currentUsage,
-      limit: limit,
+      limit,
       remaining: Math.max(0, limit - currentUsage)
     };
   }
@@ -211,8 +211,8 @@ export class LicensingService {
 
   // Mock license for development
   getMockLicense() {
-    const licenseType = process.env.NODE_ENV === 'development' 
-      ? LicensingService.LICENSE_TYPES.ENTERPRISE 
+    const licenseType = process.env.NODE_ENV === 'development'
+      ? LicensingService.LICENSE_TYPES.ENTERPRISE
       : LicensingService.LICENSE_TYPES.TRIAL;
 
     return {
@@ -306,7 +306,7 @@ export const useLicense = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchLicense = async () => {
+    const fetchLicense = async() => {
       try {
         setLoading(true);
         const licenseData = await licensingService.getLicenseStatus();
@@ -326,11 +326,11 @@ export const useLicense = () => {
     return unsubscribe;
   }, []);
 
-  const hasFeature = useCallback(async (featureName) => {
+  const hasFeature = useCallback(async(featureName) => {
     return licensingService.hasFeature(featureName);
   }, []);
 
-  const hasPermission = useCallback(async (permission) => {
+  const hasPermission = useCallback(async(permission) => {
     return licensingService.hasPermission(permission);
   }, []);
 

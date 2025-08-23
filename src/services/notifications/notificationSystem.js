@@ -25,7 +25,7 @@ export class NotificationService {
       'user_left': {
         title: '{{ userName }} left the model',
         body: '{{ userName }} has left {{ modelName }}.',
-        icon: 'user-minus', 
+        icon: 'user-minus',
         category: 'collaboration',
         priority: 'low'
       },
@@ -270,7 +270,7 @@ export class NotificationService {
     for (const recipient of recipientList) {
       const notification = await this.createNotification(recipient, template, data, options);
       notifications.push(notification);
-      
+
       // Send through appropriate channels based on user preferences
       await this.deliverNotification(notification);
     }
@@ -288,7 +288,7 @@ export class NotificationService {
       icon: template.icon || 'bell',
       category: template.category || 'general',
       priority: options.priority || template.priority || 'medium',
-      data: data,
+      data,
       metadata: {
         modelId: data.modelId || null,
         sourceUserId: data.sourceUserId || null,
@@ -404,7 +404,7 @@ export class NotificationService {
 
     // Mock email delivery
     console.log(`Email notification sent to ${emailData.to}:`, notification.title);
-    
+
     return { success: true, channel: 'email', emailId: `email_${Date.now()}` };
   }
 
@@ -496,7 +496,7 @@ export class NotificationService {
   async unsubscribe(userId, subscriptionId) {
     const userSubscriptions = this.subscriptions.get(userId) || [];
     const subscriptionIndex = userSubscriptions.findIndex(sub => sub.id === subscriptionId);
-    
+
     if (subscriptionIndex === -1) {
       throw new Error('Subscription not found');
     }
@@ -517,7 +517,7 @@ export class NotificationService {
   async handleEvent(eventType, eventData) {
     // Find all subscriptions matching this event
     const matchingSubscriptions = [];
-    
+
     for (const [userId, userSubs] of this.subscriptions.entries()) {
       for (const subscription of userSubs) {
         if (subscription.isActive && subscription.eventType === eventType) {
@@ -573,7 +573,7 @@ export class NotificationService {
 
   async markAllAsRead(userId, category = null) {
     let count = 0;
-    
+
     for (const notification of this.notifications.values()) {
       if (notification.userId === userId && !notification.readAt) {
         if (!category || notification.category === category) {
@@ -656,7 +656,7 @@ export class NotificationService {
         startDate = new Date(0);
     }
 
-    const recentNotifications = notifications.filter(n => 
+    const recentNotifications = notifications.filter(n =>
       new Date(n.createdAt) >= startDate
     );
 
@@ -671,15 +671,15 @@ export class NotificationService {
 
     recentNotifications.forEach(notification => {
       // By category
-      stats.byCategory[notification.category] = 
+      stats.byCategory[notification.category] =
         (stats.byCategory[notification.category] || 0) + 1;
 
       // By priority
-      stats.byPriority[notification.priority] = 
+      stats.byPriority[notification.priority] =
         (stats.byPriority[notification.priority] || 0) + 1;
 
       // By status
-      stats.byStatus[notification.status] = 
+      stats.byStatus[notification.status] =
         (stats.byStatus[notification.status] || 0) + 1;
     });
 
@@ -740,10 +740,10 @@ export class NotificationService {
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2 style="color: #1f2937;">${notification.title}</h2>
         <p style="color: #4b5563; line-height: 1.6;">${notification.body}</p>
-        ${notification.metadata.actionUrl ? 
-          `<a href="${notification.metadata.actionUrl}" style="background: #3b82f6; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; display: inline-block; margin-top: 15px;">View Details</a>` : 
-          ''
-        }
+        ${notification.metadata.actionUrl ?
+    `<a href="${notification.metadata.actionUrl}" style="background: #3b82f6; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; display: inline-block; margin-top: 15px;">View Details</a>` :
+    ''
+}
         <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;">
         <p style="color: #6b7280; font-size: 12px;">
           Sent by FinanceAnalyst Pro | 

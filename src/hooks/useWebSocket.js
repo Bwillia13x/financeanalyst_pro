@@ -84,7 +84,7 @@ export function useWebSocket(url, options = {}) {
         if (autoReconnect && event.code !== 1000 && reconnectAttemptsRef.current < maxReconnectAttempts) {
           reconnectAttemptsRef.current++;
           setConnectionStatus('reconnecting');
-          
+
           reconnectTimeoutRef.current = setTimeout(() => {
             connect();
           }, reconnectInterval);
@@ -115,13 +115,13 @@ export function useWebSocket(url, options = {}) {
     if (socket) {
       socket.close(1000, 'Manual disconnect');
     }
-    
+
     stopHeartbeat();
-    
+
     if (reconnectTimeoutRef.current) {
       clearTimeout(reconnectTimeoutRef.current);
     }
-    
+
     setSocket(null);
     setIsConnected(false);
     setConnectionStatus('disconnected');
@@ -192,7 +192,7 @@ export function useCollaboration(analysisId, user) {
   const [notifications, setNotifications] = useState([]);
 
   const wsUrl = process.env.REACT_APP_WS_URL || 'ws://localhost:8080';
-  
+
   const { isConnected, send, connectionStatus } = useWebSocket(wsUrl, {
     onOpen: () => {
       // Authenticate
@@ -233,7 +233,7 @@ export function useCollaboration(analysisId, user) {
           break;
 
         case 'comment:updated':
-          setComments(prev => 
+          setComments(prev =>
             prev.map(c => c.id === message.comment.id ? message.comment : c)
           );
           break;

@@ -1,5 +1,6 @@
-import React from 'react';
 import { Check, Crown, Users, Zap, ArrowRight } from 'lucide-react';
+import React from 'react';
+
 import { useLicense } from '../services/licensing';
 
 const PricingPage = () => {
@@ -118,7 +119,7 @@ const PricingPage = () => {
           {plans.map((plan) => {
             const IconComponent = plan.icon;
             const isCurrentPlan = license?.type === plan.id;
-            
+
             return (
               <div
                 key={plan.id}
@@ -135,7 +136,7 @@ const PricingPage = () => {
                     </span>
                   </div>
                 )}
-                
+
                 {isCurrentPlan && (
                   <div className="absolute -top-4 right-4">
                     <span className="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium">
@@ -178,12 +179,12 @@ const PricingPage = () => {
                   disabled={isCurrentPlan}
                   className={`
                     w-full py-3 px-4 rounded-lg font-medium transition-colors duration-200
-                    ${isCurrentPlan 
-                      ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
-                      : plan.popular
-                        ? 'bg-blue-600 text-white hover:bg-blue-700'
-                        : 'bg-gray-900 text-white hover:bg-gray-800'
-                    }
+                    ${isCurrentPlan
+                ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                : plan.popular
+                  ? 'bg-blue-600 text-white hover:bg-blue-700'
+                  : 'bg-gray-900 text-white hover:bg-gray-800'
+              }
                   `}
                 >
                   {isCurrentPlan ? 'Current Plan' : plan.cta}
@@ -205,7 +206,7 @@ const PricingPage = () => {
                 Can I upgrade or downgrade anytime?
               </h3>
               <p className="text-gray-600">
-                Yes, you can change your plan at any time. Upgrades take effect immediately, 
+                Yes, you can change your plan at any time. Upgrades take effect immediately,
                 and downgrades take effect at the end of your current billing cycle.
               </p>
             </div>
@@ -214,7 +215,7 @@ const PricingPage = () => {
                 What payment methods do you accept?
               </h3>
               <p className="text-gray-600">
-                We accept all major credit cards, PayPal, and can arrange ACH transfers 
+                We accept all major credit cards, PayPal, and can arrange ACH transfers
                 for Enterprise customers.
               </p>
             </div>
@@ -223,7 +224,7 @@ const PricingPage = () => {
                 Is there a long-term contract?
               </h3>
               <p className="text-gray-600">
-                No, all plans are month-to-month with no long-term commitment. 
+                No, all plans are month-to-month with no long-term commitment.
                 Enterprise customers can opt for annual billing for additional savings.
               </p>
             </div>
@@ -232,7 +233,7 @@ const PricingPage = () => {
                 Do you offer academic discounts?
               </h3>
               <p className="text-gray-600">
-                Yes, we offer special academic pricing for students, faculty, and 
+                Yes, we offer special academic pricing for students, faculty, and
                 educational institutions. Contact us for details.
               </p>
             </div>

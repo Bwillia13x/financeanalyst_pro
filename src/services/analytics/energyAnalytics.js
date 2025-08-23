@@ -100,7 +100,7 @@ class EnergyAnalyticsService extends EventEmitter {
       const operatingCosts = yearData.production * reserve.operating_cost_per_unit;
       const capitalCosts = yearData.capex || 0;
       const netCashFlow = revenue - operatingCosts - capitalCosts;
-      
+
       const discountFactor = 1 / Math.pow(1.10, year); // 10% discount rate
       pv10 += netCashFlow * discountFactor;
     });
@@ -119,7 +119,7 @@ class EnergyAnalyticsService extends EventEmitter {
       const operatingCosts = yearData.production * reserve.operating_cost_per_unit;
       const capitalCosts = yearData.capex || 0;
       const netCashFlow = revenue - operatingCosts - capitalCosts;
-      
+
       const discountFactor = 1 / Math.pow(1.15, year); // 15% discount rate
       pv15 += netCashFlow * discountFactor;
     });
@@ -130,7 +130,7 @@ class EnergyAnalyticsService extends EventEmitter {
   analyzeProductionProfile(assetData) {
     const wells = assetData.wells || [];
     const aggregateProfile = this.aggregateWellProduction(wells);
-    
+
     return {
       historical_production: this.analyzeHistoricalProduction(wells),
       decline_analysis: this.analyzeDeclineRates(wells),
@@ -143,7 +143,7 @@ class EnergyAnalyticsService extends EventEmitter {
 
   analyzeDrillingEconomics(assetData) {
     const drillingProgram = assetData.drilling_program || {};
-    
+
     return {
       breakeven_analysis: this.calculateBreakevenPrices(drillingProgram),
       drilling_inventory: this.assessDrillingInventory(drillingProgram),
@@ -178,11 +178,11 @@ class EnergyAnalyticsService extends EventEmitter {
   async performRenewableEconomics(projectData) {
     const projectType = projectData.technology_type;
     const techSpecs = this.renewableTypes[projectType] || this.renewableTypes.solar;
-    
+
     const energyProduction = this.calculateAnnualEnergyProduction(projectData, techSpecs);
     const revenueProfile = this.buildRevenueProfile(projectData, energyProduction);
     const costProfile = this.buildCostProfile(projectData, techSpecs);
-    
+
     return {
       project_irr: this.calculateProjectIRR(revenueProfile, costProfile),
       project_npv: this.calculateProjectNPV(revenueProfile, costProfile, projectData.discount_rate || 0.08),
@@ -198,7 +198,7 @@ class EnergyAnalyticsService extends EventEmitter {
     const capacityFactor = projectData.capacity_factor || techSpecs.capacity_factor;
     const degradationRate = techSpecs.degradation_rate;
     const lifespan = techSpecs.lifespan;
-    
+
     const productionProfile = [];
     for (let year = 1; year <= lifespan; year++) {
       const degradationFactor = Math.pow(1 - degradationRate, year - 1);
@@ -217,7 +217,7 @@ class EnergyAnalyticsService extends EventEmitter {
 
   analyzePowerPurchaseAgreement(projectData) {
     const ppa = projectData.ppa || {};
-    
+
     return {
       contract_analysis: this.analyzePPATerms(ppa),
       price_escalation: this.analyzePriceEscalation(ppa),
@@ -233,7 +233,7 @@ class EnergyAnalyticsService extends EventEmitter {
    */
   analyzeUtilityRateStructure(utilityData) {
     const segment = this.utilitySegments[utilityData.segment] || this.utilitySegments.electric;
-    
+
     return {
       rate_base_analysis: this.analyzeRateBase(utilityData, segment),
       roe_analysis: this.analyzeReturnOnEquity(utilityData, segment),
@@ -247,7 +247,7 @@ class EnergyAnalyticsService extends EventEmitter {
     const currentRateBase = utilityData.rate_base;
     const projectedGrowth = segment.rate_base_growth;
     const projectionYears = 5;
-    
+
     const rateBaseProjection = [];
     for (let year = 1; year <= projectionYears; year++) {
       const projectedRateBase = currentRateBase * Math.pow(1 + projectedGrowth, year);
@@ -306,7 +306,7 @@ class EnergyAnalyticsService extends EventEmitter {
     const initialProduction = reserve.initial_production_rate;
     const declineRate = reserve.decline_rate || 0.15; // 15% annual decline
     const economicLimit = reserve.economic_limit || initialProduction * 0.05;
-    
+
     const profile = [];
     let currentProduction = initialProduction;
     let year = 1;
@@ -318,7 +318,7 @@ class EnergyAnalyticsService extends EventEmitter {
         decline_rate: declineRate,
         cumulative_production: profile.reduce((sum, p) => sum + p.production, 0) + currentProduction
       });
-      
+
       currentProduction *= (1 - declineRate);
       year++;
     }
@@ -341,7 +341,7 @@ class EnergyAnalyticsService extends EventEmitter {
     // Simplified price strip - would typically come from market data
     const basPrice = this.commodityPrices.oil.current_price;
     const priceStrip = [];
-    
+
     for (let year = 1; year <= 20; year++) {
       // Apply mean reversion and inflation
       const meanReversionFactor = Math.pow(0.95, year - 1);
@@ -361,7 +361,7 @@ class EnergyAnalyticsService extends EventEmitter {
     energyProduction.forEach((yearData, index) => {
       const year = index + 1;
       const discountFactor = 1 / Math.pow(1 + discountRate, year);
-      
+
       presentValueCosts += (costProfile[index]?.total_costs || 0) * discountFactor;
       presentValueEnergy += yearData.energy_production_mwh * discountFactor;
     });

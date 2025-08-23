@@ -116,7 +116,7 @@ export class UserPresenceService {
   updateCursor(userId, cursorData) {
     const cursor = this.cursors.get(userId);
     const session = this.activeUsers.get(userId);
-    
+
     if (!cursor || !session) return;
 
     // Update cursor position
@@ -140,7 +140,7 @@ export class UserPresenceService {
         userId,
         userName: session.userInfo.name,
         userColor: session.userInfo.color,
-        cursor: cursor,
+        cursor,
         modelId: session.modelId
       });
     }, this.presenceConfig.cursorUpdateThrottle);
@@ -168,7 +168,7 @@ export class UserPresenceService {
   updateSelection(userId, selectionData) {
     const selection = this.selections.get(userId);
     const session = this.activeUsers.get(userId);
-    
+
     if (!selection || !session) return;
 
     selection.selection = {
@@ -190,7 +190,7 @@ export class UserPresenceService {
         userId,
         userName: session.userInfo.name,
         userColor: session.userInfo.color,
-        selection: selection,
+        selection,
         modelId: session.modelId
       });
     }, this.presenceConfig.selectionUpdateThrottle);
@@ -241,7 +241,7 @@ export class UserPresenceService {
       this.broadcastPresenceUpdate('viewport_updated', {
         userId,
         userName: session.userInfo.name,
-        viewport: viewport,
+        viewport,
         modelId: session.modelId
       });
     }
@@ -342,7 +342,7 @@ export class UserPresenceService {
   // Heartbeat and Health Monitoring
   startHeartbeatMonitoring(userId) {
     const heartbeatKey = `heartbeat_${userId}`;
-    
+
     // Clear existing heartbeat if any
     if (this.heartbeatTimers && this.heartbeatTimers[heartbeatKey]) {
       clearInterval(this.heartbeatTimers[heartbeatKey]);
@@ -360,7 +360,7 @@ export class UserPresenceService {
 
   stopHeartbeatMonitoring(userId) {
     const heartbeatKey = `heartbeat_${userId}`;
-    
+
     if (this.heartbeatTimers && this.heartbeatTimers[heartbeatKey]) {
       clearInterval(this.heartbeatTimers[heartbeatKey]);
       delete this.heartbeatTimers[heartbeatKey];
@@ -396,7 +396,7 @@ export class UserPresenceService {
     if (!session) return null;
 
     session.connection.lastHeartbeat = new Date().toISOString();
-    
+
     // If user was idle, mark as active
     if (session.presence.status === 'idle') {
       this.updateUserStatus(userId, 'active');
@@ -408,7 +408,7 @@ export class UserPresenceService {
   // Presence Queries
   getActiveUsers(modelId = null) {
     let users = Array.from(this.activeUsers.values());
-    
+
     if (modelId) {
       users = users.filter(session => session.modelId === modelId);
     }
@@ -441,7 +441,7 @@ export class UserPresenceService {
 
   getPresenceSummary(modelId) {
     const activeUsers = this.getActiveUsers(modelId);
-    
+
     const summary = {
       totalUsers: activeUsers.length,
       activeUsers: activeUsers.filter(u => u.presence.status === 'active').length,
@@ -449,7 +449,7 @@ export class UserPresenceService {
       editors: activeUsers.filter(u => u.capabilities.canEdit).length,
       viewers: activeUsers.filter(u => !u.capabilities.canEdit).length,
       locations: this.getLocationDistribution(activeUsers),
-      lastActivity: activeUsers.length > 0 ? 
+      lastActivity: activeUsers.length > 0 ?
         Math.max(...activeUsers.map(u => new Date(u.presence.lastActivity))) : null
     };
 
@@ -462,7 +462,7 @@ export class UserPresenceService {
     if (!userSession) return [];
 
     const targetLocation = location || userSession.presence.currentLocation;
-    
+
     return this.getActiveUsers(userSession.modelId)
       .filter(user => user.userId !== userId && user.presence.currentLocation === targetLocation);
   }
@@ -471,11 +471,11 @@ export class UserPresenceService {
     const usersWithElement = [];
 
     for (const [userId, selection] of this.selections.entries()) {
-      if (selection.selection && 
+      if (selection.selection &&
           selection.selection.type === elementType &&
-          (selection.selection.data?.elementId === elementId || 
+          (selection.selection.data?.elementId === elementId ||
            selection.selection.context?.elementId === elementId)) {
-        
+
         const session = this.activeUsers.get(userId);
         if (session) {
           usersWithElement.push({
@@ -545,7 +545,7 @@ export class UserPresenceService {
 
   assignUserColor(userId) {
     const colors = [
-      '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FECA57', 
+      '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FECA57',
       '#FF9FF3', '#54A0FF', '#5F27CD', '#00D2D3', '#FF9F43'
     ];
     const colorIndex = userId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length;

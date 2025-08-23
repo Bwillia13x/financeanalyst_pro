@@ -11,7 +11,7 @@ describe('Data Normalizer Contract Tests', () => {
   describe('normalizeQuote contract', () => {
     it('should always return required fields with proper types', () => {
       const result = normalizeQuote({});
-      
+
       // Contract: Must always return an object with these fields
       expect(result).toHaveProperty('symbol');
       expect(result).toHaveProperty('currentPrice');
@@ -24,18 +24,18 @@ describe('Data Normalizer Contract Tests', () => {
       expect(result).toHaveProperty('dayLow');
       expect(result).toHaveProperty('source');
       expect(result).toHaveProperty('timestamp');
-      
+
       // Contract: String fields should be string or undefined/null
       expect(['string', 'undefined'].includes(typeof result.symbol)).toBe(true);
       expect(['string'].includes(typeof result.source)).toBe(true);
       expect(['string'].includes(typeof result.timestamp)).toBe(true);
-      
+
       // Contract: Numeric fields should be number, null, or undefined
       expect(['number', 'undefined'].includes(typeof result.currentPrice)).toBe(true);
       expect(['number', 'undefined'].includes(typeof result.previousClose)).toBe(true);
       expect(['number', 'undefined'].includes(typeof result.change)).toBe(true);
       expect(['number', 'undefined'].includes(typeof result.changePercent)).toBe(true);
-      
+
       // Contract: Optional fields can be null
       expect([null, 'number'].includes(result.volume)).toBe(true);
       expect([null, 'number'].includes(result.marketCap)).toBe(true);
@@ -299,7 +299,7 @@ describe('Data Normalizer Contract Tests', () => {
       };
 
       const normalized = normalizeQuote(rawData);
-      
+
       // Should be transformable for different use cases
       const forChart = {
         x: normalized.timestamp,

@@ -1,10 +1,9 @@
 // Advanced Chart Component - Phase 2 Integration
-import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  BarChart3, 
-  LineChart, 
-  PieChart, 
+import {
+  BarChart3,
+  LineChart,
+  PieChart,
   TrendingUp,
   Download,
   Settings,
@@ -12,18 +11,19 @@ import {
   RefreshCw,
   Info
 } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
 
 // Import Phase 2 service
 import { dataVisualizationService } from '../../services/visualization/dataVisualizationComponents';
 
-export default function AdvancedChart({ 
-  data, 
-  type = 'line', 
-  config = {}, 
+export default function AdvancedChart({
+  data,
+  type = 'line',
+  config = {},
   onExport,
   className = '',
   title,
-  subtitle 
+  subtitle
 }) {
   const chartRef = useRef(null);
   const containerRef = useRef(null);
@@ -58,7 +58,7 @@ export default function AdvancedChart({
     }
   }, [chartConfig]);
 
-  const createChart = async () => {
+  const createChart = async() => {
     try {
       setIsLoading(true);
       setError(null);
@@ -72,40 +72,40 @@ export default function AdvancedChart({
       switch (type) {
         case 'line':
           newChartId = dataVisualizationService.createAdvancedLineChart(
-            containerId, 
-            data, 
+            containerId,
+            data,
             chartConfig
           );
           break;
 
         case 'bar':
           newChartId = dataVisualizationService.createAdvancedBarChart(
-            containerId, 
-            data, 
+            containerId,
+            data,
             chartConfig
           );
           break;
 
         case 'scatter':
           newChartId = dataVisualizationService.createScatterPlot(
-            containerId, 
-            data, 
+            containerId,
+            data,
             chartConfig
           );
           break;
 
         case 'heatmap':
           newChartId = dataVisualizationService.createHeatmap(
-            containerId, 
-            data, 
+            containerId,
+            data,
             chartConfig
           );
           break;
 
         case 'dashboard':
           newChartId = dataVisualizationService.createFinancialDashboard(
-            containerId, 
-            data, 
+            containerId,
+            data,
             chartConfig
           );
           break;
@@ -124,7 +124,7 @@ export default function AdvancedChart({
     }
   };
 
-  const updateChart = async () => {
+  const updateChart = async() => {
     if (!chartId) return;
 
     try {
@@ -135,7 +135,7 @@ export default function AdvancedChart({
     }
   };
 
-  const refreshChart = async () => {
+  const refreshChart = async() => {
     if (chartId) {
       dataVisualizationService.removeChart(chartId);
       setChartId(null);
@@ -143,41 +143,41 @@ export default function AdvancedChart({
     await createChart();
   };
 
-  const exportChart = async (format = 'png') => {
+  const exportChart = async(format = 'png') => {
     if (!chartRef.current) return;
 
     try {
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
-      
+
       // Get chart dimensions
       const rect = chartRef.current.getBoundingClientRect();
       canvas.width = rect.width * 2; // High DPI
       canvas.height = rect.height * 2;
-      
+
       // Scale for high DPI
       ctx.scale(2, 2);
-      
+
       // Convert SVG to canvas (simplified - would need proper implementation)
       const svgData = new XMLSerializer().serializeToString(chartRef.current.querySelector('svg'));
       const img = new Image();
-      
+
       img.onload = () => {
         ctx.drawImage(img, 0, 0);
-        
+
         // Download
         const link = document.createElement('a');
         link.download = `chart-${Date.now()}.${format}`;
         link.href = canvas.toDataURL(`image/${format}`);
         link.click();
-        
+
         if (onExport) {
           onExport({ format, data: canvas.toDataURL(`image/${format}`) });
         }
       };
-      
+
       img.src = 'data:image/svg+xml;base64,' + btoa(svgData);
-      
+
     } catch (err) {
       console.error('Failed to export chart:', err);
     }
@@ -256,7 +256,7 @@ export default function AdvancedChart({
           >
             <Download className="w-4 h-4" />
           </button>
-          
+
           <button
             onClick={refreshChart}
             className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors"
@@ -264,7 +264,7 @@ export default function AdvancedChart({
           >
             <RefreshCw className="w-4 h-4" />
           </button>
-          
+
           <button
             onClick={() => setShowSettings(!showSettings)}
             className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors"
@@ -272,7 +272,7 @@ export default function AdvancedChart({
           >
             <Settings className="w-4 h-4" />
           </button>
-          
+
           <button
             onClick={() => {/* Handle fullscreen */}}
             className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors"
@@ -306,7 +306,7 @@ export default function AdvancedChart({
                 <option value="financial">Financial</option>
               </select>
             </div>
-            
+
             <div className="flex items-center">
               <input
                 type="checkbox"
@@ -319,7 +319,7 @@ export default function AdvancedChart({
                 Show Grid
               </label>
             </div>
-            
+
             <div className="flex items-center">
               <input
                 type="checkbox"
@@ -332,7 +332,7 @@ export default function AdvancedChart({
                 Show Legend
               </label>
             </div>
-            
+
             <div className="flex items-center">
               <input
                 type="checkbox"
@@ -354,12 +354,12 @@ export default function AdvancedChart({
         {isLoading && (
           <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75 z-10">
             <div className="flex items-center space-x-3">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600" />
               <span className="text-gray-600">Loading chart...</span>
             </div>
           </div>
         )}
-        
+
         <div
           ref={chartRef}
           className="w-full"

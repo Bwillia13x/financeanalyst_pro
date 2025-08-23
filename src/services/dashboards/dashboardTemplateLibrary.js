@@ -144,7 +144,7 @@ export class DashboardTemplateLibrary {
       template.rating = 0;
       template.ratingCount = 0;
       template.isActive = true;
-      
+
       this.templates.set(template.id, template);
     });
   }
@@ -288,7 +288,7 @@ export class DashboardTemplateLibrary {
     if (!this.ratings.has(templateId)) {
       this.ratings.set(templateId, []);
     }
-    
+
     this.ratings.get(templateId).push(ratingData);
     this.recalculateTemplateRating(templateId);
 
@@ -321,7 +321,7 @@ export class DashboardTemplateLibrary {
       id: this.generateDashboardId(),
       name: dashboardName,
       description: template.description,
-      templateId: templateId,
+      templateId,
       createdBy: userId,
       createdAt: new Date().toISOString(),
       layout: { ...template.layout, ...customizations.layout },

@@ -13,32 +13,32 @@ export class NaturalLanguageQueryService {
     try {
       // Step 1: Parse and understand the query
       const parsedQuery = await this.parseQuery(query);
-      
+
       // Step 2: Extract financial entities and parameters
       const entities = this.entityExtractor.extract(query, context);
-      
+
       // Step 3: Classify intent and determine action
       const intent = this.intentClassifier.classify(parsedQuery, entities);
-      
+
       // Step 4: Execute the query
       const result = await this.executeQuery(intent, entities, context);
-      
+
       // Step 5: Generate natural language response
       const response = await this.responseGenerator.generate(result, intent, entities);
-      
+
       return {
-        query: query,
-        intent: intent,
-        entities: entities,
-        result: result,
-        response: response,
+        query,
+        intent,
+        entities,
+        result,
+        response,
         confidence: intent.confidence,
         suggestions: this.generateSuggestions(intent, entities)
       };
-      
+
     } catch (error) {
       return {
-        query: query,
+        query,
         error: error.message,
         response: "I'm sorry, I couldn't understand that query. Could you rephrase it?",
         suggestions: this.getHelpSuggestions()
@@ -49,20 +49,20 @@ export class NaturalLanguageQueryService {
   async parseQuery(query) {
     // Normalize query
     const normalized = query.toLowerCase().trim();
-    
+
     // Extract key phrases and financial terms
     const financialTerms = this.extractFinancialTerms(normalized);
     const timeReferences = this.extractTimeReferences(normalized);
     const comparisons = this.extractComparisons(normalized);
     const metrics = this.extractMetrics(normalized);
-    
+
     return {
       original: query,
-      normalized: normalized,
-      financialTerms: financialTerms,
-      timeReferences: timeReferences,
-      comparisons: comparisons,
-      metrics: metrics,
+      normalized,
+      financialTerms,
+      timeReferences,
+      comparisons,
+      metrics,
       questionType: this.identifyQuestionType(normalized)
     };
   }
@@ -78,9 +78,9 @@ export class NaturalLanguageQueryService {
     // Company name patterns
     const companyPatterns = [
       /\b([A-Z]{1,5})\b/g, // Stock tickers
-      /\b(apple|microsoft|google|amazon|tesla|netflix)\b/gi, // Common company names
+      /\b(apple|microsoft|google|amazon|tesla|netflix)\b/gi // Common company names
     ];
-    
+
     companyPatterns.forEach(pattern => {
       const matches = query.match(pattern);
       if (matches) terms.companies.push(...matches);
@@ -125,7 +125,7 @@ export class NaturalLanguageQueryService {
 
   extractComparisons(query) {
     const comparisons = [];
-    
+
     const comparisonPatterns = [
       /\bcompare\s+(.+?)\s+(?:to|with|against)\s+(.+?)(?:\s|$)/gi,
       /\b(.+?)\s+(?:vs|versus)\s+(.+?)(?:\s|$)/gi,
@@ -195,7 +195,7 @@ export class NaturalLanguageQueryService {
 
   async executeQuery(intent, entities, context) {
     const { action, confidence } = intent;
-    
+
     switch (action) {
       case 'get_financial_data':
         return await this.getFinancialData(entities, context);
@@ -216,7 +216,7 @@ export class NaturalLanguageQueryService {
 
   async getFinancialData(entities, context) {
     const { company, metrics, timeframe } = entities;
-    
+
     // Mock financial data retrieval
     const data = {
       company: company || 'AAPL',
@@ -233,7 +233,7 @@ export class NaturalLanguageQueryService {
 
     return {
       type: 'financial_data',
-      data: data,
+      data,
       source: 'premium_data_service'
     };
   }
@@ -256,14 +256,14 @@ export class NaturalLanguageQueryService {
 
     return {
       type: 'calculations',
-      calculations: calculations,
+      calculations,
       formulas: this.getFormulas(metrics)
     };
   }
 
   async compareCompanies(entities, context) {
     const { companies, metrics } = entities;
-    
+
     // Mock comparison data
     const comparison = {
       companies: companies || ['AAPL', 'MSFT'],
@@ -278,13 +278,13 @@ export class NaturalLanguageQueryService {
 
     return {
       type: 'comparison',
-      comparison: comparison
+      comparison
     };
   }
 
   async analyzeTrends(entities, context) {
     const { company, metrics, timeframe } = entities;
-    
+
     // Mock trend analysis
     const trends = {
       company: company || 'AAPL',
@@ -299,13 +299,13 @@ export class NaturalLanguageQueryService {
 
     return {
       type: 'trend_analysis',
-      trends: trends
+      trends
     };
   }
 
   async forecastValues(entities, context) {
     const { company, metrics, horizon } = entities;
-    
+
     // Mock forecast using predictive models
     const forecast = {
       company: company || 'AAPL',
@@ -323,13 +323,13 @@ export class NaturalLanguageQueryService {
 
     return {
       type: 'forecast',
-      forecast: forecast
+      forecast
     };
   }
 
   async explainConcept(entities, context) {
     const { concept } = entities;
-    
+
     const explanations = {
       'pe_ratio': {
         definition: 'Price-to-Earnings ratio measures how much investors are willing to pay per dollar of earnings',
@@ -347,7 +347,7 @@ export class NaturalLanguageQueryService {
 
     return {
       type: 'explanation',
-      concept: concept,
+      concept,
       explanation: explanations[concept] || 'Concept not found in knowledge base'
     };
   }
@@ -393,7 +393,7 @@ export class NaturalLanguageQueryService {
 class IntentClassifier {
   classify(parsedQuery, entities) {
     const { questionType, metrics, financialTerms, comparisons } = parsedQuery;
-    
+
     // Rule-based intent classification
     let action = 'get_financial_data';
     let confidence = 0.7;
@@ -468,7 +468,7 @@ class QueryProcessor {
 class ResponseGenerator {
   async generate(result, intent, entities) {
     const { type } = result;
-    
+
     switch (type) {
       case 'financial_data':
         return this.generateDataResponse(result);
@@ -514,14 +514,14 @@ Key metrics comparison shows distinct competitive advantages.`;
   generateForecastResponse(result) {
     const { forecast } = result;
     return `${forecast.company} ${forecast.metric} forecast (${forecast.horizon} quarters):
-${forecast.predictions.map((pred, i) => `Q${i+1}: $${pred}B`).join(', ')}
+${forecast.predictions.map((pred, i) => `Q${i + 1}: $${pred}B`).join(', ')}
 Model confidence: ${(forecast.model_confidence * 100).toFixed(0)}%`;
   }
 
   generateExplanationResponse(result) {
     const { explanation } = result;
     if (typeof explanation === 'string') return explanation;
-    
+
     return `${explanation.definition}
 
 Formula: ${explanation.formula}

@@ -4,7 +4,7 @@ import { lazy, Suspense } from 'react';
 // Component lazy loading with error boundaries
 export const createLazyComponent = (importFunc, fallback = null) => {
   const LazyComponent = lazy(importFunc);
-  
+
   return (props) => (
     <Suspense fallback={fallback || <ComponentSkeleton />}>
       <LazyComponent {...props} />
@@ -15,16 +15,16 @@ export const createLazyComponent = (importFunc, fallback = null) => {
 // Default loading skeleton
 const ComponentSkeleton = () => (
   <div className="animate-pulse">
-    <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-    <div className="h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
-    <div className="h-20 bg-gray-200 rounded"></div>
+    <div className="h-4 bg-gray-200 rounded w-3/4 mb-2" />
+    <div className="h-4 bg-gray-200 rounded w-1/2 mb-2" />
+    <div className="h-20 bg-gray-200 rounded" />
   </div>
 );
 
 // Lazy load Phase 2 components
 export const LazyCollaborationHub = createLazyComponent(
   () => import('../components/Collaboration/CollaborationHub'),
-  <div className="w-60 h-96 bg-gray-100 rounded-lg animate-pulse"></div>
+  <div className="w-60 h-96 bg-gray-100 rounded-lg animate-pulse" />
 );
 
 export const LazyInteractiveDashboard = createLazyComponent(
@@ -118,12 +118,12 @@ export class LazyLoader {
       threshold: 0.1,
       ...options
     };
-    
+
     this.observer = new IntersectionObserver(
       this.handleIntersection.bind(this),
       this.options
     );
-    
+
     this.loadingElements = new Map();
   }
 
@@ -180,7 +180,7 @@ export const useLazyLoad = (callback, dependencies = []) => {
 export const LazyImage = ({ src, alt, className, placeholder, ...props }) => {
   const [loaded, setLoaded] = useState(false);
   const [inView, setInView] = useState(false);
-  
+
   const imageRef = useLazyLoad(() => {
     setInView(true);
   });
@@ -193,7 +193,7 @@ export const LazyImage = ({ src, alt, className, placeholder, ...props }) => {
     <div ref={imageRef} className={`relative ${className}`}>
       {!loaded && (
         <div className="absolute inset-0 bg-gray-200 animate-pulse rounded">
-          {placeholder || <div className="w-full h-full bg-gray-300 rounded"></div>}
+          {placeholder || <div className="w-full h-full bg-gray-300 rounded" />}
         </div>
       )}
       {inView && (
@@ -213,10 +213,10 @@ export const LazyImage = ({ src, alt, className, placeholder, ...props }) => {
 export const splitBundle = {
   // Split by route
   route: (routeImport) => lazy(routeImport),
-  
+
   // Split by feature
   feature: (featureImport) => lazy(featureImport),
-  
+
   // Split by vendor libraries
   vendor: (vendorImport) => lazy(vendorImport)
 };

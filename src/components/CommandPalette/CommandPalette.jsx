@@ -21,7 +21,7 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 
 import { useCommandRegistry } from '../../hooks/useCommandRegistry';
- 
+
 
 const CommandPalette = ({
   isOpen,
@@ -42,7 +42,7 @@ const CommandPalette = ({
   const monitoringRef = useRef(null);
 
   // Lazy-load monitoring utilities to keep them out of primary chunks
-  const getMonitoring = async () => {
+  const getMonitoring = async() => {
     if (monitoringRef.current) return monitoringRef.current;
     try {
       const mod = await import('../../utils/monitoring');

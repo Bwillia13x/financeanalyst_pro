@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { WifiOff, Wifi, Cloud, CloudOff, Sync, AlertCircle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+
 import { useOfflineSync } from '../../hooks/useOfflineSync';
 
 const OfflineIndicator = () => {
@@ -60,7 +61,7 @@ const OfflineIndicator = () => {
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                     Connection Status
                   </h3>
-                  <div className={`w-3 h-3 rounded-full ${getStatusColor()}`}></div>
+                  <div className={`w-3 h-3 rounded-full ${getStatusColor()}`} />
                 </div>
 
                 <div className="space-y-3">
@@ -90,8 +91,8 @@ const OfflineIndicator = () => {
                       )}
                       <span className="text-sm text-gray-700 dark:text-gray-300">
                         {syncStatus === 'syncing' ? 'Syncing...' :
-                         syncStatus === 'error' ? 'Sync Error' :
-                         'Synced'}
+                          syncStatus === 'error' ? 'Sync Error' :
+                            'Synced'}
                       </span>
                     </div>
                     {pendingChanges > 0 && (

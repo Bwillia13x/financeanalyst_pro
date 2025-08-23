@@ -77,7 +77,7 @@ export const useOfflineSync = () => {
   }, [isOnline]);
 
   // Process the sync queue
-  const processSyncQueue = useCallback(async () => {
+  const processSyncQueue = useCallback(async() => {
     if (!isOnline || syncQueue.length === 0) {
       setSyncStatus('idle');
       return;
@@ -95,7 +95,7 @@ export const useOfflineSync = () => {
         processedItems.push(item.id);
       } catch (error) {
         console.error('Sync failed for item:', item.id, error);
-        
+
         if (item.retries < item.maxRetries) {
           failedItems.push({
             ...item,
@@ -120,7 +120,7 @@ export const useOfflineSync = () => {
   }, [isOnline, syncQueue]);
 
   // Execute individual sync action
-  const executeSync = async (action) => {
+  const executeSync = async(action) => {
     const { type, data, endpoint, method = 'POST' } = action;
 
     const response = await fetch(endpoint, {
@@ -194,7 +194,7 @@ export const useOfflineSync = () => {
   }, []);
 
   // Manual sync trigger
-  const forcSync = useCallback(async () => {
+  const forcSync = useCallback(async() => {
     if (isOnline) {
       await processSyncQueue();
     }

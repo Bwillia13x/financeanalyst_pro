@@ -169,7 +169,7 @@ export class SecurityAuditService {
 
       // Session management
       const session = await this.createSecureSession(credentials.userId, context);
-      
+
       audit.success = true;
       audit.sessionId = session.id;
       this.logSecurityEvent(audit);
@@ -232,7 +232,7 @@ export class SecurityAuditService {
     // In production, this would validate against your user database
     // For now, simulate validation
     const hashedPassword = this.hashPassword(credentials.password, credentials.userId);
-    
+
     // Simulate database lookup
     return {
       valid: true, // Replace with actual validation
@@ -259,7 +259,7 @@ export class SecurityAuditService {
   async createSecureSession(userId, context) {
     const sessionId = this.generateSecureToken();
     const policy = this.securityPolicies.get('authentication');
-    
+
     const session = {
       id: sessionId,
       userId,
@@ -273,7 +273,7 @@ export class SecurityAuditService {
 
     // Store session securely (encrypted)
     const encryptedSession = this.encryptData(JSON.stringify(session));
-    
+
     return session;
   }
 
@@ -291,7 +291,7 @@ export class SecurityAuditService {
     try {
       // Get user permissions
       const userPermissions = await this.getUserPermissions(userId);
-      
+
       // Check resource-level permissions
       const hasPermission = this.checkResourcePermission(
         userPermissions,
@@ -391,7 +391,7 @@ export class SecurityAuditService {
 
     const key = this.getEncryptionKey(classification);
     const encrypted = CryptoJS.AES.encrypt(data, key).toString();
-    
+
     return {
       data: encrypted,
       classification,
@@ -406,17 +406,17 @@ export class SecurityAuditService {
 
     const key = this.getEncryptionKey(classification);
     const decrypted = CryptoJS.AES.decrypt(encryptedData.data, key);
-    
+
     return decrypted.toString(CryptoJS.enc.Utf8);
   }
 
   getEncryptionKey(classification) {
     if (!this.encryptionKeys.has(classification)) {
       // In production, keys should be managed by a proper key management system
-      const key = CryptoJS.lib.WordArray.random(256/8).toString();
+      const key = CryptoJS.lib.WordArray.random(256 / 8).toString();
       this.encryptionKeys.set(classification, key);
     }
-    
+
     return this.encryptionKeys.get(classification);
   }
 
@@ -481,14 +481,14 @@ export class SecurityAuditService {
   detectBruteForce(userId, ip) {
     const threat = this.threatDetection.get('bruteForce');
     const key = `${userId}:${ip}`;
-    
+
     if (!this.accessPatterns.has(key)) {
       this.accessPatterns.set(key, []);
     }
 
     const attempts = this.accessPatterns.get(key);
     const now = Date.now();
-    
+
     // Clean old attempts
     const recentAttempts = attempts.filter(
       attempt => now - attempt < threat.timeWindow
@@ -499,7 +499,7 @@ export class SecurityAuditService {
 
   recordFailedAttempt(userId, ip) {
     const key = `${userId}:${ip}`;
-    
+
     if (!this.accessPatterns.has(key)) {
       this.accessPatterns.set(key, []);
     }
@@ -510,7 +510,7 @@ export class SecurityAuditService {
   checkRateLimit(userId, action) {
     const threat = this.threatDetection.get('rateLimiting');
     const limit = threat.limits[action];
-    
+
     if (!limit) return true;
 
     const key = `${userId}:${action}`;
@@ -520,12 +520,12 @@ export class SecurityAuditService {
 
     const attempts = this.accessPatterns.get(key);
     const now = Date.now();
-    
+
     // Clean old attempts
     const recentAttempts = attempts.filter(
       attempt => now - attempt < limit.window
     );
-    
+
     this.accessPatterns.set(key, recentAttempts);
 
     if (recentAttempts.length >= limit.requests) {
@@ -548,7 +548,7 @@ export class SecurityAuditService {
   // Security Headers
   getSecurityHeaders() {
     const networkPolicy = this.securityPolicies.get('network');
-    
+
     return {
       'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
       'Content-Security-Policy': this.generateCSP(),
@@ -589,7 +589,7 @@ export class SecurityAuditService {
     if (!this.auditLogs.has(date)) {
       this.auditLogs.set(date, []);
     }
-    
+
     this.auditLogs.get(date).push(logEntry);
 
     // Emit event for real-time monitoring
@@ -649,7 +649,7 @@ export class SecurityAuditService {
       if (logDate >= startDate && logDate <= endDate) {
         events.forEach(event => {
           report.summary.totalEvents++;
-          
+
           if (event.level === 'critical') report.summary.criticalEvents++;
           if (event.level === 'warning') report.summary.warningEvents++;
           if (event.blocked) report.summary.blockedAttempts++;
@@ -698,7 +698,7 @@ export class SecurityAuditService {
 
   hashPassword(password, salt) {
     return CryptoJS.PBKDF2(password, salt, {
-      keySize: 256/32,
+      keySize: 256 / 32,
       iterations: 100000
     }).toString();
   }

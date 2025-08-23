@@ -105,7 +105,7 @@ export class SumOfPartsModel {
       } = unit;
 
       let valuation = 0;
-      
+
       switch (method) {
         case 'ebitda_multiple':
           valuation = ebitda * multiple;
@@ -167,7 +167,7 @@ export class SumOfPartsModel {
   }
 }
 
-// Spin-off Analysis Model  
+// Spin-off Analysis Model
 export class SpinoffAnalysisModel {
   calculateSpinoffAnalysis(parentCompany, spinoffUnit) {
     const {
@@ -186,21 +186,21 @@ export class SpinoffAnalysisModel {
     // Calculate pro forma parent (RemainCo)
     const remainCoRevenue = parentRevenue - spinoffRevenue;
     const remainCoEBITDA = parentEBITDA - spinoffEBITDA - strandedCosts;
-    
+
     // Calculate valuations
     const parentPreSpinValue = parentEBITDA * parentMultiple;
     const remainCoValue = remainCoEBITDA * parentMultiple;
     const spinoffValue = spinoffEBITDA * spinoffMultiple;
-    
+
     const sumOfPartsValue = remainCoValue + spinoffValue;
     const valueCreation = sumOfPartsValue - parentPreSpinValue - transactionCosts;
-    
+
     // Calculate per-share values
     const remainCoValuePerShare = remainCoValue / parentShares;
     const spinoffValuePerShare = (spinoffValue / parentShares) * distributionRatio;
     const totalValuePerShare = remainCoValuePerShare + spinoffValuePerShare;
     const parentValuePerShare = parentPreSpinValue / parentShares;
-    
+
     return {
       // Pro forma companies
       remainCo: {
@@ -209,14 +209,14 @@ export class SpinoffAnalysisModel {
         valuation: remainCoValue,
         valuePerShare: remainCoValuePerShare
       },
-      
+
       spinoffCo: {
         revenue: spinoffRevenue,
         ebitda: spinoffEBITDA,
         valuation: spinoffValue,
         valuePerShare: spinoffValuePerShare
       },
-      
+
       // Analysis results
       parentPreSpinValue,
       sumOfPartsValue,
@@ -225,7 +225,7 @@ export class SpinoffAnalysisModel {
       totalValuePerShare,
       parentValuePerShare,
       valueCreationPerShare: totalValuePerShare - parentValuePerShare,
-      
+
       // Transaction costs
       strandedCosts,
       transactionCosts,
@@ -242,12 +242,12 @@ export class SpinoffAnalysisModel {
         costBasisAllocation: costBasis
       };
     }
-    
+
     // Taxable distribution
     const taxableGain = Math.max(0, spinoffValue - costBasis);
     const taxRate = 20; // Assume 20% capital gains rate
     const taxLiability = taxableGain * (taxRate / 100);
-    
+
     return {
       taxableGain,
       taxLiability,
@@ -263,9 +263,9 @@ export class SpinoffAnalysisModel {
       hr_finance: sharedServices.hr * (spinoffRevenuePercent / 100),
       facilities: sharedServices.facilities * (spinoffRevenuePercent / 100)
     };
-    
+
     const totalStranded = Object.values(strandedCostCategories).reduce((sum, cost) => sum + cost, 0);
-    
+
     return {
       categories: strandedCostCategories,
       total: totalStranded,

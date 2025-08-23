@@ -135,7 +135,7 @@ export class CreditAnalysisService {
       salesToAssets: sales / totalAssets
     };
 
-    const zScore = 
+    const zScore =
       1.2 * ratios.workingCapitalToAssets +
       1.4 * ratios.retainedEarningsToAssets +
       3.3 * ratios.ebitToAssets +
@@ -143,7 +143,7 @@ export class CreditAnalysisService {
       1.0 * ratios.salesToAssets;
 
     let riskLevel, defaultProbability;
-    
+
     if (zScore > 2.99) {
       riskLevel = 'Low';
       defaultProbability = 0.02;
@@ -176,16 +176,16 @@ export class CreditAnalysisService {
 
     const firmValue = marketValueEquity + totalDebt;
     const debtRatio = totalDebt / firmValue;
-    
+
     // Simplified Merton distance to default
     const d1 = (Math.log(firmValue / totalDebt) + (riskFreeRate + 0.5 * Math.pow(volatility, 2)) * timeHorizon) /
               (volatility * Math.sqrt(timeHorizon));
-    
+
     const d2 = d1 - volatility * Math.sqrt(timeHorizon);
-    
+
     // Default probability using normal CDF
     const defaultProbability = this.normalCDF(-d2);
-    
+
     return {
       firmValue,
       debtRatio,
@@ -200,7 +200,7 @@ export class CreditAnalysisService {
   calculateLogisticModel(data) {
     // Logistic regression model for default prediction
     const ratios = this.calculateFinancialRatios(data.financials);
-    
+
     // Coefficients based on empirical studies (simplified)
     const coefficients = {
       intercept: -3.2,
@@ -211,7 +211,7 @@ export class CreditAnalysisService {
       assetTurnover: -0.6
     };
 
-    const logit = 
+    const logit =
       coefficients.intercept +
       coefficients.leverageRatio * ratios.leverageRatio +
       coefficients.interestCoverage * Math.log(Math.max(ratios.interestCoverage, 0.1)) +
@@ -242,7 +242,7 @@ export class CreditAnalysisService {
 
     const firmValue = marketValueEquity + totalDebt;
     const assetVolatility = volatility * (marketValueEquity / firmValue);
-    
+
     const distanceToDefault = (Math.log(firmValue / totalDebt) + (riskFreeRate - 0.5 * Math.pow(assetVolatility, 2))) /
                              assetVolatility;
 
@@ -302,12 +302,12 @@ export class CreditAnalysisService {
     const couponPayment = (faceValue * couponRate) / periodsPerYear;
 
     let pv = 0;
-    
+
     // Present value of coupon payments
     for (let period = 1; period <= totalPeriods; period++) {
       pv += couponPayment / Math.pow(1 + periodRate, period);
     }
-    
+
     // Present value of principal
     pv += faceValue / Math.pow(1 + periodRate, totalPeriods);
 
@@ -332,13 +332,13 @@ export class CreditAnalysisService {
     let ytm = 0.05; // Initial guess
     const tolerance = 0.0001;
     const maxIterations = 100;
-    
+
     for (let i = 0; i < maxIterations; i++) {
       const price = this.calculatePriceFromYTM(bondData, ytm);
       const derivative = this.calculatePriceDerivative(bondData, ytm);
-      
+
       const newYTM = ytm - (price - currentPrice) / derivative;
-      
+
       if (Math.abs(newYTM - ytm) < tolerance) {
         return {
           yieldToMaturity: Math.round(newYTM * 10000) / 100, // in percentage
@@ -347,7 +347,7 @@ export class CreditAnalysisService {
           equivalentTaxableYield: this.calculateTaxEquivalentYield(newYTM, marketConditions.taxRate || 0)
         };
       }
-      
+
       ytm = newYTM;
     }
 
@@ -375,7 +375,7 @@ export class CreditAnalysisService {
       const cashFlow = period < totalPeriods ? couponPayment : couponPayment + faceValue;
       const pv = cashFlow / Math.pow(1 + periodRate, period);
       const timeWeightedPV = (period / paymentFrequency) * pv;
-      
+
       weightedCashFlows += timeWeightedPV;
       totalPV += pv;
     }
@@ -411,7 +411,7 @@ export class CreditAnalysisService {
       const cashFlow = period < totalPeriods ? couponPayment : couponPayment + faceValue;
       const pv = cashFlow / Math.pow(1 + periodRate, period);
       const convexityTerm = (period * (period + 1) / Math.pow(paymentFrequency, 2)) * pv;
-      
+
       convexitySum += convexityTerm;
       totalPV += pv;
     }
@@ -434,7 +434,7 @@ export class CreditAnalysisService {
 
     const creditSpread = corporateYield - treasuryYield;
     const ratingData = this.ratingModels.get('sp_ratings')[rating] || { spread: 0 };
-    
+
     return {
       creditSpread: Math.round(creditSpread * 100) / 100,
       benchmarkSpread: ratingData.spread,
@@ -455,7 +455,7 @@ export class CreditAnalysisService {
 
     return {
       optionAdjustedSpread: Math.round(oas * 100) / 100,
-      optionValue: optionValue,
+      optionValue,
       creditSpread: creditSpread * 100,
       interpretation: this.interpretOAS(oas, bondData.hasEmbeddedOptions)
     };
@@ -477,7 +477,7 @@ export class CreditAnalysisService {
     };
 
     assessment.qualitativeAnalysis = this.performQualitativeAnalysis(companyData);
-    
+
     if (bondData) {
       assessment.bondSpecificRisk = this.assessBondSpecificRisk(bondData);
     }

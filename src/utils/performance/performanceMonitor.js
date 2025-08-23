@@ -22,16 +22,16 @@ class PerformanceMonitor {
 
     // Initialize Web Vitals monitoring
     this.initializeWebVitals();
-    
+
     // Initialize memory monitoring
     this.initializeMemoryMonitoring();
-    
+
     // Initialize network monitoring
     this.initializeNetworkMonitoring();
-    
+
     // Initialize bundle analysis
     this.initializeBundleAnalysis();
-    
+
     // Initialize real user monitoring
     this.initializeRUM();
 
@@ -64,7 +64,7 @@ class PerformanceMonitor {
       const lcpObserver = new PerformanceObserver((list) => {
         const entries = list.getEntries();
         const lastEntry = entries[entries.length - 1];
-        
+
         this.recordMetric('lcp', lastEntry.startTime, {
           threshold: this.thresholds.lcp,
           critical: lastEntry.startTime > this.thresholds.lcp,
@@ -102,7 +102,7 @@ class PerformanceMonitor {
       const clsObserver = new PerformanceObserver((list) => {
         let clsValue = 0;
         const entries = list.getEntries();
-        
+
         entries.forEach((entry) => {
           if (!entry.hadRecentInput) {
             clsValue += entry.value;
@@ -130,7 +130,7 @@ class PerformanceMonitor {
       const checkMemory = () => {
         const memory = performance.memory;
         const usage = memory.usedJSHeapSize;
-        
+
         this.recordMetric('memory', usage, {
           threshold: this.thresholds.memoryUsage,
           critical: usage > this.thresholds.memoryUsage,
@@ -143,7 +143,7 @@ class PerformanceMonitor {
       // Check memory every 30 seconds
       const memoryInterval = setInterval(checkMemory, 30000);
       this.observers.set('memory', { disconnect: () => clearInterval(memoryInterval) });
-      
+
       // Initial check
       checkMemory();
     }
@@ -155,7 +155,7 @@ class PerformanceMonitor {
         const entries = list.getEntries();
         entries.forEach((entry) => {
           const ttfb = entry.responseStart - entry.requestStart;
-          
+
           this.recordMetric('ttfb', ttfb, {
             threshold: this.thresholds.ttfb,
             critical: ttfb > this.thresholds.ttfb,
@@ -218,7 +218,7 @@ class PerformanceMonitor {
     // Real User Monitoring - track user interactions
     const trackInteraction = (event) => {
       const startTime = performance.now();
-      
+
       requestAnimationFrame(() => {
         const duration = performance.now() - startTime;
         this.recordMetric('interaction', duration, {
@@ -273,7 +273,7 @@ class PerformanceMonitor {
     if (typeof window !== 'undefined' && window.__webpack_require__) {
       try {
         const webpackStats = window.__webpack_require__.cache || {};
-        
+
         Object.values(webpackStats).forEach(module => {
           if (module && module.exports) {
             const moduleSize = JSON.stringify(module.exports).length;
@@ -304,7 +304,7 @@ class PerformanceMonitor {
     this.metrics.forEach((values, name) => {
       const latestMetric = values[values.length - 1];
       const average = values.reduce((sum, m) => sum + m.value, 0) / values.length;
-      
+
       report.metrics[name] = {
         current: latestMetric.value,
         average: Math.round(average * 100) / 100,
@@ -326,17 +326,17 @@ class PerformanceMonitor {
 
   calculateTrend(values) {
     if (values.length < 2) return 'stable';
-    
+
     const recent = values.slice(-10);
     const older = values.slice(-20, -10);
-    
+
     if (older.length === 0) return 'stable';
-    
+
     const recentAvg = recent.reduce((sum, m) => sum + m.value, 0) / recent.length;
     const olderAvg = older.reduce((sum, m) => sum + m.value, 0) / older.length;
-    
+
     const change = ((recentAvg - olderAvg) / olderAvg) * 100;
-    
+
     if (change > 10) return 'improving';
     if (change < -10) return 'degrading';
     return 'stable';
@@ -345,14 +345,14 @@ class PerformanceMonitor {
   getMetricStatus(name, value) {
     const threshold = this.thresholds[name];
     if (!threshold) return 'unknown';
-    
+
     // Special handling for different metrics
     if (name === 'cls') {
       if (value <= 0.1) return 'good';
       if (value <= 0.25) return 'warning';
       return 'critical';
     }
-    
+
     if (value <= threshold * 0.8) return 'good';
     if (value <= threshold) return 'warning';
     return 'critical';
@@ -360,7 +360,7 @@ class PerformanceMonitor {
 
   queueReport(metric) {
     this.reportQueue.push(metric);
-    
+
     // Send queued reports every 10 seconds
     if (!this.reportTimer) {
       this.reportTimer = setTimeout(() => {
@@ -372,14 +372,14 @@ class PerformanceMonitor {
 
   async sendQueuedReports() {
     if (this.reportQueue.length === 0) return;
-    
+
     try {
       const reports = [...this.reportQueue];
       this.reportQueue = [];
-      
+
       // Send to analytics endpoint
       await this.sendToAnalytics(reports);
-      
+
     } catch (error) {
       console.error('Failed to send performance reports:', error);
       // Re-queue failed reports
@@ -397,7 +397,7 @@ class PerformanceMonitor {
       });
       console.groupEnd();
     }
-    
+
     // In production, send to analytics service
     if (process.env.REACT_APP_ANALYTICS_ENDPOINT) {
       await fetch(process.env.REACT_APP_ANALYTICS_ENDPOINT, {
@@ -410,16 +410,16 @@ class PerformanceMonitor {
 
   optimizeForDevice() {
     const deviceInfo = this.getDeviceInfo();
-    
+
     // Apply device-specific optimizations
     if (deviceInfo.isMobile) {
       this.applyMobileOptimizations();
     }
-    
+
     if (deviceInfo.isLowEnd) {
       this.applyLowEndOptimizations();
     }
-    
+
     if (deviceInfo.isSlowNetwork) {
       this.applyNetworkOptimizations();
     }
@@ -429,7 +429,7 @@ class PerformanceMonitor {
     const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
     const memory = navigator.deviceMemory || 4;
     const cores = navigator.hardwareConcurrency || 2;
-    
+
     return {
       isMobile: /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
       isLowEnd: memory <= 2 || cores <= 2,
@@ -447,7 +447,7 @@ class PerformanceMonitor {
   applyMobileOptimizations() {
     // Reduce animation complexity
     document.documentElement.style.setProperty('--animation-duration', '200ms');
-    
+
     // Lazy load images more aggressively
     const images = document.querySelectorAll('img[loading="lazy"]');
     images.forEach(img => img.setAttribute('loading', 'lazy'));
@@ -456,7 +456,7 @@ class PerformanceMonitor {
   applyLowEndOptimizations() {
     // Disable non-essential animations
     document.documentElement.style.setProperty('--animation-duration', '0ms');
-    
+
     // Reduce complexity of visualizations
     this.emit('optimize:lowend', { reduceComplexity: true });
   }
@@ -504,14 +504,14 @@ class PerformanceMonitor {
         console.warn('Error disconnecting observer:', error);
       }
     });
-    
+
     this.observers.clear();
     this.metrics.clear();
-    
+
     if (this.reportTimer) {
       clearTimeout(this.reportTimer);
     }
-    
+
     this.isMonitoring = false;
   }
 }

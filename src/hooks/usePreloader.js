@@ -1,9 +1,10 @@
 import { useEffect, useCallback } from 'react';
-import { 
-  preloadCriticalComponents, 
-  preloadAnalysisComponents, 
-  preloadAdvancedTools, 
-  preloadExportTools 
+
+import {
+  preloadCriticalComponents,
+  preloadAnalysisComponents,
+  preloadAdvancedTools,
+  preloadExportTools
 } from '../utils/lazyComponents';
 
 /**
@@ -81,7 +82,7 @@ export const usePreloader = () => {
   useEffect(() => {
     // Set up intelligent preloading
     const cleanup = preloadOnUserIntent();
-    
+
     // Preload during idle time
     preloadOnIdle();
 
@@ -103,15 +104,15 @@ export const usePreloader = () => {
 export const useLoadTimeMonitor = (componentName) => {
   useEffect(() => {
     const startTime = performance.now();
-    
+
     return () => {
       const loadTime = performance.now() - startTime;
-      
+
       // Only log significant load times in development
       if (import.meta.env.DEV && loadTime > 100) {
         console.log(`⏱️ ${componentName} loaded in ${loadTime.toFixed(2)}ms`);
       }
-      
+
       // Track to analytics in production (but not during automated tests)
       if (import.meta.env.PROD && !navigator.webdriver) {
         // Send to monitoring service
@@ -140,7 +141,7 @@ export const useImageOptimization = () => {
     // Generate optimized image path based on vite image optimization
     const basePath = src.replace(/\.[^/.]+$/, '');
     const widthSuffix = width ? `_${width}w` : '';
-    
+
     return `${basePath}${widthSuffix}.${format}`;
   }, []);
 

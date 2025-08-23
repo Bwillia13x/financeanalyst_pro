@@ -72,11 +72,11 @@ class ComputerVisionService extends EventEmitter {
 
   async classifyChart(imageData) {
     const imageBuffer = imageData.buffer || imageData.data;
-    
+
     // Simulate CNN-based chart classification
     const features = this.extractVisualFeatures(imageBuffer);
     const classification = this.performChartClassification(features);
-    
+
     return {
       chart_type: classification.primary_type,
       confidence: classification.confidence,
@@ -89,7 +89,7 @@ class ComputerVisionService extends EventEmitter {
   async extractChartData(imageData) {
     const chartType = await this.classifyChart(imageData);
     const extractionMethod = this.chartTypes[chartType.chart_type];
-    
+
     let extractedData;
     switch (chartType.chart_type) {
       case 'line_chart':
@@ -125,7 +125,7 @@ class ComputerVisionService extends EventEmitter {
     const axes = await this.detectAxes(imageData);
     const dataPoints = await this.detectDataPoints(imageData);
     const lines = await this.traceLine(dataPoints);
-    
+
     return {
       x_axis: {
         label: axes.x_label,
@@ -149,7 +149,7 @@ class ComputerVisionService extends EventEmitter {
   async extractBarChartData(imageData) {
     const axes = await this.detectAxes(imageData);
     const bars = await this.detectBars(imageData);
-    
+
     return {
       categories: bars.map(bar => bar.category),
       values: bars.map(bar => bar.value),
@@ -189,7 +189,7 @@ class ComputerVisionService extends EventEmitter {
 
   async analyzeDocumentLayout(documentData) {
     const layout = this.performLayoutDetection(documentData);
-    
+
     return {
       document_type: this.classifyDocumentType(layout),
       page_structure: this.analyzePageStructure(layout),
@@ -202,7 +202,7 @@ class ComputerVisionService extends EventEmitter {
   async extractText(documentData) {
     const ocrResults = await this.performOCR(documentData);
     const enhancedText = this.enhanceTextExtraction(ocrResults);
-    
+
     return {
       raw_text: ocrResults.text,
       confidence_scores: ocrResults.confidences,
@@ -220,11 +220,11 @@ class ComputerVisionService extends EventEmitter {
   async extractTables(documentData) {
     const tableRegions = await this.detectTableRegions(documentData);
     const extractedTables = [];
-    
+
     for (const region of tableRegions) {
       const tableData = await this.extractTableData(region);
       const structuredTable = this.structureTableData(tableData);
-      
+
       extractedTables.push({
         region: region.bounds,
         table_type: this.classifyTableType(structuredTable),
@@ -237,7 +237,7 @@ class ComputerVisionService extends EventEmitter {
         }
       });
     }
-    
+
     return {
       tables_detected: tableRegions.length,
       extracted_tables: extractedTables,
@@ -270,15 +270,15 @@ class ComputerVisionService extends EventEmitter {
   async detectStatisticalAnomalies(visualData) {
     const dataPoints = visualData.data_points || [];
     const statistics = this.calculateDataStatistics(dataPoints);
-    
+
     const anomalies = [];
     const zScoreThreshold = 2.5;
     const iqrMultiplier = 1.5;
-    
+
     dataPoints.forEach((point, index) => {
       const zScore = Math.abs((point.value - statistics.mean) / statistics.std_dev);
       const isIQROutlier = this.isIQROutlier(point.value, statistics.quartiles, iqrMultiplier);
-      
+
       if (zScore > zScoreThreshold || isIQROutlier) {
         anomalies.push({
           index,
@@ -290,10 +290,10 @@ class ComputerVisionService extends EventEmitter {
         });
       }
     });
-    
+
     return {
       anomalies_detected: anomalies.length,
-      anomalies: anomalies,
+      anomalies,
       data_statistics: statistics,
       detection_parameters: {
         z_score_threshold: zScoreThreshold,
@@ -306,7 +306,7 @@ class ComputerVisionService extends EventEmitter {
     const patterns = this.extractPatterns(visualData);
     const expectedPatterns = this.generateExpectedPatterns(visualData);
     const anomalies = [];
-    
+
     patterns.forEach(pattern => {
       const deviation = this.calculatePatternDeviation(pattern, expectedPatterns);
       if (deviation.significance > 0.7) {
@@ -318,7 +318,7 @@ class ComputerVisionService extends EventEmitter {
         });
       }
     });
-    
+
     return {
       pattern_anomalies: anomalies,
       pattern_analysis: patterns,
@@ -337,7 +337,7 @@ class ComputerVisionService extends EventEmitter {
       volume_patterns: await this.identifyVolumePatterns(chartData),
       support_resistance: await this.identifySupportResistance(chartData)
     };
-    
+
     return {
       recognized_patterns: patterns,
       pattern_confidence: this.calculatePatternConfidence(patterns),
@@ -367,10 +367,10 @@ class ComputerVisionService extends EventEmitter {
       scatter_plot: this.calculateScatterScore(features),
       candlestick: this.calculateCandlestickScore(features)
     };
-    
+
     const sortedTypes = Object.entries(scores)
-      .sort(([,a], [,b]) => b - a);
-    
+      .sort(([, a], [, b]) => b - a);
+
     return {
       primary_type: sortedTypes[0][0],
       confidence: sortedTypes[0][1],
@@ -424,12 +424,12 @@ class ComputerVisionService extends EventEmitter {
     const mean = values.reduce((sum, v) => sum + v, 0) / values.length;
     const variance = values.reduce((sum, v) => sum + Math.pow(v - mean, 2), 0) / values.length;
     const stdDev = Math.sqrt(variance);
-    
+
     const sorted = [...values].sort((a, b) => a - b);
     const q1 = sorted[Math.floor(sorted.length * 0.25)];
     const q2 = sorted[Math.floor(sorted.length * 0.5)];
     const q3 = sorted[Math.floor(sorted.length * 0.75)];
-    
+
     return {
       mean,
       std_dev: stdDev,
@@ -455,9 +455,9 @@ class ComputerVisionService extends EventEmitter {
 
   performOCR(documentData) {
     // Simulate OCR processing
-    const mockText = "FINANCIAL STATEMENT\nRevenue: $1,000,000\nExpenses: $750,000\nNet Income: $250,000";
+    const mockText = 'FINANCIAL STATEMENT\nRevenue: $1,000,000\nExpenses: $750,000\nNet Income: $250,000';
     const mockConfidences = [0.95, 0.92, 0.88, 0.94];
-    
+
     return {
       text: mockText,
       confidences: mockConfidences,
