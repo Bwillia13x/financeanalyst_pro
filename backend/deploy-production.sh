@@ -1,76 +1,47 @@
 #!/bin/bash
-
-# FinanceAnalyst Pro - Production Deployment Script
-# This script automates the full production deployment process
-
-echo "🚀 Starting FinanceAnalyst Pro Production Deployment..."
-
-# Set error handling
 set -e
 
-# Colors for output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
+# This script automates the deployment of the backend to Render.
+# It requires the Render CLI to be installed and configured with an API key.
 
-# Function to print colored output
-print_status() {
-    echo -e "${GREEN}[INFO]${NC} $1"
-}
+# Check for required environment variables
+if [ -z "$RENDER_API_KEY" ]; then
+  echo "Error: RENDER_API_KEY environment variable is not set."
+  exit 1
+fi
 
-print_warning() {
-    echo -e "${YELLOW}[WARNING]${NC} $1"
-}
+if [ -z "$RENDER_SERVICE_ID" ]; then
+  echo "Error: RENDER_SERVICE_ID environment variable is not set."
+  echo "This is the ID of the service on Render (e.g., srv-xxxxxxxxxxxx)."
+  exit 1
+fi
 
-print_error() {
-    echo -e "${RED}[ERROR]${NC} $1"
-}
-
-# Check if we're in the backend directory
-if [ ! -f "package.json" ]; then
-    print_error "Not in backend directory. Please run from the backend folder."
+if [ -z "$PRODUCTION_BACKEND_URL" ]; then
+    echo "Error: PRODUCTION_BACKEND_URL environment variable is not set."
+    echo "This is the URL of the deployed backend (e.g., https://app-name.onrender.com)."
     exit 1
 fi
 
-print_status "Validating environment..."
+# 1. Trigger deployment on Render
+echo "🚀 Starting backend deployment on Render..."
+render-cli deploy --service-id "$RENDER_SERVICE_ID"
 
-# Check for required files
-if [ ! -f ".env.production" ]; then
-    print_warning ".env.production not found. Creating from template..."
-    cp .env.example .env.production
-fi
+echo "✅ Deployment triggered. Waiting for it to complete..."
+# The Render CLI deploy command waits for the deployment to finish by default.
 
-# Install dependencies
-print_status "Installing production dependencies..."
-npm ci --only=production
+# 2. Run post-deployment verification checks
+echo "🔍 Running post-deployment verification checks..."
 
-# Run tests if available
-if npm run test --silent 2>/dev/null; then
-    print_status "Running tests..."
-    npm test
-else
-    print_warning "No tests found, skipping test phase"
-fi
+# Health check
+echo "  - Checking /api/health endpoint..."
+curl --fail --silent --show-error "$PRODUCTION_BACKEND_URL/api/health"
 
-# Build if needed (for TypeScript projects)
-if [ -f "tsconfig.json" ]; then
-    print_status "Building TypeScript..."
-    npm run build
-fi
+# Services check
+echo "  - Checking /api/health/services endpoint..."
+curl --fail --silent --show-error "$PRODUCTION_BACKEND_URL/api/health/services"
 
-print_status "✅ Backend is ready for production deployment!"
-print_status "Next steps:"
-print_status "1. Deploy to your chosen service (Railway, Render, Heroku)"
-print_status "2. Set environment variables in your hosting service"
-print_status "3. Update frontend VITE_API_BASE_URL to production backend URL"
-print_status "4. Redeploy frontend"
+# Cache check
+echo "  - Checking /api/health/cache endpoint..."
+curl --fail --silent --show-error "$PRODUCTION_BACKEND_URL/api/health/cache"
 
-echo ""
-print_status "Available deployment options:"
-print_status "- Railway: railway up"
-print_status "- Render: Push to GitHub and connect repository"
-print_status "- Heroku: git push heroku main"
-
-echo ""
-print_status "🎉 Production deployment preparation complete!"
+echo "🎉 Backend deployment and verification completed successfully!"

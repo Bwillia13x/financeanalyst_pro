@@ -5,93 +5,113 @@ Welcome to FinanceAnalyst Pro, your comprehensive financial modeling and analysi
 ## 🚀 Quick Start
 
 ### Getting Started
-1. **Access the Platform**: Navigate to [financeanalyst.pro](https://financeanalyst.pro)
-2. **Choose Your Workspace**: Select from three main analysis areas
+1. **Access the Platform**: Navigate to [https://financeanalyst-pro.netlify.app](https://financeanalyst-pro.netlify.app)
+2. **Choose Your Analysis Type**: Select Company Analysis or Private Analysis
 3. **Start Analyzing**: Begin with real-time data or build custom models
 
 ### First Steps
-- **Explore the Dashboard**: Familiarize yourself with the interface
-- **Try Demo Mode**: Use sample data to learn the features
-- **Set Up API Keys**: Configure your data sources for live data
+- **Explore the Dashboard**: Familiarize yourself with the modern interface
+- **Use Command Palette**: Press `Cmd+K` (Mac) or `Ctrl+K` (Windows) to access quick commands
+- **Try Private Analysis**: Build comprehensive financial models with our spreadsheet-like interface
+- **Explore AI Assistant**: Get intelligent insights and analysis recommendations
 
 ## 📊 Core Features
 
-### 1. Financial Model Workspace
-Build sophisticated financial models with our advanced tools:
+### 1. Company Analysis
 
-#### DCF (Discounted Cash Flow) Analysis
-- **Purpose**: Value companies based on projected cash flows
-- **How to Use**:
-  1. Enter company ticker symbol (e.g., AAPL)
-  2. Adjust growth assumptions and discount rates
-  3. Review automated calculations and sensitivity analysis
-  4. Export results to Excel or PDF
+Real-time financial analysis with live market data:
 
-#### LBO (Leveraged Buyout) Modeling
-- **Purpose**: Analyze private equity investment scenarios
-- **Key Features**:
-  - Debt capacity analysis
-  - Returns calculation (IRR, MOIC)
-  - Exit scenario modeling
-  - Sensitivity tables
+#### Market Data & Fundamentals
 
-#### Comparable Company Analysis
-- **Purpose**: Value companies relative to industry peers
-- **Process**:
-  1. Select industry or peer group
-  2. Choose valuation multiples (P/E, EV/EBITDA, etc.)
-  3. Apply multiples to target company
-  4. Generate valuation range
+- **Live Stock Quotes**: Real-time price data with change indicators
+- **Financial Statements**: Automated income statement, balance sheet, and cash flow
+- **Key Metrics**: P/E ratios, debt ratios, profitability metrics
+- **Peer Comparison**: Industry benchmarking and relative valuation
 
-### 2. Real-Time Market Data Center
-Access live financial data and market information:
+### 2. Private Analysis Workspace
 
-#### Market Data Widgets
-- **Stock Prices**: Real-time quotes and price movements
-- **Financial Metrics**: Key ratios and financial health indicators
-- **News Integration**: Latest company and market news
-- **Watchlists**: Track your favorite securities
+Advanced financial modeling tools for investment professionals:
 
-#### Data Sources
-- **Alpha Vantage**: Comprehensive market data
-- **Financial Modeling Prep**: Detailed financial statements
-- **Polygon.io**: Real-time and historical data
+#### Financial Spreadsheet Interface
 
-### 3. Scenario Analysis & Sensitivity Tools
-Perform advanced risk analysis and scenario modeling:
+- **Excel-like Experience**: Familiar spreadsheet interface with financial templates
+- **Multi-period Modeling**: Build 3-5 year financial projections
+- **Real-time Calculations**: Automatic formula updates and validation
+- **Data Import/Export**: Seamless integration with Excel and CSV files
+
+#### Advanced Financial Models
+
+- **DCF Analysis**: Discounted cash flow modeling with sensitivity analysis
+- **LBO Modeling**: Leveraged buyout analysis with debt scheduling
+- **3-Statement Models**: Integrated income statement, balance sheet, and cash flow
+- **Scenario Analysis**: Multiple scenario planning with probability weighting
+- **Monte Carlo Simulation**: Statistical modeling for risk assessment
+
+#### AI-Powered Insights
+
+- **Smart Recommendations**: AI suggests model improvements and assumptions
+- **Automated Analysis**: Natural language summaries of financial results
+- **Industry Benchmarking**: AI-driven peer group identification
+- **Risk Assessment**: Automated identification of key risk factors
+
+### 3. AI Financial Assistant
+
+Intelligent analysis and insights powered by advanced AI:
+
+#### Natural Language Analysis
+
+- **Conversational Interface**: Ask questions about financial data in plain English
+- **Automated Insights**: AI identifies trends, patterns, and anomalies
+- **Investment Recommendations**: Data-driven investment thesis generation
+- **Risk Analysis**: Comprehensive risk factor identification
+
+#### Smart Report Generation
+
+- **Executive Summaries**: Auto-generated investment committee presentations
+- **Valuation Reports**: Professional-grade valuation analysis
+- **Peer Analysis**: Automated competitive positioning reports
+- **Custom Templates**: Industry-specific report formats
+
+### 4. Advanced Analytics Engine
+
+Sophisticated quantitative analysis tools:
 
 #### Monte Carlo Simulation
-- **Purpose**: Model uncertainty in financial projections
-- **Features**:
-  - 10,000+ simulation runs
-  - Multiple variable distributions
-  - Confidence intervals and risk metrics
-  - Visual results with charts and graphs
+
+- **10,000+ Iterations**: Comprehensive statistical modeling
+- **Multiple Distributions**: Normal, triangular, uniform, and custom distributions
+- **Confidence Intervals**: 95% and 99% confidence bands
+- **Scenario Testing**: Stress testing under various market conditions
 
 #### Sensitivity Analysis
-- **Tornado Charts**: Identify key value drivers
-- **Data Tables**: Two-way sensitivity analysis
-- **Scenario Comparison**: Best/base/worst case analysis
+
+- **Tornado Charts**: Visual impact analysis of key variables
+- **Two-Way Data Tables**: Interactive sensitivity grids
+- **Scenario Planning**: Base, bull, and bear case modeling
+- **Break-even Analysis**: Critical threshold identification
 
 ## 🛠️ Advanced Features
 
-### Terminal Interface
-Access advanced functions through our command-line interface:
+### Command Palette
+Access powerful commands instantly with our Command Palette:
 
-```
-> help                    # Show available commands
-> analyze AAPL           # Quick company analysis
-> dcf AAPL --growth=5%   # DCF with custom growth rate
-> compare AAPL MSFT GOOGL # Compare multiple companies
-> export results.xlsx    # Export current analysis
+```bash
+# Open Command Palette: Cmd+K (Mac) or Ctrl+K (Windows)
+> Company Analysis        # Quick navigation to company analysis
+> Private Analysis        # Navigate to private modeling tools
+> AI Assistant           # Open AI chat interface
+> Export Analysis        # Export current work
+> Theme Toggle           # Switch between light/dark themes
 ```
 
 ### Keyboard Shortcuts
-- `Ctrl + /`: Open terminal
-- `Ctrl + S`: Save current work
-- `Ctrl + E`: Export data
-- `Ctrl + R`: Refresh data
+
+- `Cmd+K` / `Ctrl+K`: Open Command Palette
+- `Cmd+S` / `Ctrl+S`: Save current work  
+- `Cmd+E` / `Ctrl+E`: Export data
+- `Cmd+R` / `Ctrl+R`: Refresh data
 - `Esc`: Close modals/panels
+- `Tab`: Navigate through spreadsheet cells
 
 ### Data Export Options
 - **Excel**: Formatted spreadsheets with formulas

@@ -5,35 +5,54 @@ import {
   Upload,
   HelpCircle,
   Play,
-  Activity,
-  Database
+  Database,
+  Activity
 } from 'lucide-react';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, lazy, Suspense } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 
-import DataExportImport from '../components/DataExportImport';
-import AdvancedLBOTool from '../components/PrivateAnalysis/AdvancedLBOTool';
-import AnalysisResults from '../components/PrivateAnalysis/AnalysisResults';
-import ContextualInsightsSidebar from '../components/PrivateAnalysis/ContextualInsightsSidebar';
-import EnhancedMarketDataDashboard from '../components/PrivateAnalysis/EnhancedMarketDataDashboard';
-import EnhancedScenarioAnalysis from '../components/PrivateAnalysis/EnhancedScenarioAnalysis';
-import FinancialModelWorkspace from '../components/PrivateAnalysis/FinancialModelWorkspace';
-import FinancialSpreadsheet from '../components/PrivateAnalysis/FinancialSpreadsheet';
-import ModelingTools from '../components/PrivateAnalysis/ModelingTools';
-import MonteCarloIntegrationHub from '../components/PrivateAnalysis/MonteCarloIntegrationHub';
+// OnboardingTour components will be added later
 import SEOHead from '../components/SEO/SEOHead';
 import Button from '../components/ui/Button';
-import { HelpPanel, OnboardingTour } from '../components/ui/ContextualHelp';
+import { HelpPanel } from '../components/ui/ContextualHelp';
 import ErrorBoundary from '../components/ui/ErrorBoundary';
 import Header from '../components/ui/Header';
 import { LoadingWrapper, FinancialTableSkeleton } from '../components/ui/LoadingSkeleton';
 import SecondaryNav from '../components/ui/SecondaryNav';
 import defaultFinancialData from '../data/defaultFinancialData';
 import { useCollaboration } from '../hooks/useCollaboration';
-import { useOnboarding } from '../hooks/useOnboarding';
+import {
+  setFinancialData,
+  setDcfResults,
+  setLboResults,
+  setThreeStatementResults,
+  setMonteCarloResults,
+  selectFinancialData,
+  selectActiveModel,
+  selectIsDirty
+} from '../store/analysisStore';
 import { formatCurrency, formatPercentage } from '../utils/dataTransformation';
 import { calculateDCF } from '../utils/dcfCalculations';
 
+// Lazy-loaded heavy modules to reduce initial bundle size for the Private Analysis route
+const FinancialSpreadsheet = lazy(() => import('../components/PrivateAnalysis/FinancialSpreadsheet'));
+const ModelingTools = lazy(() => import('../components/PrivateAnalysis/ModelingTools'));
+const AnalysisResults = lazy(() => import('../components/PrivateAnalysis/AnalysisResults'));
+const AdvancedLBOTool = lazy(() => import('../components/PrivateAnalysis/AdvancedLBOTool'));
+const FinancialModelWorkspace = lazy(() => import('../components/PrivateAnalysis/FinancialModelWorkspace'));
+const EnhancedScenarioAnalysis = lazy(() => import('../components/PrivateAnalysis/EnhancedScenarioAnalysis'));
+const EnhancedMarketDataDashboard = lazy(() => import('../components/PrivateAnalysis/EnhancedMarketDataDashboard'));
+const MonteCarloIntegrationHub = lazy(() => import('../components/PrivateAnalysis/MonteCarloIntegrationHub'));
+const DataExportImport = lazy(() => import('../components/DataExportImport'));
+const ContextualInsightsSidebar = lazy(() => import('../components/PrivateAnalysis/ContextualInsightsSidebar'));
+
 const PrivateAnalysis = () => {
+  // Redux hooks
+  const dispatch = useDispatch();
+  const financialData = useSelector(selectFinancialData);
+  const _activeModel = useSelector(selectActiveModel);
+  const _isDirty = useSelector(state => state.analysis.isDirty);
+
   // Collaboration hook - disabled during testing to prevent errors
   const isTestEnvironment = typeof window !== 'undefined' && (
     window.navigator?.webdriver === true ||
@@ -50,7 +69,7 @@ const PrivateAnalysis = () => {
     role: 'analyst'
   });
 
-  const [showCollaboration, setShowCollaboration] = useState(false);
+  const [showCollaboration, _setShowCollaboration] = useState(false);
   const workspaceId = 'private-analysis-workspace';
 
   // Initialize collaboration workspace - skip during testing
@@ -65,15 +84,11 @@ const PrivateAnalysis = () => {
     }
   }, [isCollabInitialized, workspaceId, joinWorkspace, showCollaboration, isTestEnvironment]);
 
-  // Onboarding and help state
-  const {
-    currentTour,
-    startTour,
-    completeTour,
-    skipTour,
-    hasTourBeenCompleted
-  } = useOnboarding();
+  // Local state for UI
+  const [activeTab, setActiveTab] = useState('spreadsheet');
+  const [_showTour, setShowTour] = useState(false);
 
+  // Onboarding and help state
   const [activeHelpPanel, setActiveHelpPanel] = useState(null);
   const [showQuickStart, setShowQuickStart] = useState(false);
   const quickStartDialogRef = useRef(null);
@@ -81,18 +96,16 @@ const PrivateAnalysis = () => {
   const quickStartSkipBtnRef = useRef(null);
 
   // Existing state management
-  const [activeTab, setActiveTab] = useState('spreadsheet');
-  const [financialData, setFinancialData] = useState(defaultFinancialData);
   const [lastSaved, setLastSaved] = useState(null);
 
   // Auto-start tour for new users
   useEffect(() => {
     const hasVisited = localStorage.getItem('fa-pro-visited-private-analysis');
-    if (!hasVisited && !hasTourBeenCompleted('privateAnalysis')) {
+    if (!hasVisited && !localStorage.getItem('privateAnalyses')) {
       setShowQuickStart(true);
       localStorage.setItem('fa-pro-visited-private-analysis', 'true');
     }
-  }, [hasTourBeenCompleted]);
+  }, []);
 
   // Focus management and keyboard support for Quick Start modal
   useEffect(() => {
@@ -135,7 +148,7 @@ const PrivateAnalysis = () => {
 
   const handleStartTour = () => {
     setShowQuickStart(false);
-    startTour('privateAnalysis');
+    setShowTour(true);
     // Return focus to page title
     const titleEl = document.getElementById('page-title');
     if (titleEl) titleEl.focus();
@@ -283,7 +296,7 @@ const PrivateAnalysis = () => {
     return Math.min(progress, 100);
   };
 
-  const saveAnalysis = async(name) => {
+  const saveAnalysis = useCallback(async(name) => {
     try {
       setIsLoading(true);
       setDataStatus('saving');
@@ -320,8 +333,7 @@ const PrivateAnalysis = () => {
     } finally {
       setIsLoading(false);
     }
-  };
-
+  }, [financialData, adjustedValues, modelInputs, advancedResults, savedAnalyses]);
 
   const handleInsightClick = (insight) => {
     setCurrentMetricFocus(insight.metric);
@@ -337,6 +349,26 @@ const PrivateAnalysis = () => {
       setInsightsSidebarVisible(true);
     }
   }, [financialData, advancedResults, insightsSidebarVisible]);
+
+  // Initialize financial data if not already set
+  useEffect(() => {
+    if (!financialData || Object.keys(financialData).length === 0) {
+      dispatch(setFinancialData(defaultFinancialData));
+    }
+  }, [dispatch, financialData]);
+
+  // Function to handle data changes from components
+  const handleDataChange = useCallback((newData, section = 'general') => {
+    if (section === 'lbo') {
+      dispatch(setLboResults(newData));
+    } else if (section === 'threeStatement') {
+      dispatch(setThreeStatementResults(newData));
+    } else if (section === 'scenarios') {
+      dispatch(setMonteCarloResults(newData));
+    } else {
+      dispatch(setFinancialData({ ...financialData, ...newData }));
+    }
+  }, [dispatch, financialData]);
 
   // Status indicator component
   // (Removed unused _WorkflowNavigation component)
@@ -354,329 +386,347 @@ const PrivateAnalysis = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-900 relative">
-      <SEOHead
-        title="Private Analysis Suite | FinanceAnalyst Pro"
-        description="Comprehensive financial analysis platform with advanced modeling tools, scenario analysis, Monte Carlo simulation, and private equity workflows."
-        canonical="/private-analysis"
-        keywords="private analysis, financial modeling, scenario analysis, Monte Carlo simulation, LBO analysis, private equity tools"
-      />
-      <Header />
+    <ErrorBoundary>
+      <div className="min-h-screen bg-slate-900 relative">
+        <SEOHead
+          title="Private Analysis Suite | FinanceAnalyst Pro"
+          description="Comprehensive financial analysis platform with advanced modeling tools, scenario analysis, Monte Carlo simulation, and private equity workflows."
+          canonical="/private-analysis"
+          keywords="private analysis, financial modeling, scenario analysis, Monte Carlo simulation, LBO analysis, private equity tools"
+        />
+        <Header />
 
-      <main
-        id="main-content" className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8" role="main"
-        aria-label="Private Analysis Dashboard"
-      >
-        {/* Header Section */}
-        <section className="mb-6 sm:mb-8" aria-labelledby="page-title">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
-            <h1 id="page-title" tabIndex={-1} className="text-2xl sm:text-3xl font-bold text-white">Private Analysis</h1>
+        <main
+          id="main-content" className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8" role="main"
+          aria-label="Private Analysis Dashboard"
+        >
+          {/* Header Section */}
+          <section className="mb-6 sm:mb-8" aria-labelledby="page-title">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+              <h1 id="page-title" tabIndex={-1} className="text-2xl sm:text-3xl font-bold text-white">Private Analysis</h1>
 
-            <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
-              <div className="flex items-center gap-2">
-                <div
-                  className={`w-2 h-2 rounded-full ${
-                    dataStatus === 'ready' ? 'bg-green-400' :
-                      dataStatus === 'saving' ? 'bg-blue-400' : 'bg-yellow-400'
-                  }`}
-                />
-                <span className="text-xs text-gray-400">
-                  {dataStatus === 'ready' ? 'Ready' : dataStatus === 'saving' ? 'Saving...' : dataStatus}
-                </span>
+              <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
+                <div className="flex items-center gap-2">
+                  <div
+                    className={`w-2 h-2 rounded-full ${
+                      dataStatus === 'ready' ? 'bg-green-400' :
+                        dataStatus === 'saving' ? 'bg-blue-400' : 'bg-yellow-400'
+                    }`}
+                  />
+                  <span className="text-xs text-gray-400">
+                    {dataStatus === 'ready' ? 'Ready' : dataStatus === 'saving' ? 'Saving...' : dataStatus}
+                  </span>
+                </div>
+
+                {lastSaved && (
+                  <Button
+                    onClick={() => saveAnalysis()}
+                    disabled={isLoading}
+                    className="flex items-center gap-2 text-xs sm:text-sm"
+                    variant="primary"
+                    size="sm"
+                  >
+                    <Save className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <span className="hidden sm:inline">Saved</span>
+                    <span className="sm:hidden">{lastSaved.toLocaleTimeString()}</span>
+                    <span className="hidden sm:inline">{lastSaved.toLocaleTimeString()}</span>
+                  </Button>
+                )}
+              </div>
+            </div>
+
+            {/* Progress Indicators */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6">
+              <div className="bg-slate-800 rounded-lg p-3 sm:p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs sm:text-sm text-gray-400">Data Completeness</span>
+                  <span className="text-sm sm:text-base text-white font-semibold">{getDataCompleteness()}%</span>
+                </div>
+                <div className="w-full bg-slate-700 rounded-full h-1.5 sm:h-2">
+                  <div
+                    className="bg-blue-500 h-1.5 sm:h-2 rounded-full transition-all duration-500"
+                    style={{ width: `${getDataCompleteness()}%` }}
+                  />
+                </div>
               </div>
 
-              {lastSaved && (
-                <Button
-                  onClick={() => saveAnalysis()}
-                  disabled={isLoading}
-                  className="flex items-center gap-2 text-xs sm:text-sm"
-                  variant="primary"
-                  size="sm"
+              <div className="bg-slate-800 rounded-lg p-3 sm:p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs sm:text-sm text-gray-400">Analysis Progress</span>
+                  <span className="text-sm sm:text-base text-white font-semibold">{calculateAnalysisProgress()}%</span>
+                </div>
+                <div className="w-full bg-slate-700 rounded-full h-1.5 sm:h-2">
+                  <div
+                    className="bg-green-500 h-1.5 sm:h-2 rounded-full transition-all duration-500"
+                    style={{ width: `${calculateAnalysisProgress()}%` }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Start Modal */}
+            {showQuickStart && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+                <div
+                  ref={quickStartDialogRef}
+                  className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6"
+                  role="dialog"
+                  aria-modal="true"
+                  aria-labelledby="quickstart-title"
+                  aria-describedby="quickstart-desc"
                 >
-                  <Save className="w-3 h-3 sm:w-4 sm:h-4" />
-                  <span className="hidden sm:inline">Saved</span>
-                  <span className="sm:hidden">{lastSaved.toLocaleTimeString()}</span>
-                  <span className="hidden sm:inline">{lastSaved.toLocaleTimeString()}</span>
-                </Button>
+                  <div className="flex items-center space-x-3 mb-4">
+                    <Play className="w-6 h-6 text-blue-600" />
+                    <h3 id="quickstart-title" className="text-lg font-semibold text-slate-900">Welcome to Private Analysis</h3>
+                  </div>
+                  <p id="quickstart-desc" className="text-slate-700 mb-6">
+                    Take a quick tour to learn how to build financial models, run DCF analysis, and export professional reports.
+                  </p>
+                  <div className="flex space-x-3">
+                    <button
+                      ref={quickStartStartBtnRef}
+                      onClick={handleStartTour}
+                      className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                      aria-label="Start Tour"
+                    >
+                      Start Tour
+                    </button>
+                    <button
+                      ref={quickStartSkipBtnRef}
+                      onClick={handleSkipTour}
+                      className="flex-1 bg-slate-200 text-slate-800 px-4 py-2 rounded-lg hover:bg-slate-300"
+                      aria-label="Skip"
+                    >
+                      Skip
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </section>
+
+          {/* Secondary Navigation - Analysis Tools */}
+          <div className="flex items-center justify-between mb-4 sm:mb-6">
+            <SecondaryNav
+              variant="horizontal"
+              navigation="analysisTools"
+              activeItem={activeTab}
+              onItemClick={(itemId) => setActiveTab(itemId)}
+              className="flex-1"
+              data-tour="financial-spreadsheet-tab"
+            />
+
+            {/* Help and Tour Controls */}
+            <div className="flex items-center space-x-2 ml-4">
+              <button
+                onClick={() => openHelpPanel(activeTab === 'modeling' ? 'dcf' : activeTab)}
+                className="p-2 text-slate-400 hover:text-white hover:bg-slate-700 rounded-lg transition-colors"
+                title="Get help with this feature"
+                aria-label="Open help panel"
+              >
+                <HelpCircle className="w-4 h-4" />
+              </button>
+
+              {!localStorage.getItem('privateAnalyses') && (
+                <button
+                  onClick={() => setShowTour(true)}
+                  className="p-2 text-blue-400 hover:text-blue-300 hover:bg-slate-700 rounded-lg transition-colors"
+                  title="Take a guided tour"
+                  aria-label="Start Private Analysis tour"
+                >
+                  <Play className="w-4 h-4" />
+                </button>
               )}
             </div>
           </div>
 
-          {/* Progress Indicators */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6">
-            <div className="bg-slate-800 rounded-lg p-3 sm:p-4">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs sm:text-sm text-gray-400">Data Completeness</span>
-                <span className="text-sm sm:text-base text-white font-semibold">{getDataCompleteness()}%</span>
-              </div>
-              <div className="w-full bg-slate-700 rounded-full h-1.5 sm:h-2">
-                <div
-                  className="bg-blue-500 h-1.5 sm:h-2 rounded-full transition-all duration-500"
-                  style={{ width: `${getDataCompleteness()}%` }}
-                />
-              </div>
-            </div>
-
-            <div className="bg-slate-800 rounded-lg p-3 sm:p-4">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs sm:text-sm text-gray-400">Analysis Progress</span>
-                <span className="text-sm sm:text-base text-white font-semibold">{calculateAnalysisProgress()}%</span>
-              </div>
-              <div className="w-full bg-slate-700 rounded-full h-1.5 sm:h-2">
-                <div
-                  className="bg-green-500 h-1.5 sm:h-2 rounded-full transition-all duration-500"
-                  style={{ width: `${calculateAnalysisProgress()}%` }}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Quick Start Modal */}
-          {showQuickStart && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-              <div
-                ref={quickStartDialogRef}
-                className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6"
-                role="dialog"
-                aria-modal="true"
-                aria-labelledby="quickstart-title"
-                aria-describedby="quickstart-desc"
-              >
-                <div className="flex items-center space-x-3 mb-4">
-                  <Play className="w-6 h-6 text-blue-600" />
-                  <h3 id="quickstart-title" className="text-lg font-semibold text-slate-900">Welcome to Private Analysis</h3>
-                </div>
-                <p id="quickstart-desc" className="text-slate-700 mb-6">
-                  Take a quick tour to learn how to build financial models, run DCF analysis, and export professional reports.
-                </p>
-                <div className="flex space-x-3">
+          {/* Legacy Tab Navigation (keeping as fallback) */}
+          <nav className="mb-6 hidden" aria-label="Analysis Tools">
+            <div className="flex flex-wrap gap-2 p-1 bg-slate-800 rounded-lg" role="tablist">
+              {tabs.map(tab => {
+                const Icon = tab.icon;
+                return (
                   <button
-                    ref={quickStartStartBtnRef}
-                    onClick={handleStartTour}
-                    className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-                    aria-label="Start Tour"
-                  >
-                    Start Tour
-                  </button>
-                  <button
-                    ref={quickStartSkipBtnRef}
-                    onClick={handleSkipTour}
-                    className="flex-1 bg-slate-200 text-slate-800 px-4 py-2 rounded-lg hover:bg-slate-300"
-                    aria-label="Skip"
-                  >
-                    Skip
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-        </section>
-
-        {/* Secondary Navigation - Analysis Tools */}
-        <div className="flex items-center justify-between mb-4 sm:mb-6">
-          <SecondaryNav
-            variant="horizontal"
-            navigation="analysisTools"
-            activeItem={activeTab}
-            onItemClick={(itemId) => setActiveTab(itemId)}
-            className="flex-1"
-            data-tour="financial-spreadsheet-tab"
-          />
-
-          {/* Help and Tour Controls */}
-          <div className="flex items-center space-x-2 ml-4">
-            <button
-              onClick={() => openHelpPanel(activeTab === 'modeling' ? 'dcf' : activeTab)}
-              className="p-2 text-slate-400 hover:text-white hover:bg-slate-700 rounded-lg transition-colors"
-              title="Get help with this feature"
-              aria-label="Open help panel"
-            >
-              <HelpCircle className="w-4 h-4" />
-            </button>
-
-            {!hasTourBeenCompleted('privateAnalysis') && (
-              <button
-                onClick={() => startTour('privateAnalysis')}
-                className="p-2 text-blue-400 hover:text-blue-300 hover:bg-slate-700 rounded-lg transition-colors"
-                title="Take a guided tour"
-                aria-label="Start Private Analysis tour"
-              >
-                <Play className="w-4 h-4" />
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* Legacy Tab Navigation (keeping as fallback) */}
-        <nav className="mb-6 hidden" aria-label="Analysis Tools">
-          <div className="flex flex-wrap gap-2 p-1 bg-slate-800 rounded-lg" role="tablist">
-            {tabs.map(tab => {
-              const Icon = tab.icon;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  role="tab"
-                  aria-selected={activeTab === tab.id}
-                  aria-controls={`tabpanel-${tab.id}`}
-                  tabIndex={activeTab === tab.id ? 0 : -1}
-                  className={`
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    role="tab"
+                    aria-selected={activeTab === tab.id}
+                    aria-controls={`tabpanel-${tab.id}`}
+                    tabIndex={activeTab === tab.id ? 0 : -1}
+                    className={`
                     flex items-center gap-2 px-4 py-2 rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-slate-800
                     ${
-                activeTab === tab.id
-                  ? 'bg-blue-600 text-white shadow-lg'
-                  : 'text-gray-300 hover:text-white hover:bg-slate-700'
-                }
+                  activeTab === tab.id
+                    ? 'bg-blue-600 text-white shadow-lg'
+                    : 'text-gray-300 hover:text-white hover:bg-slate-700'
+                  }
                   `}
-                >
-                  <Icon className="w-4 h-4" />
-                  <span className="text-sm font-medium">{tab.label}</span>
-                </button>
-              );
-            })}
-          </div>
-        </nav>
+                  >
+                    <Icon className="w-4 h-4" />
+                    <span className="text-sm font-medium">{tab.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </nav>
 
-        {/* Main Content Area */}
-        <section
-          className="relative" role="tabpanel" id={`tabpanel-${activeTab}`}
-          aria-labelledby={`tab-${activeTab}`}
-        >
-          <motion.div
-            key={activeTab}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2 }}
+          {/* Main Content Area */}
+          <section
+            className="relative" role="tabpanel" id={`tabpanel-${activeTab}`}
+            aria-labelledby={`tab-${activeTab}`}
           >
-            {activeTab === 'spreadsheet' && (
-              <ErrorBoundary fallback={<div className="p-8 text-center text-red-400">Error loading spreadsheet. Please refresh the page.</div>}>
-                <LoadingWrapper
-                  isLoading={isLoading}
-                  skeleton={<FinancialTableSkeleton rows={12} columns={6} />}
-                >
-                  <FinancialSpreadsheet
-                    data={financialData}
-                    onDataChange={setFinancialData}
-                    onAdjustedValuesChange={setAdjustedValues}
-                  />
-                </LoadingWrapper>
-              </ErrorBoundary>
-            )}
+            <Suspense fallback={<div className="p-8 text-center text-gray-400">Loading...</div>}>
+              <motion.div
+                key={activeTab}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2 }}
+              >
+                {activeTab === 'spreadsheet' && (
+                  <ErrorBoundary fallback={<div className="p-8 text-center text-red-400">Error loading spreadsheet. Please refresh the page.</div>}>
+                    <Suspense fallback={<FinancialTableSkeleton rows={12} columns={6} />}>
+                      <LoadingWrapper
+                        isLoading={isLoading}
+                        skeleton={<FinancialTableSkeleton rows={12} columns={6} />}
+                      >
+                        <FinancialSpreadsheet
+                          data={financialData}
+                          onDataChange={handleDataChange}
+                          onAdjustedValuesChange={setAdjustedValues}
+                        />
+                      </LoadingWrapper>
+                    </Suspense>
+                  </ErrorBoundary>
+                )}
 
-            {activeTab === 'modeling' && (
-              <ErrorBoundary fallback={<div className="p-8 text-center text-red-400">Error loading modeling tools. Please refresh the page.</div>}>
-                <ModelingTools
-                  data={financialData}
-                  adjustedValues={adjustedValues}
-                  onDataChange={setFinancialData}
-                />
-              </ErrorBoundary>
-            )}
+                {activeTab === 'modeling' && (
+                  <ErrorBoundary fallback={<div className="p-8 text-center text-red-400">Error loading modeling tools. Please refresh the page.</div>}>
+                    <Suspense fallback={<div className="p-8 text-center text-gray-400">Loading...</div>}>
+                      <ModelingTools
+                        data={financialData}
+                        adjustedValues={adjustedValues}
+                        onDataChange={handleDataChange}
+                      />
+                    </Suspense>
+                  </ErrorBoundary>
+                )}
 
-            {activeTab === 'analysis' && (
-              <ErrorBoundary fallback={<div className="p-8 text-center text-red-400">Error loading analysis results. Please check your data and refresh.</div>}>
-                <AnalysisResults
-                  data={financialData}
-                  adjustedValues={adjustedValues}
-                  modelInputs={modelInputs}
-                  calculateDCF={(data) => calculateDCF(data, modelInputs)}
-                  formatCurrency={formatCurrency}
-                  formatPercentage={formatPercentage}
-                />
-              </ErrorBoundary>
-            )}
+                {activeTab === 'analysis' && (
+                  <ErrorBoundary fallback={<div className="p-8 text-center text-red-400">Error loading analysis results. Please check your data and refresh.</div>}>
+                    <Suspense fallback={<div className="p-8 text-center text-gray-400">Loading...</div>}>
+                      <AnalysisResults
+                        data={financialData}
+                        adjustedValues={adjustedValues}
+                        modelInputs={modelInputs}
+                        calculateDCF={(data) => calculateDCF(data, modelInputs)}
+                        formatCurrency={formatCurrency}
+                        formatPercentage={formatPercentage}
+                      />
+                    </Suspense>
+                  </ErrorBoundary>
+                )}
 
-            {activeTab === 'lbo' && (
-              <ErrorBoundary fallback={<div className="p-8 text-center text-red-400">Error loading LBO tool. Please check your data.</div>}>
-                <AdvancedLBOTool
-                  data={financialData}
-                  onDataChange={(results) => setAdvancedResults(prev => ({ ...prev, lbo: results }))}
-                />
-              </ErrorBoundary>
-            )}
+                {activeTab === 'lbo' && (
+                  <ErrorBoundary fallback={<div className="p-8 text-center text-red-400">Error loading LBO tool. Please check your data.</div>}>
+                    <Suspense fallback={<div className="p-8 text-center text-gray-400">Loading...</div>}>
+                      <AdvancedLBOTool
+                        data={financialData}
+                        onDataChange={(results) => handleDataChange(results, 'lbo')}
+                      />
+                    </Suspense>
+                  </ErrorBoundary>
+                )}
 
-            {activeTab === 'threestatement' && (
-              <ErrorBoundary fallback={<div className="p-8 text-center text-red-400">Error loading financial model workspace.</div>}>
-                <FinancialModelWorkspace
-                  data={financialData}
-                  onDataChange={(results) => setAdvancedResults(prev => ({ ...prev, threeStatement: results }))}
-                />
-              </ErrorBoundary>
-            )}
+                {activeTab === 'threestatement' && (
+                  <ErrorBoundary fallback={<div className="p-8 text-center text-red-400">Error loading financial model workspace.</div>}>
+                    <Suspense fallback={<div className="p-8 text-center text-gray-400">Loading...</div>}>
+                      <FinancialModelWorkspace
+                        data={financialData}
+                        onDataChange={(results) => handleDataChange(results, 'threeStatement')}
+                      />
+                    </Suspense>
+                  </ErrorBoundary>
+                )}
 
-            {activeTab === 'scenarios' && (
-              <ErrorBoundary fallback={<div className="p-8 text-center text-red-400">Error loading scenario analysis.</div>}>
-                <EnhancedScenarioAnalysis
-                  data={financialData}
-                  onDataChange={(results) => setAdvancedResults(prev => ({ ...prev, scenarios: results }))}
-                  calculateDCF={(data) => calculateDCF(data, modelInputs)}
-                  lboModelingEngine={null}
-                />
-              </ErrorBoundary>
-            )}
+                {activeTab === 'scenarios' && (
+                  <ErrorBoundary fallback={<div className="p-8 text-center text-red-400">Error loading scenario analysis.</div>}>
+                    <Suspense fallback={<div className="p-8 text-center text-gray-400">Loading...</div>}>
+                      <EnhancedScenarioAnalysis
+                        data={financialData}
+                        onDataChange={(results) => handleDataChange(results, 'scenarios')}
+                        calculateDCF={(data) => calculateDCF(data, modelInputs)}
+                        lboModelingEngine={null}
+                      />
+                    </Suspense>
+                  </ErrorBoundary>
+                )}
 
-            {activeTab === 'marketdata' && (
-              <ErrorBoundary fallback={<div className="p-8 text-center text-red-400">Error loading market data dashboard.</div>}>
-                <EnhancedMarketDataDashboard
-                  data={financialData}
-                  onDataChange={(results) => setAdvancedResults(prev => ({ ...prev, marketData: results }))}
-                />
-              </ErrorBoundary>
-            )}
+                {activeTab === 'marketdata' && (
+                  <ErrorBoundary fallback={<div className="p-8 text-center text-red-400">Error loading market data dashboard.</div>}>
+                    <Suspense fallback={<div className="p-8 text-center text-gray-400">Loading...</div>}>
+                      <EnhancedMarketDataDashboard
+                        data={financialData}
+                        onDataChange={(results) => handleDataChange(results, 'marketData')}
+                      />
+                    </Suspense>
+                  </ErrorBoundary>
+                )}
 
-            {activeTab === 'montecarlo' && (
-              <ErrorBoundary fallback={<div className="p-8 text-center text-red-400">Error loading Monte Carlo integration.</div>}>
-                <MonteCarloIntegrationHub
-                  data={financialData}
-                  dcfResults={advancedResults.dcf}
-                  lboResults={advancedResults.lbo}
-                  financialModel={advancedResults.threeStatement}
-                  scenarioResults={advancedResults.scenarios}
-                  onDataChange={(results) => setAdvancedResults(prev => ({ ...prev, monteCarlo: results }))}
-                />
-              </ErrorBoundary>
-            )}
+                {activeTab === 'montecarlo' && (
+                  <ErrorBoundary fallback={<div className="p-8 text-center text-red-400">Error loading Monte Carlo integration.</div>}>
+                    <Suspense fallback={<div className="p-8 text-center text-gray-400">Loading...</div>}>
+                      <MonteCarloIntegrationHub
+                        data={financialData}
+                        dcfResults={advancedResults.dcf}
+                        lboResults={advancedResults.lbo}
+                        financialModel={advancedResults.threeStatement}
+                        scenarioResults={advancedResults.scenarios}
+                        onDataChange={(results) => handleDataChange(results, 'monteCarlo')}
+                      />
+                    </Suspense>
+                  </ErrorBoundary>
+                )}
 
-            {activeTab === 'import-export' && (
-              <ErrorBoundary fallback={<div className="p-8 text-center text-red-400">Error loading import/export tools.</div>}>
-                <DataExportImport
-                  data={financialData}
-                  onDataChange={setFinancialData}
-                  savedAnalyses={savedAnalyses}
-                  onAnalysesChange={setSavedAnalyses}
-                />
-              </ErrorBoundary>
-            )}
-          </motion.div>
-        </section>
+                {activeTab === 'import-export' && (
+                  <ErrorBoundary fallback={<div className="p-8 text-center text-red-400">Error loading import/export tools.</div>}>
+                    <Suspense fallback={<div className="p-8 text-center text-gray-400">Loading...</div>}>
+                      <DataExportImport
+                        data={financialData}
+                        onDataChange={handleDataChange}
+                        savedAnalyses={savedAnalyses}
+                        onAnalysesChange={setSavedAnalyses}
+                      />
+                    </Suspense>
+                  </ErrorBoundary>
+                )}
+              </motion.div>
+            </Suspense>
+          </section>
 
-        {/* Contextual Insights Sidebar */}
-        <ContextualInsightsSidebar
-          financialData={financialData}
-          currentMetric={currentMetricFocus}
-          analysisContext={activeTab === 'analysis' ? 'dcf' : activeTab}
-          onInsightClick={handleInsightClick}
-          isVisible={insightsSidebarVisible}
-          onToggle={toggleInsightsSidebar}
+          {/* Contextual Insights Sidebar */}
+          <Suspense fallback={null}>
+            <ContextualInsightsSidebar
+              financialData={financialData}
+              currentMetric={currentMetricFocus}
+              analysisContext={activeTab === 'analysis' ? 'dcf' : activeTab}
+              onInsightClick={handleInsightClick}
+              isVisible={insightsSidebarVisible}
+              onToggle={toggleInsightsSidebar}
+            />
+          </Suspense>
+        </main>
+
+        {/* Help Panel */}
+        <HelpPanel
+          helpKey={activeHelpPanel}
+          isOpen={!!activeHelpPanel}
+          onClose={closeHelpPanel}
         />
-      </main>
 
-      {/* Help Panel */}
-      <HelpPanel
-        helpKey={activeHelpPanel}
-        isOpen={!!activeHelpPanel}
-        onClose={closeHelpPanel}
-      />
-
-      {/* Onboarding Tour */}
-      <OnboardingTour
-        steps={currentTour?.steps || []}
-        isActive={!!currentTour}
-        onComplete={() => completeTour()}
-        onSkip={skipTour}
-      />
-    </div>
+        {/* OnboardingTour - temporarily disabled for integration focus */}
+      </div>
+    </ErrorBoundary>
   );
 };
 

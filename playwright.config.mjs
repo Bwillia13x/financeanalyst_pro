@@ -9,13 +9,13 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   reporter: 'list',
   use: {
-    baseURL: 'http://localhost:5173',
+    baseURL: process.env.CI ? 'http://localhost:4173' : 'http://localhost:5173',
     trace: 'on-first-retry',
     headless: true
   },
   webServer: {
-    command: 'npm run start',
-    port: 5173,
+    command: process.env.CI ? 'npm run preview' : 'npm run start',
+    port: process.env.CI ? 4173 : 5173,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000
   },

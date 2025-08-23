@@ -4,7 +4,6 @@ import { Provider } from 'react-redux';
 import App from './App';
 import ProductionErrorBoundary from './components/ErrorBoundary/ProductionErrorBoundary';
 import { store } from './store/store';
-import { initializePerformanceMonitoring } from './utils/performanceMonitoring';
 import { initializeSecurity } from './utils/securityHeaders';
 import { initializePWA, unregisterSW } from './utils/serviceWorker';
 import './styles/tailwind.css';
@@ -60,8 +59,47 @@ if (!import.meta.env.DEV) {
 
 // Initialize monitoring only when NOT in automated environments to keep tests stable
 if (!isAutomatedEnv) {
+  // Initialize Sentry Performance Monitoring dynamically
+  import('@sentry/react')
+    .then((Sentry) => {
+      Sentry.init({
+        dsn: import.meta.env.VITE_SENTRY_DSN,
+        environment: import.meta.env.MODE,
+        integrations: [
+          Sentry.browserTracingIntegration(),
+          Sentry.replayIntegration({
+            maskAllText: false,
+            blockAllMedia: false
+          })
+        ],
+        tracesSampleRate: import.meta.env.MODE === 'production' ? 0.1 : 1.0,
+        replaysSessionSampleRate: 0.1,
+        replaysOnErrorSampleRate: 1.0,
+        beforeSend(event) {
+          // Filter out development errors
+          if (import.meta.env.MODE === 'development' && event.exception) {
+            const error = event.exception.values?.[0];
+            if (error?.value?.includes('ResizeObserver loop limit exceeded')) {
+              return null;
+            }
+          }
+          return event;
+        }
+      });
+
+      // Expose globally for compatibility
+      window.Sentry = Sentry;
+    })
+    .catch((e) => console.warn('Skipping Sentry initialization:', e));
+
   // Performance monitoring
-  initializePerformanceMonitoring();
+  import('./utils/performanceMonitoring')
+    .then((mod) => {
+      if (mod?.initializePerformanceMonitoring) {
+        mod.initializePerformanceMonitoring();
+      }
+    })
+    .catch((e) => console.warn('Skipping performance monitoring initialization:', e));
 
   // Dynamically import monitoring modules to avoid side effects during tests
   import('./services/productionMonitoring')

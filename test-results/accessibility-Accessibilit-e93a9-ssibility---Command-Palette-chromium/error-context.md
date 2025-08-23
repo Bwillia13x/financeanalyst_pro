@@ -1,0 +1,171 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - link "Skip to main content" [ref=e4] [cursor=pointer]:
+      - /url: "#main-content"
+    - banner [ref=e5]:
+      - generic [ref=e6]:
+        - generic [ref=e8]:
+          - img [ref=e10]
+          - generic [ref=e14]: FinanceAnalyst Pro
+        - navigation "Main navigation" [ref=e15]:
+          - link "Workspace" [ref=e16] [cursor=pointer]:
+            - /url: /financial-model-workspace
+          - link "Portfolio" [ref=e17] [cursor=pointer]:
+            - /url: /portfolio-management
+          - link "AI Insights" [ref=e18] [cursor=pointer]:
+            - /url: /ai-insights
+          - link "Private Analysis" [ref=e19] [cursor=pointer]:
+            - /url: /private-analysis
+        - button "Advanced Tools" [ref=e21] [cursor=pointer]:
+          - text: Advanced Tools
+          - img [ref=e22] [cursor=pointer]
+        - generic [ref=e24]:
+          - button "Open Command Palette ⌘K" [ref=e25] [cursor=pointer]:
+            - img [ref=e26] [cursor=pointer]
+            - generic [ref=e28] [cursor=pointer]: Open Command Palette
+            - generic [ref=e29] [cursor=pointer]: ⌘K
+          - generic [ref=e31]:
+            - generic [ref=e33]: DCF_Analysis_v2.3
+            - generic [ref=e34]: v2.3
+          - generic [ref=e35]:
+            - generic [ref=e37]: "Data: 2 min ago"
+            - img [ref=e38]
+          - generic [ref=e42]:
+            - button "Export" [ref=e43] [cursor=pointer]:
+              - img [ref=e44] [cursor=pointer]
+              - generic [ref=e47] [cursor=pointer]: Export
+            - button "Share" [ref=e48] [cursor=pointer]:
+              - img [ref=e49] [cursor=pointer]
+              - generic [ref=e55] [cursor=pointer]: Share
+            - button "Template" [ref=e56] [cursor=pointer]:
+              - img [ref=e57] [cursor=pointer]
+              - generic [ref=e60] [cursor=pointer]: Template
+          - button "Business Intelligence" [ref=e61] [cursor=pointer]:
+            - img [ref=e62] [cursor=pointer]
+            - generic [ref=e64] [cursor=pointer]: Business Intelligence
+          - button "Senior Analyst Active Session" [ref=e66] [cursor=pointer]:
+            - img [ref=e68] [cursor=pointer]
+            - generic [ref=e71] [cursor=pointer]:
+              - generic [ref=e72] [cursor=pointer]: Senior Analyst
+              - generic [ref=e73] [cursor=pointer]: Active Session
+            - img [ref=e74] [cursor=pointer]
+    - main [ref=e76]:
+      - generic [ref=e77]:
+        - generic [ref=e79]:
+          - img [ref=e80]
+          - generic [ref=e83]: DCF_Analysis_v2.3
+          - generic [ref=e84]: Saved
+        - generic [ref=e85]:
+          - generic [ref=e86]:
+            - button "Single-pane layout" [ref=e87] [cursor=pointer]:
+              - img [ref=e88] [cursor=pointer]
+            - button "Dual-pane layout" [ref=e90] [cursor=pointer]:
+              - img [ref=e91] [cursor=pointer]
+          - generic [ref=e93]:
+            - combobox "Select left panel content" [ref=e94]:
+              - option "Terminal" [selected]
+              - option "Variables"
+              - option "Formulas"
+              - option "Templates"
+            - combobox "Select right panel content" [ref=e95]:
+              - option "Results" [selected]
+              - option "Audit Trail"
+      - generic [ref=e96]:
+        - generic [ref=e98]:
+          - generic [ref=e99]:
+            - generic [ref=e100]:
+              - img [ref=e101]
+              - generic [ref=e103]: Financial Terminal
+              - generic [ref=e104]: • Enhanced Command Suite
+            - generic [ref=e107]: Connected
+          - button "FinanceAnalyst Pro Terminal v2.4.0 - Enhanced Command Suite Ready Type \"HELP()\" for available commands or start with DCF(AAPL), PORTFOLIO([AAPL,MSFT], [0.5,0.5]) analyst@finpro:~$" [ref=e108] [cursor=pointer]:
+            - generic [ref=e110] [cursor=pointer]:
+              - img [ref=e111] [cursor=pointer]
+              - generic [ref=e114] [cursor=pointer]: FinanceAnalyst Pro Terminal v2.4.0 - Enhanced Command Suite Ready
+            - generic [ref=e116] [cursor=pointer]:
+              - img [ref=e117] [cursor=pointer]
+              - generic [ref=e120] [cursor=pointer]: Type "HELP()" for available commands or start with DCF(AAPL), PORTFOLIO([AAPL,MSFT], [0.5,0.5])
+            - generic [ref=e121] [cursor=pointer]:
+              - generic [ref=e122] [cursor=pointer]: analyst@finpro:~$
+              - textbox "Enter command (e.g., DCF(AAPL), PORTFOLIO([AAPL,MSFT], [0.5,0.5]))..." [active] [ref=e124]
+        - generic [ref=e126]:
+          - generic [ref=e127]:
+            - generic [ref=e128]:
+              - img [ref=e129]
+              - heading "Calculation Results" [level=3] [ref=e131]
+            - generic [ref=e132]:
+              - button "Export" [ref=e133] [cursor=pointer]:
+                - img [ref=e134] [cursor=pointer]
+                - text: Export
+              - button "Share" [ref=e137] [cursor=pointer]:
+                - img [ref=e138] [cursor=pointer]
+                - text: Share
+          - generic [ref=e144]:
+            - button "Summary" [ref=e145] [cursor=pointer]:
+              - img [ref=e146] [cursor=pointer]
+              - generic [ref=e148] [cursor=pointer]: Summary
+            - button "Cash Flows" [ref=e149] [cursor=pointer]:
+              - img [ref=e150] [cursor=pointer]
+              - generic [ref=e153] [cursor=pointer]: Cash Flows
+            - button "Sensitivity" [ref=e154] [cursor=pointer]:
+              - img [ref=e155] [cursor=pointer]
+              - generic [ref=e159] [cursor=pointer]: Sensitivity
+            - button "Scenarios" [ref=e160] [cursor=pointer]:
+              - img [ref=e161] [cursor=pointer]
+              - generic [ref=e165] [cursor=pointer]: Scenarios
+            - button "Multiples" [ref=e166] [cursor=pointer]:
+              - img [ref=e167] [cursor=pointer]
+              - generic [ref=e171] [cursor=pointer]: Multiples
+          - generic [ref=e173]:
+            - generic [ref=e174]:
+              - generic [ref=e175]:
+                - generic [ref=e176]:
+                  - generic [ref=e177]: Enterprise Value
+                  - img [ref=e178]
+                - generic [ref=e182]: $2,847.5M
+              - generic [ref=e183]:
+                - generic [ref=e184]:
+                  - generic [ref=e185]: Equity Value
+                  - img [ref=e186]
+                - generic [ref=e190]: $2,547.5M
+              - generic [ref=e191]:
+                - generic [ref=e192]:
+                  - generic [ref=e193]: Share Price
+                  - img [ref=e194]
+                - generic [ref=e197]: $127.38
+              - generic [ref=e198]:
+                - generic [ref=e199]:
+                  - generic [ref=e200]: Implied Return
+                  - img [ref=e201]
+                - generic [ref=e205]: 15.6%
+            - generic [ref=e206]:
+              - generic [ref=e207]:
+                - generic [ref=e208]: Model Confidence
+                - generic [ref=e209]: 87.0%
+              - paragraph [ref=e212]: Based on data quality, assumption validity, and sensitivity analysis
+          - generic [ref=e214]:
+            - generic [ref=e215]:
+              - generic [ref=e216]: "Last Updated: 1:17:28 PM"
+              - generic [ref=e217]: •
+              - generic [ref=e218]: "Auto-refresh: ON"
+            - generic [ref=e221]: Calculations current
+  - button "Expand terminal" [ref=e223] [cursor=pointer]:
+    - generic [ref=e224] [cursor=pointer]:
+      - img [ref=e225] [cursor=pointer]
+      - generic [ref=e227] [cursor=pointer]: FinanceAnalyst Pro Terminal
+      - generic [ref=e230] [cursor=pointer]: Live
+    - generic [ref=e231] [cursor=pointer]:
+      - button "Clear output" [ref=e232] [cursor=pointer]:
+        - img [ref=e233] [cursor=pointer]
+      - button "Export output" [ref=e236] [cursor=pointer]:
+        - img [ref=e237] [cursor=pointer]
+      - button [ref=e240] [cursor=pointer]:
+        - img [ref=e241] [cursor=pointer]
+      - button "Expand" [ref=e246] [cursor=pointer]:
+        - img [ref=e247] [cursor=pointer]
+  - button [ref=e249] [cursor=pointer]:
+    - img [ref=e250] [cursor=pointer]
+```

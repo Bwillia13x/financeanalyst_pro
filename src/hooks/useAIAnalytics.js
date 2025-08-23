@@ -7,7 +7,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 
 import aiAnalyticsService from '../services/aiAnalyticsService';
-import { reportPerformanceMetric } from '../utils/performanceMonitoring';
 
 export function useAIAnalytics(options = {}) {
   const {
@@ -46,17 +45,29 @@ export function useAIAnalytics(options = {}) {
       setError(null);
 
       // Report initialization
-      reportPerformanceMetric('ai_analytics_init', {
-        success: true,
-        timestamp: Date.now()
-      });
+      import('../utils/performanceMonitoring')
+        .then((mod) => {
+          if (mod?.reportPerformanceMetric) {
+            mod.reportPerformanceMetric('ai_analytics_init', {
+              success: true,
+              timestamp: Date.now()
+            });
+          }
+        })
+        .catch(() => {});
     } catch (err) {
       setError(`Failed to initialize AI Analytics: ${err.message}`);
-      reportPerformanceMetric('ai_analytics_init', {
-        success: false,
-        error: err.message,
-        timestamp: Date.now()
-      });
+      import('../utils/performanceMonitoring')
+        .then((mod) => {
+          if (mod?.reportPerformanceMetric) {
+            mod.reportPerformanceMetric('ai_analytics_init', {
+              success: false,
+              error: err.message,
+              timestamp: Date.now()
+            });
+          }
+        })
+        .catch(() => {});
     } finally {
       setIsLoading(false);
     }
@@ -102,27 +113,39 @@ export function useAIAnalytics(options = {}) {
 
       // Track analysis performance
       analysisCountRef.current += 1;
-      reportPerformanceMetric('ai_analysis_completed', {
-        analysisTime,
-        dataPoints: data.prices.length,
-        insightsGenerated: result.insights.length,
-        patternsDetected: result.patterns.length,
-        predictionsGenerated: result.predictions.length,
-        confidence: result.confidence,
-        analysisCount: analysisCountRef.current,
-        timestamp: Date.now()
-      });
+      import('../utils/performanceMonitoring')
+        .then((mod) => {
+          if (mod?.reportPerformanceMetric) {
+            mod.reportPerformanceMetric('ai_analysis_completed', {
+              analysisTime,
+              dataPoints: data.prices.length,
+              insightsGenerated: result.insights.length,
+              patternsDetected: result.patterns.length,
+              predictionsGenerated: result.predictions.length,
+              confidence: result.confidence,
+              analysisCount: analysisCountRef.current,
+              timestamp: Date.now()
+            });
+          }
+        })
+        .catch(() => {});
 
       return result;
     } catch (err) {
       const errorMessage = `AI Analysis failed: ${err.message}`;
       setError(errorMessage);
 
-      reportPerformanceMetric('ai_analysis_error', {
-        error: err.message,
-        dataPoints: data.prices?.length || 0,
-        timestamp: Date.now()
-      });
+      import('../utils/performanceMonitoring')
+        .then((mod) => {
+          if (mod?.reportPerformanceMetric) {
+            mod.reportPerformanceMetric('ai_analysis_error', {
+              error: err.message,
+              dataPoints: data.prices?.length || 0,
+              timestamp: Date.now()
+            });
+          }
+        })
+        .catch(() => {});
 
       return null;
     } finally {

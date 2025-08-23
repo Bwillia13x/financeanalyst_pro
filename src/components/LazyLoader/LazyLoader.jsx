@@ -1,7 +1,5 @@
 import React, { useState, useEffect, useRef, Suspense } from 'react';
 
-import { trackFinancialComponentPerformance } from '../../utils/performanceMonitoring';
-
 // Enhanced lazy loading component for financial components
 
 const LazyLoader = ({
@@ -77,12 +75,18 @@ const LazyLoader = ({
     if (isLoaded && loadStartTime.current && performanceTracking) {
       const loadTime = performance.now() - loadStartTime.current;
 
-      trackFinancialComponentPerformance(componentName, {
-        loadTime,
-        priority,
-        lazy: true,
-        timestamp: Date.now()
-      });
+      import('../../utils/performanceMonitoring')
+        .then((mod) => {
+          if (mod?.trackFinancialComponentPerformance) {
+            mod.trackFinancialComponentPerformance(componentName, {
+              loadTime,
+              priority,
+              lazy: true,
+              timestamp: Date.now()
+            });
+          }
+        })
+        .catch(() => {});
 
       onLoad?.({ componentName, loadTime });
     }
@@ -100,12 +104,18 @@ const LazyLoader = ({
     onError?.(error);
 
     if (performanceTracking) {
-      trackFinancialComponentPerformance(componentName, {
-        loadError: error.message,
-        priority,
-        lazy: true,
-        timestamp: Date.now()
-      });
+      import('../../utils/performanceMonitoring')
+        .then((mod) => {
+          if (mod?.trackFinancialComponentPerformance) {
+            mod.trackFinancialComponentPerformance(componentName, {
+              loadError: error.message,
+              priority,
+              lazy: true,
+              timestamp: Date.now()
+            });
+          }
+        })
+        .catch(() => {});
     }
   };
 

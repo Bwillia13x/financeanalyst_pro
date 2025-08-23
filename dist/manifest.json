@@ -1,0 +1,85 @@
+{
+  "short_name": "FinanceAnalyst Pro",
+  "name": "FinanceAnalyst Pro - Professional Financial Modeling Platform",
+  "description": "Professional financial modeling and valuation platform for analysts, investors, and finance professionals",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/images/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/images/apple-touch-icon.svg",
+      "sizes": "180x180",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#3b82f6",
+  "background_color": "#0f172a",
+  "categories": ["finance", "business", "productivity"],
+  "lang": "en-US",
+  "dir": "ltr",
+  "shortcuts": [
+    {
+      "name": "Financial Workspace",
+      "short_name": "Workspace",
+      "description": "Access the main financial modeling workspace",
+      "url": "/financial-model-workspace",
+      "icons": [
+        {
+          "src": "/assets/images/favicon.svg",
+          "sizes": "96x96",
+          "type": "image/svg+xml"
+        }
+      ]
+    },
+    {
+      "name": "Valuation Tools",
+      "short_name": "Valuation",
+      "description": "DCF and LBO valuation tools",
+      "url": "/valuation-tool",
+      "icons": [
+        {
+          "src": "/assets/images/favicon.svg",
+          "sizes": "96x96",
+          "type": "image/svg+xml"
+        }
+      ]
+    },
+    {
+      "name": "Private Analysis",
+      "short_name": "Analysis",
+      "description": "Advanced financial analysis suite",
+      "url": "/private-analysis",
+      "icons": [
+        {
+          "src": "/assets/images/favicon.svg",
+          "sizes": "96x96",
+          "type": "image/svg+xml"
+        }
+      ]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/assets/images/og-image.svg",
+      "sizes": "1200x630",
+      "type": "image/svg+xml",
+      "form_factor": "wide",
+      "label": "FinanceAnalyst Pro main interface"
+    }
+  ],
+  "prefer_related_applications": false
+}
