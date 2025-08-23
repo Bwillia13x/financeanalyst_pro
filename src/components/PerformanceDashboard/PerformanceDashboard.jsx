@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 
 import { useAccessibilityMonitor } from '../../hooks/useAccessibility';
-import { getPerformanceDashboardData, initializePerformanceMonitoring } from '../../utils/performanceMonitoring';
 
 const PerformanceDashboard = ({ isVisible = false, onClose }) => {
   const [dashboardData, setDashboardData] = useState(null);
@@ -21,12 +20,20 @@ const PerformanceDashboard = ({ isVisible = false, onClose }) => {
 
   // Refresh dashboard data
   const refreshData = useCallback(() => {
-    try {
-      const data = getPerformanceDashboardData();
-      setDashboardData(data);
-    } catch (error) {
-      console.error('Failed to refresh performance dashboard:', error);
-    }
+    import('../../utils/performanceMonitoring')
+      .then((mod) => {
+        if (mod?.getPerformanceDashboardData) {
+          try {
+            const data = mod.getPerformanceDashboardData();
+            setDashboardData(data);
+          } catch (error) {
+            console.error('Failed to refresh performance dashboard:', error);
+          }
+        }
+      })
+      .catch((error) => {
+        console.error('Failed to load performance monitoring:', error);
+      });
   }, []);
 
   // Toggle monitoring
@@ -45,7 +52,15 @@ const PerformanceDashboard = ({ isVisible = false, onClose }) => {
     if (!isVisible) return;
 
     // Initialize performance monitoring if not already done
-    initializePerformanceMonitoring();
+    import('../../utils/performanceMonitoring')
+      .then((mod) => {
+        if (mod?.initializePerformanceMonitoring) {
+          mod.initializePerformanceMonitoring();
+        }
+      })
+      .catch(() => {
+        // Performance monitoring is optional; ignore errors
+      });
 
     // Initial data fetch
     refreshData();

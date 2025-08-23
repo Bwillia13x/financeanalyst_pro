@@ -38,11 +38,11 @@ export const useOnboarding = () => {
 
   // Persist state changes to localStorage, but skip during tests to prevent crashes
   useEffect(() => {
-    const isAutomatedEnvironment = navigator.webdriver || 
-      window.location.search.includes('lhci') || 
-      window.location.search.includes('ci') || 
+    const isAutomatedEnvironment = navigator.webdriver ||
+      window.location.search.includes('lhci') ||
+      window.location.search.includes('ci') ||
       window.location.search.includes('audit');
-      
+
     if (!isAutomatedEnvironment) {
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(onboardingState));
@@ -86,12 +86,12 @@ export const useOnboarding = () => {
       setOnboardingState(prev => {
         const fallbackId = prev.currentTour?.id;
         const normalizedId = normalizeTourId(tourId || fallbackId);
-        
+
         if (!normalizedId) {
           console.warn('completeTour called without valid tour ID');
           return { ...prev, currentTour: null };
         }
-        
+
         return {
           ...prev,
           currentTour: null,

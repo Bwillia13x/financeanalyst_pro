@@ -49,20 +49,31 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: (id) => {
-          // React core libraries
-          if (id.includes('react') || id.includes('react-dom') || id.includes('react-router')) {
-            return 'react-vendor';
+          // Split React core from React ecosystem
+          if (id.includes('react') && !id.includes('react-dom') && !id.includes('react-router')) {
+            return 'react-core';
+          }
+          if (id.includes('react-dom')) {
+            return 'react-dom';
+          }
+          if (id.includes('react-router')) {
+            return 'react-router';
           }
           
-          // Heavy visualization libraries - only load when needed
-          if (id.includes('recharts') || id.includes('d3')) {
-            return 'charts-vendor';
+          // Split chart libraries more granularly
+          if (id.includes('recharts')) {
+            return 'recharts-vendor';
+          }
+          if (id.includes('d3')) {
+            return 'd3-vendor';
           }
           
           // Advanced Analytics - separate chunk for new features
           if (id.includes('AdvancedAnalytics') || id.includes('advancedAnalyticsService')) {
             return 'advanced-analytics';
           }
+          
+          // Let React.lazy drive code-splitting for Private Analysis; no forced manual chunk
           
           // Export libraries - heavy dependencies
           if (id.includes('xlsx') || id.includes('jspdf') || id.includes('jspdf-autotable')) {
@@ -123,9 +134,23 @@ export default defineConfig({
     terserOptions: {
       compress: {
         drop_console: true,
-        drop_debugger: true
+        drop_debugger: true,
+        pure_funcs: ['console.log', 'console.info', 'console.debug'],
+        passes: 2,
+        unsafe_arrows: true,
+        unsafe_methods: true
+      },
+      mangle: {
+        safari10: true
       }
-    }
+    },
+    // Enable tree shaking
+    treeshake: {
+      preset: 'recommended'
+    },
+    // Optimize chunks for better caching
+    assetsInlineLimit: 4096,
+    cssCodeSplit: true
   },
   test: {
     environment: 'jsdom',

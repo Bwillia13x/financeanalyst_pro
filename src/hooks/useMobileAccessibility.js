@@ -1,7 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 
-import { reportPerformanceMetric } from '../utils/performanceMonitoring';
-
 // Hook for mobile-specific accessibility features
 export function useMobileAccessibility(options = {}) {
   const {
@@ -96,13 +94,19 @@ export function useMobileAccessibility(options = {}) {
     setAccessibilityIssues(issues);
 
     // Report to performance monitoring
-    reportPerformanceMetric('mobile_accessibility_audit', {
-      totalTouchTargets: targets.length,
-      validTouchTargets: targets.filter(t => t.meetsMinimum).length,
-      touchTargetIssues: issues.length,
-      isMobile,
-      timestamp: Date.now()
-    });
+    import('../utils/performanceMonitoring')
+      .then((mod) => {
+        if (mod?.reportPerformanceMetric) {
+          mod.reportPerformanceMetric('mobile_accessibility_audit', {
+            totalTouchTargets: targets.length,
+            validTouchTargets: targets.filter(t => t.meetsMinimum).length,
+            touchTargetIssues: issues.length,
+            isMobile,
+            timestamp: Date.now()
+          });
+        }
+      })
+      .catch(() => {});
 
     if (debugMode && issues.length > 0) {
       console.warn('Mobile accessibility issues found:', issues);
@@ -142,13 +146,19 @@ export function useMobileAccessibility(options = {}) {
     const duration = touchEnd.timestamp - touchStartRef.current.timestamp;
 
     // Track gesture performance
-    reportPerformanceMetric('mobile_gesture_performance', {
-      distance,
-      duration,
-      type: distance < 10 ? 'tap' : 'swipe',
-      isMobile,
-      timestamp: Date.now()
-    });
+    import('../utils/performanceMonitoring')
+      .then((mod) => {
+        if (mod?.reportPerformanceMetric) {
+          mod.reportPerformanceMetric('mobile_gesture_performance', {
+            distance,
+            duration,
+            type: distance < 10 ? 'tap' : 'swipe',
+            isMobile,
+            timestamp: Date.now()
+          });
+        }
+      })
+      .catch(() => {});
 
     gestureRef.current.isGesturing = false;
     touchStartRef.current = null;

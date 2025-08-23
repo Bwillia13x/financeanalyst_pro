@@ -11,6 +11,7 @@
     "@radix-ui/react-slot": "^1.2.3",
     "@reduxjs/toolkit": "^2.6.1",
     "@sentry/browser": "^9.39.0",
+    "@sentry/react": "^10.5.0",
     "@tailwindcss/forms": "^0.5.7",
     "@testing-library/react": "^11.2.7",
     "@testing-library/user-event": "^12.8.3",
@@ -69,6 +70,8 @@
     "budget:check": "node scripts/check-bundle-budget.cjs",
     "perf:audit": "npm run build && npm run lighthouse:ci && npm run budget:check",
     "perf:dev": "npm run build && npm run budget:check",
+    "analyze:bundle": "npm run build && node scripts/analyze-bundle.mjs",
+    "optimize": "npm run analyze:bundle && npm run budget:check",
     "staging:deploy": "node scripts/staging-deploy.cjs",
     "staging:audit": "npm run build && npm run staging:deploy"
   },
@@ -94,9 +97,11 @@
     "node": "^20.19.0 || >=22.12.0"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.10.2",
     "@axe-core/react": "^4.10.2",
     "@eslint/js": "^9.31.0",
     "@lhci/cli": "^0.15.1",
+    "@playwright/test": "^1.47.2",
     "@tailwindcss/aspect-ratio": "^0.4.2",
     "@tailwindcss/container-queries": "^0.1.1",
     "@tailwindcss/line-clamp": "^0.1.0",
@@ -105,7 +110,6 @@
     "@types/node": "^24.3.0",
     "@types/react": "^19.1.10",
     "@types/react-dom": "^19.1.7",
-    "@playwright/test": "^1.47.2",
     "@vitejs/plugin-react": "^4.6.0",
     "@vitest/coverage-v8": "^3.2.4",
     "@vitest/ui": "^3.2.4",

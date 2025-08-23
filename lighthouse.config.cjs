@@ -3,10 +3,10 @@
 module.exports = {
   ci: {
     collect: {
-      // Start a real preview server so SPA fallback works and avoids NO_FCP
-      startServerCommand: 'npm run preview',
-      startServerReadyPattern: 'Local:',
-      startServerReadyTimeout: 30000,
+      // Build first, then start preview server for SPA fallback
+      startServerCommand: 'npm run build && npm run preview',
+      startServerReadyPattern: 'Local:.*4173',
+      startServerReadyTimeout: 60000,
       url: ['http://localhost:4173/?lhci=1&pwa=0'],
       numberOfRuns: 3,
       settings: {

@@ -36,8 +36,8 @@ export default {
           foreground: "var(--color-destructive-foreground)", // white
         },
         muted: {
-          DEFAULT: "var(--color-muted)", // gray-100
-          foreground: "var(--color-muted-foreground)", // gray-500
+          DEFAULT: 'hsl(var(--muted))',
+          foreground: 'hsl(var(--muted-foreground))'
         },
         accent: {
           DEFAULT: "var(--color-accent)", // orange-600

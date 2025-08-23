@@ -1,0 +1,221 @@
+name: Staging Deployment
+
+on:
+  push:
+    branches:
+      - staging
+      - develop
+  pull_request:
+    branches:
+      - main
+      - staging
+
+env:
+  NODE_VERSION: '18'
+  STAGING_SUBDOMAIN: 'financeanalyst-staging'
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: Run unit tests
+        run: npm test -- --run
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Run E2E tests
+        run: npm run test:e2e
+
+      - name: Run accessibility tests
+        run: npm run test:accessibility
+
+  lighthouse:
+    name: Lighthouse Performance Audit
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application
+        run: npm run build
+        env:
+          VITE_APP_ENV: staging
+          VITE_API_BASE_URL: https://financeanalyst-api-staging.herokuapp.com/api
+
+      - name: Run Lighthouse CI
+        run: npm run lhci:ci
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+
+  build-and-deploy:
+    name: Build and Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: [test, lighthouse]
+    if: github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/develop'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build for staging
+        run: npm run build
+        env:
+          VITE_APP_ENV: staging
+          VITE_API_BASE_URL: https://financeanalyst-api-staging.herokuapp.com/api
+          VITE_SENTRY_DSN: ${{ secrets.VITE_SENTRY_DSN_STAGING }}
+          VITE_ENABLE_ANALYTICS: true
+          VITE_ENABLE_ERROR_REPORTING: true
+
+      - name: Deploy to Netlify
+        uses: netlify/actions/cli@master
+        with:
+          args: deploy --prod --dir=dist --message="Staging deployment from ${{ github.sha }}"
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_STAGING_SITE_ID }}
+
+      - name: Run post-deployment health checks
+        run: |
+          echo "Waiting for deployment to be ready..."
+          sleep 30
+          curl -f https://financeanalyst-staging.netlify.app/health || exit 1
+
+  pr-preview:
+    name: PR Preview Deploy
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build for preview
+        run: npm run build
+        env:
+          VITE_APP_ENV: preview
+          VITE_API_BASE_URL: https://financeanalyst-api-staging.herokuapp.com/api
+          VITE_DEBUG: true
+
+      - name: Deploy PR preview
+        uses: netlify/actions/cli@master
+        with:
+          args: deploy --dir=dist --message="PR #${{ github.event.number }} from ${{ github.head_ref }}"
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_STAGING_SITE_ID }}
+
+      - name: Comment PR with preview URL
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: deployments } = await github.rest.repos.listDeployments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: context.payload.pull_request.head.sha
+            });
+            
+            if (deployments.length > 0) {
+              const deployment = deployments[0];
+              const previewUrl = `https://deploy-preview-${context.issue.number}--financeanalyst-staging.netlify.app`;
+              
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: `🚀 **Preview deployment ready!**
+                
+                📱 **Preview URL:** ${previewUrl}
+                📊 **Lighthouse Report:** Available after deployment completes
+                🔍 **Tests:** All tests must pass before merge
+                
+                This preview will be updated automatically with new commits.`
+              });
+            }
+
+  smoke-tests:
+    name: Staging Smoke Tests
+    runs-on: ubuntu-latest
+    needs: build-and-deploy
+    if: github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/develop'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Run staging smoke tests
+        run: npm run test:smoke-staging
+        env:
+          STAGING_URL: https://financeanalyst-staging.netlify.app
+
+      - name: Notify on failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `🚨 Staging deployment smoke tests failed - ${new Date().toISOString()}`,
+              body: `**Staging smoke tests failed for commit:** ${context.sha}
+              
+              **Failed workflow:** ${context.workflow}
+              **Run URL:** ${context.payload.repository.html_url}/actions/runs/${context.runId}
+              
+              Please investigate and fix the staging environment.`,
+              labels: ['bug', 'staging', 'critical']
+            });

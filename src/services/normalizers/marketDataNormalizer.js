@@ -5,6 +5,14 @@
 // - Provides fallbacks for dayHigh/dayLow/volume/marketCap
 
 export const normalizeQuote = (raw = {}, prevWidget = {}) => {
+  // Handle null input gracefully
+  if (!raw || typeof raw !== 'object') {
+    raw = {};
+  }
+  if (!prevWidget || typeof prevWidget !== 'object') {
+    prevWidget = {};
+  }
+
   const price = typeof raw.price === 'number'
     ? raw.price
     : (typeof raw.currentPrice === 'number' ? raw.currentPrice : undefined);

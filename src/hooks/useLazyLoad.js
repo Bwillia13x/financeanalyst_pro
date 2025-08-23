@@ -1,7 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 
-import { trackFinancialComponentPerformance } from '../utils/performanceMonitoring';
-
 // Hook for lazy loading financial components with performance tracking
 export function useLazyLoad(options = {}) {
   const {
@@ -79,13 +77,19 @@ export function useLazyLoad(options = {}) {
     if (loadStartTime.current && performanceTracking) {
       const loadTime = performance.now() - loadStartTime.current;
 
-      trackFinancialComponentPerformance(componentName, {
-        loadTime,
-        priority,
-        lazy: true,
-        componentType: 'lazy-loaded',
-        timestamp: Date.now()
-      });
+      import('../utils/performanceMonitoring')
+        .then((mod) => {
+          if (mod?.trackFinancialComponentPerformance) {
+            mod.trackFinancialComponentPerformance(componentName, {
+              loadTime,
+              priority,
+              lazy: true,
+              componentType: 'lazy-loaded',
+              timestamp: Date.now()
+            });
+          }
+        })
+        .catch(() => {});
     }
   }, [componentName, priority, performanceTracking]);
 
@@ -94,13 +98,19 @@ export function useLazyLoad(options = {}) {
     setLoadError(error);
 
     if (performanceTracking) {
-      trackFinancialComponentPerformance(componentName, {
-        loadError: error?.message || 'Unknown error',
-        priority,
-        lazy: true,
-        componentType: 'lazy-loaded',
-        timestamp: Date.now()
-      });
+      import('../utils/performanceMonitoring')
+        .then((mod) => {
+          if (mod?.trackFinancialComponentPerformance) {
+            mod.trackFinancialComponentPerformance(componentName, {
+              loadError: error?.message || 'Unknown error',
+              priority,
+              lazy: true,
+              componentType: 'lazy-loaded',
+              timestamp: Date.now()
+            });
+          }
+        })
+        .catch(() => {});
     }
   }, [componentName, priority, performanceTracking]);
 
@@ -168,23 +178,35 @@ export function usePreloadComponents() {
           await loadFunction();
           const loadTime = performance.now() - startTime;
 
-          trackFinancialComponentPerformance(componentName, {
-            loadTime,
-            preloaded: true,
-            componentType: 'preloaded',
-            timestamp: Date.now()
-          });
+          import('../utils/performanceMonitoring')
+            .then((mod) => {
+              if (mod?.trackFinancialComponentPerformance) {
+                mod.trackFinancialComponentPerformance(componentName, {
+                  loadTime,
+                  preloaded: true,
+                  componentType: 'preloaded',
+                  timestamp: Date.now()
+                });
+              }
+            })
+            .catch(() => {});
 
           setPreloadedComponents(prev => new Set([...prev, componentName]));
         } catch (error) {
           console.error(`Failed to preload ${componentName}:`, error);
 
-          trackFinancialComponentPerformance(componentName, {
-            preloadError: error.message,
-            preloaded: false,
-            componentType: 'preloaded',
-            timestamp: Date.now()
-          });
+          import('../utils/performanceMonitoring')
+            .then((mod) => {
+              if (mod?.trackFinancialComponentPerformance) {
+                mod.trackFinancialComponentPerformance(componentName, {
+                  preloadError: error.message,
+                  preloaded: false,
+                  componentType: 'preloaded',
+                  timestamp: Date.now()
+                });
+              }
+            })
+            .catch(() => {});
         }
       }
 
@@ -258,11 +280,17 @@ export function useFinancialLazyLoad(componentType, options = {}) {
   // Additional financial component tracking
   useEffect(() => {
     if (lazyLoad.isLoaded) {
-      trackFinancialComponentPerformance(`financial-${componentType}`, {
-        componentType,
-        loadComplete: true,
-        timestamp: Date.now()
-      });
+      import('../utils/performanceMonitoring')
+        .then((mod) => {
+          if (mod?.trackFinancialComponentPerformance) {
+            mod.trackFinancialComponentPerformance(`financial-${componentType}`, {
+              componentType,
+              loadComplete: true,
+              timestamp: Date.now()
+            });
+          }
+        })
+        .catch(() => {});
     }
   }, [lazyLoad.isLoaded, componentType]);
 

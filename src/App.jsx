@@ -7,7 +7,6 @@ import PerformanceDashboard from './components/PerformanceDashboard';
 import SEOProvider from './components/SEO/SEOProvider';
 import { usePerformanceDashboard } from './hooks/usePerformanceDashboard';
 import Routes from './Routes';
-import { initializePerformanceMonitoring } from './utils/performanceMonitoring';
 
 function App() {
   const { isVisible, hideDashboard } = usePerformanceDashboard();
@@ -21,7 +20,15 @@ function App() {
 
   // Initialize performance monitoring on app start
   useEffect(() => {
-    initializePerformanceMonitoring();
+    import('./utils/performanceMonitoring')
+      .then((mod) => {
+        if (mod?.initializePerformanceMonitoring) {
+          mod.initializePerformanceMonitoring();
+        }
+      })
+      .catch(() => {
+        // Performance monitoring is optional; ignore errors
+      });
   }, []);
 
   // Update context when route changes

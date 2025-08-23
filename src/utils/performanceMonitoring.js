@@ -1,4 +1,5 @@
-// Real User Monitoring and Web Vitals Tracking
+// Real User Monitoring, Web Vitals Tracking, and Sentry Performance Integration
+// Note: Sentry is dynamically imported to avoid bundle bloat
 
 // Web Vitals metrics tracking
 const webVitalsData = {
@@ -251,6 +252,20 @@ function reportWebVital(name, value, entries) {
   };
 
   console.log(`Web Vital - ${name}:`, value);
+
+  // Send to Sentry Performance if available
+  if (window.Sentry) {
+    window.Sentry.addBreadcrumb({
+      category: 'performance',
+      message: `Web Vital ${name}: ${Math.round(value)}`,
+      level: value > getPerformanceThreshold(name) ? 'warning' : 'info',
+      data: { metric: name, value: Math.round(value) }
+    });
+
+    // Report as Sentry measurement
+    window.Sentry.setMeasurement(name, Math.round(value), name === 'CLS' ? '' : 'millisecond');
+  }
+
   sendToAnalytics('web-vital', data);
 }
 
@@ -347,6 +362,18 @@ export function checkPerformanceBudgets() {
 }
 
 // Utility functions
+function getPerformanceThreshold(metricName) {
+  const thresholds = {
+    LCP: 2500,  // 2.5s
+    FID: 100,   // 100ms
+    CLS: 0.1,   // 0.1
+    FCP: 1800,  // 1.8s
+    TTFB: 800,  // 800ms
+    INP: 200    // 200ms
+  };
+  return thresholds[metricName] || 1000;
+}
+
 function getConnectionInfo() {
   if ('connection' in navigator) {
     return {

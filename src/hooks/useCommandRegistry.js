@@ -83,6 +83,50 @@ const COMMAND_REGISTRY = {
     execute: (_params, _context) => ({ action: 'navigate', target: 'analysis' })
   },
 
+  'go-to-lbo': {
+    id: 'go-to-lbo',
+    title: 'Advanced LBO Tool',
+    description: 'Navigate to leveraged buyout modeling workspace',
+    category: 'navigation',
+    icon: Calculator,
+    shortcut: 'Ctrl+4',
+    keywords: ['lbo', 'leveraged', 'buyout', 'private', 'equity', 'advanced'],
+    execute: (_params, _context) => ({ action: 'navigate', target: 'lbo' })
+  },
+
+  'go-to-threestatement': {
+    id: 'go-to-threestatement',
+    title: '3-Statement Model Workspace',
+    description: 'Navigate to integrated financial statement modeling',
+    category: 'navigation',
+    icon: FileText,
+    shortcut: 'Ctrl+5',
+    keywords: ['three', 'statement', 'financial', 'model', 'income', 'balance', 'cash'],
+    execute: (_params, _context) => ({ action: 'navigate', target: 'threestatement' })
+  },
+
+  'go-to-scenarios': {
+    id: 'go-to-scenarios',
+    title: 'Scenario Analysis',
+    description: 'Navigate to enhanced scenario analysis and stress testing',
+    category: 'navigation',
+    icon: TrendingUp,
+    shortcut: 'Ctrl+6',
+    keywords: ['scenario', 'analysis', 'stress', 'testing', 'sensitivity', 'multiple'],
+    execute: (_params, _context) => ({ action: 'navigate', target: 'scenarios' })
+  },
+
+  'go-to-montecarlo': {
+    id: 'go-to-montecarlo',
+    title: 'Monte Carlo Integration Hub',
+    description: 'Navigate to cross-model Monte Carlo simulation workspace',
+    category: 'navigation',
+    icon: Activity,
+    shortcut: 'Ctrl+7',
+    keywords: ['monte', 'carlo', 'simulation', 'integration', 'risk', 'probability'],
+    execute: (_params, _context) => ({ action: 'navigate', target: 'montecarlo' })
+  },
+
   // Analysis Commands
   'create-dcf': {
     id: 'create-dcf',
@@ -127,6 +171,59 @@ const COMMAND_REGISTRY = {
     icon: Activity,
     keywords: ['monte', 'carlo', 'simulation', 'probability', 'risk'],
     execute: (_params, _context) => ({ action: 'run-monte-carlo' })
+  },
+
+  'create-lbo': {
+    id: 'create-lbo',
+    title: 'Create LBO Model',
+    description: 'Start a new leveraged buyout analysis model',
+    category: 'analysis',
+    icon: Calculator,
+    shortcut: 'Ctrl+Shift+L',
+    keywords: ['lbo', 'leveraged', 'buyout', 'private', 'equity', 'debt', 'returns'],
+    parameters: [
+      { name: 'company', type: 'string', description: 'Target company for LBO analysis', optional: true }
+    ],
+    execute: (params, _context) => ({
+      action: 'create-model',
+      type: 'lbo',
+      company: params?.company || 'New LBO Model'
+    })
+  },
+
+  'create-3statement': {
+    id: 'create-3statement',
+    title: 'Build 3-Statement Model',
+    description: 'Create integrated income statement, balance sheet, and cash flow model',
+    category: 'analysis',
+    icon: FileText,
+    shortcut: 'Ctrl+Shift+3',
+    keywords: ['three', 'statement', 'income', 'balance', 'cash', 'flow', 'integrated'],
+    parameters: [
+      { name: 'company', type: 'string', description: 'Company for financial modeling', optional: true }
+    ],
+    execute: (params, _context) => ({
+      action: 'create-model',
+      type: 'threestatement',
+      company: params?.company || 'New 3-Statement Model'
+    })
+  },
+
+  'scenario-analysis': {
+    id: 'scenario-analysis',
+    title: 'Run Scenario Analysis',
+    description: 'Create and analyze multiple scenarios with different assumptions',
+    category: 'analysis',
+    icon: TrendingUp,
+    shortcut: 'Ctrl+Shift+A',
+    keywords: ['scenario', 'analysis', 'multiple', 'assumptions', 'bull', 'bear', 'base'],
+    parameters: [
+      { name: 'scenarios', type: 'array', description: 'Number of scenarios to create', optional: true }
+    ],
+    execute: (params, _context) => ({
+      action: 'create-scenarios',
+      scenarios: params?.scenarios || ['Base', 'Bull', 'Bear']
+    })
   },
 
   // Data Commands
@@ -422,6 +519,34 @@ export const useCommandRegistry = (currentContext = {}) => {
           COMMAND_REGISTRY['create-chart'],
           COMMAND_REGISTRY['export-data'],
           COMMAND_REGISTRY['sensitivity-analysis']
+        );
+        break;
+      case 'lbo':
+        contextual.push(
+          COMMAND_REGISTRY['create-lbo'],
+          COMMAND_REGISTRY['sensitivity-analysis'],
+          COMMAND_REGISTRY['export-data']
+        );
+        break;
+      case 'threestatement':
+        contextual.push(
+          COMMAND_REGISTRY['create-3statement'],
+          COMMAND_REGISTRY['sensitivity-analysis'],
+          COMMAND_REGISTRY['go-to-scenarios']
+        );
+        break;
+      case 'scenarios':
+        contextual.push(
+          COMMAND_REGISTRY['scenario-analysis'],
+          COMMAND_REGISTRY['monte-carlo'],
+          COMMAND_REGISTRY['create-chart']
+        );
+        break;
+      case 'montecarlo':
+        contextual.push(
+          COMMAND_REGISTRY['monte-carlo'],
+          COMMAND_REGISTRY['scenario-analysis'],
+          COMMAND_REGISTRY['export-data']
         );
         break;
       default:

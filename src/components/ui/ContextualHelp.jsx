@@ -357,26 +357,26 @@ export const OnboardingTour = ({ steps, isActive, onComplete, onSkip }) => {
         const tooltipWidth = 320;
         const tooltipHeight = 250; // increased to account for buttons
         const padding = 20;
-        
+
         let top = rect.bottom + scrollTop + 12;
         let left = rect.left + scrollLeft;
-        
+
         // Ensure tooltip stays within horizontal bounds
         const maxLeft = window.innerWidth - tooltipWidth - padding;
         const minLeft = padding;
         left = Math.max(minLeft, Math.min(left, maxLeft));
-        
+
         // Ensure tooltip stays within vertical bounds
         const maxTop = window.innerHeight + scrollTop - tooltipHeight - padding;
         const minTop = scrollTop + padding;
-        
+
         if (top > maxTop) {
           // Position above target if no room below
           top = Math.max(rect.top + scrollTop - tooltipHeight - 12, minTop);
         }
-        
+
         top = Math.max(minTop, Math.min(top, maxTop));
-        
+
         setTooltipPosition({ top, left });
       }
     }
@@ -432,8 +432,8 @@ export const OnboardingTour = ({ steps, isActive, onComplete, onSkip }) => {
       {/* Tooltip */}
       <div
         className="fixed max-w-sm bg-white rounded-lg shadow-xl border border-slate-200"
-        style={{ 
-          top: tooltipPosition.top, 
+        style={{
+          top: tooltipPosition.top,
           left: tooltipPosition.left,
           zIndex: 1002
         }}

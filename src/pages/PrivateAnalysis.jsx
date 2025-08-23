@@ -5,35 +5,54 @@ import {
   Upload,
   HelpCircle,
   Play,
-  Activity,
-  Database
+  Database,
+  Activity
 } from 'lucide-react';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, lazy, Suspense } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 
-import DataExportImport from '../components/DataExportImport';
-import AdvancedLBOTool from '../components/PrivateAnalysis/AdvancedLBOTool';
-import AnalysisResults from '../components/PrivateAnalysis/AnalysisResults';
-import ContextualInsightsSidebar from '../components/PrivateAnalysis/ContextualInsightsSidebar';
-import EnhancedMarketDataDashboard from '../components/PrivateAnalysis/EnhancedMarketDataDashboard';
-import EnhancedScenarioAnalysis from '../components/PrivateAnalysis/EnhancedScenarioAnalysis';
-import FinancialModelWorkspace from '../components/PrivateAnalysis/FinancialModelWorkspace';
-import FinancialSpreadsheet from '../components/PrivateAnalysis/FinancialSpreadsheet';
-import ModelingTools from '../components/PrivateAnalysis/ModelingTools';
-import MonteCarloIntegrationHub from '../components/PrivateAnalysis/MonteCarloIntegrationHub';
-import SEOHead from '../components/SEO/SEOHead';
+// OnboardingTour components will be added later
 import Button from '../components/ui/Button';
-import { HelpPanel, OnboardingTour } from '../components/ui/ContextualHelp';
+import { HelpPanel } from '../components/ui/ContextualHelp';
 import ErrorBoundary from '../components/ui/ErrorBoundary';
 import Header from '../components/ui/Header';
+import SEOHead from '../components/SEO/SEOHead';
 import { LoadingWrapper, FinancialTableSkeleton } from '../components/ui/LoadingSkeleton';
 import SecondaryNav from '../components/ui/SecondaryNav';
 import defaultFinancialData from '../data/defaultFinancialData';
 import { useCollaboration } from '../hooks/useCollaboration';
-import { useOnboarding } from '../hooks/useOnboarding';
+import {
+  setFinancialData,
+  setDcfResults,
+  setLboResults,
+  setThreeStatementResults,
+  setMonteCarloResults,
+  selectFinancialData,
+  selectActiveModel,
+  selectIsDirty
+} from '../store/analysisStore';
 import { formatCurrency, formatPercentage } from '../utils/dataTransformation';
 import { calculateDCF } from '../utils/dcfCalculations';
 
+// Lazy-loaded heavy modules to reduce initial bundle size for the Private Analysis route
+const FinancialSpreadsheet = lazy(() => import('../components/PrivateAnalysis/FinancialSpreadsheet'));
+const ModelingTools = lazy(() => import('../components/PrivateAnalysis/ModelingTools'));
+const AnalysisResults = lazy(() => import('../components/PrivateAnalysis/AnalysisResults'));
+const AdvancedLBOTool = lazy(() => import('../components/PrivateAnalysis/AdvancedLBOTool'));
+const FinancialModelWorkspace = lazy(() => import('../components/PrivateAnalysis/FinancialModelWorkspace'));
+const EnhancedScenarioAnalysis = lazy(() => import('../components/PrivateAnalysis/EnhancedScenarioAnalysis'));
+const EnhancedMarketDataDashboard = lazy(() => import('../components/PrivateAnalysis/EnhancedMarketDataDashboard'));
+const MonteCarloIntegrationHub = lazy(() => import('../components/PrivateAnalysis/MonteCarloIntegrationHub'));
+const DataExportImport = lazy(() => import('../components/DataExportImport'));
+const ContextualInsightsSidebar = lazy(() => import('../components/PrivateAnalysis/ContextualInsightsSidebar'));
+
 const PrivateAnalysis = () => {
+  // Redux hooks
+  const dispatch = useDispatch();
+  const financialData = useSelector(selectFinancialData);
+  const _activeModel = useSelector(selectActiveModel);
+  const _isDirty = useSelector(state => state.analysis.isDirty);
+
   // Collaboration hook - disabled during testing to prevent errors
   const isTestEnvironment = typeof window !== 'undefined' && (
     window.navigator?.webdriver === true ||
@@ -50,7 +69,7 @@ const PrivateAnalysis = () => {
     role: 'analyst'
   });
 
-  const [showCollaboration, setShowCollaboration] = useState(false);
+  const [showCollaboration, _setShowCollaboration] = useState(false);
   const workspaceId = 'private-analysis-workspace';
 
   // Initialize collaboration workspace - skip during testing
@@ -65,15 +84,11 @@ const PrivateAnalysis = () => {
     }
   }, [isCollabInitialized, workspaceId, joinWorkspace, showCollaboration, isTestEnvironment]);
 
-  // Onboarding and help state
-  const {
-    currentTour,
-    startTour,
-    completeTour,
-    skipTour,
-    hasTourBeenCompleted
-  } = useOnboarding();
+  // Local state for UI
+  const [activeTab, setActiveTab] = useState('spreadsheet');
+  const [_showTour, setShowTour] = useState(false);
 
+  // Onboarding and help state
   const [activeHelpPanel, setActiveHelpPanel] = useState(null);
   const [showQuickStart, setShowQuickStart] = useState(false);
   const quickStartDialogRef = useRef(null);
@@ -81,18 +96,16 @@ const PrivateAnalysis = () => {
   const quickStartSkipBtnRef = useRef(null);
 
   // Existing state management
-  const [activeTab, setActiveTab] = useState('spreadsheet');
-  const [financialData, setFinancialData] = useState(defaultFinancialData);
   const [lastSaved, setLastSaved] = useState(null);
 
   // Auto-start tour for new users
   useEffect(() => {
     const hasVisited = localStorage.getItem('fa-pro-visited-private-analysis');
-    if (!hasVisited && !hasTourBeenCompleted('privateAnalysis')) {
+    if (!hasVisited && !localStorage.getItem('privateAnalyses')) {
       setShowQuickStart(true);
       localStorage.setItem('fa-pro-visited-private-analysis', 'true');
     }
-  }, [hasTourBeenCompleted]);
+  }, []);
 
   // Focus management and keyboard support for Quick Start modal
   useEffect(() => {
@@ -135,7 +148,7 @@ const PrivateAnalysis = () => {
 
   const handleStartTour = () => {
     setShowQuickStart(false);
-    startTour('privateAnalysis');
+    setShowTour(true);
     // Return focus to page title
     const titleEl = document.getElementById('page-title');
     if (titleEl) titleEl.focus();
@@ -283,7 +296,7 @@ const PrivateAnalysis = () => {
     return Math.min(progress, 100);
   };
 
-  const saveAnalysis = async(name) => {
+  const saveAnalysis = useCallback(async(name) => {
     try {
       setIsLoading(true);
       setDataStatus('saving');
@@ -320,8 +333,7 @@ const PrivateAnalysis = () => {
     } finally {
       setIsLoading(false);
     }
-  };
-
+  }, [financialData, adjustedValues, modelInputs, advancedResults, savedAnalyses]);
 
   const handleInsightClick = (insight) => {
     setCurrentMetricFocus(insight.metric);
@@ -337,6 +349,26 @@ const PrivateAnalysis = () => {
       setInsightsSidebarVisible(true);
     }
   }, [financialData, advancedResults, insightsSidebarVisible]);
+
+  // Initialize financial data if not already set
+  useEffect(() => {
+    if (!financialData || Object.keys(financialData).length === 0) {
+      dispatch(setFinancialData(defaultFinancialData));
+    }
+  }, [dispatch, financialData]);
+
+  // Function to handle data changes from components
+  const handleDataChange = useCallback((newData, section = 'general') => {
+    if (section === 'lbo') {
+      dispatch(setLboResults(newData));
+    } else if (section === 'threeStatement') {
+      dispatch(setThreeStatementResults(newData));
+    } else if (section === 'scenarios') {
+      dispatch(setMonteCarloResults(newData));
+    } else {
+      dispatch(setFinancialData({ ...financialData, ...newData }));
+    }
+  }, [dispatch, financialData]);
 
   // Status indicator component
   // (Removed unused _WorkflowNavigation component)
@@ -354,7 +386,8 @@ const PrivateAnalysis = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-900 relative">
+    <ErrorBoundary>
+      <div className="min-h-screen bg-slate-900 relative">
       <SEOHead
         title="Private Analysis Suite | FinanceAnalyst Pro"
         description="Comprehensive financial analysis platform with advanced modeling tools, scenario analysis, Monte Carlo simulation, and private equity workflows."
@@ -494,9 +527,9 @@ const PrivateAnalysis = () => {
               <HelpCircle className="w-4 h-4" />
             </button>
 
-            {!hasTourBeenCompleted('privateAnalysis') && (
+            {!localStorage.getItem('privateAnalyses') && (
               <button
-                onClick={() => startTour('privateAnalysis')}
+                onClick={() => setShowTour(true)}
                 className="p-2 text-blue-400 hover:text-blue-300 hover:bg-slate-700 rounded-lg transition-colors"
                 title="Take a guided tour"
                 aria-label="Start Private Analysis tour"
@@ -542,6 +575,7 @@ const PrivateAnalysis = () => {
           className="relative" role="tabpanel" id={`tabpanel-${activeTab}`}
           aria-labelledby={`tab-${activeTab}`}
         >
+          <Suspense fallback={<div className="p-8 text-center text-gray-400">Loading...</div>}>
           <motion.div
             key={activeTab}
             initial={{ opacity: 0, y: 10 }}
@@ -551,115 +585,136 @@ const PrivateAnalysis = () => {
           >
             {activeTab === 'spreadsheet' && (
               <ErrorBoundary fallback={<div className="p-8 text-center text-red-400">Error loading spreadsheet. Please refresh the page.</div>}>
-                <LoadingWrapper
-                  isLoading={isLoading}
-                  skeleton={<FinancialTableSkeleton rows={12} columns={6} />}
-                >
-                  <FinancialSpreadsheet
-                    data={financialData}
-                    onDataChange={setFinancialData}
-                    onAdjustedValuesChange={setAdjustedValues}
-                  />
-                </LoadingWrapper>
+                <Suspense fallback={<FinancialTableSkeleton rows={12} columns={6} />}>
+                  <LoadingWrapper
+                    isLoading={isLoading}
+                    skeleton={<FinancialTableSkeleton rows={12} columns={6} />}
+                  >
+                    <FinancialSpreadsheet
+                      data={financialData}
+                      onDataChange={handleDataChange}
+                      onAdjustedValuesChange={setAdjustedValues}
+                    />
+                  </LoadingWrapper>
+                </Suspense>
               </ErrorBoundary>
             )}
 
             {activeTab === 'modeling' && (
               <ErrorBoundary fallback={<div className="p-8 text-center text-red-400">Error loading modeling tools. Please refresh the page.</div>}>
-                <ModelingTools
-                  data={financialData}
-                  adjustedValues={adjustedValues}
-                  onDataChange={setFinancialData}
-                />
+                <Suspense fallback={<div className="p-8 text-center text-gray-400">Loading...</div>}>
+                  <ModelingTools
+                    data={financialData}
+                    adjustedValues={adjustedValues}
+                    onDataChange={handleDataChange}
+                  />
+                </Suspense>
               </ErrorBoundary>
             )}
 
             {activeTab === 'analysis' && (
               <ErrorBoundary fallback={<div className="p-8 text-center text-red-400">Error loading analysis results. Please check your data and refresh.</div>}>
-                <AnalysisResults
-                  data={financialData}
-                  adjustedValues={adjustedValues}
-                  modelInputs={modelInputs}
-                  calculateDCF={(data) => calculateDCF(data, modelInputs)}
-                  formatCurrency={formatCurrency}
-                  formatPercentage={formatPercentage}
-                />
+                <Suspense fallback={<div className="p-8 text-center text-gray-400">Loading...</div>}>
+                  <AnalysisResults
+                    data={financialData}
+                    adjustedValues={adjustedValues}
+                    modelInputs={modelInputs}
+                    calculateDCF={(data) => calculateDCF(data, modelInputs)}
+                    formatCurrency={formatCurrency}
+                    formatPercentage={formatPercentage}
+                  />
+                </Suspense>
               </ErrorBoundary>
             )}
 
             {activeTab === 'lbo' && (
               <ErrorBoundary fallback={<div className="p-8 text-center text-red-400">Error loading LBO tool. Please check your data.</div>}>
-                <AdvancedLBOTool
-                  data={financialData}
-                  onDataChange={(results) => setAdvancedResults(prev => ({ ...prev, lbo: results }))}
-                />
+                <Suspense fallback={<div className="p-8 text-center text-gray-400">Loading...</div>}>
+                  <AdvancedLBOTool
+                    data={financialData}
+                    onDataChange={(results) => handleDataChange(results, 'lbo')}
+                  />
+                </Suspense>
               </ErrorBoundary>
             )}
 
             {activeTab === 'threestatement' && (
               <ErrorBoundary fallback={<div className="p-8 text-center text-red-400">Error loading financial model workspace.</div>}>
-                <FinancialModelWorkspace
-                  data={financialData}
-                  onDataChange={(results) => setAdvancedResults(prev => ({ ...prev, threeStatement: results }))}
-                />
+                <Suspense fallback={<div className="p-8 text-center text-gray-400">Loading...</div>}>
+                  <FinancialModelWorkspace
+                    data={financialData}
+                    onDataChange={(results) => handleDataChange(results, 'threeStatement')}
+                  />
+                </Suspense>
               </ErrorBoundary>
             )}
 
             {activeTab === 'scenarios' && (
               <ErrorBoundary fallback={<div className="p-8 text-center text-red-400">Error loading scenario analysis.</div>}>
-                <EnhancedScenarioAnalysis
-                  data={financialData}
-                  onDataChange={(results) => setAdvancedResults(prev => ({ ...prev, scenarios: results }))}
-                  calculateDCF={(data) => calculateDCF(data, modelInputs)}
-                  lboModelingEngine={null}
-                />
+                <Suspense fallback={<div className="p-8 text-center text-gray-400">Loading...</div>}>
+                  <EnhancedScenarioAnalysis
+                    data={financialData}
+                    onDataChange={(results) => handleDataChange(results, 'scenarios')}
+                    calculateDCF={(data) => calculateDCF(data, modelInputs)}
+                    lboModelingEngine={null}
+                  />
+                </Suspense>
               </ErrorBoundary>
             )}
 
             {activeTab === 'marketdata' && (
               <ErrorBoundary fallback={<div className="p-8 text-center text-red-400">Error loading market data dashboard.</div>}>
-                <EnhancedMarketDataDashboard
-                  data={financialData}
-                  onDataChange={(results) => setAdvancedResults(prev => ({ ...prev, marketData: results }))}
-                />
+                <Suspense fallback={<div className="p-8 text-center text-gray-400">Loading...</div>}>
+                  <EnhancedMarketDataDashboard
+                    data={financialData}
+                    onDataChange={(results) => handleDataChange(results, 'marketData')}
+                  />
+                </Suspense>
               </ErrorBoundary>
             )}
 
             {activeTab === 'montecarlo' && (
               <ErrorBoundary fallback={<div className="p-8 text-center text-red-400">Error loading Monte Carlo integration.</div>}>
-                <MonteCarloIntegrationHub
-                  data={financialData}
-                  dcfResults={advancedResults.dcf}
-                  lboResults={advancedResults.lbo}
-                  financialModel={advancedResults.threeStatement}
-                  scenarioResults={advancedResults.scenarios}
-                  onDataChange={(results) => setAdvancedResults(prev => ({ ...prev, monteCarlo: results }))}
-                />
+                <Suspense fallback={<div className="p-8 text-center text-gray-400">Loading...</div>}>
+                  <MonteCarloIntegrationHub
+                    data={financialData}
+                    dcfResults={advancedResults.dcf}
+                    lboResults={advancedResults.lbo}
+                    financialModel={advancedResults.threeStatement}
+                    scenarioResults={advancedResults.scenarios}
+                    onDataChange={(results) => handleDataChange(results, 'monteCarlo')}
+                  />
+                </Suspense>
               </ErrorBoundary>
             )}
 
             {activeTab === 'import-export' && (
               <ErrorBoundary fallback={<div className="p-8 text-center text-red-400">Error loading import/export tools.</div>}>
-                <DataExportImport
-                  data={financialData}
-                  onDataChange={setFinancialData}
-                  savedAnalyses={savedAnalyses}
-                  onAnalysesChange={setSavedAnalyses}
-                />
+                <Suspense fallback={<div className="p-8 text-center text-gray-400">Loading...</div>}>
+                  <DataExportImport
+                    data={financialData}
+                    onDataChange={handleDataChange}
+                    savedAnalyses={savedAnalyses}
+                    onAnalysesChange={setSavedAnalyses}
+                  />
+                </Suspense>
               </ErrorBoundary>
             )}
           </motion.div>
+          </Suspense>
         </section>
 
         {/* Contextual Insights Sidebar */}
-        <ContextualInsightsSidebar
-          financialData={financialData}
-          currentMetric={currentMetricFocus}
-          analysisContext={activeTab === 'analysis' ? 'dcf' : activeTab}
-          onInsightClick={handleInsightClick}
-          isVisible={insightsSidebarVisible}
-          onToggle={toggleInsightsSidebar}
-        />
+        <Suspense fallback={null}>
+          <ContextualInsightsSidebar
+            financialData={financialData}
+            currentMetric={currentMetricFocus}
+            analysisContext={activeTab === 'analysis' ? 'dcf' : activeTab}
+            onInsightClick={handleInsightClick}
+            isVisible={insightsSidebarVisible}
+            onToggle={toggleInsightsSidebar}
+          />
+        </Suspense>
       </main>
 
       {/* Help Panel */}
@@ -669,14 +724,9 @@ const PrivateAnalysis = () => {
         onClose={closeHelpPanel}
       />
 
-      {/* Onboarding Tour */}
-      <OnboardingTour
-        steps={currentTour?.steps || []}
-        isActive={!!currentTour}
-        onComplete={() => completeTour()}
-        onSkip={skipTour}
-      />
-    </div>
+      {/* OnboardingTour - temporarily disabled for integration focus */}
+      </div>
+    </ErrorBoundary>
   );
 };
 

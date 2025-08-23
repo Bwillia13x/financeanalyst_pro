@@ -21,9 +21,9 @@
     --color-popover: #ffffff; /* white */
     --color-popover-foreground: #2c3e50; /* slate-700 */
 
-    /* Muted Colors */
+    /* Muted Colors - WCAG AA compliant */
     --color-muted: #f8f9fa; /* gray-100 */
-    --color-muted-foreground: #7f8c8d; /* gray-500 */
+    --color-muted-foreground: #5a6c7d; /* darker gray for 4.5:1 contrast */
 
     /* Primary Colors */
     --color-primary: #1e3a5f; /* navy-800 */
@@ -41,8 +41,8 @@
     --color-accent: #e67e22; /* orange-600 */
     --color-accent-foreground: #ffffff; /* white */
 
-    /* Success Colors */
-    --color-success: #27ae60; /* green-600 */
+    /* Success Colors - WCAG AA compliant */
+    --color-success: #1e8449; /* darker green for better contrast */
     --color-success-foreground: #ffffff; /* white */
 
     /* Warning Colors */

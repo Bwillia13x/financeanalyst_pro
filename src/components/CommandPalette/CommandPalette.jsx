@@ -21,7 +21,7 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 
 import { useCommandRegistry } from '../../hooks/useCommandRegistry';
-import monitoring from '../../utils/monitoring';
+ 
 
 const CommandPalette = ({
   isOpen,
@@ -39,6 +39,23 @@ const CommandPalette = ({
   const listRef = useRef(null);
   const dialogRef = useRef(null);
   const openTimestampRef = useRef(null);
+  const monitoringRef = useRef(null);
+
+  // Lazy-load monitoring utilities to keep them out of primary chunks
+  const getMonitoring = async () => {
+    if (monitoringRef.current) return monitoringRef.current;
+    try {
+      const mod = await import('../../utils/monitoring');
+      const api = mod?.default || mod;
+      monitoringRef.current = api;
+      return api;
+    } catch (_e) {
+      // Fallback no-op implementation to avoid conditional checks
+      const noop = { trackEvent: () => {}, trackError: () => {} };
+      monitoringRef.current = noop;
+      return noop;
+    }
+  };
 
   // Get command registry and search functionality
   const {
@@ -93,15 +110,19 @@ const CommandPalette = ({
       setSelectedIndex(0);
       // Mark palette open time and emit telemetry
       openTimestampRef.current = performance.now();
-      try {
-        monitoring.trackEvent('command_palette_open', {
-          page: currentContext?.page,
-          context: currentContext,
-          recentCount: recentCommands?.length || 0
-        });
-      } catch (e) {
-        console.warn('Monitoring: command_palette_open failed', e);
-      }
+      getMonitoring()
+        .then((mon) => {
+          try {
+            mon.trackEvent('command_palette_open', {
+              page: currentContext?.page,
+              context: currentContext,
+              recentCount: recentCommands?.length || 0
+            });
+          } catch (e) {
+            console.warn('Monitoring: command_palette_open failed', e);
+          }
+        })
+        .catch(() => {});
     }
   }, [isOpen]);
 
@@ -186,7 +207,8 @@ const CommandPalette = ({
       // Emit telemetry for command execution
       try {
         const openedAt = openTimestampRef.current || execStart;
-        monitoring.trackEvent('command_execute', {
+        const mon = await getMonitoring();
+        mon.trackEvent('command_execute', {
           commandId: command.id,
           query,
           page: currentContext?.page,
@@ -208,7 +230,8 @@ const CommandPalette = ({
     } catch (error) {
       console.error('Command execution failed:', error);
       try {
-        monitoring.trackError(error, 'command_execution', { commandId: command?.id, page: currentContext?.page });
+        const mon = await getMonitoring();
+        mon.trackError(error, 'command_execution', { commandId: command?.id, page: currentContext?.page });
       } catch (e) {
         console.warn('Monitoring: trackError failed', e);
       }

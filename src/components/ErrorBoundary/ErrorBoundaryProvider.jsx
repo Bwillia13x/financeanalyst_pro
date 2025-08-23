@@ -1,7 +1,5 @@
 import React, { Component, createContext, useContext } from 'react';
 
-import { trackError } from '../../utils/performanceMonitoring';
-
 // Error Boundary Context for advanced error handling
 const ErrorBoundaryContext = createContext({
   reportError: () => {},
@@ -41,7 +39,15 @@ class ErrorBoundaryProvider extends Component {
     const enhancedError = this.enhanceErrorWithContext(error, errorInfo);
 
     // Track error for monitoring
-    trackError(error, errorInfo);
+    import('../../utils/performanceMonitoring')
+      .then((mod) => {
+        if (mod?.trackError) {
+          mod.trackError(error, errorInfo);
+        }
+      })
+      .catch(() => {
+        // Performance monitoring is optional; ignore errors
+      });
 
     // Log to console in development
     if (import.meta.env.DEV) {

@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 
 import { accessibilityTester } from '../utils/accessibilityTesting';
-import { reportPerformanceMetric } from '../utils/performanceMonitoring';
 
 // React hook for accessibility testing
 export function useAccessibility(options = {}) {
@@ -47,12 +46,18 @@ export function useAccessibility(options = {}) {
       setLastTestTime(Date.now());
 
       // Report to performance monitoring
-      reportPerformanceMetric('accessibility_test', {
-        violations: testResults.violations?.length || 0,
-        score: accessibilityTester.calculateAccessibilityScore(),
-        componentType,
-        timestamp: Date.now()
-      });
+      import('../utils/performanceMonitoring')
+        .then((mod) => {
+          if (mod?.reportPerformanceMetric) {
+            mod.reportPerformanceMetric('accessibility_test', {
+              violations: testResults.violations?.length || 0,
+              score: accessibilityTester.calculateAccessibilityScore(),
+              componentType,
+              timestamp: Date.now()
+            });
+          }
+        })
+        .catch(() => {});
 
       // Call callbacks
       if (testResults.violations?.length > 0) {
@@ -84,12 +89,18 @@ export function useAccessibility(options = {}) {
       setLastTestTime(Date.now());
 
       // Report specific component test
-      reportPerformanceMetric('financial_component_accessibility', {
-        componentType: type,
-        violations: testResults.violations?.length || 0,
-        score: accessibilityTester.calculateAccessibilityScore(),
-        timestamp: Date.now()
-      });
+      import('../utils/performanceMonitoring')
+        .then((mod) => {
+          if (mod?.reportPerformanceMetric) {
+            mod.reportPerformanceMetric('financial_component_accessibility', {
+              componentType: type,
+              violations: testResults.violations?.length || 0,
+              score: accessibilityTester.calculateAccessibilityScore(),
+              timestamp: Date.now()
+            });
+          }
+        })
+        .catch(() => {});
 
       return testResults;
     } catch (error) {
@@ -107,13 +118,19 @@ export function useAccessibility(options = {}) {
     try {
       const navResults = await accessibilityTester.testKeyboardNavigation();
 
-      reportPerformanceMetric('keyboard_navigation_test', {
-        focusableElements: navResults.focusableElementsCount,
-        tabOrderIssues: navResults.tabOrderIssues?.length || 0,
-        focusVisibilityIssues: navResults.focusVisibilityIssues?.length || 0,
-        passed: navResults.passed,
-        timestamp: Date.now()
-      });
+      import('../utils/performanceMonitoring')
+        .then((mod) => {
+          if (mod?.reportPerformanceMetric) {
+            mod.reportPerformanceMetric('keyboard_navigation_test', {
+              focusableElements: navResults.focusableElementsCount,
+              tabOrderIssues: navResults.tabOrderIssues?.length || 0,
+              focusVisibilityIssues: navResults.focusVisibilityIssues?.length || 0,
+              passed: navResults.passed,
+              timestamp: Date.now()
+            });
+          }
+        })
+        .catch(() => {});
 
       return navResults;
     } catch (error) {
@@ -129,12 +146,18 @@ export function useAccessibility(options = {}) {
     try {
       const contrastResults = await accessibilityTester.testColorContrast();
 
-      reportPerformanceMetric('color_contrast_test', {
-        totalElements: contrastResults.totalElements,
-        contrastIssues: contrastResults.contrastIssues?.length || 0,
-        passed: contrastResults.passed,
-        timestamp: Date.now()
-      });
+      import('../utils/performanceMonitoring')
+        .then((mod) => {
+          if (mod?.reportPerformanceMetric) {
+            mod.reportPerformanceMetric('color_contrast_test', {
+              totalElements: contrastResults.totalElements,
+              contrastIssues: contrastResults.contrastIssues?.length || 0,
+              passed: contrastResults.passed,
+              timestamp: Date.now()
+            });
+          }
+        })
+        .catch(() => {});
 
       return contrastResults;
     } catch (error) {
@@ -150,12 +173,18 @@ export function useAccessibility(options = {}) {
     try {
       const formResults = await accessibilityTester.testFormAccessibility();
 
-      reportPerformanceMetric('form_accessibility_test', {
-        totalForms: formResults.totalForms,
-        formIssues: formResults.formIssues?.length || 0,
-        passed: formResults.passed,
-        timestamp: Date.now()
-      });
+      import('../utils/performanceMonitoring')
+        .then((mod) => {
+          if (mod?.reportPerformanceMetric) {
+            mod.reportPerformanceMetric('form_accessibility_test', {
+              totalForms: formResults.totalForms,
+              formIssues: formResults.formIssues?.length || 0,
+              passed: formResults.passed,
+              timestamp: Date.now()
+            });
+          }
+        })
+        .catch(() => {});
 
       return formResults;
     } catch (error) {
@@ -172,12 +201,18 @@ export function useAccessibility(options = {}) {
       const report = accessibilityTester.generateReport();
 
       // Store report data for performance monitoring
-      reportPerformanceMetric('accessibility_report_generated', {
-        score: report.summary.score,
-        violations: report.summary.violations,
-        totalChecks: report.summary.totalChecks,
-        timestamp: Date.now()
-      });
+      import('../utils/performanceMonitoring')
+        .then((mod) => {
+          if (mod?.reportPerformanceMetric) {
+            mod.reportPerformanceMetric('accessibility_report_generated', {
+              score: report.summary.score,
+              violations: report.summary.violations,
+              totalChecks: report.summary.totalChecks,
+              timestamp: Date.now()
+            });
+          }
+        })
+        .catch(() => {});
 
       return report;
     } catch (error) {
@@ -265,12 +300,18 @@ export function useAppAccessibility() {
       setTestHistory(prev => [...prev.slice(-9), historyEntry]); // Keep last 10 entries
 
       // Report global metrics
-      reportPerformanceMetric('global_accessibility_check', {
-        score,
-        violations: results.violations?.length || 0,
-        url: window.location.pathname,
-        timestamp: Date.now()
-      });
+      import('../utils/performanceMonitoring')
+        .then((mod) => {
+          if (mod?.reportPerformanceMetric) {
+            mod.reportPerformanceMetric('global_accessibility_check', {
+              score,
+              violations: results.violations?.length || 0,
+              url: window.location.pathname,
+              timestamp: Date.now()
+            });
+          }
+        })
+        .catch(() => {});
 
       return results;
     } catch (error) {
@@ -404,12 +445,18 @@ export function useAccessibilityMonitor(options = {}) {
         }
 
         // Report monitoring metrics
-        reportPerformanceMetric('accessibility_monitoring', {
-          score,
-          violations: results.violations?.length || 0,
-          criticalViolations: criticalViolations.length,
-          timestamp: Date.now()
-        });
+        import('../utils/performanceMonitoring')
+          .then((mod) => {
+            if (mod?.reportPerformanceMetric) {
+              mod.reportPerformanceMetric('accessibility_monitoring', {
+                score,
+                violations: results.violations?.length || 0,
+                criticalViolations: criticalViolations.length,
+                timestamp: Date.now()
+              });
+            }
+          })
+          .catch(() => {});
 
       } catch (error) {
         console.error('Accessibility monitoring failed:', error);
