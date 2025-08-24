@@ -127,6 +127,24 @@ try {
         true
       );
     }
+
+    // Extra hardening: stub HTMLAnchorElement.prototype.click to no-op to avoid
+    // jsdom navigation side-effects that log "Not implemented: navigation" warnings.
+    try {
+      const AnchorProto = window.HTMLAnchorElement && window.HTMLAnchorElement.prototype;
+      if (AnchorProto && !AnchorProto.__clickStubbed) {
+        Object.defineProperty(AnchorProto, '__clickStubbed', { value: true, configurable: true });
+        const originalClick = AnchorProto.click;
+        AnchorProto.click = function clickStub() {
+          // Intentionally no-op in tests
+          return undefined;
+        };
+        // Keep a reference to original in case manual restore is desired
+        AnchorProto.__originalClick = originalClick;
+      }
+    } catch {
+      // best-effort; ignore if environment differs
+    }
   }
 } catch {
   // best-effort; avoid failing tests if jsdom internals change
