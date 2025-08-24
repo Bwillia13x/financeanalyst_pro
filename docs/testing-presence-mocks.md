@@ -49,3 +49,14 @@ Notes:
 - No other inline `userPresenceService` presence mocks detected under `tests/`.
 
 If you add new collaboration tests, prefer `installPresenceMocks()` over inline presence shims.
+
+### Adoption Status (2025-08-24)
+
+Scanned scope: `tests/**` excluding `tests/integration/phase2Integration.test.js`.
+
+- No inline presence mocks found. No replacements needed.
+- References observed (for context only):
+  - `tests/README.md`: Lines 13-19 show example usage of the helper; not a test target.
+  - `tests/unit/presenceMock.test.js`: Lines 9-18 setup, 26-58 assertions verify helper behavior; intentionally uses the helper and not a replacement target.
+
+Criteria used: searched for `userPresenceService`, `getActiveUsers(`, `joinSession(`, and keywords `presence`/`activeUsers` across `tests/**`.
