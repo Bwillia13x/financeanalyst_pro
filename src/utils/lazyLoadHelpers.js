@@ -1,4 +1,4 @@
-import React from 'react';
+import { lazy, Suspense, Component, useEffect, useCallback } from 'react';
 
 // Utility functions for lazy loading financial components
 
@@ -27,7 +27,9 @@ export async function lazyImport(importFunction, componentName, retryCount = 3) 
     }
   }
 
-  throw new Error(`Failed to load ${componentName} after ${retryCount} attempts: ${lastError.message}`);
+  throw new Error(
+    `Failed to load ${componentName} after ${retryCount} attempts: ${lastError.message}`
+  );
 }
 
 // Create lazy component with enhanced error handling
@@ -40,7 +42,7 @@ export function createLazyComponent(importFunction, componentName, options = {})
     onError = null
   } = options;
 
-  const LazyComponent = React.lazy(async() => {
+  const LazyComponent = lazy(async () => {
     try {
       const startTime = performance.now();
       const module = await lazyImport(importFunction, componentName, retryCount);
@@ -58,17 +60,17 @@ export function createLazyComponent(importFunction, componentName, options = {})
   // Return wrapped component with Suspense and error boundary
   return function WrappedLazyComponent(props) {
     return (
-      <React.Suspense fallback={fallback}>
+      <Suspense fallback={fallback}>
         <ErrorBoundary fallback={errorFallback} componentName={componentName}>
           <LazyComponent {...props} />
         </ErrorBoundary>
-      </React.Suspense>
+      </Suspense>
     );
   };
 }
 
 // Error boundary for lazy components
-class ErrorBoundary extends React.Component {
+class ErrorBoundary extends Component {
   constructor(props) {
     super(props);
     this.state = { hasError: false, error: null };
@@ -93,13 +95,15 @@ class ErrorBoundary extends React.Component {
           <div className="flex">
             <div className="flex-shrink-0">
               <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                  clipRule="evenodd"
+                />
               </svg>
             </div>
             <div className="ml-3">
-              <h3 className="text-sm font-medium text-red-800">
-                Failed to load component
-              </h3>
+              <h3 className="text-sm font-medium text-red-800">Failed to load component</h3>
               <div className="mt-2 text-sm text-red-700">
                 <p>The {this.props.componentName} component could not be loaded.</p>
               </div>
@@ -166,9 +170,9 @@ export function preloadRoute(routePath, componentImports) {
   const currentPath = window.location.pathname;
 
   // Preload if user is on a related route
-  const isRelated = routePath.split('/').some(segment =>
-    currentPath.includes(segment) && segment !== ''
-  );
+  const isRelated = routePath
+    .split('/')
+    .some(segment => currentPath.includes(segment) && segment !== '');
 
   if (isRelated) {
     componentImports.forEach(({ importFunction, componentName }) => {
@@ -245,13 +249,13 @@ export class IntelligentPreloader {
   async processPreloadQueue() {
     if (!this.isIdle || this.preloadQueue.size === 0) return;
 
-    const components = Array.from(this.preloadQueue)
-      .sort((a, b) => {
-        const priorityOrder = { high: 0, medium: 1, low: 2 };
-        return priorityOrder[a.priority] - priorityOrder[b.priority];
-      });
+    const components = Array.from(this.preloadQueue).sort((a, b) => {
+      const priorityOrder = { high: 0, medium: 1, low: 2 };
+      return priorityOrder[a.priority] - priorityOrder[b.priority];
+    });
 
-    for (const component of components.slice(0, 3)) { // Limit concurrent preloads
+    for (const component of components.slice(0, 3)) {
+      // Limit concurrent preloads
       try {
         // This would need to be connected to your actual import functions
         console.log(`Preloading ${component.name} (priority: ${component.priority})`);
@@ -290,8 +294,10 @@ export class IntelligentPreloader {
   // Get preloading statistics
   getStats() {
     return {
-      totalInteractions: Array.from(this.userInteractions.values())
-        .reduce((sum, interaction) => sum + interaction.count, 0),
+      totalInteractions: Array.from(this.userInteractions.values()).reduce(
+        (sum, interaction) => sum + interaction.count,
+        0
+      ),
       uniqueComponents: this.userInteractions.size,
       preloadQueue: this.preloadQueue.size,
       preloadedComponents: this.preloadedComponents.size,
@@ -306,7 +312,7 @@ export const intelligentPreloader = new IntelligentPreloader();
 // HOC for automatic interaction tracking
 export function withPreloadTracking(WrappedComponent, componentName) {
   return function PreloadTrackedComponent(props) {
-    React.useEffect(() => {
+    useEffect(() => {
       intelligentPreloader.trackInteraction(componentName, 'mount');
 
       return () => {
@@ -320,13 +326,16 @@ export function withPreloadTracking(WrappedComponent, componentName) {
 
 // Hook for tracking component interactions
 export function usePreloadTracking(componentName) {
-  React.useEffect(() => {
+  useEffect(() => {
     intelligentPreloader.trackInteraction(componentName, 'mount');
   }, [componentName]);
 
-  const trackInteraction = React.useCallback((interactionType) => {
-    intelligentPreloader.trackInteraction(componentName, interactionType);
-  }, [componentName]);
+  const trackInteraction = useCallback(
+    interactionType => {
+      intelligentPreloader.trackInteraction(componentName, interactionType);
+    },
+    [componentName]
+  );
 
   return { trackInteraction };
 }

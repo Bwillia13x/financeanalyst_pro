@@ -1,4 +1,11 @@
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors
+} from '@dnd-kit/core';
 import {
   arrayMove,
   SortableContext,
@@ -22,7 +29,7 @@ import {
   Target,
   RefreshCw
 } from 'lucide-react';
-import React, { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 
 import secureApiClient from '../../services/secureApiClient';
 import { formatCurrency, formatPercentage, formatNumber } from '../../utils/formatters';
@@ -49,7 +56,7 @@ const PortfolioBuilder = ({ portfolio, onPortfolioUpdate, marketData: _marketDat
   const [isDirty, setIsDirty] = useState(false);
 
   // Initialize target allocation from current holdings
-  React.useEffect(() => {
+  useEffect(() => {
     if (portfolio && !Object.keys(targetAllocation).length) {
       const currentAllocation = {};
       portfolio.holdings.forEach(holding => {
@@ -60,7 +67,7 @@ const PortfolioBuilder = ({ portfolio, onPortfolioUpdate, marketData: _marketDat
   }, [portfolio, targetAllocation]);
 
   // Search for stocks to add to portfolio
-  const searchStocks = useCallback(async(query) => {
+  const searchStocks = useCallback(async query => {
     if (!query || query.length < 2) {
       setSearchResults([]);
       return;
@@ -71,20 +78,51 @@ const PortfolioBuilder = ({ portfolio, onPortfolioUpdate, marketData: _marketDat
       // Mock search results - in real implementation, this would search a stock database
       const mockResults = [
         { symbol: 'AAPL', name: 'Apple Inc.', sector: 'Technology', marketCap: 3000000000000 },
-        { symbol: 'MSFT', name: 'Microsoft Corporation', sector: 'Technology', marketCap: 2800000000000 },
+        {
+          symbol: 'MSFT',
+          name: 'Microsoft Corporation',
+          sector: 'Technology',
+          marketCap: 2800000000000
+        },
         { symbol: 'GOOGL', name: 'Alphabet Inc.', sector: 'Technology', marketCap: 1700000000000 },
-        { symbol: 'AMZN', name: 'Amazon.com Inc.', sector: 'Consumer Discretionary', marketCap: 1500000000000 },
-        { symbol: 'TSLA', name: 'Tesla Inc.', sector: 'Consumer Discretionary', marketCap: 800000000000 },
-        { symbol: 'NVDA', name: 'NVIDIA Corporation', sector: 'Technology', marketCap: 1200000000000 },
-        { symbol: 'META', name: 'Meta Platforms Inc.', sector: 'Technology', marketCap: 900000000000 },
-        { symbol: 'JPM', name: 'JPMorgan Chase & Co.', sector: 'Financials', marketCap: 500000000000 },
+        {
+          symbol: 'AMZN',
+          name: 'Amazon.com Inc.',
+          sector: 'Consumer Discretionary',
+          marketCap: 1500000000000
+        },
+        {
+          symbol: 'TSLA',
+          name: 'Tesla Inc.',
+          sector: 'Consumer Discretionary',
+          marketCap: 800000000000
+        },
+        {
+          symbol: 'NVDA',
+          name: 'NVIDIA Corporation',
+          sector: 'Technology',
+          marketCap: 1200000000000
+        },
+        {
+          symbol: 'META',
+          name: 'Meta Platforms Inc.',
+          sector: 'Technology',
+          marketCap: 900000000000
+        },
+        {
+          symbol: 'JPM',
+          name: 'JPMorgan Chase & Co.',
+          sector: 'Financials',
+          marketCap: 500000000000
+        },
         { symbol: 'JNJ', name: 'Johnson & Johnson', sector: 'Healthcare', marketCap: 450000000000 },
         { symbol: 'V', name: 'Visa Inc.', sector: 'Technology', marketCap: 500000000000 }
       ];
 
-      const filtered = mockResults.filter(stock =>
-        stock.symbol.toLowerCase().includes(query.toLowerCase()) ||
-        stock.name.toLowerCase().includes(query.toLowerCase())
+      const filtered = mockResults.filter(
+        stock =>
+          stock.symbol.toLowerCase().includes(query.toLowerCase()) ||
+          stock.name.toLowerCase().includes(query.toLowerCase())
       );
 
       setSearchResults(filtered);
@@ -97,7 +135,7 @@ const PortfolioBuilder = ({ portfolio, onPortfolioUpdate, marketData: _marketDat
   }, []);
 
   // Debounced search
-  React.useEffect(() => {
+  useEffect(() => {
     const timeoutId = setTimeout(() => searchStocks(searchTerm), 300);
     return () => clearTimeout(timeoutId);
   }, [searchTerm, searchStocks]);
@@ -116,7 +154,8 @@ const PortfolioBuilder = ({ portfolio, onPortfolioUpdate, marketData: _marketDat
     });
 
     const maxDeviation = Math.max(...deviations.map(d => d.deviation), 0);
-    const avgDeviation = deviations.reduce((sum, d) => sum + d.deviation, 0) / Math.max(deviations.length, 1);
+    const avgDeviation =
+      deviations.reduce((sum, d) => sum + d.deviation, 0) / Math.max(deviations.length, 1);
 
     return {
       totalTarget,
@@ -130,49 +169,55 @@ const PortfolioBuilder = ({ portfolio, onPortfolioUpdate, marketData: _marketDat
   }, [portfolio, targetAllocation, rebalanceSettings.threshold]);
 
   // Add stock to portfolio
-  const addStock = useCallback(async(stock) => {
-    try {
-      const quote = await secureApiClient.getQuote(stock.symbol);
-      const newHolding = {
-        symbol: stock.symbol,
-        name: stock.name,
-        shares: 0,
-        currentPrice: quote.currentPrice || 100,
-        allocation: 0,
-        value: 0,
-        costBasis: quote.currentPrice || 100
-      };
+  const addStock = useCallback(
+    async stock => {
+      try {
+        const quote = await secureApiClient.getQuote(stock.symbol);
+        const newHolding = {
+          symbol: stock.symbol,
+          name: stock.name,
+          shares: 0,
+          currentPrice: quote.currentPrice || 100,
+          allocation: 0,
+          value: 0,
+          costBasis: quote.currentPrice || 100
+        };
 
+        const updatedPortfolio = {
+          ...portfolio,
+          holdings: [...portfolio.holdings, newHolding]
+        };
+
+        onPortfolioUpdate(updatedPortfolio);
+        setTargetAllocation(prev => ({ ...prev, [stock.symbol]: 0 }));
+        setIsDirty(true);
+        setSearchTerm('');
+        setSearchResults([]);
+      } catch (error) {
+        console.error('Failed to add stock:', error);
+      }
+    },
+    [portfolio, onPortfolioUpdate]
+  );
+
+  // Remove stock from portfolio
+  const removeStock = useCallback(
+    symbol => {
       const updatedPortfolio = {
         ...portfolio,
-        holdings: [...portfolio.holdings, newHolding]
+        holdings: portfolio.holdings.filter(h => h.symbol !== symbol)
       };
 
       onPortfolioUpdate(updatedPortfolio);
-      setTargetAllocation(prev => ({ ...prev, [stock.symbol]: 0 }));
+      setTargetAllocation(prev => {
+        const updated = { ...prev };
+        delete updated[symbol];
+        return updated;
+      });
       setIsDirty(true);
-      setSearchTerm('');
-      setSearchResults([]);
-    } catch (error) {
-      console.error('Failed to add stock:', error);
-    }
-  }, [portfolio, onPortfolioUpdate]);
-
-  // Remove stock from portfolio
-  const removeStock = useCallback((symbol) => {
-    const updatedPortfolio = {
-      ...portfolio,
-      holdings: portfolio.holdings.filter(h => h.symbol !== symbol)
-    };
-
-    onPortfolioUpdate(updatedPortfolio);
-    setTargetAllocation(prev => {
-      const updated = { ...prev };
-      delete updated[symbol];
-      return updated;
-    });
-    setIsDirty(true);
-  }, [portfolio, onPortfolioUpdate]);
+    },
+    [portfolio, onPortfolioUpdate]
+  );
 
   // Update target allocation
   const updateTargetAllocation = useCallback((symbol, value) => {
@@ -221,7 +266,7 @@ const PortfolioBuilder = ({ portfolio, onPortfolioUpdate, marketData: _marketDat
     })
   );
 
-  const handleDragEnd = (event) => {
+  const handleDragEnd = event => {
     const { active, over } = event;
     if (active.id !== over.id) {
       const oldIndex = portfolio.holdings.findIndex(h => h.symbol === active.id);
@@ -280,9 +325,7 @@ const PortfolioBuilder = ({ portfolio, onPortfolioUpdate, marketData: _marketDat
             <RotateCcw className="w-4 h-4" />
             <span>Reset</span>
           </button>
-          <button
-            className="flex items-center space-x-2 px-3 py-1.5 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700"
-          >
+          <button className="flex items-center space-x-2 px-3 py-1.5 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700">
             <Save className="w-4 h-4" />
             <span>Save</span>
           </button>
@@ -335,7 +378,7 @@ const PortfolioBuilder = ({ portfolio, onPortfolioUpdate, marketData: _marketDat
                 type="text"
                 placeholder="Search stocks by symbol or name..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={e => setSearchTerm(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               {isSearching && (
@@ -345,7 +388,7 @@ const PortfolioBuilder = ({ portfolio, onPortfolioUpdate, marketData: _marketDat
 
             {searchResults.length > 0 && (
               <div className="space-y-2 max-h-64 overflow-y-auto">
-                {searchResults.map((stock) => (
+                {searchResults.map(stock => (
                   <div
                     key={stock.symbol}
                     className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50"
@@ -375,7 +418,9 @@ const PortfolioBuilder = ({ portfolio, onPortfolioUpdate, marketData: _marketDat
             <div className="space-y-3">
               <div className="flex justify-between">
                 <span className="text-gray-600">Total Allocated:</span>
-                <span className={`font-medium ${allocationAnalysis.isValid ? 'text-gray-900' : 'text-red-600'}`}>
+                <span
+                  className={`font-medium ${allocationAnalysis.isValid ? 'text-gray-900' : 'text-red-600'}`}
+                >
                   {formatPercentage(allocationAnalysis.totalTarget)}
                 </span>
               </div>
@@ -387,7 +432,9 @@ const PortfolioBuilder = ({ portfolio, onPortfolioUpdate, marketData: _marketDat
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Max Deviation:</span>
-                <span className={`font-medium ${allocationAnalysis.maxDeviation > rebalanceSettings.threshold ? 'text-red-600' : 'text-green-600'}`}>
+                <span
+                  className={`font-medium ${allocationAnalysis.maxDeviation > rebalanceSettings.threshold ? 'text-red-600' : 'text-green-600'}`}
+                >
                   {formatPercentage(allocationAnalysis.maxDeviation)}
                 </span>
               </div>
@@ -427,27 +474,28 @@ const AllocationBuilder = ({
     <div className="bg-white rounded-xl shadow-sm border">
       <div className="px-6 py-4 border-b">
         <h3 className="text-lg font-semibold text-gray-900">Target Allocation</h3>
-        <p className="text-sm text-gray-500">Drag to reorder • Set target percentages for each holding</p>
+        <p className="text-sm text-gray-500">
+          Drag to reorder • Set target percentages for each holding
+        </p>
       </div>
 
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragEnd={handleDragEnd}
-      >
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext
           items={portfolio.holdings.map(h => h.symbol)}
           strategy={verticalListSortingStrategy}
         >
           <div className="p-6 space-y-4">
-            {portfolio.holdings.map((holding) => (
+            {portfolio.holdings.map(holding => (
               <SortableHoldingRow
                 key={holding.symbol}
                 holding={holding}
                 targetAllocation={targetAllocation[holding.symbol] || 0}
                 onUpdateAllocation={onUpdateAllocation}
                 onRemove={onRemoveStock}
-                deviation={allocationAnalysis.deviations.find(d => d.symbol === holding.symbol)?.deviation || 0}
+                deviation={
+                  allocationAnalysis.deviations.find(d => d.symbol === holding.symbol)?.deviation ||
+                  0
+                }
               />
             ))}
           </div>
@@ -458,15 +506,16 @@ const AllocationBuilder = ({
 };
 
 // Sortable Holding Row Component
-const SortableHoldingRow = ({ holding, targetAllocation, onUpdateAllocation, onRemove, deviation }) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging
-  } = useSortable({ id: holding.symbol });
+const SortableHoldingRow = ({
+  holding,
+  targetAllocation,
+  onUpdateAllocation,
+  onRemove,
+  deviation
+}) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: holding.symbol
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -480,11 +529,7 @@ const SortableHoldingRow = ({ holding, targetAllocation, onUpdateAllocation, onR
       style={style}
       className="flex items-center space-x-4 p-4 border border-gray-200 rounded-lg hover:border-gray-300 transition-colors"
     >
-      <div
-        {...attributes}
-        {...listeners}
-        className="cursor-grab active:cursor-grabbing p-1"
-      >
+      <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing p-1">
         <div className="w-2 h-8 bg-gray-300 rounded-full" />
       </div>
 
@@ -494,7 +539,9 @@ const SortableHoldingRow = ({ holding, targetAllocation, onUpdateAllocation, onR
       </div>
 
       <div className="text-right">
-        <div className="text-sm text-gray-600">Current: {formatPercentage(holding.allocation || 0)}</div>
+        <div className="text-sm text-gray-600">
+          Current: {formatPercentage(holding.allocation || 0)}
+        </div>
         {deviation > 0 && (
           <div className={`text-xs ${deviation > 5 ? 'text-red-600' : 'text-orange-600'}`}>
             Deviation: {formatPercentage(deviation)}
@@ -506,7 +553,7 @@ const SortableHoldingRow = ({ holding, targetAllocation, onUpdateAllocation, onR
         <input
           type="number"
           value={targetAllocation}
-          onChange={(e) => onUpdateAllocation(holding.symbol, parseFloat(e.target.value) || 0)}
+          onChange={e => onUpdateAllocation(holding.symbol, parseFloat(e.target.value) || 0)}
           className="w-20 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           min="0"
           max="100"
@@ -526,7 +573,11 @@ const SortableHoldingRow = ({ holding, targetAllocation, onUpdateAllocation, onR
 };
 
 // Optimization Builder Component (placeholder)
-const OptimizationBuilder = ({ portfolio: _portfolio, optimizationSettings: _optimizationSettings, onSettingsChange: _onSettingsChange }) => {
+const OptimizationBuilder = ({
+  portfolio: _portfolio,
+  optimizationSettings: _optimizationSettings,
+  onSettingsChange: _onSettingsChange
+}) => {
   return (
     <div className="bg-white rounded-xl shadow-sm border p-6">
       <div className="text-center py-12">
@@ -559,7 +610,10 @@ const RebalancingBuilder = ({
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label htmlFor="rebalance-threshold" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="rebalance-threshold"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Deviation Threshold
             </label>
             <div className="flex items-center space-x-2">
@@ -567,10 +621,12 @@ const RebalancingBuilder = ({
                 id="rebalance-threshold"
                 type="number"
                 value={rebalanceSettings.threshold}
-                onChange={(e) => onSettingsChange(prev => ({
-                  ...prev,
-                  threshold: parseFloat(e.target.value) || 0
-                }))}
+                onChange={e =>
+                  onSettingsChange(prev => ({
+                    ...prev,
+                    threshold: parseFloat(e.target.value) || 0
+                  }))
+                }
                 className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 min="0.1"
                 max="20"
@@ -581,7 +637,10 @@ const RebalancingBuilder = ({
           </div>
 
           <div>
-            <label htmlFor="rebalance-cashBuffer" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="rebalance-cashBuffer"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Cash Buffer
             </label>
             <div className="flex items-center space-x-2">
@@ -590,10 +649,12 @@ const RebalancingBuilder = ({
                 id="rebalance-cashBuffer"
                 type="number"
                 value={rebalanceSettings.cashBuffer}
-                onChange={(e) => onSettingsChange(prev => ({
-                  ...prev,
-                  cashBuffer: parseFloat(e.target.value) || 0
-                }))}
+                onChange={e =>
+                  onSettingsChange(prev => ({
+                    ...prev,
+                    cashBuffer: parseFloat(e.target.value) || 0
+                  }))
+                }
                 className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 min="0"
                 step="100"
@@ -602,7 +663,10 @@ const RebalancingBuilder = ({
           </div>
 
           <div>
-            <label htmlFor="rebalance-minimumTrade" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="rebalance-minimumTrade"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Minimum Trade
             </label>
             <div className="flex items-center space-x-2">
@@ -611,10 +675,12 @@ const RebalancingBuilder = ({
                 id="rebalance-minimumTrade"
                 type="number"
                 value={rebalanceSettings.minimumTrade}
-                onChange={(e) => onSettingsChange(prev => ({
-                  ...prev,
-                  minimumTrade: parseFloat(e.target.value) || 0
-                }))}
+                onChange={e =>
+                  onSettingsChange(prev => ({
+                    ...prev,
+                    minimumTrade: parseFloat(e.target.value) || 0
+                  }))
+                }
                 className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 min="0"
                 step="50"
@@ -646,9 +712,14 @@ const RebalancingBuilder = ({
           ) : (
             <div className="space-y-3">
               {trades.map((trade, index) => (
-                <div key={index} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                <div
+                  key={index}
+                  className="flex items-center justify-between p-4 border border-gray-200 rounded-lg"
+                >
                   <div className="flex items-center space-x-4">
-                    <div className={`p-2 rounded-lg ${trade.action === 'BUY' ? 'bg-green-100' : 'bg-red-100'}`}>
+                    <div
+                      className={`p-2 rounded-lg ${trade.action === 'BUY' ? 'bg-green-100' : 'bg-red-100'}`}
+                    >
                       {trade.action === 'BUY' ? (
                         <TrendingUp className="w-4 h-4 text-green-600" />
                       ) : (

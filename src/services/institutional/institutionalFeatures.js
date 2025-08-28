@@ -8,7 +8,7 @@ import { EventEmitter } from 'events';
 class InstitutionalFeaturesService extends EventEmitter {
   constructor(config = {}) {
     super();
-    
+
     this.multiEntity = new MultiEntityManager(config.multiEntity);
     this.whiteLabel = new WhiteLabelingService(config.whiteLabel);
     this.compliance = new ComplianceWorkflowEngine(config.compliance);
@@ -19,10 +19,10 @@ class InstitutionalFeaturesService extends EventEmitter {
   // Multi-entity operations
   async createEntity(entityData, parentEntityId = null) {
     this.emit('entity:create:start', { entityData, parentEntityId });
-    
+
     const entity = await this.multiEntity.createEntity(entityData, parentEntityId);
     await this.audit.logAction('entity_created', { entityId: entity.id, data: entityData });
-    
+
     this.emit('entity:create:complete', { entity });
     return entity;
   }
@@ -34,10 +34,10 @@ class InstitutionalFeaturesService extends EventEmitter {
   // White-labeling operations
   async setupBrandingConfiguration(entityId, brandingConfig) {
     this.emit('branding:setup:start', { entityId, brandingConfig });
-    
+
     const config = await this.whiteLabel.configureBranding(entityId, brandingConfig);
     await this.audit.logAction('branding_configured', { entityId, config });
-    
+
     this.emit('branding:setup:complete', { entityId, config });
     return config;
   }
@@ -45,14 +45,14 @@ class InstitutionalFeaturesService extends EventEmitter {
   // Compliance operations
   async initiateComplianceWorkflow(workflowType, data, entityId) {
     this.emit('compliance:workflow:start', { workflowType, entityId });
-    
+
     const workflow = await this.compliance.initiate(workflowType, data, entityId);
-    await this.audit.logAction('compliance_workflow_initiated', { 
-      workflowId: workflow.id, 
-      type: workflowType, 
-      entityId 
+    await this.audit.logAction('compliance_workflow_initiated', {
+      workflowId: workflow.id,
+      type: workflowType,
+      entityId
     });
-    
+
     this.emit('compliance:workflow:initiated', { workflow });
     return workflow;
   }
@@ -139,10 +139,10 @@ class MultiEntityManager {
       if (visited.has(id)) {
         throw new Error(`Circular reference detected in entity hierarchy: ${id}`);
       }
-      
+
       visited.add(id);
       const entity = this.entities.get(id);
-      
+
       if (!entity) return null;
 
       return {
@@ -159,10 +159,10 @@ class MultiEntityManager {
   async getDescendants(entityId) {
     const descendants = [];
     const entity = this.entities.get(entityId);
-    
+
     if (!entity) return descendants;
 
-    const traverse = (id) => {
+    const traverse = id => {
       const current = this.entities.get(id);
       if (current) {
         descendants.push(current);
@@ -181,7 +181,7 @@ class MultiEntityManager {
     while (currentId) {
       const entity = this.entities.get(currentId);
       if (!entity) break;
-      
+
       if (entity.parentId) {
         const parent = this.entities.get(entity.parentId);
         if (parent) {
@@ -200,18 +200,18 @@ class MultiEntityManager {
 
   async consolidateData(entityId, dataType, options = {}) {
     const { includeDescendants = true, consolidationMethod = 'sum' } = options;
-    
-    const entities = includeDescendants ? 
-      [await this.getEntity(entityId), ...await this.getDescendants(entityId)] :
-      [await this.getEntity(entityId)];
+
+    const entities = includeDescendants
+      ? [await this.getEntity(entityId), ...(await this.getDescendants(entityId))]
+      : [await this.getEntity(entityId)];
 
     const consolidatedData = {};
-    
+
     for (const entity of entities) {
       if (!entity || !entity.data?.[dataType]) continue;
-      
+
       const entityData = entity.data[dataType];
-      
+
       Object.keys(entityData).forEach(key => {
         if (typeof entityData[key] === 'number') {
           if (consolidationMethod === 'sum') {
@@ -266,7 +266,7 @@ class WhiteLabelingService {
 
   initializeDefaultTemplates() {
     const defaultTemplates = {
-      'corporate': {
+      corporate: {
         name: 'Corporate',
         colors: {
           primary: '#2563eb',
@@ -286,7 +286,7 @@ class WhiteLabelingService {
           headerStyle: 'clean'
         }
       },
-      'investment': {
+      investment: {
         name: 'Investment Firm',
         colors: {
           primary: '#059669',
@@ -306,7 +306,7 @@ class WhiteLabelingService {
           headerStyle: 'professional'
         }
       },
-      'consulting': {
+      consulting: {
         name: 'Consulting',
         colors: {
           primary: '#7c3aed',
@@ -390,7 +390,7 @@ class WhiteLabelingService {
   validateBrandingConfig(config) {
     const required = ['colors'];
     const missing = required.filter(field => !config[field]);
-    
+
     if (missing.length > 0) {
       throw new Error(`Missing required branding fields: ${missing.join(', ')}`);
     }
@@ -399,7 +399,7 @@ class WhiteLabelingService {
     if (config.colors) {
       const requiredColors = ['primary', 'background', 'text'];
       const missingColors = requiredColors.filter(color => !config.colors[color]);
-      
+
       if (missingColors.length > 0) {
         throw new Error(`Missing required colors: ${missingColors.join(', ')}`);
       }
@@ -454,7 +454,7 @@ class WhiteLabelingService {
 
   async generateBrandedExport(entityId, reportData, format = 'pdf') {
     const brandingConfig = await this.getBrandingConfig(entityId);
-    
+
     return {
       data: reportData,
       branding: brandingConfig,
@@ -464,7 +464,7 @@ class WhiteLabelingService {
     };
   }
 
-  getBrandedTemplate(brandingConfig, format) {
+  getBrandedTemplate(brandingConfig, _format) {
     const baseTemplate = {
       header: {
         logo: brandingConfig.logoUrl,
@@ -499,12 +499,16 @@ class ComplianceWorkflowEngine {
 
   initializeComplianceRules() {
     const rules = {
-      'sox_compliance': {
+      sox_compliance: {
         name: 'Sarbanes-Oxley Compliance',
         description: 'SOX compliance checks for financial reporting',
         steps: [
           { id: 'financial_data_review', name: 'Financial Data Review', required: true },
-          { id: 'internal_controls_assessment', name: 'Internal Controls Assessment', required: true },
+          {
+            id: 'internal_controls_assessment',
+            name: 'Internal Controls Assessment',
+            required: true
+          },
           { id: 'management_certification', name: 'Management Certification', required: true },
           { id: 'external_audit_review', name: 'External Audit Review', required: false }
         ],
@@ -514,7 +518,7 @@ class ComplianceWorkflowEngine {
           retention: '7_years'
         }
       },
-      'ifrs_reporting': {
+      ifrs_reporting: {
         name: 'IFRS Reporting Standards',
         description: 'International Financial Reporting Standards compliance',
         steps: [
@@ -529,7 +533,7 @@ class ComplianceWorkflowEngine {
           retention: '5_years'
         }
       },
-      'mifid_compliance': {
+      mifid_compliance: {
         name: 'MiFID II Compliance',
         description: 'Markets in Financial Instruments Directive compliance',
         steps: [
@@ -582,7 +586,7 @@ class ComplianceWorkflowEngine {
 
     this.workflows.set(workflow.id, workflow);
     await this.advanceWorkflow(workflow.id);
-    
+
     return workflow;
   }
 
@@ -603,7 +607,7 @@ class ComplianceWorkflowEngine {
     if (currentStep.status === 'pending') {
       currentStep.status = 'in_progress';
       currentStep.startedAt = new Date().toISOString();
-      
+
       // Auto-assign if configured
       if (this.config.autoAssign) {
         currentStep.assignee = await this.getNextAssignee(workflow, currentStep);
@@ -643,16 +647,17 @@ class ComplianceWorkflowEngine {
   }
 
   async getEntityStatus(entityId) {
-    const entityWorkflows = Array.from(this.workflows.values())
-      .filter(w => w.entityId === entityId);
+    const entityWorkflows = Array.from(this.workflows.values()).filter(
+      w => w.entityId === entityId
+    );
 
     const statusSummary = {
       entityId,
       totalWorkflows: entityWorkflows.length,
       activeWorkflows: entityWorkflows.filter(w => w.status !== 'completed').length,
       completedWorkflows: entityWorkflows.filter(w => w.status === 'completed').length,
-      overdue: entityWorkflows.filter(w => 
-        w.status !== 'completed' && new Date(w.dueDate) < new Date()
+      overdue: entityWorkflows.filter(
+        w => w.status !== 'completed' && new Date(w.dueDate) < new Date()
       ).length,
       byType: {},
       recentActivity: entityWorkflows
@@ -669,7 +674,7 @@ class ComplianceWorkflowEngine {
           completed: 0
         };
       }
-      
+
       statusSummary.byType[workflow.type].total += 1;
       if (workflow.status === 'completed') {
         statusSummary.byType[workflow.type].completed += 1;
@@ -692,11 +697,11 @@ class ComplianceWorkflowEngine {
     return `workflow_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   }
 
-  async getNextAssignee(workflow, step) {
+  async getNextAssignee(workflow, _step) {
     // Simple round-robin assignment logic
     const approvalLevels = workflow.rule.requirements.approvalLevels;
     const currentLevel = approvalLevels[workflow.currentStep % approvalLevels.length];
-    
+
     return {
       role: currentLevel,
       assignedAt: new Date().toISOString()
@@ -707,8 +712,9 @@ class ComplianceWorkflowEngine {
 /**
  * Audit Trail Manager
  */
-class AuditTrailManager {
+class AuditTrailManager extends EventEmitter {
   constructor(config = {}) {
+    super();
     this.auditLogs = new Map();
     this.config = config;
   }
@@ -731,40 +737,36 @@ class AuditTrailManager {
     }
 
     this.auditLogs.get(data.entityId).push(logEntry);
-    
+
     // Emit audit event
     this.emit('audit:log', logEntry);
-    
+
     return logEntry;
   }
 
   async getTrail(entityId, filters = {}) {
     const logs = this.auditLogs.get(entityId) || [];
-    
+
     let filteredLogs = [...logs];
 
     if (filters.startDate) {
-      filteredLogs = filteredLogs.filter(log => 
-        new Date(log.timestamp) >= new Date(filters.startDate)
+      filteredLogs = filteredLogs.filter(
+        log => new Date(log.timestamp) >= new Date(filters.startDate)
       );
     }
 
     if (filters.endDate) {
-      filteredLogs = filteredLogs.filter(log => 
-        new Date(log.timestamp) <= new Date(filters.endDate)
+      filteredLogs = filteredLogs.filter(
+        log => new Date(log.timestamp) <= new Date(filters.endDate)
       );
     }
 
     if (filters.actions) {
-      filteredLogs = filteredLogs.filter(log => 
-        filters.actions.includes(log.action)
-      );
+      filteredLogs = filteredLogs.filter(log => filters.actions.includes(log.action));
     }
 
     if (filters.userId) {
-      filteredLogs = filteredLogs.filter(log => 
-        log.userId === filters.userId
-      );
+      filteredLogs = filteredLogs.filter(log => log.userId === filters.userId);
     }
 
     return {
@@ -795,19 +797,35 @@ class PermissionManager {
 
   initializeDefaultRoles() {
     const defaultRoles = {
-      'viewer': {
+      viewer: {
         name: 'Viewer',
         permissions: ['read_data', 'view_reports', 'export_basic']
       },
-      'analyst': {
+      analyst: {
         name: 'Analyst',
-        permissions: ['read_data', 'write_data', 'view_reports', 'create_reports', 'export_basic', 'export_advanced']
+        permissions: [
+          'read_data',
+          'write_data',
+          'view_reports',
+          'create_reports',
+          'export_basic',
+          'export_advanced'
+        ]
       },
-      'manager': {
+      manager: {
         name: 'Manager',
-        permissions: ['read_data', 'write_data', 'delete_data', 'view_reports', 'create_reports', 'manage_users', 'export_all', 'approve_workflows']
+        permissions: [
+          'read_data',
+          'write_data',
+          'delete_data',
+          'view_reports',
+          'create_reports',
+          'manage_users',
+          'export_all',
+          'approve_workflows'
+        ]
       },
-      'admin': {
+      admin: {
         name: 'Administrator',
         permissions: ['all']
       }
@@ -820,7 +838,7 @@ class PermissionManager {
 
   async setUserPermissions(userId, entityId, permissions) {
     const key = `${userId}:${entityId}`;
-    
+
     const userPermissions = {
       userId,
       entityId,
@@ -839,11 +857,10 @@ class PermissionManager {
 
   async checkPermission(userId, entityId, permission) {
     const userPerms = await this.getUserPermissions(userId, entityId);
-    
+
     if (!userPerms) return false;
-    
-    return userPerms.permissions.includes(permission) || 
-           userPerms.permissions.includes('all');
+
+    return userPerms.permissions.includes(permission) || userPerms.permissions.includes('all');
   }
 
   async assignRole(userId, entityId, roleId) {

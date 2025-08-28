@@ -9,8 +9,8 @@ const SensitivityHeatmap = ({
   yAxisLabels = [],
   className,
   title = 'Sensitivity Analysis',
-  _formatValue = (value) => `${value.toFixed(1)}%`,
-  formatCell = (value) => `${value > 0 ? '+' : ''}${value.toFixed(1)}%`
+  _formatValue = value => `${value.toFixed(1)}%`,
+  formatCell = value => `${value > 0 ? '+' : ''}${value.toFixed(1)}%`
 }) => {
   const [hoveredCell, setHoveredCell] = useState(null);
 
@@ -21,7 +21,7 @@ const SensitivityHeatmap = ({
   const range = maxValue - minValue;
 
   // Get color intensity based on value
-  const getColorIntensity = (value) => {
+  const getColorIntensity = value => {
     if (range === 0) return 0.5;
     return (value - minValue) / range;
   };
@@ -82,9 +82,7 @@ const SensitivityHeatmap = ({
               <div /> {/* Empty corner */}
               {xAxisLabels.map((label, index) => (
                 <div key={index} className="text-center p-2">
-                  <span className="text-xs font-medium text-muted-foreground">
-                    {label}
-                  </span>
+                  <span className="text-xs font-medium text-muted-foreground">{label}</span>
                 </div>
               ))}
             </div>
@@ -113,7 +111,7 @@ const SensitivityHeatmap = ({
                       key={xIndex}
                       className="relative h-12 rounded-sm border border-gray-100 cursor-pointer transition-all duration-200 hover:border-gray-300"
                       style={{ backgroundColor }}
-                      onMouseEnter={(e) => {
+                      onMouseEnter={e => {
                         setHoveredCell({
                           x: xIndex,
                           y: yIndex,
@@ -128,9 +126,7 @@ const SensitivityHeatmap = ({
                         <span
                           className={cn(
                             'text-xs font-mono font-medium',
-                            Math.abs(value) > range * 0.6
-                              ? 'text-white'
-                              : 'text-gray-900'
+                            Math.abs(value) > range * 0.6 ? 'text-white' : 'text-gray-900'
                           )}
                         >
                           {formatCell(value)}

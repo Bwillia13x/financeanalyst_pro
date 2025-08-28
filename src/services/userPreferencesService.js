@@ -45,7 +45,7 @@ class UserPreferencesService {
       defaultTimeHorizon: '5Y',
       riskFreeRate: 0.03,
       marketRiskPremium: 0.07,
-      defaultDiscountRate: 0.10,
+      defaultDiscountRate: 0.1,
       confidenceLevel: 0.95,
 
       // Collaboration
@@ -487,9 +487,11 @@ class UserPreferencesService {
     }
 
     // Trigger preference change event
-    window.dispatchEvent(new CustomEvent('preferencesChanged', {
-      detail: preferences
-    }));
+    window.dispatchEvent(
+      new CustomEvent('preferencesChanged', {
+        detail: preferences
+      })
+    );
   }
 
   /**
@@ -576,7 +578,6 @@ class UserPreferencesService {
         workspacesObj[id] = workspace;
       });
       localStorage.setItem('financeanalyst_workspaces', JSON.stringify(workspacesObj));
-
     } catch (error) {
       console.error('Error saving to storage:', error);
     }
@@ -638,22 +639,46 @@ class UserPreferencesService {
       dashboard: {
         name: 'Dashboard & Layout',
         icon: 'Layout',
-        preferences: ['defaultView', 'sidebarCollapsed', 'gridSize', 'widgetAnimations', 'autoSaveInterval']
+        preferences: [
+          'defaultView',
+          'sidebarCollapsed',
+          'gridSize',
+          'widgetAnimations',
+          'autoSaveInterval'
+        ]
       },
       data: {
         name: 'Data & Analysis',
         icon: 'Database',
-        preferences: ['currency', 'dateFormat', 'numberFormat', 'precision', 'autoRefreshData', 'refreshInterval']
+        preferences: [
+          'currency',
+          'dateFormat',
+          'numberFormat',
+          'precision',
+          'autoRefreshData',
+          'refreshInterval'
+        ]
       },
       notifications: {
         name: 'Notifications',
         icon: 'Bell',
-        preferences: ['enableNotifications', 'emailNotifications', 'soundEffects', 'pushNotifications']
+        preferences: [
+          'enableNotifications',
+          'emailNotifications',
+          'soundEffects',
+          'pushNotifications'
+        ]
       },
       modeling: {
         name: 'Analysis & Modeling',
         icon: 'Calculator',
-        preferences: ['defaultTimeHorizon', 'riskFreeRate', 'marketRiskPremium', 'defaultDiscountRate', 'confidenceLevel']
+        preferences: [
+          'defaultTimeHorizon',
+          'riskFreeRate',
+          'marketRiskPremium',
+          'defaultDiscountRate',
+          'confidenceLevel'
+        ]
       },
       collaboration: {
         name: 'Collaboration',

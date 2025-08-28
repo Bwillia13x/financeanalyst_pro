@@ -11,7 +11,7 @@
  * @returns {Object} Normalized income statement
  */
 export const normalizeIncomeStatement = (raw = {}, options = {}) => {
-  const { 
+  const {
     scale = 1, // Scaling factor (e.g., 1000 for thousands)
     periods = 3, // Number of periods to include
     currency = 'USD'
@@ -23,57 +23,70 @@ export const normalizeIncomeStatement = (raw = {}, options = {}) => {
     return typeof value === 'number' ? value * scale : null;
   };
 
-  // Helper function to extract array of values
-  const extractArray = (field, count = periods) => {
-    if (Array.isArray(raw[field])) {
-      return raw[field].slice(0, count).map(v => typeof v === 'number' ? v * scale : null);
+  // Helper function to extract array of values with field variations
+  const extractArray = (fieldNames, count = periods) => {
+    if (!Array.isArray(fieldNames)) {
+      fieldNames = [fieldNames];
     }
-    const value = extractValue(field);
-    return value !== null ? [value] : [];
+
+    for (const field of fieldNames) {
+      if (Array.isArray(raw[field])) {
+        return raw[field].slice(0, count).map(v => {
+          if (typeof v === 'number') return v * scale;
+          if (v === 'N/A' || v === null || v === undefined) return null;
+          return null;
+        });
+      }
+      const value = extractValue(field);
+      if (value !== null) {
+        return [value];
+      }
+    }
+    return [];
   };
 
   return {
     currency,
-    periods: periods,
+    periods,
     scale,
-    
+
     // Revenue section
-    revenue: extractArray('revenue') || extractArray('totalRevenue') || extractArray('sales'),
-    costOfRevenue: extractArray('costOfRevenue') || extractArray('costOfSales') || extractArray('cogs'),
+    revenue: extractArray(['revenue', 'totalRevenue', 'sales']),
+    costOfRevenue: extractArray(['costOfRevenue', 'costOfSales', 'cogs']),
     grossProfit: extractArray('grossProfit'),
-    
+
     // Operating expenses
-    operatingExpenses: extractArray('operatingExpenses') || extractArray('totalOperatingExpenses'),
-    researchAndDevelopment: extractArray('researchAndDevelopment') || extractArray('rdExpenses'),
-    sellingGeneralAdministrative: extractArray('sellingGeneralAdministrative') || extractArray('sgaExpenses'),
-    
+    operatingExpenses: extractArray(['operatingExpenses', 'totalOperatingExpenses']),
+    researchAndDevelopment: extractArray(['researchAndDevelopment', 'rdExpenses']),
+    sellingGeneralAdministrative: extractArray(['sellingGeneralAdministrative', 'sgaExpenses']),
+
     // Operating income
-    operatingIncome: extractArray('operatingIncome') || extractArray('ebit'),
+    operatingIncome: extractArray(['operatingIncome', 'ebit']),
     ebitda: extractArray('ebitda'),
-    
+
     // Non-operating items
     interestExpense: extractArray('interestExpense'),
     interestIncome: extractArray('interestIncome'),
     otherIncomeExpense: extractArray('otherIncomeExpense'),
-    
+
     // Pre-tax and taxes
-    incomeBeforeTax: extractArray('incomeBeforeTax') || extractArray('pretaxIncome'),
-    incomeTaxExpense: extractArray('incomeTaxExpense') || extractArray('taxExpense'),
-    
+    incomeBeforeTax: extractArray(['incomeBeforeTax', 'pretaxIncome']),
+    incomeTaxExpense: extractArray(['incomeTaxExpense', 'taxExpense']),
+
     // Net income
-    netIncome: extractArray('netIncome') || extractArray('netIncomeCommon'),
+    netIncome: extractArray(['netIncome', 'netIncomeCommon']),
     netIncomeToCommon: extractArray('netIncomeToCommon'),
-    
+
     // Per share data
-    eps: extractArray('eps') || extractArray('earningsPerShare'),
+    eps: extractArray(['eps', 'earningsPerShare']),
     epsBasic: extractArray('epsBasic'),
     epsDiluted: extractArray('epsDiluted'),
-    
+
     // Share counts
-    sharesOutstanding: extractArray('sharesOutstanding') || extractArray('commonShares'),
+    sharesOutstanding: extractArray(['sharesOutstanding', 'commonShares']),
     sharesOutstandingBasic: extractArray('sharesOutstandingBasic'),
     sharesOutstandingDiluted: extractArray('sharesOutstandingDiluted'),
-    
+
     // Metadata
     source: raw.source || 'UNKNOWN',
     reportingCurrency: raw.reportingCurrency || currency,
@@ -88,65 +101,74 @@ export const normalizeIncomeStatement = (raw = {}, options = {}) => {
  * @returns {Object} Normalized balance sheet
  */
 export const normalizeBalanceSheet = (raw = {}, options = {}) => {
-  const { 
-    scale = 1,
-    periods = 3,
-    currency = 'USD'
-  } = options;
+  const { scale = 1, periods = 3, currency = 'USD' } = options;
 
   const extractValue = (field, period = 0) => {
     const value = raw[field]?.[period] ?? raw[field] ?? null;
     return typeof value === 'number' ? value * scale : null;
   };
 
-  const extractArray = (field, count = periods) => {
-    if (Array.isArray(raw[field])) {
-      return raw[field].slice(0, count).map(v => typeof v === 'number' ? v * scale : null);
+  const extractArray = (fieldNames, count = periods) => {
+    if (!Array.isArray(fieldNames)) {
+      fieldNames = [fieldNames];
     }
-    const value = extractValue(field);
-    return value !== null ? [value] : [];
+
+    for (const field of fieldNames) {
+      if (Array.isArray(raw[field])) {
+        return raw[field].slice(0, count).map(v => {
+          if (typeof v === 'number') return v * scale;
+          if (v === 'N/A' || v === null || v === undefined) return null;
+          return null;
+        });
+      }
+      const value = extractValue(field);
+      if (value !== null) {
+        return [value];
+      }
+    }
+    return [];
   };
 
   return {
     currency,
     periods,
     scale,
-    
+
     // Assets
     totalAssets: extractArray('totalAssets'),
     currentAssets: extractArray('currentAssets'),
-    cash: extractArray('cash') || extractArray('cashAndEquivalents'),
+    cash: extractArray(['cash', 'cashAndEquivalents']),
     shortTermInvestments: extractArray('shortTermInvestments'),
-    accountsReceivable: extractArray('accountsReceivable') || extractArray('receivables'),
+    accountsReceivable: extractArray(['accountsReceivable', 'receivables']),
     inventory: extractArray('inventory'),
     prepaidExpenses: extractArray('prepaidExpenses'),
     otherCurrentAssets: extractArray('otherCurrentAssets'),
-    
+
     // Non-current assets
     nonCurrentAssets: extractArray('nonCurrentAssets'),
-    propertyPlantEquipment: extractArray('propertyPlantEquipment') || extractArray('ppe'),
+    propertyPlantEquipment: extractArray(['propertyPlantEquipment', 'ppe']),
     goodwill: extractArray('goodwill'),
     intangibleAssets: extractArray('intangibleAssets'),
     longTermInvestments: extractArray('longTermInvestments'),
-    
+
     // Liabilities
     totalLiabilities: extractArray('totalLiabilities'),
     currentLiabilities: extractArray('currentLiabilities'),
-    accountsPayable: extractArray('accountsPayable') || extractArray('payables'),
+    accountsPayable: extractArray(['accountsPayable', 'payables']),
     shortTermDebt: extractArray('shortTermDebt'),
     accruedLiabilities: extractArray('accruedLiabilities'),
-    
+
     // Non-current liabilities
     nonCurrentLiabilities: extractArray('nonCurrentLiabilities'),
     longTermDebt: extractArray('longTermDebt'),
     deferredTaxLiabilities: extractArray('deferredTaxLiabilities'),
-    
+
     // Equity
-    totalEquity: extractArray('totalEquity') || extractArray('shareholderEquity'),
+    totalEquity: extractArray(['totalEquity', 'shareholderEquity']),
     retainedEarnings: extractArray('retainedEarnings'),
     additionalPaidInCapital: extractArray('additionalPaidInCapital'),
     treasuryStock: extractArray('treasuryStock'),
-    
+
     // Metadata
     source: raw.source || 'UNKNOWN',
     reportingCurrency: raw.reportingCurrency || currency,
@@ -161,51 +183,60 @@ export const normalizeBalanceSheet = (raw = {}, options = {}) => {
  * @returns {Object} Normalized cash flow statement
  */
 export const normalizeCashFlow = (raw = {}, options = {}) => {
-  const { 
-    scale = 1,
-    periods = 3,
-    currency = 'USD'
-  } = options;
+  const { scale = 1, periods = 3, currency = 'USD' } = options;
 
-  const extractArray = (field, count = periods) => {
-    if (Array.isArray(raw[field])) {
-      return raw[field].slice(0, count).map(v => typeof v === 'number' ? v * scale : null);
+  const extractArray = (fieldNames, count = periods) => {
+    if (!Array.isArray(fieldNames)) {
+      fieldNames = [fieldNames];
     }
-    const value = raw[field];
-    return typeof value === 'number' ? [value * scale] : [];
+
+    for (const field of fieldNames) {
+      if (Array.isArray(raw[field])) {
+        return raw[field].slice(0, count).map(v => {
+          if (typeof v === 'number') return v * scale;
+          if (v === 'N/A' || v === null || v === undefined) return null;
+          return null;
+        });
+      }
+      const value = raw[field];
+      if (typeof value === 'number') {
+        return [value * scale];
+      }
+    }
+    return [];
   };
 
   return {
     currency,
     periods,
     scale,
-    
+
     // Operating activities
-    operatingCashFlow: extractArray('operatingCashFlow') || extractArray('cashFromOperations'),
+    operatingCashFlow: extractArray(['operatingCashFlow', 'cashFromOperations']),
     netIncome: extractArray('netIncome'),
-    depreciationAmortization: extractArray('depreciationAmortization') || extractArray('depreciation'),
+    depreciationAmortization: extractArray(['depreciationAmortization', 'depreciation']),
     changeInWorkingCapital: extractArray('changeInWorkingCapital'),
     changeInReceivables: extractArray('changeInReceivables'),
     changeInInventory: extractArray('changeInInventory'),
     changeInPayables: extractArray('changeInPayables'),
-    
+
     // Investing activities
-    investingCashFlow: extractArray('investingCashFlow') || extractArray('cashFromInvesting'),
-    capitalExpenditures: extractArray('capitalExpenditures') || extractArray('capex'),
+    investingCashFlow: extractArray(['investingCashFlow', 'cashFromInvesting']),
+    capitalExpenditures: extractArray(['capitalExpenditures', 'capex']),
     acquisitions: extractArray('acquisitions'),
     investments: extractArray('investments'),
-    
+
     // Financing activities
-    financingCashFlow: extractArray('financingCashFlow') || extractArray('cashFromFinancing'),
+    financingCashFlow: extractArray(['financingCashFlow', 'cashFromFinancing']),
     dividendsPaid: extractArray('dividendsPaid'),
-    shareRepurchases: extractArray('shareRepurchases') || extractArray('buybacks'),
+    shareRepurchases: extractArray(['shareRepurchases', 'buybacks']),
     debtIssuance: extractArray('debtIssuance'),
     debtRepayment: extractArray('debtRepayment'),
-    
+
     // Net change in cash
     netChangeInCash: extractArray('netChangeInCash'),
     freeCashFlow: extractArray('freeCashFlow'),
-    
+
     // Metadata
     source: raw.source || 'UNKNOWN',
     reportingCurrency: raw.reportingCurrency || currency,
@@ -247,7 +278,7 @@ export const validateNormalizedData = (data, type) => {
         warnings.push('Net income data is missing');
       }
       break;
-      
+
     case 'balance':
       if (!data.totalAssets || data.totalAssets.length === 0) {
         errors.push('Total assets data is required for balance sheet');
@@ -259,7 +290,7 @@ export const validateNormalizedData = (data, type) => {
         warnings.push('Total equity data is missing');
       }
       break;
-      
+
     case 'cashflow':
       if (!data.operatingCashFlow || data.operatingCashFlow.length === 0) {
         warnings.push('Operating cash flow data is missing');

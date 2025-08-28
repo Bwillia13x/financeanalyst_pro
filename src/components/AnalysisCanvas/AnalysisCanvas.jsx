@@ -1,12 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  BarChart3,
-  Minimize2,
-  Calculator,
-  Target,
-  Search,
-  ChevronRight
-} from 'lucide-react';
+import { BarChart3, Minimize2, Calculator, Target, Search, ChevronRight } from 'lucide-react';
 import { useState, useCallback } from 'react';
 
 import { calculateEnhancedDCF } from '../../utils/dcfCalculations';
@@ -79,7 +72,7 @@ const AnalysisCanvas = () => {
   ];
 
   // Handle company selection with intelligent data population
-  const handleCompanySelect = useCallback(async(company) => {
+  const handleCompanySelect = useCallback(async company => {
     setSelectedCompany(company);
     setCanvasMode('analysis');
 
@@ -103,7 +96,7 @@ const AnalysisCanvas = () => {
   }, []);
 
   // Calculate historical growth rates for intelligent defaults
-  const calculateHistoricalGrowthRates = (revenueData) => {
+  const calculateHistoricalGrowthRates = revenueData => {
     if (!revenueData || revenueData.length < 2) return [];
 
     const growthRates = [];
@@ -117,16 +110,20 @@ const AnalysisCanvas = () => {
 
   // Generate intelligent defaults based on historical data and sector
   const generateIntelligentDefaults = (historicalGrowth, sector) => {
-    const avgGrowth = historicalGrowth.length > 0
-      ? historicalGrowth.reduce((a, b) => a + b, 0) / historicalGrowth.length
-      : 10;
+    const avgGrowth =
+      historicalGrowth.length > 0
+        ? historicalGrowth.reduce((a, b) => a + b, 0) / historicalGrowth.length
+        : 10;
 
     const sectorDefaults = getSectorDefaults(sector);
 
     const yearlyData = {};
     for (let year = 1; year <= 5; year++) {
       // Declining growth model
-      const yearGrowth = Math.max(avgGrowth * (1 - (year - 1) * 0.1), sectorDefaults.terminalGrowth);
+      const yearGrowth = Math.max(
+        avgGrowth * (1 - (year - 1) * 0.1),
+        sectorDefaults.terminalGrowth
+      );
 
       yearlyData[year] = {
         revenueGrowth: yearGrowth,
@@ -142,9 +139,9 @@ const AnalysisCanvas = () => {
   };
 
   // Sector-specific defaults
-  const getSectorDefaults = (sector) => {
+  const getSectorDefaults = sector => {
     const defaults = {
-      'Technology': {
+      Technology: {
         ebitdaMargin: 25,
         taxRate: 21,
         capexPercent: 3,
@@ -152,7 +149,7 @@ const AnalysisCanvas = () => {
         workingCapitalChange: 1,
         terminalGrowth: 3
       },
-      'Healthcare': {
+      Healthcare: {
         ebitdaMargin: 20,
         taxRate: 25,
         capexPercent: 4,
@@ -174,14 +171,14 @@ const AnalysisCanvas = () => {
   };
 
   // Add analysis module to canvas
-  const addModule = (moduleId) => {
+  const addModule = moduleId => {
     if (!activeModules.includes(moduleId)) {
       setActiveModules(prev => [...prev, moduleId]);
     }
   };
 
   // Remove module from canvas
-  const removeModule = (moduleId) => {
+  const removeModule = moduleId => {
     setActiveModules(prev => prev.filter(id => id !== moduleId));
     if (focusedModule === moduleId) {
       setFocusedModule(null);
@@ -190,24 +187,27 @@ const AnalysisCanvas = () => {
   };
 
   // Focus on specific module
-  const focusModule = (moduleId) => {
+  const focusModule = moduleId => {
     setFocusedModule(moduleId);
     setCanvasMode('focused');
   };
 
   // Update analysis inputs with real-time calculation
-  const updateAnalysisInputs = useCallback((moduleId, newInputs) => {
-    setAnalysisInputs(prev => ({
-      ...prev,
-      [moduleId]: { ...prev[moduleId], ...newInputs }
-    }));
+  const updateAnalysisInputs = useCallback(
+    (moduleId, newInputs) => {
+      setAnalysisInputs(prev => ({
+        ...prev,
+        [moduleId]: { ...prev[moduleId], ...newInputs }
+      }));
 
-    // Trigger real-time calculation
-    if (moduleId === 'dcf') {
-      const results = calculateEnhancedDCF({ ...analysisInputs.dcf, ...newInputs });
-      setAnalysisResults(prev => ({ ...prev, dcf: results }));
-    }
-  }, [analysisInputs]);
+      // Trigger real-time calculation
+      if (moduleId === 'dcf') {
+        const results = calculateEnhancedDCF({ ...analysisInputs.dcf, ...newInputs });
+        setAnalysisResults(prev => ({ ...prev, dcf: results }));
+      }
+    },
+    [analysisInputs]
+  );
 
   // Canvas layout variants
   const canvasVariants = {
@@ -247,18 +247,14 @@ const AnalysisCanvas = () => {
                   <Minimize2 size={20} />
                 </button>
                 <div>
-                  <h1 className="text-2xl font-light text-gray-900">
-                    {selectedCompany.name}
-                  </h1>
+                  <h1 className="text-2xl font-light text-gray-900">{selectedCompany.name}</h1>
                   <p className="text-sm text-gray-500">
                     {selectedCompany.sector} • {selectedCompany.ticker}
                   </p>
                 </div>
               </div>
             ) : (
-              <h1 className="text-2xl font-light text-gray-900">
-                Analysis Canvas
-              </h1>
+              <h1 className="text-2xl font-light text-gray-900">Analysis Canvas</h1>
             )}
 
             {/* Canvas Mode Controls */}
@@ -314,9 +310,7 @@ const AnalysisCanvas = () => {
                   <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-50 rounded-full mb-4">
                     <Search className="w-8 h-8 text-blue-600" />
                   </div>
-                  <h2 className="text-3xl font-light text-gray-900 mb-3">
-                    Begin Your Analysis
-                  </h2>
+                  <h2 className="text-3xl font-light text-gray-900 mb-3">Begin Your Analysis</h2>
                   <p className="text-lg text-gray-600">
                     Select a company to start building your financial model
                   </p>
@@ -360,7 +354,7 @@ const AnalysisCanvas = () => {
                 companyData={selectedCompany}
                 inputs={analysisInputs[focusedModule]}
                 results={analysisResults[focusedModule]}
-                onInputChange={(newInputs) => updateAnalysisInputs(focusedModule, newInputs)}
+                onInputChange={newInputs => updateAnalysisInputs(focusedModule, newInputs)}
                 isFullscreen={true}
               />
             </motion.div>
@@ -375,10 +369,7 @@ const AnalysisCanvas = () => {
               className="space-y-8"
             >
               {/* Company Overview Section */}
-              <CompanyOverview
-                company={selectedCompany}
-                compact={activeModules.length > 0}
-              />
+              <CompanyOverview company={selectedCompany} compact={activeModules.length > 0} />
 
               {/* Analysis Modules Grid */}
               {activeModules.length > 0 && (
@@ -397,7 +388,7 @@ const AnalysisCanvas = () => {
                         companyData={selectedCompany}
                         inputs={analysisInputs[moduleId]}
                         results={analysisResults[moduleId]}
-                        onInputChange={(newInputs) => updateAnalysisInputs(moduleId, newInputs)}
+                        onInputChange={newInputs => updateAnalysisInputs(moduleId, newInputs)}
                         onFocus={() => focusModule(moduleId)}
                         onRemove={() => removeModule(moduleId)}
                         isCompact={true}
@@ -409,9 +400,7 @@ const AnalysisCanvas = () => {
 
               {/* Available Modules */}
               <div className="border-t border-gray-100 pt-8">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">
-                  Available Analysis Tools
-                </h3>
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Available Analysis Tools</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {availableModules
                     .filter(module => !activeModules.includes(module.id))
@@ -425,15 +414,13 @@ const AnalysisCanvas = () => {
                           whileTap={{ scale: 0.98 }}
                           className="p-6 bg-white rounded-xl border border-gray-200 hover:border-gray-300 transition-all duration-200 text-left group"
                         >
-                          <div className={`inline-flex items-center justify-center w-12 h-12 bg-${module.color}-50 rounded-lg mb-3 group-hover:bg-${module.color}-100 transition-colors`}>
+                          <div
+                            className={`inline-flex items-center justify-center w-12 h-12 bg-${module.color}-50 rounded-lg mb-3 group-hover:bg-${module.color}-100 transition-colors`}
+                          >
                             <Icon className={`w-6 h-6 text-${module.color}-600`} />
                           </div>
-                          <h4 className="font-medium text-gray-900 mb-1">
-                            {module.name}
-                          </h4>
-                          <p className="text-sm text-gray-600">
-                            {module.description}
-                          </p>
+                          <h4 className="font-medium text-gray-900 mb-1">{module.name}</h4>
+                          <p className="text-sm text-gray-600">{module.description}</p>
                         </motion.button>
                       );
                     })}

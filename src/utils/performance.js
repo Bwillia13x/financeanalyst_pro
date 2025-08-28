@@ -3,26 +3,30 @@
  * Tools for monitoring and optimizing application performance
  */
 
-import React from 'react';
+import { useEffect, createElement } from 'react';
 
 // Performance metrics collection
 export class PerformanceMonitor {
   constructor() {
     this.metrics = new Map();
     this.observers = new Map();
-    this.isSupported = typeof window !== 'undefined' && 'performance' in window;
+    this.perf =
+      typeof globalThis !== 'undefined' && globalThis.performance
+        ? globalThis.performance
+        : undefined;
+    this.isSupported = !!this.perf;
   }
 
   // Start timing a operation
   startTiming(name) {
     if (!this.isSupported) return;
 
-    const startTime = performance.now();
+    const startTime = this.perf.now();
     this.metrics.set(name, { startTime, endTime: null, duration: null });
 
     // Also use Performance API mark if available
-    if (performance.mark) {
-      performance.mark(`${name}-start`);
+    if (this.perf.mark) {
+      this.perf.mark(`${name}-start`);
     }
   }
 
@@ -30,7 +34,7 @@ export class PerformanceMonitor {
   endTiming(name) {
     if (!this.isSupported) return null;
 
-    const endTime = performance.now();
+    const endTime = this.perf.now();
     const metric = this.metrics.get(name);
 
     if (!metric) {
@@ -43,9 +47,9 @@ export class PerformanceMonitor {
     metric.duration = duration;
 
     // Use Performance API measure if available
-    if (performance.mark && performance.measure) {
-      performance.mark(`${name}-end`);
-      performance.measure(name, `${name}-start`, `${name}-end`);
+    if (this.perf.mark && this.perf.measure) {
+      this.perf.mark(`${name}-end`);
+      this.perf.measure(name, `${name}-start`, `${name}-end`);
     }
 
     return duration;
@@ -64,11 +68,11 @@ export class PerformanceMonitor {
   // Clear metrics
   clearMetrics() {
     this.metrics.clear();
-    if (performance.clearMarks) {
-      performance.clearMarks();
+    if (this.perf && this.perf.clearMarks) {
+      this.perf.clearMarks();
     }
-    if (performance.clearMeasures) {
-      performance.clearMeasures();
+    if (this.perf && this.perf.clearMeasures) {
+      this.perf.clearMeasures();
     }
   }
 
@@ -230,7 +234,7 @@ export const withPerformanceMonitoring = (WrappedComponent, componentName) => {
   return function PerformanceMonitoredComponent(props) {
     const monitor = new PerformanceMonitor();
 
-    React.useEffect(() => {
+    useEffect(() => {
       monitor.startTiming(`${componentName}-mount`);
 
       return () => {
@@ -245,7 +249,7 @@ export const withPerformanceMonitoring = (WrappedComponent, componentName) => {
       };
     }, []);
 
-    return React.createElement(WrappedComponent, props);
+    return createElement(WrappedComponent, props);
   };
 };
 
@@ -267,7 +271,7 @@ export const debounce = (func, wait, immediate = false) => {
 // Throttle utility for performance
 export const throttle = (func, limit) => {
   let inThrottle;
-  return function(...args) {
+  return function (...args) {
     if (!inThrottle) {
       func.apply(this, args);
       inThrottle = true;

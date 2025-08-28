@@ -10,13 +10,25 @@ class ComputerVisionService extends EventEmitter {
     super();
     this.models = {
       chart_recognition: {
-        cnn_classifier: { accuracy: 0.92, chart_types: ['line', 'bar', 'pie', 'scatter', 'candlestick'] },
-        object_detection: { accuracy: 0.89, detectable_elements: ['axes', 'legends', 'data_points', 'annotations'] },
+        cnn_classifier: {
+          accuracy: 0.92,
+          chart_types: ['line', 'bar', 'pie', 'scatter', 'candlestick']
+        },
+        object_detection: {
+          accuracy: 0.89,
+          detectable_elements: ['axes', 'legends', 'data_points', 'annotations']
+        },
         ocr_engine: { accuracy: 0.94, languages: ['en', 'es', 'fr', 'de', 'zh'] }
       },
       document_processing: {
-        layout_detection: { accuracy: 0.91, elements: ['tables', 'paragraphs', 'headers', 'figures'] },
-        table_extraction: { accuracy: 0.87, formats: ['financial_statements', 'data_tables', 'schedules'] },
+        layout_detection: {
+          accuracy: 0.91,
+          elements: ['tables', 'paragraphs', 'headers', 'figures']
+        },
+        table_extraction: {
+          accuracy: 0.87,
+          formats: ['financial_statements', 'data_tables', 'schedules']
+        },
         signature_verification: { accuracy: 0.95, false_positive_rate: 0.02 }
       },
       anomaly_detection: {
@@ -28,7 +40,7 @@ class ComputerVisionService extends EventEmitter {
 
     this.chartTypes = {
       line_chart: { data_extraction: 'continuous', accuracy: 0.93 },
-      bar_chart: { data_extraction: 'categorical', accuracy: 0.90 },
+      bar_chart: { data_extraction: 'categorical', accuracy: 0.9 },
       pie_chart: { data_extraction: 'proportional', accuracy: 0.88 },
       scatter_plot: { data_extraction: 'bivariate', accuracy: 0.91 },
       candlestick: { data_extraction: 'ohlc', accuracy: 0.89 },
@@ -38,7 +50,10 @@ class ComputerVisionService extends EventEmitter {
     this.documentTypes = {
       financial_statements: {
         balance_sheet: { structure: 'tabular', key_sections: ['assets', 'liabilities', 'equity'] },
-        income_statement: { structure: 'linear', key_sections: ['revenue', 'expenses', 'net_income'] },
+        income_statement: {
+          structure: 'linear',
+          key_sections: ['revenue', 'expenses', 'net_income']
+        },
         cash_flow: { structure: 'sectioned', key_sections: ['operating', 'investing', 'financing'] }
       },
       regulatory_filings: {
@@ -72,11 +87,11 @@ class ComputerVisionService extends EventEmitter {
 
   async classifyChart(imageData) {
     const imageBuffer = imageData.buffer || imageData.data;
-    
+
     // Simulate CNN-based chart classification
     const features = this.extractVisualFeatures(imageBuffer);
     const classification = this.performChartClassification(features);
-    
+
     return {
       chart_type: classification.primary_type,
       confidence: classification.confidence,
@@ -88,8 +103,8 @@ class ComputerVisionService extends EventEmitter {
 
   async extractChartData(imageData) {
     const chartType = await this.classifyChart(imageData);
-    const extractionMethod = this.chartTypes[chartType.chart_type];
-    
+    const _extractionMethod = this.chartTypes[chartType.chart_type];
+
     let extractedData;
     switch (chartType.chart_type) {
       case 'line_chart':
@@ -125,7 +140,7 @@ class ComputerVisionService extends EventEmitter {
     const axes = await this.detectAxes(imageData);
     const dataPoints = await this.detectDataPoints(imageData);
     const lines = await this.traceLine(dataPoints);
-    
+
     return {
       x_axis: {
         label: axes.x_label,
@@ -146,10 +161,36 @@ class ComputerVisionService extends EventEmitter {
     };
   }
 
-  async extractBarChartData(imageData) {
-    const axes = await this.detectAxes(imageData);
-    const bars = await this.detectBars(imageData);
-    
+  async extractPieChartData(_imageData) {
+    // Simulate pie chart data extraction
+    const axes = await this.detectAxes(_imageData);
+    const dataPoints = await this.detectDataPoints(_imageData);
+    const lines = await this.traceLine(dataPoints);
+
+    return {
+      x_axis: {
+        label: axes.x_label,
+        scale: axes.x_scale,
+        range: axes.x_range
+      },
+      y_axis: {
+        label: axes.y_label,
+        scale: axes.y_scale,
+        range: axes.y_range
+      },
+      data_series: lines.map(line => ({
+        name: line.series_name,
+        points: line.coordinates,
+        trend: this.calculateTrend(line.coordinates),
+        statistics: this.calculateSeriesStatistics(line.coordinates)
+      }))
+    };
+  }
+
+  async extractBarChartData(_imageData) {
+    const axes = await this.detectAxes(_imageData);
+    const bars = await this.detectBars(_imageData);
+
     return {
       categories: bars.map(bar => bar.category),
       values: bars.map(bar => bar.value),
@@ -187,9 +228,9 @@ class ComputerVisionService extends EventEmitter {
     }
   }
 
-  async analyzeDocumentLayout(documentData) {
-    const layout = this.performLayoutDetection(documentData);
-    
+  async analyzeDocumentLayout(_documentData) {
+    const layout = this.performLayoutDetection(_documentData);
+
     return {
       document_type: this.classifyDocumentType(layout),
       page_structure: this.analyzePageStructure(layout),
@@ -199,10 +240,10 @@ class ComputerVisionService extends EventEmitter {
     };
   }
 
-  async extractText(documentData) {
-    const ocrResults = await this.performOCR(documentData);
+  async generateInterpretation(_documentData) {
+    const ocrResults = await this.performOCR(_documentData);
     const enhancedText = this.enhanceTextExtraction(ocrResults);
-    
+
     return {
       raw_text: ocrResults.text,
       confidence_scores: ocrResults.confidences,
@@ -220,11 +261,11 @@ class ComputerVisionService extends EventEmitter {
   async extractTables(documentData) {
     const tableRegions = await this.detectTableRegions(documentData);
     const extractedTables = [];
-    
+
     for (const region of tableRegions) {
       const tableData = await this.extractTableData(region);
       const structuredTable = this.structureTableData(tableData);
-      
+
       extractedTables.push({
         region: region.bounds,
         table_type: this.classifyTableType(structuredTable),
@@ -237,7 +278,7 @@ class ComputerVisionService extends EventEmitter {
         }
       });
     }
-    
+
     return {
       tables_detected: tableRegions.length,
       extracted_tables: extractedTables,
@@ -270,15 +311,15 @@ class ComputerVisionService extends EventEmitter {
   async detectStatisticalAnomalies(visualData) {
     const dataPoints = visualData.data_points || [];
     const statistics = this.calculateDataStatistics(dataPoints);
-    
+
     const anomalies = [];
     const zScoreThreshold = 2.5;
     const iqrMultiplier = 1.5;
-    
+
     dataPoints.forEach((point, index) => {
       const zScore = Math.abs((point.value - statistics.mean) / statistics.std_dev);
       const isIQROutlier = this.isIQROutlier(point.value, statistics.quartiles, iqrMultiplier);
-      
+
       if (zScore > zScoreThreshold || isIQROutlier) {
         anomalies.push({
           index,
@@ -290,10 +331,10 @@ class ComputerVisionService extends EventEmitter {
         });
       }
     });
-    
+
     return {
       anomalies_detected: anomalies.length,
-      anomalies: anomalies,
+      anomalies,
       data_statistics: statistics,
       detection_parameters: {
         z_score_threshold: zScoreThreshold,
@@ -306,7 +347,7 @@ class ComputerVisionService extends EventEmitter {
     const patterns = this.extractPatterns(visualData);
     const expectedPatterns = this.generateExpectedPatterns(visualData);
     const anomalies = [];
-    
+
     patterns.forEach(pattern => {
       const deviation = this.calculatePatternDeviation(pattern, expectedPatterns);
       if (deviation.significance > 0.7) {
@@ -318,7 +359,7 @@ class ComputerVisionService extends EventEmitter {
         });
       }
     });
-    
+
     return {
       pattern_anomalies: anomalies,
       pattern_analysis: patterns,
@@ -337,7 +378,7 @@ class ComputerVisionService extends EventEmitter {
       volume_patterns: await this.identifyVolumePatterns(chartData),
       support_resistance: await this.identifySupportResistance(chartData)
     };
-    
+
     return {
       recognized_patterns: patterns,
       pattern_confidence: this.calculatePatternConfidence(patterns),
@@ -367,10 +408,9 @@ class ComputerVisionService extends EventEmitter {
       scatter_plot: this.calculateScatterScore(features),
       candlestick: this.calculateCandlestickScore(features)
     };
-    
-    const sortedTypes = Object.entries(scores)
-      .sort(([,a], [,b]) => b - a);
-    
+
+    const sortedTypes = Object.entries(scores).sort(([, a], [, b]) => b - a);
+
     return {
       primary_type: sortedTypes[0][0],
       confidence: sortedTypes[0][1],
@@ -394,7 +434,7 @@ class ComputerVisionService extends EventEmitter {
     return Math.min(score, 1.0);
   }
 
-  async detectAxes(imageData) {
+  async detectAxes(_imageData) {
     // Simulate axes detection
     return {
       x_label: 'Time Period',
@@ -406,7 +446,7 @@ class ComputerVisionService extends EventEmitter {
     };
   }
 
-  async detectDataPoints(imageData) {
+  async detectDataPoints(_imageData) {
     // Simulate data point detection
     const points = [];
     for (let i = 0; i < 20; i++) {
@@ -424,12 +464,12 @@ class ComputerVisionService extends EventEmitter {
     const mean = values.reduce((sum, v) => sum + v, 0) / values.length;
     const variance = values.reduce((sum, v) => sum + Math.pow(v - mean, 2), 0) / values.length;
     const stdDev = Math.sqrt(variance);
-    
+
     const sorted = [...values].sort((a, b) => a - b);
     const q1 = sorted[Math.floor(sorted.length * 0.25)];
     const q2 = sorted[Math.floor(sorted.length * 0.5)];
     const q3 = sorted[Math.floor(sorted.length * 0.75)];
-    
+
     return {
       mean,
       std_dev: stdDev,
@@ -453,11 +493,12 @@ class ComputerVisionService extends EventEmitter {
     return 'low';
   }
 
-  performOCR(documentData) {
+  performOCR(_documentData) {
     // Simulate OCR processing
-    const mockText = "FINANCIAL STATEMENT\nRevenue: $1,000,000\nExpenses: $750,000\nNet Income: $250,000";
+    const mockText =
+      'FINANCIAL STATEMENT\nRevenue: $1,000,000\nExpenses: $750,000\nNet Income: $250,000';
     const mockConfidences = [0.95, 0.92, 0.88, 0.94];
-    
+
     return {
       text: mockText,
       confidences: mockConfidences,
@@ -477,68 +518,192 @@ class ComputerVisionService extends EventEmitter {
   }
 
   // Additional helper methods would be implemented here...
-  identifyVisualElements() { /* Implementation */ }
-  calculateComplexityScore() { /* Implementation */ }
-  extractPieChartData() { /* Implementation */ }
-  extractScatterPlotData() { /* Implementation */ }
-  extractCandlestickData() { /* Implementation */ }
-  extractGenericChartData() { /* Implementation */ }
-  detectBars() { /* Implementation */ }
-  traceLine() { /* Implementation */ }
-  calculateTrend() { /* Implementation */ }
-  calculateSeriesStatistics() { /* Implementation */ }
-  assessDataQuality() { /* Implementation */ }
-  calculateExtractionConfidence() { /* Implementation */ }
-  formatStructuredData() { /* Implementation */ }
-  assessImageQuality() { /* Implementation */ }
-  extractChartMetadata() { /* Implementation */ }
-  validateExtraction() { /* Implementation */ }
-  performLayoutDetection() { /* Implementation */ }
-  classifyDocumentType() { /* Implementation */ }
-  analyzePageStructure() { /* Implementation */ }
-  identifyContentRegions() { /* Implementation */ }
-  determineReadingOrder() { /* Implementation */ }
-  assessLayoutQuality() { /* Implementation */ }
-  enhanceTextExtraction() { /* Implementation */ }
-  detectLanguage() { /* Implementation */ }
-  performSpellCheck() { /* Implementation */ }
-  performGrammarCheck() { /* Implementation */ }
-  restoreFormatting() { /* Implementation */ }
-  detectTableRegions() { /* Implementation */ }
-  extractTableData() { /* Implementation */ }
-  structureTableData() { /* Implementation */ }
-  classifyTableType() { /* Implementation */ }
-  calculateTableConfidence() { /* Implementation */ }
-  identifyFinancialTables() { /* Implementation */ }
-  validateTableData() { /* Implementation */ }
-  detectSignatures() { /* Implementation */ }
-  enhanceDocumentQuality() { /* Implementation */ }
-  detectTemporalAnomalies() { /* Implementation */ }
-  detectFraudIndicators() { /* Implementation */ }
-  assessAnomalyRisk() { /* Implementation */ }
-  extractPatterns() { /* Implementation */ }
-  generateExpectedPatterns() { /* Implementation */ }
-  calculatePatternDeviation() { /* Implementation */ }
-  assessPatternImpact() { /* Implementation */ }
-  comparePatterns() { /* Implementation */ }
-  identifyTrendPatterns() { /* Implementation */ }
-  identifyReversalPatterns() { /* Implementation */ }
-  identifyContinuationPatterns() { /* Implementation */ }
-  identifyVolumePatterns() { /* Implementation */ }
-  identifySupportResistance() { /* Implementation */ }
-  calculatePatternConfidence() { /* Implementation */ }
-  generateTradingSignals() { /* Implementation */ }
-  identifyRiskIndicators() { /* Implementation */ }
-  detectEdges() { /* Implementation */ }
-  detectShapes() { /* Implementation */ }
-  analyzeColorDistribution() { /* Implementation */ }
-  analyzeTexture() { /* Implementation */ }
-  detectContours() { /* Implementation */ }
-  calculatePieChartScore() { /* Implementation */ }
-  calculateScatterScore() { /* Implementation */ }
-  calculateCandlestickScore() { /* Implementation */ }
-  getAnomalyContext() { /* Implementation */ }
-  generateLineBoxes() { /* Implementation */ }
+  identifyVisualElements() {
+    /* Implementation */
+  }
+  calculateComplexityScore() {
+    /* Implementation */
+  }
+  extractPieChartDataHelper() {
+    /* Implementation */
+  }
+  extractScatterPlotData() {
+    /* Implementation */
+  }
+  extractCandlestickData() {
+    /* Implementation */
+  }
+  extractGenericChartData() {
+    /* Implementation */
+  }
+  detectBars() {
+    /* Implementation */
+  }
+  traceLine() {
+    /* Implementation */
+  }
+  calculateTrend() {
+    /* Implementation */
+  }
+  calculateSeriesStatistics() {
+    /* Implementation */
+  }
+  assessDataQuality() {
+    /* Implementation */
+  }
+  calculateExtractionConfidence() {
+    /* Implementation */
+  }
+  formatStructuredData() {
+    /* Implementation */
+  }
+  assessImageQuality() {
+    /* Implementation */
+  }
+  extractChartMetadata() {
+    /* Implementation */
+  }
+  validateExtraction() {
+    /* Implementation */
+  }
+  performLayoutDetection() {
+    /* Implementation */
+  }
+  classifyDocumentType() {
+    /* Implementation */
+  }
+  analyzePageStructure() {
+    /* Implementation */
+  }
+  identifyContentRegions() {
+    /* Implementation */
+  }
+  determineReadingOrder() {
+    /* Implementation */
+  }
+  assessLayoutQuality() {
+    /* Implementation */
+  }
+  enhanceTextExtraction() {
+    /* Implementation */
+  }
+  detectLanguage() {
+    /* Implementation */
+  }
+  performSpellCheck() {
+    /* Implementation */
+  }
+  performGrammarCheck() {
+    /* Implementation */
+  }
+  restoreFormatting() {
+    /* Implementation */
+  }
+  detectTableRegions() {
+    /* Implementation */
+  }
+  extractTableData() {
+    /* Implementation */
+  }
+  structureTableData() {
+    /* Implementation */
+  }
+  classifyTableType() {
+    /* Implementation */
+  }
+  calculateTableConfidence() {
+    /* Implementation */
+  }
+  identifyFinancialTables() {
+    /* Implementation */
+  }
+  validateTableData() {
+    /* Implementation */
+  }
+  detectSignatures() {
+    /* Implementation */
+  }
+  enhanceDocumentQuality() {
+    /* Implementation */
+  }
+  detectTemporalAnomalies() {
+    /* Implementation */
+  }
+  detectFraudIndicators() {
+    /* Implementation */
+  }
+  assessAnomalyRisk() {
+    /* Implementation */
+  }
+  extractPatterns() {
+    /* Implementation */
+  }
+  generateExpectedPatterns() {
+    /* Implementation */
+  }
+  calculatePatternDeviation() {
+    /* Implementation */
+  }
+  assessPatternImpact() {
+    /* Implementation */
+  }
+  comparePatterns() {
+    /* Implementation */
+  }
+  identifyTrendPatterns() {
+    /* Implementation */
+  }
+  identifyReversalPatterns() {
+    /* Implementation */
+  }
+  identifyContinuationPatterns() {
+    /* Implementation */
+  }
+  identifyVolumePatterns() {
+    /* Implementation */
+  }
+  identifySupportResistance() {
+    /* Implementation */
+  }
+  calculatePatternConfidence() {
+    /* Implementation */
+  }
+  generateTradingSignals() {
+    /* Implementation */
+  }
+  identifyRiskIndicators() {
+    /* Implementation */
+  }
+  detectEdges() {
+    /* Implementation */
+  }
+  detectShapes() {
+    /* Implementation */
+  }
+  analyzeColorDistribution() {
+    /* Implementation */
+  }
+  analyzeTexture() {
+    /* Implementation */
+  }
+  detectContours() {
+    /* Implementation */
+  }
+  calculatePieChartScore() {
+    /* Implementation */
+  }
+  calculateScatterScore() {
+    /* Implementation */
+  }
+  calculateCandlestickScore() {
+    /* Implementation */
+  }
+  getAnomalyContext() {
+    /* Implementation */
+  }
+  generateLineBoxes() {
+    /* Implementation */
+  }
 }
 
 export default new ComputerVisionService();

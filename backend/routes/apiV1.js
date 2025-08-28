@@ -3,28 +3,24 @@
  * RESTful API endpoints for Phase 3 ecosystem integration
  */
 
+const cors = require('cors');
 const express = require('express');
 const rateLimit = require('express-rate-limit');
-const helmet = require('helmet');
-const cors = require('cors');
 const { body, param, query, validationResult } = require('express-validator');
+const helmet = require('helmet');
 
 // Import specialized analytics services
-const bankingAnalytics = require('../../src/services/analytics/bankingAnalytics');
-const realEstateAnalytics = require('../../src/services/analytics/realEstateAnalytics');
-const healthcareAnalytics = require('../../src/services/analytics/healthcareAnalytics');
-const energyAnalytics = require('../../src/services/analytics/energyAnalytics');
-const technologyAnalytics = require('../../src/services/analytics/technologyAnalytics');
-
-// Import AI/ML services
-const predictiveAnalytics = require('../../src/services/ai/predictiveAnalytics');
-const nlpService = require('../../src/services/ai/nlpService');
 const computerVision = require('../../src/services/ai/computerVision');
-
-// Import Phase 2 services
-const dataVisualization = require('../../src/services/visualization/dataVisualizationComponents');
-const exportSharing = require('../../src/services/sharing/exportSharingService');
+const nlpService = require('../../src/services/ai/nlpService');
+const predictiveAnalytics = require('../../src/services/ai/predictiveAnalytics');
+const bankingAnalytics = require('../../src/services/analytics/bankingAnalytics');
+const energyAnalytics = require('../../src/services/analytics/energyAnalytics');
+const healthcareAnalytics = require('../../src/services/analytics/healthcareAnalytics');
+const realEstateAnalytics = require('../../src/services/analytics/realEstateAnalytics');
+const technologyAnalytics = require('../../src/services/analytics/technologyAnalytics');
 const collaboration = require('../../src/services/collaboration/realTimeCollaboration');
+const exportSharing = require('../../src/services/sharing/exportSharingService');
+const dataVisualization = require('../../src/services/visualization/dataVisualizationComponents');
 
 const router = express.Router();
 
@@ -56,20 +52,20 @@ router.use('/', generalLimit);
 const authenticateAPI = (req, res, next) => {
   const apiKey = req.header('X-API-Key') || req.query.api_key;
   const authHeader = req.header('Authorization');
-  
+
   if (!apiKey && !authHeader) {
     return res.status(401).json({ error: 'API key or authorization token required' });
   }
-  
+
   // Validate API key or JWT token
   if (apiKey && !validateAPIKey(apiKey)) {
     return res.status(401).json({ error: 'Invalid API key' });
   }
-  
+
   if (authHeader && !validateJWT(authHeader)) {
     return res.status(401).json({ error: 'Invalid authorization token' });
   }
-  
+
   req.apiKey = apiKey;
   req.userId = extractUserFromAuth(apiKey || authHeader);
   next();
@@ -100,25 +96,25 @@ router.get('/companies/:id/financials',
   query('period').optional().isIn(['annual', 'quarterly']),
   query('years').optional().isInt({ min: 1, max: 10 }),
   handleValidation,
-  async (req, res) => {
+  async(req, res) => {
     try {
       const { id } = req.params;
       const { period = 'annual', years = 5 } = req.query;
-      
+
       const financials = await getCompanyFinancials(id, { period, years });
-      
+
       res.json({
         success: true,
         data: {
-          company_id: id,
+          companyId: id,
           period,
-          years_requested: years,
+          yearsRequested: years,
           financials
         },
         metadata: {
-          request_id: generateRequestId(),
+          requestId: generateRequestId(),
           timestamp: new Date().toISOString(),
-          api_version: '1.0'
+          apiVersion: '1.0'
         }
       });
     } catch (error) {
@@ -132,19 +128,19 @@ router.get('/markets/indices',
   query('symbols').optional().isString(),
   query('period').optional().isIn(['1d', '5d', '1m', '3m', '1y', '5y']),
   handleValidation,
-  async (req, res) => {
+  async(req, res) => {
     try {
       const { symbols, period = '1y' } = req.query;
       const symbolList = symbols ? symbols.split(',') : ['SPY', 'QQQ', 'DIA', 'IWM'];
-      
+
       const marketData = await getMarketIndices(symbolList, period);
-      
+
       res.json({
         success: true,
         data: {
           symbols: symbolList,
           period,
-          market_data: marketData
+          marketData
         }
       });
     } catch (error) {
@@ -157,15 +153,15 @@ router.get('/markets/indices',
 router.get('/analysis/:id/results',
   param('id').isUUID(),
   handleValidation,
-  async (req, res) => {
+  async(req, res) => {
     try {
       const { id } = req.params;
       const analysis = await getAnalysisResults(id, req.userId);
-      
+
       if (!analysis) {
         return res.status(404).json({ error: 'Analysis not found' });
       }
-      
+
       res.json({
         success: true,
         data: analysis
@@ -182,23 +178,23 @@ router.post('/models/dcf/calculate',
   body('assumptions').isObject(),
   body('scenarios').optional().isArray(),
   handleValidation,
-  async (req, res) => {
+  async(req, res) => {
     try {
-      const { company_id, assumptions, scenarios = ['base'] } = req.body;
-      
+      const { companyId, assumptions, scenarios = ['base'] } = req.body;
+
       const dcfResults = await calculateDCF({
-        companyId: company_id,
+        companyId,
         assumptions,
         scenarios,
         userId: req.userId
       });
-      
+
       res.json({
         success: true,
         data: dcfResults,
         metadata: {
-          calculation_time: dcfResults.metadata.calculation_time,
-          model_version: dcfResults.metadata.model_version
+          calculationTime: dcfResults.metadata.calculationTime,
+          modelVersion: dcfResults.metadata.modelVersion
         }
       });
     } catch (error) {
@@ -212,21 +208,21 @@ router.get('/benchmarks/industry/:sector',
   param('sector').isString().notEmpty(),
   query('metrics').optional().isString(),
   handleValidation,
-  async (req, res) => {
+  async(req, res) => {
     try {
       const { sector } = req.params;
       const { metrics } = req.query;
       const metricList = metrics ? metrics.split(',') : null;
-      
+
       const benchmarks = await getIndustryBenchmarks(sector, metricList);
-      
+
       res.json({
         success: true,
         data: {
           sector,
           benchmarks,
-          data_sources: benchmarks.metadata.sources,
-          last_updated: benchmarks.metadata.last_updated
+          dataSources: benchmarks.metadata.sources,
+          lastUpdated: benchmarks.metadata.lastUpdated
         }
       });
     } catch (error) {
@@ -244,34 +240,34 @@ router.post('/analytics/specialized/banking/credit-portfolio',
   body('portfolio_data').isObject(),
   body('analysis_type').isIn(['risk_assessment', 'basel3_compliance', 'cecl_calculation', 'stress_testing']),
   handleValidation,
-  async (req, res) => {
+  async(req, res) => {
     try {
-      const { portfolio_data, analysis_type } = req.body;
-      
+      const { portfolioData, analysisType } = req.body;
+
       let results;
-      switch (analysis_type) {
+      switch (analysisType) {
         case 'risk_assessment':
-          results = await bankingAnalytics.performRiskAssessment(portfolio_data);
+          results = await bankingAnalytics.performRiskAssessment(portfolioData);
           break;
         case 'basel3_compliance':
-          results = await bankingAnalytics.checkBasel3Compliance(portfolio_data);
+          results = await bankingAnalytics.checkBasel3Compliance(portfolioData);
           break;
         case 'cecl_calculation':
-          results = await bankingAnalytics.calculateCECL(portfolio_data);
+          results = await bankingAnalytics.calculateCECL(portfolioData);
           break;
         case 'stress_testing':
-          results = await bankingAnalytics.runStressTests(portfolio_data);
+          results = await bankingAnalytics.runStressTests(portfolioData);
           break;
       }
-      
+
       res.json({
         success: true,
         data: {
-          analysis_type,
+          analysisType,
           results,
-          portfolio_summary: {
-            total_exposure: portfolio_data.total_exposure,
-            loan_count: portfolio_data.loans?.length || 0
+          portfolioSummary: {
+            totalExposure: portfolioData.totalExposure,
+            loanCount: portfolioData.loans?.length || 0
           }
         }
       });
@@ -286,30 +282,30 @@ router.post('/analytics/specialized/real-estate/property-valuation',
   body('property_data').isObject(),
   body('valuation_methods').optional().isArray(),
   handleValidation,
-  async (req, res) => {
+  async(req, res) => {
     try {
-      const { property_data, valuation_methods = ['dcf', 'cap_rate', 'comparable_sales'] } = req.body;
-      
-      const analysis = await realEstateAnalytics.analyzeProperty(property_data);
-      
+      const { propertyData, valuationMethods = ['dcf', 'cap_rate', 'comparable_sales'] } = req.body;
+
+      const analysis = await realEstateAnalytics.analyzeProperty(propertyData);
+
       // Filter results based on requested methods
       const filteredResults = {};
-      valuation_methods.forEach(method => {
+      valuationMethods.forEach(method => {
         if (analysis[method + '_analysis'] || analysis[method + '_valuation']) {
           filteredResults[method] = analysis[method + '_analysis'] || analysis[method + '_valuation'];
         }
       });
-      
+
       res.json({
         success: true,
         data: {
-          property_id: property_data.id,
-          valuation_methods,
+          propertyId: propertyData.id,
+          valuationMethods,
           results: filteredResults,
           summary: {
-            property_type: property_data.property_type,
-            location: property_data.location,
-            square_footage: property_data.square_footage
+            propertyType: propertyData.propertyType,
+            location: propertyData.location,
+            squareFootage: propertyData.squareFootage
           }
         }
       });
@@ -324,26 +320,26 @@ router.post('/analytics/specialized/healthcare/drug-pipeline',
   body('pipeline_data').isObject(),
   body('analysis_scope').optional().isArray(),
   handleValidation,
-  async (req, res) => {
+  async(req, res) => {
     try {
-      const { pipeline_data, analysis_scope = ['valuation', 'clinical_trials', 'regulatory_risk'] } = req.body;
-      
-      const analysis = await healthcareAnalytics.modelDrugPipeline(pipeline_data);
-      
+      const { pipelineData, analysisScope = ['valuation', 'clinical_trials', 'regulatory_risk'] } = req.body;
+
+      const analysis = await healthcareAnalytics.modelDrugPipeline(pipelineData);
+
       // Filter analysis based on scope
       const filteredAnalysis = {};
-      analysis_scope.forEach(scope => {
+      analysisScope.forEach(scope => {
         if (analysis[scope] || analysis[scope.replace('_', '_')]) {
           filteredAnalysis[scope] = analysis[scope] || analysis[scope.replace('_', '_')];
         }
       });
-      
+
       res.json({
         success: true,
         data: {
-          pipeline_overview: {
-            program_count: pipeline_data.programs?.length || 0,
-            therapeutic_areas: [...new Set(pipeline_data.programs?.map(p => p.therapeutic_area) || [])]
+          pipelineOverview: {
+            programCount: pipelineData.programs?.length || 0,
+            therapeuticAreas: [...new Set(pipelineData.programs?.map(p => p.therapeuticArea) || [])]
           },
           analysis: filteredAnalysis
         }
@@ -359,21 +355,21 @@ router.post('/analytics/specialized/energy/reserves-valuation',
   body('asset_data').isObject(),
   body('valuation_methods').optional().isArray(),
   handleValidation,
-  async (req, res) => {
+  async(req, res) => {
     try {
-      const { asset_data, valuation_methods = ['pv10', 'pv15', 'risked_value'] } = req.body;
-      
-      const analysis = await energyAnalytics.performReserveValuation(asset_data);
-      
+      const { assetData, valuationMethods = ['pv10', 'pv15', 'risked_value'] } = req.body;
+
+      const analysis = await energyAnalytics.performReserveValuation(assetData);
+
       res.json({
         success: true,
         data: {
-          asset_summary: {
-            reserve_count: asset_data.reserves?.length || 0,
-            total_estimated_reserves: asset_data.reserves?.reduce((sum, r) => sum + r.estimated_reserves, 0) || 0
+          assetSummary: {
+            reserveCount: assetData.reserves?.length || 0,
+            totalEstimatedReserves: assetData.reserves?.reduce((sum, r) => sum + r.estimatedReserves, 0) || 0
           },
-          valuation_results: analysis,
-          methodology: valuation_methods
+          valuationResults: analysis,
+          methodology: valuationMethods
         }
       });
     } catch (error) {
@@ -387,26 +383,26 @@ router.post('/analytics/specialized/technology/saas-metrics',
   body('saas_data').isObject(),
   body('metric_categories').optional().isArray(),
   handleValidation,
-  async (req, res) => {
+  async(req, res) => {
     try {
-      const { saas_data, metric_categories = ['revenue', 'customer', 'unit_economics', 'cohort'] } = req.body;
-      
-      const analysis = await technologyAnalytics.analyzeSaaSMetrics(saas_data);
-      
+      const { saasData, metricCategories = ['revenue', 'customer', 'unit_economics', 'cohort'] } = req.body;
+
+      const analysis = await technologyAnalytics.analyzeSaaSMetrics(saasData);
+
       // Filter by requested categories
       const filteredAnalysis = {};
-      metric_categories.forEach(category => {
+      metricCategories.forEach(category => {
         const categoryKey = category + '_metrics';
         if (analysis[categoryKey]) {
           filteredAnalysis[category] = analysis[categoryKey];
         }
       });
-      
+
       res.json({
         success: true,
         data: {
-          company_overview: {
-            total_customers: saas_data.customers?.length || 0,
+          companyOverview: {
+            totalCustomers: saasData.customers?.length || 0,
             mrr: analysis.revenue_metrics?.monthly_recurring_revenue || 0
           },
           metrics: filteredAnalysis,
@@ -429,24 +425,24 @@ router.post('/ai/predictions/revenue',
   body('forecast_horizon').optional().isInt({ min: 1, max: 60 }),
   body('model_preferences').optional().isArray(),
   handleValidation,
-  async (req, res) => {
+  async(req, res) => {
     try {
-      const { company_data, forecast_horizon = 12, model_preferences } = req.body;
-      
+      const { companyData, forecastHorizon = 12, modelPreferences } = req.body;
+
       const forecast = await predictiveAnalytics.forecastRevenue({
-        ...company_data,
-        forecast_horizon,
-        model_preferences
+        ...companyData,
+        forecastHorizon,
+        modelPreferences
       });
-      
+
       res.json({
         success: true,
         data: {
-          forecast_horizon_months: forecast_horizon,
-          selected_model: forecast.model_selection.selected_model,
-          forecasts: forecast.ensemble_forecast || forecast.univariate_forecast,
-          model_performance: forecast.model_selection.model_performance,
-          confidence_intervals: forecast.confidence_intervals
+          forecastHorizonMonths: forecastHorizon,
+          selectedModel: forecast.modelSelection.selectedModel,
+          forecasts: forecast.ensembleForecast || forecast.univariateForecast,
+          modelPerformance: forecast.modelSelection.modelPerformance,
+          confidenceIntervals: forecast.confidenceIntervals
         }
       });
     } catch (error) {
@@ -460,32 +456,32 @@ router.post('/ai/nlp/analyze-document',
   body('document').isObject(),
   body('analysis_types').optional().isArray(),
   handleValidation,
-  async (req, res) => {
+  async(req, res) => {
     try {
-      const { document, analysis_types = ['sentiment', 'entities', 'metrics', 'summary'] } = req.body;
-      
+      const { document, analysisTypes = ['sentiment', 'entities', 'metrics', 'summary'] } = req.body;
+
       const analysis = await nlpService.analyzeDocument(document);
-      
+
       // Filter analysis based on requested types
       const filteredAnalysis = {};
-      analysis_types.forEach(type => {
-        const analysisKey = type === 'entities' ? 'entity_recognition' : 
-                           type === 'metrics' ? 'key_metrics_extraction' :
-                           type + '_analysis';
+      analysisTypes.forEach(type => {
+        const analysisKey = type === 'entities' ? 'entityRecognition' :
+          type === 'metrics' ? 'keyMetricsExtraction' :
+            type + '_analysis';
         if (analysis[analysisKey]) {
           filteredAnalysis[type] = analysis[analysisKey];
         }
       });
-      
+
       res.json({
         success: true,
         data: {
-          document_classification: analysis.document_classification,
-          analysis_results: filteredAnalysis,
-          processing_metadata: {
-            document_type: analysis.document_classification.document_type,
-            confidence: analysis.document_classification.confidence,
-            processing_time: Date.now() - req.startTime
+          documentClassification: analysis.documentClassification,
+          analysisResults: filteredAnalysis,
+          processingMetadata: {
+            documentType: analysis.documentClassification.documentType,
+            confidence: analysis.documentClassification.confidence,
+            processingTime: Date.now() - req.startTime
           }
         }
       });
@@ -500,23 +496,23 @@ router.post('/ai/computer-vision/recognize-chart',
   body('image_data').isObject(),
   body('extract_data').optional().isBoolean(),
   handleValidation,
-  async (req, res) => {
+  async(req, res) => {
     try {
-      const { image_data, extract_data = true } = req.body;
-      
-      const recognition = await computerVision.recognizeChart(image_data);
-      
+      const { imageData, extractData = true } = req.body;
+
+      const recognition = await computerVision.recognizeChart(imageData);
+
       const response = {
-        chart_type: recognition.chart_classification.chart_type,
-        confidence: recognition.chart_classification.confidence,
-        quality_score: recognition.quality_assessment.overall_score
+        chartType: recognition.chartClassification.chartType,
+        confidence: recognition.chartClassification.confidence,
+        qualityScore: recognition.qualityAssessment.overallScore
       };
-      
-      if (extract_data) {
-        response.extracted_data = recognition.data_extraction.extracted_data;
-        response.data_quality = recognition.data_extraction.data_quality;
+
+      if (extractData) {
+        response.extractedData = recognition.dataExtraction.extractedData;
+        response.dataQuality = recognition.dataExtraction.dataQuality;
       }
-      
+
       res.json({
         success: true,
         data: response
@@ -535,21 +531,21 @@ router.post('/ai/computer-vision/recognize-chart',
 router.get('/workspaces/:id/users',
   param('id').isUUID(),
   handleValidation,
-  async (req, res) => {
+  async(req, res) => {
     try {
       const { id } = req.params;
       const users = await collaboration.getWorkspaceUsers(id);
-      
+
       res.json({
         success: true,
         data: {
-          workspace_id: id,
+          workspaceId: id,
           users: users.map(user => ({
             id: user.id,
             name: user.name,
             role: user.role,
             status: user.status,
-            last_active: user.last_active
+            lastActive: user.lastActive
           }))
         }
       });
@@ -565,17 +561,17 @@ router.post('/comments',
   body('content').isString().notEmpty(),
   body('parent_id').optional().isUUID(),
   handleValidation,
-  async (req, res) => {
+  async(req, res) => {
     try {
-      const { analysis_id, content, parent_id } = req.body;
-      
+      const { analysisId, content, parentId } = req.body;
+
       const comment = await collaboration.createComment({
-        analysisId: analysis_id,
+        analysisId,
         content,
-        parentId: parent_id,
+        parentId,
         userId: req.userId
       });
-      
+
       res.status(201).json({
         success: true,
         data: comment
@@ -591,19 +587,19 @@ router.get('/versions/:id/history',
   param('id').isUUID(),
   query('limit').optional().isInt({ min: 1, max: 100 }),
   handleValidation,
-  async (req, res) => {
+  async(req, res) => {
     try {
       const { id } = req.params;
       const { limit = 20 } = req.query;
-      
+
       const history = await collaboration.getVersionHistory(id, { limit });
-      
+
       res.json({
         success: true,
         data: {
-          analysis_id: id,
+          analysisId: id,
           versions: history,
-          total_versions: history.length
+          totalVersions: history.length
         }
       });
     } catch (error) {
@@ -619,18 +615,18 @@ router.post('/notifications/send',
   body('type').isIn(['info', 'warning', 'error', 'success']),
   body('analysis_id').optional().isUUID(),
   handleValidation,
-  async (req, res) => {
+  async(req, res) => {
     try {
-      const { recipients, message, type, analysis_id } = req.body;
-      
+      const { recipients, message, type, analysisId } = req.body;
+
       const notification = await collaboration.sendNotification({
         recipients,
         message,
         type,
-        analysisId: analysis_id,
+        analysisId,
         senderId: req.userId
       });
-      
+
       res.status(201).json({
         success: true,
         data: notification
@@ -651,17 +647,17 @@ router.post('/visualizations/create',
   body('chart_type').isString().notEmpty(),
   body('configuration').optional().isObject(),
   handleValidation,
-  async (req, res) => {
+  async(req, res) => {
     try {
-      const { data, chart_type, configuration = {} } = req.body;
-      
+      const { data, chartType, configuration = {} } = req.body;
+
       const visualization = await dataVisualization.createVisualization({
         data,
-        chartType: chart_type,
+        chartType,
         configuration,
         userId: req.userId
       });
-      
+
       res.status(201).json({
         success: true,
         data: visualization
@@ -678,23 +674,23 @@ router.post('/export',
   body('format').isIn(['pdf', 'excel', 'csv']),
   body('template').optional().isString(),
   handleValidation,
-  async (req, res) => {
+  async(req, res) => {
     try {
-      const { analysis_id, format, template } = req.body;
-      
+      const { analysisId, format, template } = req.body;
+
       const exportResult = await exportSharing.exportAnalysis({
-        analysisId: analysis_id,
+        analysisId,
         format,
         template,
         userId: req.userId
       });
-      
+
       res.json({
         success: true,
         data: {
-          download_url: exportResult.download_url,
-          expires_at: exportResult.expires_at,
-          file_size: exportResult.file_size,
+          downloadUrl: exportResult.downloadUrl,
+          expiresAt: exportResult.expiresAt,
+          fileSize: exportResult.fileSize,
           format
         }
       });
@@ -707,10 +703,10 @@ router.post('/export',
 // Error handling
 const handleAPIError = (res, error) => {
   console.error('API Error:', error);
-  
+
   const statusCode = error.statusCode || 500;
   const message = error.message || 'Internal server error';
-  
+
   res.status(statusCode).json({
     success: false,
     error: {
@@ -732,7 +728,7 @@ const validateJWT = (authHeader) => {
   return authHeader && authHeader.startsWith('Bearer ');
 };
 
-const extractUserFromAuth = (auth) => {
+const extractUserFromAuth = (_auth) => {
   // Implementation would extract user ID from API key or JWT
   return 'user_' + Math.random().toString(36).substr(2, 9);
 };
@@ -748,10 +744,10 @@ router.use((req, res, next) => {
 });
 
 // Placeholder service functions (would be implemented with actual business logic)
-const getCompanyFinancials = async (id, options) => ({ /* Mock data */ });
-const getMarketIndices = async (symbols, period) => ({ /* Mock data */ });
-const getAnalysisResults = async (id, userId) => ({ /* Mock data */ });
-const calculateDCF = async (params) => ({ /* Mock data */ });
-const getIndustryBenchmarks = async (sector, metrics) => ({ /* Mock data */ });
+const getCompanyFinancials = async(_id, _options) => ({ /* Mock data */ });
+const getMarketIndices = async(_symbols, _period) => ({ /* Mock data */ });
+const getAnalysisResults = async(_id, _userId) => ({ /* Mock data */ });
+const calculateDCF = async(_params) => ({ /* Mock data */ });
+const getIndustryBenchmarks = async(_sector, _metrics) => ({ /* Mock data */ });
 
 module.exports = router;

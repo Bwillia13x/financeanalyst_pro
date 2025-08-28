@@ -1,5 +1,5 @@
 import { AlertTriangle, RefreshCw, Bug, Download } from 'lucide-react';
-import React, { Component } from 'react';
+import { Component, useCallback, useState } from 'react';
 
 import performanceMonitor from '../../services/performanceMonitor';
 
@@ -133,9 +133,7 @@ class ErrorBoundary extends Component {
               {this.state.error && (
                 <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
                   <div className="text-xs font-medium text-slate-800 mb-1">Error Message</div>
-                  <div className="text-xs text-slate-700">
-                    {this.state.error.message}
-                  </div>
+                  <div className="text-xs text-slate-700">{this.state.error.message}</div>
                 </div>
               )}
 
@@ -249,13 +247,16 @@ export const useErrorHandler = () => {
 
 // Async error boundary hook
 export const useAsyncError = () => {
-  const [, setError] = React.useState();
+  const [, setError] = useState();
 
-  return React.useCallback((error) => {
-    setError(() => {
-      throw error;
-    });
-  }, [setError]);
+  return useCallback(
+    error => {
+      setError(() => {
+        throw error;
+      });
+    },
+    [setError]
+  );
 };
 
 export default ErrorBoundary;

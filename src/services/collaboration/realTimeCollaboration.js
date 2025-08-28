@@ -17,7 +17,7 @@ export class RealTimeCollaborationService {
     try {
       const wsUrl = process.env.REACT_APP_WEBSOCKET_URL || 'ws://localhost:8080/collaboration';
       this.websocket = new WebSocket(`${wsUrl}?modelId=${modelId}&userId=${userId}`);
-      
+
       this.currentUser = { id: userId, name: userName };
       this.currentRoom = modelId;
 
@@ -45,7 +45,7 @@ export class RealTimeCollaborationService {
   async waitForConnection(timeout = 5000) {
     return new Promise((resolve, reject) => {
       const timer = setTimeout(() => reject(new Error('Connection timeout')), timeout);
-      
+
       const checkConnection = () => {
         if (this.websocket.readyState === WebSocket.OPEN) {
           clearTimeout(timer);
@@ -55,7 +55,7 @@ export class RealTimeCollaborationService {
           setTimeout(checkConnection, 100);
         }
       };
-      
+
       checkConnection();
     });
   }
@@ -179,7 +179,7 @@ export class RealTimeCollaborationService {
   handleMessage(event) {
     try {
       const message = JSON.parse(event.data);
-      
+
       switch (message.type) {
         case 'user_joined':
           this.handleUserJoined(message);
@@ -214,7 +214,7 @@ export class RealTimeCollaborationService {
       joinedAt: Date.now(),
       isActive: true
     });
-    
+
     this.emit('user_joined', user);
   }
 
@@ -226,13 +226,13 @@ export class RealTimeCollaborationService {
 
   handleRemoteOperation(message) {
     const { operation } = message;
-    
+
     // Skip if it's our own operation echoed back
     if (operation.userId === this.currentUser.id) return;
 
     // Apply operational transformation
     const transformedOperation = this.operationalTransform.transform(
-      operation, 
+      operation,
       this.pendingOperations
     );
 
@@ -242,34 +242,31 @@ export class RealTimeCollaborationService {
 
   handlePresenceUpdate(message) {
     const { presence } = message;
-    
+
     if (presence.userId === this.currentUser.id) return;
-    
+
     const user = this.activeUsers.get(presence.userId);
     if (user) {
       user.lastActivity = Date.now();
       user.cursor = presence.cellId;
       user.selection = presence.selectedRange;
-      
+
       this.emit('presence_updated', presence);
     }
   }
 
   handleConflict(message) {
     const { conflict } = message;
-    
+
     // Use conflict resolution strategy
-    const resolution = this.conflictResolver.resolve(
-      conflict.operations,
-      this.currentUser.id
-    );
+    const resolution = this.conflictResolver.resolve(conflict.operations, this.currentUser.id);
 
     this.emit('conflict_detected', { conflict, resolution });
   }
 
   handleSyncState(message) {
     const { modelState, version } = message;
-    
+
     // Synchronize local state with server
     this.syncLocalState(modelState, version);
     this.emit('state_synced', { version });
@@ -279,21 +276,19 @@ export class RealTimeCollaborationService {
   applyOperationLocally(operation) {
     // Add to pending operations queue
     this.pendingOperations.push(operation);
-    
+
     // Apply operation to local model
     this.updateLocalModel(operation);
-    
+
     // Clean up old pending operations
     this.cleanupPendingOperations();
   }
 
   applyOperationRemotely(operation) {
     this.updateLocalModel(operation);
-    
+
     // Remove corresponding pending operation if exists
-    this.pendingOperations = this.pendingOperations.filter(
-      op => op.id !== operation.id
-    );
+    this.pendingOperations = this.pendingOperations.filter(op => op.id !== operation.id);
   }
 
   updateLocalModel(operation) {
@@ -328,7 +323,7 @@ export class RealTimeCollaborationService {
     return dependencies.map(dep => dep.cellId);
   }
 
-  calculateAssumptionImpact(assumptionId, newValue) {
+  calculateAssumptionImpact(_assumptionId, _newValue) {
     // Calculate the impact of assumption change on model outputs
     // This would use sensitivity analysis
     return {
@@ -340,9 +335,7 @@ export class RealTimeCollaborationService {
 
   cleanupPendingOperations(maxAge = 30000) {
     const now = Date.now();
-    this.pendingOperations = this.pendingOperations.filter(
-      op => now - op.timestamp < maxAge
-    );
+    this.pendingOperations = this.pendingOperations.filter(op => now - op.timestamp < maxAge);
   }
 
   sendMessage(message) {
@@ -378,14 +371,14 @@ export class RealTimeCollaborationService {
   handleConnectionClose() {
     this.isConnected = false;
     console.log('Disconnected from collaboration service');
-    
+
     // Attempt reconnection
     setTimeout(() => {
       if (this.currentRoom && this.currentUser) {
         this.connect(this.currentUser.id, this.currentUser.name, this.currentRoom);
       }
     }, 3000);
-    
+
     this.emit('disconnected');
   }
 
@@ -401,11 +394,11 @@ export class RealTimeCollaborationService {
         roomId: this.currentRoom,
         userId: this.currentUser.id
       });
-      
+
       this.websocket.close();
       this.websocket = null;
     }
-    
+
     this.isConnected = false;
     this.activeUsers.clear();
     this.pendingOperations = [];
@@ -429,11 +422,13 @@ export class RealTimeCollaborationService {
 
   getUserPresence(userId) {
     const user = this.activeUsers.get(userId);
-    return user ? {
-      cursor: user.cursor,
-      selection: user.selection,
-      lastActivity: user.lastActivity
-    } : null;
+    return user
+      ? {
+          cursor: user.cursor,
+          selection: user.selection,
+          lastActivity: user.lastActivity
+        }
+      : null;
   }
 }
 
@@ -442,28 +437,27 @@ class OperationalTransformService {
   transform(remoteOperation, localOperations) {
     // Implement operational transformation algorithm
     // This is a simplified version - production would need more sophisticated OT
-    
+
     let transformedOp = { ...remoteOperation };
-    
+
     localOperations.forEach(localOp => {
       if (this.operationsConflict(transformedOp, localOp)) {
         transformedOp = this.resolveConflict(transformedOp, localOp);
       }
     });
-    
+
     return transformedOp;
   }
 
   operationsConflict(op1, op2) {
     // Check if operations conflict (same cell, overlapping time, etc.)
-    return op1.cellId === op2.cellId && 
-           Math.abs(op1.timestamp - op2.timestamp) < 1000;
+    return op1.cellId === op2.cellId && Math.abs(op1.timestamp - op2.timestamp) < 1000;
   }
 
   resolveConflict(remoteOp, localOp) {
     // Resolve conflict using timestamp-based precedence
     // More sophisticated conflict resolution could consider user roles, operation types, etc.
-    
+
     if (remoteOp.timestamp > localOp.timestamp) {
       return remoteOp; // Remote operation wins
     } else {
@@ -476,17 +470,17 @@ class OperationalTransformService {
 class ConflictResolutionService {
   resolve(conflictingOperations, currentUserId) {
     const strategies = {
-      'last_writer_wins': this.lastWriterWins,
-      'merge_changes': this.mergeChanges,
-      'user_priority': this.userPriority,
-      'manual_resolution': this.manualResolution
+      last_writer_wins: this.lastWriterWins,
+      merge_changes: this.mergeChanges,
+      user_priority: this.userPriority,
+      manual_resolution: this.manualResolution
     };
 
     // Default to last writer wins for now
     return strategies.last_writer_wins(conflictingOperations, currentUserId);
   }
 
-  lastWriterWins(operations, currentUserId) {
+  lastWriterWins(operations, _currentUserId) {
     const sortedOps = operations.sort((a, b) => b.timestamp - a.timestamp);
     return {
       strategy: 'last_writer_wins',
@@ -496,7 +490,7 @@ class ConflictResolutionService {
     };
   }
 
-  mergeChanges(operations, currentUserId) {
+  mergeChanges(operations, _currentUserId) {
     // Attempt to merge non-conflicting changes
     return {
       strategy: 'merge_changes',
@@ -515,7 +509,7 @@ class ConflictResolutionService {
     };
   }
 
-  manualResolution(operations, currentUserId) {
+  manualResolution(operations, _currentUserId) {
     return {
       strategy: 'manual_resolution',
       conflictingOperations: operations,

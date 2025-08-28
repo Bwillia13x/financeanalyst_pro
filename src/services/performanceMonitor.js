@@ -66,7 +66,7 @@ class PerformanceMonitor {
 
   // Error monitoring
   startErrorMonitoring() {
-    window.addEventListener('error', (event) => {
+    window.addEventListener('error', event => {
       this.logError('JavaScript Error', {
         message: event.message,
         filename: event.filename,
@@ -76,7 +76,7 @@ class PerformanceMonitor {
       });
     });
 
-    window.addEventListener('unhandledrejection', (event) => {
+    window.addEventListener('unhandledrejection', event => {
       this.logError('Unhandled Promise Rejection', {
         reason: event.reason,
         stack: event.reason?.stack
@@ -164,7 +164,7 @@ class PerformanceMonitor {
   // Get performance summary
   getPerformanceSummary() {
     const now = Date.now();
-    const oneHourAgo = now - (60 * 60 * 1000);
+    const oneHourAgo = now - 60 * 60 * 1000;
 
     const recentMetrics = this.metrics.filter(m => m.timestamp > oneHourAgo);
     const recentErrors = this.errorLog.filter(e => e.timestamp > oneHourAgo);
@@ -172,7 +172,9 @@ class PerformanceMonitor {
 
     // Calculate statistics
     const durations = recentMetrics.map(m => m.duration);
-    const avgDuration = durations.length ? durations.reduce((a, b) => a + b, 0) / durations.length : 0;
+    const avgDuration = durations.length
+      ? durations.reduce((a, b) => a + b, 0) / durations.length
+      : 0;
     const maxDuration = durations.length ? Math.max(...durations) : 0;
     const slowOperations = recentMetrics.filter(m => m.duration > this.thresholds.slowCalculation);
 
@@ -200,12 +202,14 @@ class PerformanceMonitor {
         slowOperations: slowOperations.length,
         topOperations
       },
-      memory: currentMemory ? {
-        current: Math.round(currentMemory.usedJSHeapSize),
-        total: Math.round(currentMemory.totalJSHeapSize),
-        limit: Math.round(currentMemory.jsHeapSizeLimit),
-        usage: Math.round((currentMemory.usedJSHeapSize / currentMemory.jsHeapSizeLimit) * 100)
-      } : null,
+      memory: currentMemory
+        ? {
+            current: Math.round(currentMemory.usedJSHeapSize),
+            total: Math.round(currentMemory.totalJSHeapSize),
+            limit: Math.round(currentMemory.jsHeapSizeLimit),
+            usage: Math.round((currentMemory.usedJSHeapSize / currentMemory.jsHeapSizeLimit) * 100)
+          }
+        : null,
       errors: {
         total: recentErrors.length,
         errors: recentErrors.filter(e => e.severity === 'error').length,
@@ -233,7 +237,7 @@ class PerformanceMonitor {
 
     // Deduct for high memory usage
     if (summary.memory?.usage > 80) {
-      score -= Math.min(20, (summary.memory.usage - 80));
+      score -= Math.min(20, summary.memory.usage - 80);
     }
 
     // Deduct for very slow average performance
@@ -266,7 +270,8 @@ class PerformanceMonitor {
         type: 'performance',
         priority: 'high',
         title: 'Slow Operations Detected',
-        description: 'Multiple operations are taking longer than expected. Consider debouncing or caching',
+        description:
+          'Multiple operations are taking longer than expected. Consider debouncing or caching',
         action: 'Optimize calculations'
       });
     }

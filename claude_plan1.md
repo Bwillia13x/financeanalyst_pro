@@ -14,7 +14,7 @@
 
 ⏺ Update Todos
 
-  ⎿  ☐ Deploy staging environment and run live Lighthouse audits              
+  ⎿  ☐ Deploy staging environment and run live Lighthouse audits
      ☐ Create comprehensive error boundary system with user-friendly fallbacks
      ☐ Implement advanced caching strategies for financial data
      ☐ Set up automated accessibility testing with axe-core integration
@@ -31,7 +31,7 @@
 
 ⏺ Write(scripts/staging-deploy.cjs)
 
-  ⎿  Wrote 289 lines to scripts/staging-deploy.cjs                                
+  ⎿  Wrote 289 lines to scripts/staging-deploy.cjs
      #!/usr/bin/env node
      // Staging Deployment and Live Audit Script
      const { execSync } = require('child_process');
@@ -44,10 +44,10 @@
 
 ⏺ Update(package.json)
 
-  ⎿  Updated package.json with 3 additions and 1 removal                          
+  ⎿  Updated package.json with 3 additions and 1 removal
        54        "analyze": "npm run build && npx vite-bundle-analyzer",
        55        "budget:check": "node scripts/check-bundle-budget.cjs",
-       56        "perf:audit": "npm run build && npm run lighthouse:ci && npm run 
+       56        "perf:audit": "npm run build && npm run lighthouse:ci && npm run
             budget:check",
        57 -      "perf:dev": "npm run build && npm run budget:check"
        57 +      "perf:dev": "npm run build && npm run budget:check",
@@ -60,7 +60,7 @@
 
 ⏺ Update Todos
 
-  ⎿  ☒ Deploy staging environment and run live Lighthouse audits              
+  ⎿  ☒ Deploy staging environment and run live Lighthouse audits
      ☐ Create comprehensive error boundary system with user-friendly fallbacks
      ☐ Implement advanced caching strategies for financial data
      ☐ Set up automated accessibility testing with axe-core integration
@@ -95,7 +95,7 @@
 
 ⏺ Write(src/components/ErrorBoundary/CalculationErrorBoundary.jsx)
 
-  ⎿  Wrote 126 lines to src/components/ErrorBoundary/CalculationErrorBoundary.jsx  
+  ⎿  Wrote 126 lines to src/components/ErrorBoundary/CalculationErrorBoundary.jsx
      import React from 'react';
      import ErrorBoundaryProvider from './ErrorBoundaryProvider';
      // Specialized Error Boundary for Financial Calculations
@@ -110,7 +110,7 @@
 
 ⏺ Write(src/components/ErrorBoundary/DataErrorBoundary.jsx)
 
-  ⎿  Wrote 240 lines to src/components/ErrorBoundary/DataErrorBoundary.jsx            
+  ⎿  Wrote 240 lines to src/components/ErrorBoundary/DataErrorBoundary.jsx
      import React from 'react';
      import ErrorBoundaryProvider from './ErrorBoundaryProvider';
      // Specialized Error Boundary for Data Loading and API Operations
@@ -127,7 +127,7 @@
 
 ⏺ Write(src/components/ErrorBoundary/index.js)
 
-  ⎿  Wrote 7 lines to src/components/ErrorBoundary/index.js                           
+  ⎿  Wrote 7 lines to src/components/ErrorBoundary/index.js
      // Error Boundary Components Export
      export { default as ErrorBoundaryProvider, useErrorBoundary } from
      './ErrorBoundaryProvider';
@@ -142,11 +142,11 @@
 
 ⏺ Update(src/App.jsx)
 
-  ⎿  Updated src/App.jsx with 6 additions and 3 removals                        
+  ⎿  Updated src/App.jsx with 6 additions and 3 removals
         1    import SEOProvider from './components/SEO/SEOProvider';
         2 +  import { ErrorBoundaryProvider } from './components/ErrorBoundary';
         3    import Routes from './Routes';
-        4    
+        4
         5    function App() {
         6      return (
         7 -      <SEOProvider>
@@ -159,12 +159,12 @@
        11 +      </ErrorBoundaryProvider>
        12      );
        13    }
-       14    
+       14
 
 
 ⏺ Update Todos
 
-  ⎿  ☒ Deploy staging environment and run live Lighthouse audits              
+  ⎿  ☒ Deploy staging environment and run live Lighthouse audits
      ☒ Create comprehensive error boundary system with user-friendly fallbacks
      ☐ Implement advanced caching strategies for financial data
      ☐ Set up automated accessibility testing with axe-core integration
@@ -181,7 +181,7 @@
 
 ⏺ Write(src/utils/financialDataCache.js)
 
-  ⎿  Wrote 470 lines to src/utils/financialDataCache.js                             
+  ⎿  Wrote 470 lines to src/utils/financialDataCache.js
      // Advanced Caching System for Financial Data
      // Respects data sensitivity, freshness requirements, and regulatory compliance
      class FinancialDataCache {
@@ -199,7 +199,7 @@
 
 ⏺ Write(src/hooks/useFinancialCache.js)
 
-  ⎿  Wrote 330 lines to src/hooks/useFinancialCache.js                    
+  ⎿  Wrote 330 lines to src/hooks/useFinancialCache.js
      import { useState, useEffect, useCallback, useRef } from 'react';
      import financialDataCache from '../utils/financialDataCache';
      // Custom hook for financial data caching
@@ -217,95 +217,95 @@
 
 ⏺ Update(public/sw.js)
 
-  ⎿  Updated public/sw.js with 132 additions                                           
+  ⎿  Updated public/sw.js with 132 additions
        114      const url = new URL(request.url);
-       115      
+       115
        116      try {
        117 +      // Special handling for financial API calls
        118 +      if (url.pathname.startsWith('/api/')) {
        119 +        return await handleFinancialApiRequest(request);
        120 +      }
-       121 +      
+       121 +
        122        // Network-first for API calls and dynamic data
-       123        if (NETWORK_FIRST_PATTERNS.some(pattern => 
+       123        if (NETWORK_FIRST_PATTERNS.some(pattern =>
              pattern.test(url.pathname))) {
        124          return await networkFirst(request);
      ...
        139      }
        140    }
-       141    
+       141
        142 +  // Special handler for financial API requests with cache coordination
        143 +  async function handleFinancialApiRequest(request) {
        144 +    const url = new URL(request.url);
        145 +    const cacheKey = `api-${url.pathname}${url.search}`;
-       146 +    
+       146 +
        147 +    // Check if this is sensitive data that shouldn't be cached
        148 +    if (isSensitiveFinancialData(url.pathname)) {
-       149 +      console.log('[SW] Bypassing cache for sensitive financial data:', 
+       149 +      console.log('[SW] Bypassing cache for sensitive financial data:',
            + url.pathname);
        150 +      return await fetch(request);
        151 +    }
-       152 +    
+       152 +
        153 +    // For market data, use short TTL cache
-       154 +    if (url.pathname.includes('/market/') || 
+       154 +    if (url.pathname.includes('/market/') ||
            + url.pathname.includes('/quote/')) {
        155 +      return await handleMarketDataRequest(request, cacheKey);
        156 +    }
-       157 +    
+       157 +
        158 +    // For reference data, use long TTL cache
-       159 +    if (url.pathname.includes('/reference/') || 
+       159 +    if (url.pathname.includes('/reference/') ||
            + url.pathname.includes('/symbols/')) {
        160 +      return await handleReferenceDataRequest(request, cacheKey);
        161 +    }
-       162 +    
+       162 +
        163 +    // Default API handling
        164 +    return await networkFirst(request);
        165 +  }
-       166 +  
+       166 +
        167 +  // Handle market data with short TTL and stale-while-revalidate
        168 +  async function handleMarketDataRequest(request, cacheKey) {
        169 +    const cache = await caches.open(DYNAMIC_CACHE);
        170 +    const cachedResponse = await cache.match(request);
-       171 +    
+       171 +
        172 +    // Check cache timestamp
        173 +    if (cachedResponse) {
        174 +      const cacheTime = cachedResponse.headers.get('sw-cache-time');
        175 +      const age = Date.now() - parseInt(cacheTime || '0');
-       176 +      
+       176 +
        177 +      // If less than 30 seconds old, return cached
        178 +      if (age < 30000) {
        179 +        console.log('[SW] Serving fresh market data from cache');
        180 +        return cachedResponse;
        181 +      }
-       182 +      
+       182 +
        183 +      // If less than 2 minutes old, return stale but refresh in background
        184 +      if (age < 120000) {
-       185 +        console.log('[SW] Serving stale market data, refreshing in 
+       185 +        console.log('[SW] Serving stale market data, refreshing in
            + background');
-       186 +        
+       186 +
        187 +        // Refresh in background
        188 +        fetch(request).then(async (response) => {
        189 +          if (response.ok) {
        190 +            const responseToCache = response.clone();
-       191 +            responseToCache.headers.set('sw-cache-time', 
+       191 +            responseToCache.headers.set('sw-cache-time',
            + Date.now().toString());
        192 +            await cache.put(request, responseToCache);
        193 +          }
        194 +        }).catch(error => {
-       195 +          console.warn('[SW] Background market data refresh failed:', 
+       195 +          console.warn('[SW] Background market data refresh failed:',
            + error);
        196 +        });
-       197 +        
+       197 +
        198 +        return cachedResponse;
        199 +      }
        200 +    }
-       201 +    
+       201 +
        202 +    // Fetch fresh data
        203 +    try {
        204 +      const response = await fetch(request);
        205 +      if (response.ok) {
        206 +        const responseToCache = response.clone();
-       207 +        responseToCache.headers.set('sw-cache-time', 
+       207 +        responseToCache.headers.set('sw-cache-time',
      Date.now().toString());
        208 +        await cache.put(request, responseToCache);
        209 +      }
@@ -319,29 +319,29 @@
        217 +      throw error;
        218 +    }
        219 +  }
-       220 +  
+       220 +
        221 +  // Handle reference data with long TTL
        222 +  async function handleReferenceDataRequest(request, cacheKey) {
        223 +    const cache = await caches.open(DYNAMIC_CACHE);
        224 +    const cachedResponse = await cache.match(request);
-       225 +    
+       225 +
        226 +    if (cachedResponse) {
        227 +      const cacheTime = cachedResponse.headers.get('sw-cache-time');
        228 +      const age = Date.now() - parseInt(cacheTime || '0');
-       229 +      
+       229 +
        230 +      // Reference data is valid for 24 hours
        231 +      if (age < 24 * 60 * 60 * 1000) {
        232 +        console.log('[SW] Serving reference data from cache');
        233 +        return cachedResponse;
        234 +      }
        235 +    }
-       236 +    
+       236 +
        237 +    // Fetch fresh reference data
        238 +    try {
        239 +      const response = await fetch(request);
        240 +      if (response.ok) {
        241 +        const responseToCache = response.clone();
-       242 +        responseToCache.headers.set('sw-cache-time', 
+       242 +        responseToCache.headers.set('sw-cache-time',
      Date.now().toString());
        243 +        await cache.put(request, responseToCache);
        244 +      }
@@ -354,7 +354,7 @@
        251 +      throw error;
        252 +    }
        253 +  }
-       254 +  
+       254 +
        255 +  // Check if financial data is sensitive
        256 +  function isSensitiveFinancialData(pathname) {
        257 +    const sensitivePatterns = [
@@ -365,10 +365,10 @@
        262 +      '/api/analysis/',
        263 +      '/api/auth/'
        264 +    ];
-       265 +    
+       265 +
        266 +    return sensitivePatterns.some(pattern => pathname.includes(pattern));
        267 +  }
-       268 +  
+       268 +
        269    // Network-first strategy
        270    async function networkFirst(request) {
        271      try {
@@ -376,7 +376,7 @@
 
 ⏺ Update Todos
 
-  ⎿  ☒ Deploy staging environment and run live Lighthouse audits              
+  ⎿  ☒ Deploy staging environment and run live Lighthouse audits
      ☒ Create comprehensive error boundary system with user-friendly fallbacks
      ☒ Implement advanced caching strategies for financial data
      ☐ Set up automated accessibility testing with axe-core integration
@@ -431,7 +431,7 @@
   monitoring system.
 
 ⏺ Update Todos
-  ⎿  ☒ Deploy staging environment and run live Lighthouse audits              
+  ⎿  ☒ Deploy staging environment and run live Lighthouse audits
      ☒ Create comprehensive error boundary system with user-friendly fallbacks
      ☒ Implement advanced caching strategies for financial data
      ☐ Set up automated accessibility testing with axe-core integration
@@ -441,7 +441,7 @@
      ☐ Implement advanced lazy loading for heavy financial components
 
 ⏺ Update Todos
-  ⎿  ☒ Deploy staging environment and run live Lighthouse audits              
+  ⎿  ☒ Deploy staging environment and run live Lighthouse audits
      ☒ Create comprehensive error boundary system with user-friendly fallbacks
      ☒ Implement advanced caching strategies for financial data
      ☒ Set up automated accessibility testing with axe-core integration
@@ -451,7 +451,7 @@
      ☐ Implement advanced lazy loading for heavy financial components
 
 ⏺ Write(src/hooks/useAccessibility.js)
-  ⎿  Wrote 445 lines to src/hooks/useAccessibility.js                         
+  ⎿  Wrote 445 lines to src/hooks/useAccessibility.js
      import { useState, useEffect, useCallback, useRef } from 'react';
      import { accessibilityTester } from '../utils/accessibilityTesting';
      import { reportPerformanceMetric } from '../utils/performanceMonitoring';
@@ -464,7 +464,7 @@
      … +435 lines (ctrl+r to expand)
 
 ⏺ Update Todos
-  ⎿  ☒ Deploy staging environment and run live Lighthouse audits              
+  ⎿  ☒ Deploy staging environment and run live Lighthouse audits
      ☒ Create comprehensive error boundary system with user-friendly fallbacks
      ☒ Implement advanced caching strategies for financial data
      ☒ Set up automated accessibility testing with axe-core integration
@@ -477,10 +477,10 @@
   ⎿  Read 453 lines (ctrl+r to expand)
 
 ⏺ Update(src/utils/performanceMonitoring.js)
-  ⎿  Updated src/utils/performanceMonitoring.js with 102 additions                     
+  ⎿  Updated src/utils/performanceMonitoring.js with 102 additions
        443      sendAnalyticsBatch();
        444    });
-       445    
+       445
        446 +  // Accessibility metrics reporting
        447 +  export function reportPerformanceMetric(type, data) {
        448 +    const metricData = {
@@ -490,11 +490,11 @@
        452 +      userAgent: navigator.userAgent,
        453 +      timestamp: Date.now()
        454 +    };
-       455 +    
+       455 +
        456 +    console.log(`Performance Metric - ${type}:`, data);
        457 +    sendToAnalytics('performance-metric', metricData);
        458 +  }
-       459 +  
+       459 +
        460 +  // Track accessibility test results
        461 +  export function trackAccessibilityResults(results) {
        462 +    const accessibilityData = {
@@ -506,30 +506,30 @@
        468 +      timestamp: Date.now(),
        469 +      userAgent: navigator.userAgent
        470 +    };
-       471 +    
+       471 +
        472 +    console.log('Accessibility Results:', accessibilityData);
        473 +    sendToAnalytics('accessibility-results', accessibilityData);
-       474 +    
+       474 +
        475 +    // Store accessibility history
        476 +    try {
-       477 +      const history = 
+       477 +      const history =
            + JSON.parse(localStorage.getItem('accessibility-history') || '[]');
        478 +      history.push(accessibilityData);
-       479 +      
+       479 +
        480 +      // Keep only last 50 entries
        481 +      if (history.length > 50) {
        482 +        history.splice(0, history.length - 50);
        483 +      }
-       484 +      
-       485 +      localStorage.setItem('accessibility-history', 
+       484 +
+       485 +      localStorage.setItem('accessibility-history',
            + JSON.stringify(history));
        486 +    } catch (error) {
        487 +      console.error('Failed to store accessibility history:', error);
        488 +    }
        489 +  }
-       490 +  
+       490 +
        491 +  // Track financial component performance
-       492 +  export function trackFinancialComponentPerformance(componentName, 
+       492 +  export function trackFinancialComponentPerformance(componentName,
      metrics)
            +  {
        493 +    const performanceData = {
@@ -539,49 +539,49 @@
        497 +      timestamp: Date.now(),
        498 +      userAgent: navigator.userAgent
        499 +    };
-       500 +    
-       501 +    console.log(`Financial Component Performance - ${componentName}:`, 
+       500 +
+       501 +    console.log(`Financial Component Performance - ${componentName}:`,
            + metrics);
        502 +    sendToAnalytics('financial-component-performance', performanceData);
        503 +  }
-       504 +  
+       504 +
        505 +  // Get comprehensive performance dashboard data
        506 +  export function getPerformanceDashboardData() {
-       507 +    const accessibilityHistory = 
+       507 +    const accessibilityHistory =
            + JSON.parse(localStorage.getItem('accessibility-history') || '[]');
-       508 +    const analyticsQueue = 
+       508 +    const analyticsQueue =
            + JSON.parse(localStorage.getItem('analytics-queue') || '[]');
-       509 +    
+       509 +
        510 +    // Calculate trends
        511 +    const recentAccessibility = accessibilityHistory.slice(-10);
-       512 +    const avgScore = recentAccessibility.reduce((sum, entry) => sum + 
+       512 +    const avgScore = recentAccessibility.reduce((sum, entry) => sum +
            + entry.score, 0) / recentAccessibility.length || 0;
-       513 +    const avgViolations = recentAccessibility.reduce((sum, entry) => sum + 
+       513 +    const avgViolations = recentAccessibility.reduce((sum, entry) => sum +
            + entry.violations, 0) / recentAccessibility.length || 0;
-       514 +    
+       514 +
        515 +    // Get performance metrics from queue
        516 +    const performanceMetrics = analyticsQueue
        517 +      .filter(item => item.type === 'performance-metric')
        518 +      .slice(-20)
        519 +      .map(item => item.data);
-       520 +    
+       520 +
        521 +    const webVitalMetrics = analyticsQueue
        522 +      .filter(item => item.type === 'web-vital')
        523 +      .slice(-10)
        524 +      .map(item => item.data);
-       525 +  
+       525 +
        526 +    return {
        527 +      webVitals: webVitalsData,
        528 +      budgetViolations: checkPerformanceBudgets(),
        529 +      accessibility: {
-       530 +        currentScore: recentAccessibility[recentAccessibility.length - 
+       530 +        currentScore: recentAccessibility[recentAccessibility.length -
            + 1]?.score || 0,
        531 +        averageScore: Math.round(avgScore),
        532 +        averageViolations: Math.round(avgViolations),
        533 +        history: recentAccessibility,
        534 +        trends: {
-       535 +          scoreImproving: recentAccessibility.length >= 2 && 
-       536 +            recentAccessibility[recentAccessibility.length - 1].score > 
+       535 +          scoreImproving: recentAccessibility.length >= 2 &&
+       536 +            recentAccessibility[recentAccessibility.length - 1].score >
        537 +            recentAccessibility[recentAccessibility.length - 2].score
        538 +        }
        539 +      },
@@ -592,13 +592,13 @@
        544 +      timestamp: Date.now()
        545 +    };
        546 +  }
-       547 +  
+       547 +
        548    // Export current performance data
        549    export function getPerformanceData() {
        550      return {
 
 ⏺ Update Todos
-  ⎿  ☒ Deploy staging environment and run live Lighthouse audits              
+  ⎿  ☒ Deploy staging environment and run live Lighthouse audits
      ☒ Create comprehensive error boundary system with user-friendly fallbacks
      ☒ Implement advanced caching strategies for financial data
      ☒ Set up automated accessibility testing with axe-core integration
@@ -625,7 +625,7 @@
      export { default } from './PerformanceDashboard';
 
 ⏺ Write(src/hooks/usePerformanceDashboard.js)
-  ⎿  Wrote 65 lines to src/hooks/usePerformanceDashboard.js          
+  ⎿  Wrote 65 lines to src/hooks/usePerformanceDashboard.js
      import { useState, useCallback, useEffect } from 'react';
      // Hook for managing performance dashboard visibility and hotkey
      export function usePerformanceDashboard() {
@@ -639,30 +639,30 @@
   ⎿  Read 16 lines (ctrl+r to expand)
 
 ⏺ Update(src/App.jsx)
-  ⎿  Updated src/App.jsx with 15 additions                                             
+  ⎿  Updated src/App.jsx with 15 additions
         1    import SEOProvider from './components/SEO/SEOProvider';
         2    import { ErrorBoundaryProvider } from './components/ErrorBoundary';
         3 +  import PerformanceDashboard from './components/PerformanceDashboard';
         4 +  import { usePerformanceDashboard } from './hooks/usePerformanceDashboard';
-        5 +  import { initializePerformanceMonitoring } from 
+        5 +  import { initializePerformanceMonitoring } from
           + './utils/performanceMonitoring';
         6 +  import { useEffect } from 'react';
         7    import Routes from './Routes';
-        8    
+        8
         9    function App() {
        10 +    const { isVisible, hideDashboard } = usePerformanceDashboard();
-       11 +  
+       11 +
        12 +    // Initialize performance monitoring on app start
        13 +    useEffect(() => {
        14 +      initializePerformanceMonitoring();
        15 +    }, []);
-       16 +  
+       16 +
        17      return (
        18        <ErrorBoundaryProvider>
        19          <SEOProvider>
        20            <Routes />
-       21 +          <PerformanceDashboard 
-       22 +            isVisible={isVisible} 
+       21 +          <PerformanceDashboard
+       22 +            isVisible={isVisible}
        23 +            onClose={hideDashboard}
        24 +          />
        25          </SEOProvider>
@@ -670,7 +670,7 @@
        27      );
 
 ⏺ Update Todos
-  ⎿  ☒ Deploy staging environment and run live Lighthouse audits              
+  ⎿  ☒ Deploy staging environment and run live Lighthouse audits
      ☒ Create comprehensive error boundary system with user-friendly fallbacks
      ☒ Implement advanced caching strategies for financial data
      ☒ Set up automated accessibility testing with axe-core integration
@@ -680,7 +680,7 @@
      ☐ Implement advanced lazy loading for heavy financial components
 
 ⏺ Write(src/components/LazyLoader/LazyLoader.jsx)
-  ⎿  Wrote 205 lines to src/components/LazyLoader/LazyLoader.jsx                       
+  ⎿  Wrote 205 lines to src/components/LazyLoader/LazyLoader.jsx
      import React, { useState, useEffect, useRef, Suspense } from 'react';
      import { trackFinancialComponentPerformance } from
      '../../utils/performanceMonitoring';
@@ -698,7 +698,7 @@
      export { default } from './LazyLoader';
 
 ⏺ Write(src/hooks/useLazyLoad.js)
-  ⎿  Wrote 326 lines to src/hooks/useLazyLoad.js                                       
+  ⎿  Wrote 326 lines to src/hooks/useLazyLoad.js
      import { useState, useEffect, useRef, useCallback } from 'react';
      import { trackFinancialComponentPerformance } from
      '../utils/performanceMonitoring';
@@ -712,7 +712,7 @@
      … +316 lines (ctrl+r to expand)
 
 ⏺ Write(src/utils/lazyLoadHelpers.js)
-  ⎿  Wrote 330 lines to src/utils/lazyLoadHelpers.js                                  
+  ⎿  Wrote 330 lines to src/utils/lazyLoadHelpers.js
      // Utility functions for lazy loading financial components
      // Dynamic import helper with error handling and retry logic
      export async function lazyImport(importFunction, componentName, retryCount = 3) {
@@ -724,15 +724,15 @@
      … +320 lines (ctrl+r to expand)
 
 ⏺ Update(src/utils/lazyLoadHelpers.js)
-  ⎿  Updated src/utils/lazyLoadHelpers.js with 2 additions              
+  ⎿  Updated src/utils/lazyLoadHelpers.js with 2 additions
        1 +  import React from 'react';
-       2 +  
+       2 +
        3    // Utility functions for lazy loading financial components
-       4    
+       4
        5    // Dynamic import helper with error handling and retry logic
 
 ⏺ Update Todos
-  ⎿  ☒ Deploy staging environment and run live Lighthouse audits              
+  ⎿  ☒ Deploy staging environment and run live Lighthouse audits
      ☒ Create comprehensive error boundary system with user-friendly fallbacks
      ☒ Implement advanced caching strategies for financial data
      ☒ Set up automated accessibility testing with axe-core integration
@@ -747,15 +747,15 @@
 
 
      /Users/benjaminwilliams/valor-ivx/financeanalyst_pro/src/App.jsx
-        2:1   error  `./components/ErrorBoundary` import should occur before import of 
+        2:1   error  `./components/ErrorBoundary` import should occur before import of
      `./components/SEO/SEOProvider`         import/order
-        3:1   error  `./components/PerformanceDashboard` import should occur before 
+        3:1   error  `./components/PerformanceDashboard` import should occur before
      import of `./components/SEO/SEOProvider`  import/order
-        5:1   error  There should be at least one empty line between import groups      
+        5:1   error  There should be at least one empty line between import groups
                                            import/order
-        6:1   error  There should be at least one empty line between import groups      
+        6:1   error  There should be at least one empty line between import groups
                                            import/order
-        6:1   error  `react` import should occur before import of 
+        6:1   error  `react` import should occur before import of
      `./components/SEO/SEOProvider`                              import/order
      … +76 lines (ctrl+r to see all)
 
@@ -769,7 +769,7 @@
   works:
 
 ⏺ Write(test-accessibility.js)
-  ⎿  Wrote 73 lines to test-accessibility.js                                   
+  ⎿  Wrote 73 lines to test-accessibility.js
      // Simple test to verify accessibility implementation
      import { accessibilityTester } from './src/utils/accessibilityTesting.js';
      // Create a simple DOM structure for testing
@@ -782,7 +782,7 @@
      … +63 lines (ctrl+r to expand)
 
 ⏺ Bash(node test-accessibility.js)
-  ⎿  ✅ Accessibility testing implementation completed successfully! 
+  ⎿  ✅ Accessibility testing implementation completed successfully!
 
      🎯 Implementation Summary:
      … +31 lines (ctrl+r to expand)

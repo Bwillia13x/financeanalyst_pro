@@ -75,11 +75,7 @@ const LoadingState = ({
             variantStyles[variant]
           )}
         />
-        {message && (
-          <span className={cn(config.text, variantStyles[variant])}>
-            {message}
-          </span>
-        )}
+        {message && <span className={cn(config.text, variantStyles[variant])}>{message}</span>}
       </div>
     );
   }
@@ -103,7 +99,8 @@ const LoadingState = ({
         config.gap,
         'bg-muted/30 rounded-lg border border-dashed border-muted-foreground/30',
         className
-      )} {...props}
+      )}
+      {...props}
     >
       <div className="flex items-center gap-2">
         {/* Animated spinner */}
@@ -117,25 +114,13 @@ const LoadingState = ({
 
         {/* Icon with subtle animation */}
         {showIcon && (
-          <Icon
-            size={config.icon}
-            className={cn(
-              'animate-pulse',
-              variantStyles[variant]
-            )}
-          />
+          <Icon size={config.icon} className={cn('animate-pulse', variantStyles[variant])} />
         )}
       </div>
 
       {/* Loading message */}
       {displayMessage && (
-        <p
-          className={cn(
-            config.text,
-            'font-medium text-center',
-            variantStyles[variant]
-          )}
-        >
+        <p className={cn(config.text, 'font-medium text-center', variantStyles[variant])}>
           {displayMessage}
         </p>
       )}
@@ -159,25 +144,14 @@ const LoadingSkeleton = ({
 
   return (
     <div
-      className={cn(
-        'animate-pulse rounded-md',
-        width,
-        height,
-        variantClasses[variant],
-        className
-      )}
+      className={cn('animate-pulse rounded-md', width, height, variantClasses[variant], className)}
       {...props}
     />
   );
 };
 
 // Pulse component for subtle loading indicators
-const LoadingPulse = ({
-  children,
-  className,
-  isLoading = false,
-  ...props
-}) => {
+const LoadingPulse = ({ children, className, isLoading = false, ...props }) => {
   if (!isLoading) {
     return children;
   }
@@ -190,12 +164,7 @@ const LoadingPulse = ({
 };
 
 // Dots animation for minimal loading states
-const LoadingDots = ({
-  size = 'default',
-  className,
-  variant = 'default',
-  ...props
-}) => {
+const LoadingDots = ({ size = 'default', className, variant = 'default', ...props }) => {
   const sizeClasses = {
     sm: 'w-1 h-1',
     default: 'w-1.5 h-1.5',
@@ -210,18 +179,11 @@ const LoadingDots = ({
   };
 
   return (
-    <div
-      className={cn('flex items-center gap-1', className)}
-      {...props}
-    >
-      {[0, 1, 2].map((i) => (
+    <div className={cn('flex items-center gap-1', className)} {...props}>
+      {[0, 1, 2].map(i => (
         <div
           key={i}
-          className={cn(
-            'rounded-full animate-pulse',
-            sizeClasses[size],
-            variantClasses[variant]
-          )}
+          className={cn('rounded-full animate-pulse', sizeClasses[size], variantClasses[variant])}
           style={{
             animationDelay: `${i * 0.2}s`,
             animationDuration: '1.4s'

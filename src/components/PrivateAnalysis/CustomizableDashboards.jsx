@@ -169,26 +169,26 @@ const CustomizableDashboards = ({ modelData: _modelData, onDataChange: _onDataCh
     { label: 'MOIC', value: '2.4x', change: '+0.3x', positive: true }
   ];
 
-  const handleAddWidget = (widgetId) => {
+  const handleAddWidget = widgetId => {
     const updatedDashboard = {
       ...activeDashboard,
       widgets: [...activeDashboard.widgets, widgetId]
     };
     setActiveDashboard(updatedDashboard);
-    setDashboards(prev => prev.map(d => d.id === activeDashboard.id ? updatedDashboard : d));
+    setDashboards(prev => prev.map(d => (d.id === activeDashboard.id ? updatedDashboard : d)));
     setShowWidgetLibrary(false);
   };
 
-  const handleRemoveWidget = (widgetId) => {
+  const handleRemoveWidget = widgetId => {
     const updatedDashboard = {
       ...activeDashboard,
       widgets: activeDashboard.widgets.filter(w => w !== widgetId)
     };
     setActiveDashboard(updatedDashboard);
-    setDashboards(prev => prev.map(d => d.id === activeDashboard.id ? updatedDashboard : d));
+    setDashboards(prev => prev.map(d => (d.id === activeDashboard.id ? updatedDashboard : d)));
   };
 
-  const renderWidget = (widgetId) => {
+  const renderWidget = widgetId => {
     const widget = availableWidgets.find(w => w.id === widgetId);
     if (!widget) return null;
 
@@ -254,7 +254,7 @@ const CustomizableDashboards = ({ modelData: _modelData, onDataChange: _onDataCh
                   dataKey="revenue"
                   stroke="#10B981"
                   strokeWidth={2}
-                  strokeDasharray={(entry) => entry.projected ? '5 5' : '0'}
+                  strokeDasharray={entry => (entry.projected ? '5 5' : '0')}
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -340,13 +340,13 @@ const CustomizableDashboards = ({ modelData: _modelData, onDataChange: _onDataCh
             <div className="flex items-center space-x-4">
               <select
                 value={activeDashboard.id}
-                onChange={(e) => {
+                onChange={e => {
                   const dashboard = dashboards.find(d => d.id === parseInt(e.target.value));
                   setActiveDashboard(dashboard);
                 }}
                 className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
               >
-                {dashboards.map((dashboard) => (
+                {dashboards.map(dashboard => (
                   <option key={dashboard.id} value={dashboard.id}>
                     {dashboard.name}
                   </option>
@@ -411,7 +411,8 @@ const CustomizableDashboards = ({ modelData: _modelData, onDataChange: _onDataCh
                 <div>
                   <h4 className="font-medium text-yellow-900">Edit Mode Active</h4>
                   <p className="text-sm text-yellow-700 mt-1">
-                    Drag widgets to reorder, click the + button to add new widgets, or use the trash icon to remove widgets.
+                    Drag widgets to reorder, click the + button to add new widgets, or use the trash
+                    icon to remove widgets.
                   </p>
                 </div>
               </div>
@@ -419,7 +420,7 @@ const CustomizableDashboards = ({ modelData: _modelData, onDataChange: _onDataCh
           )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {activeDashboard.widgets.map((widgetId) => (
+            {activeDashboard.widgets.map(widgetId => (
               <motion.div
                 key={widgetId}
                 layout
@@ -435,8 +436,12 @@ const CustomizableDashboards = ({ modelData: _modelData, onDataChange: _onDataCh
             {activeDashboard.widgets.length === 0 && (
               <div className="col-span-full text-center py-12">
                 <LayoutDashboard className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No widgets in this dashboard</h3>
-                <p className="text-gray-600 mb-4">Start building your dashboard by adding some widgets.</p>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                  No widgets in this dashboard
+                </h3>
+                <p className="text-gray-600 mb-4">
+                  Start building your dashboard by adding some widgets.
+                </p>
                 <button
                   onClick={() => setShowWidgetLibrary(true)}
                   className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg font-medium flex items-center mx-auto"
@@ -478,7 +483,7 @@ const CustomizableDashboards = ({ modelData: _modelData, onDataChange: _onDataCh
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {availableWidgets
                   .filter(widget => !activeDashboard.widgets.includes(widget.id))
-                  .map((widget) => {
+                  .map(widget => {
                     const Icon = widget.icon;
                     return (
                       <motion.div

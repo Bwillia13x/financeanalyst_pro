@@ -2,7 +2,7 @@
  * Performance monitoring and bundle size optimization utilities
  * Tracks loading performance and provides insights for optimization
  */
-import React from 'react';
+import { forwardRef, useEffect, createElement } from 'react';
 
 class PerformanceMonitor {
   constructor() {
@@ -18,16 +18,25 @@ class PerformanceMonitor {
       largeBundleWarning: 500000, // bytes (500kb)
       memoryLeakWarning: 50000000 // bytes (50mb)
     };
+
+    // Safe performance reference for browser and Node/Vitest
+    this.perf =
+      typeof globalThis !== 'undefined' && globalThis.performance
+        ? globalThis.performance
+        : typeof performance !== 'undefined'
+          ? performance
+          : null;
   }
 
   /**
    * Monitor component loading time
    */
   measureComponentLoad(componentName, loadPromise) {
-    const startTime = performance.now();
+    const startTime = this.perf ? this.perf.now() : Date.now();
 
     return loadPromise.then(component => {
-      const loadTime = performance.now() - startTime;
+      const end = this.perf ? this.perf.now() : Date.now();
+      const loadTime = end - startTime;
       this.metrics.loadTimes[componentName] = loadTime;
 
       if (loadTime > this.thresholds.slowComponent) {
@@ -42,9 +51,10 @@ class PerformanceMonitor {
    * Monitor component render performance
    */
   measureRender(componentName, renderFunction) {
-    const startTime = performance.now();
+    const startTime = this.perf ? this.perf.now() : Date.now();
     const result = renderFunction();
-    const renderTime = performance.now() - startTime;
+    const end = this.perf ? this.perf.now() : Date.now();
+    const renderTime = end - startTime;
 
     this.metrics.renderTimes[componentName] = renderTime;
 
@@ -59,12 +69,12 @@ class PerformanceMonitor {
    * Track memory usage
    */
   trackMemoryUsage() {
-    if (performance.memory) {
+    if (this.perf && this.perf.memory) {
       const usage = {
         timestamp: Date.now(),
-        used: performance.memory.usedJSHeapSize,
-        total: performance.memory.totalJSHeapSize,
-        limit: performance.memory.jsHeapSizeLimit
+        used: this.perf.memory.usedJSHeapSize,
+        total: this.perf.memory.totalJSHeapSize,
+        limit: this.perf.memory.jsHeapSizeLimit
       };
 
       this.metrics.memoryUsage.push(usage);
@@ -166,7 +176,8 @@ class PerformanceMonitor {
       recommendations.push({
         type: 'memory',
         issue: 'memory_leak',
-        suggestion: 'Potential memory leak detected - check for uncleared intervals and event listeners',
+        suggestion:
+          'Potential memory leak detected - check for uncleared intervals and event listeners',
         impact: 'high'
       });
     }
@@ -230,8 +241,9 @@ class PerformanceMonitor {
     }, 30000);
 
     // Monitor navigation performance
-    if ('navigation' in performance) {
-      const nav = performance.getEntriesByType('navigation')[0];
+    if (this.perf && typeof this.perf.getEntriesByType === 'function') {
+      const entries = this.perf.getEntriesByType('navigation');
+      const nav = entries && entries[0];
       if (nav) {
         console.log('Page load performance:', {
           domContentLoaded: nav.domContentLoadedEventEnd - nav.domContentLoadedEventStart,
@@ -253,15 +265,15 @@ class PerformanceMonitor {
    * React component performance wrapper
    */
   withPerformanceTracking(WrappedComponent, componentName) {
-    const Tracked = React.forwardRef((props, ref) => {
+    const Tracked = forwardRef((props, ref) => {
       const renderStart = performance.now();
 
-      React.useEffect(() => {
+      useEffect(() => {
         const renderTime = performance.now() - renderStart;
         this.metrics.renderTimes[componentName] = renderTime;
       }, []);
 
-      return React.createElement(WrappedComponent, { ...props, ref });
+      return createElement(WrappedComponent, { ...props, ref });
     });
     Tracked.displayName = `WithPerformance(${componentName})`;
     return Tracked;
@@ -271,10 +283,11 @@ class PerformanceMonitor {
    * Lazy loading with performance tracking
    */
   trackLazyLoad(importFunction, componentName) {
-    const startTime = performance.now();
+    const startTime = this.perf ? this.perf.now() : Date.now();
 
     return importFunction().then(module => {
-      const loadTime = performance.now() - startTime;
+      const end = this.perf ? this.perf.now() : Date.now();
+      const loadTime = end - startTime;
       this.metrics.loadTimes[componentName] = loadTime;
 
       console.log(`Lazy loaded ${componentName} in ${loadTime.toFixed(2)}ms`);
@@ -288,14 +301,16 @@ class PerformanceMonitor {
 const performanceMonitor = new PerformanceMonitor();
 
 // Export convenience functions
-export const measureComponentLoad = (name, promise) => performanceMonitor.measureComponentLoad(name, promise);
+export const measureComponentLoad = (name, promise) =>
+  performanceMonitor.measureComponentLoad(name, promise);
 export const measureRender = (name, fn) => performanceMonitor.measureRender(name, fn);
 export const trackMemoryUsage = () => performanceMonitor.trackMemoryUsage();
 export const getPerformanceReport = () => performanceMonitor.getPerformanceReport();
-export const analyzeBundleSize = (chunks) => performanceMonitor.analyzeBundleSize(chunks);
+export const analyzeBundleSize = chunks => performanceMonitor.analyzeBundleSize(chunks);
 export const startPerformanceMonitoring = () => performanceMonitor.startPerformanceMonitoring();
 export const stopPerformanceMonitoring = () => performanceMonitor.stopPerformanceMonitoring();
-export const withPerformanceTracking = (component, name) => performanceMonitor.withPerformanceTracking(component, name);
+export const withPerformanceTracking = (component, name) =>
+  performanceMonitor.withPerformanceTracking(component, name);
 export const trackLazyLoad = (importFn, name) => performanceMonitor.trackLazyLoad(importFn, name);
 
 export default performanceMonitor;

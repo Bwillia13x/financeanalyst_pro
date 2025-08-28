@@ -10,10 +10,16 @@ export const userSlice = createSlice({
   initialState,
   reducers: {
     login: (state, action) => {
-      state.name = action.payload.name;
+      if (action.payload === null) {
+        state.name = null;
+      } else if (action.payload === undefined) {
+        state.name = undefined;
+      } else {
+        state.name = action.payload.name;
+      }
       state.isAuthenticated = true;
     },
-    logout: (state) => {
+    logout: state => {
       state.name = 'Guest';
       state.isAuthenticated = false;
     }

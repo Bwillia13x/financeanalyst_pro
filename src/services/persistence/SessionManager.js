@@ -171,7 +171,6 @@ export class SessionManager {
         session,
         user
       };
-
     } catch (error) {
       console.error('Failed to create session:', error);
       throw error;
@@ -211,7 +210,6 @@ export class SessionManager {
       this.notifyListeners('sessionLoaded', { session, user });
 
       return { session, user };
-
     } catch (error) {
       console.error('Failed to load session:', error);
       // Clear corrupted session data
@@ -234,13 +232,13 @@ export class SessionManager {
 
       // Extend session if needed
       const timeUntilExpiry = this.currentSession.expires - Date.now();
-      if (timeUntilExpiry < this.sessionTimeout * 0.1) { // Extend if less than 10% time left
+      if (timeUntilExpiry < this.sessionTimeout * 0.1) {
+        // Extend if less than 10% time left
         this.currentSession.expires = Date.now() + this.sessionTimeout;
       }
 
       await this.storeSession(this.currentSession);
       return true;
-
     } catch (error) {
       console.error('Failed to update session activity:', error);
       return false;
@@ -266,7 +264,6 @@ export class SessionManager {
       this.notifyListeners('sessionDestroyed', { session, user });
 
       return true;
-
     } catch (error) {
       console.error('Failed to destroy session:', error);
       return false;
@@ -330,7 +327,6 @@ export class SessionManager {
       this.notifyListeners('preferencesUpdated', { preferences: this.currentUser.preferences });
 
       return this.currentUser.preferences;
-
     } catch (error) {
       console.error('Failed to update preferences:', error);
       throw error;
@@ -413,7 +409,6 @@ export class SessionManager {
       this.notifyListeners('sessionImported', { session, user });
 
       return { success: true, session, user };
-
     } catch (error) {
       console.error('Failed to import session data:', error);
       throw error;
@@ -495,7 +490,8 @@ export class SessionManager {
 
     const throttledUpdate = this.throttle(() => {
       const now = Date.now();
-      if (now - lastActivity > 60000) { // Update every minute
+      if (now - lastActivity > 60000) {
+        // Update every minute
         this.updateActivity();
         lastActivity = now;
       }
@@ -534,13 +530,13 @@ export class SessionManager {
    */
   throttle(func, limit) {
     let inThrottle;
-    return function() {
+    return function () {
       const args = arguments;
       const context = this;
       if (!inThrottle) {
         func.apply(context, args);
         inThrottle = true;
-        setTimeout(() => inThrottle = false, limit);
+        setTimeout(() => (inThrottle = false), limit);
       }
     };
   }

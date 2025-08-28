@@ -51,29 +51,31 @@ export class BackupService {
 
       // Include user settings and preferences
       if (includeSettings) {
-        backupData.data.settings = await persistenceManager.retrieve('user_preferences') || {};
-        backupData.data.session = await persistenceManager.retrieve('session_data') || {};
+        backupData.data.settings = (await persistenceManager.retrieve('user_preferences')) || {};
+        backupData.data.session = (await persistenceManager.retrieve('session_data')) || {};
       }
 
       // Include watchlists
       if (includeWatchlists) {
-        backupData.data.watchlists = await persistenceManager.retrieve('watchlists') || {};
+        backupData.data.watchlists = (await persistenceManager.retrieve('watchlists')) || {};
       }
 
       // Include alerts
       if (includeAlerts) {
-        backupData.data.alerts = await persistenceManager.retrieve('alerts') || [];
+        backupData.data.alerts = (await persistenceManager.retrieve('alerts')) || [];
       }
 
       // Include command and analysis history
       if (includeHistory) {
-        backupData.data.commandHistory = await persistenceManager.retrieve('command_history') || [];
-        backupData.data.analysisHistory = await persistenceManager.retrieve('analysis_history') || [];
+        backupData.data.commandHistory =
+          (await persistenceManager.retrieve('command_history')) || [];
+        backupData.data.analysisHistory =
+          (await persistenceManager.retrieve('analysis_history')) || [];
       }
 
       // Include cached data (optional, can be large)
       if (includeCachedData) {
-        backupData.data.cachedData = await persistenceManager.retrieve('cached_data') || {};
+        backupData.data.cachedData = (await persistenceManager.retrieve('cached_data')) || {};
       }
 
       // Calculate backup size
@@ -81,7 +83,9 @@ export class BackupService {
       const originalSize = backupString.length;
 
       if (originalSize > this.maxBackupSize) {
-        throw new Error(`Backup too large: ${originalSize} bytes exceeds ${this.maxBackupSize} bytes`);
+        throw new Error(
+          `Backup too large: ${originalSize} bytes exceeds ${this.maxBackupSize} bytes`
+        );
       }
 
       // Compress if requested
@@ -114,7 +118,6 @@ export class BackupService {
         metadata: backupData.metadata,
         timestamp: backupData.timestamp
       };
-
     } catch (error) {
       console.error('Failed to create backup:', error);
       throw error;
@@ -166,13 +169,15 @@ export class BackupService {
 
       // Validate backup version compatibility
       if (!this.isVersionCompatible(backupData.version)) {
-        throw new Error(`Backup version ${backupData.version} is not compatible with current version ${this.backupVersion}`);
+        throw new Error(
+          `Backup version ${backupData.version} is not compatible with current version ${this.backupVersion}`
+        );
       }
 
       // Restore data selectively or completely
-      const dataToRestore = selectiveRestore ?
-        this.filterBackupData(backupData.data, selectiveRestore) :
-        backupData.data;
+      const dataToRestore = selectiveRestore
+        ? this.filterBackupData(backupData.data, selectiveRestore)
+        : backupData.data;
 
       const restoreResults = {
         restored: 0,
@@ -199,7 +204,6 @@ export class BackupService {
 
           restoreResults.restored++;
           restoreResults.details[dataType] = 'restored';
-
         } catch (error) {
           console.error(`Failed to restore ${dataType}:`, error);
           restoreResults.errors++;
@@ -214,7 +218,6 @@ export class BackupService {
         restoreTimestamp: new Date().toISOString(),
         results: restoreResults
       };
-
     } catch (error) {
       console.error('Failed to restore backup:', error);
       throw error;
@@ -231,7 +234,9 @@ export class BackupService {
 
       for (const key of backupKeys) {
         if (key.startsWith('backup_')) {
-          const backup = await persistenceManager.indexedDB.retrieve(key, { storeName: 'export_data' });
+          const backup = await persistenceManager.indexedDB.retrieve(key, {
+            storeName: 'export_data'
+          });
           if (backup) {
             backups.push({
               id: key,
@@ -249,7 +254,6 @@ export class BackupService {
       backups.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
       return backups;
-
     } catch (error) {
       console.error('Failed to list backups:', error);
       return [];
@@ -287,7 +291,8 @@ export class BackupService {
       const dataString = JSON.stringify(exportData, null, 2);
       const blob = new Blob([dataString], { type: 'application/json' });
 
-      const suggestedFilename = filename ||
+      const suggestedFilename =
+        filename ||
         `financeanalyst_backup_${backupId}_${new Date().toISOString().split('T')[0]}.json`;
 
       return {
@@ -296,7 +301,6 @@ export class BackupService {
         size: blob.size,
         type: 'application/json'
       };
-
     } catch (error) {
       console.error('Failed to export backup to file:', error);
       throw error;
@@ -323,7 +327,6 @@ export class BackupService {
         backupId: backupData.backupId,
         timestamp: backupData.metadata.timestamp
       };
-
     } catch (error) {
       console.error('Failed to import backup from file:', error);
       throw error;
@@ -347,7 +350,6 @@ export class BackupService {
       };
 
       return stats;
-
     } catch (error) {
       console.error('Failed to get backup stats:', error);
       return null;
@@ -410,7 +412,6 @@ export class BackupService {
 
         console.warn(`✅ Cleaned up ${backupsToDelete.length} old backups`);
       }
-
     } catch (error) {
       console.error('Failed to cleanup old backups:', error);
     }

@@ -37,7 +37,7 @@ class AdvancedFinancialMetrics {
       ),
       defensiveInterval: this.safeDivide(
         balanceSheet.cash + balanceSheet.marketableSecurities + balanceSheet.accountsReceivable,
-        incomeStatement.dailyOperatingExpenses || (incomeStatement.operatingExpenses / 365)
+        incomeStatement.dailyOperatingExpenses || incomeStatement.operatingExpenses / 365
       ),
       workingCapital: balanceSheet.currentAssets - balanceSheet.currentLiabilities,
       workingCapitalRatio: this.safeDivide(
@@ -48,7 +48,7 @@ class AdvancedFinancialMetrics {
       // Days-based metrics
       daysInCash: this.safeDivide(
         balanceSheet.cash,
-        incomeStatement.dailyOperatingExpenses || (incomeStatement.operatingExpenses / 365)
+        incomeStatement.dailyOperatingExpenses || incomeStatement.operatingExpenses / 365
       ),
       cashConversionCycle: this.calculateCashConversionCycle(financialData)
     };
@@ -156,7 +156,10 @@ class AdvancedFinancialMetrics {
       // Activity ratios
       assetTurnover: this.safeDivide(incomeStatement.revenue, balanceSheet.totalAssets),
       inventoryTurnover: this.safeDivide(incomeStatement.cogs, balanceSheet.inventory),
-      receivablesTurnover: this.safeDivide(incomeStatement.revenue, balanceSheet.accountsReceivable),
+      receivablesTurnover: this.safeDivide(
+        incomeStatement.revenue,
+        balanceSheet.accountsReceivable
+      ),
       payablesTurnover: this.safeDivide(incomeStatement.cogs, balanceSheet.accountsPayable),
       workingCapitalTurnover: this.safeDivide(
         incomeStatement.revenue,
@@ -164,9 +167,18 @@ class AdvancedFinancialMetrics {
       ),
 
       // Days ratios
-      daysInInventory: this.safeDivide(365, this.safeDivide(incomeStatement.cogs, balanceSheet.inventory)),
-      daysInReceivables: this.safeDivide(365, this.safeDivide(incomeStatement.revenue, balanceSheet.accountsReceivable)),
-      daysInPayables: this.safeDivide(365, this.safeDivide(incomeStatement.cogs, balanceSheet.accountsPayable)),
+      daysInInventory: this.safeDivide(
+        365,
+        this.safeDivide(incomeStatement.cogs, balanceSheet.inventory)
+      ),
+      daysInReceivables: this.safeDivide(
+        365,
+        this.safeDivide(incomeStatement.revenue, balanceSheet.accountsReceivable)
+      ),
+      daysInPayables: this.safeDivide(
+        365,
+        this.safeDivide(incomeStatement.cogs, balanceSheet.accountsPayable)
+      ),
 
       // Fixed asset efficiency
       fixedAssetTurnover: this.safeDivide(incomeStatement.revenue, balanceSheet.netPPE),
@@ -195,7 +207,12 @@ class AdvancedFinancialMetrics {
    */
   calculateValuationRatios(financialData) {
     const { balanceSheet, incomeStatement, marketData } = financialData;
-    const { stockPrice, sharesOutstanding: _sharesOutstanding, marketCap, enterpriseValue } = marketData;
+    const {
+      stockPrice,
+      sharesOutstanding: _sharesOutstanding,
+      marketCap,
+      enterpriseValue
+    } = marketData;
 
     return {
       // Price ratios
@@ -204,7 +221,7 @@ class AdvancedFinancialMetrics {
       priceToSales: this.safeDivide(marketCap, incomeStatement.revenue),
       priceToTangibleBook: this.safeDivide(
         marketCap,
-        balanceSheet.tangibleBookValue || (balanceSheet.totalEquity - balanceSheet.intangibleAssets)
+        balanceSheet.tangibleBookValue || balanceSheet.totalEquity - balanceSheet.intangibleAssets
       ),
 
       // Enterprise ratios
@@ -275,9 +292,12 @@ class AdvancedFinancialMetrics {
    */
   calculateROIC(financialData) {
     const { balanceSheet, incomeStatement } = financialData;
-    const nopat = incomeStatement.nopat || (incomeStatement.ebit * (1 - incomeStatement.taxRate));
-    const investedCapital = balanceSheet.totalAssets - balanceSheet.currentLiabilities +
-                           balanceSheet.cash - balanceSheet.goodwill;
+    const nopat = incomeStatement.nopat || incomeStatement.ebit * (1 - incomeStatement.taxRate);
+    const investedCapital =
+      balanceSheet.totalAssets -
+      balanceSheet.currentLiabilities +
+      balanceSheet.cash -
+      balanceSheet.goodwill;
 
     return this.safeDivide(nopat, investedCapital);
   }
@@ -288,10 +308,10 @@ class AdvancedFinancialMetrics {
   calculateEVA(financialData) {
     const { balanceSheet, incomeStatement, assumptions } = financialData;
     const wacc = assumptions?.wacc || 0.1;
-    const nopat = incomeStatement.nopat || (incomeStatement.ebit * (1 - incomeStatement.taxRate));
+    const nopat = incomeStatement.nopat || incomeStatement.ebit * (1 - incomeStatement.taxRate);
     const investedCapital = balanceSheet.totalAssets - balanceSheet.currentLiabilities;
 
-    return nopat - (wacc * investedCapital);
+    return nopat - wacc * investedCapital;
   }
 
   /**
@@ -302,7 +322,7 @@ class AdvancedFinancialMetrics {
     const requiredReturn = assumptions?.requiredReturn || 0.12;
     const totalCapital = balanceSheet.totalDebt + balanceSheet.totalEquity;
 
-    return incomeStatement.netIncome - (requiredReturn * totalCapital);
+    return incomeStatement.netIncome - requiredReturn * totalCapital;
   }
 
   /**
@@ -312,7 +332,7 @@ class AdvancedFinancialMetrics {
     const { balanceSheet, incomeStatement, assumptions } = financialData;
     const costOfEquity = assumptions?.costOfEquity || 0.12;
 
-    return incomeStatement.netIncome - (costOfEquity * balanceSheet.totalEquity);
+    return incomeStatement.netIncome - costOfEquity * balanceSheet.totalEquity;
   }
 
   /**
@@ -360,9 +380,18 @@ class AdvancedFinancialMetrics {
   calculateCashConversionCycle(financialData) {
     const { balanceSheet, incomeStatement } = financialData;
 
-    const daysInInventory = this.safeDivide(365, this.safeDivide(incomeStatement.cogs, balanceSheet.inventory));
-    const daysInReceivables = this.safeDivide(365, this.safeDivide(incomeStatement.revenue, balanceSheet.accountsReceivable));
-    const daysInPayables = this.safeDivide(365, this.safeDivide(incomeStatement.cogs, balanceSheet.accountsPayable));
+    const daysInInventory = this.safeDivide(
+      365,
+      this.safeDivide(incomeStatement.cogs, balanceSheet.inventory)
+    );
+    const daysInReceivables = this.safeDivide(
+      365,
+      this.safeDivide(incomeStatement.revenue, balanceSheet.accountsReceivable)
+    );
+    const daysInPayables = this.safeDivide(
+      365,
+      this.safeDivide(incomeStatement.cogs, balanceSheet.accountsPayable)
+    );
 
     return daysInInventory + daysInReceivables - daysInPayables;
   }
@@ -404,13 +433,18 @@ class AdvancedFinancialMetrics {
     if (incomeStatement.operatingCashFlow > incomeStatement.netIncome) score += 1;
 
     // Leverage, liquidity and source of funds signals (3 points max)
-    if (balanceSheet.longTermDebt < (priorYearData?.balanceSheet?.longTermDebt || Infinity)) score += 1;
+    if (balanceSheet.longTermDebt < (priorYearData?.balanceSheet?.longTermDebt || Infinity))
+      score += 1;
     if (this.calculateCurrentRatio(financialData) > (priorYearData?.currentRatio || 0)) score += 1;
-    if (balanceSheet.sharesOutstanding <= (priorYearData?.balanceSheet?.sharesOutstanding || Infinity)) score += 1;
+    if (
+      balanceSheet.sharesOutstanding <= (priorYearData?.balanceSheet?.sharesOutstanding || Infinity)
+    )
+      score += 1;
 
     // Operating efficiency signals (2 points max)
     if (this.calculateGrossMargin(financialData) > (priorYearData?.grossMargin || 0)) score += 1;
-    if (this.calculateAssetTurnover(financialData) > (priorYearData?.assetTurnover || 0)) score += 1;
+    if (this.calculateAssetTurnover(financialData) > (priorYearData?.assetTurnover || 0))
+      score += 1;
 
     return score;
   }
@@ -536,12 +570,12 @@ class AdvancedFinancialMetrics {
   scoreProfitability(ratios) {
     let score = 0;
     if (ratios.roe >= 0.15) score += 25;
-    else if (ratios.roe >= 0.10) score += 20;
+    else if (ratios.roe >= 0.1) score += 20;
     else if (ratios.roe >= 0.05) score += 15;
     else if (ratios.roe > 0) score += 10;
     else score += 0;
 
-    if (ratios.netMargin >= 0.10) score += 25;
+    if (ratios.netMargin >= 0.1) score += 25;
     else if (ratios.netMargin >= 0.05) score += 20;
     else if (ratios.netMargin >= 0.02) score += 15;
     else if (ratios.netMargin > 0) score += 10;
@@ -673,7 +707,8 @@ class AdvancedFinancialMetrics {
 
     const cashFlows = historicalData.map(period => period.operatingCashFlow);
     const mean = cashFlows.reduce((sum, cf) => sum + cf, 0) / cashFlows.length;
-    const variance = cashFlows.reduce((sum, cf) => sum + Math.pow(cf - mean, 2), 0) / cashFlows.length;
+    const variance =
+      cashFlows.reduce((sum, cf) => sum + Math.pow(cf - mean, 2), 0) / cashFlows.length;
 
     return Math.sqrt(variance) / Math.abs(mean); // Coefficient of variation
   }
@@ -752,7 +787,10 @@ class AdvancedFinancialMetrics {
     const { balanceSheet, incomeStatement, priorYearData: _priorYearData } = financialData;
 
     // Placeholder calculation - would need proper implementation with all 8 variables
-    const daysInReceivables = this.safeDivide(365, this.safeDivide(incomeStatement.revenue, balanceSheet.accountsReceivable));
+    const daysInReceivables = this.safeDivide(
+      365,
+      this.safeDivide(incomeStatement.revenue, balanceSheet.accountsReceivable)
+    );
     const grossMargin = this.safeDivide(incomeStatement.grossProfit, incomeStatement.revenue);
     const assetTurnover = this.safeDivide(incomeStatement.revenue, balanceSheet.totalAssets);
 
@@ -772,12 +810,21 @@ class AdvancedFinancialMetrics {
       balanceSheet.currentAssets - balanceSheet.currentLiabilities,
       balanceSheet.totalAssets
     );
-    const currentLiabilities = this.safeDivide(balanceSheet.currentLiabilities, balanceSheet.currentAssets);
+    const currentLiabilities = this.safeDivide(
+      balanceSheet.currentLiabilities,
+      balanceSheet.currentAssets
+    );
     const netIncome = this.safeDivide(incomeStatement.netIncome, balanceSheet.totalAssets);
 
     // Simplified O-Score calculation
-    return -1.32 - 0.407 * size + 6.03 * leverage - 1.43 * workingCapital +
-           0.0757 * currentLiabilities - 2.37 * netIncome;
+    return (
+      -1.32 -
+      0.407 * size +
+      6.03 * leverage -
+      1.43 * workingCapital +
+      0.0757 * currentLiabilities -
+      2.37 * netIncome
+    );
   }
 
   /**
@@ -815,10 +862,10 @@ export const advancedFinancialMetrics = new AdvancedFinancialMetrics();
 // Treatment Mix Normalization for Medispa Revenue Analysis
 export const treatmentMixAdjustment = (revenue, treatmentBreakdown) => {
   const optimalMix = {
-    injectables: 0.45,      // Higher margin treatments (Botox, fillers)
-    energyDevices: 0.25,    // Laser, RF, IPL treatments
-    skincare: 0.20,         // Products and facial treatments
-    bodyTreatments: 0.10    // CoolSculpting, body contouring
+    injectables: 0.45, // Higher margin treatments (Botox, fillers)
+    energyDevices: 0.25, // Laser, RF, IPL treatments
+    skincare: 0.2, // Products and facial treatments
+    bodyTreatments: 0.1 // CoolSculpting, body contouring
   };
 
   let adjustedRevenue = 0;
@@ -848,20 +895,20 @@ export const treatmentMixAdjustment = (revenue, treatmentBreakdown) => {
 };
 
 // Seasonality Smoothing for Aesthetic Services
-export const seasonalityAdjustment = (monthlyRevenue) => {
+export const seasonalityAdjustment = monthlyRevenue => {
   const seasonalFactors = {
-    1: 0.85,  // January - post-holiday slow
-    2: 0.90,  // February - gradual pickup
-    3: 1.05,  // March - spring preparation
-    4: 1.10,  // April - wedding season starts
-    5: 1.15,  // May - peak wedding/graduation season
-    6: 1.05,  // June - summer activities
-    7: 0.95,  // July - vacation slowdown
-    8: 0.90,  // August - continued vacation impact
-    9: 1.05,  // September - back-to-school boost
-    10: 1.10, // October - holiday preparation
+    1: 0.85, // January - post-holiday slow
+    2: 0.9, // February - gradual pickup
+    3: 1.05, // March - spring preparation
+    4: 1.1, // April - wedding season starts
+    5: 1.15, // May - peak wedding/graduation season
+    6: 1.05, // June - summer activities
+    7: 0.95, // July - vacation slowdown
+    8: 0.9, // August - continued vacation impact
+    9: 1.05, // September - back-to-school boost
+    10: 1.1, // October - holiday preparation
     11: 0.95, // November - holiday distraction
-    12: 0.95  // December - holiday season impact
+    12: 0.95 // December - holiday season impact
   };
 
   const normalizedRevenue = monthlyRevenue.map((revenue, index) => ({
@@ -869,7 +916,7 @@ export const seasonalityAdjustment = (monthlyRevenue) => {
     original: revenue,
     seasonalFactor: seasonalFactors[index + 1],
     normalized: revenue / seasonalFactors[index + 1],
-    adjustment: (revenue / seasonalFactors[index + 1]) - revenue
+    adjustment: revenue / seasonalFactors[index + 1] - revenue
   }));
 
   const totalNormalized = normalizedRevenue.reduce((sum, month) => sum + month.normalized, 0);
@@ -885,7 +932,7 @@ export const seasonalityAdjustment = (monthlyRevenue) => {
 };
 
 // Medispa-Specific KPI Calculator
-export const calculateMedspaMetrics = (financialData) => {
+export const calculateMedspaMetrics = financialData => {
   const {
     totalRevenue,
     squareFootage,
@@ -930,19 +977,14 @@ export const calculateMedspaMetrics = (financialData) => {
 };
 
 // Helper Functions for Medispa Calculations
-const calculateCustomerLTV = (customerData) => {
-  const {
-    avgSpend = 0,
-    frequency = 0,
-    retentionRate = 0.7,
-    years = 5
-  } = customerData;
+const calculateCustomerLTV = customerData => {
+  const { avgSpend = 0, frequency = 0, retentionRate = 0.7, years = 5 } = customerData;
 
   if (!avgSpend || !frequency) return null;
 
   let clv = 0;
   for (let year = 1; year <= years; year++) {
-    clv += (avgSpend * frequency * Math.pow(retentionRate, year - 1));
+    clv += avgSpend * frequency * Math.pow(retentionRate, year - 1);
   }
 
   return {
@@ -953,12 +995,8 @@ const calculateCustomerLTV = (customerData) => {
   };
 };
 
-const calculateCAC = (operatingData) => {
-  const {
-    marketingSpend = 0,
-    salesExpenses = 0,
-    newCustomers = 0
-  } = operatingData;
+const calculateCAC = operatingData => {
+  const { marketingSpend = 0, salesExpenses = 0, newCustomers = 0 } = operatingData;
 
   if (!newCustomers) return null;
 
@@ -971,12 +1009,8 @@ const calculateCAC = (operatingData) => {
   };
 };
 
-const calculateInjectableMargin = (treatmentData) => {
-  const {
-    injectableRevenue = 0,
-    productCosts = 0,
-    laborCosts = 0
-  } = treatmentData;
+const calculateInjectableMargin = treatmentData => {
+  const { injectableRevenue = 0, productCosts = 0, laborCosts = 0 } = treatmentData;
 
   if (!injectableRevenue) return null;
 
@@ -992,13 +1026,8 @@ const calculateInjectableMargin = (treatmentData) => {
   };
 };
 
-const calculateDeviceROI = (treatmentData) => {
-  const {
-    deviceRevenue = 0,
-    deviceCost = 0,
-    deviceLife = 5,
-    maintenanceCosts = 0
-  } = treatmentData;
+const calculateDeviceROI = treatmentData => {
+  const { deviceRevenue = 0, deviceCost = 0, deviceLife = 5, maintenanceCosts = 0 } = treatmentData;
 
   if (!deviceCost) return null;
 
@@ -1011,7 +1040,7 @@ const calculateDeviceROI = (treatmentData) => {
     paybackPeriod,
     annualDepreciation,
     netAnnualCashFlow: deviceRevenue - annualDepreciation - maintenanceCosts,
-    totalROI: ((deviceRevenue * deviceLife) - deviceCost - (maintenanceCosts * deviceLife)) / deviceCost
+    totalROI: (deviceRevenue * deviceLife - deviceCost - maintenanceCosts * deviceLife) / deviceCost
   };
 };
 
@@ -1019,8 +1048,8 @@ const calculateDeviceROI = (treatmentData) => {
 const getMedspaBenchmarks = () => ({
   revenuePerSquareFoot: { min: 400, target: 800, excellent: 1200 },
   revenuePerProvider: { min: 250000, target: 400000, excellent: 600000 },
-  injectableGrossMargin: { min: 0.70, target: 0.80, excellent: 0.85 },
-  customerRetentionRate: { min: 0.60, target: 0.75, excellent: 0.85 },
+  injectableGrossMargin: { min: 0.7, target: 0.8, excellent: 0.85 },
+  customerRetentionRate: { min: 0.6, target: 0.75, excellent: 0.85 },
   appointmentUtilization: { min: 0.65, target: 0.75, excellent: 0.85 },
   ebitdaMargin: { min: 0.15, target: 0.25, excellent: 0.35 },
   averageTicket: { min: 300, target: 500, excellent: 800 },
@@ -1092,22 +1121,22 @@ const calculatePerformanceScore = (metrics, benchmarks) => {
 };
 
 // Additional Utility Functions
-const calculateUtilizationRate = (operatingData) => {
+const calculateUtilizationRate = operatingData => {
   const { scheduledHours = 0, availableHours = 0 } = operatingData;
   return availableHours > 0 ? scheduledHours / availableHours : null;
 };
 
-const calculateAverageTicket = (customerData) => {
+const calculateAverageTicket = customerData => {
   const { totalRevenue = 0, totalTransactions = 0 } = customerData;
   return totalTransactions > 0 ? totalRevenue / totalTransactions : null;
 };
 
-const calculateEBITDAMargin = (financialData) => {
+const calculateEBITDAMargin = financialData => {
   const { ebitda = 0, totalRevenue = 0 } = financialData;
   return totalRevenue > 0 ? ebitda / totalRevenue : null;
 };
 
-const calculateCashConversionCycle = (financialData) => {
+const calculateCashConversionCycle = financialData => {
   const {
     accountsReceivable = 0,
     inventory = 0,

@@ -1,15 +1,11 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 import { cryptoUtils } from '../../utils/cryptoUtils.js';
-import {
-  encryptionService,
-  DATA_CLASSIFICATION,
-  ENCRYPTION_CONFIG
-} from '../encryptionService.js';
+import { encryptionService, DATA_CLASSIFICATION, ENCRYPTION_CONFIG } from '../encryptionService.js';
 
 vi.mock('../../utils/cryptoUtils.js', () => ({
   cryptoUtils: {
-    getRandomValues: vi.fn((arr) => {
+    getRandomValues: vi.fn(arr => {
       for (let i = 0; i < arr.length; i++) {
         arr[i] = Math.floor(Math.random() * 256);
       }
@@ -28,16 +24,16 @@ vi.mock('../../utils/cryptoUtils.js', () => ({
 }));
 
 // Mock btoa and atob
-global.btoa = vi.fn((str) => Buffer.from(str, 'binary').toString('base64'));
-global.atob = vi.fn((str) => Buffer.from(str, 'base64').toString('binary'));
+global.btoa = vi.fn(str => Buffer.from(str, 'binary').toString('base64'));
+global.atob = vi.fn(str => Buffer.from(str, 'base64').toString('binary'));
 
 // Mock TextEncoder and TextDecoder
 global.TextEncoder = vi.fn(() => ({
-  encode: vi.fn((str) => new Uint8Array(Buffer.from(str, 'utf8')))
+  encode: vi.fn(str => new Uint8Array(Buffer.from(str, 'utf8')))
 }));
 
 global.TextDecoder = vi.fn(() => ({
-  decode: vi.fn((buffer) => {
+  decode: vi.fn(buffer => {
     if (!buffer) return '';
     return Buffer.from(buffer).toString('utf8');
   })
@@ -59,12 +55,12 @@ describe('EncryptionService', () => {
     });
 
     it('should handle unsupported crypto environment', () => {
-      const service = new (encryptionService.constructor)();
+      const service = new encryptionService.constructor();
       service.isSupported = false;
       expect(service.isSupported).toBe(false);
     });
 
-    it('should initialize with password successfully', async() => {
+    it('should initialize with password successfully', async () => {
       const mockKey = { key: 'mock-key', salt: new Uint8Array(16) };
 
       cryptoUtils.subtle.importKey.mockResolvedValue('mock-key-material');
@@ -77,8 +73,10 @@ describe('EncryptionService', () => {
       expect(encryptionService.masterKey).toBe(mockKey);
     });
 
-    it('should handle initialization failure', async() => {
-      const spy = vi.spyOn(encryptionService, 'deriveKeyFromPassword').mockRejectedValue(new Error('Derivation failed'));
+    it('should handle initialization failure', async () => {
+      const spy = vi
+        .spyOn(encryptionService, 'deriveKeyFromPassword')
+        .mockRejectedValue(new Error('Derivation failed'));
 
       const result = await encryptionService.initialize('test-password');
       expect(result).toBe(false);
@@ -92,7 +90,7 @@ describe('EncryptionService', () => {
       vi.clearAllMocks();
     });
 
-    it('should derive key from password with salt', async() => {
+    it('should derive key from password with salt', async () => {
       const mockSalt = new Uint8Array(16);
       const mockKeyMaterial = 'mock-key-material';
       const mockDerivedKey = 'mock-derived-key';
@@ -116,7 +114,7 @@ describe('EncryptionService', () => {
       );
     });
 
-    it('should generate random salt when not provided', async() => {
+    it('should generate random salt when not provided', async () => {
       const mockKeyMaterial = 'mock-key-material';
       const mockDerivedKey = 'mock-derived-key';
 
@@ -129,7 +127,7 @@ describe('EncryptionService', () => {
       expect(result.salt.length).toBe(ENCRYPTION_CONFIG.saltLength);
     });
 
-    it('should generate random encryption key', async() => {
+    it('should generate random encryption key', async () => {
       const mockKey = 'mock-generated-key';
       cryptoUtils.subtle.generateKey.mockResolvedValue(mockKey);
 
@@ -146,7 +144,7 @@ describe('EncryptionService', () => {
       );
     });
 
-    it('should throw error when generating key without crypto support', async() => {
+    it('should throw error when generating key without crypto support', async () => {
       const originalSupported = encryptionService.isSupported;
       encryptionService.isSupported = false;
 
@@ -165,7 +163,7 @@ describe('EncryptionService', () => {
       cryptoUtils.subtle.encrypt.mockResolvedValue(mockEncryptedBuffer);
     });
 
-    it('should encrypt data successfully', async() => {
+    it('should encrypt data successfully', async () => {
       const testData = { message: 'Hello, World!' };
 
       const result = await encryptionService.encryptData(testData);
@@ -175,7 +173,7 @@ describe('EncryptionService', () => {
       expect(result.data.length).toBeGreaterThan(0);
     });
 
-    it('should decrypt data successfully', async() => {
+    it('should decrypt data successfully', async () => {
       const testData = { message: 'Hello, World!' };
 
       // First, setup mocks for encryption
@@ -193,7 +191,7 @@ describe('EncryptionService', () => {
       expect(decrypted).toEqual(testData);
     });
 
-    it('should handle encryption without crypto support', async() => {
+    it('should handle encryption without crypto support', async () => {
       const originalSupported = encryptionService.isSupported;
       encryptionService.isSupported = false;
 
@@ -206,7 +204,7 @@ describe('EncryptionService', () => {
       encryptionService.isSupported = originalSupported;
     });
 
-    it('should decrypt data successfully', async() => {
+    it('should decrypt data successfully', async () => {
       const encryptedData = {
         encrypted: true,
         data: 'encrypted-data',
@@ -221,7 +219,7 @@ describe('EncryptionService', () => {
       expect(result).toEqual({ test: 'data' });
     });
 
-    it('should handle decryption of non-encrypted data', async() => {
+    it('should handle decryption of non-encrypted data', async () => {
       const nonEncryptedData = { encrypted: false, data: { test: 'data' } };
 
       const result = await encryptionService.decryptData(nonEncryptedData);
@@ -272,7 +270,7 @@ describe('EncryptionService', () => {
       encryptionService.masterKey = { key: 'mock-master-key' };
     });
 
-    it('should encrypt sensitive fields only', async() => {
+    it('should encrypt sensitive fields only', async () => {
       const data = {
         publicInfo: 'public',
         personalInfo: { name: 'John Doe' },
@@ -284,13 +282,16 @@ describe('EncryptionService', () => {
         data: 'encrypted-value'
       });
 
-      const result = await encryptionService.encryptSensitiveFields(data, DATA_CLASSIFICATION.CONFIDENTIAL);
+      const result = await encryptionService.encryptSensitiveFields(
+        data,
+        DATA_CLASSIFICATION.CONFIDENTIAL
+      );
 
       expect(result.encryptedFields).toContain('personalInfo');
       expect(result.data.publicInfo).toBe('public');
     });
 
-    it('should encrypt entire object for restricted data', async() => {
+    it('should encrypt entire object for restricted data', async () => {
       const data = { test: 'data' };
 
       vi.spyOn(encryptionService, 'encryptData').mockResolvedValue({
@@ -298,13 +299,16 @@ describe('EncryptionService', () => {
         data: 'encrypted-entire-object'
       });
 
-      const result = await encryptionService.encryptSensitiveFields(data, DATA_CLASSIFICATION.RESTRICTED);
+      const result = await encryptionService.encryptSensitiveFields(
+        data,
+        DATA_CLASSIFICATION.RESTRICTED
+      );
 
       expect(result.encrypted).toBe(true);
       expect(result.data).toBe('encrypted-entire-object');
     });
 
-    it('should decrypt sensitive fields', async() => {
+    it('should decrypt sensitive fields', async () => {
       const encryptedData = {
         encrypted: true,
         data: {
@@ -340,7 +344,7 @@ describe('EncryptionService', () => {
       expect(obj.a.b.c).toBe('value');
     });
 
-    it('should generate hash for data integrity', async() => {
+    it('should generate hash for data integrity', async () => {
       const testData = { test: 'data' };
       const mockHashBuffer = new ArrayBuffer(32);
 
@@ -352,7 +356,7 @@ describe('EncryptionService', () => {
       expect(typeof hash).toBe('string');
     });
 
-    it('should verify data integrity', async() => {
+    it('should verify data integrity', async () => {
       const testData = { test: 'data' };
       const expectedHash = 'test-hash';
 
@@ -363,7 +367,7 @@ describe('EncryptionService', () => {
       expect(isValid).toBe(true);
     });
 
-    it('should handle integrity verification without hash', async() => {
+    it('should handle integrity verification without hash', async () => {
       const testData = { test: 'data' };
 
       const isValid = await encryptionService.verifyIntegrity(testData, null);
@@ -377,7 +381,7 @@ describe('EncryptionService', () => {
       encryptionService.masterKey = { key: 'mock-master-key' };
     });
 
-    it('should export key successfully', async() => {
+    it('should export key successfully', async () => {
       const mockExportedKey = new ArrayBuffer(32);
       cryptoUtils.subtle.exportKey.mockResolvedValue(mockExportedKey);
 
@@ -387,7 +391,7 @@ describe('EncryptionService', () => {
       expect(typeof exportedKey).toBe('string');
     });
 
-    it('should import key successfully', async() => {
+    it('should import key successfully', async () => {
       const keyData = 'base64-encoded-key';
       const mockImportedKey = 'imported-key';
 
@@ -398,7 +402,7 @@ describe('EncryptionService', () => {
       expect(importedKey).toBe(mockImportedKey);
     });
 
-    it('should throw error when exporting without key', async() => {
+    it('should throw error when exporting without key', async () => {
       encryptionService.masterKey = null;
 
       await expect(encryptionService.exportKey()).rejects.toThrow('No key to export');

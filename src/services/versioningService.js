@@ -173,8 +173,7 @@ class VersioningService {
         changes.outputs[key] = {
           from: fromValue,
           to: toValue,
-          type: fromValue === undefined ? 'added' :
-            toValue === undefined ? 'removed' : 'modified',
+          type: fromValue === undefined ? 'added' : toValue === undefined ? 'removed' : 'modified',
           difference: this.calculateNumericDifference(fromValue, toValue)
         };
         changes.summary.outputChanges++;
@@ -265,7 +264,7 @@ class VersioningService {
     let hash = 0;
     for (let i = 0; i < str.length; i++) {
       const char = str.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
+      hash = (hash << 5) - hash + char;
       hash = hash & hash; // Convert to 32-bit integer
     }
     return hash.toString(16);
@@ -313,17 +312,22 @@ class VersioningService {
       weekCounts[weekKey] = (weekCounts[weekKey] || 0) + 1;
     });
 
-    const maxWeek = Object.entries(weekCounts).reduce((max, [week, count]) =>
-      count > max.count ? { week, count } : max, { week: null, count: 0 });
+    const maxWeek = Object.entries(weekCounts).reduce(
+      (max, [week, count]) => (count > max.count ? { week, count } : max),
+      { week: null, count: 0 }
+    );
 
-    return maxWeek.week ? {
-      weekStart: maxWeek.week,
-      changeCount: maxWeek.count
-    } : null;
+    return maxWeek.week
+      ? {
+          weekStart: maxWeek.week,
+          changeCount: maxWeek.count
+        }
+      : null;
   }
 
   // Cleanup old versions
-  cleanup(maxAge = 30) { // Default: 30 days
+  cleanup(maxAge = 30) {
+    // Default: 30 days
     const allVersions = this.getAllVersions();
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - maxAge);

@@ -34,144 +34,279 @@ const KeyboardNavigation = ({ onNavigate: _onNavigate, onExecuteCommand, childre
   // Comprehensive keyboard shortcuts for financial analysis
   const shortcuts = {
     global: {
-      'cmd+k': { action: 'openCommandPalette', description: 'Open Command Palette', category: 'Navigation' },
-      'cmd+/': { action: 'showShortcuts', description: 'Show Keyboard Shortcuts', category: 'Help' },
+      'cmd+k': {
+        action: 'openCommandPalette',
+        description: 'Open Command Palette',
+        category: 'Navigation'
+      },
+      'cmd+/': {
+        action: 'showShortcuts',
+        description: 'Show Keyboard Shortcuts',
+        category: 'Help'
+      },
       'cmd+shift+n': { action: 'newAnalysis', description: 'New Analysis', category: 'Analysis' },
       'cmd+shift+o': { action: 'openAnalysis', description: 'Open Analysis', category: 'Analysis' },
       'cmd+s': { action: 'saveAnalysis', description: 'Save Analysis', category: 'Analysis' },
       'cmd+z': { action: 'undo', description: 'Undo', category: 'Editing' },
       'cmd+shift+z': { action: 'redo', description: 'Redo', category: 'Editing' },
-      'esc': { action: 'closeOverlays', description: 'Close Overlays/Modals', category: 'Navigation' }
+      esc: { action: 'closeOverlays', description: 'Close Overlays/Modals', category: 'Navigation' }
     },
     navigation: {
       'g+h': { action: 'goHome', description: 'Go to Dashboard', category: 'Navigation' },
-      'g+p': { action: 'goPrivateAnalysis', description: 'Go to Private Analysis', category: 'Navigation' },
+      'g+p': {
+        action: 'goPrivateAnalysis',
+        description: 'Go to Private Analysis',
+        category: 'Navigation'
+      },
       'g+m': { action: 'goMarketData', description: 'Go to Market Data', category: 'Navigation' },
-      'g+s': { action: 'goScenarios', description: 'Go to Scenario Analysis', category: 'Navigation' },
+      'g+s': {
+        action: 'goScenarios',
+        description: 'Go to Scenario Analysis',
+        category: 'Navigation'
+      },
       'g+l': { action: 'goLBO', description: 'Go to LBO Modeling', category: 'Navigation' },
       'g+c': { action: 'goComparables', description: 'Go to Comparables', category: 'Navigation' },
-      'tab': { action: 'nextSection', description: 'Next Section', category: 'Navigation' },
-      'shift+tab': { action: 'prevSection', description: 'Previous Section', category: 'Navigation' }
+      tab: { action: 'nextSection', description: 'Next Section', category: 'Navigation' },
+      'shift+tab': {
+        action: 'prevSection',
+        description: 'Previous Section',
+        category: 'Navigation'
+      }
     },
     analysis: {
-      'cmd+enter': { action: 'runAnalysis', description: 'Run/Update Analysis', category: 'Analysis' },
+      'cmd+enter': {
+        action: 'runAnalysis',
+        description: 'Run/Update Analysis',
+        category: 'Analysis'
+      },
       'cmd+r': { action: 'refreshData', description: 'Refresh Market Data', category: 'Analysis' },
       'cmd+e': { action: 'exportAnalysis', description: 'Export Analysis', category: 'Analysis' },
-      'cmd+d': { action: 'duplicateAnalysis', description: 'Duplicate Analysis', category: 'Analysis' },
-      'cmd+shift+s': { action: 'saveAsTemplate', description: 'Save as Template', category: 'Analysis' },
-      'f2': { action: 'renameAnalysis', description: 'Rename Analysis', category: 'Analysis' },
-      'delete': { action: 'deleteAnalysis', description: 'Delete Analysis', category: 'Analysis' }
+      'cmd+d': {
+        action: 'duplicateAnalysis',
+        description: 'Duplicate Analysis',
+        category: 'Analysis'
+      },
+      'cmd+shift+s': {
+        action: 'saveAsTemplate',
+        description: 'Save as Template',
+        category: 'Analysis'
+      },
+      f2: { action: 'renameAnalysis', description: 'Rename Analysis', category: 'Analysis' },
+      delete: { action: 'deleteAnalysis', description: 'Delete Analysis', category: 'Analysis' }
     },
     modeling: {
-      'cmd+m': { action: 'toggleModelingMode', description: 'Toggle Modeling Mode', category: 'Modeling' },
+      'cmd+m': {
+        action: 'toggleModelingMode',
+        description: 'Toggle Modeling Mode',
+        category: 'Modeling'
+      },
       'cmd+shift+d': { action: 'addDriver', description: 'Add Key Driver', category: 'Modeling' },
-      'cmd+shift+a': { action: 'addAssumption', description: 'Add Assumption', category: 'Modeling' },
+      'cmd+shift+a': {
+        action: 'addAssumption',
+        description: 'Add Assumption',
+        category: 'Modeling'
+      },
       'cmd+shift+f': { action: 'addFormula', description: 'Add Formula', category: 'Modeling' },
       'cmd+shift+c': { action: 'copyFormula', description: 'Copy Formula', category: 'Modeling' },
       'cmd+shift+v': { action: 'pasteFormula', description: 'Paste Formula', category: 'Modeling' },
-      'f9': { action: 'recalculate', description: 'Recalculate Model', category: 'Modeling' }
+      f9: { action: 'recalculate', description: 'Recalculate Model', category: 'Modeling' }
     },
     charts: {
       'c+l': { action: 'createLineChart', description: 'Create Line Chart', category: 'Charts' },
       'c+b': { action: 'createBarChart', description: 'Create Bar Chart', category: 'Charts' },
       'c+p': { action: 'createPieChart', description: 'Create Pie Chart', category: 'Charts' },
       'c+a': { action: 'createAreaChart', description: 'Create Area Chart', category: 'Charts' },
-      'c+s': { action: 'createScatterChart', description: 'Create Scatter Chart', category: 'Charts' },
-      'c+w': { action: 'createWaterfallChart', description: 'Create Waterfall Chart', category: 'Charts' }
+      'c+s': {
+        action: 'createScatterChart',
+        description: 'Create Scatter Chart',
+        category: 'Charts'
+      },
+      'c+w': {
+        action: 'createWaterfallChart',
+        description: 'Create Waterfall Chart',
+        category: 'Charts'
+      }
     },
     tables: {
       'cmd+t': { action: 'insertTable', description: 'Insert Table', category: 'Tables' },
       'cmd+shift+r': { action: 'addRow', description: 'Add Row', category: 'Tables' },
       'cmd+shift+c': { action: 'addColumn', description: 'Add Column', category: 'Tables' },
       'cmd+minus': { action: 'deleteRow', description: 'Delete Row', category: 'Tables' },
-      'cmd+shift+minus': { action: 'deleteColumn', description: 'Delete Column', category: 'Tables' }
+      'cmd+shift+minus': {
+        action: 'deleteColumn',
+        description: 'Delete Column',
+        category: 'Tables'
+      }
     }
   };
 
   // Commands for the command palette
   const commands = [
-    { id: 'new-dcf', title: 'New DCF Analysis', description: 'Create a new DCF valuation model', category: 'Analysis', shortcut: 'cmd+shift+d' },
-    { id: 'new-lbo', title: 'New LBO Analysis', description: 'Create a new LBO model', category: 'Analysis', shortcut: 'cmd+shift+l' },
-    { id: 'new-comp', title: 'New Comparable Analysis', description: 'Create comparable company analysis', category: 'Analysis', shortcut: 'cmd+shift+c' },
-    { id: 'import-data', title: 'Import Financial Data', description: 'Import data from Excel or CSV', category: 'Data', shortcut: 'cmd+i' },
-    { id: 'refresh-market', title: 'Refresh Market Data', description: 'Update real-time market data', category: 'Data', shortcut: 'cmd+r' },
-    { id: 'export-pdf', title: 'Export to PDF', description: 'Export analysis as PDF report', category: 'Export', shortcut: 'cmd+e' },
-    { id: 'export-excel', title: 'Export to Excel', description: 'Export model to Excel workbook', category: 'Export', shortcut: 'cmd+shift+e' },
-    { id: 'save-template', title: 'Save as Template', description: 'Save current model as template', category: 'Templates', shortcut: 'cmd+shift+s' },
-    { id: 'scenario-analysis', title: 'Scenario Analysis', description: 'Run scenario and sensitivity analysis', category: 'Analysis', shortcut: 'cmd+shift+a' },
-    { id: 'monte-carlo', title: 'Monte Carlo Simulation', description: 'Run Monte Carlo simulation', category: 'Analysis', shortcut: 'cmd+shift+m' },
-    { id: 'presentation-mode', title: 'Presentation Mode', description: 'Enter presentation-ready view', category: 'Presentation', shortcut: 'cmd+shift+p' },
-    { id: 'source-transparency', title: 'Show Data Sources', description: 'View data source transparency', category: 'Data', shortcut: 'cmd+shift+t' }
+    {
+      id: 'new-dcf',
+      title: 'New DCF Analysis',
+      description: 'Create a new DCF valuation model',
+      category: 'Analysis',
+      shortcut: 'cmd+shift+d'
+    },
+    {
+      id: 'new-lbo',
+      title: 'New LBO Analysis',
+      description: 'Create a new LBO model',
+      category: 'Analysis',
+      shortcut: 'cmd+shift+l'
+    },
+    {
+      id: 'new-comp',
+      title: 'New Comparable Analysis',
+      description: 'Create comparable company analysis',
+      category: 'Analysis',
+      shortcut: 'cmd+shift+c'
+    },
+    {
+      id: 'import-data',
+      title: 'Import Financial Data',
+      description: 'Import data from Excel or CSV',
+      category: 'Data',
+      shortcut: 'cmd+i'
+    },
+    {
+      id: 'refresh-market',
+      title: 'Refresh Market Data',
+      description: 'Update real-time market data',
+      category: 'Data',
+      shortcut: 'cmd+r'
+    },
+    {
+      id: 'export-pdf',
+      title: 'Export to PDF',
+      description: 'Export analysis as PDF report',
+      category: 'Export',
+      shortcut: 'cmd+e'
+    },
+    {
+      id: 'export-excel',
+      title: 'Export to Excel',
+      description: 'Export model to Excel workbook',
+      category: 'Export',
+      shortcut: 'cmd+shift+e'
+    },
+    {
+      id: 'save-template',
+      title: 'Save as Template',
+      description: 'Save current model as template',
+      category: 'Templates',
+      shortcut: 'cmd+shift+s'
+    },
+    {
+      id: 'scenario-analysis',
+      title: 'Scenario Analysis',
+      description: 'Run scenario and sensitivity analysis',
+      category: 'Analysis',
+      shortcut: 'cmd+shift+a'
+    },
+    {
+      id: 'monte-carlo',
+      title: 'Monte Carlo Simulation',
+      description: 'Run Monte Carlo simulation',
+      category: 'Analysis',
+      shortcut: 'cmd+shift+m'
+    },
+    {
+      id: 'presentation-mode',
+      title: 'Presentation Mode',
+      description: 'Enter presentation-ready view',
+      category: 'Presentation',
+      shortcut: 'cmd+shift+p'
+    },
+    {
+      id: 'source-transparency',
+      title: 'Show Data Sources',
+      description: 'View data source transparency',
+      category: 'Data',
+      shortcut: 'cmd+shift+t'
+    }
   ];
 
-  const filteredCommands = commands.filter(command =>
-    command.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    command.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    command.category.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredCommands = commands.filter(
+    command =>
+      command.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      command.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      command.category.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   // Handle keyboard events
-  const handleKeyDown = useCallback((event) => {
-    const key = event.key.toLowerCase();
-    const isCmd = event.metaKey || event.ctrlKey;
-    const isShift = event.shiftKey;
-    const isAlt = event.altKey;
+  const handleKeyDown = useCallback(
+    event => {
+      const key = event.key.toLowerCase();
+      const isCmd = event.metaKey || event.ctrlKey;
+      const isShift = event.shiftKey;
+      const isAlt = event.altKey;
 
-    // Build shortcut string
-    let shortcut = '';
-    if (isCmd) shortcut += 'cmd+';
-    if (isShift) shortcut += 'shift+';
-    if (isAlt) shortcut += 'alt+';
-    shortcut += key;
+      // Build shortcut string
+      let shortcut = '';
+      if (isCmd) shortcut += 'cmd+';
+      if (isShift) shortcut += 'shift+';
+      if (isAlt) shortcut += 'alt+';
+      shortcut += key;
 
-    // Handle command palette
-    if (showCommandPalette) {
-      switch (key) {
-        case 'escape':
-          setShowCommandPalette(false);
-          setSearchQuery('');
-          setSelectedIndex(0);
-          event.preventDefault();
-          return;
-        case 'arrowdown':
-          setSelectedIndex(prev => Math.min(prev + 1, filteredCommands.length - 1));
-          event.preventDefault();
-          return;
-        case 'arrowup':
-          setSelectedIndex(prev => Math.max(prev - 1, 0));
-          event.preventDefault();
-          return;
-        case 'enter':
-          if (filteredCommands[selectedIndex]) {
-            executeCommand(filteredCommands[selectedIndex].id);
+      // Handle command palette
+      if (showCommandPalette) {
+        switch (key) {
+          case 'escape':
             setShowCommandPalette(false);
             setSearchQuery('');
             setSelectedIndex(0);
-          }
-          event.preventDefault();
-          return;
+            event.preventDefault();
+            return;
+          case 'arrowdown':
+            setSelectedIndex(prev => Math.min(prev + 1, filteredCommands.length - 1));
+            event.preventDefault();
+            return;
+          case 'arrowup':
+            setSelectedIndex(prev => Math.max(prev - 1, 0));
+            event.preventDefault();
+            return;
+          case 'enter':
+            if (filteredCommands[selectedIndex]) {
+              executeCommand(filteredCommands[selectedIndex].id);
+              setShowCommandPalette(false);
+              setSearchQuery('');
+              setSelectedIndex(0);
+            }
+            event.preventDefault();
+            return;
+        }
+        return;
       }
-      return;
-    }
 
-    // Handle help overlay
-    if (showShortcutsHelp && key === 'escape') {
-      setShowShortcutsHelp(false);
-      event.preventDefault();
-      return;
-    }
+      // Handle help overlay
+      if (showShortcutsHelp && key === 'escape') {
+        setShowShortcutsHelp(false);
+        event.preventDefault();
+        return;
+      }
 
-    // Global shortcuts
-    const allShortcuts = { ...shortcuts.global, ...shortcuts.navigation, ...shortcuts.analysis, ...shortcuts.modeling, ...shortcuts.charts, ...shortcuts.tables };
-    const shortcutConfig = allShortcuts[shortcut];
+      // Global shortcuts
+      const allShortcuts = {
+        ...shortcuts.global,
+        ...shortcuts.navigation,
+        ...shortcuts.analysis,
+        ...shortcuts.modeling,
+        ...shortcuts.charts,
+        ...shortcuts.tables
+      };
+      const shortcutConfig = allShortcuts[shortcut];
 
-    if (shortcutConfig) {
-      event.preventDefault();
-      executeShortcut(shortcutConfig.action);
-    }
-  }, [showCommandPalette, showShortcutsHelp, searchQuery, selectedIndex, filteredCommands]);
+      if (shortcutConfig) {
+        event.preventDefault();
+        executeShortcut(shortcutConfig.action);
+      }
+    },
+    [showCommandPalette, showShortcutsHelp, searchQuery, selectedIndex, filteredCommands]
+  );
 
-  const executeShortcut = (action) => {
+  const executeShortcut = action => {
     switch (action) {
       case 'openCommandPalette':
         setShowCommandPalette(true);
@@ -194,7 +329,7 @@ const KeyboardNavigation = ({ onNavigate: _onNavigate, onExecuteCommand, childre
     }
   };
 
-  const executeCommand = (commandId) => {
+  const executeCommand = commandId => {
     if (onExecuteCommand) {
       onExecuteCommand(commandId);
     }
@@ -247,7 +382,7 @@ const KeyboardNavigation = ({ onNavigate: _onNavigate, onExecuteCommand, childre
                     type="text"
                     placeholder="Search commands, actions, and features..."
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onChange={e => setSearchQuery(e.target.value)}
                     className="flex-1 text-lg outline-none placeholder-gray-400"
                   />
                   <kbd className="px-2 py-1 text-xs bg-gray-100 rounded">ESC</kbd>
@@ -262,7 +397,9 @@ const KeyboardNavigation = ({ onNavigate: _onNavigate, onExecuteCommand, childre
                       <motion.div
                         key={command.id}
                         className={`p-3 rounded-lg cursor-pointer flex items-center justify-between ${
-                          index === selectedIndex ? 'bg-blue-50 border border-blue-200' : 'hover:bg-gray-50'
+                          index === selectedIndex
+                            ? 'bg-blue-50 border border-blue-200'
+                            : 'hover:bg-gray-50'
                         }`}
                         onClick={() => {
                           executeCommand(command.id);
@@ -274,7 +411,9 @@ const KeyboardNavigation = ({ onNavigate: _onNavigate, onExecuteCommand, childre
                         <div className="flex items-center space-x-3">
                           <div
                             className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                              index === selectedIndex ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-600'
+                              index === selectedIndex
+                                ? 'bg-blue-100 text-blue-600'
+                                : 'bg-gray-100 text-gray-600'
                             }`}
                           >
                             <Command className="w-4 h-4" />
@@ -364,7 +503,9 @@ const KeyboardNavigation = ({ onNavigate: _onNavigate, onExecuteCommand, childre
                     ×
                   </button>
                 </div>
-                <p className="text-gray-600 mt-2">Navigate FinanceAnalyst Pro at the speed of thought</p>
+                <p className="text-gray-600 mt-2">
+                  Navigate FinanceAnalyst Pro at the speed of thought
+                </p>
               </div>
 
               <div className="p-6 max-h-96 overflow-y-auto">
@@ -385,7 +526,10 @@ const KeyboardNavigation = ({ onNavigate: _onNavigate, onExecuteCommand, childre
                           <div key={shortcut} className="flex items-center justify-between">
                             <span className="text-sm text-gray-700">{config.description}</span>
                             <kbd className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded border">
-                              {shortcut.replace('cmd', '⌘').replace('shift', '⇧').replace('alt', '⌥')}
+                              {shortcut
+                                .replace('cmd', '⌘')
+                                .replace('shift', '⇧')
+                                .replace('alt', '⌥')}
                             </kbd>
                           </div>
                         ))}

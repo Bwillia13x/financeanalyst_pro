@@ -22,18 +22,18 @@ export class MergersAcquisitionsModel {
     const {
       purchasePrice,
       targetEBITDA,
-      targetShares,
+      targetShares: _targetShares,
       acquirerEBITDA,
       acquirerShares,
       acquirerMultiple,
       stockConsideration,
       synergies,
-      taxRate = 25
+      taxRate: _taxRate = 25
     } = inputs;
 
     // Calculate exchange ratio and new shares
     const acquirerStockPrice = acquirerMultiple * (acquirerEBITDA / acquirerShares);
-    const newSharesIssued = (purchasePrice * stockConsideration / 100) / acquirerStockPrice;
+    const newSharesIssued = (purchasePrice * stockConsideration) / 100 / acquirerStockPrice;
     const totalSharesPostDeal = acquirerShares + newSharesIssued;
 
     // Calculate pro forma metrics
@@ -55,10 +55,16 @@ export class MergersAcquisitionsModel {
   }
 
   calculateSynergies(revenueSynergies, costSynergies, integrationCosts, taxRate = 25) {
-    const totalRevenueSynergies = Object.values(revenueSynergies).reduce((sum, val) => sum + val, 0);
+    const totalRevenueSynergies = Object.values(revenueSynergies).reduce(
+      (sum, val) => sum + val,
+      0
+    );
     const totalCostSynergies = Object.values(costSynergies).reduce((sum, val) => sum + val, 0);
     const totalSynergies = totalRevenueSynergies + totalCostSynergies;
-    const totalIntegrationCosts = Object.values(integrationCosts).reduce((sum, val) => sum + val, 0);
+    const totalIntegrationCosts = Object.values(integrationCosts).reduce(
+      (sum, val) => sum + val,
+      0
+    );
 
     const afterTaxSynergies = totalSynergies * (1 - taxRate / 100);
     const afterTaxIntegrationCosts = totalIntegrationCosts * (1 - taxRate / 100);
@@ -105,7 +111,7 @@ export class SumOfPartsModel {
       } = unit;
 
       let valuation = 0;
-      
+
       switch (method) {
         case 'ebitda_multiple':
           valuation = ebitda * multiple;
@@ -128,7 +134,7 @@ export class SumOfPartsModel {
         method,
         valuation,
         revenuePercent: 0, // Will be calculated after
-        valuePercent: 0    // Will be calculated after
+        valuePercent: 0 // Will be calculated after
       };
     });
 
@@ -167,7 +173,7 @@ export class SumOfPartsModel {
   }
 }
 
-// Spin-off Analysis Model  
+// Spin-off Analysis Model
 export class SpinoffAnalysisModel {
   calculateSpinoffAnalysis(parentCompany, spinoffUnit) {
     const {
@@ -186,21 +192,21 @@ export class SpinoffAnalysisModel {
     // Calculate pro forma parent (RemainCo)
     const remainCoRevenue = parentRevenue - spinoffRevenue;
     const remainCoEBITDA = parentEBITDA - spinoffEBITDA - strandedCosts;
-    
+
     // Calculate valuations
     const parentPreSpinValue = parentEBITDA * parentMultiple;
     const remainCoValue = remainCoEBITDA * parentMultiple;
     const spinoffValue = spinoffEBITDA * spinoffMultiple;
-    
+
     const sumOfPartsValue = remainCoValue + spinoffValue;
     const valueCreation = sumOfPartsValue - parentPreSpinValue - transactionCosts;
-    
+
     // Calculate per-share values
     const remainCoValuePerShare = remainCoValue / parentShares;
     const spinoffValuePerShare = (spinoffValue / parentShares) * distributionRatio;
     const totalValuePerShare = remainCoValuePerShare + spinoffValuePerShare;
     const parentValuePerShare = parentPreSpinValue / parentShares;
-    
+
     return {
       // Pro forma companies
       remainCo: {
@@ -209,14 +215,14 @@ export class SpinoffAnalysisModel {
         valuation: remainCoValue,
         valuePerShare: remainCoValuePerShare
       },
-      
+
       spinoffCo: {
         revenue: spinoffRevenue,
         ebitda: spinoffEBITDA,
         valuation: spinoffValue,
         valuePerShare: spinoffValuePerShare
       },
-      
+
       // Analysis results
       parentPreSpinValue,
       sumOfPartsValue,
@@ -225,11 +231,11 @@ export class SpinoffAnalysisModel {
       totalValuePerShare,
       parentValuePerShare,
       valueCreationPerShare: totalValuePerShare - parentValuePerShare,
-      
+
       // Transaction costs
       strandedCosts,
       transactionCosts,
-      totalCosts: strandomCosts + transactionCosts
+      totalCosts: strandedCosts + transactionCosts
     };
   }
 
@@ -242,12 +248,12 @@ export class SpinoffAnalysisModel {
         costBasisAllocation: costBasis
       };
     }
-    
+
     // Taxable distribution
     const taxableGain = Math.max(0, spinoffValue - costBasis);
     const taxRate = 20; // Assume 20% capital gains rate
     const taxLiability = taxableGain * (taxRate / 100);
-    
+
     return {
       taxableGain,
       taxLiability,
@@ -256,20 +262,29 @@ export class SpinoffAnalysisModel {
     };
   }
 
-  calculateStrandedCosts(sharedServices, spinoffRevenuePercent) {
+  calculateStrandedCosts(
+    sharedServices,
+    spinoffRevenuePercent,
+    parentRevenue = 0,
+    spinoffRevenue = 0
+  ) {
     const strandedCostCategories = {
       corporate_overhead: sharedServices.corporate * (spinoffRevenuePercent / 100),
       it_systems: sharedServices.it * (spinoffRevenuePercent / 100),
       hr_finance: sharedServices.hr * (spinoffRevenuePercent / 100),
       facilities: sharedServices.facilities * (spinoffRevenuePercent / 100)
     };
-    
-    const totalStranded = Object.values(strandedCostCategories).reduce((sum, cost) => sum + cost, 0);
-    
+
+    const totalStranded = Object.values(strandedCostCategories).reduce(
+      (sum, cost) => sum + cost,
+      0
+    );
+    const remainingRevenue = parentRevenue - spinoffRevenue;
+
     return {
       categories: strandedCostCategories,
       total: totalStranded,
-      percentOfRevenue: (totalStranded / (parentRevenue - spinoffRevenue)) * 100
+      percentOfRevenue: remainingRevenue > 0 ? (totalStranded / remainingRevenue) * 100 : 0
     };
   }
 }

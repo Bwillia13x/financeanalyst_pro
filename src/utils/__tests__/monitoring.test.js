@@ -112,10 +112,7 @@ describe.skip('MonitoringService', () => {
         'unhandledrejection',
         expect.any(Function)
       );
-      expect(mockWindow.addEventListener).toHaveBeenCalledWith(
-        'error',
-        expect.any(Function)
-      );
+      expect(mockWindow.addEventListener).toHaveBeenCalledWith('error', expect.any(Function));
     });
   });
 
@@ -159,11 +156,7 @@ describe.skip('MonitoringService', () => {
 
       monitoring.trackError(testError, 'test_error');
 
-      expect(console.error).toHaveBeenCalledWith(
-        '[test_error]',
-        testError,
-        {}
-      );
+      expect(console.error).toHaveBeenCalledWith('[test_error]', testError, {});
     });
 
     it('should not track errors when error reporting is disabled', () => {
@@ -259,10 +252,7 @@ describe.skip('MonitoringService', () => {
 
       monitoring.monitorMemoryUsage();
 
-      expect(setIntervalSpy).toHaveBeenCalledWith(
-        expect.any(Function),
-        60000
-      );
+      expect(setIntervalSpy).toHaveBeenCalledWith(expect.any(Function), 60000);
     });
 
     it('should monitor API performance', () => {
@@ -318,7 +308,7 @@ describe.skip('MonitoringService', () => {
       expect(global.fetch).not.toHaveBeenCalled();
     });
 
-    it('should handle analytics endpoint failures gracefully', async() => {
+    it('should handle analytics endpoint failures gracefully', async () => {
       const originalProduction = monitoring.isProduction;
       monitoring.isProduction = true;
 
@@ -389,15 +379,11 @@ describe.skip('MonitoringService', () => {
       const trackErrorSpy = vi.spyOn(monitoring, 'trackError');
       errorHandlers['error'](mockErrorEvent);
 
-      expect(trackErrorSpy).toHaveBeenCalledWith(
-        mockErrorEvent.error,
-        'javascript_error',
-        {
-          filename: 'test.js',
-          lineno: 10,
-          colno: 5
-        }
-      );
+      expect(trackErrorSpy).toHaveBeenCalledWith(mockErrorEvent.error, 'javascript_error', {
+        filename: 'test.js',
+        lineno: 10,
+        colno: 5
+      });
     });
   });
 

@@ -6,7 +6,9 @@ const Card = ({ title, right, children, className = '' }) => (
   <section className={`rounded-2xl border border-slate-200 bg-white shadow-sm ${className}`}>
     {(title || right) && (
       <header className="flex items-center justify-between border-b border-slate-200 px-4 py-2.5">
-        {title && <h3 className="text-[13px] font-semibold tracking-wide text-slate-700">{title}</h3>}
+        {title && (
+          <h3 className="text-[13px] font-semibold tracking-wide text-slate-700">{title}</h3>
+        )}
         {right}
       </header>
     )}
@@ -23,18 +25,30 @@ const Pill = ({ children, tone = 'slate' }) => {
     red: 'bg-rose-50 text-rose-700 border-rose-200'
   };
   return (
-    <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] ${tones[tone]}`}>
+    <span
+      className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] ${tones[tone]}`}
+    >
       {children}
     </span>
   );
 };
 
-const Cur = (x, c = 0) => (x >= 1e9 ? `$${(x / 1e9).toFixed(c)}B` : x >= 1e6 ? `$${(x / 1e6).toFixed(c)}M` : `$${x.toFixed(c)}`);
+const Cur = (x, c = 0) =>
+  x >= 1e9
+    ? `$${(x / 1e9).toFixed(c)}B`
+    : x >= 1e6
+      ? `$${(x / 1e6).toFixed(c)}M`
+      : `$${x.toFixed(c)}`;
 const Pct = (x, d = 1) => `${(100 * x).toFixed(d)}%`;
 
 const Compare = ({ models }) => {
   const selected = models.filter(m => m.selected);
-  const rows = selected.map(m => ({ id: m.id, name: m.name, kind: m.kind, out: computeOutputs(m) }));
+  const rows = selected.map(m => ({
+    id: m.id,
+    name: m.name,
+    kind: m.kind,
+    out: computeOutputs(m)
+  }));
 
   return (
     <Card title="Cross‑Model Compare" right={<Pill tone="green">{selected.length} models</Pill>}>
@@ -58,7 +72,9 @@ const Compare = ({ models }) => {
                   <td className="px-2 py-1 text-left">{r.name}</td>
                   <td className="px-2 py-1">{r.kind}</td>
                   <td className="px-2 py-1">{r.out.ev !== undefined ? Cur(r.out.ev, 0) : '—'}</td>
-                  <td className="px-2 py-1">{r.out.perShare !== undefined ? `$${r.out.perShare.toFixed(2)}` : '—'}</td>
+                  <td className="px-2 py-1">
+                    {r.out.perShare !== undefined ? `$${r.out.perShare.toFixed(2)}` : '—'}
+                  </td>
                   <td className="px-2 py-1">{r.out.irr !== undefined ? Pct(r.out.irr, 1) : '—'}</td>
                 </tr>
               ))}

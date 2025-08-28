@@ -35,7 +35,7 @@ const Reports = () => {
         {/* Report Builder */}
         <div className="bg-white dark:bg-slate-800 rounded-lg shadow-lg">
           <ReportBuilder
-            onReportGenerated={(report) => {
+            onReportGenerated={report => {
               console.log('Report generated:', report);
               // Handle report generation success
             }}

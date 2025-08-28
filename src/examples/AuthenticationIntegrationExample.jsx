@@ -43,7 +43,7 @@ const AuthenticationIntegrationExample = () => {
     }
   }, [isAuthenticated]);
 
-  const loadContextData = async() => {
+  const loadContextData = async () => {
     try {
       const stats = await userContextService.getContextStats();
       setContextStats(stats);
@@ -55,12 +55,12 @@ const AuthenticationIntegrationExample = () => {
     }
   };
 
-  const handleLoginSuccess = (userData) => {
+  const handleLoginSuccess = userData => {
     console.log('Login successful:', userData);
     setCurrentView('dashboard');
   };
 
-  const handleLogout = async() => {
+  const handleLogout = async () => {
     await logout();
     setCurrentView('login');
     setShowProfile(false);
@@ -135,9 +135,7 @@ const AuthenticationIntegrationExample = () => {
                   <CheckCircle className="h-5 w-5 text-green-600 mr-2" />
                   <span className="font-medium text-green-900">Authenticated</span>
                 </div>
-                <div className="text-sm text-green-700 mt-1">
-                  Session active and secure
-                </div>
+                <div className="text-sm text-green-700 mt-1">Session active and secure</div>
               </div>
 
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
@@ -155,9 +153,7 @@ const AuthenticationIntegrationExample = () => {
                   <Database className="h-5 w-5 text-purple-600 mr-2" />
                   <span className="font-medium text-purple-900">Data Isolated</span>
                 </div>
-                <div className="text-sm text-purple-700 mt-1">
-                  User-specific workspace
-                </div>
+                <div className="text-sm text-purple-700 mt-1">User-specific workspace</div>
               </div>
             </div>
           </div>
@@ -177,10 +173,12 @@ const AuthenticationIntegrationExample = () => {
                     <span className="font-medium text-red-900">Admin Features</span>
                   </div>
                   <div className="text-sm text-red-700 mt-2">
-                    ✅ User Management<br />
-                    ✅ System Configuration<br />
-                    ✅ View Logs<br />
-                    ✅ All Data Access
+                    ✅ User Management
+                    <br />
+                    ✅ System Configuration
+                    <br />
+                    ✅ View Logs
+                    <br />✅ All Data Access
                   </div>
                 </div>
               </PermissionGate>
@@ -193,26 +191,32 @@ const AuthenticationIntegrationExample = () => {
                     <span className="font-medium text-blue-900">Analyst Features</span>
                   </div>
                   <div className="text-sm text-blue-700 mt-2">
-                    ✅ Create/Edit Models<br />
-                    ✅ Export Data<br />
-                    ✅ API Access<br />
-                    ✅ Bulk Operations
+                    ✅ Create/Edit Models
+                    <br />
+                    ✅ Export Data
+                    <br />
+                    ✅ API Access
+                    <br />✅ Bulk Operations
                   </div>
                 </div>
               </PermissionGate>
 
               {/* Viewer Features */}
-              <PermissionGate requiredRoles={[USER_ROLES.VIEWER, USER_ROLES.ANALYST, USER_ROLES.ADMIN]}>
+              <PermissionGate
+                requiredRoles={[USER_ROLES.VIEWER, USER_ROLES.ANALYST, USER_ROLES.ADMIN]}
+              >
                 <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                   <div className="flex items-center">
                     <Eye className="h-5 w-5 text-green-600 mr-2" />
                     <span className="font-medium text-green-900">Viewer Features</span>
                   </div>
                   <div className="text-sm text-green-700 mt-2">
-                    ✅ Read Models<br />
-                    ✅ Export Data<br />
-                    ❌ Edit Models<br />
-                    ❌ User Management
+                    ✅ Read Models
+                    <br />
+                    ✅ Export Data
+                    <br />
+                    ❌ Edit Models
+                    <br />❌ User Management
                   </div>
                 </div>
               </PermissionGate>
@@ -294,9 +298,7 @@ const AuthenticationIntegrationExample = () => {
           {/* Security Features */}
           {encryptionStatus && (
             <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-lg font-medium text-gray-900 mb-4">
-                Security Features
-              </h2>
+              <h2 className="text-lg font-medium text-gray-900 mb-4">Security Features</h2>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="bg-gray-50 rounded-lg p-4">
@@ -307,7 +309,9 @@ const AuthenticationIntegrationExample = () => {
                   <div className="text-sm space-y-1">
                     <div className="flex justify-between">
                       <span>Status:</span>
-                      <span className={`font-medium ${encryptionStatus.supported ? 'text-green-600' : 'text-red-600'}`}>
+                      <span
+                        className={`font-medium ${encryptionStatus.supported ? 'text-green-600' : 'text-red-600'}`}
+                      >
                         {encryptionStatus.supported ? 'Supported' : 'Not Supported'}
                       </span>
                     </div>
@@ -377,9 +381,7 @@ const AuthenticationIntegrationExample = () => {
 
           {/* Demo Actions */}
           <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-medium text-gray-900 mb-4">
-              Demo Actions
-            </h2>
+            <h2 className="text-lg font-medium text-gray-900 mb-4">Demo Actions</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <button
@@ -423,9 +425,7 @@ const AuthenticationIntegrationExample = () => {
       </main>
 
       {/* User Profile Modal */}
-      {showProfile && (
-        <UserProfile onClose={() => setShowProfile(false)} />
-      )}
+      {showProfile && <UserProfile onClose={() => setShowProfile(false)} />}
     </div>
   );
 };

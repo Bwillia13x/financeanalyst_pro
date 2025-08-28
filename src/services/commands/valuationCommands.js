@@ -8,7 +8,7 @@ import { dataFetchingService } from '../dataFetching';
 
 export const valuationCommands = {
   DDM: {
-    execute: async(parsedCommand, _context, _processor) => {
+    execute: async (parsedCommand, _context, _processor) => {
       const [ticker] = parsedCommand.parameters;
 
       if (!ticker) {
@@ -20,7 +20,10 @@ export const valuationCommands = {
 
       try {
         const profile = await dataFetchingService.fetchCompanyProfile(ticker.toUpperCase());
-        const _financials = await dataFetchingService.fetchFinancialStatements(ticker.toUpperCase(), 'income-statement');
+        const _financials = await dataFetchingService.fetchFinancialStatements(
+          ticker.toUpperCase(),
+          'income-statement'
+        );
 
         // DDM calculations
         const currentDividend = profile.dividendYield * profile.price || 0;
@@ -35,7 +38,8 @@ export const valuationCommands = {
         }
 
         // Gordon Growth Model
-        const gordonValue = currentDividend * (1 + dividendGrowthRate) / (requiredReturn - dividendGrowthRate);
+        const gordonValue =
+          (currentDividend * (1 + dividendGrowthRate)) / (requiredReturn - dividendGrowthRate);
 
         // Two-stage DDM
         const highGrowthYears = 5;
@@ -49,7 +53,10 @@ export const valuationCommands = {
           presentValueHighGrowth += presentValue;
         }
 
-        const terminalDividend = currentDividend * Math.pow(1 + highGrowthRate, highGrowthYears) * (1 + terminalGrowthRate);
+        const terminalDividend =
+          currentDividend *
+          Math.pow(1 + highGrowthRate, highGrowthYears) *
+          (1 + terminalGrowthRate);
         const terminalValue = terminalDividend / (requiredReturn - terminalGrowthRate);
         const presentValueTerminal = terminalValue / Math.pow(1 + requiredReturn, highGrowthYears);
 
@@ -78,7 +85,6 @@ export const valuationCommands = {
             }
           }
         };
-
       } catch (error) {
         return {
           type: 'error',
@@ -93,7 +99,7 @@ export const valuationCommands = {
   },
 
   RESIDUAL_INCOME: {
-    execute: async(parsedCommand, _context, _processor) => {
+    execute: async (parsedCommand, _context, _processor) => {
       const [ticker] = parsedCommand.parameters;
 
       if (!ticker) {
@@ -105,7 +111,10 @@ export const valuationCommands = {
 
       try {
         const profile = await dataFetchingService.fetchCompanyProfile(ticker.toUpperCase());
-        const _financials = await dataFetchingService.fetchFinancialStatements(ticker.toUpperCase(), 'income-statement');
+        const _financials = await dataFetchingService.fetchFinancialStatements(
+          ticker.toUpperCase(),
+          'income-statement'
+        );
 
         // Residual Income calculations
         const bookValue = profile.bookValue || profile.mktCap / 2; // Fallback estimate
@@ -119,13 +128,14 @@ export const valuationCommands = {
 
         // Project residual income for 5 years
         const projectionYears = 5;
-        const residualIncomeGrowth = Math.max(-0.05, Math.min(0.10, roe - costOfEquity)); // Fade to zero
+        const residualIncomeGrowth = Math.max(-0.05, Math.min(0.1, roe - costOfEquity)); // Fade to zero
 
         let totalPVResidualIncome = 0;
         const projections = [];
 
         for (let year = 1; year <= projectionYears; year++) {
-          const projectedRI = residualIncome * Math.pow(1 + residualIncomeGrowth * (1 - year * 0.15), year);
+          const projectedRI =
+            residualIncome * Math.pow(1 + residualIncomeGrowth * (1 - year * 0.15), year);
           const presentValue = projectedRI / Math.pow(1 + costOfEquity, year);
           totalPVResidualIncome += presentValue;
 
@@ -143,12 +153,18 @@ export const valuationCommands = {
 
         // Calculate intrinsic value
         const intrinsicValue = bookValue + totalPVResidualIncome + pvTerminalValue;
-        const valuePerShare = intrinsicValue / (profile.sharesOutstanding || profile.mktCap / profile.price);
+        const valuePerShare =
+          intrinsicValue / (profile.sharesOutstanding || profile.mktCap / profile.price);
         const upside = ((valuePerShare - profile.price) / profile.price) * 100;
 
-        const content = `Residual Income Model for ${profile.companyName} (${ticker.toUpperCase()})\n\n📊 BASE METRICS:\n• Book Value: ${formatCurrency(bookValue, 'USD', true)}\n• ROE: ${formatPercentage(roe)}\n• Cost of Equity: ${formatPercentage(costOfEquity)}\n• Net Income: ${formatCurrency(netIncome, 'USD', true)}\n\n💰 RESIDUAL INCOME ANALYSIS:\n• Normal Income: ${formatCurrency(normalIncome, 'USD', true)}\n• Current Residual Income: ${formatCurrency(residualIncome, 'USD', true)}\n• RI Growth Rate: ${formatPercentage(residualIncomeGrowth)}\n\n📈 5-YEAR PROJECTIONS:\n${projections.map(p =>
-          `Year ${p.year}: RI ${formatCurrency(p.residualIncome, 'USD', true)}, PV ${formatCurrency(p.presentValue, 'USD', true)}`
-        ).join('\n')}\n\n🎯 VALUATION RESULTS:\n• Book Value: ${formatCurrency(bookValue, 'USD', true)}\n• PV of Residual Income: ${formatCurrency(totalPVResidualIncome, 'USD', true)}\n• PV of Terminal Value: ${formatCurrency(pvTerminalValue, 'USD', true)}\n• Total Intrinsic Value: ${formatCurrency(intrinsicValue, 'USD', true)}\n• Value Per Share: ${formatCurrency(valuePerShare)}\n• Current Price: ${formatCurrency(profile.price)}\n• Upside/(Downside): ${formatPercentage(upside / 100)}\n\n📊 KEY INSIGHTS:\n• ${residualIncome > 0 ? 'Company generates positive economic value' : 'Company destroys economic value'}\n• ROE vs Cost of Equity: ${roe > costOfEquity ? 'Value Creating' : 'Value Destroying'}\n• ${upside > 0 ? 'Undervalued' : 'Overvalued'} by ${formatPercentage(Math.abs(upside) / 100)}\n\n⚠️ MODEL ASSUMPTIONS:\n• Residual income growth fades over time\n• Terminal value assumes sustainable competitive advantage\n• Cost of equity based on CAPM\n\n${dataFetchingService.demoMode ? '💡 Note: Using estimated data. Configure API keys for live analysis.' : '✅ Analysis based on live market data'}`;
+        const content = `Residual Income Model for ${profile.companyName} (${ticker.toUpperCase()})\n\n📊 BASE METRICS:\n• Book Value: ${formatCurrency(bookValue, 'USD', true)}\n• ROE: ${formatPercentage(roe)}\n• Cost of Equity: ${formatPercentage(costOfEquity)}\n• Net Income: ${formatCurrency(netIncome, 'USD', true)}\n\n💰 RESIDUAL INCOME ANALYSIS:\n• Normal Income: ${formatCurrency(normalIncome, 'USD', true)}\n• Current Residual Income: ${formatCurrency(residualIncome, 'USD', true)}\n• RI Growth Rate: ${formatPercentage(residualIncomeGrowth)}\n\n📈 5-YEAR PROJECTIONS:\n${projections
+          .map(
+            p =>
+              `Year ${p.year}: RI ${formatCurrency(p.residualIncome, 'USD', true)}, PV ${formatCurrency(p.presentValue, 'USD', true)}`
+          )
+          .join(
+            '\n'
+          )}\n\n🎯 VALUATION RESULTS:\n• Book Value: ${formatCurrency(bookValue, 'USD', true)}\n• PV of Residual Income: ${formatCurrency(totalPVResidualIncome, 'USD', true)}\n• PV of Terminal Value: ${formatCurrency(pvTerminalValue, 'USD', true)}\n• Total Intrinsic Value: ${formatCurrency(intrinsicValue, 'USD', true)}\n• Value Per Share: ${formatCurrency(valuePerShare)}\n• Current Price: ${formatCurrency(profile.price)}\n• Upside/(Downside): ${formatPercentage(upside / 100)}\n\n📊 KEY INSIGHTS:\n• ${residualIncome > 0 ? 'Company generates positive economic value' : 'Company destroys economic value'}\n• ROE vs Cost of Equity: ${roe > costOfEquity ? 'Value Creating' : 'Value Destroying'}\n• ${upside > 0 ? 'Undervalued' : 'Overvalued'} by ${formatPercentage(Math.abs(upside) / 100)}\n\n⚠️ MODEL ASSUMPTIONS:\n• Residual income growth fades over time\n• Terminal value assumes sustainable competitive advantage\n• Cost of equity based on CAPM\n\n${dataFetchingService.demoMode ? '💡 Note: Using estimated data. Configure API keys for live analysis.' : '✅ Analysis based on live market data'}`;
 
         return {
           type: 'success',
@@ -166,7 +182,6 @@ export const valuationCommands = {
             }
           }
         };
-
       } catch (error) {
         return {
           type: 'error',
@@ -181,7 +196,7 @@ export const valuationCommands = {
   },
 
   ASSET_BASED: {
-    execute: async(parsedCommand, _context, _processor) => {
+    execute: async (parsedCommand, _context, _processor) => {
       const [ticker] = parsedCommand.parameters;
 
       if (!ticker) {
@@ -193,15 +208,20 @@ export const valuationCommands = {
 
       try {
         const profile = await dataFetchingService.fetchCompanyProfile(ticker.toUpperCase());
-        const balanceSheet = await dataFetchingService.fetchFinancialStatements(ticker.toUpperCase(), 'balance-sheet-statement');
+        const balanceSheet = await dataFetchingService.fetchFinancialStatements(
+          ticker.toUpperCase(),
+          'balance-sheet-statement'
+        );
 
         // Asset-based valuation
         const totalAssets = balanceSheet[0]?.totalAssets || profile.mktCap * 1.5; // Fallback
-        const totalLiabilities = balanceSheet[0]?.totalLiabilities || profile.totalDebt || totalAssets * 0.4;
+        const totalLiabilities =
+          balanceSheet[0]?.totalLiabilities || profile.totalDebt || totalAssets * 0.4;
         const bookValue = totalAssets - totalLiabilities;
 
         // Adjust assets to market value
-        const cashAndEquivalents = balanceSheet[0]?.cashAndCashEquivalents || profile.totalCash || totalAssets * 0.1;
+        const cashAndEquivalents =
+          balanceSheet[0]?.cashAndCashEquivalents || profile.totalCash || totalAssets * 0.1;
         const inventory = balanceSheet[0]?.inventory || totalAssets * 0.15;
         const ppe = balanceSheet[0]?.propertyPlantEquipmentNet || totalAssets * 0.3;
         const intangibleAssets = balanceSheet[0]?.intangibleAssets || totalAssets * 0.2;
@@ -216,16 +236,21 @@ export const valuationCommands = {
           other: { book: otherAssets, market: otherAssets * 0.9, adjustment: 0.9 }
         };
 
-        const totalMarketAssets = Object.values(adjustments).reduce((sum, adj) => sum + adj.market, 0);
+        const totalMarketAssets = Object.values(adjustments).reduce(
+          (sum, adj) => sum + adj.market,
+          0
+        );
         const netAssetValue = totalMarketAssets - totalLiabilities;
-        const navPerShare = netAssetValue / (profile.sharesOutstanding || profile.mktCap / profile.price);
+        const navPerShare =
+          netAssetValue / (profile.sharesOutstanding || profile.mktCap / profile.price);
         const upside = ((navPerShare - profile.price) / profile.price) * 100;
 
         // Liquidation value (more conservative)
         const liquidationValue = totalMarketAssets * 0.7 - totalLiabilities; // 30% liquidation discount
-        const liquidationPerShare = liquidationValue / (profile.sharesOutstanding || profile.mktCap / profile.price);
+        const liquidationPerShare =
+          liquidationValue / (profile.sharesOutstanding || profile.mktCap / profile.price);
 
-        const content = `Asset-Based Valuation for ${profile.companyName} (${ticker.toUpperCase()})\n\n📊 BALANCE SHEET SUMMARY:\n• Total Assets: ${formatCurrency(totalAssets, 'USD', true)}\n• Total Liabilities: ${formatCurrency(totalLiabilities, 'USD', true)}\n• Book Value: ${formatCurrency(bookValue, 'USD', true)}\n\n💰 ASSET BREAKDOWN & ADJUSTMENTS:\n• Cash & Equivalents: ${formatCurrency(adjustments.cash.book, 'USD', true)} → ${formatCurrency(adjustments.cash.market, 'USD', true)} (${formatPercentage(adjustments.cash.adjustment - 1)})\n• Inventory: ${formatCurrency(adjustments.inventory.book, 'USD', true)} → ${formatCurrency(adjustments.inventory.market, 'USD', true)} (${formatPercentage(adjustments.inventory.adjustment - 1)})\n• PP&E: ${formatCurrency(adjustments.ppe.book, 'USD', true)} → ${formatCurrency(adjustments.ppe.market, 'USD', true)} (${formatPercentage(adjustments.ppe.adjustment - 1)})\n• Intangibles: ${formatCurrency(adjustments.intangibles.book, 'USD', true)} → ${formatCurrency(adjustments.intangibles.market, 'USD', true)} (${formatPercentage(adjustments.intangibles.adjustment - 1)})\n• Other Assets: ${formatCurrency(adjustments.other.book, 'USD', true)} → ${formatCurrency(adjustments.other.market, 'USD', true)} (${formatPercentage(adjustments.other.adjustment - 1)})\n\n🎯 VALUATION RESULTS:\n• Adjusted Asset Value: ${formatCurrency(totalMarketAssets, 'USD', true)}\n• Net Asset Value: ${formatCurrency(netAssetValue, 'USD', true)}\n• NAV Per Share: ${formatCurrency(navPerShare)}\n• Current Price: ${formatCurrency(profile.price)}\n• Upside/(Downside): ${formatPercentage(upside / 100)}\n\n🔥 LIQUIDATION ANALYSIS:\n• Liquidation Value: ${formatCurrency(liquidationValue, 'USD', true)}\n• Liquidation Per Share: ${formatCurrency(liquidationPerShare)}\n• Liquidation Premium: ${formatPercentage((liquidationPerShare / profile.price - 1))}\n\n📈 ASSET EFFICIENCY:\n• Asset Turnover: ${formatNumber(profile.revenue / totalAssets, 2)}x\n• Book Value Multiple: ${formatNumber(profile.price / (bookValue / (profile.sharesOutstanding || profile.mktCap / profile.price)), 2)}x\n• Tangible Book Multiple: ${formatNumber(profile.pb, 2)}x\n\n💡 INSIGHTS:\n• ${upside > 0 ? 'Trading below asset value - potential value opportunity' : 'Trading above asset value - premium for intangibles/growth'}\n• Asset-based valuation most relevant for asset-heavy businesses\n• Consider liquidation value as downside protection\n\n${dataFetchingService.demoMode ? '💡 Note: Using estimated data. Configure API keys for live analysis.' : '✅ Analysis based on live market data'}`;
+        const content = `Asset-Based Valuation for ${profile.companyName} (${ticker.toUpperCase()})\n\n📊 BALANCE SHEET SUMMARY:\n• Total Assets: ${formatCurrency(totalAssets, 'USD', true)}\n• Total Liabilities: ${formatCurrency(totalLiabilities, 'USD', true)}\n• Book Value: ${formatCurrency(bookValue, 'USD', true)}\n\n💰 ASSET BREAKDOWN & ADJUSTMENTS:\n• Cash & Equivalents: ${formatCurrency(adjustments.cash.book, 'USD', true)} → ${formatCurrency(adjustments.cash.market, 'USD', true)} (${formatPercentage(adjustments.cash.adjustment - 1)})\n• Inventory: ${formatCurrency(adjustments.inventory.book, 'USD', true)} → ${formatCurrency(adjustments.inventory.market, 'USD', true)} (${formatPercentage(adjustments.inventory.adjustment - 1)})\n• PP&E: ${formatCurrency(adjustments.ppe.book, 'USD', true)} → ${formatCurrency(adjustments.ppe.market, 'USD', true)} (${formatPercentage(adjustments.ppe.adjustment - 1)})\n• Intangibles: ${formatCurrency(adjustments.intangibles.book, 'USD', true)} → ${formatCurrency(adjustments.intangibles.market, 'USD', true)} (${formatPercentage(adjustments.intangibles.adjustment - 1)})\n• Other Assets: ${formatCurrency(adjustments.other.book, 'USD', true)} → ${formatCurrency(adjustments.other.market, 'USD', true)} (${formatPercentage(adjustments.other.adjustment - 1)})\n\n🎯 VALUATION RESULTS:\n• Adjusted Asset Value: ${formatCurrency(totalMarketAssets, 'USD', true)}\n• Net Asset Value: ${formatCurrency(netAssetValue, 'USD', true)}\n• NAV Per Share: ${formatCurrency(navPerShare)}\n• Current Price: ${formatCurrency(profile.price)}\n• Upside/(Downside): ${formatPercentage(upside / 100)}\n\n🔥 LIQUIDATION ANALYSIS:\n• Liquidation Value: ${formatCurrency(liquidationValue, 'USD', true)}\n• Liquidation Per Share: ${formatCurrency(liquidationPerShare)}\n• Liquidation Premium: ${formatPercentage(liquidationPerShare / profile.price - 1)}\n\n📈 ASSET EFFICIENCY:\n• Asset Turnover: ${formatNumber(profile.revenue / totalAssets, 2)}x\n• Book Value Multiple: ${formatNumber(profile.price / (bookValue / (profile.sharesOutstanding || profile.mktCap / profile.price)), 2)}x\n• Tangible Book Multiple: ${formatNumber(profile.pb, 2)}x\n\n💡 INSIGHTS:\n• ${upside > 0 ? 'Trading below asset value - potential value opportunity' : 'Trading above asset value - premium for intangibles/growth'}\n• Asset-based valuation most relevant for asset-heavy businesses\n• Consider liquidation value as downside protection\n\n${dataFetchingService.demoMode ? '💡 Note: Using estimated data. Configure API keys for live analysis.' : '✅ Analysis based on live market data'}`;
 
         return {
           type: 'success',
@@ -244,7 +269,6 @@ export const valuationCommands = {
             }
           }
         };
-
       } catch (error) {
         return {
           type: 'error',

@@ -75,7 +75,12 @@ class ReportingEngine {
           name: 'Company Overview',
           type: 'company_profile',
           required: true,
-          fields: ['business_description', 'key_products', 'market_position', 'competitive_landscape']
+          fields: [
+            'business_description',
+            'key_products',
+            'market_position',
+            'competitive_landscape'
+          ]
         },
         {
           id: 'financial_performance',
@@ -89,7 +94,12 @@ class ReportingEngine {
           name: 'Valuation Analysis',
           type: 'valuation_detailed',
           required: true,
-          fields: ['dcf_model', 'comparable_analysis', 'precedent_transactions', 'sensitivity_analysis']
+          fields: [
+            'dcf_model',
+            'comparable_analysis',
+            'precedent_transactions',
+            'sensitivity_analysis'
+          ]
         },
         {
           id: 'scenario_analysis',
@@ -212,7 +222,12 @@ class ReportingEngine {
           name: 'Financial Analysis',
           type: 'financial_deep_dive',
           required: true,
-          fields: ['historical_performance', 'quality_of_earnings', 'working_capital', 'capex_analysis']
+          fields: [
+            'historical_performance',
+            'quality_of_earnings',
+            'working_capital',
+            'capex_analysis'
+          ]
         },
         {
           id: 'valuation',
@@ -378,7 +393,7 @@ class ReportingEngine {
       }
 
       // Add custom sections
-      for (const customSection of (options.customSections || [])) {
+      for (const customSection of options.customSections || []) {
         const section = await this.generateCustomSection(customSection, data, theme, options);
         report.sections.push(section);
       }
@@ -393,7 +408,6 @@ class ReportingEngine {
       this.reports.set(reportId, report);
 
       return report;
-
     } catch (error) {
       report.status = 'error';
       report.error = error.message;
@@ -456,7 +470,8 @@ class ReportingEngine {
       analystName: data.analyst?.name || 'Financial Analyst',
       executiveSummary: data.executiveSummary || 'Comprehensive financial analysis and valuation.',
       logo: data.company?.logo,
-      disclaimer: 'This report is for informational purposes only and should not be considered as investment advice.'
+      disclaimer:
+        'This report is for informational purposes only and should not be considered as investment advice.'
     };
   }
 
@@ -465,7 +480,9 @@ class ReportingEngine {
    */
   generateMetricsGrid(data, _fields) {
     const statements = data.financialData?.statements;
-    const latest = statements?.incomeStatement ? Object.keys(statements.incomeStatement).sort().pop() : null;
+    const latest = statements?.incomeStatement
+      ? Object.keys(statements.incomeStatement).sort().pop()
+      : null;
 
     return {
       revenue: {
@@ -482,7 +499,10 @@ class ReportingEngine {
       },
       roe: {
         label: 'Return on Equity',
-        value: this.calculateROE(statements?.incomeStatement?.[latest], statements?.balanceSheet?.[latest]),
+        value: this.calculateROE(
+          statements?.incomeStatement?.[latest],
+          statements?.balanceSheet?.[latest]
+        ),
         format: 'percentage',
         trend: 'positive'
       },
@@ -508,10 +528,40 @@ class ReportingEngine {
       marketValue,
       upside,
       recommendation: upside > 20 ? 'BUY' : upside > -10 ? 'HOLD' : 'SELL',
-      priceTarget: dcfValue * (data.assumptions?.sharesOutstanding || 1000000) / 1000000,
+      priceTarget: (dcfValue * (data.assumptions?.sharesOutstanding || 1000000)) / 1000000,
       confidence: 'Medium',
       methodology: 'DCF Analysis with peer comparison'
     };
+  }
+
+  /**
+   * Generate valuation charts
+   */
+  generateValuationCharts(data) {
+    const dcfValue = data.dcfResults?.enterpriseValue || 0;
+    const marketValue = data.marketData?.marketCap || 0;
+
+    return [
+      {
+        type: 'valuation_comparison',
+        title: 'DCF vs Market Value',
+        data: [
+          { label: 'DCF Value', value: dcfValue, color: '#10b981' },
+          { label: 'Market Value', value: marketValue, color: '#3b82f6' }
+        ],
+        chartType: 'bar'
+      },
+      {
+        type: 'valuation_timeline',
+        title: 'Valuation Trend',
+        data: [
+          { period: 'Current', dcf: dcfValue, market: marketValue },
+          { period: '1 Year', dcf: dcfValue * 1.05, market: marketValue * 1.08 },
+          { period: '3 Years', dcf: dcfValue * 1.15, market: marketValue * 1.25 }
+        ],
+        chartType: 'line'
+      }
+    ];
   }
 
   /**
@@ -612,7 +662,8 @@ class ReportingEngine {
     }
 
     // Add table pages
-    for (const table of section.tables || []) {
+    const tables = Array.isArray(section.tables) ? section.tables : [];
+    for (const table of tables) {
       pages.push({
         type: 'table',
         table,
@@ -667,7 +718,6 @@ class ReportingEngine {
         size: exportedData.length,
         exportedAt: new Date().toISOString()
       };
-
     } catch (error) {
       throw new Error(`Export failed: ${error.message}`);
     }
@@ -869,11 +919,23 @@ class ReportingEngine {
       risks: [
         { category: 'Market Risk', level: 'Medium', description: 'General market volatility' },
         { category: 'Credit Risk', level: 'Low', description: 'Strong balance sheet' },
-        { category: 'Operational Risk', level: 'Medium', description: 'Industry-specific challenges' }
+        {
+          category: 'Operational Risk',
+          level: 'Medium',
+          description: 'Industry-specific challenges'
+        }
       ],
       opportunities: [
-        { category: 'Market Expansion', potential: 'High', description: 'New market opportunities' },
-        { category: 'Cost Optimization', potential: 'Medium', description: 'Operational improvements' }
+        {
+          category: 'Market Expansion',
+          potential: 'High',
+          description: 'New market opportunities'
+        },
+        {
+          category: 'Cost Optimization',
+          potential: 'Medium',
+          description: 'Operational improvements'
+        }
       ]
     };
   }

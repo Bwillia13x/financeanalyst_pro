@@ -21,7 +21,7 @@ export const LivePriceWidget = ({
   const [isFlashing, setIsFlashing] = useState(false);
 
   const { data, isConnected, error, lastUpdated } = useRealTimeData(dataType, symbol, {
-    onUpdate: (newData) => {
+    onUpdate: newData => {
       // Trigger flash animation on price change
       setIsFlashing(true);
       setTimeout(() => setIsFlashing(false), 200);
@@ -123,9 +123,7 @@ export const LivePriceWidget = ({
           >
             {symbol}
           </h3>
-          {name && (
-            <p className="text-xs text-slate-500 dark:text-slate-400">{name}</p>
-          )}
+          {name && <p className="text-xs text-slate-500 dark:text-slate-400">{name}</p>}
         </div>
 
         {/* Connection Status */}
@@ -144,10 +142,7 @@ export const LivePriceWidget = ({
       <div className="flex items-center justify-between">
         <div>
           <div
-            className={cn(
-              'font-bold text-slate-900 dark:text-white',
-              textSizeClasses[size].price
-            )}
+            className={cn('font-bold text-slate-900 dark:text-white', textSizeClasses[size].price)}
           >
             {formatPrice()}
           </div>
@@ -158,7 +153,9 @@ export const LivePriceWidget = ({
               className={cn(
                 'flex items-center space-x-1 mt-1',
                 textSizeClasses[size].change,
-                direction === 'positive' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+                direction === 'positive'
+                  ? 'text-green-600 dark:text-green-400'
+                  : 'text-red-600 dark:text-red-400'
               )}
             >
               {direction === 'positive' ? (
@@ -167,11 +164,9 @@ export const LivePriceWidget = ({
                 <TrendingDown className="w-3 h-3" />
               )}
               <span>
-                {dataType === 'stock_price' ? (
-                  `$${change.absolute} (${change.percent}%)`
-                ) : (
-                  `${change.percent}%`
-                )}
+                {dataType === 'stock_price'
+                  ? `$${change.absolute} (${change.percent}%)`
+                  : `${change.percent}%`}
               </span>
             </div>
           )}
@@ -216,11 +211,13 @@ const MiniChart = ({ data, color = '#3b82f6' }) => {
   const max = Math.max(...data);
   const range = max - min || 1;
 
-  const points = data.map((value, index) => {
-    const x = (index / (data.length - 1)) * 64; // 64px width
-    const y = 32 - ((value - min) / range) * 32; // 32px height, inverted
-    return `${x},${y}`;
-  }).join(' ');
+  const points = data
+    .map((value, index) => {
+      const x = (index / (data.length - 1)) * 64; // 64px width
+      const y = 32 - ((value - min) / range) * 32; // 32px height, inverted
+      return `${x},${y}`;
+    })
+    .join(' ');
 
   return (
     <svg width="64" height="32" className="overflow-visible">
@@ -233,12 +230,7 @@ const MiniChart = ({ data, color = '#3b82f6' }) => {
         strokeLinejoin="round"
       />
       {/* Dot at the end */}
-      <circle
-        cx={64}
-        cy={32 - ((data[data.length - 1] - min) / range) * 32}
-        r="2"
-        fill={color}
-      />
+      <circle cx={64} cy={32 - ((data[data.length - 1] - min) / range) * 32} r="2" fill={color} />
     </svg>
   );
 };

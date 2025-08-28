@@ -4,7 +4,9 @@ const Card = ({ title, right, children, className = '' }) => (
   <section className={`rounded-2xl border border-slate-200 bg-white shadow-sm ${className}`}>
     {(title || right) && (
       <header className="flex items-center justify-between border-b border-slate-200 px-4 py-2.5">
-        {title && <h3 className="text-[13px] font-semibold tracking-wide text-slate-700">{title}</h3>}
+        {title && (
+          <h3 className="text-[13px] font-semibold tracking-wide text-slate-700">{title}</h3>
+        )}
         {right}
       </header>
     )}
@@ -21,7 +23,9 @@ const Pill = ({ children, tone = 'slate' }) => {
     red: 'bg-rose-50 text-rose-700 border-rose-200'
   };
   return (
-    <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] ${tones[tone]}`}>
+    <span
+      className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] ${tones[tone]}`}
+    >
       {children}
     </span>
   );
@@ -66,7 +70,10 @@ const DriverInspector = ({ model }) => {
     <Card title="Driver Inspector" right={<Pill tone="amber">{model.kind}</Pill>}>
       <ul className="space-y-1 text-[12px]">
         {items.map((it, i) => (
-          <li key={i} className="flex items-center justify-between rounded border border-slate-200 bg-slate-50 px-2 py-1">
+          <li
+            key={i}
+            className="flex items-center justify-between rounded border border-slate-200 bg-slate-50 px-2 py-1"
+          >
             <span className="text-slate-700">{it.label}</span>
             <span className="text-slate-500">{it.affects.join(' • ')}</span>
           </li>

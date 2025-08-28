@@ -1,148 +1,94 @@
-import axios from 'axios';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 import DataFetchingService from '../dataFetching';
+import secureApiClient from '../secureApiClient.js';
 
-// Mock axios
-vi.mock('axios');
+// No axios mocking; we will spy on secureApiClient methods directly
 
 describe('DataFetchingService', () => {
   let service;
-  let mockAxios;
 
   beforeEach(() => {
-    mockAxios = vi.mocked(axios);
-
-    // Clear all mocks
-    vi.clearAllMocks();
-
-    // Mock environment variables
-    const mockEnv = {
-      VITE_ALPHA_VANTAGE_API_KEY: 'test_alpha_key',
-      VITE_FMP_API_KEY: 'test_fmp_key',
-      VITE_FORCE_DEMO_MODE: 'false'
-    };
-
-    service = new DataFetchingService(mockEnv);
+    vi.restoreAllMocks();
+    service = new DataFetchingService();
   });
 
   afterEach(() => {
-    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
   });
 
   describe('Rate Limiting', () => {
-    it('should enforce rate limits', async() => {
-      // Create a service with custom rate limits for testing
-      const mockEnv = {
-        VITE_ALPHA_VANTAGE_API_KEY: 'test_alpha_key',
-        VITE_FMP_API_KEY: 'test_fmp_key',
-        VITE_FORCE_DEMO_MODE: 'false'
-      };
-      const customRateLimits = {
-        FMP: { requests: 5, period: 60000 } // 5 requests per minute for testing
-      };
-      const rateLimitedService = new DataFetchingService(mockEnv, customRateLimits);
+    it('should enforce rate limits using checkRateLimit()', async () => {
+      service.customRateLimits = { ALPHA_VANTAGE: { requests: 5, period: 60000 } };
+      service.rateLimiters = {};
+      service.initializeRateLimiters();
 
-      // Mock successful responses
-      mockAxios.get.mockResolvedValue({
-        data: [{ symbol: 'AAPL', companyName: 'Apple Inc.' }]
-      });
-
-      // Make requests up to the limit with different tickers to avoid caching
-      const promises = [];
+      // Perform 5 allowed requests
       for (let i = 0; i < 5; i++) {
-        promises.push(rateLimitedService.fetchCompanyProfile(`AAPL${i}`));
+        await service.checkRateLimit('ALPHA_VANTAGE');
       }
 
-      await Promise.all(promises);
-
-      // The 6th request should be rate limited
-      await expect(rateLimitedService.fetchCompanyProfile('AAPL6')).rejects.toThrow(
-        'Rate limit exceeded'
-      );
+      // The 6th should be rate limited
+      await expect(service.checkRateLimit('ALPHA_VANTAGE')).rejects.toThrow(/Rate limit exceeded/);
     });
   });
 
   describe('Error Handling', () => {
-    it('should handle API errors gracefully', async() => {
-      mockAxios.get.mockRejectedValue({
-        response: { status: 401 },
-        message: 'Unauthorized'
-      });
+    it('should throw a friendly error when company profile fetch fails', async () => {
+      vi.spyOn(secureApiClient, 'getCompanyProfile').mockRejectedValue(new Error('Unauthorized'));
 
-      // Should fall back to demo mode instead of throwing
-      const result = await service.fetchCompanyProfile('AAPL');
-      expect(result).toBeDefined();
-      expect(result.symbol).toBe('AAPL');
+      await expect(service.fetchCompanyProfile('AAPL')).rejects.toThrow(
+        /Failed to fetch company profile/
+      );
     });
 
-    it('should handle network errors', async() => {
-      mockAxios.get.mockRejectedValue(new Error('Network Error'));
+    it('should handle network errors', async () => {
+      vi.spyOn(secureApiClient, 'getCompanyProfile').mockRejectedValue(new Error('Network Error'));
 
       await expect(service.fetchCompanyProfile('INVALID')).rejects.toThrow(
-        'Failed to fetch company profile'
+        /Failed to fetch company profile/
       );
     });
   });
 
   describe('Caching', () => {
-    it('should cache successful responses', async() => {
-      const mockData = [{ symbol: 'AAPL', companyName: 'Apple Inc.' }];
-      mockAxios.get.mockResolvedValue({ data: mockData });
+    it('should cache successful company profile responses', async () => {
+      const mockProfile = { symbol: 'AAPL', companyName: 'Apple Inc.' };
+      const spy = vi.spyOn(secureApiClient, 'getCompanyProfile').mockResolvedValue(mockProfile);
 
-      // First call
       const result1 = await service.fetchCompanyProfile('AAPL');
-
-      // Second call should use cache
       const result2 = await service.fetchCompanyProfile('AAPL');
 
-      expect(mockAxios.get).toHaveBeenCalledTimes(1);
+      expect(spy).toHaveBeenCalledTimes(1);
       expect(result1).toEqual(result2);
     });
   });
 
   describe('Demo Mode', () => {
-    it('should detect demo mode correctly', () => {
-      const mockEnv = {
-        VITE_ALPHA_VANTAGE_API_KEY: 'test_alpha_key',
-        VITE_FMP_API_KEY: 'test_fmp_key',
-        VITE_FORCE_DEMO_MODE: 'false'
-      };
-      const demoService = new DataFetchingService(mockEnv);
+    it('should validate tickers using built-in list in demo mode', async () => {
+      service.demoMode = true;
 
-      // With valid API keys, should not be in demo mode
-      expect(demoService.demoMode).toBe(false);
-    });
+      const isValid = await service.validateTicker('AAPL');
+      const isInvalid = await service.validateTicker('INVALID');
 
-    it('should generate mock data in demo mode', async() => {
-      // Force demo mode
-      const mockEnv = {
-        VITE_ALPHA_VANTAGE_API_KEY: 'demo',
-        VITE_FMP_API_KEY: 'demo',
-        VITE_FORCE_DEMO_MODE: 'true'
-      };
-
-      const demoService = new DataFetchingService(mockEnv);
-      const result = await demoService.fetchCompanyProfile('AAPL');
-
-      expect(result).toBeDefined();
-      expect(result.symbol).toBe('AAPL');
-      expect(result.companyName).toContain('Apple');
+      expect(isValid).toBe(true);
+      expect(isInvalid).toBe(false);
     });
   });
 
   describe('Data Validation', () => {
-    it('should validate ticker symbols', async() => {
-      mockAxios.get.mockResolvedValue({
-        data: [{ symbol: 'AAPL', companyName: 'Apple Inc.' }]
+    it('should validate ticker symbols via company profile lookup', async () => {
+      vi.spyOn(secureApiClient, 'getCompanyProfile').mockResolvedValue({
+        symbol: 'AAPL',
+        companyName: 'Apple Inc.'
       });
 
       const isValid = await service.validateTicker('AAPL');
       expect(isValid).toBe(true);
     });
 
-    it('should reject invalid ticker symbols', async() => {
-      mockAxios.get.mockRejectedValue(new Error('Not found'));
+    it('should reject invalid ticker symbols when profile lookup fails', async () => {
+      vi.spyOn(secureApiClient, 'getCompanyProfile').mockRejectedValue(new Error('Not found'));
 
       const isValid = await service.validateTicker('INVALID');
       expect(isValid).toBe(false);
@@ -150,50 +96,65 @@ describe('DataFetchingService', () => {
   });
 
   describe('Financial Data Fetching', () => {
-    it('should fetch financial statements', async() => {
+    it('should fetch financial statements via SecureApiClient', async () => {
       const mockFinancials = [{ date: '2023-12-31', revenue: 1000000, netIncome: 100000 }];
-
-      mockAxios.get.mockResolvedValue({ data: mockFinancials });
+      vi.spyOn(secureApiClient, 'fetchFinancialStatements').mockResolvedValue(mockFinancials);
 
       const result = await service.fetchFinancialStatements('AAPL', 'income-statement');
       expect(result).toEqual(mockFinancials);
     });
 
-    it('should fetch market data', async() => {
+    it('should fetch market data via SecureApiClient', async () => {
       const mockMarketData = {
-        chart: {
-          result: [
-            {
-              meta: {
-                symbol: 'AAPL',
-                regularMarketPrice: 150.0,
-                previousClose: 148.0,
-                currency: 'USD',
-                marketCap: 2500000000000,
-                regularMarketVolume: 50000000
-              },
-              timestamp: [1640995200],
-              indicators: {
-                quote: [
-                  {
-                    open: [149.0],
-                    high: [151.0],
-                    low: [148.5],
-                    close: [150.0],
-                    volume: [50000000]
-                  }
-                ]
-              }
-            }
-          ]
-        }
+        symbol: 'AAPL',
+        range: '1y',
+        data: [
+          {
+            timestamp: 1640995200,
+            open: 149.0,
+            high: 151.0,
+            low: 148.5,
+            close: 150.0,
+            volume: 50000000
+          }
+        ],
+        meta: {
+          symbol: 'AAPL',
+          regularMarketPrice: 150.0,
+          previousClose: 148.0,
+          currency: 'USD',
+          marketCap: 2500000000000
+        },
+        timestamps: [1640995200],
+        prices: {
+          close: [150.0],
+          high: [151.0],
+          low: [148.5],
+          open: [149.0]
+        },
+        volume: [50000000],
+        source: 'test'
       };
-
-      mockAxios.get.mockResolvedValue({ data: mockMarketData });
+      vi.spyOn(secureApiClient, 'fetchMarketData').mockResolvedValue(mockMarketData);
 
       const result = await service.fetchMarketData('AAPL');
       expect(result.symbol).toBe('AAPL');
-      expect(result.currentPrice).toBe(150.0);
+      expect(result.timestamps.length).toBe(1);
+      expect(result.prices.close[0]).toBe(150.0);
+    });
+
+    it('should fetch peer comparables via SecureApiClient', async () => {
+      const mockPeers = [
+        { symbol: 'MSFT', name: 'Microsoft Corp', evToEbitda: 15.2 },
+        { symbol: 'GOOGL', name: 'Alphabet Inc', evToEbitda: 13.8 }
+      ];
+      const spy = vi.spyOn(secureApiClient, 'fetchPeerComparables').mockResolvedValue(mockPeers);
+
+      const result1 = await service.fetchPeerComparables('AAPL');
+      const result2 = await service.fetchPeerComparables('AAPL');
+
+      expect(result1).toEqual(mockPeers);
+      expect(spy).toHaveBeenCalledTimes(1);
     });
   });
 });

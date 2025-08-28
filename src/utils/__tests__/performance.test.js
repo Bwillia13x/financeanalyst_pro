@@ -150,7 +150,7 @@ describe('Performance Utilities', () => {
   });
 
   describe('debounce', () => {
-    it('should debounce function calls', async() => {
+    it('should debounce function calls', async () => {
       const mockFn = vi.fn();
       const debouncedFn = debounce(mockFn, 100);
 
@@ -165,7 +165,7 @@ describe('Performance Utilities', () => {
       expect(mockFn).toHaveBeenCalledTimes(1);
     });
 
-    it('should pass arguments to debounced function', async() => {
+    it('should pass arguments to debounced function', async () => {
       const mockFn = vi.fn();
       const debouncedFn = debounce(mockFn, 50);
 
@@ -187,7 +187,7 @@ describe('Performance Utilities', () => {
   });
 
   describe('throttle', () => {
-    it('should throttle function calls', async() => {
+    it('should throttle function calls', async () => {
       const mockFn = vi.fn();
       const throttledFn = throttle(mockFn, 100);
 

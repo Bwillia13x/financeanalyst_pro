@@ -6,7 +6,7 @@ import { LineChart, Line, XAxis, YAxis, ResponsiveContainer } from 'recharts';
 const CompanyOverview = ({ company, compact = false }) => {
   if (!company) return null;
 
-  const formatCurrency = (value) => {
+  const formatCurrency = value => {
     if (value >= 1e12) return `$${(value / 1e12).toFixed(1)}T`;
     if (value >= 1e9) return `$${(value / 1e9).toFixed(1)}B`;
     if (value >= 1e6) return `$${(value / 1e6).toFixed(1)}M`;
@@ -14,13 +14,14 @@ const CompanyOverview = ({ company, compact = false }) => {
   };
 
   // Prepare chart data
-  const chartData = company.financials?.revenue?.map((revenue, index) => ({
-    year: company.financials.years[index],
-    revenue: revenue / 1e9 // Convert to billions for readability
-  })) || [];
+  const chartData =
+    company.financials?.revenue?.map((revenue, index) => ({
+      year: company.financials.years[index],
+      revenue: revenue / 1e9 // Convert to billions for readability
+    })) || [];
 
   // Calculate growth metrics
-  const calculateGrowth = (data) => {
+  const calculateGrowth = data => {
     if (!data || data.length < 2) return 0;
     const latest = data[data.length - 1];
     const previous = data[data.length - 2];
@@ -54,9 +55,7 @@ const CompanyOverview = ({ company, compact = false }) => {
               }`}
             >
               <TrendingUp
-                className={`w-4 h-4 mr-1 ${
-                  company.changePercent < 0 ? 'rotate-180' : ''
-                }`}
+                className={`w-4 h-4 mr-1 ${company.changePercent < 0 ? 'rotate-180' : ''}`}
               />
               {company.changePercent >= 0 ? '+' : ''}
               {company.changePercent.toFixed(2)}%
@@ -90,18 +89,14 @@ const CompanyOverview = ({ company, compact = false }) => {
         </div>
 
         <div className="text-right">
-          <div className="text-4xl font-light text-gray-900 mb-1">
-            ${company.price}
-          </div>
+          <div className="text-4xl font-light text-gray-900 mb-1">${company.price}</div>
           <div
             className={`text-lg flex items-center justify-end ${
               company.changePercent >= 0 ? 'text-green-600' : 'text-red-600'
             }`}
           >
             <TrendingUp
-              className={`w-5 h-5 mr-2 ${
-                company.changePercent < 0 ? 'rotate-180' : ''
-              }`}
+              className={`w-5 h-5 mr-2 ${company.changePercent < 0 ? 'rotate-180' : ''}`}
             />
             {company.changePercent >= 0 ? '+' : ''}
             {company.change.toFixed(2)} ({company.changePercent.toFixed(2)}%)
@@ -117,7 +112,9 @@ const CompanyOverview = ({ company, compact = false }) => {
             <h3 className="text-lg font-medium text-gray-900">Revenue Trend</h3>
             <div className="flex items-center space-x-2 text-sm text-gray-500">
               <Calendar className="w-4 h-4" />
-              <span>{company.financials?.years?.[0]} - {company.financials?.years?.slice(-1)}</span>
+              <span>
+                {company.financials?.years?.[0]} - {company.financials?.years?.slice(-1)}
+              </span>
             </div>
           </div>
           <div className="h-48">
@@ -133,7 +130,7 @@ const CompanyOverview = ({ company, compact = false }) => {
                   axisLine={false}
                   tickLine={false}
                   tick={{ fontSize: 12, fill: '#6B7280' }}
-                  tickFormatter={(value) => `$${value}B`}
+                  tickFormatter={value => `$${value}B`}
                 />
                 <Line
                   type="monotone"
@@ -159,11 +156,10 @@ const CompanyOverview = ({ company, compact = false }) => {
               {formatCurrency(company.financials?.revenue?.slice(-1)[0] || 0)}
             </div>
             <div
-              className={`text-sm mt-1 ${
-                revenueGrowth >= 0 ? 'text-green-600' : 'text-red-600'
-              }`}
+              className={`text-sm mt-1 ${revenueGrowth >= 0 ? 'text-green-600' : 'text-red-600'}`}
             >
-              {revenueGrowth >= 0 ? '+' : ''}{revenueGrowth.toFixed(1)}% YoY
+              {revenueGrowth >= 0 ? '+' : ''}
+              {revenueGrowth.toFixed(1)}% YoY
             </div>
           </div>
 
@@ -175,9 +171,7 @@ const CompanyOverview = ({ company, compact = false }) => {
             <div className="text-2xl font-semibold text-gray-900">
               {formatCurrency(company.marketCap)}
             </div>
-            <div className="text-sm text-gray-500 mt-1">
-              Public Market
-            </div>
+            <div className="text-sm text-gray-500 mt-1">Public Market</div>
           </div>
 
           <div className="bg-gray-50 rounded-2xl p-4">
@@ -185,12 +179,8 @@ const CompanyOverview = ({ company, compact = false }) => {
               <span className="text-sm font-medium text-gray-600">Sector</span>
               <Building2 className="w-4 h-4 text-gray-400" />
             </div>
-            <div className="text-lg font-medium text-gray-900">
-              {company.sector}
-            </div>
-            <div className="text-sm text-gray-500 mt-1">
-              Industry Classification
-            </div>
+            <div className="text-lg font-medium text-gray-900">{company.sector}</div>
+            <div className="text-sm text-gray-500 mt-1">Industry Classification</div>
           </div>
         </div>
       </div>

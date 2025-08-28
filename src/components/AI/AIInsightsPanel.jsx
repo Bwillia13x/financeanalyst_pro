@@ -1,5 +1,20 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { Activity, AlertTriangle, BarChart3, Brain, ChevronDown, ChevronRight, Lightbulb, PieChart, RefreshCw, Shield, Sparkles, Target, TrendingUp, Zap } from 'lucide-react';
+import {
+  Activity,
+  AlertTriangle,
+  BarChart3,
+  Brain,
+  ChevronDown,
+  ChevronRight,
+  Lightbulb,
+  PieChart,
+  RefreshCw,
+  Shield,
+  Sparkles,
+  Target,
+  TrendingUp,
+  Zap
+} from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 
 import aiInsightsService from '../../services/aiInsightsService';
@@ -26,7 +41,7 @@ const AIInsightsPanel = ({
     }
   }, [financialData, industry]);
 
-  const generateInsights = async() => {
+  const generateInsights = async () => {
     setIsLoading(true);
     setError(null);
 
@@ -48,7 +63,7 @@ const AIInsightsPanel = ({
     }
   };
 
-  const toggleSection = (sectionId) => {
+  const toggleSection = sectionId => {
     const newExpanded = new Set(expandedSections);
     if (newExpanded.has(sectionId)) {
       newExpanded.delete(sectionId);
@@ -58,28 +73,37 @@ const AIInsightsPanel = ({
     setExpandedSections(newExpanded);
   };
 
-  const getConfidenceColor = (confidence) => {
+  const getConfidenceColor = confidence => {
     if (confidence > 0.8) return 'text-green-600 dark:text-green-400';
     if (confidence > 0.6) return 'text-yellow-600 dark:text-yellow-400';
     return 'text-red-600 dark:text-red-400';
   };
 
-  const getHealthColor = (health) => {
+  const getHealthColor = health => {
     switch (health) {
-      case 'excellent': return 'text-green-600 dark:text-green-400';
-      case 'good': return 'text-blue-600 dark:text-blue-400';
-      case 'fair': return 'text-yellow-600 dark:text-yellow-400';
-      case 'poor': return 'text-red-600 dark:text-red-400';
-      default: return 'text-slate-600 dark:text-slate-400';
+      case 'excellent':
+        return 'text-green-600 dark:text-green-400';
+      case 'good':
+        return 'text-blue-600 dark:text-blue-400';
+      case 'fair':
+        return 'text-yellow-600 dark:text-yellow-400';
+      case 'poor':
+        return 'text-red-600 dark:text-red-400';
+      default:
+        return 'text-slate-600 dark:text-slate-400';
     }
   };
 
-  const getImpactIcon = (impact) => {
+  const getImpactIcon = impact => {
     switch (impact) {
-      case 'high': return <TrendingUp className="w-4 h-4 text-green-600" />;
-      case 'medium': return <BarChart3 className="w-4 h-4 text-yellow-600" />;
-      case 'low': return <Activity className="w-4 h-4 text-blue-600" />;
-      default: return <PieChart className="w-4 h-4 text-slate-600" />;
+      case 'high':
+        return <TrendingUp className="w-4 h-4 text-green-600" />;
+      case 'medium':
+        return <BarChart3 className="w-4 h-4 text-yellow-600" />;
+      case 'low':
+        return <Activity className="w-4 h-4 text-blue-600" />;
+      default:
+        return <PieChart className="w-4 h-4 text-slate-600" />;
     }
   };
 
@@ -151,7 +175,9 @@ const AIInsightsPanel = ({
           </div>
 
           <div className="flex items-center space-x-2">
-            <div className={`flex items-center space-x-1 ${getConfidenceColor(insights.confidence)}`}>
+            <div
+              className={`flex items-center space-x-1 ${getConfidenceColor(insights.confidence)}`}
+            >
               <Sparkles className="w-4 h-4" />
               <span className="text-sm font-medium">
                 {Math.round(insights.confidence * 100)}% confidence
@@ -196,7 +222,9 @@ const AIInsightsPanel = ({
                       Financial Health
                     </span>
                   </div>
-                  <span className={`text-lg font-bold capitalize ${getHealthColor(insights.summary.overallHealth)}`}>
+                  <span
+                    className={`text-lg font-bold capitalize ${getHealthColor(insights.summary.overallHealth)}`}
+                  >
                     {insights.summary.overallHealth}
                   </span>
                 </div>
@@ -221,13 +249,18 @@ const AIInsightsPanel = ({
       {/* Insights by Category */}
       <div className="border-t border-slate-200 dark:border-slate-700">
         {Object.entries(insights.analyses).map(([category, analysis]) => (
-          <div key={category} className="border-b border-slate-200 dark:border-slate-700 last:border-b-0">
+          <div
+            key={category}
+            className="border-b border-slate-200 dark:border-slate-700 last:border-b-0"
+          >
             <button
               onClick={() => toggleSection(category)}
               className="flex items-center justify-between w-full p-4 text-left hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
             >
               <div className="flex items-center space-x-3">
-                <div className={`p-1 rounded ${analysis.priority === 'high' ? 'bg-red-100 dark:bg-red-900' : 'bg-yellow-100 dark:bg-yellow-900'}`}>
+                <div
+                  className={`p-1 rounded ${analysis.priority === 'high' ? 'bg-red-100 dark:bg-red-900' : 'bg-yellow-100 dark:bg-yellow-900'}`}
+                >
                   {category === 'revenue' && <TrendingUp className="w-4 h-4" />}
                   {category === 'profitability' && <BarChart3 className="w-4 h-4" />}
                   {category === 'valuation' && <PieChart className="w-4 h-4" />}
@@ -246,7 +279,9 @@ const AIInsightsPanel = ({
               </div>
 
               <div className="flex items-center space-x-2">
-                <span className={`text-xs px-2 py-1 rounded-full ${analysis.priority === 'high' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'}`}>
+                <span
+                  className={`text-xs px-2 py-1 rounded-full ${analysis.priority === 'high' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'}`}
+                >
                   {analysis.priority}
                 </span>
                 {expandedSections.has(category) ? (
@@ -271,9 +306,7 @@ const AIInsightsPanel = ({
                       {analysis.analysis.insights.map((insight, index) => (
                         <div key={index} className="flex items-start space-x-2">
                           <Lightbulb className="w-4 h-4 text-yellow-500 mt-0.5 flex-shrink-0" />
-                          <p className="text-sm text-slate-700 dark:text-slate-300">
-                            {insight}
-                          </p>
+                          <p className="text-sm text-slate-700 dark:text-slate-300">{insight}</p>
                         </div>
                       ))}
                     </div>
@@ -308,7 +341,8 @@ const AIInsightsPanel = ({
                                 Effort: <span className="font-medium">{suggestion.effort}</span>
                               </span>
                               <span className="text-slate-500 dark:text-slate-400">
-                                Timeline: <span className="font-medium">{suggestion.timeframe}</span>
+                                Timeline:{' '}
+                                <span className="font-medium">{suggestion.timeframe}</span>
                               </span>
                             </div>
                           </div>

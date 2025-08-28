@@ -1,5 +1,5 @@
 // Executive Presentation Builder - Phase 2 Implementation
-import JSZip from 'jszip';
+// import JSZip from 'jszip'; // Commented out - not currently used
 
 export class ExecutivePresentationBuilder {
   constructor() {
@@ -44,8 +44,16 @@ export class ExecutivePresentationBuilder {
           { type: 'title', title: 'Q4 2024 Business Review', layout: 'title-subtitle' },
           { type: 'agenda', title: 'Agenda', layout: 'bullet-points' },
           { type: 'key-metrics', title: 'Key Performance Metrics', layout: 'kpi-dashboard' },
-          { type: 'financial-performance', title: 'Financial Performance', layout: 'chart-comparison' },
-          { type: 'operational-highlights', title: 'Operational Highlights', layout: 'icon-bullets' },
+          {
+            type: 'financial-performance',
+            title: 'Financial Performance',
+            layout: 'chart-comparison'
+          },
+          {
+            type: 'operational-highlights',
+            title: 'Operational Highlights',
+            layout: 'icon-bullets'
+          },
           { type: 'market-analysis', title: 'Market Analysis', layout: 'chart-text' },
           { type: 'challenges-opportunities', title: 'Challenges & Opportunities', layout: 'swot' },
           { type: 'outlook', title: 'Forward Looking', layout: 'forecast-chart' },
@@ -64,7 +72,11 @@ export class ExecutivePresentationBuilder {
           { type: 'financial-analysis', title: 'Financial Analysis', layout: 'metrics-comparison' },
           { type: 'synergies', title: 'Synergy Analysis', layout: 'waterfall-chart' },
           { type: 'valuation-methods', title: 'Valuation Methodology', layout: 'comparison-table' },
-          { type: 'accretion-dilution', title: 'Accretion/Dilution Analysis', layout: 'sensitivity-table' },
+          {
+            type: 'accretion-dilution',
+            title: 'Accretion/Dilution Analysis',
+            layout: 'sensitivity-table'
+          },
           { type: 'risk-assessment', title: 'Risk Assessment', layout: 'risk-matrix' },
           { type: 'recommendation', title: 'Recommendation', layout: 'decision-framework' }
         ]
@@ -231,12 +243,16 @@ export class ExecutivePresentationBuilder {
 
     // Create slides from template
     for (const templateSlide of template.slides) {
-      const slide = await this.createSlide(presentationId, {
-        type: templateSlide.type,
-        title: templateSlide.title,
-        layout: templateSlide.layout
-      }, userId);
-      
+      const slide = await this.createSlide(
+        presentationId,
+        {
+          type: templateSlide.type,
+          title: templateSlide.title,
+          layout: templateSlide.layout
+        },
+        userId
+      );
+
       presentation.slides.push(slide.id);
     }
 
@@ -282,7 +298,7 @@ export class ExecutivePresentationBuilder {
     slide.content.elements = this.getDefaultElementsForLayout(slide.layout);
 
     this.slides.set(slide.id, slide);
-    
+
     if (slideConfig.order !== undefined) {
       presentation.slides.splice(slideConfig.order, 0, slide.id);
     } else {
@@ -302,29 +318,77 @@ export class ExecutivePresentationBuilder {
         { type: 'title', content: 'Slide Title', position: { x: 10, y: 40, width: 80, height: 20 } }
       ],
       'title-content': [
-        { type: 'title', content: 'Slide Title', position: { x: 10, y: 10, width: 80, height: 15 } },
-        { type: 'text', content: 'Content goes here', position: { x: 10, y: 30, width: 80, height: 60 } }
+        {
+          type: 'title',
+          content: 'Slide Title',
+          position: { x: 10, y: 10, width: 80, height: 15 }
+        },
+        {
+          type: 'text',
+          content: 'Content goes here',
+          position: { x: 10, y: 30, width: 80, height: 60 }
+        }
       ],
       'bullet-points': [
-        { type: 'title', content: 'Slide Title', position: { x: 10, y: 10, width: 80, height: 15 } },
-        { type: 'bullets', content: ['Point 1', 'Point 2', 'Point 3'], position: { x: 10, y: 30, width: 80, height: 60 } }
+        {
+          type: 'title',
+          content: 'Slide Title',
+          position: { x: 10, y: 10, width: 80, height: 15 }
+        },
+        {
+          type: 'bullets',
+          content: ['Point 1', 'Point 2', 'Point 3'],
+          position: { x: 10, y: 30, width: 80, height: 60 }
+        }
       ],
       'chart-text': [
-        { type: 'title', content: 'Slide Title', position: { x: 10, y: 10, width: 80, height: 15 } },
+        {
+          type: 'title',
+          content: 'Slide Title',
+          position: { x: 10, y: 10, width: 80, height: 15 }
+        },
         { type: 'chart', content: null, position: { x: 10, y: 25, width: 45, height: 65 } },
-        { type: 'text', content: 'Analysis text', position: { x: 60, y: 25, width: 30, height: 65 } }
+        {
+          type: 'text',
+          content: 'Analysis text',
+          position: { x: 60, y: 25, width: 30, height: 65 }
+        }
       ],
       'two-column': [
-        { type: 'title', content: 'Slide Title', position: { x: 10, y: 10, width: 80, height: 15 } },
+        {
+          type: 'title',
+          content: 'Slide Title',
+          position: { x: 10, y: 10, width: 80, height: 15 }
+        },
         { type: 'text', content: 'Left column', position: { x: 10, y: 25, width: 35, height: 65 } },
         { type: 'text', content: 'Right column', position: { x: 55, y: 25, width: 35, height: 65 } }
       ],
       'metrics-grid': [
-        { type: 'title', content: 'Key Metrics', position: { x: 10, y: 10, width: 80, height: 15 } },
-        { type: 'kpi', content: { value: '$100M', label: 'Revenue', trend: '+12%' }, position: { x: 10, y: 25, width: 35, height: 30 } },
-        { type: 'kpi', content: { value: '15%', label: 'EBITDA Margin', trend: '+2%' }, position: { x: 55, y: 25, width: 35, height: 30 } },
-        { type: 'kpi', content: { value: '$2.5B', label: 'Market Cap', trend: '+25%' }, position: { x: 10, y: 65, width: 35, height: 30 } },
-        { type: 'kpi', content: { value: '12.5x', label: 'P/E Ratio', trend: '-5%' }, position: { x: 55, y: 65, width: 35, height: 30 } }
+        {
+          type: 'title',
+          content: 'Key Metrics',
+          position: { x: 10, y: 10, width: 80, height: 15 }
+        },
+        {
+          type: 'kpi',
+          content: { value: '$100M', label: 'Revenue', trend: '+12%' },
+          position: { x: 10, y: 25, width: 35, height: 30 }
+        },
+        {
+          type: 'kpi',
+          content: { value: '15%', label: 'EBITDA Margin', trend: '+2%' },
+          position: { x: 55, y: 25, width: 35, height: 30 }
+        },
+        {
+          type: 'kpi',
+          content: { value: '$2.5B', label: 'Market Cap', trend: '+25%' },
+          position: { x: 10, y: 65, width: 35, height: 30 }
+        },
+        {
+          type: 'kpi',
+          content: { value: '12.5x', label: 'P/E Ratio', trend: '-5%' },
+          position: { x: 55, y: 65, width: 35, height: 30 }
+        }
       ]
     };
 
@@ -332,7 +396,7 @@ export class ExecutivePresentationBuilder {
   }
 
   // Content Element Management
-  async addElement(slideId, element, userId) {
+  async addElement(slideId, element, _userId) {
     const slide = this.slides.get(slideId);
     if (!slide) {
       throw new Error('Slide not found');
@@ -355,7 +419,7 @@ export class ExecutivePresentationBuilder {
     return newElement;
   }
 
-  async updateElement(slideId, elementId, updates, userId) {
+  async updateElement(slideId, elementId, updates, _userId) {
     const slide = this.slides.get(slideId);
     if (!slide) {
       throw new Error('Slide not found');
@@ -412,12 +476,14 @@ export class ExecutivePresentationBuilder {
       type: mapping.chartType || 'line',
       data: {
         labels: dataSource.labels || [],
-        datasets: [{
-          label: mapping.label || 'Data',
-          data: dataSource.values || [],
-          backgroundColor: mapping.backgroundColor || '#3b82f6',
-          borderColor: mapping.borderColor || '#1d4ed8'
-        }]
+        datasets: [
+          {
+            label: mapping.label || 'Data',
+            data: dataSource.values || [],
+            backgroundColor: mapping.backgroundColor || '#3b82f6',
+            borderColor: mapping.borderColor || '#1d4ed8'
+          }
+        ]
       },
       options: {
         responsive: true,
@@ -456,6 +522,22 @@ export class ExecutivePresentationBuilder {
     };
   }
 
+  async formatTableData(_dataSource, _mapping) {
+    // Placeholder implementation for table data formatting
+    return {
+      headers: ['Column 1', 'Column 2', 'Column 3'],
+      rows: [
+        ['Data 1', 'Data 2', 'Data 3'],
+        ['Data 4', 'Data 5', 'Data 6']
+      ]
+    };
+  }
+
+  async formatTextData(_dataSource, _mapping) {
+    // Placeholder implementation for text data formatting
+    return 'Formatted text content';
+  }
+
   // Export Functions
   async exportToPowerPoint(presentationId, options = {}) {
     const presentation = this.presentations.get(presentationId);
@@ -464,14 +546,14 @@ export class ExecutivePresentationBuilder {
     }
 
     const pptxData = await this.generatePowerPointData(presentation, options);
-    
+
     // Track analytics
     presentation.analytics.downloads++;
-    
+
     return pptxData;
   }
 
-  async generatePowerPointData(presentation, options) {
+  async generatePowerPointData(presentation, _options) {
     // This would integrate with a library like PptxGenJS
     const theme = this.themes.get(presentation.themeId);
     const slides = presentation.slides.map(id => this.slides.get(id)).filter(Boolean);
@@ -542,7 +624,7 @@ export class ExecutivePresentationBuilder {
     });
 
     presentation.analytics.downloads++;
-    
+
     return {
       type: 'pdf',
       data: pdfBuffer,
@@ -581,20 +663,20 @@ export class ExecutivePresentationBuilder {
   generatePresentationCSS(theme, settings) {
     return `
       * { margin: 0; padding: 0; box-sizing: border-box; }
-      
+
       body {
         font-family: ${theme.fonts.body};
         color: ${theme.colors.text};
         background: ${theme.colors.background};
         line-height: 1.6;
       }
-      
+
       .presentation-container {
         max-width: 1200px;
         margin: 0 auto;
         padding: 20px;
       }
-      
+
       .slide {
         width: 100%;
         min-height: ${settings.aspectRatio === '16:9' ? '675px' : '900px'};
@@ -605,7 +687,7 @@ export class ExecutivePresentationBuilder {
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         position: relative;
       }
-      
+
       .slide-title {
         font-family: ${theme.fonts.heading};
         font-size: 2.5rem;
@@ -613,11 +695,11 @@ export class ExecutivePresentationBuilder {
         color: ${theme.colors.primary};
         margin-bottom: ${theme.spacing.elementSpacing}px;
       }
-      
+
       .slide-element {
         position: absolute;
       }
-      
+
       .kpi-element {
         background: ${theme.colors.background};
         border: 2px solid ${theme.colors.primary};
@@ -625,25 +707,25 @@ export class ExecutivePresentationBuilder {
         padding: 20px;
         text-align: center;
       }
-      
+
       .kpi-value {
         font-size: 2.5rem;
         font-weight: 700;
         color: ${theme.colors.primary};
       }
-      
+
       .kpi-label {
         font-size: 1rem;
         color: ${theme.colors.textSecondary};
         margin-top: 8px;
       }
-      
+
       .chart-container {
         position: relative;
         height: 100%;
         width: 100%;
       }
-      
+
       @media print {
         .slide {
           page-break-after: always;
@@ -657,7 +739,7 @@ export class ExecutivePresentationBuilder {
   // Utility Methods
   formatNumber(value, format) {
     if (typeof value !== 'number') return value;
-    
+
     switch (format) {
       case 'currency':
         return new Intl.NumberFormat('en-US', {
@@ -711,8 +793,9 @@ export class ExecutivePresentationBuilder {
 
   // Query Methods
   getUserPresentations(userId, filters = {}) {
-    let presentations = Array.from(this.presentations.values())
-      .filter(p => p.createdBy === userId || p.collaboration.editors.includes(userId));
+    let presentations = Array.from(this.presentations.values()).filter(
+      p => p.createdBy === userId || p.collaboration.editors.includes(userId)
+    );
 
     if (filters.industry) {
       presentations = presentations.filter(p => p.metadata.industry === filters.industry);
@@ -724,9 +807,10 @@ export class ExecutivePresentationBuilder {
 
     if (filters.search) {
       const searchLower = filters.search.toLowerCase();
-      presentations = presentations.filter(p =>
-        p.title.toLowerCase().includes(searchLower) ||
-        p.description.toLowerCase().includes(searchLower)
+      presentations = presentations.filter(
+        p =>
+          p.title.toLowerCase().includes(searchLower) ||
+          p.description.toLowerCase().includes(searchLower)
       );
     }
 
@@ -735,7 +819,7 @@ export class ExecutivePresentationBuilder {
 
   getTemplates(category = null) {
     let templates = Array.from(this.templates.values());
-    
+
     if (category) {
       templates = templates.filter(template => template.category === category);
     }
@@ -745,3 +829,4 @@ export class ExecutivePresentationBuilder {
 }
 
 export const executivePresentationBuilder = new ExecutivePresentationBuilder();
+export const executivePresentationService = executivePresentationBuilder;

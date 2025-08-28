@@ -10,15 +10,15 @@ export class CLICommandProcessor {
     this.context = {};
     this.commandHistory = [];
     this.aliases = {
-      'p': 'portfolio',
-      'md': 'market-data',
-      'calc': 'calculate',
-      'nav': 'navigate',
-      'help': 'help',
-      'clear': 'clear',
-      'ls': 'list',
-      'll': 'list --detailed',
-      'cd': 'navigate'
+      p: 'portfolio',
+      md: 'market-data',
+      calc: 'calculate',
+      nav: 'navigate',
+      help: 'help',
+      clear: 'clear',
+      ls: 'list',
+      ll: 'list --detailed',
+      cd: 'navigate'
     };
 
     this.commands = this.initializeCommands();
@@ -226,7 +226,15 @@ export class CLICommandProcessor {
 
     switch (command) {
       case 'navigate':
-        suggestions.push('workspace', 'market-data', 'portfolio', 'analysis', 'private-analysis', 'valuation-workbench', 'model-lab');
+        suggestions.push(
+          'workspace',
+          'market-data',
+          'portfolio',
+          'analysis',
+          'private-analysis',
+          'valuation-workbench',
+          'model-lab'
+        );
         break;
       case 'portfolio':
         suggestions.push('show', 'analyze', 'rebalance', 'risk', 'holdings', 'performance');
@@ -444,8 +452,12 @@ export class CLICommandProcessor {
     output += '═══════════════════════════════════════\n';
     output += 'Backend API:       🟡 Unknown\n';
     output += 'Cache:             🟡 Unknown\n';
-    output += 'Watchlists:        ' + (this.context.watchlists ? '🟢 Available' : '🟡 Not available') + '\n';
-    output += 'Portfolio Data:    ' + (this.context.portfolioData ? '🟢 Loaded' : '🟡 Not loaded') + '\n';
+    output +=
+      'Watchlists:        ' +
+      (this.context.watchlists ? '🟢 Available' : '🟡 Not available') +
+      '\n';
+    output +=
+      'Portfolio Data:    ' + (this.context.portfolioData ? '🟢 Loaded' : '🟡 Not loaded') + '\n';
     output += 'AI Assistant:      🟢 Online\n';
 
     if (detailed) {
@@ -477,8 +489,12 @@ export class CLICommandProcessor {
     output += '═══════════════════════════════════════\n';
     output += 'Backend API:       🟡 Unknown\n';
     output += 'Cache:             🟡 Unknown\n';
-    output += 'Watchlists:        ' + (this.context.watchlists ? '🟢 Available' : '🟡 Not available') + '\n';
-    output += 'Portfolio Data:    ' + (this.context.portfolioData ? '🟢 Loaded' : '🟡 Not loaded') + '\n';
+    output +=
+      'Watchlists:        ' +
+      (this.context.watchlists ? '🟢 Available' : '🟡 Not available') +
+      '\n';
+    output +=
+      'Portfolio Data:    ' + (this.context.portfolioData ? '🟢 Loaded' : '🟡 Not loaded') + '\n';
     output += 'AI Assistant:      🟢 Online\n';
 
     if (_detailed) {
@@ -506,7 +522,8 @@ export class CLICommandProcessor {
   async handleVersion(_args, _flags) {
     return {
       success: true,
-      output: 'FinanceAnalyst Pro v1.0.0\nBuild: 2025.08.18\nNode.js CLI Interface\nSecure Backend API Integration',
+      output:
+        'FinanceAnalyst Pro v1.0.0\nBuild: 2025.08.18\nNode.js CLI Interface\nSecure Backend API Integration',
       type: 'info'
     };
   }

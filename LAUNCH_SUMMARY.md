@@ -47,7 +47,7 @@
 
 **CI/CD Pipeline**: GitHub Actions workflow with automated testing
 **Environment Configuration**: Production and staging environments ready
-**Monitoring Stack**: 
+**Monitoring Stack**:
   - **Error Tracking**: Sentry (configured)
   - **Analytics**: Google Analytics 4
   - **Performance**: Hotjar + Core Web Vitals
@@ -241,7 +241,7 @@ build/assets/utils-vendor-52VqQrbv.js    26.65 kB │ gzip:   8.11 kB
 
 **Alert Thresholds**:
 - **Error Rate**: Alert if >1% in 5-minute window
-- **Response Time**: Alert if >3s average for 5 minutes  
+- **Response Time**: Alert if >3s average for 5 minutes
 - **Uptime**: Alert if <99% in any 1-hour period
 - **API Failures**: Alert if >10% API calls fail
 

@@ -14,7 +14,7 @@ const reactiveCalculationEngine = {
 
 const realTimeDataService = {
   subscribe: (_symbol, _callback) => ({ unsubscribe: () => {} }),
-  getCurrentPrice: (_symbol) => Promise.resolve(150.0)
+  getCurrentPrice: _symbol => Promise.resolve(150.0)
 };
 
 const LivingModelDCF = ({ symbol, onBack }) => {
@@ -35,11 +35,46 @@ const LivingModelDCF = ({ symbol, onBack }) => {
     symbol: symbol || 'AAPL',
     trackRealTime: true,
     yearlyData: {
-      1: { revenueGrowth: 15, ebitdaMargin: 25, taxRate: 25, capexPercent: 4, daPercent: 3, workingCapitalChange: 2 },
-      2: { revenueGrowth: 12, ebitdaMargin: 24, taxRate: 25, capexPercent: 4, daPercent: 3, workingCapitalChange: 2 },
-      3: { revenueGrowth: 10, ebitdaMargin: 23, taxRate: 25, capexPercent: 3, daPercent: 3, workingCapitalChange: 1 },
-      4: { revenueGrowth: 8, ebitdaMargin: 22, taxRate: 25, capexPercent: 3, daPercent: 3, workingCapitalChange: 1 },
-      5: { revenueGrowth: 6, ebitdaMargin: 21, taxRate: 25, capexPercent: 3, daPercent: 3, workingCapitalChange: 1 }
+      1: {
+        revenueGrowth: 15,
+        ebitdaMargin: 25,
+        taxRate: 25,
+        capexPercent: 4,
+        daPercent: 3,
+        workingCapitalChange: 2
+      },
+      2: {
+        revenueGrowth: 12,
+        ebitdaMargin: 24,
+        taxRate: 25,
+        capexPercent: 4,
+        daPercent: 3,
+        workingCapitalChange: 2
+      },
+      3: {
+        revenueGrowth: 10,
+        ebitdaMargin: 23,
+        taxRate: 25,
+        capexPercent: 3,
+        daPercent: 3,
+        workingCapitalChange: 1
+      },
+      4: {
+        revenueGrowth: 8,
+        ebitdaMargin: 22,
+        taxRate: 25,
+        capexPercent: 3,
+        daPercent: 3,
+        workingCapitalChange: 1
+      },
+      5: {
+        revenueGrowth: 6,
+        ebitdaMargin: 21,
+        taxRate: 25,
+        capexPercent: 3,
+        daPercent: 3,
+        workingCapitalChange: 1
+      }
     },
     balanceSheet: {
       cash: 100000000,
@@ -93,7 +128,7 @@ const LivingModelDCF = ({ symbol, onBack }) => {
       subscriptions.map(({ dataType, symbol }) => ({
         dataType,
         symbol,
-        callback: (data) => {
+        callback: data => {
           setRealTimeData(prev => ({
             ...prev,
             [`${dataType}_${symbol}`]: data
@@ -127,43 +162,51 @@ const LivingModelDCF = ({ symbol, onBack }) => {
     });
   }, []);
 
-  const updateYearlyData = useCallback((year, field, value) => {
-    updateInput(`yearlyData.${year}.${field}`, parseFloat(value) || 0);
-  }, [updateInput]);
+  const updateYearlyData = useCallback(
+    (year, field, value) => {
+      updateInput(`yearlyData.${year}.${field}`, parseFloat(value) || 0);
+    },
+    [updateInput]
+  );
 
-  const handleProjectionYearsChange = useCallback((newYears) => {
-    updateInput('projectionYears', newYears);
+  const handleProjectionYearsChange = useCallback(
+    newYears => {
+      updateInput('projectionYears', newYears);
 
-    // Extend or trim yearly data
-    setInputs(prev => {
-      const updated = { ...prev };
-      updated.projectionYears = newYears;
+      // Extend or trim yearly data
+      setInputs(prev => {
+        const updated = { ...prev };
+        updated.projectionYears = newYears;
 
-      // Add new years with reasonable defaults
-      for (let year = Object.keys(prev.yearlyData).length + 1; year <= newYears; year++) {
-        if (!updated.yearlyData[year]) {
-          const prevYear = updated.yearlyData[year - 1] || updated.yearlyData[Object.keys(updated.yearlyData).pop()];
-          updated.yearlyData[year] = {
-            revenueGrowth: Math.max(2, (prevYear?.revenueGrowth || 10) - 2),
-            ebitdaMargin: prevYear?.ebitdaMargin || 20,
-            taxRate: prevYear?.taxRate || 25,
-            capexPercent: prevYear?.capexPercent || 3,
-            daPercent: prevYear?.daPercent || 3,
-            workingCapitalChange: prevYear?.workingCapitalChange || 1
-          };
+        // Add new years with reasonable defaults
+        for (let year = Object.keys(prev.yearlyData).length + 1; year <= newYears; year++) {
+          if (!updated.yearlyData[year]) {
+            const prevYear =
+              updated.yearlyData[year - 1] ||
+              updated.yearlyData[Object.keys(updated.yearlyData).pop()];
+            updated.yearlyData[year] = {
+              revenueGrowth: Math.max(2, (prevYear?.revenueGrowth || 10) - 2),
+              ebitdaMargin: prevYear?.ebitdaMargin || 20,
+              taxRate: prevYear?.taxRate || 25,
+              capexPercent: prevYear?.capexPercent || 3,
+              daPercent: prevYear?.daPercent || 3,
+              workingCapitalChange: prevYear?.workingCapitalChange || 1
+            };
+          }
         }
-      }
 
-      // Remove years beyond the new projection period
-      Object.keys(updated.yearlyData).forEach(year => {
-        if (parseInt(year) > newYears) {
-          delete updated.yearlyData[year];
-        }
+        // Remove years beyond the new projection period
+        Object.keys(updated.yearlyData).forEach(year => {
+          if (parseInt(year) > newYears) {
+            delete updated.yearlyData[year];
+          }
+        });
+
+        return updated;
       });
-
-      return updated;
-    });
-  }, [updateInput]);
+    },
+    [updateInput]
+  );
 
   const toggleRealTimeTracking = useCallback(() => {
     const newValue = !inputs.trackRealTime;
@@ -209,11 +252,7 @@ const LivingModelDCF = ({ symbol, onBack }) => {
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center space-x-4">
-            <Button
-              onClick={onBack}
-              className="bg-gray-700 hover:bg-gray-600"
-              size="sm"
-            >
+            <Button onClick={onBack} className="bg-gray-700 hover:bg-gray-600" size="sm">
               <Icon name="ArrowLeft" className="w-4 h-4 mr-2" />
               Back
             </Button>
@@ -258,13 +297,16 @@ const LivingModelDCF = ({ symbol, onBack }) => {
 
               <div className="space-y-4">
                 <div>
-                  <label htmlFor="symbol-input" className="block text-sm font-medium text-gray-300 mb-2">
+                  <label
+                    htmlFor="symbol-input"
+                    className="block text-sm font-medium text-gray-300 mb-2"
+                  >
                     Symbol
                   </label>
                   <Input
                     id="symbol-input"
                     value={inputs.symbol}
-                    onChange={(e) => updateInput('symbol', e.target.value.toUpperCase())}
+                    onChange={e => updateInput('symbol', e.target.value.toUpperCase())}
                     className="bg-gray-700 border-gray-600"
                     placeholder="AAPL"
                   />
@@ -272,21 +314,27 @@ const LivingModelDCF = ({ symbol, onBack }) => {
                 </div>
 
                 <div>
-                  <label htmlFor="current-revenue-input" className="block text-sm font-medium text-gray-300 mb-2">
+                  <label
+                    htmlFor="current-revenue-input"
+                    className="block text-sm font-medium text-gray-300 mb-2"
+                  >
                     Current Revenue
                   </label>
                   <Input
                     id="current-revenue-input"
                     type="number"
                     value={inputs.currentRevenue}
-                    onChange={(e) => updateInput('currentRevenue', parseFloat(e.target.value) || 0)}
+                    onChange={e => updateInput('currentRevenue', parseFloat(e.target.value) || 0)}
                     className="bg-gray-700 border-gray-600"
                     step="1000000"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="discount-rate-input" className="block text-sm font-medium text-gray-300 mb-2">
+                  <label
+                    htmlFor="discount-rate-input"
+                    className="block text-sm font-medium text-gray-300 mb-2"
+                  >
                     Discount Rate (WACC)
                   </label>
                   <div className="flex items-center space-x-2">
@@ -294,7 +342,9 @@ const LivingModelDCF = ({ symbol, onBack }) => {
                       id="discount-rate-input"
                       type="number"
                       value={(inputs.discountRate * 100).toFixed(1)}
-                      onChange={(e) => updateInput('discountRate', parseFloat(e.target.value) / 100 || 0)}
+                      onChange={e =>
+                        updateInput('discountRate', parseFloat(e.target.value) / 100 || 0)
+                      }
                       className="bg-gray-700 border-gray-600"
                       step="0.1"
                       min="0"
@@ -306,7 +356,10 @@ const LivingModelDCF = ({ symbol, onBack }) => {
                 </div>
 
                 <div>
-                  <label htmlFor="terminal-growth-input" className="block text-sm font-medium text-gray-300 mb-2">
+                  <label
+                    htmlFor="terminal-growth-input"
+                    className="block text-sm font-medium text-gray-300 mb-2"
+                  >
                     Terminal Growth Rate
                   </label>
                   <div className="flex items-center space-x-2">
@@ -314,7 +367,9 @@ const LivingModelDCF = ({ symbol, onBack }) => {
                       id="terminal-growth-input"
                       type="number"
                       value={(inputs.terminalGrowthRate * 100).toFixed(1)}
-                      onChange={(e) => updateInput('terminalGrowthRate', parseFloat(e.target.value) / 100 || 0)}
+                      onChange={e =>
+                        updateInput('terminalGrowthRate', parseFloat(e.target.value) / 100 || 0)
+                      }
                       className="bg-gray-700 border-gray-600"
                       step="0.1"
                       min="0"
@@ -381,48 +436,68 @@ const LivingModelDCF = ({ symbol, onBack }) => {
 
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <label htmlFor={`rev-growth-${year}`} className="block text-xs text-gray-400 mb-1">Rev Growth %</label>
+                        <label
+                          htmlFor={`rev-growth-${year}`}
+                          className="block text-xs text-gray-400 mb-1"
+                        >
+                          Rev Growth %
+                        </label>
                         <Input
                           id={`rev-growth-${year}`}
                           type="number"
                           value={inputs.yearlyData[year]?.revenueGrowth || 0}
-                          onChange={(e) => updateYearlyData(year, 'revenueGrowth', e.target.value)}
+                          onChange={e => updateYearlyData(year, 'revenueGrowth', e.target.value)}
                           className="bg-gray-700 border-gray-600 text-sm"
                           step="0.1"
                         />
                       </div>
 
                       <div>
-                        <label htmlFor={`ebitda-margin-${year}`} className="block text-xs text-gray-400 mb-1">EBITDA Margin %</label>
+                        <label
+                          htmlFor={`ebitda-margin-${year}`}
+                          className="block text-xs text-gray-400 mb-1"
+                        >
+                          EBITDA Margin %
+                        </label>
                         <Input
                           id={`ebitda-margin-${year}`}
                           type="number"
                           value={inputs.yearlyData[year]?.ebitdaMargin || 0}
-                          onChange={(e) => updateYearlyData(year, 'ebitdaMargin', e.target.value)}
+                          onChange={e => updateYearlyData(year, 'ebitdaMargin', e.target.value)}
                           className="bg-gray-700 border-gray-600 text-sm"
                           step="0.1"
                         />
                       </div>
 
                       <div>
-                        <label htmlFor={`tax-rate-${year}`} className="block text-xs text-gray-400 mb-1">Tax Rate %</label>
+                        <label
+                          htmlFor={`tax-rate-${year}`}
+                          className="block text-xs text-gray-400 mb-1"
+                        >
+                          Tax Rate %
+                        </label>
                         <Input
                           id={`tax-rate-${year}`}
                           type="number"
                           value={inputs.yearlyData[year]?.taxRate || 0}
-                          onChange={(e) => updateYearlyData(year, 'taxRate', e.target.value)}
+                          onChange={e => updateYearlyData(year, 'taxRate', e.target.value)}
                           className="bg-gray-700 border-gray-600 text-sm"
                           step="0.1"
                         />
                       </div>
 
                       <div>
-                        <label htmlFor={`capex-${year}`} className="block text-xs text-gray-400 mb-1">CapEx % Rev</label>
+                        <label
+                          htmlFor={`capex-${year}`}
+                          className="block text-xs text-gray-400 mb-1"
+                        >
+                          CapEx % Rev
+                        </label>
                         <Input
                           id={`capex-${year}`}
                           type="number"
                           value={inputs.yearlyData[year]?.capexPercent || 0}
-                          onChange={(e) => updateYearlyData(year, 'capexPercent', e.target.value)}
+                          onChange={e => updateYearlyData(year, 'capexPercent', e.target.value)}
                           className="bg-gray-700 border-gray-600 text-sm"
                           step="0.1"
                         />

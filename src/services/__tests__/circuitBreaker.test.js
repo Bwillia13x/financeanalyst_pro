@@ -3,12 +3,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 import DataFetchingService from '../dataFetching.js';
 
-// Mock axios
-vi.mock('axios', () => ({
-  default: {
-    get: vi.fn()
-  }
-}));
+// Use global axios mock from test setup (supports axios.create and interceptors)
 
 describe('Circuit Breaker Pattern', () => {
   let service;
@@ -50,7 +45,7 @@ describe('Circuit Breaker Pattern', () => {
       expect(status.FMP.isOpen).toBe(false);
     });
 
-    it('should transition to OPEN state after failure threshold', async() => {
+    it('should transition to OPEN state after failure threshold', async () => {
       const error = new Error('Service unavailable');
       error.response = { status: 500 };
 
@@ -74,7 +69,7 @@ describe('Circuit Breaker Pattern', () => {
       expect(status.FMP.isOpen).toBe(true);
     }, 10000);
 
-    it('should fail fast when circuit is OPEN', async() => {
+    it('should fail fast when circuit is OPEN', async () => {
       vi.useFakeTimers();
 
       const error = new Error('Service unavailable');
@@ -125,7 +120,7 @@ describe('Circuit Breaker Pattern', () => {
       vi.useRealTimers();
     }, 10000);
 
-    it('should transition to HALF_OPEN after recovery timeout', async() => {
+    it('should transition to HALF_OPEN after recovery timeout', async () => {
       const error = new Error('Service unavailable');
       error.response = { status: 500 };
 
@@ -159,7 +154,7 @@ describe('Circuit Breaker Pattern', () => {
       expect(service.getCircuitBreakerStatus().FMP.state).toBe('HALF_OPEN');
     }, 10000);
 
-    it('should close circuit after successful calls in HALF_OPEN state', async() => {
+    it('should close circuit after successful calls in HALF_OPEN state', async () => {
       vi.useFakeTimers();
 
       const error = new Error('Service unavailable');
@@ -198,7 +193,7 @@ describe('Circuit Breaker Pattern', () => {
       vi.useRealTimers();
     });
 
-    it('should reopen circuit if failure occurs in HALF_OPEN state', async() => {
+    it('should reopen circuit if failure occurs in HALF_OPEN state', async () => {
       vi.useFakeTimers();
 
       const error = new Error('Service unavailable');
@@ -246,7 +241,7 @@ describe('Circuit Breaker Pattern', () => {
   });
 
   describe('Circuit Breaker Integration', () => {
-    it('should track success and failure rates', async() => {
+    it('should track success and failure rates', async () => {
       vi.useFakeTimers();
 
       // Mock some successful calls
@@ -280,7 +275,7 @@ describe('Circuit Breaker Pattern', () => {
       vi.useRealTimers();
     });
 
-    it('should provide comprehensive status information', async() => {
+    it('should provide comprehensive status information', async () => {
       const status = service.getCircuitBreakerStatus();
 
       expect(status).toHaveProperty('FMP');
@@ -299,7 +294,7 @@ describe('Circuit Breaker Pattern', () => {
       expect(fmpStatus).toHaveProperty('nextRetryTime', null);
     });
 
-    it('should work with different API sources', async() => {
+    it('should work with different API sources', async () => {
       // Test that each API source has its own circuit breaker
       const status = service.getCircuitBreakerStatus();
 
@@ -316,7 +311,7 @@ describe('Circuit Breaker Pattern', () => {
       vi.spyOn(console, 'warn').mockImplementation(() => {});
     });
 
-    it('should log circuit breaker state transitions', async() => {
+    it('should log circuit breaker state transitions', async () => {
       vi.useFakeTimers();
 
       const error = new Error('Service unavailable');
@@ -343,7 +338,7 @@ describe('Circuit Breaker Pattern', () => {
       vi.useRealTimers();
     });
 
-    it('should log recovery transitions', async() => {
+    it('should log recovery transitions', async () => {
       vi.useFakeTimers();
 
       const error = new Error('Service unavailable');

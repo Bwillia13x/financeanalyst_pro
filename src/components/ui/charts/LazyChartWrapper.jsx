@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react';
+import { forwardRef, Suspense } from 'react';
 
 import { useFinancialAccessibility } from '../../../hooks/useAccessibility';
 import LazyLoader from '../../LazyLoader';
@@ -25,24 +25,33 @@ const ChartLoadingFallback = ({ title = 'Chart', height = 320 }) => (
 
 // HOC for lazy loading charts with accessibility
 const withLazyChart = (ChartComponent, componentName, options = {}) => {
-  const LazyChartComponent = React.forwardRef((props, ref) => {
+  const LazyChartComponent = forwardRef((props, ref) => {
     const {
       priority = 'normal',
       preloadDelay = 2000,
       height = 320,
-      title = componentName,
+      title,
+      // Allow tests/consumers to override for instrumentation expectations
+      componentName: overrideName,
       ...chartProps
     } = props;
+
+    const resolvedName = overrideName || componentName;
+    const resolvedTitle = title || resolvedName;
 
     // Add accessibility monitoring
     const { elementRef } = useFinancialAccessibility('chart');
 
-    const fallback = <ChartLoadingFallback title={title} height={height} />;
+    const fallback = <ChartLoadingFallback title={resolvedTitle} height={height} />;
 
     return (
       <div
-        ref={(el) => {
-          elementRef(el);
+        ref={el => {
+          // Assign to accessibility ref object
+          if (elementRef) {
+            elementRef.current = el;
+          }
+          // Forward ref support
           if (ref) {
             if (typeof ref === 'function') ref(el);
             else ref.current = el;
@@ -50,7 +59,7 @@ const withLazyChart = (ChartComponent, componentName, options = {}) => {
         }}
       >
         <LazyLoader
-          componentName={componentName}
+          componentName={resolvedName}
           priority={priority}
           preloadDelay={preloadDelay}
           fallback={fallback}

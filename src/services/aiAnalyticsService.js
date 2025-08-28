@@ -301,7 +301,11 @@ class AIAnalyticsService {
         title: 'High Volatility Alert',
         message: `Asset shows high volatility (${(riskMetrics.volatility * 100).toFixed(1)}%). Consider risk management strategies.`,
         actionable: true,
-        recommendations: ['Implement stop-loss orders', 'Consider position sizing', 'Monitor closely']
+        recommendations: [
+          'Implement stop-loss orders',
+          'Consider position sizing',
+          'Monitor closely'
+        ]
       });
     }
 
@@ -364,12 +368,12 @@ class AIAnalyticsService {
 
   getPatternBonus(patternType) {
     const bonuses = {
-      'head_and_shoulders': 0.15,
-      'double_top': 0.12,
-      'double_bottom': 0.12,
-      'triangle_formation': 0.08,
-      'flag_pattern': 0.10,
-      'cup_and_handle': 0.18
+      head_and_shoulders: 0.15,
+      double_top: 0.12,
+      double_bottom: 0.12,
+      triangle_formation: 0.08,
+      flag_pattern: 0.1,
+      cup_and_handle: 0.18
     };
     return bonuses[patternType] || 0.05;
   }
@@ -429,7 +433,9 @@ class AIAnalyticsService {
 
   calculateSharpeRatio(returns, riskFreeRate = 0.02) {
     const meanReturn = returns.reduce((sum, r) => sum + r, 0) / returns.length;
-    const volatility = Math.sqrt(returns.reduce((sum, r) => sum + Math.pow(r - meanReturn, 2), 0) / returns.length);
+    const volatility = Math.sqrt(
+      returns.reduce((sum, r) => sum + Math.pow(r - meanReturn, 2), 0) / returns.length
+    );
     return (meanReturn * 252 - riskFreeRate) / (volatility * Math.sqrt(252));
   }
 
@@ -459,9 +465,9 @@ class AIAnalyticsService {
   calculateRiskScore(volatility, riskTolerance) {
     const baseScore = volatility * 10;
     const toleranceMultiplier = {
-      'conservative': 1.5,
-      'moderate': 1.0,
-      'aggressive': 0.7
+      conservative: 1.5,
+      moderate: 1.0,
+      aggressive: 0.7
     };
     return Math.min(10, baseScore * (toleranceMultiplier[riskTolerance] || 1.0));
   }
@@ -497,7 +503,8 @@ class AIAnalyticsService {
     const correlationValues = Object.values(correlations);
     if (correlationValues.length === 0) return 1.0;
 
-    const avgCorrelation = correlationValues.reduce((sum, corr) => sum + Math.abs(corr), 0) / correlationValues.length;
+    const avgCorrelation =
+      correlationValues.reduce((sum, corr) => sum + Math.abs(corr), 0) / correlationValues.length;
     return Math.max(0, 1 - avgCorrelation);
   }
 
@@ -526,24 +533,24 @@ class AIAnalyticsService {
 
   getPatternDescription(patternType) {
     const descriptions = {
-      'head_and_shoulders': 'reversal pattern indicating potential downward movement',
-      'double_top': 'bearish reversal pattern suggesting price decline',
-      'double_bottom': 'bullish reversal pattern indicating potential upward movement',
-      'triangle_formation': 'continuation pattern suggesting breakout direction',
-      'flag_pattern': 'short-term continuation pattern',
-      'cup_and_handle': 'bullish continuation pattern with strong upward potential'
+      head_and_shoulders: 'reversal pattern indicating potential downward movement',
+      double_top: 'bearish reversal pattern suggesting price decline',
+      double_bottom: 'bullish reversal pattern indicating potential upward movement',
+      triangle_formation: 'continuation pattern suggesting breakout direction',
+      flag_pattern: 'short-term continuation pattern',
+      cup_and_handle: 'bullish continuation pattern with strong upward potential'
     };
     return descriptions[patternType] || 'technical pattern';
   }
 
   getPatternImplications(patternType) {
     const implications = {
-      'head_and_shoulders': ['Consider short position', 'Set stop-loss above right shoulder'],
-      'double_top': ['Bearish signal - consider selling', 'Watch for breakdown'],
-      'double_bottom': ['Bullish signal - consider buying', 'Set stop-loss below support'],
-      'triangle_formation': ['Wait for breakout direction', 'Trade in direction of breakout'],
-      'flag_pattern': ['Continuation expected', 'Trade in trend direction'],
-      'cup_and_handle': ['Strong buy signal', 'Set target at cup depth projection']
+      head_and_shoulders: ['Consider short position', 'Set stop-loss above right shoulder'],
+      double_top: ['Bearish signal - consider selling', 'Watch for breakdown'],
+      double_bottom: ['Bullish signal - consider buying', 'Set stop-loss below support'],
+      triangle_formation: ['Wait for breakout direction', 'Trade in direction of breakout'],
+      flag_pattern: ['Continuation expected', 'Trade in trend direction'],
+      cup_and_handle: ['Strong buy signal', 'Set target at cup depth projection']
     };
     return implications[patternType] || ['Monitor closely'];
   }
@@ -553,12 +560,12 @@ class AIAnalyticsService {
     const _volatility = this.calculateVolatility(prices);
 
     const targetMultipliers = {
-      'head_and_shoulders': -0.15,
-      'double_top': -0.12,
-      'double_bottom': 0.12,
-      'triangle_formation': 0.08,
-      'flag_pattern': 0.05,
-      'cup_and_handle': 0.20
+      head_and_shoulders: -0.15,
+      double_top: -0.12,
+      double_bottom: 0.12,
+      triangle_formation: 0.08,
+      flag_pattern: 0.05,
+      cup_and_handle: 0.2
     };
 
     const multiplier = targetMultipliers[patternType] || 0;
@@ -569,12 +576,12 @@ class AIAnalyticsService {
     const currentPrice = prices[prices.length - 1];
 
     const stopLossMultipliers = {
-      'head_and_shoulders': 0.05,
-      'double_top': 0.03,
-      'double_bottom': -0.03,
-      'triangle_formation': 0.02,
-      'flag_pattern': 0.02,
-      'cup_and_handle': -0.05
+      head_and_shoulders: 0.05,
+      double_top: 0.03,
+      double_bottom: -0.03,
+      triangle_formation: 0.02,
+      flag_pattern: 0.02,
+      cup_and_handle: -0.05
     };
 
     const multiplier = stopLossMultipliers[patternType] || 0.02;

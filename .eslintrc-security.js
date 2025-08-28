@@ -31,7 +31,7 @@ module.exports = {
     'security/detect-disable-mustache-escape': 'error',
     'security/detect-new-buffer': 'error',
     'security/detect-no-csrf-before-method-override': 'error',
-    
+
     // Additional security patterns
     'no-eval': 'error',
     'no-implied-eval': 'error',
@@ -39,14 +39,14 @@ module.exports = {
     'no-script-url': 'error',
     'no-alert': 'warn',
     'no-console': 'warn',
-    
+
     // Prevent common XSS vectors
     'react/no-danger': 'error',
     'react/no-danger-with-children': 'error',
-    
+
     // Prevent prototype pollution
     'no-prototype-builtins': 'error',
-    
+
     // Enforce secure coding practices
     'prefer-const': 'error',
     'no-var': 'error',

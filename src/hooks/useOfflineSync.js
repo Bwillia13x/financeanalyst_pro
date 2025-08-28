@@ -59,22 +59,25 @@ export const useOfflineSync = () => {
   }, [syncQueue]);
 
   // Add item to sync queue
-  const queueSync = useCallback((action) => {
-    const syncItem = {
-      id: Date.now() + Math.random(),
-      timestamp: Date.now(),
-      action,
-      retries: 0,
-      maxRetries: 3
-    };
+  const queueSync = useCallback(
+    action => {
+      const syncItem = {
+        id: Date.now() + Math.random(),
+        timestamp: Date.now(),
+        action,
+        retries: 0,
+        maxRetries: 3
+      };
 
-    setSyncQueue(prev => [...prev, syncItem]);
+      setSyncQueue(prev => [...prev, syncItem]);
 
-    // If online, try to sync immediately
-    if (isOnline) {
-      setTimeout(processSyncQueue, 100);
-    }
-  }, [isOnline]);
+      // If online, try to sync immediately
+      if (isOnline) {
+        setTimeout(processSyncQueue, 100);
+      }
+    },
+    [isOnline]
+  );
 
   // Process the sync queue
   const processSyncQueue = useCallback(async () => {
@@ -95,7 +98,7 @@ export const useOfflineSync = () => {
         processedItems.push(item.id);
       } catch (error) {
         console.error('Sync failed for item:', item.id, error);
-        
+
         if (item.retries < item.maxRetries) {
           failedItems.push({
             ...item,
@@ -120,8 +123,8 @@ export const useOfflineSync = () => {
   }, [isOnline, syncQueue]);
 
   // Execute individual sync action
-  const executeSync = async (action) => {
-    const { type, data, endpoint, method = 'POST' } = action;
+  const executeSync = async action => {
+    const { type: _type, data, endpoint, method = 'POST' } = action;
 
     const response = await fetch(endpoint, {
       method,
@@ -129,7 +132,7 @@ export const useOfflineSync = () => {
         'Content-Type': 'application/json',
         // Add auth headers if available
         ...(localStorage.getItem('auth_token') && {
-          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+          Authorization: `Bearer ${localStorage.getItem('auth_token')}`
         })
       },
       body: method !== 'GET' ? JSON.stringify(data) : undefined
@@ -149,22 +152,28 @@ export const useOfflineSync = () => {
   }, []);
 
   // Save data offline with automatic queuing for sync
-  const saveOffline = useCallback((key, data, syncAction = null) => {
-    // Save to localStorage immediately
-    localStorage.setItem(`offline_${key}`, JSON.stringify({
-      data,
-      timestamp: Date.now(),
-      synced: isOnline && !syncAction
-    }));
+  const saveOffline = useCallback(
+    (key, data, syncAction = null) => {
+      // Save to localStorage immediately
+      localStorage.setItem(
+        `offline_${key}`,
+        JSON.stringify({
+          data,
+          timestamp: Date.now(),
+          synced: isOnline && !syncAction
+        })
+      );
 
-    // Queue for sync if sync action provided
-    if (syncAction) {
-      queueSync(syncAction);
-    }
-  }, [isOnline, queueSync]);
+      // Queue for sync if sync action provided
+      if (syncAction) {
+        queueSync(syncAction);
+      }
+    },
+    [isOnline, queueSync]
+  );
 
   // Load data from offline storage
-  const loadOffline = useCallback((key) => {
+  const loadOffline = useCallback(key => {
     const stored = localStorage.getItem(`offline_${key}`);
     if (stored) {
       try {
@@ -177,7 +186,7 @@ export const useOfflineSync = () => {
   }, []);
 
   // Remove offline data
-  const removeOffline = useCallback((key) => {
+  const removeOffline = useCallback(key => {
     localStorage.removeItem(`offline_${key}`);
   }, []);
 

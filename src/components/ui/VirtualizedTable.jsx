@@ -38,73 +38,77 @@ const VirtualizedTable = ({
   const headerRef = useRef();
 
   // Memoized row data for performance
-  const rowData = useMemo(() => ({
-    items: data,
-    columns,
-    onRowClick,
-    onCellEdit,
-    hoveredRowIndex,
-    setHoveredRowIndex,
-    editingCell,
-    setEditingCell,
-    selectedRows,
-    onRowSelect,
-    selectable,
-    editableColumns,
-    formatters
-  }), [
-    data,
-    columns,
-    onRowClick,
-    onCellEdit,
-    hoveredRowIndex,
-    editingCell,
-    selectedRows,
-    onRowSelect,
-    selectable,
-    editableColumns,
-    formatters
-  ]);
+  const rowData = useMemo(
+    () => ({
+      items: data,
+      columns,
+      onRowClick,
+      onCellEdit,
+      hoveredRowIndex,
+      setHoveredRowIndex,
+      editingCell,
+      setEditingCell,
+      selectedRows,
+      onRowSelect,
+      selectable,
+      editableColumns,
+      formatters
+    }),
+    [
+      data,
+      columns,
+      onRowClick,
+      onCellEdit,
+      hoveredRowIndex,
+      editingCell,
+      selectedRows,
+      onRowSelect,
+      selectable,
+      editableColumns,
+      formatters
+    ]
+  );
 
   // Handle keyboard navigation
-  const handleKeyDown = useCallback((event) => {
-    if (!editingCell) return;
+  const handleKeyDown = useCallback(
+    event => {
+      if (!editingCell) return;
 
-    const { rowIndex, columnKey } = editingCell;
-    const currentColumnIndex = columns.findIndex(col => col.key === columnKey);
+      const { rowIndex, columnKey } = editingCell;
+      const currentColumnIndex = columns.findIndex(col => col.key === columnKey);
 
-    switch (event.key) {
-      case 'Tab': {
-        event.preventDefault();
-        const nextColumnIndex = event.shiftKey
-          ? Math.max(0, currentColumnIndex - 1)
-          : Math.min(columns.length - 1, currentColumnIndex + 1);
+      switch (event.key) {
+        case 'Tab': {
+          event.preventDefault();
+          const nextColumnIndex = event.shiftKey
+            ? Math.max(0, currentColumnIndex - 1)
+            : Math.min(columns.length - 1, currentColumnIndex + 1);
 
-        if (nextColumnIndex !== currentColumnIndex) {
-          setEditingCell({
-            rowIndex,
-            columnKey: columns[nextColumnIndex].key
-          });
+          if (nextColumnIndex !== currentColumnIndex) {
+            setEditingCell({
+              rowIndex,
+              columnKey: columns[nextColumnIndex].key
+            });
+          }
+          break;
         }
-        break;
-
+        case 'Enter': {
+          event.preventDefault();
+          const nextRowIndex = Math.min(data.length - 1, rowIndex + 1);
+          setEditingCell({
+            rowIndex: nextRowIndex,
+            columnKey
+          });
+          break;
+        }
+        case 'Escape': {
+          setEditingCell(null);
+          break;
+        }
       }
-      case 'Enter': {
-        event.preventDefault();
-        const nextRowIndex = Math.min(data.length - 1, rowIndex + 1);
-        setEditingCell({
-          rowIndex: nextRowIndex,
-          columnKey
-        });
-        break;
-
-      }
-      case 'Escape': {
-        setEditingCell(null);
-        break;
-      }
-    }
-  }, [editingCell, columns, data.length]);
+    },
+    [editingCell, columns, data.length]
+  );
 
   useEffect(() => {
     document.addEventListener('keydown', handleKeyDown);
@@ -160,16 +164,17 @@ const VirtualizedTable = ({
             <input
               type="checkbox"
               checked={isSelected}
-              onChange={(e) => onRowSelect?.(index, e.target.checked)}
+              onChange={e => onRowSelect?.(index, e.target.checked)}
               className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
               aria-label={`Select row ${index + 1}`}
             />
           </div>
         )}
 
-        {columns.map((column) => {
+        {columns.map(column => {
           const cellValue = row[column.key];
-          const isEditing = editingCell?.rowIndex === index && editingCell?.columnKey === column.key;
+          const isEditing =
+            editingCell?.rowIndex === index && editingCell?.columnKey === column.key;
           const isEditable = editableColumns.includes(column.key);
           const formatter = formatters[column.key];
           const displayValue = formatter ? formatter(cellValue, row) : cellValue;
@@ -189,7 +194,7 @@ const VirtualizedTable = ({
                 minWidth: column.minWidth || 100,
                 maxWidth: column.maxWidth || 300
               }}
-              onClick={(e) => {
+              onClick={e => {
                 e.stopPropagation();
                 if (isEditable) {
                   setEditingCell({ rowIndex: index, columnKey: column.key });
@@ -203,7 +208,7 @@ const VirtualizedTable = ({
                 <input
                   type={column.type || 'text'}
                   value={cellValue || ''}
-                  onChange={(e) => onCellEdit?.(index, column.key, e.target.value)}
+                  onChange={e => onCellEdit?.(index, column.key, e.target.value)}
                   onBlur={() => setEditingCell(null)}
                   className="w-full bg-transparent border-none outline-none"
                   autoFocus
@@ -277,7 +282,7 @@ const VirtualizedTable = ({
           <input
             type="checkbox"
             checked={selectedRows.length === data.length && data.length > 0}
-            onChange={(e) => {
+            onChange={e => {
               const allIndices = data.map((_, index) => index);
               onRowSelect?.(allIndices, e.target.checked);
             }}
@@ -287,7 +292,7 @@ const VirtualizedTable = ({
         </div>
       )}
 
-      {columns.map((column) => (
+      {columns.map(column => (
         <div
           key={column.key}
           className={cn(
@@ -305,16 +310,16 @@ const VirtualizedTable = ({
           role="columnheader"
           aria-sort={
             sortConfig?.key === column.key
-              ? (sortConfig.direction === 'asc' ? 'ascending' : 'descending')
+              ? sortConfig.direction === 'asc'
+                ? 'ascending'
+                : 'descending'
               : 'none'
           }
           tabIndex={sortable ? 0 : -1}
         >
           <span>{column.header}</span>
           {sortable && sortConfig?.key === column.key && (
-            <span className="ml-1 text-blue-600">
-              {sortConfig.direction === 'asc' ? '↑' : '↓'}
-            </span>
+            <span className="ml-1 text-blue-600">{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
           )}
         </div>
       ))}

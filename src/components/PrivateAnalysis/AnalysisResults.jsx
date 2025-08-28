@@ -34,7 +34,9 @@ const AnalysisResults = ({
       if (!data?.statements?.incomeStatement) return null;
 
       const income = data.statements.incomeStatement;
-      const periods = Object.keys(income.totalRevenue || {}).sort((a, b) => parseInt(a) - parseInt(b));
+      const periods = Object.keys(income.totalRevenue || {}).sort(
+        (a, b) => parseInt(a) - parseInt(b)
+      );
 
       if (periods.length < 2) return null;
 
@@ -50,28 +52,52 @@ const AnalysisResults = ({
       const grossProfitLatest = adjustedValues?.grossProfit || income.grossProfit?.[latest] || 0;
       const grossProfitPrevious = income.grossProfit?.[previous] || 0;
 
-      const operatingIncomeLatest = adjustedValues?.operatingIncome || income.operatingIncome?.[latest] || 0;
+      const operatingIncomeLatest =
+        adjustedValues?.operatingIncome || income.operatingIncome?.[latest] || 0;
       const operatingIncomePrevious = income.operatingIncome?.[previous] || 0;
 
-      const _totalCOGSLatest = adjustedValues?.totalCostOfGoodsSold || income.totalCostOfGoodsSold?.[latest] || 0;
+      const _totalCOGSLatest =
+        adjustedValues?.totalCostOfGoodsSold || income.totalCostOfGoodsSold?.[latest] || 0;
       const _totalCOGSPrevious = income.totalCostOfGoodsSold?.[previous] || 0;
 
       // Growth Calculations
-      const revenueGrowthYoY = revenuePrevious ? ((revenueLatest - revenuePrevious) / revenuePrevious) * 100 : 0;
-      const revenueCAGR = revenueEarliest && periods.length > 2 ?
-        (Math.pow(revenueLatest / revenueEarliest, 1 / (periods.length - 1)) - 1) * 100 : 0;
+      const revenueGrowthYoY = revenuePrevious
+        ? ((revenueLatest - revenuePrevious) / revenuePrevious) * 100
+        : 0;
+      const revenueCAGR =
+        revenueEarliest && periods.length > 2
+          ? (Math.pow(revenueLatest / revenueEarliest, 1 / (periods.length - 1)) - 1) * 100
+          : 0;
 
-      const _grossProfitGrowth = grossProfitPrevious ? ((grossProfitLatest - grossProfitPrevious) / grossProfitPrevious) * 100 : 0;
-      const operatingIncomeGrowth = operatingIncomePrevious ? ((operatingIncomeLatest - operatingIncomePrevious) / operatingIncomePrevious) * 100 : 0;
+      const _grossProfitGrowth = grossProfitPrevious
+        ? ((grossProfitLatest - grossProfitPrevious) / grossProfitPrevious) * 100
+        : 0;
+      const operatingIncomeGrowth = operatingIncomePrevious
+        ? ((operatingIncomeLatest - operatingIncomePrevious) / operatingIncomePrevious) * 100
+        : 0;
 
       // Profitability Ratios (with safe calculations)
-      const grossMarginLatest = (revenueLatest && revenueLatest !== 0) ? (grossProfitLatest / revenueLatest) * 100 : 0;
-      const grossMarginPrevious = (revenuePrevious && revenuePrevious !== 0) ? (grossProfitPrevious / revenuePrevious) * 100 : 0;
-      const operatingMarginLatest = (revenueLatest && revenueLatest !== 0) ? (operatingIncomeLatest / revenueLatest) * 100 : 0;
-      const operatingMarginPrevious = (revenuePrevious && revenuePrevious !== 0) ? (operatingIncomePrevious / revenuePrevious) * 100 : 0;
+      const grossMarginLatest =
+        revenueLatest && revenueLatest !== 0 ? (grossProfitLatest / revenueLatest) * 100 : 0;
+      const grossMarginPrevious =
+        revenuePrevious && revenuePrevious !== 0
+          ? (grossProfitPrevious / revenuePrevious) * 100
+          : 0;
+      const operatingMarginLatest =
+        revenueLatest && revenueLatest !== 0 ? (operatingIncomeLatest / revenueLatest) * 100 : 0;
+      const operatingMarginPrevious =
+        revenuePrevious && revenuePrevious !== 0
+          ? (operatingIncomePrevious / revenuePrevious) * 100
+          : 0;
 
-      const marginImprovement = isFinite(grossMarginLatest) && isFinite(grossMarginPrevious) ? grossMarginLatest - grossMarginPrevious : 0;
-      const operatingMarginChange = isFinite(operatingMarginLatest) && isFinite(operatingMarginPrevious) ? operatingMarginLatest - operatingMarginPrevious : 0;
+      const marginImprovement =
+        isFinite(grossMarginLatest) && isFinite(grossMarginPrevious)
+          ? grossMarginLatest - grossMarginPrevious
+          : 0;
+      const operatingMarginChange =
+        isFinite(operatingMarginLatest) && isFinite(operatingMarginPrevious)
+          ? operatingMarginLatest - operatingMarginPrevious
+          : 0;
 
       // DCF Analysis
       let dcfResults = null;
@@ -104,35 +130,62 @@ const AnalysisResults = ({
       const cashAndEquivalents = income.cashAndEquivalents?.[latest] || totalAssets * 0.1; // Estimate if not provided
 
       // Advanced Ratios
-      const returnOnAssets = (totalAssets && totalAssets !== 0) ? (operatingIncomeLatest / totalAssets) * 100 : 0;
-      const returnOnEquity = (totalEquity && totalEquity !== 0) ? (operatingIncomeLatest / totalEquity) * 100 : 0;
-      const debtToEquity = (totalEquity && totalEquity !== 0) ? totalDebt / totalEquity : 0;
-      const currentRatio = (currentLiabilities && currentLiabilities !== 0) ? currentAssets / currentLiabilities : 0;
-      const quickRatio = (currentLiabilities && currentLiabilities !== 0) ? (currentAssets - inventory) / currentLiabilities : 0;
-      const assetTurnover = (totalAssets && totalAssets !== 0) ? revenueLatest / totalAssets : 0;
-      const inventoryTurnover = (inventory && inventory !== 0) ? (revenueLatest * 0.7) / inventory : 0; // Assuming COGS is 70% of revenue
-      const receivablesTurnover = (accountsReceivable && accountsReceivable !== 0) ? revenueLatest / accountsReceivable : 0;
-      const cashRatio = (currentLiabilities && currentLiabilities !== 0) ? cashAndEquivalents / currentLiabilities : 0;
+      const returnOnAssets =
+        totalAssets && totalAssets !== 0 ? (operatingIncomeLatest / totalAssets) * 100 : 0;
+      const returnOnEquity =
+        totalEquity && totalEquity !== 0 ? (operatingIncomeLatest / totalEquity) * 100 : 0;
+      const debtToEquity = totalEquity && totalEquity !== 0 ? totalDebt / totalEquity : 0;
+      const currentRatio =
+        currentLiabilities && currentLiabilities !== 0 ? currentAssets / currentLiabilities : 0;
+      const quickRatio =
+        currentLiabilities && currentLiabilities !== 0
+          ? (currentAssets - inventory) / currentLiabilities
+          : 0;
+      const assetTurnover = totalAssets && totalAssets !== 0 ? revenueLatest / totalAssets : 0;
+      const inventoryTurnover =
+        inventory && inventory !== 0 ? (revenueLatest * 0.7) / inventory : 0; // Assuming COGS is 70% of revenue
+      const receivablesTurnover =
+        accountsReceivable && accountsReceivable !== 0 ? revenueLatest / accountsReceivable : 0;
+      const cashRatio =
+        currentLiabilities && currentLiabilities !== 0
+          ? cashAndEquivalents / currentLiabilities
+          : 0;
       const workingCapital = currentAssets - currentLiabilities;
-      const workingCapitalRatio = (revenueLatest && revenueLatest !== 0) ? workingCapital / revenueLatest : 0;
+      const workingCapitalRatio =
+        revenueLatest && revenueLatest !== 0 ? workingCapital / revenueLatest : 0;
 
       // Efficiency Metrics
-      const operatingCycle = inventoryTurnover > 0 && receivablesTurnover > 0 ? (365 / inventoryTurnover) + (365 / receivablesTurnover) : 0;
+      const operatingCycle =
+        inventoryTurnover > 0 && receivablesTurnover > 0
+          ? 365 / inventoryTurnover + 365 / receivablesTurnover
+          : 0;
       const cashConversionCycle = operatingCycle > 0 ? operatingCycle - 30 : 0; // Assuming 30 days payable period
 
       // Growth Quality Metrics
-      const operatingLeverage = grossProfitPrevious !== 0 ? (operatingIncomeGrowth / revenueGrowthYoY) : 0;
+      const operatingLeverage =
+        grossProfitPrevious !== 0 ? operatingIncomeGrowth / revenueGrowthYoY : 0;
       const profitabilityTrend = (operatingMarginLatest - operatingMarginPrevious) * 100;
 
       // Risk Metrics
-      const financialLeverage = (totalEquity && totalEquity !== 0) ? totalAssets / totalEquity : 0;
-      const interestCoverage = income.interestExpense?.[latest] ? operatingIncomeLatest / income.interestExpense[latest] : 0;
-      const debtServiceCoverage = income.debtService?.[latest] ? operatingIncomeLatest / income.debtService[latest] : 0;
+      const financialLeverage = totalEquity && totalEquity !== 0 ? totalAssets / totalEquity : 0;
+      const interestCoverage = income.interestExpense?.[latest]
+        ? operatingIncomeLatest / income.interestExpense[latest]
+        : 0;
+      const debtServiceCoverage = income.debtService?.[latest]
+        ? operatingIncomeLatest / income.debtService[latest]
+        : 0;
 
       // Market & Valuation Metrics (estimated)
-      const revenuePerEmployee = income.employeeCount?.[latest] ? revenueLatest / income.employeeCount[latest] : 0;
-      const revenuePerShare = income.sharesOutstanding?.[latest] ? revenueLatest / income.sharesOutstanding[latest] : 0;
-      const bookValuePerShare = income.sharesOutstanding?.[latest] && totalEquity ? totalEquity / income.sharesOutstanding[latest] : 0;
+      const revenuePerEmployee = income.employeeCount?.[latest]
+        ? revenueLatest / income.employeeCount[latest]
+        : 0;
+      const revenuePerShare = income.sharesOutstanding?.[latest]
+        ? revenueLatest / income.sharesOutstanding[latest]
+        : 0;
+      const bookValuePerShare =
+        income.sharesOutstanding?.[latest] && totalEquity
+          ? totalEquity / income.sharesOutstanding[latest]
+          : 0;
 
       // Industry Benchmarks (Healthcare/Medical Device estimates)
       const industryBenchmarks = {
@@ -241,28 +294,54 @@ const AnalysisResults = ({
           value: currentRatio,
           formatted: `${currentRatio.toFixed(2)}x`,
           benchmark: 2.5,
-          status: currentRatio >= 2.5 ? 'excellent' : currentRatio >= 2.0 ? 'good' : currentRatio >= 1.5 ? 'fair' : 'poor'
+          status:
+            currentRatio >= 2.5
+              ? 'excellent'
+              : currentRatio >= 2.0
+                ? 'good'
+                : currentRatio >= 1.5
+                  ? 'fair'
+                  : 'poor'
         },
         {
           name: 'Quick Ratio',
           value: quickRatio,
           formatted: `${quickRatio.toFixed(2)}x`,
           benchmark: 1.5,
-          status: quickRatio >= 1.5 ? 'excellent' : quickRatio >= 1.0 ? 'good' : quickRatio >= 0.8 ? 'fair' : 'poor'
+          status:
+            quickRatio >= 1.5
+              ? 'excellent'
+              : quickRatio >= 1.0
+                ? 'good'
+                : quickRatio >= 0.8
+                  ? 'fair'
+                  : 'poor'
         },
         {
           name: 'Cash Ratio',
           value: cashRatio,
           formatted: `${cashRatio.toFixed(2)}x`,
           benchmark: 0.5,
-          status: cashRatio >= 0.5 ? 'excellent' : cashRatio >= 0.3 ? 'good' : cashRatio >= 0.2 ? 'fair' : 'poor'
+          status:
+            cashRatio >= 0.5
+              ? 'excellent'
+              : cashRatio >= 0.3
+                ? 'good'
+                : cashRatio >= 0.2
+                  ? 'fair'
+                  : 'poor'
         },
         {
           name: 'Working Capital',
           value: workingCapital,
           formatted: formatCurrency(workingCapital),
           benchmark: revenueLatest * 0.15,
-          status: workingCapital >= revenueLatest * 0.15 ? 'excellent' : workingCapital >= 0 ? 'good' : 'poor'
+          status:
+            workingCapital >= revenueLatest * 0.15
+              ? 'excellent'
+              : workingCapital >= 0
+                ? 'good'
+                : 'poor'
         }
       ];
 
@@ -392,7 +471,9 @@ const AnalysisResults = ({
         <div className="text-center">
           <AlertTriangle className="mx-auto h-12 w-12 text-yellow-400 mb-4" />
           <h3 className="text-lg font-medium text-gray-900 mb-2">Insufficient Data</h3>
-          <p className="text-gray-500">Please ensure financial data is loaded to generate analysis results.</p>
+          <p className="text-gray-500">
+            Please ensure financial data is loaded to generate analysis results.
+          </p>
         </div>
       </div>
     );
@@ -404,9 +485,11 @@ const AnalysisResults = ({
         <div className="flex items-center gap-3">
           <div
             className={`p-2 rounded-lg ${
-              trend === 'up' ? 'bg-green-900/30 text-green-400' :
-                trend === 'down' ? 'bg-red-900/30 text-red-400' :
-                  'bg-gray-700 text-gray-400'
+              trend === 'up'
+                ? 'bg-green-900/30 text-green-400'
+                : trend === 'down'
+                  ? 'bg-red-900/30 text-red-400'
+                  : 'bg-gray-700 text-gray-400'
             }`}
           >
             <Icon className="h-5 w-5" />
@@ -424,16 +507,26 @@ const AnalysisResults = ({
         <div className="border-t border-gray-700 pt-3 mt-3">
           <div className="flex justify-between text-xs">
             <span className="text-gray-400">Industry Avg:</span>
-            <span className="text-gray-300">{typeof benchmark === 'number' ? benchmark.toFixed(1) + (title.includes('%') ? '%' : title.includes('x') ? 'x' : '') : benchmark}</span>
+            <span className="text-gray-300">
+              {typeof benchmark === 'number'
+                ? benchmark.toFixed(1) +
+                  (title.includes('%') ? '%' : title.includes('x') ? 'x' : '')
+                : benchmark}
+            </span>
           </div>
           <div className="flex justify-between text-xs mt-1">
             <span className="text-gray-400">vs Industry:</span>
             <span
               className={`font-medium ${
-                performance > 0 ? 'text-green-400' : performance < 0 ? 'text-red-400' : 'text-gray-300'
+                performance > 0
+                  ? 'text-green-400'
+                  : performance < 0
+                    ? 'text-red-400'
+                    : 'text-gray-300'
               }`}
             >
-              {performance > 0 ? '+' : ''}{performance?.toFixed(1) || '0.0'}
+              {performance > 0 ? '+' : ''}
+              {performance?.toFixed(1) || '0.0'}
             </span>
           </div>
         </div>
@@ -491,10 +584,13 @@ const AnalysisResults = ({
                   <span className="text-sm font-medium text-gray-200">{metric.name}</span>
                   <span
                     className={`px-2 py-1 rounded text-xs font-medium ${
-                      metric.status === 'excellent' ? 'bg-green-900/30 text-green-400' :
-                        metric.status === 'good' ? 'bg-blue-900/30 text-blue-400' :
-                          metric.status === 'fair' ? 'bg-yellow-900/30 text-yellow-400' :
-                            'bg-red-900/30 text-red-400'
+                      metric.status === 'excellent'
+                        ? 'bg-green-900/30 text-green-400'
+                        : metric.status === 'good'
+                          ? 'bg-blue-900/30 text-blue-400'
+                          : metric.status === 'fair'
+                            ? 'bg-yellow-900/30 text-yellow-400'
+                            : 'bg-red-900/30 text-red-400'
                     }`}
                   >
                     {metric.status}
@@ -502,7 +598,10 @@ const AnalysisResults = ({
                 </div>
                 <div className="text-xl font-bold text-white mb-1">{metric.formatted}</div>
                 <div className="text-xs text-gray-400">
-                  Benchmark: {typeof metric.benchmark === 'number' ? metric.benchmark.toFixed(1) + 'x' : formatCurrency(metric.benchmark)}
+                  Benchmark:{' '}
+                  {typeof metric.benchmark === 'number'
+                    ? metric.benchmark.toFixed(1) + 'x'
+                    : formatCurrency(metric.benchmark)}
                 </div>
               </div>
             ))}
@@ -516,19 +615,27 @@ const AnalysisResults = ({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
               <div>
                 <span className="text-gray-400">Working Capital:</span>
-                <span className="text-white ml-2 font-medium">{formatCurrency(analysis.financial.workingCapital)}</span>
+                <span className="text-white ml-2 font-medium">
+                  {formatCurrency(analysis.financial.workingCapital)}
+                </span>
               </div>
               <div>
                 <span className="text-gray-400">Cash Position:</span>
-                <span className="text-white ml-2 font-medium">{formatCurrency(analysis.liquidity.cashAndEquivalents)}</span>
+                <span className="text-white ml-2 font-medium">
+                  {formatCurrency(analysis.liquidity.cashAndEquivalents)}
+                </span>
               </div>
               <div>
                 <span className="text-gray-400">Current Assets:</span>
-                <span className="text-white ml-2 font-medium">{formatCurrency(analysis.liquidity.currentAssets)}</span>
+                <span className="text-white ml-2 font-medium">
+                  {formatCurrency(analysis.liquidity.currentAssets)}
+                </span>
               </div>
               <div>
                 <span className="text-gray-400">Current Liabilities:</span>
-                <span className="text-white ml-2 font-medium">{formatCurrency(analysis.liquidity.currentLiabilities)}</span>
+                <span className="text-white ml-2 font-medium">
+                  {formatCurrency(analysis.liquidity.currentLiabilities)}
+                </span>
               </div>
             </div>
           </div>
@@ -557,7 +664,9 @@ const AnalysisResults = ({
               <Timer className="h-4 w-4 text-orange-400 mr-2" />
               <span className="text-sm font-medium text-gray-200">Cash Conversion</span>
             </div>
-            <div className="text-lg font-bold text-white">{analysis.efficiency.cashConversionCycle.toFixed(0)} days</div>
+            <div className="text-lg font-bold text-white">
+              {analysis.efficiency.cashConversionCycle.toFixed(0)} days
+            </div>
             <div className="text-xs text-gray-400">Time to convert inventory to cash</div>
           </div>
           <div className="bg-gray-750 rounded-lg p-4 border border-gray-600">
@@ -565,7 +674,9 @@ const AnalysisResults = ({
               <Gauge className="h-4 w-4 text-orange-400 mr-2" />
               <span className="text-sm font-medium text-gray-200">Asset Productivity</span>
             </div>
-            <div className="text-lg font-bold text-white">{analysis.financial.assetTurnover.toFixed(2)}x</div>
+            <div className="text-lg font-bold text-white">
+              {analysis.financial.assetTurnover.toFixed(2)}x
+            </div>
             <div className="text-xs text-gray-400">Revenue per dollar of assets</div>
           </div>
           <div className="bg-gray-750 rounded-lg p-4 border border-gray-600">
@@ -574,7 +685,9 @@ const AnalysisResults = ({
               <span className="text-sm font-medium text-gray-200">Revenue/Employee</span>
             </div>
             <div className="text-lg font-bold text-white">
-              {analysis.market.revenuePerEmployee > 0 ? formatCurrency(analysis.market.revenuePerEmployee) : 'N/A'}
+              {analysis.market.revenuePerEmployee > 0
+                ? formatCurrency(analysis.market.revenuePerEmployee)
+                : 'N/A'}
             </div>
             <div className="text-xs text-gray-400">Productivity per employee</div>
           </div>
@@ -594,9 +707,11 @@ const AnalysisResults = ({
                 <span className="text-sm font-medium text-gray-200">{metric.name}</span>
                 <span
                   className={`px-2 py-1 rounded text-xs font-medium ${
-                    metric.level === 'low' ? 'bg-green-900/30 text-green-400' :
-                      metric.level === 'moderate' ? 'bg-yellow-900/30 text-yellow-400' :
-                        'bg-red-900/30 text-red-400'
+                    metric.level === 'low'
+                      ? 'bg-green-900/30 text-green-400'
+                      : metric.level === 'moderate'
+                        ? 'bg-yellow-900/30 text-yellow-400'
+                        : 'bg-red-900/30 text-red-400'
                   }`}
                 >
                   {metric.level} risk
@@ -617,8 +732,11 @@ const AnalysisResults = ({
               <span className="text-gray-400">Financial Leverage:</span>
               <span
                 className={`ml-2 font-medium ${
-                  analysis.risk.financialLeverage < 2 ? 'text-green-400' :
-                    analysis.risk.financialLeverage < 3 ? 'text-yellow-400' : 'text-red-400'
+                  analysis.risk.financialLeverage < 2
+                    ? 'text-green-400'
+                    : analysis.risk.financialLeverage < 3
+                      ? 'text-yellow-400'
+                      : 'text-red-400'
                 }`}
               >
                 {analysis.risk.financialLeverage.toFixed(1)}x
@@ -628,8 +746,11 @@ const AnalysisResults = ({
               <span className="text-gray-400">Interest Coverage:</span>
               <span
                 className={`ml-2 font-medium ${
-                  analysis.risk.interestCoverage > 10 ? 'text-green-400' :
-                    analysis.risk.interestCoverage > 5 ? 'text-yellow-400' : 'text-red-400'
+                  analysis.risk.interestCoverage > 10
+                    ? 'text-green-400'
+                    : analysis.risk.interestCoverage > 5
+                      ? 'text-yellow-400'
+                      : 'text-red-400'
                 }`}
               >
                 {analysis.risk.interestCoverage.toFixed(1)}x
@@ -653,7 +774,9 @@ const AnalysisResults = ({
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-400">Latest Period:</span>
-                  <span className="font-semibold text-white">{formatCurrency(analysis.revenue.latest)}</span>
+                  <span className="font-semibold text-white">
+                    {formatCurrency(analysis.revenue.latest)}
+                  </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-400">YoY Growth:</span>
@@ -662,12 +785,15 @@ const AnalysisResults = ({
                       analysis.revenue.growth > 0 ? 'text-green-400' : 'text-red-400'
                     }`}
                   >
-                    {analysis.revenue.growth > 0 ? '+' : ''}{analysis.revenue.growth.toFixed(1)}%
+                    {analysis.revenue.growth > 0 ? '+' : ''}
+                    {analysis.revenue.growth.toFixed(1)}%
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-400">CAGR:</span>
-                  <span className="font-semibold text-gray-200">{analysis.revenue.cagr.toFixed(1)}%</span>
+                  <span className="font-semibold text-gray-200">
+                    {analysis.revenue.cagr.toFixed(1)}%
+                  </span>
                 </div>
               </div>
             </div>
@@ -676,20 +802,27 @@ const AnalysisResults = ({
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-400">Gross Margin:</span>
-                  <span className="font-semibold text-white">{analysis.profitability.grossMargin.toFixed(1)}%</span>
+                  <span className="font-semibold text-white">
+                    {analysis.profitability.grossMargin.toFixed(1)}%
+                  </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-400">Operating Margin:</span>
-                  <span className="font-semibold text-white">{analysis.profitability.operatingMargin.toFixed(1)}%</span>
+                  <span className="font-semibold text-white">
+                    {analysis.profitability.operatingMargin.toFixed(1)}%
+                  </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-400">Margin Change:</span>
                   <span
                     className={`font-semibold ${
-                      analysis.profitability.grossMarginChange > 0 ? 'text-green-400' : 'text-red-400'
+                      analysis.profitability.grossMarginChange > 0
+                        ? 'text-green-400'
+                        : 'text-red-400'
                     }`}
                   >
-                    {analysis.profitability.grossMarginChange > 0 ? '+' : ''}{analysis.profitability.grossMarginChange.toFixed(1)}pp
+                    {analysis.profitability.grossMarginChange > 0 ? '+' : ''}
+                    {analysis.profitability.grossMarginChange.toFixed(1)}pp
                   </span>
                 </div>
               </div>
@@ -736,7 +869,9 @@ const AnalysisResults = ({
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {analysis.revenueBreakdown.map((unit, index) => {
-            const percentage = analysis.revenue.latest ? (unit.value / analysis.revenue.latest) * 100 : 0;
+            const percentage = analysis.revenue.latest
+              ? (unit.value / analysis.revenue.latest) * 100
+              : 0;
             return (
               <div key={index} className="p-4 bg-gray-700 border border-gray-600 rounded-lg">
                 <div className="flex justify-between items-center mb-2">

@@ -32,43 +32,46 @@ export function useFinancialCache(key, fetchFunction, options = {}) {
   }, [fetchFunction]);
 
   // Main fetch function with caching
-  const fetchData = useCallback(async(bypassCache = false) => {
-    if (!enabled || !key) return;
+  const fetchData = useCallback(
+    async (bypassCache = false) => {
+      if (!enabled || !key) return;
 
-    setIsLoading(true);
-    setError(null);
+      setIsLoading(true);
+      setError(null);
 
-    try {
-      const result = await financialDataCache.get(key, {
-        dataType,
-        fetchFallback: fetchFunctionRef.current,
-        bypassCache,
-        requireFresh
-      });
+      try {
+        const result = await financialDataCache.get(key, {
+          dataType,
+          fetchFallback: fetchFunctionRef.current,
+          bypassCache,
+          requireFresh
+        });
 
-      setData(result);
-      setLastFetch(Date.now());
-      setRetryAttempt(0);
+        setData(result);
+        setLastFetch(Date.now());
+        setRetryAttempt(0);
 
-      onSuccess?.(result);
-    } catch (err) {
-      console.error('Cache fetch failed:', err);
-      setError(err);
+        onSuccess?.(result);
+      } catch (err) {
+        console.error('Cache fetch failed:', err);
+        setError(err);
 
-      // Retry logic
-      if (retryAttempt < retryCount) {
-        const delay = retryDelay * Math.pow(2, retryAttempt); // Exponential backoff
-        retryTimeoutRef.current = setTimeout(() => {
-          setRetryAttempt(prev => prev + 1);
-          fetchData(bypassCache);
-        }, delay);
-      } else {
-        onError?.(err);
+        // Retry logic
+        if (retryAttempt < retryCount) {
+          const delay = retryDelay * Math.pow(2, retryAttempt); // Exponential backoff
+          retryTimeoutRef.current = setTimeout(() => {
+            setRetryAttempt(prev => prev + 1);
+            fetchData(bypassCache);
+          }, delay);
+        } else {
+          onError?.(err);
+        }
+      } finally {
+        setIsLoading(false);
       }
-    } finally {
-      setIsLoading(false);
-    }
-  }, [key, dataType, enabled, requireFresh, retryAttempt, retryCount, retryDelay, onSuccess, onError]);
+    },
+    [key, dataType, enabled, requireFresh, retryAttempt, retryCount, retryDelay, onSuccess, onError]
+  );
 
   // Initial fetch
   useEffect(() => {
@@ -119,30 +122,36 @@ export function useFinancialCache(key, fetchFunction, options = {}) {
   }, [refetchOnWindowFocus, enabled, fetchData]);
 
   // Manual refetch function
-  const refetch = useCallback((bypassCache = false) => {
-    return fetchData(bypassCache);
-  }, [fetchData]);
+  const refetch = useCallback(
+    (bypassCache = false) => {
+      return fetchData(bypassCache);
+    },
+    [fetchData]
+  );
 
   // Mutate cache data
-  const mutate = useCallback(async(updater) => {
-    const currentData = data;
+  const mutate = useCallback(
+    async updater => {
+      const currentData = data;
 
-    try {
-      const newData = typeof updater === 'function' ? updater(currentData) : updater;
+      try {
+        const newData = typeof updater === 'function' ? updater(currentData) : updater;
 
-      // Optimistically update local state
-      setData(newData);
+        // Optimistically update local state
+        setData(newData);
 
-      // Update cache
-      await financialDataCache.set(key, newData, dataType);
+        // Update cache
+        await financialDataCache.set(key, newData, dataType);
 
-      return newData;
-    } catch (err) {
-      // Revert on error
-      setData(currentData);
-      throw err;
-    }
-  }, [key, dataType, data]);
+        return newData;
+      } catch (err) {
+        // Revert on error
+        setData(currentData);
+        throw err;
+      }
+    },
+    [key, dataType, data]
+  );
 
   // Invalidate cache entry
   const invalidate = useCallback(() => {
@@ -166,7 +175,7 @@ export function useFinancialCache(key, fetchFunction, options = {}) {
 
 // Hook for market data with specific optimizations
 export function useMarketData(symbol, options = {}) {
-  const fetchMarketData = useCallback(async() => {
+  const fetchMarketData = useCallback(async () => {
     if (!symbol) throw new Error('Symbol is required');
 
     // Simulate API call - replace with actual market data API
@@ -177,21 +186,17 @@ export function useMarketData(symbol, options = {}) {
     return response.json();
   }, [symbol]);
 
-  return useFinancialCache(
-    symbol ? `market-${symbol}` : null,
-    fetchMarketData,
-    {
-      dataType: 'market-data',
-      refetchInterval: 30000, // 30 seconds
-      refetchOnWindowFocus: true,
-      ...options
-    }
-  );
+  return useFinancialCache(symbol ? `market-${symbol}` : null, fetchMarketData, {
+    dataType: 'market-data',
+    refetchInterval: 30000, // 30 seconds
+    refetchOnWindowFocus: true,
+    ...options
+  });
 }
 
 // Hook for company financials
 export function useCompanyFinancials(symbol, options = {}) {
-  const fetchFinancials = useCallback(async() => {
+  const fetchFinancials = useCallback(async () => {
     if (!symbol) throw new Error('Symbol is required');
 
     const response = await fetch(`/api/financials/${symbol}`);
@@ -201,20 +206,16 @@ export function useCompanyFinancials(symbol, options = {}) {
     return response.json();
   }, [symbol]);
 
-  return useFinancialCache(
-    symbol ? `financials-${symbol}` : null,
-    fetchFinancials,
-    {
-      dataType: 'company-financials',
-      refetchInterval: 15 * 60 * 1000, // 15 minutes
-      ...options
-    }
-  );
+  return useFinancialCache(symbol ? `financials-${symbol}` : null, fetchFinancials, {
+    dataType: 'company-financials',
+    refetchInterval: 15 * 60 * 1000, // 15 minutes
+    ...options
+  });
 }
 
 // Hook for user models with authentication
 export function useUserModel(modelId, options = {}) {
-  const fetchUserModel = useCallback(async() => {
+  const fetchUserModel = useCallback(async () => {
     if (!modelId) throw new Error('Model ID is required');
 
     const token = localStorage.getItem('auth-token');
@@ -222,7 +223,7 @@ export function useUserModel(modelId, options = {}) {
 
     const response = await fetch(`/api/models/${modelId}`, {
       headers: {
-        'Authorization': `Bearer ${token}`
+        Authorization: `Bearer ${token}`
       }
     });
 
@@ -233,19 +234,15 @@ export function useUserModel(modelId, options = {}) {
     return response.json();
   }, [modelId]);
 
-  return useFinancialCache(
-    modelId ? `model-${modelId}` : null,
-    fetchUserModel,
-    {
-      dataType: 'user-models',
-      ...options
-    }
-  );
+  return useFinancialCache(modelId ? `model-${modelId}` : null, fetchUserModel, {
+    dataType: 'user-models',
+    ...options
+  });
 }
 
 // Hook for private analysis data
 export function usePrivateAnalysis(analysisId, options = {}) {
-  const fetchAnalysis = useCallback(async() => {
+  const fetchAnalysis = useCallback(async () => {
     if (!analysisId) throw new Error('Analysis ID is required');
 
     const token = localStorage.getItem('auth-token');
@@ -253,7 +250,7 @@ export function usePrivateAnalysis(analysisId, options = {}) {
 
     const response = await fetch(`/api/analysis/${analysisId}`, {
       headers: {
-        'Authorization': `Bearer ${token}`
+        Authorization: `Bearer ${token}`
       }
     });
 
@@ -264,15 +261,11 @@ export function usePrivateAnalysis(analysisId, options = {}) {
     return response.json();
   }, [analysisId]);
 
-  return useFinancialCache(
-    analysisId ? `analysis-${analysisId}` : null,
-    fetchAnalysis,
-    {
-      dataType: 'private-analysis',
-      requireFresh: true, // Always get fresh private analysis data
-      ...options
-    }
-  );
+  return useFinancialCache(analysisId ? `analysis-${analysisId}` : null, fetchAnalysis, {
+    dataType: 'private-analysis',
+    requireFresh: true, // Always get fresh private analysis data
+    ...options
+  });
 }
 
 // Hook for cache statistics and management
@@ -284,15 +277,18 @@ export function useCacheManager() {
     setStats(currentStats);
   }, []);
 
-  const clearCache = useCallback((filter) => {
-    financialDataCache.clear(filter);
-    refreshStats();
-  }, [refreshStats]);
+  const clearCache = useCallback(
+    filter => {
+      financialDataCache.clear(filter);
+      refreshStats();
+    },
+    [refreshStats]
+  );
 
   const clearSensitiveData = useCallback(() => {
-    financialDataCache.clear((key, metadata) =>
-      metadata.dataType === 'private-analysis' ||
-      metadata.dataType === 'user-models'
+    financialDataCache.clear(
+      (key, metadata) =>
+        metadata.dataType === 'private-analysis' || metadata.dataType === 'user-models'
     );
     refreshStats();
   }, [refreshStats]);
@@ -315,13 +311,12 @@ export function useCacheManager() {
 
 // Hook for preloading data
 export function usePreloadData() {
-  const preload = useCallback(async(keys, dataType = 'api-response') => {
+  const preload = useCallback(async (keys, dataType = 'api-response') => {
     const promises = keys.map(key =>
-      financialDataCache.get(key, { dataType, requireFresh: false })
-        .catch(error => {
-          console.warn(`Failed to preload ${key}:`, error);
-          return null;
-        })
+      financialDataCache.get(key, { dataType, requireFresh: false }).catch(error => {
+        console.warn(`Failed to preload ${key}:`, error);
+        return null;
+      })
     );
 
     return Promise.allSettled(promises);

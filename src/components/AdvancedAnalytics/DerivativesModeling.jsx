@@ -1,11 +1,21 @@
 import { useState, useMemo } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area } from 'recharts';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  AreaChart,
+  Area
+} from 'recharts';
 
 import Button from '../ui/Button';
 import { Card } from '../ui/Card';
 import Input from '../ui/Input';
 import Select from '../ui/Select';
-
 
 const DerivativesModeling = () => {
   const [activeDerivative, setActiveDerivative] = useState('swap');
@@ -79,7 +89,13 @@ const DerivativesModeling = () => {
 
   // Futures pricing
   const futuresValuation = useMemo(() => {
-    const { underlyingPrice: S, timeToExpiry: T, riskFreeRate: r, dividendYield: q, contractSize } = futureInputs;
+    const {
+      underlyingPrice: S,
+      timeToExpiry: T,
+      riskFreeRate: r,
+      dividendYield: q,
+      contractSize
+    } = futureInputs;
 
     if (!S || !T || !contractSize) return null;
 
@@ -113,7 +129,7 @@ const DerivativesModeling = () => {
 
     if (activeDerivative === 'swap') {
       return spotPrices.map(rate => {
-        const rateDiff = (rate / 100 - swapInputs.fixedRate);
+        const rateDiff = rate / 100 - swapInputs.fixedRate;
         const swapPnL = rateDiff * swapInputs.notional * swapInputs.maturity;
 
         return {
@@ -124,7 +140,11 @@ const DerivativesModeling = () => {
       });
     } else {
       return spotPrices.map(spot => {
-        const futureValue = spot * Math.exp((futureInputs.riskFreeRate - futureInputs.dividendYield) * futureInputs.timeToExpiry);
+        const futureValue =
+          spot *
+          Math.exp(
+            (futureInputs.riskFreeRate - futureInputs.dividendYield) * futureInputs.timeToExpiry
+          );
         const contractPnL = (futureValue - futureInputs.strikePrice) * futureInputs.contractSize;
 
         return {
@@ -156,8 +176,13 @@ const DerivativesModeling = () => {
     } else if (futuresValuation) {
       shocks.forEach(shock => {
         const newSpot = futureInputs.underlyingPrice * (1 + shock);
-        const newFuturesPrice = newSpot * Math.exp((futureInputs.riskFreeRate - futureInputs.dividendYield) * futureInputs.timeToExpiry);
-        const valueChange = (newFuturesPrice - futuresValuation.futuresPrice) * futureInputs.contractSize;
+        const newFuturesPrice =
+          newSpot *
+          Math.exp(
+            (futureInputs.riskFreeRate - futureInputs.dividendYield) * futureInputs.timeToExpiry
+          );
+        const valueChange =
+          (newFuturesPrice - futuresValuation.futuresPrice) * futureInputs.contractSize;
 
         scenarios.push({
           shock: shock * 100, // Convert to percentage
@@ -209,7 +234,10 @@ const DerivativesModeling = () => {
 
               <div className="space-y-4">
                 <div>
-                  <label htmlFor="notional-amount" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="notional-amount"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Notional Amount ($)
                   </label>
                   <Input
@@ -217,12 +245,15 @@ const DerivativesModeling = () => {
                     type="number"
                     step="1000000"
                     value={swapInputs.notional}
-                    onChange={(e) => handleSwapInputChange('notional', e.target.value)}
+                    onChange={e => handleSwapInputChange('notional', e.target.value)}
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="maturity-years" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="maturity-years"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Maturity (Years)
                   </label>
                   <Input
@@ -230,12 +261,15 @@ const DerivativesModeling = () => {
                     type="number"
                     step="0.25"
                     value={swapInputs.maturity}
-                    onChange={(e) => handleSwapInputChange('maturity', e.target.value)}
+                    onChange={e => handleSwapInputChange('maturity', e.target.value)}
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="fixed-rate" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="fixed-rate"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Fixed Rate (%)
                   </label>
                   <Input
@@ -243,12 +277,15 @@ const DerivativesModeling = () => {
                     type="number"
                     step="0.001"
                     value={swapInputs.fixedRate * 100}
-                    onChange={(e) => handleSwapInputChange('fixedRate', e.target.value / 100)}
+                    onChange={e => handleSwapInputChange('fixedRate', e.target.value / 100)}
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="floating-rate" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="floating-rate"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Current Floating Rate (%)
                   </label>
                   <Input
@@ -256,18 +293,21 @@ const DerivativesModeling = () => {
                     type="number"
                     step="0.001"
                     value={swapInputs.floatingRate * 100}
-                    onChange={(e) => handleSwapInputChange('floatingRate', e.target.value / 100)}
+                    onChange={e => handleSwapInputChange('floatingRate', e.target.value / 100)}
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="payment-frequency" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="payment-frequency"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Payment Frequency
                   </label>
                   <Select
                     id="payment-frequency"
                     value={swapInputs.paymentFrequency}
-                    onChange={(e) => handleSwapInputChange('paymentFrequency', e.target.value)}
+                    onChange={e => handleSwapInputChange('paymentFrequency', e.target.value)}
                     options={[
                       { value: 1, label: 'Annual' },
                       { value: 2, label: 'Semi-Annual' },
@@ -341,7 +381,10 @@ const DerivativesModeling = () => {
 
               <div className="space-y-4">
                 <div>
-                  <label htmlFor="underlying-price" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="underlying-price"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Underlying Price ($)
                   </label>
                   <Input
@@ -349,12 +392,15 @@ const DerivativesModeling = () => {
                     type="number"
                     step="0.01"
                     value={futureInputs.underlyingPrice}
-                    onChange={(e) => handleFutureInputChange('underlyingPrice', e.target.value)}
+                    onChange={e => handleFutureInputChange('underlyingPrice', e.target.value)}
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="strike-price" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="strike-price"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Strike Price ($)
                   </label>
                   <Input
@@ -362,12 +408,15 @@ const DerivativesModeling = () => {
                     type="number"
                     step="0.01"
                     value={futureInputs.strikePrice}
-                    onChange={(e) => handleFutureInputChange('strikePrice', e.target.value)}
+                    onChange={e => handleFutureInputChange('strikePrice', e.target.value)}
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="time-to-expiry" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="time-to-expiry"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Time to Expiry (Years)
                   </label>
                   <Input
@@ -375,12 +424,15 @@ const DerivativesModeling = () => {
                     type="number"
                     step="0.01"
                     value={futureInputs.timeToExpiry}
-                    onChange={(e) => handleFutureInputChange('timeToExpiry', e.target.value)}
+                    onChange={e => handleFutureInputChange('timeToExpiry', e.target.value)}
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="risk-free-rate" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="risk-free-rate"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Risk-Free Rate (%)
                   </label>
                   <Input
@@ -388,12 +440,15 @@ const DerivativesModeling = () => {
                     type="number"
                     step="0.001"
                     value={futureInputs.riskFreeRate * 100}
-                    onChange={(e) => handleFutureInputChange('riskFreeRate', e.target.value / 100)}
+                    onChange={e => handleFutureInputChange('riskFreeRate', e.target.value / 100)}
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="dividend-yield" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="dividend-yield"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Dividend Yield (%)
                   </label>
                   <Input
@@ -401,12 +456,15 @@ const DerivativesModeling = () => {
                     type="number"
                     step="0.001"
                     value={futureInputs.dividendYield * 100}
-                    onChange={(e) => handleFutureInputChange('dividendYield', e.target.value / 100)}
+                    onChange={e => handleFutureInputChange('dividendYield', e.target.value / 100)}
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="contract-size" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="contract-size"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Contract Size
                   </label>
                   <Input
@@ -414,7 +472,7 @@ const DerivativesModeling = () => {
                     type="number"
                     step="1"
                     value={futureInputs.contractSize}
-                    onChange={(e) => handleFutureInputChange('contractSize', e.target.value)}
+                    onChange={e => handleFutureInputChange('contractSize', e.target.value)}
                   />
                 </div>
               </div>
@@ -477,17 +535,19 @@ const DerivativesModeling = () => {
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis
                   dataKey="spotPrice"
-                  tickFormatter={(value) => activeDerivative === 'swap' ? `${value}%` : `$${value}`}
+                  tickFormatter={value => (activeDerivative === 'swap' ? `${value}%` : `$${value}`)}
                 />
                 <YAxis
-                  tickFormatter={(value) => activeDerivative === 'swap' ? `$${value}M` : `$${value}K`}
+                  tickFormatter={value =>
+                    activeDerivative === 'swap' ? `$${value}M` : `$${value}K`
+                  }
                 />
                 <Tooltip
-                  formatter={(value) => [
+                  formatter={value => [
                     activeDerivative === 'swap' ? `$${value.toFixed(2)}M` : `$${value.toFixed(2)}K`,
                     'P&L'
                   ]}
-                  labelFormatter={(value) =>
+                  labelFormatter={value =>
                     activeDerivative === 'swap' ? `Rate: ${value}%` : `Spot: $${value}`
                   }
                 />
@@ -511,17 +571,21 @@ const DerivativesModeling = () => {
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis
                   dataKey="shock"
-                  tickFormatter={(value) => `${value > 0 ? '+' : ''}${value}${activeDerivative === 'swap' ? 'bps' : '%'}`}
+                  tickFormatter={value =>
+                    `${value > 0 ? '+' : ''}${value}${activeDerivative === 'swap' ? 'bps' : '%'}`
+                  }
                 />
                 <YAxis
-                  tickFormatter={(value) => activeDerivative === 'swap' ? `$${value.toFixed(1)}M` : `$${value.toFixed(1)}K`}
+                  tickFormatter={value =>
+                    activeDerivative === 'swap' ? `$${value.toFixed(1)}M` : `$${value.toFixed(1)}K`
+                  }
                 />
                 <Tooltip
                   formatter={(value, name) => [
                     activeDerivative === 'swap' ? `$${value.toFixed(2)}M` : `$${value.toFixed(2)}K`,
                     name === 'valueChange' ? 'Value Change' : 'New Value'
                   ]}
-                  labelFormatter={(value) =>
+                  labelFormatter={value =>
                     `Shock: ${value > 0 ? '+' : ''}${value}${activeDerivative === 'swap' ? ' bps' : '%'}`
                   }
                 />

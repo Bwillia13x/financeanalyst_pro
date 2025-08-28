@@ -1,9 +1,10 @@
 import { useEffect, useCallback } from 'react';
-import { 
-  preloadCriticalComponents, 
-  preloadAnalysisComponents, 
-  preloadAdvancedTools, 
-  preloadExportTools 
+
+import {
+  preloadCriticalComponents,
+  preloadAnalysisComponents,
+  preloadAdvancedTools,
+  preloadExportTools
 } from '../utils/lazyComponents';
 
 /**
@@ -49,7 +50,7 @@ export const usePreloader = () => {
     };
   }, []);
 
-  const preloadOnHover = useCallback((componentName) => {
+  const preloadOnHover = useCallback(componentName => {
     switch (componentName) {
       case 'export':
         preloadExportTools();
@@ -81,7 +82,7 @@ export const usePreloader = () => {
   useEffect(() => {
     // Set up intelligent preloading
     const cleanup = preloadOnUserIntent();
-    
+
     // Preload during idle time
     preloadOnIdle();
 
@@ -100,18 +101,18 @@ export const usePreloader = () => {
 /**
  * Hook for monitoring component load times
  */
-export const useLoadTimeMonitor = (componentName) => {
+export const useLoadTimeMonitor = componentName => {
   useEffect(() => {
     const startTime = performance.now();
-    
+
     return () => {
       const loadTime = performance.now() - startTime;
-      
+
       // Only log significant load times in development
       if (import.meta.env.DEV && loadTime > 100) {
         console.log(`⏱️ ${componentName} loaded in ${loadTime.toFixed(2)}ms`);
       }
-      
+
       // Track to analytics in production (but not during automated tests)
       if (import.meta.env.PROD && !navigator.webdriver) {
         // Send to monitoring service
@@ -131,24 +132,30 @@ export const useLoadTimeMonitor = (componentName) => {
  * Hook for optimizing images with lazy loading and progressive enhancement
  */
 export const useImageOptimization = () => {
-  const createOptimizedImageSrc = useCallback((src, { width, quality = 80, format = 'webp' } = {}) => {
-    // If image is already optimized or external, return as-is
-    if (src.includes('http') || src.includes('webp') || src.includes('avif')) {
-      return src;
-    }
+  const createOptimizedImageSrc = useCallback(
+    (src, { width, quality: _quality = 80, format = 'webp' } = {}) => {
+      // If image is already optimized or external, return as-is
+      if (src.includes('http') || src.includes('webp') || src.includes('avif')) {
+        return src;
+      }
 
-    // Generate optimized image path based on vite image optimization
-    const basePath = src.replace(/\.[^/.]+$/, '');
-    const widthSuffix = width ? `_${width}w` : '';
-    
-    return `${basePath}${widthSuffix}.${format}`;
-  }, []);
+      // Generate optimized image path based on vite image optimization
+      const basePath = src.replace(/\.[^/.]+$/, '');
+      const widthSuffix = width ? `_${width}w` : '';
 
-  const getImageSrcSet = useCallback((src, sizes = [320, 640, 768, 1024, 1280]) => {
-    return sizes
-      .map(size => `${createOptimizedImageSrc(src, { width: size })} ${size}w`)
-      .join(', ');
-  }, [createOptimizedImageSrc]);
+      return `${basePath}${widthSuffix}.${format}`;
+    },
+    []
+  );
+
+  const getImageSrcSet = useCallback(
+    (src, sizes = [320, 640, 768, 1024, 1280]) => {
+      return sizes
+        .map(size => `${createOptimizedImageSrc(src, { width: size })} ${size}w`)
+        .join(', ');
+    },
+    [createOptimizedImageSrc]
+  );
 
   return {
     createOptimizedImageSrc,

@@ -18,7 +18,14 @@ class DataValidationService {
     return {
       marketData: {
         required: ['symbol', 'currentPrice', 'volume'],
-        numeric: ['currentPrice', 'previousClose', 'change', 'changePercent', 'volume', 'marketCap'],
+        numeric: [
+          'currentPrice',
+          'previousClose',
+          'change',
+          'changePercent',
+          'volume',
+          'marketCap'
+        ],
         ranges: {
           currentPrice: { min: 0, max: 100000 },
           volume: { min: 0, max: 1e12 },
@@ -49,7 +56,7 @@ class DataValidationService {
       dcfModel: {
         required: ['cashFlows', 'discountRate'],
         numeric: ['discountRate', 'terminalGrowthRate', 'years'],
-        custom: (data) => {
+        custom: data => {
           const errors = [];
           if (!Array.isArray(data.cashFlows) || data.cashFlows.length === 0) {
             errors.push('Cash flows must be a non-empty array');
@@ -62,8 +69,14 @@ class DataValidationService {
       },
       lboModel: {
         required: ['purchasePrice', 'debtFinancing', 'equityFinancing'],
-        numeric: ['purchasePrice', 'debtFinancing', 'equityFinancing', 'exitMultiple', 'holdingPeriod'],
-        custom: (data) => {
+        numeric: [
+          'purchasePrice',
+          'debtFinancing',
+          'equityFinancing',
+          'exitMultiple',
+          'holdingPeriod'
+        ],
+        custom: data => {
           const errors = [];
           const warnings = [];
           if (data.debtFinancing && data.equityFinancing && data.purchasePrice) {
@@ -82,7 +95,7 @@ class DataValidationService {
       stockData: {
         required: ['symbol', 'price'],
         numeric: ['price', 'volume', 'change', 'changePercent'],
-        custom: (data) => {
+        custom: data => {
           const errors = [];
           if (!data.symbol || typeof data.symbol !== 'string' || data.symbol.trim() === '') {
             errors.push('Symbol is required and must be a non-empty string');
@@ -126,11 +139,13 @@ class DataValidationService {
           if (isNaN(value)) {
             errors.push(`Field ${field} must be numeric, got: ${data[field]}`);
           } else {
-          // Check ranges
+            // Check ranges
             const range = rules.ranges?.[field];
             if (range) {
               if (value < range.min || value > range.max) {
-                warnings.push(`Field ${field} value ${value} outside expected range [${range.min}, ${range.max}]`);
+                warnings.push(
+                  `Field ${field} value ${value} outside expected range [${range.min}, ${range.max}]`
+                );
               }
             }
           }
@@ -172,7 +187,11 @@ class DataValidationService {
         qualityScore: this.calculateQualityScore(errors, warnings)
       };
     } catch {
-      return { isValid: false, errors: ['An unexpected error occurred during validation.'], warnings: [] };
+      return {
+        isValid: false,
+        errors: ['An unexpected error occurred during validation.'],
+        warnings: []
+      };
     }
   }
 
@@ -194,11 +213,15 @@ class DataValidationService {
           const calculatedChangePercent = (calculatedChange / data.previousClose) * 100;
 
           if (data.change && Math.abs(data.change - calculatedChange) > 0.01) {
-            warnings.push(`Price change inconsistency: reported ${data.change}, calculated ${calculatedChange.toFixed(2)}`);
+            warnings.push(
+              `Price change inconsistency: reported ${data.change}, calculated ${calculatedChange.toFixed(2)}`
+            );
           }
 
           if (data.changePercent && Math.abs(data.changePercent - calculatedChangePercent) > 0.1) {
-            warnings.push(`Change percent inconsistency: reported ${data.changePercent}%, calculated ${calculatedChangePercent.toFixed(2)}%`);
+            warnings.push(
+              `Change percent inconsistency: reported ${data.changePercent}%, calculated ${calculatedChangePercent.toFixed(2)}%`
+            );
           }
         }
 
@@ -257,10 +280,10 @@ class DataValidationService {
    */
   calculateQualityScore(errors, warnings) {
     if (errors.length > 0) {
-      return Math.max(0, 50 - (errors.length * 10));
+      return Math.max(0, 50 - errors.length * 10);
     }
 
-    return Math.max(70, 100 - (warnings.length * 5));
+    return Math.max(70, 100 - warnings.length * 5);
   }
 
   /**
@@ -311,8 +334,8 @@ class DataValidationService {
       };
     });
 
-    const recommendedSource = sourceQuality
-      .sort((a, b) => b.qualityScore - a.qualityScore)[0]?.source;
+    const recommendedSource = sourceQuality.sort((a, b) => b.qualityScore - a.qualityScore)[0]
+      ?.source;
 
     return {
       isConsistent: discrepancies.length === 0,
@@ -400,8 +423,8 @@ class DataValidationService {
     ];
 
     const uniqueFields = [...new Set(allFields)];
-    const presentFields = uniqueFields.filter(field =>
-      data[field] !== undefined && data[field] !== null && data[field] !== ''
+    const presentFields = uniqueFields.filter(
+      field => data[field] !== undefined && data[field] !== null && data[field] !== ''
     );
 
     return (presentFields.length / uniqueFields.length) * 100;
@@ -427,7 +450,6 @@ class DataValidationService {
     if (ageMinutes < 1440) return 60;
     return 40;
   }
-
 
   /**
    * Sanitize input string

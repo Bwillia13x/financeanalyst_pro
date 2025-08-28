@@ -3,7 +3,9 @@ export const Card = ({ title, right, children, className = '' }) => (
   <section className={`rounded-2xl border border-border bg-card shadow-sm ${className}`}>
     {(title || right) && (
       <header className="flex items-center justify-between border-b border-border px-4 py-2.5">
-        {title && <h3 className="text-[13px] font-semibold tracking-wide text-foreground">{title}</h3>}
+        {title && (
+          <h3 className="text-[13px] font-semibold tracking-wide text-foreground">{title}</h3>
+        )}
         {right}
       </header>
     )}
@@ -21,22 +23,16 @@ export const Pill = ({ children, tone = 'slate' }) => {
     red: 'bg-rose-50 text-rose-700 border-rose-200'
   };
   return (
-    <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] ${tones[tone]}`}>
+    <span
+      className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] ${tones[tone]}`}
+    >
       {children}
     </span>
   );
 };
 
 // NumberInput component for numerical form inputs
-export const NumberInput = ({
-  label,
-  value,
-  onChange,
-  suffix,
-  step = 0.01,
-  min,
-  max
-}) => {
+export const NumberInput = ({ label, value, onChange, suffix, step = 0.01, min, max }) => {
   return (
     <label className="flex items-center justify-between gap-3 text-[13px]">
       <span className="text-muted-foreground">{label}</span>
@@ -48,7 +44,14 @@ export const NumberInput = ({
           step={step}
           min={min}
           max={max}
-          onChange={(e) => onChange(Math.max(min ?? -Infinity, Math.min(max ?? Infinity, parseFloat(e.target.value || '0'))))}
+          onChange={e =>
+            onChange(
+              Math.max(
+                min ?? -Infinity,
+                Math.min(max ?? Infinity, parseFloat(e.target.value || '0'))
+              )
+            )
+          }
         />
         {suffix && <span className="text-muted-foreground">{suffix}</span>}
       </span>
@@ -65,7 +68,9 @@ export const Switch = ({ label, on, setOn }) => {
         onClick={() => setOn(!on)}
         className={`h-5 w-9 rounded-full border ${on ? 'bg-emerald-500 border-emerald-500' : 'bg-muted border-border'}`}
       >
-        <span className={`block h-4 w-4 translate-y-[2px] rounded-full bg-white shadow transition ${on ? 'translate-x-5' : 'translate-x-1'}`} />
+        <span
+          className={`block h-4 w-4 translate-y-[2px] rounded-full bg-white shadow transition ${on ? 'translate-x-5' : 'translate-x-1'}`}
+        />
       </button>
     </label>
   );

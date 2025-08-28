@@ -6,10 +6,39 @@
 process.on('unhandledRejection', reason => {
   // Silently swallow the rejection to prevent false-positive test failures.
   // Still output a debug message so genuine issues can be spotted when needed.
-
   console.debug('[vitest] handled unhandledRejection:', reason);
 });
-import '@testing-library/jest-dom';
+
+// Reduce noise from Node warnings specifically for promise rejection handling
+process.on('warning', warning => {
+  if (warning && warning.name === 'PromiseRejectionHandledWarning') {
+    // Swallow this to avoid noisy logs in CI
+    console.debug('[vitest] suppressed warning:', warning.message);
+    return;
+  }
+  // Fallback to default behavior for other warnings
+  console.warn(warning);
+});
+
+// Intercept Node's emitWarning to fully suppress PromiseRejectionHandledWarning printed by workers
+const __originalEmitWarning = process.emitWarning;
+process.emitWarning = function patchedEmitWarning(warning, ...args) {
+  const name = typeof warning === 'object' && warning ? warning.name : warning;
+  if (name === 'PromiseRejectionHandledWarning') {
+    console.debug(
+      '[vitest] suppressed emitWarning:',
+      typeof warning === 'object' ? warning.message : warning
+    );
+    return;
+  }
+  return __originalEmitWarning.call(process, warning, ...args);
+};
+
+// Only load DOM matchers when a browser-like env exists
+if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+  // Top-level await is supported in ESM and Vitest setup files
+  await import('@testing-library/jest-dom');
+}
 import { webcrypto } from 'crypto';
 
 // Polyfill for crypto object
@@ -52,23 +81,25 @@ vi.mock('axios', () => {
     }
   };
   instance.create = vi.fn(() => instance);
-  return { default: instance };
+  return { __esModule: true, default: instance };
 });
 
-// Mock window.matchMedia
-Object.defineProperty(window, 'matchMedia', {
-  writable: true,
-  value: vi.fn().mockImplementation(query => ({
-    matches: false,
-    media: query,
-    onchange: null,
-    addListener: vi.fn(), // deprecated
-    removeListener: vi.fn(), // deprecated
-    addEventListener: vi.fn(),
-    removeEventListener: vi.fn(),
-    dispatchEvent: vi.fn()
-  }))
-});
+// Mock window.matchMedia (only when jsdom provides window)
+if (typeof window !== 'undefined') {
+  Object.defineProperty(window, 'matchMedia', {
+    writable: true,
+    value: vi.fn().mockImplementation(query => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addListener: vi.fn(), // deprecated
+      removeListener: vi.fn(), // deprecated
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn()
+    }))
+  });
+}
 
 // Mock IntersectionObserver
 global.IntersectionObserver = vi.fn().mockImplementation(() => ({
@@ -86,7 +117,9 @@ global.ResizeObserver = vi.fn().mockImplementation(() => ({
 
 // Mock window.scrollTo (jsdom defines it but throws Not implemented)
 // Always stub to a no-op to prevent test failures from ScrollToTop/useEffect
-window.scrollTo = vi.fn();
+if (typeof window !== 'undefined') {
+  window.scrollTo = vi.fn();
+}
 
 // Prevent jsdom from attempting navigation (which logs noisy 'Not implemented: navigation')
 // - Stub window.open/Location.assign/Location.replace
@@ -118,7 +151,7 @@ try {
     if (typeof document !== 'undefined' && document.addEventListener) {
       document.addEventListener(
         'click',
-        (e) => {
+        e => {
           const t = e.target;
           if (t && t.tagName === 'A' && (t.href || t.getAttribute('href'))) {
             e.preventDefault();
@@ -172,18 +205,14 @@ vi.mock('react-helmet-async', () => {
       const type = node.type;
       const props = node.props || {};
       if (type === 'title') {
-        const text = Array.isArray(props.children)
-          ? props.children.join('')
-          : props.children || '';
+        const text = Array.isArray(props.children) ? props.children.join('') : props.children || '';
         if (typeof document !== 'undefined') {
           document.title = String(text);
         }
       } else if (type === 'meta') {
         const { name, property, content } = props;
         if (typeof document !== 'undefined' && (name || property)) {
-          const selector = name
-            ? `meta[name="${name}"]`
-            : `meta[property="${property}"]`;
+          const selector = name ? `meta[name="${name}"]` : `meta[property="${property}"]`;
           let el = document.head.querySelector(selector);
           if (!el) {
             el = document.createElement('meta');

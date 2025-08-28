@@ -28,9 +28,32 @@ function bumpVersion(currentVersion) {
 function createDefaultModel(kind, templateData = {}) {
   const now = new Date().toISOString();
   const defaults = {
-    DCF: { rev0: 5_000_000_000, margin: 0.16, tax: 0.23, g: 0.05, tg: 0.02, wacc: 0.09, price: 25, shares: 300_000_000, netDebt: 2_000_000_000 },
-    Comps: { metric: 800_000_000, multiple: 9, price: 25, shares: 300_000_000, netDebt: 2_000_000_000 },
-    EPV: { ebit: 700_000_000, tax: 0.23, wacc: 0.09, price: 25, shares: 300_000_000, netDebt: 2_000_000_000 },
+    DCF: {
+      rev0: 5_000_000_000,
+      margin: 0.16,
+      tax: 0.23,
+      g: 0.05,
+      tg: 0.02,
+      wacc: 0.09,
+      price: 25,
+      shares: 300_000_000,
+      netDebt: 2_000_000_000
+    },
+    Comps: {
+      metric: 800_000_000,
+      multiple: 9,
+      price: 25,
+      shares: 300_000_000,
+      netDebt: 2_000_000_000
+    },
+    EPV: {
+      ebit: 700_000_000,
+      tax: 0.23,
+      wacc: 0.09,
+      price: 25,
+      shares: 300_000_000,
+      netDebt: 2_000_000_000
+    },
     LBO: { ebitda: 600_000_000, entryX: 9, exitX: 9, debtPct: 0.55, years: 5, ebitdaCAGR: 0.06 }
   };
 
@@ -223,9 +246,7 @@ class ModelStore {
    * Export models to JSON
    */
   export(ids = null) {
-    const modelsToExport = ids ?
-      this.models.filter(m => ids.includes(m.id)) :
-      this.models;
+    const modelsToExport = ids ? this.models.filter(m => ids.includes(m.id)) : this.models;
 
     const exportData = {
       schemaVersion: SCHEMA_VERSION,
@@ -291,7 +312,8 @@ class ModelStore {
   search(query, tag = null) {
     const lowerQuery = query.toLowerCase();
     return this.models.filter(model => {
-      const matchesQuery = !query ||
+      const matchesQuery =
+        !query ||
         model.name.toLowerCase().includes(lowerQuery) ||
         model.tags.some(t => t.toLowerCase().includes(lowerQuery));
 
@@ -344,8 +366,10 @@ class ModelStore {
       totalModels: this.models.length,
       storageSize: totalSize,
       modelCounts,
-      lastUpdated: this.models.length > 0 ?
-        Math.max(...this.models.map(m => new Date(m.updated).getTime())) : null
+      lastUpdated:
+        this.models.length > 0
+          ? Math.max(...this.models.map(m => new Date(m.updated).getTime()))
+          : null
     };
   }
 }

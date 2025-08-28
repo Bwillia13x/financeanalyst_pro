@@ -20,7 +20,7 @@ import {
   Minus,
   CheckCircle
 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import {
   useBusinessIntelligence,
@@ -35,25 +35,85 @@ const BusinessIntelligenceDashboard = ({ isVisible = true, onClose }) => {
   const [refreshing, setRefreshing] = useState(false);
 
   // Disable BI during testing to prevent infinite re-renders
-  const isTestEnvironment = typeof window !== 'undefined' && (
-    window.navigator?.webdriver === true ||
-    window.location?.search?.includes('lhci') ||
-    window.location?.search?.includes('ci') ||
-    window.location?.search?.includes('audit')
-  );
+  const isTestEnvironment =
+    typeof window !== 'undefined' &&
+    (window.navigator?.webdriver === true ||
+      window.location?.search?.includes('lhci') ||
+      window.location?.search?.includes('ci') ||
+      window.location?.search?.includes('audit'));
 
-  const { generateReport, exportData } = isTestEnvironment ? { generateReport: () => {}, exportData: () => {} } : useBusinessIntelligence();
-  const { usageMetrics } = isTestEnvironment ? { usageMetrics: {} } : useUsageAnalytics();
-  const { performanceMetrics, benchmarks, alerts } = isTestEnvironment ? { performanceMetrics: {}, benchmarks: {}, alerts: [] } : usePerformanceAnalytics();
-  const { insights: automatedInsights, recommendations } = isTestEnvironment ? { insights: [], recommendations: [] } : useAutomatedInsights();
+  // Always call hooks, but provide fallback values in test environments
+  const businessIntelligence = useBusinessIntelligence();
+  const usageAnalytics = useUsageAnalytics();
+  const performanceAnalytics = usePerformanceAnalytics();
+  const automatedInsightsHook = useAutomatedInsights();
 
-  const handleRefresh = async() => {
+  const { isInitialized, generateReport, exportData, trackUserAction } = businessIntelligence;
+  const { usageMetrics } = isTestEnvironment ? { usageMetrics: {} } : usageAnalytics;
+  const { performanceMetrics, benchmarks, alerts } = isTestEnvironment
+    ? { performanceMetrics: {}, benchmarks: {}, alerts: [] }
+    : performanceAnalytics;
+  const { insights: automatedInsights, recommendations } = isTestEnvironment
+    ? { insights: [], recommendations: [] }
+    : automatedInsightsHook;
+
+  // Local report state for displaying generated report metrics
+  const [reportData, setReportData] = useState(null);
+
+  // Track dashboard open after BI initializes
+  useEffect(() => {
+    if (!isInitialized) return;
+    try {
+      trackUserAction('open_dashboard', 'bi_dashboard', { initialTab: activeTab });
+    } catch (_e) {
+      // noop
+    }
+    (async () => {
+      try {
+        const report = await generateReport();
+        if (report) setReportData(report);
+      } catch (_err) {
+        // noop for tests
+      }
+    })();
+  }, [isInitialized]);
+
+  const handleRefresh = async () => {
     setRefreshing(true);
     try {
-      await generateReport();
+      trackUserAction('refresh_reports', 'bi_dashboard', { tab: activeTab });
+      const report = await generateReport();
+      if (report) setReportData(report);
       setTimeout(() => setRefreshing(false), 1000);
     } catch (_error) {
       console.error('Error fetching insights:', _error);
+    }
+  };
+
+  const handleExport = () => {
+    try {
+      trackUserAction('export_data', 'bi_dashboard');
+    } catch (_e) {
+      // noop
+    }
+    exportData();
+  };
+
+  const handleClose = () => {
+    try {
+      trackUserAction('close_dashboard', 'bi_dashboard', { tab: activeTab });
+    } catch (_e) {
+      // noop
+    }
+    if (typeof onClose === 'function') onClose();
+  };
+
+  const handleTabChange = tabId => {
+    setActiveTab(tabId);
+    try {
+      trackUserAction('tab_change', 'bi_dashboard', { tab: tabId });
+    } catch (_e) {
+      // noop
     }
   };
 
@@ -64,6 +124,7 @@ const BusinessIntelligenceDashboard = ({ isVisible = true, onClose }) => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50 p-4"
+      data-testid="bi-dashboard"
     >
       <SEOHead
         title="Business Intelligence Analytics - FinanceAnalyst Pro"
@@ -86,13 +147,22 @@ const BusinessIntelligenceDashboard = ({ isVisible = true, onClose }) => {
               </div>
             </div>
             <div className="flex items-center space-x-4">
-              <button onClick={handleRefresh} disabled={refreshing} className="p-2 bg-white bg-opacity-20 rounded-lg">
+              <button
+                onClick={handleRefresh}
+                disabled={refreshing}
+                className="p-2 bg-white bg-opacity-20 rounded-lg"
+              >
                 <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
               </button>
-              <button onClick={() => exportData()} className="p-2 bg-white bg-opacity-20 rounded-lg">
+              <button onClick={handleExport} className="p-2 bg-white bg-opacity-20 rounded-lg">
                 <Download className="w-4 h-4" />
               </button>
-              <button onClick={onClose} className="p-2 rounded-lg hover:bg-white hover:bg-opacity-10">✕</button>
+              <button
+                onClick={handleClose}
+                className="p-2 rounded-lg hover:bg-white hover:bg-opacity-10"
+              >
+                ✕
+              </button>
             </div>
           </div>
         </div>
@@ -105,14 +175,16 @@ const BusinessIntelligenceDashboard = ({ isVisible = true, onClose }) => {
               { id: 'usage', label: 'Usage', icon: Users },
               { id: 'performance', label: 'Performance', icon: Activity },
               { id: 'insights', label: 'AI Insights', icon: Lightbulb }
-            ].map((tab) => {
+            ].map(tab => {
               const Icon = tab.icon;
               return (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
+                  onClick={() => handleTabChange(tab.id)}
                   className={`flex items-center space-x-2 py-4 px-2 border-b-2 transition-colors ${
-                    activeTab === tab.id ? 'border-purple-500 text-purple-600' : 'border-transparent text-gray-500'
+                    activeTab === tab.id
+                      ? 'border-purple-500 text-purple-600'
+                      : 'border-transparent text-gray-500'
                   }`}
                 >
                   <Icon className="w-4 h-4" />
@@ -128,15 +200,42 @@ const BusinessIntelligenceDashboard = ({ isVisible = true, onClose }) => {
           {/* Overview Tab */}
           {activeTab === 'overview' && (
             <div className="space-y-6">
+              {/* Report Summary (from generated report) */}
+              {reportData && (
+                <div className="bg-white border border-gray-200 rounded-lg p-4">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Report Summary</h3>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div>
+                      <p className="text-sm text-gray-600">Total Actions</p>
+                      <p className="text-2xl font-bold text-gray-900">{reportData.totalActions}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-600">Engagement</p>
+                      <p className="text-2xl font-bold text-gray-900">
+                        {Math.round((reportData.userEngagement || 0) * 100)}%
+                      </p>
+                    </div>
+                    <div className="md:col-span-2">
+                      <p className="text-sm text-gray-600">Popular Features</p>
+                      <p className="text-sm text-gray-900">
+                        {(reportData.popularFeatures || []).join(', ') || '—'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
               {/* Key Metrics */}
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-blue-600 text-sm font-medium">Total Users</p>
-                      <p className="text-2xl font-bold text-blue-900">{usageMetrics.users?.toLocaleString() || '892'}</p>
+                      <p className="text-2xl font-bold text-blue-900">
+                        {usageMetrics.users?.toLocaleString() || '892'}
+                      </p>
                       <p className="text-xs text-blue-600 flex items-center mt-1">
-                        <ArrowUp className="w-3 h-3 mr-1" />+12.5%
+                        <ArrowUp className="w-3 h-3 mr-1" />
+                        +12.5%
                       </p>
                     </div>
                     <Users className="w-8 h-8 text-blue-500" />
@@ -147,9 +246,12 @@ const BusinessIntelligenceDashboard = ({ isVisible = true, onClose }) => {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-green-600 text-sm font-medium">Sessions</p>
-                      <p className="text-2xl font-bold text-green-900">{usageMetrics.sessions?.toLocaleString() || '1,247'}</p>
+                      <p className="text-2xl font-bold text-green-900">
+                        {usageMetrics.sessions?.toLocaleString() || '1,247'}
+                      </p>
                       <p className="text-xs text-green-600 flex items-center mt-1">
-                        <ArrowUp className="w-3 h-3 mr-1" />+8.7%
+                        <ArrowUp className="w-3 h-3 mr-1" />
+                        +8.7%
                       </p>
                     </div>
                     <Activity className="w-8 h-8 text-green-500" />
@@ -160,9 +262,12 @@ const BusinessIntelligenceDashboard = ({ isVisible = true, onClose }) => {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-purple-600 text-sm font-medium">Response Time</p>
-                      <p className="text-2xl font-bold text-purple-900">{performanceMetrics.responseTime?.average || 284}ms</p>
+                      <p className="text-2xl font-bold text-purple-900">
+                        {performanceMetrics.responseTime?.average || 284}ms
+                      </p>
                       <p className="text-xs text-purple-600 flex items-center mt-1">
-                        <ArrowDown className="w-3 h-3 mr-1" />-5.2%
+                        <ArrowDown className="w-3 h-3 mr-1" />
+                        -5.2%
                       </p>
                     </div>
                     <Zap className="w-8 h-8 text-purple-500" />
@@ -173,9 +278,12 @@ const BusinessIntelligenceDashboard = ({ isVisible = true, onClose }) => {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-orange-600 text-sm font-medium">Uptime</p>
-                      <p className="text-2xl font-bold text-orange-900">{performanceMetrics.uptime || 99.87}%</p>
+                      <p className="text-2xl font-bold text-orange-900">
+                        {performanceMetrics.uptime || 99.87}%
+                      </p>
                       <p className="text-xs text-orange-600 flex items-center mt-1">
-                        <Minus className="w-3 h-3 mr-1" />Stable
+                        <Minus className="w-3 h-3 mr-1" />
+                        Stable
                       </p>
                     </div>
                     <Target className="w-8 h-8 text-orange-500" />
@@ -188,11 +296,18 @@ const BusinessIntelligenceDashboard = ({ isVisible = true, onClose }) => {
                 <div className="bg-white border border-gray-200 rounded-lg p-6">
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">Latest AI Insights</h3>
                   <div className="space-y-4">
-                    {automatedInsights.slice(0, 3).map((insight) => (
-                      <div key={insight.id} className="flex items-start space-x-3 p-4 bg-gray-50 rounded-lg">
+                    {automatedInsights.slice(0, 3).map(insight => (
+                      <div
+                        key={insight.id}
+                        className="flex items-start space-x-3 p-4 bg-gray-50 rounded-lg"
+                      >
                         <div
                           className={`w-2 h-2 rounded-full mt-2 ${
-                            insight.impact === 'high' ? 'bg-red-500' : insight.impact === 'medium' ? 'bg-yellow-500' : 'bg-green-500'
+                            insight.impact === 'high'
+                              ? 'bg-red-500'
+                              : insight.impact === 'medium'
+                                ? 'bg-yellow-500'
+                                : 'bg-green-500'
                           }`}
                         />
                         <div className="flex-1">
@@ -212,14 +327,18 @@ const BusinessIntelligenceDashboard = ({ isVisible = true, onClose }) => {
                 <div className="bg-white border border-gray-200 rounded-lg p-6">
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">Top Recommendations</h3>
                   <div className="space-y-3">
-                    {recommendations.slice(0, 4).map((rec) => (
+                    {recommendations.slice(0, 4).map(rec => (
                       <div key={rec.id} className="flex items-center space-x-3">
                         <div className="flex-shrink-0 w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center">
-                          <span className="text-xs font-medium text-purple-600">{rec.priority}</span>
+                          <span className="text-xs font-medium text-purple-600">
+                            {rec.priority}
+                          </span>
                         </div>
                         <div className="flex-1">
                           <p className="text-sm font-medium text-gray-900">{rec.title}</p>
-                          <p className="text-xs text-gray-500">{rec.effort} effort • {rec.impact} impact</p>
+                          <p className="text-xs text-gray-500">
+                            {rec.effort} effort • {rec.impact} impact
+                          </p>
                         </div>
                       </div>
                     ))}
@@ -302,8 +421,10 @@ const BusinessIntelligenceDashboard = ({ isVisible = true, onClose }) => {
                     <AlertTriangle className="w-5 h-5 text-yellow-600 mr-2" />
                     <h4 className="font-medium text-yellow-800">Performance Alerts</h4>
                   </div>
-                  {alerts.map((alert) => (
-                    <div key={alert.id} className="text-sm text-yellow-700">{alert.message}</div>
+                  {alerts.map(alert => (
+                    <div key={alert.id} className="text-sm text-yellow-700">
+                      {alert.message}
+                    </div>
                   ))}
                 </div>
               )}
@@ -350,12 +471,15 @@ const BusinessIntelligenceDashboard = ({ isVisible = true, onClose }) => {
                   <div className="space-y-3">
                     {Object.entries(benchmarks).map(([metric, data]) => (
                       <div key={metric} className="flex justify-between">
-                        <span className="text-sm text-gray-600 capitalize">{metric.replace('_', ' ')}</span>
+                        <span className="text-sm text-gray-600 capitalize">
+                          {metric.replace('_', ' ')}
+                        </span>
                         <span
                           className={`text-sm font-medium ${
                             data.status === 'excellent' ? 'text-green-600' : 'text-blue-600'
                           }`}
-                        >{data.status}
+                        >
+                          {data.status}
                         </span>
                       </div>
                     ))}
@@ -374,7 +498,7 @@ const BusinessIntelligenceDashboard = ({ isVisible = true, onClose }) => {
                 <div className="bg-white border border-gray-200 rounded-lg p-6">
                   <h4 className="font-medium text-gray-900 mb-4">Automated Insights</h4>
                   <div className="space-y-4">
-                    {automatedInsights.map((insight) => (
+                    {automatedInsights.map(insight => (
                       <div key={insight.id} className="border-l-4 border-purple-500 pl-4">
                         <h5 className="font-medium text-gray-900">{insight.title}</h5>
                         <p className="text-sm text-gray-600 mt-1">{insight.description}</p>
@@ -382,11 +506,14 @@ const BusinessIntelligenceDashboard = ({ isVisible = true, onClose }) => {
                           <span>Confidence: {Math.round(insight.confidence * 100)}%</span>
                           <span
                             className={`px-2 py-1 rounded-full ${
-                              insight.impact === 'high' ? 'bg-red-100 text-red-800' :
-                                insight.impact === 'medium' ? 'bg-yellow-100 text-yellow-800' :
-                                  'bg-green-100 text-green-800'
+                              insight.impact === 'high'
+                                ? 'bg-red-100 text-red-800'
+                                : insight.impact === 'medium'
+                                  ? 'bg-yellow-100 text-yellow-800'
+                                  : 'bg-green-100 text-green-800'
                             }`}
-                          >{insight.impact} impact
+                          >
+                            {insight.impact} impact
                           </span>
                         </div>
                       </div>
@@ -397,8 +524,11 @@ const BusinessIntelligenceDashboard = ({ isVisible = true, onClose }) => {
                 <div className="bg-white border border-gray-200 rounded-lg p-6">
                   <h4 className="font-medium text-gray-900 mb-4">Smart Recommendations</h4>
                   <div className="space-y-4">
-                    {recommendations.map((rec) => (
-                      <div key={rec.id} className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
+                    {recommendations.map(rec => (
+                      <div
+                        key={rec.id}
+                        className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg"
+                      >
                         <div className="flex-shrink-0 w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
                           <span className="text-sm font-bold text-purple-600">{rec.priority}</span>
                         </div>
@@ -406,8 +536,12 @@ const BusinessIntelligenceDashboard = ({ isVisible = true, onClose }) => {
                           <h5 className="font-medium text-gray-900">{rec.title}</h5>
                           <p className="text-sm text-gray-600 mt-1">{rec.description}</p>
                           <div className="flex items-center space-x-3 mt-2 text-xs text-gray-500">
-                            <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full">{rec.effort} effort</span>
-                            <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full">{rec.impact} impact</span>
+                            <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                              {rec.effort} effort
+                            </span>
+                            <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full">
+                              {rec.impact} impact
+                            </span>
                           </div>
                         </div>
                       </div>

@@ -38,7 +38,7 @@ describe('Performance Load Testing', () => {
   describe('Component Load Performance', () => {
     it('renders PrivateAnalysis under load within performance budget', async () => {
       const startTime = performance.now();
-      
+
       const { container } = render(
         <Provider store={store}>
           <BrowserRouter>
@@ -60,7 +60,7 @@ describe('Performance Load Testing', () => {
 
       for (let i = 0; i < iterations; i++) {
         const startTime = performance.now();
-        
+
         const { unmount } = render(
           <Provider store={store}>
             <BrowserRouter>
@@ -71,7 +71,7 @@ describe('Performance Load Testing', () => {
 
         const endTime = performance.now();
         totalRenderTime += (endTime - startTime);
-        
+
         unmount();
       }
 
@@ -96,15 +96,15 @@ describe('Performance Load Testing', () => {
       };
 
       const startTime = performance.now();
-      
+
       // Simulate processing large dataset
       const processedData = largeDataset.companies.map(company => ({
         ...company,
         metrics: {
-          revenueGrowth: company.financials.revenue.slice(1).map((rev, i) => 
+          revenueGrowth: company.financials.revenue.slice(1).map((rev, i) =>
             ((rev - company.financials.revenue[i]) / company.financials.revenue[i]) * 100
           ),
-          profitMargin: company.financials.revenue.map((rev, i) => 
+          profitMargin: company.financials.revenue.map((rev, i) =>
             ((rev - company.financials.expenses[i]) / rev) * 100
           )
         }
@@ -128,14 +128,14 @@ describe('Performance Load Testing', () => {
       }));
 
       const startTime = performance.now();
-      
+
       // Simulate concurrent calculations
-      const promises = calculations.map(calc => 
+      const promises = calculations.map(calc =>
         new Promise(resolve => {
           setTimeout(() => {
             const result = {
               ...calc,
-              npv: calc.data.revenue.reduce((sum, rev, i) => 
+              npv: calc.data.revenue.reduce((sum, rev, i) =>
                 sum + (rev - calc.data.expenses[i]) / Math.pow(1 + calc.data.discountRate, i + 1), 0
               )
             };
@@ -156,7 +156,7 @@ describe('Performance Load Testing', () => {
   describe('Memory Usage Optimization', () => {
     it('maintains stable memory usage during extended operation', async () => {
       const initialMemory = performance.memory?.usedJSHeapSize || 0;
-      
+
       // Simulate extended operation
       for (let i = 0; i < 50; i++) {
         const { unmount } = render(
@@ -169,7 +169,7 @@ describe('Performance Load Testing', () => {
 
         // Simulate user interaction
         await new Promise(resolve => setTimeout(resolve, 50));
-        
+
         unmount();
       }
 
@@ -217,7 +217,7 @@ describe('Performance Load Testing', () => {
       );
 
       unmount();
-      
+
       eventListenerCount.final = listenerCount;
 
       // Should have cleaned up all listeners
@@ -295,7 +295,7 @@ describe('Performance Load Testing', () => {
     it('implements proper code splitting', () => {
       // Test that large dependencies are not loaded immediately
       const initialModules = Object.keys(require.cache || {});
-      
+
       render(
         <Provider store={store}>
           <BrowserRouter>

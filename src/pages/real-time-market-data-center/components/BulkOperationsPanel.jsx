@@ -48,7 +48,7 @@ const BulkOperationsPanel = ({ selectedSymbols, onBulkExport, onBulkAlert, onBul
         onClick={() => setIsExpanded(!isExpanded)}
         aria-expanded={isExpanded}
         aria-controls="bulk-ops-panel-content"
-        onKeyDown={(e) => {
+        onKeyDown={e => {
           if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
             setIsExpanded(prev => !prev);
@@ -112,10 +112,7 @@ const BulkOperationsPanel = ({ selectedSymbols, onBulkExport, onBulkAlert, onBul
                   <option value="json">JSON Format</option>
                   <option value="pdf">PDF Report</option>
                 </select>
-                <Button
-                  variant="outline" size="sm" iconName="Download"
-                  onClick={handleBulkExport}
-                >
+                <Button variant="outline" size="sm" iconName="Download" onClick={handleBulkExport}>
                   Export Data
                 </Button>
               </div>

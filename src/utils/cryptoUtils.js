@@ -8,7 +8,7 @@ const getCrypto = () => {
 };
 
 export const cryptoUtils = {
-  getRandomValues: (array) => getCrypto().getRandomValues(array),
+  getRandomValues: array => getCrypto().getRandomValues(array),
   subtle: {
     importKey: (...args) => getCrypto().subtle.importKey(...args),
     deriveKey: (...args) => getCrypto().subtle.deriveKey(...args),

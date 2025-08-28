@@ -13,7 +13,7 @@ const MetricCard = ({
   suffix = '',
   className
 }) => {
-  const formatValue = (val) => {
+  const formatValue = val => {
     if (format === 'currency') {
       return `$${(val / 1000000).toFixed(1)}M`;
     } else if (format === 'percentage') {
@@ -51,23 +51,17 @@ const MetricCard = ({
           {change !== undefined && (
             <div className={cn('flex items-center gap-1', getTrendColor())}>
               <TrendIcon className="h-4 w-4" />
-              <span className="text-xs font-medium">
-                {Math.abs(change).toFixed(1)}%
-              </span>
+              <span className="text-xs font-medium">{Math.abs(change).toFixed(1)}%</span>
             </div>
           )}
         </div>
         <div className="flex items-baseline gap-1">
           {prefix && <span className="text-lg text-muted-foreground">{prefix}</span>}
-          <p className="text-2xl font-bold text-foreground">
-            {formatValue(value)}
-          </p>
+          <p className="text-2xl font-bold text-foreground">{formatValue(value)}</p>
           {suffix && <span className="text-lg text-muted-foreground">{suffix}</span>}
         </div>
         {change !== undefined && (
-          <p className="text-xs text-muted-foreground mt-1">
-            vs. previous period
-          </p>
+          <p className="text-xs text-muted-foreground mt-1">vs. previous period</p>
         )}
       </CardContent>
     </Card>
@@ -96,7 +90,8 @@ const MetricsDashboard = ({
     return groups;
   }, {});
 
-  const hasCategories = Object.keys(groupedMetrics).length > 1 ||
+  const hasCategories =
+    Object.keys(groupedMetrics).length > 1 ||
     (Object.keys(groupedMetrics).length === 1 && !groupedMetrics.default);
 
   return (

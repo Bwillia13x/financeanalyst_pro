@@ -103,7 +103,6 @@ export class PersistenceTestSuite {
         success: passed === total,
         results: this.testResults
       };
-
     } catch (error) {
       console.error('❌ Test suite failed:', error);
       const message = error instanceof Error ? error.message : String(error);
@@ -129,12 +128,7 @@ export class PersistenceTestSuite {
     try {
       const result = await persistenceManager.initialize();
 
-      this.assert(
-        result.success === true,
-        testName,
-        'Should initialize successfully',
-        result
-      );
+      this.assert(result.success === true, testName, 'Should initialize successfully', result);
 
       this.assert(
         persistenceManager.isInitialized === true,
@@ -142,7 +136,6 @@ export class PersistenceTestSuite {
         'Should set initialized flag',
         { isInitialized: persistenceManager.isInitialized }
       );
-
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       this.recordFailure(testName, message);
@@ -196,7 +189,6 @@ export class PersistenceTestSuite {
         'Should store data in IndexedDB',
         indexedStoreResult
       );
-
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       this.recordFailure(testName, message);
@@ -217,23 +209,16 @@ export class PersistenceTestSuite {
       // Remove the data
       const removeResult = await persistenceManager.remove('test_removal');
 
-      this.assert(
-        removeResult === true,
-        testName,
-        'Should remove data successfully',
-        { removeResult }
-      );
+      this.assert(removeResult === true, testName, 'Should remove data successfully', {
+        removeResult
+      });
 
       // Verify data is gone
       const retrievedData = await persistenceManager.retrieve('test_removal');
 
-      this.assert(
-        retrievedData === null,
-        testName,
-        'Should return null for removed data',
-        { retrievedData }
-      );
-
+      this.assert(retrievedData === null, testName, 'Should return null for removed data', {
+        retrievedData
+      });
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       this.recordFailure(testName, message);
@@ -257,13 +242,9 @@ export class PersistenceTestSuite {
         stats
       );
 
-      this.assert(
-        typeof stats.total.used === 'number',
-        testName,
-        'Should include total usage',
-        { totalUsed: stats.total.used }
-      );
-
+      this.assert(typeof stats.total.used === 'number', testName, 'Should include total usage', {
+        totalUsed: stats.total.used
+      });
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       this.recordFailure(testName, message);
@@ -289,20 +270,11 @@ export class PersistenceTestSuite {
         compress: true
       });
 
-      this.assert(
-        backup.success === true,
-        testName,
-        'Should create backup successfully',
-        backup
-      );
+      this.assert(backup.success === true, testName, 'Should create backup successfully', backup);
 
-      this.assert(
-        typeof backup.backupId === 'string',
-        testName,
-        'Should return backup ID',
-        { backupId: backup.backupId }
-      );
-
+      this.assert(typeof backup.backupId === 'string', testName, 'Should return backup ID', {
+        backupId: backup.backupId
+      });
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       this.recordFailure(testName, message);
@@ -319,13 +291,9 @@ export class PersistenceTestSuite {
     try {
       const backups = await backupService.listBackups();
 
-      this.assert(
-        Array.isArray(backups),
-        testName,
-        'Should return array of backups',
-        { backupsCount: backups.length }
-      );
-
+      this.assert(Array.isArray(backups), testName, 'Should return array of backups', {
+        backupsCount: backups.length
+      });
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       this.recordFailure(testName, message);
@@ -359,7 +327,6 @@ export class PersistenceTestSuite {
       } else {
         this.recordSkip(testName, 'No backups available for restore test');
       }
-
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       this.recordFailure(testName, message);
@@ -388,13 +355,9 @@ export class PersistenceTestSuite {
 
       const updatedSettings = privacyService.getPrivacySettings();
 
-      this.assert(
-        updatedSettings.analytics === false,
-        testName,
-        'Should update privacy settings',
-        { analytics: updatedSettings.analytics }
-      );
-
+      this.assert(updatedSettings.analytics === false, testName, 'Should update privacy settings', {
+        analytics: updatedSettings.analytics
+      });
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       this.recordFailure(testName, message);
@@ -417,7 +380,6 @@ export class PersistenceTestSuite {
         'Should return cleanup results',
         cleanupResult
       );
-
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       this.recordFailure(testName, message);
@@ -434,20 +396,11 @@ export class PersistenceTestSuite {
     try {
       const status = syncService.getSyncStatus();
 
-      this.assert(
-        typeof status === 'object',
-        testName,
-        'Should return sync status',
-        status
-      );
+      this.assert(typeof status === 'object', testName, 'Should return sync status', status);
 
-      this.assert(
-        typeof status.isOnline === 'boolean',
-        testName,
-        'Should include online status',
-        { isOnline: status.isOnline }
-      );
-
+      this.assert(typeof status.isOnline === 'boolean', testName, 'Should include online status', {
+        isOnline: status.isOnline
+      });
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       this.recordFailure(testName, message);
@@ -485,9 +438,7 @@ export class PersistenceTestSuite {
       const retrievedAfterRemoval = await persistenceManager.retrieve(testKey);
 
       this.assert(
-        retrieved.step === 1 &&
-        retrievedUpdated.step === 2 &&
-        retrievedAfterRemoval === null,
+        retrieved.step === 1 && retrievedUpdated.step === 2 && retrievedAfterRemoval === null,
         testName,
         'Should handle complete data lifecycle',
         {
@@ -496,7 +447,6 @@ export class PersistenceTestSuite {
           afterRemoval: retrievedAfterRemoval
         }
       );
-
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       this.recordFailure(testName, message);
@@ -514,12 +464,9 @@ export class PersistenceTestSuite {
       // Test invalid data retrieval
       const invalidResult = await persistenceManager.retrieve('non_existent_key_12345');
 
-      this.assert(
-        invalidResult === null,
-        testName,
-        'Should handle non-existent keys gracefully',
-        { invalidResult }
-      );
+      this.assert(invalidResult === null, testName, 'Should handle non-existent keys gracefully', {
+        invalidResult
+      });
 
       // Test invalid backup restore
       try {
@@ -527,14 +474,8 @@ export class PersistenceTestSuite {
         this.recordFailure(testName, 'Should have thrown error for invalid backup ID');
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
-        this.assert(
-          true,
-          testName,
-          'Should throw error for invalid backup ID',
-          { error: message }
-        );
+        this.assert(true, testName, 'Should throw error for invalid backup ID', { error: message });
       }
-
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       this.recordFailure(testName, message);

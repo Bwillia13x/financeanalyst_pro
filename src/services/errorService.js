@@ -78,58 +78,74 @@ class ErrorService {
    * Handle financial calculation errors
    */
   logFinancialError(error, calculationType, inputData) {
-    return this.logError(error, {
-      component: 'FinancialCalculator',
-      action: calculationType,
-      data: {
-        calculationType,
-        inputData: this.sanitizeFinancialData(inputData)
-      }
-    }, 'warning');
+    return this.logError(
+      error,
+      {
+        component: 'FinancialCalculator',
+        action: calculationType,
+        data: {
+          calculationType,
+          inputData: this.sanitizeFinancialData(inputData)
+        }
+      },
+      'warning'
+    );
   }
 
   /**
    * Handle API errors
    */
   logApiError(error, endpoint, requestData) {
-    return this.logError(error, {
-      component: 'ApiService',
-      action: 'apiRequest',
-      data: {
-        endpoint,
-        method: requestData?.method,
-        status: error.status || error.code
-      }
-    }, error.status >= 500 ? 'error' : 'warning');
+    return this.logError(
+      error,
+      {
+        component: 'ApiService',
+        action: 'apiRequest',
+        data: {
+          endpoint,
+          method: requestData?.method,
+          status: error.status || error.code
+        }
+      },
+      error.status >= 500 ? 'error' : 'warning'
+    );
   }
 
   /**
    * Handle component rendering errors
    */
   logComponentError(error, componentName, props) {
-    return this.logError(error, {
-      component: componentName,
-      action: 'render',
-      data: {
-        propsKeys: Object.keys(props || {}),
-        propsSize: JSON.stringify(props || {}).length
-      }
-    }, 'error');
+    return this.logError(
+      error,
+      {
+        component: componentName,
+        action: 'render',
+        data: {
+          propsKeys: Object.keys(props || {}),
+          propsSize: JSON.stringify(props || {}).length
+        }
+      },
+      'error'
+    );
   }
 
   /**
    * Handle data validation errors
    */
   logValidationError(error, fieldName, value) {
-    return this.logError(error, {
-      component: 'DataValidator',
-      action: 'validation',
-      data: {
-        fieldName,
-        valueType: typeof value,
-        valueLength: value?.length || 0
-      }
-    }, 'warning');
+    return this.logError(
+      error,
+      {
+        component: 'DataValidator',
+        action: 'validation',
+        data: {
+          fieldName,
+          valueType: typeof value,
+          valueLength: value?.length || 0
+        }
+      },
+      'warning'
+    );
   }
 
   /**
@@ -310,8 +326,7 @@ export const logValidationError = (error, fieldName, value) =>
 export const getUserFriendlyMessage = (error, context) =>
   errorService.getUserFriendlyMessage(error, context);
 
-export const shouldRetry = (error, retryCount) =>
-  errorService.shouldRetry(error, retryCount);
+export const shouldRetry = (error, retryCount) => errorService.shouldRetry(error, retryCount);
 
 export const getRecoverySuggestions = (error, context) =>
   errorService.getRecoverySuggestions(error, context);

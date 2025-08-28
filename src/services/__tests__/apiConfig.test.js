@@ -26,68 +26,56 @@ vi.mock('import.meta', () => ({
 
 describe('API Configuration', () => {
   describe('API_CONFIG', () => {
-    it('should have all required API service configurations', () => {
-      expect(API_CONFIG).toHaveProperty('ALPHA_VANTAGE');
-      expect(API_CONFIG).toHaveProperty('FMP');
-      expect(API_CONFIG).toHaveProperty('SEC_EDGAR');
-      expect(API_CONFIG).toHaveProperty('YAHOO_FINANCE');
-      expect(API_CONFIG).toHaveProperty('QUANDL');
-      expect(API_CONFIG).toHaveProperty('FRED');
+    it('should have backend proxy configuration', () => {
+      expect(API_CONFIG).toHaveProperty('BACKEND_PROXY');
+      expect(API_CONFIG.BACKEND_PROXY).toHaveProperty('baseURL');
+      expect(API_CONFIG.BACKEND_PROXY).toHaveProperty('endpoints');
     });
 
-    it('should have valid Alpha Vantage configuration', () => {
-      const config = API_CONFIG.ALPHA_VANTAGE;
-      expect(config.baseURL).toBe('https://www.alphavantage.co/query');
-      expect(config.rateLimit.requests).toBe(5);
-      expect(config.rateLimit.period).toBe(60000);
-      expect(config.endpoints).toHaveProperty('quote');
-      expect(config.endpoints).toHaveProperty('dailyAdjusted');
+    it('should have external services reference information', () => {
+      expect(API_CONFIG).toHaveProperty('EXTERNAL_SERVICES');
+      expect(API_CONFIG.EXTERNAL_SERVICES).toHaveProperty('ALPHA_VANTAGE');
+      expect(API_CONFIG.EXTERNAL_SERVICES).toHaveProperty('FMP');
+      expect(API_CONFIG.EXTERNAL_SERVICES).toHaveProperty('SEC_EDGAR');
+      expect(API_CONFIG.EXTERNAL_SERVICES).toHaveProperty('YAHOO_FINANCE');
+      expect(API_CONFIG.EXTERNAL_SERVICES).toHaveProperty('QUANDL');
+      expect(API_CONFIG.EXTERNAL_SERVICES).toHaveProperty('FRED');
     });
 
-    it('should have valid FMP configuration', () => {
-      const config = API_CONFIG.FMP;
-      expect(config.baseURL).toBe('https://financialmodelingprep.com/api/v3');
-      expect(config.rateLimit.requests).toBe(250);
-      expect(config.rateLimit.period).toBe(86400000);
-      expect(config.endpoints).toHaveProperty('profile');
-      expect(config.endpoints).toHaveProperty('incomeStatement');
-    });
-
-    it('should have valid SEC EDGAR configuration', () => {
-      const config = API_CONFIG.SEC_EDGAR;
-      expect(config.baseURL).toBe('https://data.sec.gov');
-      expect(config.headers['User-Agent']).toBe('FinanceAnalyst-Pro contact@financeanalyst.com');
-      expect(config.rateLimit.requests).toBe(10);
-      expect(config.rateLimit.period).toBe(1000);
-    });
-
-    it('should have valid Yahoo Finance configuration', () => {
-      const config = API_CONFIG.YAHOO_FINANCE;
-      expect(config.baseURL).toBe('https://query1.finance.yahoo.com/v8/finance/chart');
-      expect(config.fallbackURL).toBe('https://query2.finance.yahoo.com/v8/finance/chart');
-      expect(config.rateLimit.requests).toBe(100);
+    it('should have valid backend proxy configuration', () => {
+      const config = API_CONFIG.BACKEND_PROXY;
+      expect(config.baseURL).toMatch(/^http:\/\/localhost:3001\/api/);
+      expect(config.endpoints).toHaveProperty('marketData');
+      expect(config.endpoints).toHaveProperty('financialStatements');
+      expect(config.endpoints).toHaveProperty('companyData');
+      expect(config.endpoints).toHaveProperty('economicData');
+      expect(config.endpoints).toHaveProperty('health');
     });
   });
 
   describe('DATA_SOURCE_PRIORITY', () => {
     it('should define priority for market data sources', () => {
-      expect(DATA_SOURCE_PRIORITY.marketData).toEqual(['YAHOO_FINANCE', 'ALPHA_VANTAGE']);
+      expect(DATA_SOURCE_PRIORITY.marketData).toEqual(['BACKEND_PROXY']);
     });
 
     it('should define priority for financial statements', () => {
-      expect(DATA_SOURCE_PRIORITY.financialStatements).toEqual(['FMP', 'ALPHA_VANTAGE']);
+      expect(DATA_SOURCE_PRIORITY.financialStatements).toEqual(['BACKEND_PROXY']);
     });
 
     it('should define priority for company profiles', () => {
-      expect(DATA_SOURCE_PRIORITY.companyProfile).toEqual(['FMP', 'ALPHA_VANTAGE']);
+      expect(DATA_SOURCE_PRIORITY.companyProfile).toEqual(['BACKEND_PROXY']);
     });
 
     it('should define priority for SEC filings', () => {
-      expect(DATA_SOURCE_PRIORITY.secFilings).toEqual(['SEC_EDGAR']);
+      expect(DATA_SOURCE_PRIORITY.secFilings).toEqual(['BACKEND_PROXY']);
     });
 
     it('should define priority for economic data', () => {
-      expect(DATA_SOURCE_PRIORITY.economicData).toEqual(['FRED', 'QUANDL']);
+      expect(DATA_SOURCE_PRIORITY.economicData).toEqual(['BACKEND_PROXY']);
+    });
+
+    it('should define priority for peers', () => {
+      expect(DATA_SOURCE_PRIORITY.peers).toEqual(['BACKEND_PROXY']);
     });
   });
 
@@ -202,16 +190,16 @@ describe('API Configuration', () => {
   });
 
   describe('getApiKey', () => {
-    it('should return API keys from environment variables', () => {
-      // These will return the actual env values or 'demo' as fallback
-      expect(typeof getApiKey('ALPHA_VANTAGE')).toBe('string');
-      expect(typeof getApiKey('FMP')).toBe('string');
-      expect(typeof getApiKey('QUANDL')).toBe('string');
-      expect(typeof getApiKey('FRED')).toBe('string');
+    it('should return null for all services (deprecated function)', () => {
+      // All API calls now route through secure backend proxy
+      expect(getApiKey('ALPHA_VANTAGE')).toBe(null);
+      expect(getApiKey('FMP')).toBe(null);
+      expect(getApiKey('QUANDL')).toBe(null);
+      expect(getApiKey('FRED')).toBe(null);
     });
 
-    it('should return demo key for unknown services', () => {
-      expect(getApiKey('UNKNOWN_SERVICE')).toBe('demo');
+    it('should return null for unknown services', () => {
+      expect(getApiKey('UNKNOWN_SERVICE')).toBe(null);
     });
   });
 
@@ -222,24 +210,19 @@ describe('API Configuration', () => {
       expect(headers.Accept).toBe('application/json');
     });
 
-    it('should build SEC EDGAR specific headers', () => {
-      const headers = buildHeaders('SEC_EDGAR');
-      expect(headers['Content-Type']).toBe('application/json');
-      expect(headers.Accept).toBe('application/json');
-      expect(headers['User-Agent']).toBe('FinanceAnalyst-Pro contact@financeanalyst.com');
-    });
-
     it('should merge custom headers', () => {
       const customHeaders = { 'X-Custom-Header': 'custom-value' };
-      const headers = buildHeaders('ALPHA_VANTAGE', customHeaders);
+      const headers = buildHeaders(customHeaders);
       expect(headers['Content-Type']).toBe('application/json');
+      expect(headers.Accept).toBe('application/json');
       expect(headers['X-Custom-Header']).toBe('custom-value');
     });
 
     it('should allow custom headers to override defaults', () => {
       const customHeaders = { 'Content-Type': 'text/plain' };
-      const headers = buildHeaders('ALPHA_VANTAGE', customHeaders);
+      const headers = buildHeaders(customHeaders);
       expect(headers['Content-Type']).toBe('text/plain');
+      expect(headers.Accept).toBe('application/json');
     });
   });
 });

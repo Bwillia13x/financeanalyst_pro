@@ -68,7 +68,7 @@ const CorrelationMatrix = ({
     return denominator === 0 ? 0 : numerator / denominator;
   };
 
-  const getCorrelationColor = (correlation) => {
+  const getCorrelationColor = correlation => {
     const _absCorr = Math.abs(correlation);
 
     if (correlation > 0.7) return '#10b981'; // Strong positive - green
@@ -78,15 +78,15 @@ const CorrelationMatrix = ({
     return '#ef4444'; // Strong negative - red
   };
 
-  const getCorrelationIntensity = (correlation) => {
+  const getCorrelationIntensity = correlation => {
     return Math.abs(correlation) * 0.8 + 0.2;
   };
 
-  const getTextColor = (correlation) => {
+  const getTextColor = correlation => {
     return Math.abs(correlation) > 0.5 ? '#ffffff' : '#374151';
   };
 
-  const getCorrelationLabel = (correlation) => {
+  const getCorrelationLabel = correlation => {
     const absCorr = Math.abs(correlation);
     if (absCorr > 0.7) return correlation > 0 ? 'Strong +' : 'Strong -';
     if (absCorr > 0.3) return correlation > 0 ? 'Moderate +' : 'Moderate -';
@@ -99,11 +99,15 @@ const CorrelationMatrix = ({
         <div className="text-center">
           <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-2">
             <svg
-              className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor"
+              className="w-6 h-6 text-gray-400"
+              fill="none"
+              stroke="currentColor"
               viewBox="0 0 24 24"
             >
               <path
-                strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
                 d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"
               />
             </svg>
@@ -159,32 +163,34 @@ const CorrelationMatrix = ({
           className="bg-white rounded-lg border"
         >
           {/* Column headers */}
-          {showLabels && correlationData.labels.map((label, index) => (
-            <text
-              key={`col-${index}`}
-              x={80 + index * cellSize + cellSize / 2}
-              y={25}
-              textAnchor="middle"
-              className="text-xs fill-gray-700 font-medium"
-              transform={`rotate(-45, ${80 + index * cellSize + cellSize / 2}, 25)`}
-            >
-              {label}
-            </text>
-          ))}
+          {showLabels &&
+            correlationData.labels.map((label, index) => (
+              <text
+                key={`col-${index}`}
+                x={80 + index * cellSize + cellSize / 2}
+                y={25}
+                textAnchor="middle"
+                className="text-xs fill-gray-700 font-medium"
+                transform={`rotate(-45, ${80 + index * cellSize + cellSize / 2}, 25)`}
+              >
+                {label}
+              </text>
+            ))}
 
           {/* Row headers */}
-          {showLabels && correlationData.labels.map((label, index) => (
-            <text
-              key={`row-${index}`}
-              x={70}
-              y={50 + index * cellSize + cellSize / 2}
-              textAnchor="end"
-              dominantBaseline="middle"
-              className="text-xs fill-gray-700 font-medium"
-            >
-              {label}
-            </text>
-          ))}
+          {showLabels &&
+            correlationData.labels.map((label, index) => (
+              <text
+                key={`row-${index}`}
+                x={70}
+                y={50 + index * cellSize + cellSize / 2}
+                textAnchor="end"
+                dominantBaseline="middle"
+                className="text-xs fill-gray-700 font-medium"
+              >
+                {label}
+              </text>
+            ))}
 
           {/* Matrix cells */}
           {correlationData.matrix.map((row, rowIndex) =>
@@ -222,7 +228,8 @@ const CorrelationMatrix = ({
                   className="cursor-pointer"
                 >
                   <title>
-                    {correlationData.labels[rowIndex]} vs {correlationData.labels[colIndex]}: {correlation.toFixed(3)} ({getCorrelationLabel(correlation)})
+                    {correlationData.labels[rowIndex]} vs {correlationData.labels[colIndex]}:{' '}
+                    {correlation.toFixed(3)} ({getCorrelationLabel(correlation)})
                   </title>
                 </rect>
               </g>
@@ -269,7 +276,8 @@ const CorrelationMatrix = ({
           {correlationData.matrix.flat().filter(v => v < -0.5).length > 0 && (
             <p>✅ Negative correlations present - good for risk reduction</p>
           )}
-          {correlationData.matrix.flat().filter(v => Math.abs(v) < 0.3 && v !== 1).length > correlationData.labels.length && (
+          {correlationData.matrix.flat().filter(v => Math.abs(v) < 0.3 && v !== 1).length >
+            correlationData.labels.length && (
             <p>✅ Low correlations indicate good diversification</p>
           )}
         </div>

@@ -25,21 +25,40 @@ const SecondaryNav = ({
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [_isMobileMenuOpen, _setIsMobileMenuOpen] = useState(false);
 
-  const visibleItems = showMoreButton && items.length > maxVisibleItems
-    ? items.slice(0, maxVisibleItems)
-    : items;
+  const visibleItems =
+    showMoreButton && items.length > maxVisibleItems ? items.slice(0, maxVisibleItems) : items;
 
-  const hiddenItems = showMoreButton && items.length > maxVisibleItems
-    ? items.slice(maxVisibleItems)
-    : [];
+  const hiddenItems =
+    showMoreButton && items.length > maxVisibleItems ? items.slice(maxVisibleItems) : [];
 
   // Handle predefined navigation configurations
   const getNavigationItems = () => {
     if (navigation === 'analysisTools') {
       return [
-        { id: 'spreadsheet', label: 'Financial Spreadsheet', icon: '📊', 'data-tour': 'financial-spreadsheet-tab' },
-        { id: 'modeling', label: 'Financial Modeling', icon: '🧮', 'data-tour': 'financial-modeling-tab' },
-        { id: 'analysis', label: 'Analysis & Results', icon: '📈', 'data-tour': 'analysis-results-tab' }
+        {
+          id: 'spreadsheet',
+          label: 'Financial Spreadsheet',
+          icon: '📊',
+          'data-tour': 'financial-spreadsheet-tab'
+        },
+        {
+          id: 'modeling',
+          label: 'Financial Modeling',
+          icon: '🧮',
+          'data-tour': 'financial-modeling-tab'
+        },
+        {
+          id: 'analysis',
+          label: 'Analysis & Results',
+          icon: '📈',
+          'data-tour': 'analysis-results-tab'
+        },
+        { id: 'lbo', label: 'Advanced LBO', icon: '🏢' },
+        { id: 'threestatement', label: '3-Statement Model', icon: '📑' },
+        { id: 'scenarios', label: 'Scenario Analysis', icon: '🎯' },
+        { id: 'marketdata', label: 'Market Data', icon: '📈' },
+        { id: 'montecarlo', label: 'Monte Carlo', icon: '🎲' },
+        { id: 'import-export', label: 'Import/Export', icon: '💾' }
       ];
     }
     if (navigation === 'portfolioViews') {
@@ -59,10 +78,10 @@ const SecondaryNav = ({
     const handleClick = onItemClick ? () => onItemClick(item.id) : undefined;
 
     const content = (
-      <div
-        role="button"
-        tabIndex={0}
-        onKeyDown={(e) => e.key === 'Enter' && handleClick?.()}
+      <button
+        key={item.id || index}
+        type="button"
+        onKeyDown={e => e.key === 'Enter' && handleClick?.()}
         className={cn(
           'relative px-3 py-2 sm:px-4 sm:py-2 text-sm font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 cursor-pointer',
           isActive
@@ -75,13 +94,16 @@ const SecondaryNav = ({
         aria-current={isActive ? 'page' : undefined}
         title={item.tooltip}
         data-tour={item['data-tour']}
+        data-tab={item.id}
       >
         {item.icon && (
-          <span className="mr-2 text-sm" aria-hidden="true">{item.icon}</span>
+          <span className="mr-2 text-sm" aria-hidden="true">
+            {item.icon}
+          </span>
         )}
         <span className="hidden sm:inline">{item.label}</span>
         <span className="sm:hidden">{item.label.split(' ')[0]}</span>
-      </div>
+      </button>
     );
 
     if (item.path && !onItemClick) {
@@ -92,11 +114,7 @@ const SecondaryNav = ({
       );
     }
 
-    return (
-      <div key={item.id || index}>
-        {content}
-      </div>
-    );
+    return content;
   };
 
   if (variant === 'dropdown') {
@@ -112,8 +130,7 @@ const SecondaryNav = ({
         >
           Advanced Tools
           <ChevronDown
-            className={cn('w-4 h-4 ml-1 transition-transform',
-              isDropdownOpen && 'rotate-180')}
+            className={cn('w-4 h-4 ml-1 transition-transform', isDropdownOpen && 'rotate-180')}
           />
         </Button>
 
@@ -131,15 +148,11 @@ const SecondaryNav = ({
                   onClick={() => setIsDropdownOpen(false)}
                   aria-current={location.pathname === item.path ? 'page' : undefined}
                 >
-                  {item.icon && (
-                    <item.icon className="w-4 h-4 mr-3" aria-hidden="true" />
-                  )}
+                  {item.icon && <item.icon className="w-4 h-4 mr-3" aria-hidden="true" />}
                   <div>
                     <div className="font-medium">{item.label}</div>
                     {item.description && (
-                      <div className="text-xs text-muted-foreground">
-                        {item.description}
-                      </div>
+                      <div className="text-xs text-muted-foreground">{item.description}</div>
                     )}
                   </div>
                 </Link>
@@ -180,16 +193,14 @@ const SecondaryNav = ({
 
             {isDropdownOpen && (
               <div className="absolute right-0 top-full mt-1 w-48 bg-background border border-border rounded-md shadow-lg z-50">
-                <div className="py-1">
-                  {hiddenItems.map(renderNavItem)}
-                </div>
+                <div className="py-1">{hiddenItems.map(renderNavItem)}</div>
               </div>
             )}
           </div>
         )}
       </nav>
     );
-  };
+  }
 
   return (
     <nav

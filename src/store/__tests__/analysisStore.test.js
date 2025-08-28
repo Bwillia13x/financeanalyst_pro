@@ -18,11 +18,12 @@ import analysisReducer, {
   setMonteCarloResults,
   saveAnalysis,
   loadAnalysis,
+  resetAll,
   selectFinancialData,
-  selectDcfResults,
-  selectLboResults,
+  selectDcf,
+  selectLbo,
   selectScenarios,
-  selectMonteCarloResults,
+  selectMonteCarlo,
   selectDataCompleteness
 } from '../analysisStore';
 
@@ -68,7 +69,7 @@ describe('analysisSlice reducers', () => {
   beforeEach(() => {
     store = configureStore({
       reducer: {
-        analysis: analysisSlice.reducer
+        analysis: analysisReducer
       }
     });
   });
@@ -76,13 +77,13 @@ describe('analysisSlice reducers', () => {
   describe('financial data management', () => {
     it('should set financial data', () => {
       store.dispatch(setFinancialData(mockFinancialData));
-      
+
       const state = store.getState().analysis;
       expect(state.financialData).toEqual(mockFinancialData);
     });
 
     it('should update adjusted values', () => {
-      const adjustments = { 'revenue_2023': 1150 };
+      const adjustments = { revenue_2023: 1150 };
       store.dispatch(setAdjustedValues(adjustments));
 
       const state = store.getState().analysis;
@@ -90,13 +91,13 @@ describe('analysisSlice reducers', () => {
     });
 
     it('should merge adjusted values with existing ones', () => {
-      store.dispatch(setAdjustedValues({ 'revenue_2023': 1150 }));
-      store.dispatch(setAdjustedValues({ 'grossProfit_2023': 680 }));
+      store.dispatch(setAdjustedValues({ revenue_2023: 1150 }));
+      store.dispatch(setAdjustedValues({ grossProfit_2023: 680 }));
 
       const state = store.getState().analysis;
       expect(state.adjustedValues).toEqual({
-        'revenue_2023': 1150,
-        'grossProfit_2023': 680
+        revenue_2023: 1150,
+        grossProfit_2023: 680
       });
     });
   });
@@ -138,7 +139,7 @@ describe('analysisSlice reducers', () => {
         debtToEquity: 3,
         holdingPeriod: 5
       };
-      
+
       store.dispatch(setLboInputs(lboInputs));
 
       const state = store.getState().analysis;
@@ -151,7 +152,7 @@ describe('analysisSlice reducers', () => {
         moic: 2.5,
         totalReturns: 5000
       };
-      
+
       store.dispatch(setLboResults(lboResults));
 
       const state = store.getState().analysis;
@@ -167,9 +168,9 @@ describe('analysisSlice reducers', () => {
         name: 'Optimistic',
         assumptions: { revenueGrowth: 0.15 }
       };
-      
+
       store.dispatch(addScenario(scenario));
-      
+
       const state = store.getState().analysis;
       expect(state.scenarios.scenarios).toHaveLength(1);
       expect(state.scenarios.scenarios[0]).toEqual(scenario);
@@ -181,31 +182,31 @@ describe('analysisSlice reducers', () => {
         name: 'Optimistic',
         assumptions: { revenueGrowth: 0.15 }
       };
-      
+
       store.dispatch(addScenario(scenario));
-      
+
       const updatedScenario = {
         id: 'scenario-1',
         name: 'Very Optimistic',
-        assumptions: { revenueGrowth: 0.20 }
+        assumptions: { revenueGrowth: 0.2 }
       };
-      
+
       store.dispatch(updateScenario(updatedScenario));
-      
+
       const state = store.getState().analysis;
       expect(state.scenarios.scenarios).toHaveLength(1);
       expect(state.scenarios.scenarios[0].name).toBe('Very Optimistic');
-      expect(state.scenarios.scenarios[0].assumptions.revenueGrowth).toBe(0.20);
+      expect(state.scenarios.scenarios[0].assumptions.revenueGrowth).toBe(0.2);
     });
 
     it('should remove a scenario', () => {
       const scenario1 = { id: 'scenario-1', name: 'Optimistic' };
       const scenario2 = { id: 'scenario-2', name: 'Pessimistic' };
-      
+
       store.dispatch(addScenario(scenario1));
       store.dispatch(addScenario(scenario2));
       store.dispatch(removeScenario('scenario-1'));
-      
+
       const state = store.getState().analysis;
       expect(state.scenarios.scenarios).toHaveLength(1);
       expect(state.scenarios.scenarios[0].id).toBe('scenario-2');
@@ -219,9 +220,9 @@ describe('analysisSlice reducers', () => {
         confidenceLevel: 0.99,
         correlationsEnabled: false
       };
-      
+
       store.dispatch(setMonteCarloSettings(settings));
-      
+
       const state = store.getState().analysis;
       expect(state.monteCarlo.settings).toEqual({
         ...state.monteCarlo.settings,
@@ -237,9 +238,9 @@ describe('analysisSlice reducers', () => {
         confidenceInterval: [32.1, 58.3],
         percentiles: { p10: 34.2, p90: 56.1 }
       };
-      
+
       store.dispatch(setMonteCarloResults(results));
-      
+
       const state = store.getState().analysis;
       expect(state.monteCarlo.results).toEqual(results);
       expect(state.monteCarlo.status).toBe('succeeded');
@@ -249,11 +250,11 @@ describe('analysisSlice reducers', () => {
   describe('analysis persistence', () => {
     it('should save analysis', () => {
       store.dispatch(setFinancialData(mockFinancialData));
-      store.dispatch(setDCFInputs(mockDCFInputs));
-      
+      store.dispatch(setDcfInputs(mockDCFInputs));
+
       const analysisName = 'Test Analysis';
       store.dispatch(saveAnalysis(analysisName));
-      
+
       const state = store.getState().analysis;
       expect(state.lastSaved).toBeDefined();
       expect(state.savedAnalyses).toHaveProperty(analysisName);
@@ -262,15 +263,15 @@ describe('analysisSlice reducers', () => {
     it('should load analysis', () => {
       // First save an analysis
       store.dispatch(setFinancialData(mockFinancialData));
-      store.dispatch(setDCFInputs(mockDCFInputs));
+      store.dispatch(setDcfInputs(mockDCFInputs));
       store.dispatch(saveAnalysis('Test Analysis'));
-      
+
       // Clear current state
-      store.dispatch(clearAnalysis());
-      
+      store.dispatch(resetAll());
+
       // Load the analysis
       store.dispatch(loadAnalysis('Test Analysis'));
-      
+
       const state = store.getState().analysis;
       expect(state.financialData).toEqual(mockFinancialData);
       expect(state.dcf.inputs).toEqual(mockDCFInputs);
@@ -278,9 +279,9 @@ describe('analysisSlice reducers', () => {
 
     it('should clear analysis', () => {
       store.dispatch(setFinancialData(mockFinancialData));
-      store.dispatch(setDCFInputs(mockDCFInputs));
-      store.dispatch(clearAnalysis());
-      
+      store.dispatch(setDcfInputs(mockDCFInputs));
+      store.dispatch(resetAll());
+
       const state = store.getState().analysis;
       expect(state.financialData).toBeNull();
       expect(state.adjustedValues).toEqual({});
@@ -296,31 +297,31 @@ describe('analysisStore selectors', () => {
   beforeEach(() => {
     store = configureStore({
       reducer: {
-        analysis: analysisSlice.reducer
+        analysis: analysisReducer
       }
     });
   });
 
   it('should select financial data', () => {
     store.dispatch(setFinancialData(mockFinancialData));
-    
+
     const state = store.getState();
     const financialData = selectFinancialData(state);
     expect(financialData).toEqual(mockFinancialData);
   });
 
   it('should select DCF results', () => {
-    store.dispatch(setDCFResults(mockDCFResults));
-    
+    store.dispatch(setDcfResults(mockDCFResults));
+
     const state = store.getState();
-    const dcfResults = selectDCFResults(state);
-    expect(dcfResults).toEqual(mockDCFResults);
+    const dcfData = selectDcf(state);
+    expect(dcfData.results).toEqual(mockDCFResults);
   });
 
   it('should select scenarios', () => {
     const scenario = { id: 'test', name: 'Test Scenario' };
     store.dispatch(addScenario(scenario));
-    
+
     const state = store.getState();
     const scenarios = selectScenarios(state);
     expect(scenarios).toHaveLength(1);
@@ -329,7 +330,7 @@ describe('analysisStore selectors', () => {
 
   it('should calculate data completeness', () => {
     store.dispatch(setFinancialData(mockFinancialData));
-    
+
     const state = store.getState();
     const completeness = selectDataCompleteness(state);
     expect(completeness).toBeGreaterThan(0);
@@ -349,7 +350,7 @@ describe('data integrity and validation', () => {
   beforeEach(() => {
     store = configureStore({
       reducer: {
-        analysis: analysisSlice.reducer
+        analysis: analysisReducer
       }
     });
   });
@@ -357,12 +358,12 @@ describe('data integrity and validation', () => {
   it('should maintain state consistency across operations', () => {
     // Set up complete analysis
     store.dispatch(setFinancialData(mockFinancialData));
-    store.dispatch(setDCFInputs(mockDCFInputs));
-    store.dispatch(setDCFResults(mockDCFResults));
-    
+    store.dispatch(setDcfInputs(mockDCFInputs));
+    store.dispatch(setDcfResults(mockDCFResults));
+
     const scenario = { id: 'test', name: 'Test' };
     store.dispatch(addScenario(scenario));
-    
+
     // Verify all data is present
     const state = store.getState().analysis;
     expect(state.financialData).toBeDefined();
@@ -373,8 +374,8 @@ describe('data integrity and validation', () => {
 
   it('should handle partial data gracefully', () => {
     // Set only some data
-    store.dispatch(setDCFInputs(mockDCFInputs));
-    
+    store.dispatch(setDcfInputs(mockDCFInputs));
+
     const state = store.getState().analysis;
     expect(state.dcf.inputs).toEqual(mockDCFInputs);
     expect(state.financialData).toBeNull();
@@ -382,18 +383,18 @@ describe('data integrity and validation', () => {
   });
 
   it('should preserve timestamps for calculations', () => {
-    store.dispatch(setDCFResults(mockDCFResults));
-    
+    store.dispatch(setDcfResults(mockDCFResults));
+
     const state1 = store.getState().analysis;
     const timestamp1 = state1.dcf.lastCalculated;
-    
+
     // Wait a moment and calculate again
     setTimeout(() => {
-      store.dispatch(setDCFResults({ ...mockDCFResults, presentValue: 2600 }));
-      
+      store.dispatch(setDcfResults({ ...mockDCFResults, presentValue: 2600 }));
+
       const state2 = store.getState().analysis;
       const timestamp2 = state2.dcf.lastCalculated;
-      
+
       expect(timestamp2).not.toBe(timestamp1);
       expect(new Date(timestamp2)).toBeInstanceOf(Date);
     }, 10);

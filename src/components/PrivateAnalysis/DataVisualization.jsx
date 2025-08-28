@@ -1,9 +1,27 @@
 import { motion } from 'framer-motion';
-import { TrendingUp, BarChart3, PieChart as PieChartIcon, Activity, Eye, EyeOff } from 'lucide-react';
+import {
+  TrendingUp,
+  BarChart3,
+  PieChart as PieChartIcon,
+  Activity,
+  Eye,
+  EyeOff
+} from 'lucide-react';
 import React, { useState, useMemo } from 'react';
 import {
-  LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
-  XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
+  LineChart,
+  Line,
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer
 } from 'recharts';
 
 const DataVisualization = ({
@@ -20,8 +38,18 @@ const DataVisualization = ({
   const chartTypes = [
     { id: 'dcf-waterfall', label: 'DCF Waterfall', icon: BarChart3, category: 'dcf' },
     { id: 'cashflow-trend', label: 'Cash Flow Trend', icon: TrendingUp, category: 'dcf' },
-    { id: 'sensitivity-tornado', label: 'Sensitivity Tornado', icon: Activity, category: 'sensitivity' },
-    { id: 'scenario-distribution', label: 'Scenario Distribution', icon: PieChartIcon, category: 'scenario' },
+    {
+      id: 'sensitivity-tornado',
+      label: 'Sensitivity Tornado',
+      icon: Activity,
+      category: 'sensitivity'
+    },
+    {
+      id: 'scenario-distribution',
+      label: 'Scenario Distribution',
+      icon: PieChartIcon,
+      category: 'scenario'
+    },
     { id: 'valuation-bridge', label: 'Valuation Bridge', icon: BarChart3, category: 'combined' }
   ];
 
@@ -81,17 +109,19 @@ const DataVisualization = ({
   const sensitivityTornadoData = useMemo(() => {
     if (!sensitivityData) return [];
 
-    return Object.entries(sensitivityData).map(([_variable, result]) => {
-      const maxUpside = Math.max(...result.dataPoints.map(d => d.changeFromBase));
-      const maxDownside = Math.min(...result.dataPoints.map(d => d.changeFromBase));
+    return Object.entries(sensitivityData)
+      .map(([_variable, result]) => {
+        const maxUpside = Math.max(...result.dataPoints.map(d => d.changeFromBase));
+        const maxDownside = Math.min(...result.dataPoints.map(d => d.changeFromBase));
 
-      return {
-        variable: result.definition.name,
-        upside: maxUpside,
-        downside: Math.abs(maxDownside),
-        range: maxUpside - maxDownside
-      };
-    }).sort((a, b) => b.range - a.range);
+        return {
+          variable: result.definition.name,
+          upside: maxUpside,
+          downside: Math.abs(maxDownside),
+          range: maxUpside - maxDownside
+        };
+      })
+      .sort((a, b) => b.range - a.range);
   }, [sensitivityData]);
 
   // Prepare Scenario Distribution Data
@@ -136,7 +166,7 @@ const DataVisualization = ({
       <BarChart data={dcfWaterfallData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="name" />
-        <YAxis tickFormatter={(value) => formatCurrency(value)} />
+        <YAxis tickFormatter={value => formatCurrency(value)} />
         <Tooltip content={<CustomTooltip chartType="waterfall" />} />
         <Bar dataKey="value" fill="#3B82F6" />
       </BarChart>
@@ -149,21 +179,24 @@ const DataVisualization = ({
       <LineChart data={cashFlowTrendData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="year" />
-        <YAxis tickFormatter={(value) => formatCurrency(value)} />
+        <YAxis tickFormatter={value => formatCurrency(value)} />
         <Tooltip content={<CustomTooltip chartType="trend" />} />
         <Legend />
         <Line
-          type="monotone" dataKey="freeCashFlow" stroke="#10B981"
-          strokeWidth={3} name="Free Cash Flow"
+          type="monotone"
+          dataKey="freeCashFlow"
+          stroke="#10B981"
+          strokeWidth={3}
+          name="Free Cash Flow"
         />
         <Line
-          type="monotone" dataKey="presentValue" stroke="#3B82F6"
-          strokeWidth={2} name="Present Value"
+          type="monotone"
+          dataKey="presentValue"
+          stroke="#3B82F6"
+          strokeWidth={2}
+          name="Present Value"
         />
-        <Line
-          type="monotone" dataKey="revenue" stroke="#8B5CF6"
-          strokeWidth={2} name="Revenue"
-        />
+        <Line type="monotone" dataKey="revenue" stroke="#8B5CF6" strokeWidth={2} name="Revenue" />
       </LineChart>
     </ResponsiveContainer>
   );
@@ -177,11 +210,11 @@ const DataVisualization = ({
         margin={{ top: 20, right: 30, left: 100, bottom: 5 }}
       >
         <CartesianGrid strokeDasharray="3 3" />
-        <XAxis type="number" tickFormatter={(value) => `${value.toFixed(1)}%`} />
+        <XAxis type="number" tickFormatter={value => `${value.toFixed(1)}%`} />
         <YAxis type="category" dataKey="variable" />
         <Tooltip
           formatter={(value, name) => [`${value.toFixed(1)}%`, name]}
-          labelFormatter={(label) => `Variable: ${label}`}
+          labelFormatter={label => `Variable: ${label}`}
         />
         <Bar dataKey="upside" fill="#10B981" name="Upside Impact" />
         <Bar dataKey="downside" fill="#EF4444" name="Downside Impact" />
@@ -206,7 +239,7 @@ const DataVisualization = ({
               <Cell key={`cell-${index}`} fill={entry.fill} />
             ))}
           </Pie>
-          <Tooltip formatter={(value) => `${value}%`} />
+          <Tooltip formatter={value => `${value}%`} />
         </PieChart>
       </ResponsiveContainer>
 
@@ -214,7 +247,7 @@ const DataVisualization = ({
         <BarChart data={scenarioDistributionData}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="name" />
-          <YAxis tickFormatter={(value) => formatCurrency(value)} />
+          <YAxis tickFormatter={value => formatCurrency(value)} />
           <Tooltip content={<CustomTooltip chartType="scenario" />} />
           <Bar dataKey="value" fill="#8B5CF6" name="Enterprise Value" />
         </BarChart>
@@ -235,12 +268,9 @@ const DataVisualization = ({
         <BarChart data={bridgeData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="name" />
-          <YAxis tickFormatter={(value) => formatCurrency(value)} />
+          <YAxis tickFormatter={value => formatCurrency(value)} />
           <Tooltip content={<CustomTooltip chartType="bridge" />} />
-          <Bar
-            dataKey="value"
-            fill={(entry) => entry.type === 'total' ? '#1F2937' : '#3B82F6'}
-          />
+          <Bar dataKey="value" fill={entry => (entry.type === 'total' ? '#1F2937' : '#3B82F6')} />
         </BarChart>
       </ResponsiveContainer>
     );
@@ -266,7 +296,7 @@ const DataVisualization = ({
   const getChartDescription = () => {
     switch (activeChart) {
       case 'dcf-waterfall':
-        return 'Shows the contribution of each year\'s cash flows and terminal value to total enterprise value.';
+        return "Shows the contribution of each year's cash flows and terminal value to total enterprise value.";
       case 'cashflow-trend':
         return 'Displays the trend of free cash flows, present values, and key financial metrics over time.';
       case 'sensitivity-tornado':
@@ -306,7 +336,7 @@ const DataVisualization = ({
 
       {/* Chart Type Selector */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-        {chartTypes.map((chart) => {
+        {chartTypes.map(chart => {
           const Icon = chart.icon;
           return (
             <motion.button
@@ -333,16 +363,10 @@ const DataVisualization = ({
           <h4 className="font-semibold text-lg">
             {chartTypes.find(c => c.id === activeChart)?.label}
           </h4>
-          {showDetails && (
-            <span className="text-sm text-gray-500">
-              {getChartDescription()}
-            </span>
-          )}
+          {showDetails && <span className="text-sm text-gray-500">{getChartDescription()}</span>}
         </div>
 
-        <div className="min-h-[400px]">
-          {renderChart()}
-        </div>
+        <div className="min-h-[400px]">{renderChart()}</div>
       </div>
 
       {/* Chart Insights */}
@@ -356,28 +380,28 @@ const DataVisualization = ({
                 <div className="p-4 bg-blue-50 rounded-lg">
                   <div className="text-sm text-blue-600 font-medium">Operations Contribution</div>
                   <div className="text-lg font-bold text-blue-800">
-                    {dcfData?.cumulativePV ?
-                      `${((dcfData.cumulativePV / dcfData.enterpriseValue) * 100).toFixed(1)}%` :
-                      'N/A'
-                    }
+                    {dcfData?.cumulativePV
+                      ? `${((dcfData.cumulativePV / dcfData.enterpriseValue) * 100).toFixed(1)}%`
+                      : 'N/A'}
                   </div>
                 </div>
                 <div className="p-4 bg-purple-50 rounded-lg">
                   <div className="text-sm text-purple-600 font-medium">Terminal Contribution</div>
                   <div className="text-lg font-bold text-purple-800">
-                    {dcfData?.presentValueTerminal ?
-                      `${((dcfData.presentValueTerminal / dcfData.enterpriseValue) * 100).toFixed(1)}%` :
-                      'N/A'
-                    }
+                    {dcfData?.presentValueTerminal
+                      ? `${((dcfData.presentValueTerminal / dcfData.enterpriseValue) * 100).toFixed(1)}%`
+                      : 'N/A'}
                   </div>
                 </div>
                 <div className="p-4 bg-green-50 rounded-lg">
                   <div className="text-sm text-green-600 font-medium">Avg. Annual FCF</div>
                   <div className="text-lg font-bold text-green-800">
-                    {dcfData?.freeCashFlows ?
-                      formatCurrency(dcfData.freeCashFlows.reduce((a, b) => a + b, 0) / dcfData.freeCashFlows.length) :
-                      'N/A'
-                    }
+                    {dcfData?.freeCashFlows
+                      ? formatCurrency(
+                          dcfData.freeCashFlows.reduce((a, b) => a + b, 0) /
+                            dcfData.freeCashFlows.length
+                        )
+                      : 'N/A'}
                   </div>
                 </div>
               </>
@@ -397,7 +421,10 @@ const DataVisualization = ({
                 <div className="p-4 bg-yellow-50 rounded-lg">
                   <div className="text-sm text-yellow-600 font-medium">Medium Risk Variables</div>
                   <div className="text-lg font-bold text-yellow-800">
-                    {sensitivityTornadoData.slice(1, 3).map(v => v.variable).join(', ')}
+                    {sensitivityTornadoData
+                      .slice(1, 3)
+                      .map(v => v.variable)
+                      .join(', ')}
                   </div>
                 </div>
                 <div className="p-4 bg-green-50 rounded-lg">

@@ -250,9 +250,16 @@ class EncryptionService {
 
     // Check for restricted patterns
     const restrictedPatterns = [
-      'ssn', 'social security', 'tax id', 'ein',
-      'bank account', 'routing number', 'credit card',
-      'password', 'secret', 'private key'
+      'ssn',
+      'social security',
+      'tax id',
+      'ein',
+      'bank account',
+      'routing number',
+      'credit card',
+      'password',
+      'secret',
+      'private key'
     ];
 
     if (restrictedPatterns.some(pattern => dataString.includes(pattern))) {
@@ -261,9 +268,15 @@ class EncryptionService {
 
     // Check for confidential patterns
     const confidentialPatterns = [
-      'revenue', 'profit', 'ebitda', 'cash flow',
-      'valuation', 'acquisition', 'merger',
-      'proprietary', 'confidential'
+      'revenue',
+      'profit',
+      'ebitda',
+      'cash flow',
+      'valuation',
+      'acquisition',
+      'merger',
+      'proprietary',
+      'confidential'
     ];
 
     if (confidentialPatterns.some(pattern => dataString.includes(pattern))) {
@@ -288,8 +301,9 @@ class EncryptionService {
 
     const dataClass = classification || this.classifyData(data);
 
-    return dataClass === DATA_CLASSIFICATION.CONFIDENTIAL ||
-           dataClass === DATA_CLASSIFICATION.RESTRICTED;
+    return (
+      dataClass === DATA_CLASSIFICATION.CONFIDENTIAL || dataClass === DATA_CLASSIFICATION.RESTRICTED
+    );
   }
 
   /**

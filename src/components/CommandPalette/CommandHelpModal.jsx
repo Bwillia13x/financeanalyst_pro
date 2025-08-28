@@ -75,7 +75,7 @@ const CommandHelpModal = ({ isOpen, onClose }) => {
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
           transition={{ type: 'spring', duration: 0.3 }}
           className="bg-white rounded-xl shadow-2xl border border-slate-200 w-full max-w-4xl max-h-[90vh] overflow-hidden"
-          onClick={(e) => e.stopPropagation()}
+          onClick={e => e.stopPropagation()}
         >
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-slate-200 bg-slate-50">
@@ -85,7 +85,9 @@ const CommandHelpModal = ({ isOpen, onClose }) => {
               </div>
               <div>
                 <h2 className="text-xl font-semibold text-slate-900">Keyboard Shortcuts</h2>
-                <p className="text-sm text-slate-600">Speed up your workflow with these shortcuts</p>
+                <p className="text-sm text-slate-600">
+                  Speed up your workflow with these shortcuts
+                </p>
               </div>
             </div>
             <button
@@ -157,7 +159,7 @@ const CommandHelpModal = ({ isOpen, onClose }) => {
                     </div>
 
                     <div className="space-y-2">
-                      {shortcuts.map((shortcut) => (
+                      {shortcuts.map(shortcut => (
                         <div
                           key={shortcut.key}
                           className="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-200 hover:bg-slate-100 transition-colors"
@@ -201,11 +203,17 @@ const CommandHelpModal = ({ isOpen, onClose }) => {
                   <ul className="space-y-2 text-sm text-amber-800">
                     <li className="flex items-start gap-2">
                       <span className="w-1.5 h-1.5 bg-amber-500 rounded-full mt-2 flex-shrink-0" />
-                      <span>Use natural language in the command palette: &quot;Create a chart for revenue trends&quot;</span>
+                      <span>
+                        Use natural language in the command palette: &quot;Create a chart for
+                        revenue trends&quot;
+                      </span>
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="w-1.5 h-1.5 bg-amber-500 rounded-full mt-2 flex-shrink-0" />
-                      <span>Cmd+K opens the &quot;Command Palette&quot; learns from your usage and shows relevant suggestions</span>
+                      <span>
+                        Cmd+K opens the &quot;Command Palette&quot; learns from your usage and shows
+                        relevant suggestions
+                      </span>
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="w-1.5 h-1.5 bg-amber-500 rounded-full mt-2 flex-shrink-0" />
@@ -224,7 +232,9 @@ const CommandHelpModal = ({ isOpen, onClose }) => {
           {/* Footer */}
           <div className="flex items-center justify-between px-6 py-4 bg-slate-50 border-t border-slate-200">
             <div className="text-sm text-slate-600">
-              Press <kbd className="px-2 py-1 bg-white border border-slate-300 rounded text-xs">Esc</kbd> to close
+              Press{' '}
+              <kbd className="px-2 py-1 bg-white border border-slate-300 rounded text-xs">Esc</kbd>{' '}
+              to close
             </div>
             <div className="text-sm text-slate-500">
               {Object.values(shortcutCategories).flat().length} shortcuts available

@@ -18,7 +18,18 @@ export class DataVisualizationService {
     const themes = {
       professional: {
         colors: {
-          primary: ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf'],
+          primary: [
+            '#1f77b4',
+            '#ff7f0e',
+            '#2ca02c',
+            '#d62728',
+            '#9467bd',
+            '#8c564b',
+            '#e377c2',
+            '#7f7f7f',
+            '#bcbd22',
+            '#17becf'
+          ],
           sequential: d3.schemeBlues[9],
           diverging: d3.schemeRdYlBu[11],
           categorical: d3.schemeCategory10
@@ -42,7 +53,18 @@ export class DataVisualizationService {
       },
       dark: {
         colors: {
-          primary: ['#8dd3c7', '#ffffb3', '#bebada', '#fb8072', '#80b1d3', '#fdb462', '#b3de69', '#fccde5', '#d9d9d9', '#bc80bd'],
+          primary: [
+            '#8dd3c7',
+            '#ffffb3',
+            '#bebada',
+            '#fb8072',
+            '#80b1d3',
+            '#fdb462',
+            '#b3de69',
+            '#fccde5',
+            '#d9d9d9',
+            '#bc80bd'
+          ],
           sequential: d3.schemeGreys[9],
           diverging: d3.schemePRGn[11],
           categorical: d3.schemeSet3
@@ -66,7 +88,16 @@ export class DataVisualizationService {
       },
       financial: {
         colors: {
-          primary: ['#2E86AB', '#A23B72', '#F18F01', '#C73E1D', '#592E83', '#A8DADC', '#457B9D', '#1D3557'],
+          primary: [
+            '#2E86AB',
+            '#A23B72',
+            '#F18F01',
+            '#C73E1D',
+            '#592E83',
+            '#A8DADC',
+            '#457B9D',
+            '#1D3557'
+          ],
           sequential: d3.schemeGreens[9],
           diverging: d3.schemeRdBu[11],
           categorical: ['#2E86AB', '#A23B72', '#F18F01', '#C73E1D', '#592E83']
@@ -179,13 +210,15 @@ export class DataVisualizationService {
     }
 
     // Handle single series
-    return [{
-      name: 'Series 1',
-      values: data.map(d => ({
-        date: new Date(d.date),
-        value: +d.value
-      }))
-    }];
+    return [
+      {
+        name: 'Series 1',
+        values: data.map(d => ({
+          date: new Date(d.date),
+          value: +d.value
+        }))
+      }
+    ];
   }
 
   renderAdvancedLineChart(chart) {
@@ -203,26 +236,39 @@ export class DataVisualizationService {
       .attr('height', height)
       .style('background-color', chart.theme.style.backgroundColor);
 
-    const g = svg.append('g')
-      .attr('transform', `translate(${margin.left},${margin.top})`);
+    const g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`);
 
     // Scales
-    const xScale = d3.scaleTime()
-      .domain(d3.extent(chart.data.flatMap(d => d.values), d => d.date))
+    const xScale = d3
+      .scaleTime()
+      .domain(
+        d3.extent(
+          chart.data.flatMap(d => d.values),
+          d => d.date
+        )
+      )
       .range([0, innerWidth]);
 
-    const yScale = d3.scaleLinear()
-      .domain(d3.extent(chart.data.flatMap(d => d.values), d => d.value))
+    const yScale = d3
+      .scaleLinear()
+      .domain(
+        d3.extent(
+          chart.data.flatMap(d => d.values),
+          d => d.value
+        )
+      )
       .nice()
       .range([innerHeight, 0]);
 
     // Color scale
-    const colorScale = d3.scaleOrdinal()
+    const colorScale = d3
+      .scaleOrdinal()
       .domain(chart.data.map(d => d.name))
       .range(chart.theme.colors.primary);
 
     // Line generator
-    const line = d3.line()
+    const line = d3
+      .line()
       .x(d => xScale(d.date))
       .y(d => yScale(d.value))
       .curve(d3[chart.config.interpolation] || d3.curveMonotoneX);
@@ -236,7 +282,8 @@ export class DataVisualizationService {
     this.addAxes(g, xScale, yScale, innerWidth, innerHeight, chart.config, chart.theme);
 
     // Lines and areas
-    const seriesGroups = g.selectAll('.series')
+    const seriesGroups = g
+      .selectAll('.series')
       .data(chart.data)
       .enter()
       .append('g')
@@ -254,7 +301,8 @@ export class DataVisualizationService {
 
     // Add markers
     if (chart.config.markers) {
-      seriesGroups.selectAll('.marker')
+      seriesGroups
+        .selectAll('.marker')
         .data(d => d.values)
         .enter()
         .append('circle')
@@ -330,7 +378,9 @@ export class DataVisualizationService {
 
     return data.map(d => ({
       ...d,
-      values: Array.isArray(d.values) ? d.values.map(v => ({ ...v, value: +v.value })) : [{ category: d.category, value: +d.value }]
+      values: Array.isArray(d.values)
+        ? d.values.map(v => ({ ...v, value: +v.value }))
+        : [{ category: d.category, value: +d.value }]
     }));
   }
 
@@ -349,8 +399,7 @@ export class DataVisualizationService {
       .attr('height', height)
       .style('background-color', chart.theme.style.backgroundColor);
 
-    const g = svg.append('g')
-      .attr('transform', `translate(${margin.left},${margin.top})`);
+    const g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`);
 
     // Process data for stacking if needed
     let processedData = chart.data;
@@ -364,30 +413,32 @@ export class DataVisualizationService {
 
     let xScale, yScale;
     if (orientation === 'vertical') {
-      xScale = d3.scaleBand()
+      xScale = d3
+        .scaleBand()
         .domain(categories)
         .range([0, innerWidth])
         .padding(chart.config.groupPadding);
 
-      yScale = d3.scaleLinear()
+      yScale = d3
+        .scaleLinear()
         .domain([0, d3.max(processedData.flatMap(d => d.values.map(v => v.y1 || v.value)))])
         .nice()
         .range([innerHeight, 0]);
     } else {
-      xScale = d3.scaleLinear()
+      xScale = d3
+        .scaleLinear()
         .domain([0, d3.max(processedData.flatMap(d => d.values.map(v => v.y1 || v.value)))])
         .nice()
         .range([0, innerWidth]);
 
-      yScale = d3.scaleBand()
+      yScale = d3
+        .scaleBand()
         .domain(categories)
         .range([0, innerHeight])
         .padding(chart.config.groupPadding);
     }
 
-    const colorScale = d3.scaleOrdinal()
-      .domain(series)
-      .range(chart.theme.colors.primary);
+    const colorScale = d3.scaleOrdinal().domain(series).range(chart.theme.colors.primary);
 
     // Grid
     if (chart.config.showGrid) {
@@ -448,7 +499,7 @@ export class DataVisualizationService {
         processed.push({
           row: i,
           col: j,
-          value: value,
+          value,
           rowLabel: data.rowLabels?.[i] || `Row ${i}`,
           colLabel: data.colLabels?.[j] || `Col ${j}`
         });
@@ -472,8 +523,7 @@ export class DataVisualizationService {
       .attr('height', height)
       .style('background-color', chart.theme.style.backgroundColor);
 
-    const g = svg.append('g')
-      .attr('transform', `translate(${margin.left},${margin.top})`);
+    const g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`);
 
     // Dimensions
     const numRows = Math.max(...chart.data.map(d => d.row)) + 1;
@@ -482,12 +532,14 @@ export class DataVisualizationService {
     const cellHeight = innerHeight / numRows;
 
     // Color scale
-    const colorScale = d3.scaleSequential()
+    const colorScale = d3
+      .scaleSequential()
       .domain(d3.extent(chart.data, d => d.value))
       .interpolator(d3[`interpolate${chart.config.colorScheme}`]);
 
     // Cells
-    const cells = g.selectAll('.cell')
+    const cells = g
+      .selectAll('.cell')
       .data(chart.data)
       .enter()
       .append('rect')
@@ -511,7 +563,7 @@ export class DataVisualizationService {
         .attr('text-anchor', 'middle')
         .attr('dy', '0.35em')
         .style('font-size', Math.min(cellWidth, cellHeight) * 0.2)
-        .style('fill', d => d3.lab(colorScale(d.value)).l > 50 ? '#000' : '#fff')
+        .style('fill', d => (d3.lab(colorScale(d.value)).l > 50 ? '#000' : '#fff'))
         .text(d => d3.format('.2f')(d.value));
     }
 
@@ -554,6 +606,65 @@ export class DataVisualizationService {
     return chart.id;
   }
 
+  processScatterData(data) {
+    // Placeholder implementation for scatter plot data processing
+    if (!Array.isArray(data) || data.length === 0) return [];
+
+    return data.map(d => ({
+      ...d,
+      x: +d.x || 0,
+      y: +d.y || 0,
+      size: +d.size || 5,
+      category: d.category || 'default'
+    }));
+  }
+
+  renderScatterPlot(chart) {
+    // Placeholder implementation for scatter plot rendering
+    const container = d3.select(`#${chart.containerId}`);
+    container.selectAll('*').remove();
+
+    const svg = container
+      .append('svg')
+      .attr('width', chart.config.width)
+      .attr('height', chart.config.height)
+      .style('background-color', chart.theme.style.backgroundColor);
+
+    // Add placeholder text
+    svg
+      .append('text')
+      .attr('x', chart.config.width / 2)
+      .attr('y', chart.config.height / 2)
+      .attr('text-anchor', 'middle')
+      .style('font-family', chart.theme.typography.fontFamily)
+      .style('font-size', '16px')
+      .style('fill', chart.theme.style.axisColor)
+      .text('Scatter plot rendering - placeholder implementation');
+  }
+
+  renderFinancialDashboard(chart) {
+    // Placeholder implementation for financial dashboard rendering
+    const container = d3.select(`#${chart.containerId}`);
+    container.selectAll('*').remove();
+
+    const svg = container
+      .append('svg')
+      .attr('width', chart.config.width || 800)
+      .attr('height', chart.config.height || 600)
+      .style('background-color', chart.theme.style.backgroundColor);
+
+    // Add placeholder text
+    svg
+      .append('text')
+      .attr('x', (chart.config.width || 800) / 2)
+      .attr('y', (chart.config.height || 600) / 2)
+      .attr('text-anchor', 'middle')
+      .style('font-family', chart.theme.typography.fontFamily)
+      .style('font-size', '16px')
+      .style('fill', chart.theme.style.axisColor)
+      .text('Financial dashboard rendering - placeholder implementation');
+  }
+
   // Interactive Financial Dashboard Components
   createFinancialDashboard(containerId, data, config = {}) {
     const dashboard = {
@@ -561,7 +672,7 @@ export class DataVisualizationService {
       type: 'financial_dashboard',
       containerId,
       config: { theme: 'financial', ...config },
-      data: data,
+      data,
       components: []
     };
 
@@ -609,29 +720,30 @@ export class DataVisualizationService {
   }
 
   addAxes(g, xScale, yScale, width, height, config, theme) {
-    const xAxis = g.append('g')
+    const xAxis = g
+      .append('g')
       .attr('class', 'x-axis')
       .attr('transform', `translate(0,${height})`)
       .call(d3.axisBottom(xScale));
 
-    const yAxis = g.append('g')
-      .attr('class', 'y-axis')
-      .call(d3.axisLeft(yScale));
+    const yAxis = g.append('g').attr('class', 'y-axis').call(d3.axisLeft(yScale));
 
     // Style axes
     [xAxis, yAxis].forEach(axis => {
-      axis.selectAll('text')
+      axis
+        .selectAll('text')
         .style('font-family', theme.typography.fontFamily)
         .style('font-size', theme.typography.tickSize)
         .style('fill', theme.style.axisColor);
 
-      axis.selectAll('line, path')
-        .style('stroke', theme.style.axisColor);
+      axis.selectAll('line, path').style('stroke', theme.style.axisColor);
     });
   }
 
-  addTooltip(chart, g, xScale, yScale, colorScale) {
-    const tooltip = d3.select('body').append('div')
+  addTooltip(chart, g, xScale, yScale, _colorScale) {
+    const tooltip = d3
+      .select('body')
+      .append('div')
       .attr('class', 'chart-tooltip')
       .style('opacity', 0)
       .style('position', 'absolute')
@@ -650,18 +762,17 @@ export class DataVisualizationService {
       .attr('height', yScale.range()[0])
       .style('fill', 'none')
       .style('pointer-events', 'all')
-      .on('mousemove', (event) => {
+      .on('mousemove', event => {
         const [mouseX] = d3.pointer(event);
         const date = xScale.invert(mouseX);
-        
+
         // Find closest data point
         const closestData = this.findClosestDataPoint(chart.data, date);
         if (closestData) {
           tooltip
             .style('opacity', 1)
-            .style('left', (event.pageX + 10) + 'px')
-            .style('top', (event.pageY - 10) + 'px')
-            .html(`
+            .style('left', event.pageX + 10 + 'px')
+            .style('top', event.pageY - 10 + 'px').html(`
               <strong>${closestData.series}</strong><br/>
               Date: ${d3.timeFormat('%Y-%m-%d')(closestData.date)}<br/>
               Value: ${d3.format(',.2f')(closestData.value)}
@@ -674,23 +785,23 @@ export class DataVisualizationService {
   }
 
   addLegend(chart, svg, colorScale) {
-    const legend = svg.append('g')
+    const legend = svg
+      .append('g')
       .attr('class', 'legend')
       .attr('transform', `translate(${chart.config.width - 120}, 20)`);
 
-    const legendItems = legend.selectAll('.legend-item')
+    const legendItems = legend
+      .selectAll('.legend-item')
       .data(colorScale.domain())
       .enter()
       .append('g')
       .attr('class', 'legend-item')
       .attr('transform', (d, i) => `translate(0, ${i * 20})`);
 
-    legendItems.append('rect')
-      .attr('width', 12)
-      .attr('height', 12)
-      .attr('fill', colorScale);
+    legendItems.append('rect').attr('width', 12).attr('height', 12).attr('fill', colorScale);
 
-    legendItems.append('text')
+    legendItems
+      .append('text')
       .attr('x', 18)
       .attr('y', 6)
       .attr('dy', '0.35em')
@@ -709,10 +820,10 @@ export class DataVisualizationService {
 
   async processRenderQueue() {
     this.isProcessingQueue = true;
-    
+
     while (this.renderQueue.length > 0) {
       const chart = this.renderQueue.shift();
-      
+
       try {
         switch (chart.type) {
           case 'advanced_line':
@@ -731,15 +842,14 @@ export class DataVisualizationService {
             this.renderFinancialDashboard(chart);
             break;
         }
-        
+
         // Small delay to prevent blocking the UI
         await new Promise(resolve => setTimeout(resolve, 16));
-        
       } catch (error) {
         console.error(`Error rendering chart ${chart.id}:`, error);
       }
     }
-    
+
     this.isProcessingQueue = false;
   }
 

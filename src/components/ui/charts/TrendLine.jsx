@@ -9,7 +9,7 @@ const TrendLine = ({
   className,
   title = 'Growth Trend Analysis',
   dataKey = 'value',
-  formatValue = (value) => `${value.toFixed(1)}%`,
+  formatValue = value => `${value.toFixed(1)}%`,
   showGrowthRate = true
 }) => {
   // Calculate period-over-period growth
@@ -29,7 +29,7 @@ const TrendLine = ({
   const overallGrowth = firstValue !== 0 ? ((lastValue - firstValue) / firstValue) * 100 : 0;
   const isPositiveTrend = overallGrowth >= 0;
 
-  const CustomDot = (props) => {
+  const CustomDot = props => {
     const { payload, cx, cy } = props;
     if (!payload) return null;
 
@@ -64,7 +64,8 @@ const TrendLine = ({
                 data.growth >= 0 ? 'text-success' : 'text-destructive'
               )}
             >
-              {data.growth >= 0 ? '+' : ''}{data.growth.toFixed(1)}%
+              {data.growth >= 0 ? '+' : ''}
+              {data.growth.toFixed(1)}%
             </span>
           </p>
         )}
@@ -86,7 +87,8 @@ const TrendLine = ({
                   isPositiveTrend ? 'text-success' : 'text-destructive'
                 )}
               >
-                {isPositiveTrend ? '+' : ''}{overallGrowth.toFixed(1)}%
+                {isPositiveTrend ? '+' : ''}
+                {overallGrowth.toFixed(1)}%
               </p>
             </div>
           )}
@@ -95,10 +97,7 @@ const TrendLine = ({
       <CardContent className="pt-0">
         <div className="h-80 w-full">
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart
-              data={processedData}
-              margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
-            >
+            <LineChart data={processedData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
               <XAxis
                 dataKey="period"
                 axisLine={false}
@@ -152,7 +151,8 @@ const TrendLine = ({
                 isPositiveTrend ? 'text-success' : 'text-destructive'
               )}
             >
-              {isPositiveTrend ? '+' : ''}{overallGrowth.toFixed(1)}%
+              {isPositiveTrend ? '+' : ''}
+              {overallGrowth.toFixed(1)}%
             </p>
           </div>
         </div>

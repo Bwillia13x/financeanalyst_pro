@@ -1,5 +1,14 @@
 import { motion } from 'framer-motion';
-import { Users, TrendingUp, BarChart3, Plus, Search, DollarSign, Target, Filter } from 'lucide-react';
+import {
+  Users,
+  TrendingUp,
+  BarChart3,
+  Plus,
+  Search,
+  DollarSign,
+  Target,
+  Filter
+} from 'lucide-react';
 import React, { useState, useMemo } from 'react';
 
 const ComparableAnalysis = ({ data, formatCurrency, formatPercent: _formatPercent }) => {
@@ -85,7 +94,7 @@ const ComparableAnalysis = ({ data, formatCurrency, formatPercent: _formatPercen
   const marketStats = useMemo(() => {
     const multiples = comparableMultiples.map(c => c.multiples);
 
-    const calculateStats = (values) => ({
+    const calculateStats = values => ({
       mean: values.reduce((a, b) => a + b, 0) / values.length,
       median: values.sort((a, b) => a - b)[Math.floor(values.length / 2)],
       min: Math.min(...values),
@@ -139,7 +148,7 @@ const ComparableAnalysis = ({ data, formatCurrency, formatPercent: _formatPercen
     market_cap_revenue: { name: 'Market Cap/Revenue', description: 'Market Cap / Revenue' }
   };
 
-  const addComparableCompany = (companyData) => {
+  const addComparableCompany = companyData => {
     const newCompany = {
       id: Date.now(),
       ...companyData,
@@ -155,7 +164,7 @@ const ComparableAnalysis = ({ data, formatCurrency, formatPercent: _formatPercen
     setShowAddComp(false);
   };
 
-  const removeComparable = (id) => {
+  const removeComparable = id => {
     setComparableCompanies(comparableCompanies.filter(comp => comp.id !== id));
   };
 
@@ -202,9 +211,7 @@ const ComparableAnalysis = ({ data, formatCurrency, formatPercent: _formatPercen
           <div className="text-2xl font-bold text-blue-800">
             {marketStats.ev_revenue.median.toFixed(1)}x
           </div>
-          <div className="text-sm text-blue-600 mt-1">
-            Median multiple
-          </div>
+          <div className="text-sm text-blue-600 mt-1">Median multiple</div>
         </motion.div>
 
         <motion.div
@@ -218,9 +225,7 @@ const ComparableAnalysis = ({ data, formatCurrency, formatPercent: _formatPercen
           <div className="text-2xl font-bold text-green-800">
             {formatCurrency(impliedValuation.ev_revenue.median)}
           </div>
-          <div className="text-sm text-green-600 mt-1">
-            EV/Revenue basis
-          </div>
+          <div className="text-sm text-green-600 mt-1">EV/Revenue basis</div>
         </motion.div>
 
         <motion.div
@@ -232,11 +237,10 @@ const ComparableAnalysis = ({ data, formatCurrency, formatPercent: _formatPercen
             <span className="text-xs text-purple-600 font-medium">VALUATION RANGE</span>
           </div>
           <div className="text-lg font-bold text-purple-800">
-            {formatCurrency(impliedValuation.ev_revenue.p25)} - {formatCurrency(impliedValuation.ev_revenue.p75)}
+            {formatCurrency(impliedValuation.ev_revenue.p25)} -{' '}
+            {formatCurrency(impliedValuation.ev_revenue.p75)}
           </div>
-          <div className="text-sm text-purple-600 mt-1">
-            25th - 75th percentile
-          </div>
+          <div className="text-sm text-purple-600 mt-1">25th - 75th percentile</div>
         </motion.div>
 
         <motion.div
@@ -247,18 +251,14 @@ const ComparableAnalysis = ({ data, formatCurrency, formatPercent: _formatPercen
             <Users size={20} className="text-orange-600" />
             <span className="text-xs text-orange-600 font-medium">PEER COUNT</span>
           </div>
-          <div className="text-2xl font-bold text-orange-800">
-            {comparableCompanies.length}
-          </div>
-          <div className="text-sm text-orange-600 mt-1">
-            Comparable companies
-          </div>
+          <div className="text-2xl font-bold text-orange-800">{comparableCompanies.length}</div>
+          <div className="text-sm text-orange-600 mt-1">Comparable companies</div>
         </motion.div>
       </div>
 
       {/* Tab Navigation */}
       <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg">
-        {tabs.map((tab) => {
+        {tabs.map(tab => {
           const Icon = tab.icon;
           return (
             <button
@@ -285,11 +285,13 @@ const ComparableAnalysis = ({ data, formatCurrency, formatPercent: _formatPercen
               <h4 className="font-semibold text-lg">Trading Multiples Analysis</h4>
               <select
                 value={selectedMultiple}
-                onChange={(e) => setSelectedMultiple(e.target.value)}
+                onChange={e => setSelectedMultiple(e.target.value)}
                 className="px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 {Object.entries(multipleDefinitions).map(([key, def]) => (
-                  <option key={key} value={key}>{def.name}</option>
+                  <option key={key} value={key}>
+                    {def.name}
+                  </option>
                 ))}
               </select>
             </div>
@@ -319,9 +321,15 @@ const ComparableAnalysis = ({ data, formatCurrency, formatPercent: _formatPercen
                       <td className="p-3 text-right">{formatCurrency(comp.marketCap)}</td>
                       <td className="p-3 text-right">{formatCurrency(comp.enterpriseValue)}</td>
                       <td className="p-3 text-right">{formatCurrency(comp.revenue)}</td>
-                      <td className="p-3 text-right font-medium">{comp.multiples.ev_revenue.toFixed(1)}x</td>
-                      <td className="p-3 text-right font-medium">{comp.multiples.ev_ebitda.toFixed(1)}x</td>
-                      <td className="p-3 text-right font-medium">{comp.multiples.pe_ratio.toFixed(1)}x</td>
+                      <td className="p-3 text-right font-medium">
+                        {comp.multiples.ev_revenue.toFixed(1)}x
+                      </td>
+                      <td className="p-3 text-right font-medium">
+                        {comp.multiples.ev_ebitda.toFixed(1)}x
+                      </td>
+                      <td className="p-3 text-right font-medium">
+                        {comp.multiples.pe_ratio.toFixed(1)}x
+                      </td>
                     </tr>
                   ))}
 
@@ -344,26 +352,28 @@ const ComparableAnalysis = ({ data, formatCurrency, formatPercent: _formatPercen
               <div className="p-4 bg-gray-50 rounded-lg">
                 <h6 className="font-medium mb-3">Multiple Distribution</h6>
                 <div className="space-y-3">
-                  {Object.entries(marketStats).slice(0, 3).map(([key, stats]) => (
-                    <div key={key}>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span>{multipleDefinitions[key].name}</span>
-                        <span className="font-medium">{stats.median.toFixed(1)}x</span>
+                  {Object.entries(marketStats)
+                    .slice(0, 3)
+                    .map(([key, stats]) => (
+                      <div key={key}>
+                        <div className="flex justify-between text-sm mb-1">
+                          <span>{multipleDefinitions[key].name}</span>
+                          <span className="font-medium">{stats.median.toFixed(1)}x</span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div
+                            className="bg-blue-500 h-2 rounded-full"
+                            style={{
+                              width: `${((stats.median - stats.min) / (stats.max - stats.min)) * 100}%`
+                            }}
+                          />
+                        </div>
+                        <div className="flex justify-between text-xs text-gray-500 mt-1">
+                          <span>{stats.min.toFixed(1)}x</span>
+                          <span>{stats.max.toFixed(1)}x</span>
+                        </div>
                       </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div
-                          className="bg-blue-500 h-2 rounded-full"
-                          style={{
-                            width: `${((stats.median - stats.min) / (stats.max - stats.min)) * 100}%`
-                          }}
-                        />
-                      </div>
-                      <div className="flex justify-between text-xs text-gray-500 mt-1">
-                        <span>{stats.min.toFixed(1)}x</span>
-                        <span>{stats.max.toFixed(1)}x</span>
-                      </div>
-                    </div>
-                  ))}
+                    ))}
                 </div>
               </div>
 
@@ -376,15 +386,32 @@ const ComparableAnalysis = ({ data, formatCurrency, formatPercent: _formatPercen
                   </div>
                   <div className="flex justify-between">
                     <span>Median Market Cap:</span>
-                    <span className="font-medium">{formatCurrency(comparableCompanies.sort((a, b) => a.marketCap - b.marketCap)[Math.floor(comparableCompanies.length / 2)]?.marketCap || 0)}</span>
+                    <span className="font-medium">
+                      {formatCurrency(
+                        comparableCompanies.sort((a, b) => a.marketCap - b.marketCap)[
+                          Math.floor(comparableCompanies.length / 2)
+                        ]?.marketCap || 0
+                      )}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span>Median Revenue:</span>
-                    <span className="font-medium">{formatCurrency(comparableCompanies.sort((a, b) => a.revenue - b.revenue)[Math.floor(comparableCompanies.length / 2)]?.revenue || 0)}</span>
+                    <span className="font-medium">
+                      {formatCurrency(
+                        comparableCompanies.sort((a, b) => a.revenue - b.revenue)[
+                          Math.floor(comparableCompanies.length / 2)
+                        ]?.revenue || 0
+                      )}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span>Avg Founded Year:</span>
-                    <span className="font-medium">{Math.round(comparableCompanies.reduce((sum, c) => sum + c.founded, 0) / comparableCompanies.length)}</span>
+                    <span className="font-medium">
+                      {Math.round(
+                        comparableCompanies.reduce((sum, c) => sum + c.founded, 0) /
+                          comparableCompanies.length
+                      )}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -416,7 +443,9 @@ const ComparableAnalysis = ({ data, formatCurrency, formatPercent: _formatPercen
                         </div>
                         <div className="flex justify-between">
                           <span>Median:</span>
-                          <span className="font-bold text-blue-600">{formatCurrency(values.median)}</span>
+                          <span className="font-bold text-blue-600">
+                            {formatCurrency(values.median)}
+                          </span>
                         </div>
                         <div className="flex justify-between">
                           <span>75th Percentile:</span>
@@ -438,18 +467,30 @@ const ComparableAnalysis = ({ data, formatCurrency, formatPercent: _formatPercen
                 <div className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
                   <div className="space-y-4">
                     <div>
-                      <div className="text-sm text-blue-600 font-medium mb-1">Recommended Range</div>
+                      <div className="text-sm text-blue-600 font-medium mb-1">
+                        Recommended Range
+                      </div>
                       <div className="text-2xl font-bold text-blue-800">
-                        {formatCurrency((impliedValuation.ev_revenue.p25 + impliedValuation.ev_ebitda.p25) / 2)} -
-                        {formatCurrency((impliedValuation.ev_revenue.p75 + impliedValuation.ev_ebitda.p75) / 2)}
+                        {formatCurrency(
+                          (impliedValuation.ev_revenue.p25 + impliedValuation.ev_ebitda.p25) / 2
+                        )}{' '}
+                        -
+                        {formatCurrency(
+                          (impliedValuation.ev_revenue.p75 + impliedValuation.ev_ebitda.p75) / 2
+                        )}
                       </div>
                       <div className="text-sm text-blue-600">Blended 25th-75th percentile</div>
                     </div>
 
                     <div>
-                      <div className="text-sm text-blue-600 font-medium mb-1">Midpoint Valuation</div>
+                      <div className="text-sm text-blue-600 font-medium mb-1">
+                        Midpoint Valuation
+                      </div>
                       <div className="text-xl font-bold text-blue-800">
-                        {formatCurrency((impliedValuation.ev_revenue.median + impliedValuation.ev_ebitda.median) / 2)}
+                        {formatCurrency(
+                          (impliedValuation.ev_revenue.median + impliedValuation.ev_ebitda.median) /
+                            2
+                        )}
                       </div>
                       <div className="text-sm text-blue-600">Average of median multiples</div>
                     </div>
@@ -496,7 +537,7 @@ const ComparableAnalysis = ({ data, formatCurrency, formatPercent: _formatPercen
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              {comparableCompanies.map((comp) => (
+              {comparableCompanies.map(comp => (
                 <motion.div
                   key={comp.id}
                   className="border rounded-lg p-4 hover:shadow-lg transition-shadow"
@@ -505,7 +546,9 @@ const ComparableAnalysis = ({ data, formatCurrency, formatPercent: _formatPercen
                   <div className="flex justify-between items-start mb-3">
                     <div>
                       <h6 className="font-semibold text-gray-800">{comp.name}</h6>
-                      <div className="text-sm text-gray-500">{comp.ticker} • {comp.geography}</div>
+                      <div className="text-sm text-gray-500">
+                        {comp.ticker} • {comp.geography}
+                      </div>
                     </div>
                     <button
                       onClick={() => removeComparable(comp.id)}
@@ -526,7 +569,9 @@ const ComparableAnalysis = ({ data, formatCurrency, formatPercent: _formatPercen
                     </div>
                     <div className="flex justify-between">
                       <span>EV/Revenue:</span>
-                      <span className="font-medium">{(comp.enterpriseValue / comp.revenue).toFixed(1)}x</span>
+                      <span className="font-medium">
+                        {(comp.enterpriseValue / comp.revenue).toFixed(1)}x
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span>Founded:</span>
@@ -550,7 +595,7 @@ const ComparableAnalysis = ({ data, formatCurrency, formatPercent: _formatPercen
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
             <h4 className="font-semibold text-lg mb-4">Add Comparable Company</h4>
             <form
-              onSubmit={(e) => {
+              onSubmit={e => {
                 e.preventDefault();
                 const formData = new FormData(e.target);
                 addComparableCompany(Object.fromEntries(formData));
@@ -558,24 +603,40 @@ const ComparableAnalysis = ({ data, formatCurrency, formatPercent: _formatPercen
             >
               <div className="space-y-4">
                 <div>
-                  <label htmlFor="company-name" className="block text-sm font-medium text-gray-700 mb-1">Company Name</label>
+                  <label
+                    htmlFor="company-name"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Company Name
+                  </label>
                   <input
                     id="company-name"
-                    name="name" type="text" required
+                    name="name"
+                    type="text"
+                    required
                     className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
                 <div>
-                  <label htmlFor="ticker" className="block text-sm font-medium text-gray-700 mb-1">Ticker</label>
+                  <label htmlFor="ticker" className="block text-sm font-medium text-gray-700 mb-1">
+                    Ticker
+                  </label>
                   <input
                     id="ticker"
-                    name="ticker" type="text" required
+                    name="ticker"
+                    type="text"
+                    required
                     className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label htmlFor="marketCap" className="block text-sm font-medium text-gray-700 mb-1">Market Cap ($000s)</label>
+                    <label
+                      htmlFor="marketCap"
+                      className="block text-sm font-medium text-gray-700 mb-1"
+                    >
+                      Market Cap ($000s)
+                    </label>
                     <input
                       id="marketCap"
                       name="marketCap"
@@ -585,7 +646,12 @@ const ComparableAnalysis = ({ data, formatCurrency, formatPercent: _formatPercen
                     />
                   </div>
                   <div>
-                    <label htmlFor="enterpriseValue" className="block text-sm font-medium text-gray-700 mb-1">Enterprise Value ($000s)</label>
+                    <label
+                      htmlFor="enterpriseValue"
+                      className="block text-sm font-medium text-gray-700 mb-1"
+                    >
+                      Enterprise Value ($000s)
+                    </label>
                     <input
                       id="enterpriseValue"
                       name="enterpriseValue"
@@ -597,7 +663,12 @@ const ComparableAnalysis = ({ data, formatCurrency, formatPercent: _formatPercen
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label htmlFor="revenue" className="block text-sm font-medium text-gray-700 mb-1">Revenue ($000s)</label>
+                    <label
+                      htmlFor="revenue"
+                      className="block text-sm font-medium text-gray-700 mb-1"
+                    >
+                      Revenue ($000s)
+                    </label>
                     <input
                       id="revenue"
                       name="revenue"
@@ -607,7 +678,12 @@ const ComparableAnalysis = ({ data, formatCurrency, formatPercent: _formatPercen
                     />
                   </div>
                   <div>
-                    <label htmlFor="ebitda" className="block text-sm font-medium text-gray-700 mb-1">EBITDA ($000s)</label>
+                    <label
+                      htmlFor="ebitda"
+                      className="block text-sm font-medium text-gray-700 mb-1"
+                    >
+                      EBITDA ($000s)
+                    </label>
                     <input
                       id="ebitda"
                       name="ebitda"
@@ -618,7 +694,12 @@ const ComparableAnalysis = ({ data, formatCurrency, formatPercent: _formatPercen
                   </div>
                 </div>
                 <div>
-                  <label htmlFor="businessModel" className="block text-sm font-medium text-gray-700 mb-1">Business Model</label>
+                  <label
+                    htmlFor="businessModel"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Business Model
+                  </label>
                   <input
                     id="businessModel"
                     name="businessModel"
@@ -630,7 +711,10 @@ const ComparableAnalysis = ({ data, formatCurrency, formatPercent: _formatPercen
               </div>
 
               <div className="flex gap-3 mt-6">
-                <button type="submit" className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                <button
+                  type="submit"
+                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
                   Add Company
                 </button>
                 <button

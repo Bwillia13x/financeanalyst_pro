@@ -45,7 +45,7 @@ class ReactiveCalculationEngine {
 
     return {
       updateInput: (path, value) => this.updateModelInput(modelId, path, value),
-      updateInputs: (updates) => this.updateModelInputs(modelId, updates),
+      updateInputs: updates => this.updateModelInputs(modelId, updates),
       getResult: () => model.result,
       destroy: () => this.destroyModel(modelId),
       addDependency: (dataType, symbol) => this.addModelDependency(modelId, dataType, symbol)
@@ -93,7 +93,7 @@ class ReactiveCalculationEngine {
     model.dependencies.add(dependencyKey);
 
     // Subscribe to real-time updates
-    const unsubscribe = realTimeDataService.subscribe(dataType, symbol, (data) => {
+    const unsubscribe = realTimeDataService.subscribe(dataType, symbol, data => {
       this.handleRealTimeUpdate(modelId, dataType, symbol, data);
     });
 
@@ -196,7 +196,6 @@ class ReactiveCalculationEngine {
       if (model.callback && typeof model.callback === 'function') {
         model.callback(result, model.inputs);
       }
-
     } catch (error) {
       console.error(`Error calculating model ${model.id}:`, error);
 

@@ -68,7 +68,7 @@ const insights = await aiInsightsService.generateInsights(financialData);
 const {
   recommendations,  // Array of strategic recommendations
   risks,           // Array of identified risks
-  opportunities,   // Array of growth opportunities  
+  opportunities,   // Array of growth opportunities
   keyMetrics,      // Important financial ratios
   confidence,      // Confidence score (0-1)
   methodology      // Analysis methodology used
@@ -156,7 +156,7 @@ const chart = visualizationService.createVisualization({
 });
 ```
 
-### Analytics Service API  
+### Analytics Service API
 
 ```javascript
 import analyticsService from '../services/analyticsService';
@@ -198,7 +198,7 @@ import { useCachedData } from '../hooks/usePerformanceOptimizer';
 
 const { data, loading, error } = useCachedData(
   'financial_data',
-  'AAPL_2023', 
+  'AAPL_2023',
   () => fetchFinancialData('AAPL', '2023')
 );
 ```
@@ -274,7 +274,7 @@ const reportConfig = {
   theme: 'professional',
   sections: [
     'cover_page',
-    'executive_summary', 
+    'executive_summary',
     'financial_overview',
     'valuation_analysis',
     'risk_assessment',
@@ -309,7 +309,7 @@ const dashboardLayout = {
     },
     {
       id: 'metrics_table',
-      type: 'table', 
+      type: 'table',
       x: 6, y: 0, w: 6, h: 3,
       config: {
         title: 'Key Metrics',
@@ -367,7 +367,7 @@ const securityPolicies = {
 // Core Web Vitals thresholds
 const webVitalsThresholds = {
   lcp: 2500,    // Largest Contentful Paint (ms)
-  fid: 100,     // First Input Delay (ms)  
+  fid: 100,     // First Input Delay (ms)
   cls: 0.1      // Cumulative Layout Shift
 };
 

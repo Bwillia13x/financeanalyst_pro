@@ -3,8 +3,9 @@
  * Real-time event delivery system for API ecosystem integration
  */
 
-const EventEmitter = require('events');
 const crypto = require('crypto');
+const EventEmitter = require('events');
+
 const axios = require('axios');
 
 class WebhookService extends EventEmitter {
@@ -15,34 +16,34 @@ class WebhookService extends EventEmitter {
     this.maxRetries = 3;
     this.retryDelays = [1000, 5000, 15000]; // 1s, 5s, 15s
     this.deliveryTimeout = 30000; // 30 seconds
-    
+
     this.eventTypes = {
       // Analysis Events
       'analysis.completed': { description: 'Analysis calculation completed' },
       'analysis.failed': { description: 'Analysis calculation failed' },
       'analysis.started': { description: 'Analysis calculation started' },
-      
+
       // Model Events
       'model.updated': { description: 'Financial model updated' },
       'model.published': { description: 'Model published for collaboration' },
-      
+
       // Data Events
       'data.updated': { description: 'Market data updated' },
       'data.anomaly_detected': { description: 'Data anomaly detected' },
-      
+
       // Collaboration Events
       'collaboration.comment_added': { description: 'New comment added' },
       'collaboration.user_joined': { description: 'User joined workspace' },
       'collaboration.version_created': { description: 'New version created' },
-      
+
       // Export Events
       'export.completed': { description: 'Export generation completed' },
       'export.failed': { description: 'Export generation failed' },
-      
+
       // Notification Events
       'notification.sent': { description: 'Notification delivered' },
       'alert.triggered': { description: 'Alert condition triggered' },
-      
+
       // System Events
       'system.maintenance_start': { description: 'System maintenance started' },
       'system.maintenance_end': { description: 'System maintenance ended' },
@@ -91,9 +92,9 @@ class WebhookService extends EventEmitter {
     }
 
     this.webhooks.set(webhook.id, webhook);
-    
+
     this.emit('webhook:registered', { webhook_id: webhook.id, url: webhook.url });
-    
+
     return {
       webhook_id: webhook.id,
       url: webhook.url,
@@ -124,9 +125,9 @@ class WebhookService extends EventEmitter {
     };
 
     this.webhooks.set(webhookId, updatedWebhook);
-    
+
     this.emit('webhook:updated', { webhook_id: webhookId, updates });
-    
+
     return updatedWebhook;
   }
 
@@ -137,9 +138,9 @@ class WebhookService extends EventEmitter {
     }
 
     this.webhooks.delete(webhookId);
-    
+
     this.emit('webhook:deleted', { webhook_id: webhookId });
-    
+
     return { success: true, deleted_at: new Date() };
   }
 
@@ -149,20 +150,20 @@ class WebhookService extends EventEmitter {
 
   listWebhooks(filters = {}) {
     const webhooks = Array.from(this.webhooks.values());
-    
+
     let filtered = webhooks;
-    
+
     if (filters.user_id) {
       filtered = filtered.filter(w => w.metadata.user_id === filters.user_id);
     }
-    
+
     if (filters.active !== undefined) {
       filtered = filtered.filter(w => w.active === filters.active);
     }
-    
+
     if (filters.events) {
       const eventList = Array.isArray(filters.events) ? filters.events : [filters.events];
-      filtered = filtered.filter(w => 
+      filtered = filtered.filter(w =>
         eventList.some(event => w.events.includes(event))
       );
     }
@@ -202,8 +203,8 @@ class WebhookService extends EventEmitter {
 
     // Find webhooks subscribed to this event type
     const subscribedWebhooks = Array.from(this.webhooks.values())
-      .filter(webhook => 
-        webhook.active && 
+      .filter(webhook =>
+        webhook.active &&
         (webhook.events.includes(eventType) || webhook.events.includes('*'))
       );
 
@@ -232,10 +233,10 @@ class WebhookService extends EventEmitter {
       this.deliveryQueue.push(delivery);
     }
 
-    this.emit('event:published', { 
-      event_id: event.id, 
-      event_type: eventType, 
-      subscribers: subscribedWebhooks.length 
+    this.emit('event:published', {
+      event_id: event.id,
+      event_type: eventType,
+      subscribers: subscribedWebhooks.length
     });
 
     return {
@@ -257,7 +258,7 @@ class WebhookService extends EventEmitter {
 
   async processDeliveryQueue() {
     const pendingDeliveries = this.deliveryQueue.filter(d => d.status === 'pending');
-    
+
     for (const delivery of pendingDeliveries.slice(0, 10)) { // Process max 10 at a time
       try {
         await this.attemptDelivery(delivery);
@@ -274,9 +275,9 @@ class WebhookService extends EventEmitter {
 
     try {
       const startTime = Date.now();
-      
+
       const signature = this.generateSignature(delivery.payload, delivery.secret);
-      
+
       const response = await axios.post(delivery.webhook_url, delivery.payload, {
         headers: {
           'Content-Type': 'application/json',
@@ -328,7 +329,7 @@ class WebhookService extends EventEmitter {
       // Schedule retry
       delivery.status = 'pending';
       delivery.next_retry = new Date(Date.now() + this.calculateRetryDelay(delivery.attempts));
-      
+
       this.emit('delivery:retry_scheduled', {
         delivery_id: delivery.id,
         webhook_id: delivery.webhook_id,
@@ -443,9 +444,9 @@ class WebhookService extends EventEmitter {
     };
   }
 
-  getGlobalStatistics(timeframe = '24h') {
+  getGlobalStatistics(_timeframe = '24h') {
     const allWebhooks = Array.from(this.webhooks.values());
-    
+
     return {
       total_webhooks: allWebhooks.length,
       active_webhooks: allWebhooks.filter(w => w.active).length,
@@ -497,15 +498,15 @@ class WebhookService extends EventEmitter {
     if (!webhook) return;
 
     webhook.statistics.total_deliveries++;
-    
+
     if (stats.successful_delivery) {
       webhook.statistics.successful_deliveries++;
       webhook.statistics.last_delivery = new Date();
-      
+
       if (stats.response_time) {
         const currentAvg = webhook.statistics.average_response_time;
         const totalDeliveries = webhook.statistics.total_deliveries;
-        webhook.statistics.average_response_time = 
+        webhook.statistics.average_response_time =
           ((currentAvg * (totalDeliveries - 1)) + stats.response_time) / totalDeliveries;
       }
     } else if (stats.failed_delivery) {
@@ -525,38 +526,38 @@ class WebhookService extends EventEmitter {
   calculateWebhookHealthScore(webhook) {
     const stats = webhook.statistics;
     if (stats.total_deliveries === 0) return 1.0;
-    
+
     const successRate = stats.successful_deliveries / stats.total_deliveries;
     const responseTimeScore = stats.average_response_time < 5000 ? 1.0 : 0.5;
-    
+
     return (successRate * 0.8) + (responseTimeScore * 0.2);
   }
 
   generateHealthRecommendations(webhook) {
     const recommendations = [];
     const healthScore = this.calculateWebhookHealthScore(webhook);
-    
+
     if (healthScore < 0.8) {
       recommendations.push('Webhook reliability is below optimal. Check endpoint stability.');
     }
-    
+
     if (webhook.statistics.average_response_time > 10000) {
       recommendations.push('Response times are high. Consider optimizing endpoint performance.');
     }
-    
+
     if (webhook.statistics.failed_deliveries > webhook.statistics.successful_deliveries * 0.1) {
       recommendations.push('High failure rate detected. Review error logs and endpoint availability.');
     }
-    
+
     return recommendations;
   }
 
   calculateGlobalAverageResponseTime(webhooks) {
-    const totalResponseTime = webhooks.reduce((sum, w) => 
+    const totalResponseTime = webhooks.reduce((sum, w) =>
       sum + (w.statistics.average_response_time * w.statistics.successful_deliveries), 0);
-    const totalSuccessfulDeliveries = webhooks.reduce((sum, w) => 
+    const totalSuccessfulDeliveries = webhooks.reduce((sum, w) =>
       sum + w.statistics.successful_deliveries, 0);
-    
+
     return totalSuccessfulDeliveries > 0 ? totalResponseTime / totalSuccessfulDeliveries : 0;
   }
 }

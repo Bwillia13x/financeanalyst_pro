@@ -24,8 +24,8 @@ class HealthcareAnalyticsService extends EventEmitter {
     };
 
     this.healthcareSegments = {
-      hospitals: { typical_margins: 0.02, capital_intensity: 0.15, labor_ratio: 0.60 },
-      pharma: { typical_margins: 0.25, rd_ratio: 0.18, patent_dependency: 0.80 },
+      hospitals: { typical_margins: 0.02, capital_intensity: 0.15, labor_ratio: 0.6 },
+      pharma: { typical_margins: 0.25, rd_ratio: 0.18, patent_dependency: 0.8 },
       biotech: { typical_margins: -0.15, rd_ratio: 0.85, risk_factor: 2.5 },
       medical_devices: { typical_margins: 0.12, rd_ratio: 0.08, regulatory_risk: 0.3 },
       healthcare_services: { typical_margins: 0.08, scalability: 1.2, competition_factor: 0.7 }
@@ -75,22 +75,27 @@ class HealthcareAnalyticsService extends EventEmitter {
   }
 
   async valuateProgram(program) {
-    const therapeuticArea = this.therapeuticAreas[program.therapeutic_area] || this.therapeuticAreas.cardiovascular;
+    const therapeuticArea =
+      this.therapeuticAreas[program.therapeutic_area] || this.therapeuticAreas.cardiovascular;
     const phases = this.buildClinicalTimeline(program);
-    
+
     // Calculate peak sales and market penetration
     const peakSales = this.calculatePeakSales(program);
     const salesProfile = this.buildSalesProfile(program, peakSales);
-    
+
     // Calculate development costs
     const developmentCosts = this.calculateDevelopmentCosts(phases);
-    
+
     // Calculate success probabilities
     const cumulativeProbability = this.calculateCumulativeSuccess(phases, therapeuticArea);
-    
+
     // Perform NPV calculation
-    const npv = this.calculateProgramNPV(salesProfile, developmentCosts, program.discount_rate || 0.12);
-    
+    const npv = this.calculateProgramNPV(
+      salesProfile,
+      developmentCosts,
+      program.discount_rate || 0.12
+    );
+
     return {
       program_id: program.id,
       indication: program.indication,
@@ -152,7 +157,8 @@ class HealthcareAnalyticsService extends EventEmitter {
   }
 
   calculateHealthcareMetrics(organizationData) {
-    const segment = this.healthcareSegments[organizationData.segment] || this.healthcareSegments.hospitals;
+    const segment =
+      this.healthcareSegments[organizationData.segment] || this.healthcareSegments.hospitals;
     const financials = organizationData.financials;
 
     const metrics = {
@@ -225,7 +231,7 @@ class HealthcareAnalyticsService extends EventEmitter {
   buildClinicalTimeline(program) {
     const currentPhase = program.current_phase;
     const phases = [];
-    
+
     Object.entries(this.clinicalTrialProbabilities).forEach(([phase, data]) => {
       if (this.isPhaseApplicable(phase, currentPhase)) {
         phases.push({
@@ -246,10 +252,10 @@ class HealthcareAnalyticsService extends EventEmitter {
     const marketSize = program.addressable_market || 1000000000; // $1B default
     const penetrationRate = program.market_penetration || 0.15; // 15% default
     const pricingPremium = program.pricing_premium || 1.0;
-    
+
     const therapeuticArea = this.therapeuticAreas[program.therapeutic_area];
     const marketPremium = therapeuticArea?.market_premium || 1.0;
-    
+
     return marketSize * penetrationRate * pricingPremium * marketPremium;
   }
 
@@ -260,7 +266,7 @@ class HealthcareAnalyticsService extends EventEmitter {
 
     for (let year = launchYear; year <= launchYear + 20; year++) {
       let sales = 0;
-      
+
       if (year < patentExpiry) {
         // Ramp-up phase
         const yearsFromLaunch = year - launchYear;
@@ -302,10 +308,11 @@ class HealthcareAnalyticsService extends EventEmitter {
 
   calculateProgramNPV(salesProfile, developmentCosts, discountRate) {
     let npv = -developmentCosts; // Initial investment
-    
+
     salesProfile.forEach(yearData => {
       const netCashFlow = yearData.sales * 0.6; // 60% margin assumption
-      const presentValue = netCashFlow / Math.pow(1 + discountRate, yearData.year - salesProfile[0].year);
+      const presentValue =
+        netCashFlow / Math.pow(1 + discountRate, yearData.year - salesProfile[0].year);
       npv += presentValue;
     });
 
@@ -318,7 +325,8 @@ class HealthcareAnalyticsService extends EventEmitter {
     const inflationRate = 0.025;
 
     const projectedRevenue = baseRevenue * Math.pow(1 + growthRate, year);
-    const projectedExpenses = organizationData.financials.expenses * Math.pow(1 + inflationRate, year);
+    const projectedExpenses =
+      organizationData.financials.expenses * Math.pow(1 + inflationRate, year);
 
     return {
       year: new Date().getFullYear() + year,
@@ -333,7 +341,7 @@ class HealthcareAnalyticsService extends EventEmitter {
   calculateDeviceROI(analysisData) {
     const benefits = analysisData.economic_impact.annual_savings;
     const costs = analysisData.implementation_costs.total_cost;
-    
+
     return {
       simple_roi: (benefits - costs) / costs,
       payback_period: costs / benefits,
@@ -343,53 +351,137 @@ class HealthcareAnalyticsService extends EventEmitter {
   }
 
   // Additional helper methods
-  isPhaseApplicable(phase, currentPhase) { 
-    const phaseOrder = { 'phase1': 1, 'phase2': 2, 'phase3': 3, 'regulatory': 4 };
+  isPhaseApplicable(phase, currentPhase) {
+    const phaseOrder = { phase1: 1, phase2: 2, phase3: 3, regulatory: 4 };
     return phaseOrder[phase] >= phaseOrder[currentPhase];
   }
-  
-  calculatePhaseCosts(program, phase, data) { /* Implementation */ }
-  definePhaseMilestones(phase) { /* Implementation */ }
-  calculateLaunchYear(program) { /* Implementation */ }
-  calculateMarketShare(program, year, launchYear) { /* Implementation */ }
-  calculatePricing(program, year, launchYear) { /* Implementation */ }
-  identifyValueDrivers(program) { /* Implementation */ }
-  performProgramSensitivity(program) { /* Implementation */ }
-  projectEnrollment(program) { /* Implementation */ }
-  projectTrialCosts(phases) { /* Implementation */ }
-  analyzeMilestones(phases) { /* Implementation */ }
-  identifyTrialRisks(program) { /* Implementation */ }
-  createPortfolioTimeline(programs) { /* Implementation */ }
-  calculateResourceRequirements(programs) { /* Implementation */ }
-  projectDevelopmentCashFlows(programs) { /* Implementation */ }
-  assessRegulatoryRisk(pipelineData) { /* Implementation */ }
-  analyzePatentProtection(pipelineData) { /* Implementation */ }
-  analyzeCompetition(pipelineData) { /* Implementation */ }
-  assessCommercialPotential(pipelineData) { /* Implementation */ }
-  aggregateValueByPhase(pipelineValue) { /* Implementation */ }
-  aggregateValueByIndication(pipelineValue) { /* Implementation */ }
-  assessPortfolioDiversification(programs) { /* Implementation */ }
-  analyzeValueBasedContracts(organizationData) { /* Implementation */ }
-  assessQualityMetrics(organizationData) { /* Implementation */ }
-  analyzePopulationHealth(organizationData) { /* Implementation */ }
-  assessTechnologyImpact(organizationData) { /* Implementation */ }
-  benchmarkAgainstPeers(metrics, segment) { /* Implementation */ }
-  analyzePerformanceTrends(organizationData) { /* Implementation */ }
-  identifyImprovementOpportunities(metrics) { /* Implementation */ }
-  documentKeyAssumptions(organizationData) { /* Implementation */ }
-  performHealthcareScenarios(organizationData) { /* Implementation */ }
-  calculateHealthcareValuation(projections) { /* Implementation */ }
-  assessClinicalOutcomes(deviceData) { /* Implementation */ }
-  calculateEconomicImpact(deviceData) { /* Implementation */ }
-  analyzeImplementationCosts(deviceData) { /* Implementation */ }
-  performPaybackAnalysis(deviceData) { /* Implementation */ }
-  calculateBudgetImpact(deviceData) { /* Implementation */ }
-  performDeviceSensitivity(deviceData) { /* Implementation */ }
-  modelDeviceAdoption(deviceData) { /* Implementation */ }
-  projectCapacityMetrics(organizationData, year) { /* Implementation */ }
-  projectQualityMetrics(organizationData, year) { /* Implementation */ }
-  calculateIRR(cashFlows) { /* Implementation */ }
-  calculateNPV(cashFlows, discountRate) { /* Implementation */ }
+
+  calculatePhaseCosts(_program, _phase, _data) {
+    /* Implementation */
+  }
+  definePhaseMilestones(_phase) {
+    /* Implementation */
+  }
+  calculateLaunchYear(_program) {
+    /* Implementation */
+  }
+  calculateMarketShare(_program, _year, _launchYear) {
+    /* Implementation */
+  }
+  calculatePricing(_program, _year, _launchYear) {
+    /* Implementation */
+  }
+  identifyValueDrivers(_program) {
+    /* Implementation */
+  }
+  performProgramSensitivity(_program) {
+    /* Implementation */
+  }
+  projectEnrollment(_program) {
+    /* Implementation */
+  }
+  projectTrialCosts(_phases) {
+    /* Implementation */
+  }
+  analyzeMilestones(_phases) {
+    /* Implementation */
+  }
+  identifyTrialRisks(_program) {
+    /* Implementation */
+  }
+  createPortfolioTimeline(_programs) {
+    /* Implementation */
+  }
+  calculateResourceRequirements(_programs) {
+    /* Implementation */
+  }
+  projectDevelopmentCashFlows(_programs) {
+    /* Implementation */
+  }
+  assessRegulatoryRisk(_pipelineData) {
+    /* Implementation */
+  }
+  analyzePatentProtection(_pipelineData) {
+    /* Implementation */
+  }
+  analyzeCompetition(_pipelineData) {
+    /* Implementation */
+  }
+  assessCommercialPotential(_pipelineData) {
+    /* Implementation */
+  }
+  aggregateValueByPhase(_pipelineValue) {
+    /* Implementation */
+  }
+  aggregateValueByIndication(_pipelineValue) {
+    /* Implementation */
+  }
+  assessPortfolioDiversification(_programs) {
+    /* Implementation */
+  }
+  analyzeValueBasedContracts(_organizationData) {
+    /* Implementation */
+  }
+  assessQualityMetrics(_organizationData) {
+    /* Implementation */
+  }
+  analyzePopulationHealth(_organizationData) {
+    /* Implementation */
+  }
+  assessTechnologyImpact(_organizationData) {
+    /* Implementation */
+  }
+  benchmarkAgainstPeers(_metrics, _segment) {
+    /* Implementation */
+  }
+  analyzePerformanceTrends(_organizationData) {
+    /* Implementation */
+  }
+  identifyImprovementOpportunities(_metrics) {
+    /* Implementation */
+  }
+  documentKeyAssumptions(_organizationData) {
+    /* Implementation */
+  }
+  performHealthcareScenarios(_organizationData) {
+    /* Implementation */
+  }
+  calculateHealthcareValuation(_projections) {
+    /* Implementation */
+  }
+  assessClinicalOutcomes(_deviceData) {
+    /* Implementation */
+  }
+  calculateEconomicImpact(_deviceData) {
+    /* Implementation */
+  }
+  analyzeImplementationCosts(_deviceData) {
+    /* Implementation */
+  }
+  performPaybackAnalysis(_deviceData) {
+    /* Implementation */
+  }
+  calculateBudgetImpact(_deviceData) {
+    /* Implementation */
+  }
+  performDeviceSensitivity(_deviceData) {
+    /* Implementation */
+  }
+  modelDeviceAdoption(_deviceData) {
+    /* Implementation */
+  }
+  projectCapacityMetrics(_organizationData, _year) {
+    /* Implementation */
+  }
+  projectQualityMetrics(_organizationData, _year) {
+    /* Implementation */
+  }
+  calculateIRR(_cashFlows) {
+    /* Implementation */
+  }
+  calculateNPV(_cashFlows, _discountRate) {
+    /* Implementation */
+  }
 }
 
 export default new HealthcareAnalyticsService();

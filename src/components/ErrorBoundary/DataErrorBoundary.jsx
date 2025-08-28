@@ -1,4 +1,4 @@
-import React from 'react';
+import { useEffect } from 'react';
 
 import ErrorBoundaryProvider from './ErrorBoundaryProvider';
 
@@ -81,7 +81,7 @@ const DataErrorBoundary = ({ children, dataSource, onError }) => {
     const errorInfo = getDataErrorInfo();
 
     // Auto-retry for certain error types
-    React.useEffect(() => {
+    useEffect(() => {
       if (errorInfo.autoRetry && retryCount < 3) {
         const delay = Math.min(1000 * Math.pow(2, retryCount), 10000); // Exponential backoff
         const timer = setTimeout(() => {
@@ -97,11 +97,15 @@ const DataErrorBoundary = ({ children, dataSource, onError }) => {
         case 'network':
           return (
             <svg
-              className="h-6 w-6 text-orange-600" fill="none" stroke="currentColor"
+              className="h-6 w-6 text-orange-600"
+              fill="none"
+              stroke="currentColor"
               viewBox="0 0 24 24"
             >
               <path
-                strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
                 d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
               />
             </svg>
@@ -109,11 +113,15 @@ const DataErrorBoundary = ({ children, dataSource, onError }) => {
         case 'unauthorized':
           return (
             <svg
-              className="h-6 w-6 text-red-600" fill="none" stroke="currentColor"
+              className="h-6 w-6 text-red-600"
+              fill="none"
+              stroke="currentColor"
               viewBox="0 0 24 24"
             >
               <path
-                strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
                 d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
               />
             </svg>
@@ -121,11 +129,15 @@ const DataErrorBoundary = ({ children, dataSource, onError }) => {
         case 'rate-limit':
           return (
             <svg
-              className="h-6 w-6 text-yellow-600" fill="none" stroke="currentColor"
+              className="h-6 w-6 text-yellow-600"
+              fill="none"
+              stroke="currentColor"
               viewBox="0 0 24 24"
             >
               <path
-                strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
                 d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
@@ -133,11 +145,15 @@ const DataErrorBoundary = ({ children, dataSource, onError }) => {
         default:
           return (
             <svg
-              className="h-6 w-6 text-red-600" fill="none" stroke="currentColor"
+              className="h-6 w-6 text-red-600"
+              fill="none"
+              stroke="currentColor"
               viewBox="0 0 24 24"
             >
               <path
-                strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
                 d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
               />
             </svg>
@@ -148,33 +164,29 @@ const DataErrorBoundary = ({ children, dataSource, onError }) => {
     return (
       <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-6 m-4">
         <div className="flex items-start">
-          <div className="flex-shrink-0">
-            {getIconForErrorType()}
-          </div>
+          <div className="flex-shrink-0">{getIconForErrorType()}</div>
 
           <div className="ml-3 flex-1">
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
-              {errorInfo.title}
-            </h3>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">{errorInfo.title}</h3>
 
-            <p className="text-gray-600 mb-4">
-              {errorInfo.message}
-            </p>
+            <p className="text-gray-600 mb-4">{errorInfo.message}</p>
 
             <div className="bg-blue-50 border border-blue-200 rounded-md p-3 mb-4">
               <div className="flex">
                 <svg
-                  className="h-5 w-5 text-blue-600 mr-2" fill="none" stroke="currentColor"
+                  className="h-5 w-5 text-blue-600 mr-2"
+                  fill="none"
+                  stroke="currentColor"
                   viewBox="0 0 24 24"
                 >
                   <path
-                    strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
                     d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                   />
                 </svg>
-                <p className="text-blue-800 text-sm">
-                  {errorInfo.suggestion}
-                </p>
+                <p className="text-blue-800 text-sm">{errorInfo.suggestion}</p>
               </div>
             </div>
 
@@ -201,13 +213,22 @@ const DataErrorBoundary = ({ children, dataSource, onError }) => {
                 >
                   {errorInfo.autoRetry ? (
                     <span className="flex items-center">
-                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                      <svg
+                        className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
                         <circle
-                          className="opacity-25" cx="12" cy="12"
-                          r="10" stroke="currentColor" strokeWidth="4"
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
                         />
                         <path
-                          className="opacity-75" fill="currentColor"
+                          className="opacity-75"
+                          fill="currentColor"
                           d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                         />
                       </svg>
@@ -245,16 +266,21 @@ const DataErrorBoundary = ({ children, dataSource, onError }) => {
               <div className="mt-4 p-3 bg-orange-50 border border-orange-200 rounded-md">
                 <div className="flex">
                   <svg
-                    className="h-5 w-5 text-orange-600 mr-2" fill="none" stroke="currentColor"
+                    className="h-5 w-5 text-orange-600 mr-2"
+                    fill="none"
+                    stroke="currentColor"
                     viewBox="0 0 24 24"
                   >
                     <path
-                      strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
                       d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
                     />
                   </svg>
                   <p className="text-orange-800 text-sm">
-                    You&apos;re currently offline. Some features may not work until your connection is restored.
+                    You&apos;re currently offline. Some features may not work until your connection
+                    is restored.
                   </p>
                 </div>
               </div>
@@ -266,10 +292,7 @@ const DataErrorBoundary = ({ children, dataSource, onError }) => {
   };
 
   return (
-    <ErrorBoundaryProvider
-      fallback={DataErrorFallback}
-      onError={onError}
-    >
+    <ErrorBoundaryProvider fallback={DataErrorFallback} onError={onError}>
       {children}
     </ErrorBoundaryProvider>
   );

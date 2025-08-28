@@ -73,7 +73,7 @@ router.get('/income/:symbol',
             source: 'fmp'
           });
         }
-      } catch (fmpError) {
+      } catch (_fmpError) {
         console.log('FMP failed, trying Alpha Vantage...');
       }
 

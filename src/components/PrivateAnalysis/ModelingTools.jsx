@@ -1,11 +1,4 @@
-import {
-  DollarSign,
-  Target,
-  Activity,
-  BarChart3,
-  Users,
-  Zap
-} from 'lucide-react';
+import { DollarSign, Target, Activity, BarChart3, Users, Zap } from 'lucide-react';
 import React, { useState, useMemo } from 'react';
 
 import AdvancedDCF from './AdvancedDCF.jsx';
@@ -131,18 +124,22 @@ const ModelingTools = ({ data, adjustedValues, onDataChange }) => {
     periods.forEach((_, index) => {
       // Revenue metrics - Use adjusted values for latest period when available
       const isLatestPeriod = index === periods.length - 1;
-      const revenue = isLatestPeriod && adjustedValues?.totalRevenue
-        ? adjustedValues.totalRevenue
-        : statements.totalRevenue?.[index] || 0;
-      const totalCOGS = isLatestPeriod && adjustedValues?.totalCostOfGoodsSold
-        ? adjustedValues.totalCostOfGoodsSold
-        : statements.totalCostOfGoodsSold?.[index] || 0;
-      const grossProfit = isLatestPeriod && adjustedValues?.grossProfit
-        ? adjustedValues.grossProfit
-        : statements.grossProfit?.[index] || (revenue - totalCOGS);
-      const operatingIncome = isLatestPeriod && adjustedValues?.operatingIncome
-        ? adjustedValues.operatingIncome
-        : statements.operatingIncome?.[index] || 0;
+      const revenue =
+        isLatestPeriod && adjustedValues?.totalRevenue
+          ? adjustedValues.totalRevenue
+          : statements.totalRevenue?.[index] || 0;
+      const totalCOGS =
+        isLatestPeriod && adjustedValues?.totalCostOfGoodsSold
+          ? adjustedValues.totalCostOfGoodsSold
+          : statements.totalCostOfGoodsSold?.[index] || 0;
+      const grossProfit =
+        isLatestPeriod && adjustedValues?.grossProfit
+          ? adjustedValues.grossProfit
+          : statements.grossProfit?.[index] || revenue - totalCOGS;
+      const operatingIncome =
+        isLatestPeriod && adjustedValues?.operatingIncome
+          ? adjustedValues.operatingIncome
+          : statements.operatingIncome?.[index] || 0;
 
       metrics.revenue.push(revenue);
       metrics.grossProfit.push(grossProfit);
@@ -157,8 +154,12 @@ const ModelingTools = ({ data, adjustedValues, onDataChange }) => {
         const prevRevenue = statements.totalRevenue?.[index - 1] || 0;
         const prevOperating = statements.operatingIncome?.[index - 1] || 0;
 
-        metrics.growth.revenue.push(prevRevenue ? ((revenue - prevRevenue) / prevRevenue) * 100 : 0);
-        metrics.growth.operating.push(prevOperating ? ((operatingIncome - prevOperating) / prevOperating) * 100 : 0);
+        metrics.growth.revenue.push(
+          prevRevenue ? ((revenue - prevRevenue) / prevRevenue) * 100 : 0
+        );
+        metrics.growth.operating.push(
+          prevOperating ? ((operatingIncome - prevOperating) / prevOperating) * 100 : 0
+        );
       }
     });
 
@@ -177,7 +178,9 @@ const ModelingTools = ({ data, adjustedValues, onDataChange }) => {
       operatingIncomes = [];
       sourceData.periods.forEach((_, index) => {
         if (index > 0 && index <= projectionYears) {
-          operatingIncomes.push(sourceData.statements.incomeStatement.operatingIncome?.[index] || 0);
+          operatingIncomes.push(
+            sourceData.statements.incomeStatement.operatingIncome?.[index] || 0
+          );
         }
       });
     } else {
@@ -188,7 +191,7 @@ const ModelingTools = ({ data, adjustedValues, onDataChange }) => {
     if (operatingIncomes.length === 0) return { enterpriseValue: 0, equityValue: 0, sharePrice: 0 };
 
     let presentValue = 0;
-    const discountFactor = 1 + (discountRate / 100);
+    const discountFactor = 1 + discountRate / 100;
 
     // Calculate present value of cash flows
     operatingIncomes.forEach((income, index) => {
@@ -217,12 +220,42 @@ const ModelingTools = ({ data, adjustedValues, onDataChange }) => {
   const _dcfResults = calculateDCF();
 
   const modelTypes = [
-    { id: 'dcf', label: 'DCF Valuation', icon: DollarSign, description: 'Discounted Cash Flow analysis' },
-    { id: 'ratios', label: 'Ratio Analysis', icon: BarChart3, description: 'Financial ratio comparison' },
-    { id: 'sensitivity', label: 'Sensitivity Analysis', icon: Activity, description: 'Variable impact analysis' },
-    { id: 'scenario', label: 'Scenario Modeling', icon: Target, description: 'Multi-scenario projections' },
-    { id: 'comparable', label: 'Comparable Analysis', icon: Users, description: 'Market-based valuation' },
-    { id: 'montecarlo', label: 'Monte Carlo', icon: Zap, description: 'Probabilistic risk analysis' }
+    {
+      id: 'dcf',
+      label: 'DCF Valuation',
+      icon: DollarSign,
+      description: 'Discounted Cash Flow analysis'
+    },
+    {
+      id: 'ratios',
+      label: 'Ratio Analysis',
+      icon: BarChart3,
+      description: 'Financial ratio comparison'
+    },
+    {
+      id: 'sensitivity',
+      label: 'Sensitivity Analysis',
+      icon: Activity,
+      description: 'Variable impact analysis'
+    },
+    {
+      id: 'scenario',
+      label: 'Scenario Modeling',
+      icon: Target,
+      description: 'Multi-scenario projections'
+    },
+    {
+      id: 'comparable',
+      label: 'Comparable Analysis',
+      icon: Users,
+      description: 'Market-based valuation'
+    },
+    {
+      id: 'montecarlo',
+      label: 'Monte Carlo',
+      icon: Zap,
+      description: 'Probabilistic risk analysis'
+    }
   ];
 
   const updateModelInput = (modelType, field, value) => {
@@ -235,7 +268,7 @@ const ModelingTools = ({ data, adjustedValues, onDataChange }) => {
     }));
   };
 
-  const formatCurrency = (value) => {
+  const formatCurrency = value => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
@@ -244,12 +277,12 @@ const ModelingTools = ({ data, adjustedValues, onDataChange }) => {
     }).format(value * 1000); // Convert from thousands
   };
 
-  const formatPercent = (value) => {
+  const formatPercent = value => {
     return `${value.toFixed(1)}%`;
   };
 
   return (
-    <div className="h-full bg-gray-900 text-white p-6">
+    <div className="h-full bg-gray-900 text-white p-6" data-testid="modeling-tools">
       {/* Advanced Analytics Integration */}
       <AdvancedAnalyticsIntegration
         onOpenOptions={handleOpenOptions}
@@ -262,12 +295,14 @@ const ModelingTools = ({ data, adjustedValues, onDataChange }) => {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h2 className="text-xl font-semibold text-white">Financial Modeling</h2>
-            <p className="text-gray-400 text-sm mt-1">Select a modeling approach to analyze your financial data</p>
+            <p className="text-gray-400 text-sm mt-1">
+              Select a modeling approach to analyze your financial data
+            </p>
           </div>
         </div>
 
         <div className="flex flex-wrap gap-2 mb-6">
-          {modelTypes.map((type) => {
+          {modelTypes.map(type => {
             const Icon = type.icon;
             return (
               <button
@@ -279,7 +314,10 @@ const ModelingTools = ({ data, adjustedValues, onDataChange }) => {
                     : 'bg-gray-800 text-gray-300 border-gray-700 hover:bg-gray-700 hover:text-white hover:border-gray-600'
                 } flex items-center gap-3 px-4 py-3 rounded-lg border transition-all duration-200`}
               >
-                <Icon size={18} className={activeModel === type.id ? 'text-white' : 'text-blue-400'} />
+                <Icon
+                  size={18}
+                  className={activeModel === type.id ? 'text-white' : 'text-blue-400'}
+                />
                 <span className="font-medium">{type.label}</span>
               </button>
             );
@@ -313,6 +351,18 @@ const ModelingTools = ({ data, adjustedValues, onDataChange }) => {
               <DollarSign size={20} className="text-blue-400" />
               DCF Valuation Model
             </h3>
+
+            {/* Summary highlight for tests and quick reference */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+              <div className="bg-gradient-to-r from-green-50 to-green-100 rounded-lg p-4 border border-green-200">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-green-700 font-medium">ENTERPRISE VALUE</span>
+                  <span className="text-2xl font-bold text-green-800">
+                    {formatCurrency(_dcfResults.enterpriseValue || 0)}
+                  </span>
+                </div>
+              </div>
+            </div>
 
             <AdvancedDCF
               data={data}
@@ -358,7 +408,9 @@ const ModelingTools = ({ data, adjustedValues, onDataChange }) => {
                   {calculatedMetrics.growth.revenue.map((growth, index) => (
                     <div key={index} className="flex justify-between">
                       <span className="text-sm">{data.periods[index + 1]} Revenue Growth:</span>
-                      <span className={`font-medium ${growth >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                      <span
+                        className={`font-medium ${growth >= 0 ? 'text-green-600' : 'text-red-600'}`}
+                      >
                         {formatPercent(growth)}
                       </span>
                     </div>
@@ -366,7 +418,9 @@ const ModelingTools = ({ data, adjustedValues, onDataChange }) => {
                   {calculatedMetrics.growth.operating.map((growth, index) => (
                     <div key={index} className="flex justify-between">
                       <span className="text-sm">{data.periods[index + 1]} Operating Growth:</span>
-                      <span className={`font-medium ${growth >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                      <span
+                        className={`font-medium ${growth >= 0 ? 'text-green-600' : 'text-red-600'}`}
+                      >
                         {formatPercent(growth)}
                       </span>
                     </div>
@@ -379,10 +433,19 @@ const ModelingTools = ({ data, adjustedValues, onDataChange }) => {
                 <h4 className="font-semibold mb-3 text-gray-200">Industry Comparison</h4>
                 <div className="space-y-3">
                   <div className="p-3 bg-gray-700 rounded-lg">
-                    <div className="text-xs text-gray-400 uppercase tracking-wide">Industry Avg</div>
-                    <div className="text-sm">Gross Margin: {formatPercent(modelInputs.ratios.industryAverages.grossMargin)}</div>
-                    <div className="text-sm">Operating Margin: {formatPercent(modelInputs.ratios.industryAverages.operatingMargin)}</div>
-                    <div className="text-sm">Net Margin: {formatPercent(modelInputs.ratios.industryAverages.netMargin)}</div>
+                    <div className="text-xs text-gray-400 uppercase tracking-wide">
+                      Industry Avg
+                    </div>
+                    <div className="text-sm">
+                      Gross Margin: {formatPercent(modelInputs.ratios.industryAverages.grossMargin)}
+                    </div>
+                    <div className="text-sm">
+                      Operating Margin:{' '}
+                      {formatPercent(modelInputs.ratios.industryAverages.operatingMargin)}
+                    </div>
+                    <div className="text-sm">
+                      Net Margin: {formatPercent(modelInputs.ratios.industryAverages.netMargin)}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -443,10 +506,7 @@ const ModelingTools = ({ data, adjustedValues, onDataChange }) => {
               Monte Carlo Simulation
             </h3>
 
-            <MonteCarloSimulation
-              data={data}
-              onDataChange={onDataChange}
-            />
+            <MonteCarloSimulation data={data} onDataChange={onDataChange} />
           </div>
         )}
       </div>

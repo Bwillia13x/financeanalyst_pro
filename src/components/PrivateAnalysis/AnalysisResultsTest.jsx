@@ -35,9 +35,11 @@ const AnalysisResultsTest = ({
             <div className="flex items-center gap-3">
               <div
                 className={`p-2 rounded-lg ${
-                  trend === 'up' ? 'bg-green-900/30 text-green-400' :
-                    trend === 'down' ? 'bg-red-900/30 text-red-400' :
-                      'bg-gray-700 text-gray-400'
+                  trend === 'up'
+                    ? 'bg-green-900/30 text-green-400'
+                    : trend === 'down'
+                      ? 'bg-red-900/30 text-red-400'
+                      : 'bg-gray-700 text-gray-400'
                 }`}
               >
                 <Icon className="h-5 w-5" />
@@ -90,12 +92,8 @@ const AnalysisResultsTest = ({
     return (
       <div className="space-y-6 p-6">
         <div>
-          <h2 className="text-3xl font-bold mb-4 text-white">
-            Analysis Results Test
-          </h2>
-          <p className="text-gray-400">
-            Testing basic rendering functionality
-          </p>
+          <h2 className="text-3xl font-bold mb-4 text-white">Analysis Results Test</h2>
+          <p className="text-gray-400">Testing basic rendering functionality</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -107,12 +105,13 @@ const AnalysisResultsTest = ({
         <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
           <h3 className="text-lg font-semibold mb-4 text-white">Data Check</h3>
           <p className="text-gray-300">Data exists: {data ? 'Yes' : 'No'}</p>
-          <p className="text-gray-300">Income statement: {data?.statements?.incomeStatement ? 'Yes' : 'No'}</p>
+          <p className="text-gray-300">
+            Income statement: {data?.statements?.incomeStatement ? 'Yes' : 'No'}
+          </p>
           <p className="text-gray-300">CalculateDCF function: {calculateDCF ? 'Yes' : 'No'}</p>
         </div>
       </div>
     );
-
   } catch (error) {
     console.error('AnalysisResultsTest render error:', error);
     return (

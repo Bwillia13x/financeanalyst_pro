@@ -24,7 +24,7 @@ class CollaborationService extends EventEmitter {
     this.isOnline = navigator.onLine;
 
     // Env and feature flags (Vite)
-    this.env = (typeof import.meta !== 'undefined' && import.meta.env) ? import.meta.env : {};
+    this.env = typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env : {};
     // Explicitly opt-in to collaboration to avoid unexpected WS errors in dev/staging
     this.collabEnabled = this.env.VITE_ENABLE_COLLABORATION === 'true';
 
@@ -74,7 +74,9 @@ class CollaborationService extends EventEmitter {
       if (this.collabEnabled) {
         await this.initializeWebSocket();
       } else {
-        console.info('Collaboration disabled via VITE_ENABLE_COLLABORATION. Skipping WebSocket initialization.');
+        console.info(
+          'Collaboration disabled via VITE_ENABLE_COLLABORATION. Skipping WebSocket initialization.'
+        );
       }
 
       // Start heartbeat if enabled
@@ -124,7 +126,7 @@ class CollaborationService extends EventEmitter {
         // Simulated WebSocket for demo/testing
         this.wsConnection = {
           readyState: 1, // OPEN
-          send: (data) => {
+          send: data => {
             console.log('WebSocket send (mock):', data);
             setTimeout(() => {
               this.handleConnectionMessage({ data });
@@ -146,7 +148,6 @@ class CollaborationService extends EventEmitter {
         this.wsConnection.addEventListener('error', this.handleConnectionError);
         console.info(`Connecting to Collaboration WebSocket at ${wsUrl}`);
       }
-
     } catch (error) {
       console.error('WebSocket initialization failed:', error);
       throw error;
@@ -223,9 +224,12 @@ class CollaborationService extends EventEmitter {
     this.emit('connectionStatus', { online: this.isOnline, connected: false });
 
     if (this.isOnline && this.reconnectAttempts < this.maxReconnectAttempts) {
-      setTimeout(() => {
-        this.reconnectWebSocket();
-      }, Math.pow(2, this.reconnectAttempts) * 1000); // Exponential backoff
+      setTimeout(
+        () => {
+          this.reconnectWebSocket();
+        },
+        Math.pow(2, this.reconnectAttempts) * 1000
+      ); // Exponential backoff
     }
   }
 
@@ -247,7 +251,9 @@ class CollaborationService extends EventEmitter {
     }
 
     this.reconnectAttempts++;
-    console.log(`Attempting to reconnect... (${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
+    console.log(
+      `Attempting to reconnect... (${this.reconnectAttempts}/${this.maxReconnectAttempts})`
+    );
 
     try {
       await this.initializeWebSocket();
@@ -548,8 +554,9 @@ class CollaborationService extends EventEmitter {
     const workspace = this.workspaces.get(workspaceId);
     if (!workspace) return [];
 
-    return Array.from(workspace.annotations.values())
-      .filter(annotation => annotation.modelId === modelId);
+    return Array.from(workspace.annotations.values()).filter(
+      annotation => annotation.modelId === modelId
+    );
   }
 
   /**

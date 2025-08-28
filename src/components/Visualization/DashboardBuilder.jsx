@@ -66,9 +66,7 @@ const DashboardBuilder = ({ onDashboardSaved }) => {
       const updated = visualizationService.updateDashboard(selectedDashboard.id, selectedDashboard);
       setSelectedDashboard(updated);
 
-      const updatedDashboards = dashboards.map(d =>
-        d.id === updated.id ? updated : d
-      );
+      const updatedDashboards = dashboards.map(d => (d.id === updated.id ? updated : d));
       setDashboards(updatedDashboards);
       setIsEditing(false);
 
@@ -76,7 +74,7 @@ const DashboardBuilder = ({ onDashboardSaved }) => {
     }
   };
 
-  const deleteDashboard = (dashboardId) => {
+  const deleteDashboard = dashboardId => {
     if (window.confirm('Are you sure you want to delete this dashboard?')) {
       visualizationService.deleteDashboard(dashboardId);
       const filtered = dashboards.filter(d => d.id !== dashboardId);
@@ -110,7 +108,7 @@ const DashboardBuilder = ({ onDashboardSaved }) => {
     setSelectedDashboard(updatedDashboard);
   };
 
-  const removeWidget = (widgetId) => {
+  const removeWidget = widgetId => {
     if (!selectedDashboard || !isEditing) return;
 
     const updatedDashboard = {
@@ -140,7 +138,7 @@ const DashboardBuilder = ({ onDashboardSaved }) => {
     setSelectedDashboard(updatedDashboard);
   };
 
-  const createVisualization = (config) => {
+  const createVisualization = config => {
     const visualization = visualizationService.createVisualization(config);
 
     // Add as widget to current dashboard
@@ -156,7 +154,7 @@ const DashboardBuilder = ({ onDashboardSaved }) => {
     return visualization;
   };
 
-  const getWidgetIcon = (type) => {
+  const getWidgetIcon = type => {
     const icons = {
       chart: BarChart3,
       metrics_grid: Grid3X3,
@@ -175,7 +173,7 @@ const DashboardBuilder = ({ onDashboardSaved }) => {
         <div>
           <h4 className="text-sm font-medium text-gray-700 mb-2">Available Widgets</h4>
           <div className="space-y-2">
-            {availableWidgets.map((widget) => {
+            {availableWidgets.map(widget => {
               const Icon = getWidgetIcon(widget.type);
               return (
                 <motion.div
@@ -200,16 +198,18 @@ const DashboardBuilder = ({ onDashboardSaved }) => {
         <div>
           <h4 className="text-sm font-medium text-gray-700 mb-2">Chart Templates</h4>
           <div className="space-y-2">
-            {chartTemplates.map((template) => (
+            {chartTemplates.map(template => (
               <motion.div
                 key={template.type}
                 whileHover={{ scale: 1.02 }}
-                onClick={() => createVisualization({
-                  name: template.name,
-                  template: template.type,
-                  type: template.type,
-                  data: [] // Would be populated from data source
-                })}
+                onClick={() =>
+                  createVisualization({
+                    name: template.name,
+                    template: template.type,
+                    type: template.type,
+                    data: [] // Would be populated from data source
+                  })
+                }
                 className="p-3 bg-blue-50 rounded-lg cursor-pointer hover:bg-blue-100 transition-colors"
               >
                 <div className="flex items-center space-x-2">
@@ -253,7 +253,7 @@ const DashboardBuilder = ({ onDashboardSaved }) => {
         <div
           className="relative border-2 border-dashed border-gray-300 rounded-lg"
           style={{ height: grid.rows * cellHeight }}
-          onDrop={(e) => {
+          onDrop={e => {
             e.preventDefault();
             if (draggedWidget && isEditing) {
               const rect = e.currentTarget.getBoundingClientRect();
@@ -262,7 +262,7 @@ const DashboardBuilder = ({ onDashboardSaved }) => {
               addWidget(draggedWidget, { x, y });
             }
           }}
-          onDragOver={(e) => e.preventDefault()}
+          onDragOver={e => e.preventDefault()}
         >
           {/* Grid overlay for editing */}
           {isEditing && (
@@ -285,7 +285,7 @@ const DashboardBuilder = ({ onDashboardSaved }) => {
           )}
 
           {/* Widgets */}
-          {widgets.map((widget) => {
+          {widgets.map(widget => {
             const Icon = getWidgetIcon(widget.type);
             return (
               <motion.div
@@ -352,7 +352,7 @@ const DashboardBuilder = ({ onDashboardSaved }) => {
       </div>
 
       <div className="space-y-2">
-        {dashboards.map((dashboard) => (
+        {dashboards.map(dashboard => (
           <motion.div
             key={dashboard.id}
             whileHover={{ scale: 1.02 }}
@@ -372,7 +372,7 @@ const DashboardBuilder = ({ onDashboardSaved }) => {
                 </p>
               </div>
               <button
-                onClick={(e) => {
+                onClick={e => {
                   e.stopPropagation();
                   deleteDashboard(dashboard.id);
                 }}
@@ -407,10 +407,12 @@ const DashboardBuilder = ({ onDashboardSaved }) => {
               <>
                 <select
                   value={selectedDashboard.theme}
-                  onChange={(e) => setSelectedDashboard({
-                    ...selectedDashboard,
-                    theme: e.target.value
-                  })}
+                  onChange={e =>
+                    setSelectedDashboard({
+                      ...selectedDashboard,
+                      theme: e.target.value
+                    })
+                  }
                   className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
                 >
                   {themes.map(theme => (

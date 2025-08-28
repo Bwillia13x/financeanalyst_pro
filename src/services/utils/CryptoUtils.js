@@ -90,7 +90,6 @@ export class CryptoUtils {
 
       // Convert to base64 for storage
       return this.arrayBufferToBase64(combined.buffer);
-
     } catch (error) {
       console.error('Encryption failed:', error);
       throw new Error(`Encryption failed: ${error.message}`);
@@ -125,7 +124,6 @@ export class CryptoUtils {
 
       // Convert back to string
       return this.textDecoder.decode(decryptedBuffer);
-
     } catch (error) {
       console.error('Decryption failed:', error);
       throw new Error(`Decryption failed: ${error.message}`);
@@ -203,7 +201,6 @@ export class CryptoUtils {
       );
 
       return derivedKey;
-
     } catch (error) {
       console.error('Key derivation failed:', error);
       throw new Error(`Key derivation failed: ${error.message}`);
@@ -311,7 +308,6 @@ export class CryptoUtils {
         compressionRatio: encrypted.length / testData.length,
         iterations
       };
-
     } catch (error) {
       console.error('Crypto performance test failed:', error);
       return null;

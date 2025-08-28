@@ -86,7 +86,7 @@ const PersistentCLI = ({
     setOutput(prev => [...prev, newOutput]);
   }, []);
 
-  const handleCommand = async(command) => {
+  const handleCommand = async command => {
     if (!command.trim()) return;
 
     // Add command to history
@@ -136,7 +136,7 @@ const PersistentCLI = ({
     }
   };
 
-  const formatTable = (data) => {
+  const formatTable = data => {
     if (!Array.isArray(data) || data.length === 0) return 'No data';
 
     const headers = Object.keys(data[0]);
@@ -153,7 +153,7 @@ const PersistentCLI = ({
     return [headerRow, separator, ...dataRows].join('\n');
   };
 
-  const formatPortfolioData = (data) => {
+  const formatPortfolioData = data => {
     if (!data) return 'No portfolio data available';
 
     let output = '📊 PORTFOLIO OVERVIEW\n';
@@ -172,7 +172,7 @@ const PersistentCLI = ({
     return output;
   };
 
-  const formatMarketData = (data) => {
+  const formatMarketData = data => {
     if (!data) return 'No market data available';
 
     let output = '📈 MARKET DATA\n';
@@ -185,7 +185,7 @@ const PersistentCLI = ({
     return output;
   };
 
-  const handleKeyDown = (e) => {
+  const handleKeyDown = e => {
     if (e.key === 'Enter') {
       e.preventDefault();
       handleCommand(input);
@@ -219,7 +219,7 @@ const PersistentCLI = ({
     }
   };
 
-  const handleInputChange = (e) => {
+  const handleInputChange = e => {
     const value = e.target.value;
     setInput(value);
 
@@ -238,9 +238,9 @@ const PersistentCLI = ({
   };
 
   const exportOutput = () => {
-    const exportText = output.map(item =>
-      `[${item.timestamp.toLocaleTimeString()}] ${item.content}`
-    ).join('\n');
+    const exportText = output
+      .map(item => `[${item.timestamp.toLocaleTimeString()}] ${item.content}`)
+      .join('\n');
 
     const blob = new Blob([exportText], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
@@ -253,16 +253,24 @@ const PersistentCLI = ({
     URL.revokeObjectURL(url);
   };
 
-  const getOutputTypeColor = (type) => {
+  const getOutputTypeColor = type => {
     switch (type) {
-      case 'command': return 'text-blue-400';
-      case 'error': return 'text-red-400';
-      case 'success': return 'text-green-400';
-      case 'warning': return 'text-yellow-400';
-      case 'info': return 'text-cyan-400';
-      case 'system': return 'text-gray-400';
-      case 'formatted': return 'text-purple-400';
-      default: return 'text-gray-300';
+      case 'command':
+        return 'text-blue-400';
+      case 'error':
+        return 'text-red-400';
+      case 'success':
+        return 'text-green-400';
+      case 'warning':
+        return 'text-yellow-400';
+      case 'info':
+        return 'text-cyan-400';
+      case 'system':
+        return 'text-gray-400';
+      case 'formatted':
+        return 'text-purple-400';
+      default:
+        return 'text-gray-300';
     }
   };
 
@@ -275,7 +283,7 @@ const PersistentCLI = ({
         role="button"
         tabIndex={0}
         aria-label={`${isExpanded ? 'Collapse' : 'Expand'} terminal`}
-        onKeyDown={(e) => {
+        onKeyDown={e => {
           if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
             setIsExpanded(!isExpanded);
@@ -284,9 +292,7 @@ const PersistentCLI = ({
       >
         <div className="flex items-center space-x-3">
           <Terminal className="w-5 h-5 text-green-400" />
-          <span className="text-sm font-mono text-gray-300">
-            FinanceAnalyst Pro Terminal
-          </span>
+          <span className="text-sm font-mono text-gray-300">FinanceAnalyst Pro Terminal</span>
           <div className="flex items-center space-x-2">
             <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
             <span className="text-xs text-gray-500">Live</span>
@@ -297,7 +303,7 @@ const PersistentCLI = ({
           {!isMinimized && (
             <>
               <button
-                onClick={(e) => {
+                onClick={e => {
                   e.stopPropagation();
                   clearOutput();
                 }}
@@ -307,7 +313,7 @@ const PersistentCLI = ({
                 <X className="w-4 h-4" />
               </button>
               <button
-                onClick={(e) => {
+                onClick={e => {
                   e.stopPropagation();
                   exportOutput();
                 }}
@@ -319,7 +325,7 @@ const PersistentCLI = ({
             </>
           )}
           <button
-            onClick={(e) => {
+            onClick={e => {
               e.stopPropagation();
               setIsMinimized(!isMinimized);
             }}
@@ -353,8 +359,11 @@ const PersistentCLI = ({
                 className="flex-1 overflow-y-auto p-4 font-mono text-sm space-y-1"
                 style={{ maxHeight: '320px' }}
               >
-                {output.map((item) => (
-                  <div key={item.id} className={`${getOutputTypeColor(item.type)} whitespace-pre-wrap`}>
+                {output.map(item => (
+                  <div
+                    key={item.id}
+                    className={`${getOutputTypeColor(item.type)} whitespace-pre-wrap`}
+                  >
                     {item.type === 'formatted' ? (
                       <div className="bg-gray-800 p-3 rounded border border-gray-700 overflow-x-auto">
                         <pre className="text-xs text-gray-300">{item.content}</pre>
@@ -420,9 +429,7 @@ const PersistentCLI = ({
                   <span>
                     Use ↑↓ for history • Tab for autocomplete • Type &quot;help&quot; for commands
                   </span>
-                  <span>
-                    {commandHistory.length} commands in history
-                  </span>
+                  <span>{commandHistory.length} commands in history</span>
                 </div>
               </div>
             </div>

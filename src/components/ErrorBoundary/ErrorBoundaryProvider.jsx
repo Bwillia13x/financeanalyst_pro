@@ -40,7 +40,7 @@ class ErrorBoundaryProvider extends Component {
 
     // Track error for monitoring
     import('../../utils/performanceMonitoring')
-      .then((mod) => {
+      .then(mod => {
         if (mod?.trackError) {
           mod.trackError(error, errorInfo);
         }
@@ -160,7 +160,7 @@ class ErrorBoundaryProvider extends Component {
     return null;
   };
 
-  reportErrorToService = async(enhancedError) => {
+  reportErrorToService = async enhancedError => {
     try {
       // In production, send to your error monitoring service
       if (import.meta.env.PROD) {
@@ -192,7 +192,7 @@ class ErrorBoundaryProvider extends Component {
     }, 1000);
   };
 
-  handleReportFeedback = (feedback) => {
+  handleReportFeedback = feedback => {
     // Collect user feedback about the error
     const errorReport = {
       errorId: this.state.errorId,
@@ -266,22 +266,22 @@ class ErrorBoundaryProvider extends Component {
     }
 
     return (
-      <ErrorBoundaryContext.Provider value={contextValue}>
-        {children}
-      </ErrorBoundaryContext.Provider>
+      <ErrorBoundaryContext.Provider value={contextValue}>{children}</ErrorBoundaryContext.Provider>
     );
   }
 }
 
 // Financial Application Specific Error UI
 const FinancialErrorFallback = ({ error, retry, retryCount, onReportFeedback }) => {
-  const isDataError = error?.message?.toLowerCase().includes('data') ||
-                     error?.message?.toLowerCase().includes('calculation') ||
-                     error?.message?.toLowerCase().includes('financial');
+  const isDataError =
+    error?.message?.toLowerCase().includes('data') ||
+    error?.message?.toLowerCase().includes('calculation') ||
+    error?.message?.toLowerCase().includes('financial');
 
-  const isNetworkError = error?.message?.toLowerCase().includes('network') ||
-                        error?.message?.toLowerCase().includes('fetch') ||
-                        !navigator.onLine;
+  const isNetworkError =
+    error?.message?.toLowerCase().includes('network') ||
+    error?.message?.toLowerCase().includes('fetch') ||
+    !navigator.onLine;
 
   const getErrorType = () => {
     if (isNetworkError) return 'network';
@@ -308,7 +308,7 @@ const FinancialErrorFallback = ({ error, retry, retryCount, onReportFeedback }) 
       default:
         return {
           title: 'Application Error',
-          message: 'Something went wrong. Don\'t worry - your financial data is safe.',
+          message: "Something went wrong. Don't worry - your financial data is safe.",
           action: 'Try Again'
         };
     }
@@ -323,11 +323,15 @@ const FinancialErrorFallback = ({ error, retry, retryCount, onReportFeedback }) 
         <div className="mb-6">
           <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto">
             <svg
-              className="w-8 h-8 text-red-600" fill="none" stroke="currentColor"
+              className="w-8 h-8 text-red-600"
+              fill="none"
+              stroke="currentColor"
               viewBox="0 0 24 24"
             >
               <path
-                strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
                 d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
               />
             </svg>
@@ -341,12 +345,11 @@ const FinancialErrorFallback = ({ error, retry, retryCount, onReportFeedback }) 
         {/* Data Safety Assurance */}
         <div className="bg-green-900/20 border border-green-700 rounded-lg p-4 mb-6">
           <div className="flex items-center justify-center text-green-400 mb-2">
-            <svg
-              className="w-5 h-5 mr-2" fill="none" stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
-                strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
                 d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
@@ -382,9 +385,15 @@ const FinancialErrorFallback = ({ error, retry, retryCount, onReportFeedback }) 
               Technical Details
             </summary>
             <div className="mt-3 p-3 bg-slate-700 rounded text-left text-xs text-gray-300 font-mono">
-              <p><strong>Error:</strong> {error.message}</p>
-              <p><strong>Retry Count:</strong> {retryCount}</p>
-              <p><strong>Time:</strong> {new Date().toLocaleString()}</p>
+              <p>
+                <strong>Error:</strong> {error.message}
+              </p>
+              <p>
+                <strong>Retry Count:</strong> {retryCount}
+              </p>
+              <p>
+                <strong>Time:</strong> {new Date().toLocaleString()}
+              </p>
             </div>
           </details>
         </div>

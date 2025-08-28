@@ -10,7 +10,7 @@ test.describe('Accessibility Tests', () => {
   test.beforeEach(async ({ page }) => {
     // Navigate to the application
     await page.goto('/');
-    
+
     // Wait for the page to be fully loaded
     await page.waitForLoadState('networkidle');
   });
@@ -26,7 +26,7 @@ test.describe('Accessibility Tests', () => {
   test('Private Analysis page accessibility', async ({ page }) => {
     await page.goto('/private-analysis');
     await page.waitForLoadState('networkidle');
-    
+
     // Wait for components to load
     await page.waitForSelector('[data-testid="financial-spreadsheet"]', { timeout: 10000 });
 
@@ -41,7 +41,7 @@ test.describe('Accessibility Tests', () => {
   test('Valuation Tool accessibility', async ({ page }) => {
     await page.goto('/valuation-tool');
     await page.waitForLoadState('networkidle');
-    
+
     const accessibilityScanResults = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa', 'wcag21aa'])
       .analyze();
@@ -52,7 +52,7 @@ test.describe('Accessibility Tests', () => {
   test('Settings page accessibility', async ({ page }) => {
     await page.goto('/settings');
     await page.waitForLoadState('networkidle');
-    
+
     const accessibilityScanResults = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa', 'wcag21aa'])
       .analyze();
@@ -73,7 +73,7 @@ test.describe('Accessibility Tests', () => {
   test('Form accessibility in DCF analysis', async ({ page }) => {
     await page.goto('/private-analysis');
     await page.waitForLoadState('networkidle');
-    
+
     // Navigate to DCF modeling tab
     await page.click('[data-testid="tab-modeling"]');
     await page.waitForSelector('[data-testid="dcf-parameters"]', { timeout: 5000 });
@@ -102,7 +102,7 @@ test.describe('Accessibility Tests', () => {
   test('Charts and data visualization accessibility', async ({ page }) => {
     await page.goto('/private-analysis');
     await page.waitForLoadState('networkidle');
-    
+
     // Navigate to results tab where charts are displayed
     await page.click('[data-testid="tab-results"]');
     await page.waitForTimeout(2000); // Wait for charts to render
@@ -119,7 +119,7 @@ test.describe('Accessibility Tests', () => {
   test('Keyboard navigation test', async ({ page }) => {
     // Test tab navigation through major interactive elements
     await page.focus('body');
-    
+
     // Tab through navigation
     await page.keyboard.press('Tab');
     let focusedElement = await page.locator(':focus');
@@ -157,14 +157,14 @@ test.describe('Accessibility Tests', () => {
   test('Focus management in dynamic content', async ({ page }) => {
     await page.goto('/private-analysis');
     await page.waitForLoadState('networkidle');
-    
+
     // Test focus management when switching tabs
     await page.click('[data-testid="tab-modeling"]');
-    
+
     // Verify focus is moved appropriately
     const focusedElement = await page.locator(':focus');
     await expect(focusedElement).toBeVisible();
-    
+
     // Run accessibility scan on the newly loaded content
     const accessibilityScanResults = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa'])
@@ -185,7 +185,7 @@ test.describe('Accessibility Tests', () => {
   test('Form labels and descriptions', async ({ page }) => {
     await page.goto('/private-analysis');
     await page.waitForLoadState('networkidle');
-    
+
     const accessibilityScanResults = await new AxeBuilder({ page })
       .withRules(['label', 'label-title-only', 'form-field-multiple-labels'])
       .withTags(['wcag2a', 'wcag2aa'])

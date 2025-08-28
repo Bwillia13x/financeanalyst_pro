@@ -1,9 +1,9 @@
 import { AlertTriangle, RefreshCw, Home, MessageCircle } from 'lucide-react';
-import React from 'react';
+import { Component } from 'react';
 
 import Button from '../ui/Button';
 
-class ProductionErrorBoundary extends React.Component {
+class ProductionErrorBoundary extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -48,7 +48,7 @@ class ProductionErrorBoundary extends React.Component {
     try {
       // Send to Sentry if available
       if (window.Sentry) {
-        window.Sentry.withScope((scope) => {
+        window.Sentry.withScope(scope => {
           scope.setTag('errorBoundary', true);
           scope.setContext('errorInfo', errorInfo);
           scope.setContext('errorId', errorId);
@@ -76,7 +76,6 @@ class ProductionErrorBoundary extends React.Component {
       }).catch(err => {
         console.warn('Failed to send error to monitoring:', err);
       });
-
     } catch (monitoringError) {
       console.warn('Error in monitoring:', monitoringError);
     }
@@ -137,9 +136,7 @@ Please describe what you were doing when this error occurred:
             <div className="flex items-start space-x-3">
               <AlertTriangle className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />
               <div className="flex-1 min-w-0">
-                <h3 className="text-sm font-medium text-red-800">
-                  Component Error
-                </h3>
+                <h3 className="text-sm font-medium text-red-800">Component Error</h3>
                 <p className="text-sm text-red-600 mt-1">
                   This component encountered an error and couldn&apos;t be displayed.
                 </p>
@@ -169,12 +166,11 @@ Please describe what you were doing when this error occurred:
                 <AlertTriangle className="w-8 h-8 text-red-500" />
               </div>
 
-              <h1 className="text-xl font-semibold text-gray-900 mb-2">
-                Something went wrong
-              </h1>
+              <h1 className="text-xl font-semibold text-gray-900 mb-2">Something went wrong</h1>
 
               <p className="text-gray-600 mb-6">
-                We apologize for the inconvenience. An unexpected error occurred while loading this page.
+                We apologize for the inconvenience. An unexpected error occurred while loading this
+                page.
               </p>
 
               <div className="bg-gray-50 rounded-lg p-3 mb-6 text-left">
@@ -183,40 +179,24 @@ Please describe what you were doing when this error occurred:
               </div>
 
               <div className="space-y-3">
-                <Button
-                  onClick={this.handleRetry}
-                  className="w-full"
-                  variant="primary"
-                >
+                <Button onClick={this.handleRetry} className="w-full" variant="primary">
                   <RefreshCw className="w-4 h-4 mr-2" />
                   Try Again
                 </Button>
 
                 <div className="flex space-x-3">
-                  <Button
-                    onClick={this.handleGoHome}
-                    variant="secondary"
-                    className="flex-1"
-                  >
+                  <Button onClick={this.handleGoHome} variant="secondary" className="flex-1">
                     <Home className="w-4 h-4 mr-2" />
                     Go Home
                   </Button>
 
-                  <Button
-                    onClick={this.handleReportIssue}
-                    variant="outline"
-                    className="flex-1"
-                  >
+                  <Button onClick={this.handleReportIssue} variant="outline" className="flex-1">
                     <MessageCircle className="w-4 h-4 mr-2" />
                     Report
                   </Button>
                 </div>
 
-                <Button
-                  onClick={this.handleReload}
-                  variant="ghost"
-                  className="w-full text-sm"
-                >
+                <Button onClick={this.handleReload} variant="ghost" className="w-full text-sm">
                   Reload Page
                 </Button>
               </div>
@@ -236,7 +216,9 @@ Please describe what you were doing when this error occurred:
                     </div>
                     <div>
                       <strong>Component Stack:</strong>
-                      <pre className="mt-1 whitespace-pre-wrap">{this.state.errorInfo?.componentStack}</pre>
+                      <pre className="mt-1 whitespace-pre-wrap">
+                        {this.state.errorInfo?.componentStack}
+                      </pre>
                     </div>
                   </div>
                 </details>

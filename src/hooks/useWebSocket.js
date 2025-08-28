@@ -35,7 +35,7 @@ export function useWebSocket(url, options = {}) {
 
       const ws = new WebSocket(url);
 
-      ws.onopen = (event) => {
+      ws.onopen = event => {
         console.log('WebSocket connected');
         setSocket(ws);
         setIsConnected(true);
@@ -56,7 +56,7 @@ export function useWebSocket(url, options = {}) {
         }
       };
 
-      ws.onmessage = (event) => {
+      ws.onmessage = event => {
         try {
           const message = JSON.parse(event.data);
           setLastMessage(message);
@@ -69,7 +69,7 @@ export function useWebSocket(url, options = {}) {
         }
       };
 
-      ws.onclose = (event) => {
+      ws.onclose = event => {
         console.log('WebSocket disconnected:', event.code, event.reason);
         setSocket(null);
         setIsConnected(false);
@@ -81,10 +81,14 @@ export function useWebSocket(url, options = {}) {
         }
 
         // Auto-reconnect if enabled and not a normal closure
-        if (autoReconnect && event.code !== 1000 && reconnectAttemptsRef.current < maxReconnectAttempts) {
+        if (
+          autoReconnect &&
+          event.code !== 1000 &&
+          reconnectAttemptsRef.current < maxReconnectAttempts
+        ) {
           reconnectAttemptsRef.current++;
           setConnectionStatus('reconnecting');
-          
+
           reconnectTimeoutRef.current = setTimeout(() => {
             connect();
           }, reconnectInterval);
@@ -94,7 +98,7 @@ export function useWebSocket(url, options = {}) {
         }
       };
 
-      ws.onerror = (event) => {
+      ws.onerror = event => {
         console.error('WebSocket error:', event);
         setError('WebSocket connection error');
         setConnectionStatus('error');
@@ -103,50 +107,64 @@ export function useWebSocket(url, options = {}) {
           onError(event);
         }
       };
-
     } catch (err) {
       console.error('Failed to create WebSocket connection:', err);
       setError(err.message);
       setConnectionStatus('error');
     }
-  }, [url, autoReconnect, reconnectInterval, maxReconnectAttempts, onOpen, onMessage, onClose, onError]);
+  }, [
+    url,
+    autoReconnect,
+    reconnectInterval,
+    maxReconnectAttempts,
+    onOpen,
+    onMessage,
+    onClose,
+    onError
+  ]);
 
   const disconnect = useCallback(() => {
     if (socket) {
       socket.close(1000, 'Manual disconnect');
     }
-    
+
     stopHeartbeat();
-    
+
     if (reconnectTimeoutRef.current) {
       clearTimeout(reconnectTimeoutRef.current);
     }
-    
+
     setSocket(null);
     setIsConnected(false);
     setConnectionStatus('disconnected');
   }, [socket]);
 
-  const send = useCallback((message) => {
-    if (socket?.readyState === WebSocket.OPEN) {
-      socket.send(JSON.stringify(message));
-    } else {
-      // Queue message for when connection is restored
-      messageQueueRef.current.push(message);
-    }
-  }, [socket]);
-
-  const startHeartbeat = useCallback((ws) => {
-    if (heartbeatIntervalRef.current) {
-      clearInterval(heartbeatIntervalRef.current);
-    }
-
-    heartbeatIntervalRef.current = setInterval(() => {
-      if (ws.readyState === WebSocket.OPEN) {
-        ws.send(JSON.stringify({ type: 'heartbeat' }));
+  const send = useCallback(
+    message => {
+      if (socket?.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify(message));
+      } else {
+        // Queue message for when connection is restored
+        messageQueueRef.current.push(message);
       }
-    }, heartbeatInterval);
-  }, [heartbeatInterval]);
+    },
+    [socket]
+  );
+
+  const startHeartbeat = useCallback(
+    ws => {
+      if (heartbeatIntervalRef.current) {
+        clearInterval(heartbeatIntervalRef.current);
+      }
+
+      heartbeatIntervalRef.current = setInterval(() => {
+        if (ws.readyState === WebSocket.OPEN) {
+          ws.send(JSON.stringify({ type: 'heartbeat' }));
+        }
+      }, heartbeatInterval);
+    },
+    [heartbeatInterval]
+  );
 
   const stopHeartbeat = useCallback(() => {
     if (heartbeatIntervalRef.current) {
@@ -192,7 +210,7 @@ export function useCollaboration(analysisId, user) {
   const [notifications, setNotifications] = useState([]);
 
   const wsUrl = process.env.REACT_APP_WS_URL || 'ws://localhost:8080';
-  
+
   const { isConnected, send, connectionStatus } = useWebSocket(wsUrl, {
     onOpen: () => {
       // Authenticate
@@ -203,7 +221,7 @@ export function useCollaboration(analysisId, user) {
         }
       });
     },
-    onMessage: (message) => {
+    onMessage: message => {
       switch (message.type) {
         case 'auth:success':
           // Join analysis room
@@ -233,9 +251,7 @@ export function useCollaboration(analysisId, user) {
           break;
 
         case 'comment:updated':
-          setComments(prev => 
-            prev.map(c => c.id === message.comment.id ? message.comment : c)
-          );
+          setComments(prev => prev.map(c => (c.id === message.comment.id ? message.comment : c)));
           break;
 
         case 'version:created':
@@ -249,56 +265,71 @@ export function useCollaboration(analysisId, user) {
     }
   });
 
-  const updatePresence = useCallback((presence) => {
-    send({
-      type: 'presence:update',
-      payload: {
-        roomId: analysisId,
-        presence
-      }
-    });
-  }, [send, analysisId]);
+  const updatePresence = useCallback(
+    presence => {
+      send({
+        type: 'presence:update',
+        payload: {
+          roomId: analysisId,
+          presence
+        }
+      });
+    },
+    [send, analysisId]
+  );
 
-  const updateCursor = useCallback((cursor) => {
-    send({
-      type: 'cursor:update',
-      payload: {
-        roomId: analysisId,
-        cursor
-      }
-    });
-  }, [send, analysisId]);
+  const updateCursor = useCallback(
+    cursor => {
+      send({
+        type: 'cursor:update',
+        payload: {
+          roomId: analysisId,
+          cursor
+        }
+      });
+    },
+    [send, analysisId]
+  );
 
-  const addComment = useCallback((comment) => {
-    send({
-      type: 'comment:add',
-      payload: {
-        roomId: analysisId,
-        comment
-      }
-    });
-  }, [send, analysisId]);
+  const addComment = useCallback(
+    comment => {
+      send({
+        type: 'comment:add',
+        payload: {
+          roomId: analysisId,
+          comment
+        }
+      });
+    },
+    [send, analysisId]
+  );
 
-  const createVersion = useCallback((version) => {
-    send({
-      type: 'version:create',
-      payload: {
-        roomId: analysisId,
-        version
-      }
-    });
-  }, [send, analysisId]);
+  const createVersion = useCallback(
+    version => {
+      send({
+        type: 'version:create',
+        payload: {
+          roomId: analysisId,
+          version
+        }
+      });
+    },
+    [send, analysisId]
+  );
 
-  const updateDashboard = useCallback((dashboard, changes) => {
-    send({
-      type: 'dashboard:update',
-      payload: {
-        roomId: analysisId,
-        dashboard,
-        changes
-      }
-    });
-  }, [send, analysisId]);
+  const updateDashboard = useCallback(
+    (dashboard, changes) => {
+      send({
+        type: 'dashboard:update',
+        payload: {
+          roomId: analysisId,
+          dashboard,
+          changes
+        }
+      });
+    },
+    [send, analysisId]
+  );
 
   return {
     isConnected,
@@ -318,11 +349,13 @@ export function useCollaboration(analysisId, user) {
 // Helper function to generate auth token (replace with actual implementation)
 function generateAuthToken(user) {
   // In production, this would be a proper JWT token
-  return btoa(JSON.stringify({
-    id: user.id,
-    name: user.name,
-    avatar: user.avatar,
-    role: user.role,
-    timestamp: Date.now()
-  }));
+  return btoa(
+    JSON.stringify({
+      id: user.id,
+      name: user.name,
+      avatar: user.avatar,
+      role: user.role,
+      timestamp: Date.now()
+    })
+  );
 }

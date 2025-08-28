@@ -1,9 +1,9 @@
-import React from 'react';
+import { Component, useCallback } from 'react';
 
 import Icon from './AppIcon';
 import Button from './ui/Button';
 
-class EnhancedErrorBoundary extends React.Component {
+class EnhancedErrorBoundary extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -228,20 +228,20 @@ class EnhancedErrorBoundary extends React.Component {
 }
 
 // Higher-order component for wrapping components with error boundaries
-export const withErrorBoundary = (Component, fallback = null) => {
-  const WrappedComponent = props => (
+export const withErrorBoundary = (Wrapped, fallback = null) => {
+  const WithErrorBoundary = props => (
     <EnhancedErrorBoundary fallback={fallback}>
-      <Component {...props} />
+      <Wrapped {...props} />
     </EnhancedErrorBoundary>
   );
 
-  WrappedComponent.displayName = `withErrorBoundary(${Component.displayName || Component.name})`;
-  return WrappedComponent;
+  WithErrorBoundary.displayName = `withErrorBoundary(${Wrapped.displayName || Wrapped.name})`;
+  return WithErrorBoundary;
 };
 
 // Hook for error reporting in functional components
 export const useErrorHandler = () => {
-  const reportError = React.useCallback((error, errorInfo = {}) => {
+  const reportError = useCallback((error, errorInfo = {}) => {
     console.error('Manual error report:', error, errorInfo);
 
     if (import.meta.env.PROD && import.meta.env.VITE_MONITORING_ENDPOINT) {

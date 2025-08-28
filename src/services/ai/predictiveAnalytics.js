@@ -11,21 +11,21 @@ class PredictiveAnalyticsService extends EventEmitter {
     this.models = {
       timeSeries: {
         arima: { accuracy_range: [0.75, 0.85], best_for: 'stationary_data' },
-        prophet: { accuracy_range: [0.80, 0.90], best_for: 'seasonal_trends' },
+        prophet: { accuracy_range: [0.8, 0.9], best_for: 'seasonal_trends' },
         lstm: { accuracy_range: [0.85, 0.95], best_for: 'complex_patterns' },
-        exponential_smoothing: { accuracy_range: [0.70, 0.80], best_for: 'simple_trends' }
+        exponential_smoothing: { accuracy_range: [0.7, 0.8], best_for: 'simple_trends' }
       },
       classification: {
-        random_forest: { accuracy_range: [0.80, 0.90], interpretability: 'high' },
+        random_forest: { accuracy_range: [0.8, 0.9], interpretability: 'high' },
         gradient_boosting: { accuracy_range: [0.85, 0.92], interpretability: 'medium' },
         neural_network: { accuracy_range: [0.87, 0.95], interpretability: 'low' },
         logistic_regression: { accuracy_range: [0.75, 0.85], interpretability: 'high' }
       },
       regression: {
-        linear_regression: { r_squared_range: [0.60, 0.80], interpretability: 'high' },
+        linear_regression: { r_squared_range: [0.6, 0.8], interpretability: 'high' },
         ridge_regression: { r_squared_range: [0.65, 0.82], interpretability: 'high' },
-        xgboost: { r_squared_range: [0.75, 0.90], interpretability: 'medium' },
-        neural_network: { r_squared_range: [0.80, 0.95], interpretability: 'low' }
+        xgboost: { r_squared_range: [0.75, 0.9], interpretability: 'medium' },
+        neural_network: { r_squared_range: [0.8, 0.95], interpretability: 'low' }
       }
     };
 
@@ -59,13 +59,13 @@ class PredictiveAnalyticsService extends EventEmitter {
     }
   }
 
-  async selectOptimalModel(data, forecastType) {
+  async selectOptimalModel(data, _forecastType) {
     const historicalData = data.historical_data || [];
     const dataCharacteristics = this.analyzeDataCharacteristics(historicalData);
-    
+
     // Test multiple models and select best performer
     const modelPerformance = {};
-    
+
     for (const [modelType, models] of Object.entries(this.models.timeSeries)) {
       const performance = await this.backtestModel(historicalData, modelType);
       modelPerformance[modelType] = {
@@ -74,8 +74,9 @@ class PredictiveAnalyticsService extends EventEmitter {
       };
     }
 
-    const bestModel = Object.entries(modelPerformance)
-      .sort(([,a], [,b]) => b.overall_score - a.overall_score)[0];
+    const bestModel = Object.entries(modelPerformance).sort(
+      ([, a], [, b]) => b.overall_score - a.overall_score
+    )[0];
 
     return {
       selected_model: bestModel[0],
@@ -88,13 +89,13 @@ class PredictiveAnalyticsService extends EventEmitter {
   async performUnivariateForecast(companyData) {
     const timeSeries = companyData.revenue_history || [];
     const forecastHorizon = companyData.forecast_horizon || 12; // months
-    
+
     // ARIMA Model
     const arimaForecast = await this.fitARIMA(timeSeries, forecastHorizon);
-    
+
     // Prophet Model (for seasonal data)
     const prophetForecast = await this.fitProphet(timeSeries, forecastHorizon);
-    
+
     // LSTM Neural Network
     const lstmForecast = await this.fitLSTM(timeSeries, forecastHorizon);
 
@@ -110,11 +111,11 @@ class PredictiveAnalyticsService extends EventEmitter {
   async performMultivariateForecast(companyData) {
     const features = this.extractFeatures(companyData);
     const targetVariable = companyData.target_variable || 'revenue';
-    
+
     // Feature selection and engineering
     const selectedFeatures = await this.performFeatureSelection(features, targetVariable);
     const engineeredFeatures = this.engineerFeatures(selectedFeatures);
-    
+
     // Multiple regression models
     const models = {
       vector_autoregression: await this.fitVAR(engineeredFeatures),
@@ -142,7 +143,7 @@ class PredictiveAnalyticsService extends EventEmitter {
     };
 
     const aggregatedForecast = this.aggregateCashFlowComponents(cashFlowComponents);
-    
+
     return {
       component_forecasts: cashFlowComponents,
       total_cash_flow_forecast: aggregatedForecast,
@@ -176,7 +177,7 @@ class PredictiveAnalyticsService extends EventEmitter {
    */
   async predictDefaultProbability(borrowerData) {
     const features = this.extractCreditFeatures(borrowerData);
-    
+
     const models = {
       logistic_regression: await this.fitLogisticRegression(features),
       random_forest: await this.fitRandomForest(features),
@@ -185,7 +186,7 @@ class PredictiveAnalyticsService extends EventEmitter {
     };
 
     const ensembleModel = this.createEnsembleClassifier(models);
-    
+
     return {
       individual_models: models,
       ensemble_model: ensembleModel,
@@ -201,10 +202,10 @@ class PredictiveAnalyticsService extends EventEmitter {
   async predictCustomerChurn(customerData) {
     const churnFeatures = this.extractChurnFeatures(customerData);
     const churnLabels = customerData.churn_labels || [];
-    
+
     // Time-based feature engineering for churn
     const timeBasedFeatures = this.createTimeBasedFeatures(churnFeatures);
-    
+
     const churnModels = {
       logistic_regression: await this.fitChurnLogistic(timeBasedFeatures, churnLabels),
       random_forest: await this.fitChurnRandomForest(timeBasedFeatures, churnLabels),
@@ -243,7 +244,7 @@ class PredictiveAnalyticsService extends EventEmitter {
   // Helper Methods
   analyzeDataCharacteristics(data) {
     const values = data.map(d => d.value || d);
-    
+
     return {
       length: data.length,
       stationarity: this.testStationarity(values),
@@ -259,11 +260,11 @@ class PredictiveAnalyticsService extends EventEmitter {
     const trainSize = Math.floor(data.length * 0.8);
     const trainData = data.slice(0, trainSize);
     const testData = data.slice(trainSize);
-    
+
     // Simulate model fitting and prediction
     const predictions = await this.simulateModelPredictions(trainData, testData, modelType);
     const actuals = testData.map(d => d.value || d);
-    
+
     return {
       mae: this.calculateMAE(actuals, predictions),
       rmse: this.calculateRMSE(actuals, predictions),
@@ -275,7 +276,7 @@ class PredictiveAnalyticsService extends EventEmitter {
 
   calculateSuitabilityScore(characteristics, modelSpecs) {
     let score = 0.5; // Base score
-    
+
     // Adjust based on data characteristics
     if (characteristics.seasonality > 0.3 && modelSpecs.best_for === 'seasonal_trends') {
       score += 0.3;
@@ -286,7 +287,7 @@ class PredictiveAnalyticsService extends EventEmitter {
     if (characteristics.volatility > 0.2 && modelSpecs.best_for === 'complex_patterns') {
       score += 0.2;
     }
-    
+
     return Math.min(score, 1.0);
   }
 
@@ -294,7 +295,7 @@ class PredictiveAnalyticsService extends EventEmitter {
     // ARIMA model simulation - in production would use actual ML library
     const order = this.selectARIMAOrder(timeSeries);
     const model = this.simulateARIMAFit(timeSeries, order);
-    
+
     const forecast = [];
     for (let i = 1; i <= horizon; i++) {
       const prediction = this.simulateARIMAPrediction(model, i);
@@ -306,11 +307,11 @@ class PredictiveAnalyticsService extends EventEmitter {
         confidence: 0.95
       });
     }
-    
+
     return {
       model_order: order,
       model_params: model.params,
-      forecast: forecast,
+      forecast,
       model_diagnostics: this.simulateARIMADiagnostics(model)
     };
   }
@@ -318,26 +319,26 @@ class PredictiveAnalyticsService extends EventEmitter {
   async fitProphet(timeSeries, horizon) {
     // Prophet model simulation
     const seasonalComponents = this.detectSeasonalComponents(timeSeries);
-    
+
     const forecast = [];
     for (let i = 1; i <= horizon; i++) {
       const trend = this.predictTrend(timeSeries, i);
       const seasonal = this.predictSeasonal(seasonalComponents, i);
       const prediction = trend + seasonal;
-      
+
       forecast.push({
         period: i,
         forecast: prediction,
-        trend: trend,
-        seasonal: seasonal,
+        trend,
+        seasonal,
         lower_bound: prediction * 0.85,
         upper_bound: prediction * 1.15
       });
     }
-    
+
     return {
       seasonal_components: seasonalComponents,
-      forecast: forecast,
+      forecast,
       model_performance: this.simulateProphetPerformance()
     };
   }
@@ -346,51 +347,51 @@ class PredictiveAnalyticsService extends EventEmitter {
     // LSTM neural network simulation
     const sequences = this.createSequences(timeSeries, 12); // 12-period lookback
     const model = this.simulateLSTMTraining(sequences);
-    
+
     const forecast = [];
     let lastSequence = timeSeries.slice(-12);
-    
+
     for (let i = 1; i <= horizon; i++) {
       const prediction = this.simulateLSTMPrediction(model, lastSequence);
       forecast.push({
         period: i,
         forecast: prediction,
-        confidence: 0.90
+        confidence: 0.9
       });
-      
+
       // Update sequence for next prediction
       lastSequence = [...lastSequence.slice(1), prediction];
     }
-    
+
     return {
       model_architecture: model.architecture,
       training_history: model.training_history,
-      forecast: forecast,
+      forecast,
       feature_importance: this.calculateLSTMFeatureImportance(model)
     };
   }
 
   extractFeatures(companyData) {
     const features = {};
-    
+
     // Financial features
     if (companyData.financials) {
       features.financial_ratios = this.calculateFinancialRatios(companyData.financials);
       features.growth_metrics = this.calculateGrowthMetrics(companyData.financials);
       features.profitability_metrics = this.calculateProfitabilityMetrics(companyData.financials);
     }
-    
+
     // Market features
     if (companyData.market_data) {
       features.technical_indicators = this.calculateTechnicalIndicators(companyData.market_data);
       features.market_metrics = this.calculateMarketMetrics(companyData.market_data);
     }
-    
+
     // Macroeconomic features
     if (companyData.macro_data) {
       features.macro_indicators = this.processMacroIndicators(companyData.macro_data);
     }
-    
+
     return features;
   }
 
@@ -406,38 +407,38 @@ class PredictiveAnalyticsService extends EventEmitter {
     // Simple seasonality detection using autocorrelation
     const periods = [4, 12, 52]; // Quarterly, monthly, weekly
     let maxCorrelation = 0;
-    
+
     periods.forEach(period => {
       if (values.length > period * 2) {
         const correlation = this.calculateAutocorrelation(values, period);
         maxCorrelation = Math.max(maxCorrelation, Math.abs(correlation));
       }
     });
-    
+
     return maxCorrelation;
   }
 
   detectTrend(values) {
     if (values.length < 3) return 0;
-    
+
     const firstHalf = values.slice(0, Math.floor(values.length / 2));
     const secondHalf = values.slice(Math.floor(values.length / 2));
-    
+
     const firstMean = firstHalf.reduce((sum, v) => sum + v, 0) / firstHalf.length;
     const secondMean = secondHalf.reduce((sum, v) => sum + v, 0) / secondHalf.length;
-    
+
     return (secondMean - firstMean) / firstMean;
   }
 
   calculateVolatility(values) {
     const returns = [];
     for (let i = 1; i < values.length; i++) {
-      returns.push((values[i] - values[i-1]) / values[i-1]);
+      returns.push((values[i] - values[i - 1]) / values[i - 1]);
     }
-    
+
     const mean = returns.reduce((sum, r) => sum + r, 0) / returns.length;
     const variance = returns.reduce((sum, r) => sum + Math.pow(r - mean, 2), 0) / returns.length;
-    
+
     return Math.sqrt(variance);
   }
 
@@ -465,42 +466,87 @@ class PredictiveAnalyticsService extends EventEmitter {
     const residualSumSquares = actuals.reduce((sum, actual, i) => {
       return sum + Math.pow(actual - predictions[i], 2);
     }, 0);
-    
-    return 1 - (residualSumSquares / totalSumSquares);
+
+    return 1 - residualSumSquares / totalSumSquares;
   }
 
   calculateOverallScore(actuals, predictions) {
     const mae = this.calculateMAE(actuals, predictions);
     const rmse = this.calculateRMSE(actuals, predictions);
     const rSquared = this.calculateRSquared(actuals, predictions);
-    
+
     // Weighted combination of metrics
-    return (rSquared * 0.5) + ((1 - mae / actuals.reduce((sum, v) => sum + v, 0) * actuals.length) * 0.3) + 
-           ((1 - rmse / actuals.reduce((sum, v) => sum + v, 0) * actuals.length) * 0.2);
+    return (
+      rSquared * 0.5 +
+      (1 - (mae / actuals.reduce((sum, v) => sum + v, 0)) * actuals.length) * 0.3 +
+      (1 - (rmse / actuals.reduce((sum, v) => sum + v, 0)) * actuals.length) * 0.2
+    );
   }
 
   // Additional helper methods would be implemented here...
-  generateSelectionRationale() { /* Implementation */ }
-  createEnsembleForecast() { /* Implementation */ }
-  calculateConfidenceIntervals() { /* Implementation */ }
-  generateScenarioForecasts() { /* Implementation */ }
-  performFeatureSelection() { /* Implementation */ }
-  engineerFeatures() { /* Implementation */ }
-  fitVAR() { /* Implementation */ }
-  fitMultivariateLSTM() { /* Implementation */ }
-  fitGradientBoosting() { /* Implementation */ }
-  fitNeuralNetwork() { /* Implementation */ }
-  calculateFeatureImportance() { /* Implementation */ }
-  createEnsemblePrediction() { /* Implementation */ }
-  performModelDiagnostics() { /* Implementation */ }
-  compareForecasts() { /* Implementation */ }
-  forecastOperatingCashFlow() { /* Implementation */ }
-  forecastInvestingCashFlow() { /* Implementation */ }
-  forecastFinancingCashFlow() { /* Implementation */ }
-  aggregateCashFlowComponents() { /* Implementation */ }
-  analyzeLiquidityProjections() { /* Implementation */ }
-  performCashFlowStressTesting() { /* Implementation */ }
-  forecastWorkingCapital() { /* Implementation */ }
+  generateSelectionRationale() {
+    /* Implementation */
+  }
+  createEnsembleForecast() {
+    /* Implementation */
+  }
+  calculateConfidenceIntervals() {
+    /* Implementation */
+  }
+  generateScenarioForecasts() {
+    /* Implementation */
+  }
+  performFeatureSelection() {
+    /* Implementation */
+  }
+  engineerFeatures() {
+    /* Implementation */
+  }
+  fitVAR() {
+    /* Implementation */
+  }
+  fitMultivariateLSTM() {
+    /* Implementation */
+  }
+  fitGradientBoosting() {
+    /* Implementation */
+  }
+  fitNeuralNetwork() {
+    /* Implementation */
+  }
+  calculateFeatureImportance() {
+    /* Implementation */
+  }
+  createEnsemblePrediction() {
+    /* Implementation */
+  }
+  performModelDiagnostics() {
+    /* Implementation */
+  }
+  compareForecasts() {
+    /* Implementation */
+  }
+  forecastOperatingCashFlow() {
+    /* Implementation */
+  }
+  forecastInvestingCashFlow() {
+    /* Implementation */
+  }
+  forecastFinancingCashFlow() {
+    /* Implementation */
+  }
+  aggregateCashFlowComponents() {
+    /* Implementation */
+  }
+  analyzeLiquidityProjections() {
+    /* Implementation */
+  }
+  performCashFlowStressTesting() {
+    /* Implementation */
+  }
+  forecastWorkingCapital() {
+    /* Implementation */
+  }
   // ... many more helper methods for complete implementation
 }
 

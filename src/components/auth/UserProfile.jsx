@@ -36,29 +36,31 @@ const UserProfile = ({ onClose }) => {
     loadUserData();
   }, []);
 
-  const loadUserData = async() => {
+  const loadUserData = async () => {
     try {
       setIsLoading(true);
 
       // Load user preferences
       const userPrefs = await financialDataStorage.getUserPreferences();
-      setPreferences(userPrefs || {
-        theme: 'light',
-        notifications: {
-          email: true,
-          browser: true,
-          modelUpdates: true,
-          marketAlerts: false
-        },
-        privacy: {
-          analytics: true,
-          dataSharing: false,
-          marketingEmails: false
-        },
-        autoSave: true,
-        defaultCurrency: 'USD',
-        dateFormat: 'MM/DD/YYYY'
-      });
+      setPreferences(
+        userPrefs || {
+          theme: 'light',
+          notifications: {
+            email: true,
+            browser: true,
+            modelUpdates: true,
+            marketAlerts: false
+          },
+          privacy: {
+            analytics: true,
+            dataSharing: false,
+            marketingEmails: false
+          },
+          autoSave: true,
+          defaultCurrency: 'USD',
+          dateFormat: 'MM/DD/YYYY'
+        }
+      );
 
       // Load storage statistics
       const storageStats = await financialDataStorage.getFinancialDataStats();
@@ -70,7 +72,7 @@ const UserProfile = ({ onClose }) => {
     }
   };
 
-  const handleSavePreferences = async() => {
+  const handleSavePreferences = async () => {
     try {
       setIsLoading(true);
       setSaveStatus(null);
@@ -93,7 +95,7 @@ const UserProfile = ({ onClose }) => {
     }
   };
 
-  const handleLogout = async() => {
+  const handleLogout = async () => {
     if (window.confirm('Are you sure you want to sign out?')) {
       await logout();
     }
@@ -115,16 +117,20 @@ const UserProfile = ({ onClose }) => {
     });
   };
 
-  const getRoleBadgeColor = (role) => {
+  const getRoleBadgeColor = role => {
     switch (role) {
-      case USER_ROLES.ADMIN: return 'bg-red-100 text-red-800';
-      case USER_ROLES.ANALYST: return 'bg-blue-100 text-blue-800';
-      case USER_ROLES.VIEWER: return 'bg-green-100 text-green-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case USER_ROLES.ADMIN:
+        return 'bg-red-100 text-red-800';
+      case USER_ROLES.ANALYST:
+        return 'bg-blue-100 text-blue-800';
+      case USER_ROLES.VIEWER:
+        return 'bg-green-100 text-green-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
     }
   };
 
-  const formatBytes = (bytes) => {
+  const formatBytes = bytes => {
     if (bytes === 0) return '0 Bytes';
     const k = 1024;
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
@@ -149,10 +155,7 @@ const UserProfile = ({ onClose }) => {
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b">
           <h2 className="text-xl font-semibold text-gray-900">User Profile</h2>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
-          >
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
             ×
           </button>
         </div>
@@ -191,7 +194,9 @@ const UserProfile = ({ onClose }) => {
                 <div>
                   <h3 className="text-lg font-medium text-gray-900">{user.name}</h3>
                   <p className="text-gray-600">{user.email}</p>
-                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getRoleBadgeColor(user.role)}`}>
+                  <span
+                    className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getRoleBadgeColor(user.role)}`}
+                  >
                     {user.role}
                   </span>
                 </div>
@@ -284,7 +289,9 @@ const UserProfile = ({ onClose }) => {
                       <input
                         type="checkbox"
                         checked={preferences.notifications[setting.key]}
-                        onChange={(e) => updatePreference(`notifications.${setting.key}`, e.target.checked)}
+                        onChange={e =>
+                          updatePreference(`notifications.${setting.key}`, e.target.checked)
+                        }
                         className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                       />
                       <span className="ml-2 text-sm text-gray-700">{setting.label}</span>
@@ -301,18 +308,20 @@ const UserProfile = ({ onClose }) => {
                     <input
                       type="checkbox"
                       checked={preferences.autoSave}
-                      onChange={(e) => updatePreference('autoSave', e.target.checked)}
+                      onChange={e => updatePreference('autoSave', e.target.checked)}
                       className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                     />
                     <span className="ml-2 text-sm text-gray-700">Auto-save models</span>
                   </label>
 
                   <div className="flex items-center space-x-4">
-                    <label htmlFor="defaultCurrency" className="text-sm text-gray-700">Default Currency:</label>
+                    <label htmlFor="defaultCurrency" className="text-sm text-gray-700">
+                      Default Currency:
+                    </label>
                     <select
                       id="defaultCurrency"
                       value={preferences.defaultCurrency}
-                      onChange={(e) => updatePreference('defaultCurrency', e.target.value)}
+                      onChange={e => updatePreference('defaultCurrency', e.target.value)}
                       className="border border-gray-300 rounded px-2 py-1 text-sm"
                     >
                       <option value="USD">USD</option>
@@ -336,7 +345,9 @@ const UserProfile = ({ onClose }) => {
               {saveStatus && (
                 <div
                   className={`flex items-center p-3 rounded-lg ${
-                    saveStatus.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
+                    saveStatus.type === 'success'
+                      ? 'bg-green-50 text-green-700'
+                      : 'bg-red-50 text-red-700'
                   }`}
                 >
                   {saveStatus.type === 'success' ? (
@@ -358,8 +369,8 @@ const UserProfile = ({ onClose }) => {
                   <div>
                     <h4 className="font-medium text-amber-900">Demo Mode</h4>
                     <p className="text-sm text-amber-700 mt-1">
-                      Security features are simulated in demo mode. In production, this would include password changes,
-                      two-factor authentication, and session management.
+                      Security features are simulated in demo mode. In production, this would
+                      include password changes, two-factor authentication, and session management.
                     </p>
                   </div>
                 </div>

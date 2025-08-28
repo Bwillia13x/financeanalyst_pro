@@ -215,7 +215,6 @@ class APIIntegrationService {
 
       console.log(`Successfully connected to ${integration.name}`);
       return { success: true, integration: integrationId };
-
     } catch (error) {
       integration.status = 'error';
       integration.lastError = error.message;
@@ -249,7 +248,6 @@ class APIIntegrationService {
 
       console.log(`Disconnected from ${integration.name}`);
       return { success: true };
-
     } catch (error) {
       console.error(`Error disconnecting from ${integration.name}:`, error);
       throw error;
@@ -294,7 +292,6 @@ class APIIntegrationService {
       this.updateRateLimit(integrationId);
 
       return response;
-
     } catch (error) {
       integration.errorCount++;
       console.error(`API request failed for ${integrationId}:`, error);
@@ -314,8 +311,10 @@ class APIIntegrationService {
     const results = [];
     for (const batch of batches) {
       const batchPromises = batch.map(req =>
-        this.makeRequest(req.integrationId, req.endpoint, req.options)
-          .catch(error => ({ error: error.message, request: req }))
+        this.makeRequest(req.integrationId, req.endpoint, req.options).catch(error => ({
+          error: error.message,
+          request: req
+        }))
       );
 
       const batchResults = await Promise.all(batchPromises);
@@ -421,7 +420,6 @@ class APIIntegrationService {
       integration.lastSync = new Date().toISOString();
       syncResults.endTime = new Date().toISOString();
       syncResults.success = true;
-
     } catch (error) {
       syncResults.error = error.message;
       syncResults.success = false;
@@ -511,9 +509,9 @@ class APIIntegrationService {
   getAuthHeaders(integration, credentials) {
     switch (integration.authentication) {
       case 'api_key':
-        return { 'Authorization': `Bearer ${credentials.apiKey}` };
+        return { Authorization: `Bearer ${credentials.apiKey}` };
       case 'oauth':
-        return { 'Authorization': `Bearer ${credentials.accessToken}` };
+        return { Authorization: `Bearer ${credentials.accessToken}` };
       case 'session':
         return { 'X-Session-ID': credentials.sessionId };
       default:
@@ -540,7 +538,10 @@ class APIIntegrationService {
     // Live API calls using fetch
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), options.timeout || this.config.timeout);
+      const timeoutId = setTimeout(
+        () => controller.abort(),
+        options.timeout || this.config.timeout
+      );
 
       const response = await fetch(url, {
         ...options,
@@ -560,7 +561,6 @@ class APIIntegrationService {
         status: response.status,
         headers: Object.fromEntries(response.headers.entries())
       };
-
     } catch (error) {
       if (error.name === 'AbortError') {
         throw new Error('Request timeout');

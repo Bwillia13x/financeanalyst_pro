@@ -70,25 +70,23 @@ export const LiveMarketDashboard = ({
     .flatMap(section => section.items)
     .map(({ dataType, symbol }) => ({ dataType, symbol }));
 
-  const {
-    getData,
-    getConnectionState,
-    isAllConnected,
-    hasAnyErrors
-  } = useMultipleRealTimeData(allSubscriptions);
+  const { getData, getConnectionState, isAllConnected, hasAnyErrors } =
+    useMultipleRealTimeData(allSubscriptions);
 
   const handleTickerClick = (dataType, symbol, data) => {
     onAssetClick?.(dataType, symbol, data);
   };
 
-  const handleWidgetExpand = (key) => {
+  const handleWidgetExpand = key => {
     setExpandedWidget(expandedWidget === key ? null : key);
   };
 
   const activeItems = MARKET_SECTIONS[activeSection]?.items || [];
 
   return (
-    <div className={cn('bg-white dark:bg-slate-900 rounded-lg shadow-lg overflow-hidden', className)}>
+    <div
+      className={cn('bg-white dark:bg-slate-900 rounded-lg shadow-lg overflow-hidden', className)}
+    >
       {/* Market Ticker */}
       {showTicker && (
         <LiveMarketTicker
@@ -178,7 +176,7 @@ export const LiveMarketDashboard = ({
                     name={name}
                     size={isExpanded ? 'large' : 'medium'}
                     showChart={isExpanded}
-                    onPriceUpdate={(data) => onAssetClick?.(dataType, symbol, data)}
+                    onPriceUpdate={data => onAssetClick?.(dataType, symbol, data)}
                     className="cursor-pointer hover:shadow-md"
                     onClick={() => handleWidgetExpand(key)}
                   />
@@ -196,7 +194,7 @@ export const LiveMarketDashboard = ({
                 <div
                   key={`${dataType}_${symbol}`}
                   onClick={() => onAssetClick?.(dataType, symbol, data)}
-                  onKeyDown={(e) => e.key === 'Enter' && onAssetClick?.(dataType, symbol, data)}
+                  onKeyDown={e => e.key === 'Enter' && onAssetClick?.(dataType, symbol, data)}
                   role="button"
                   tabIndex={0}
                   className="flex items-center justify-between p-3 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg cursor-pointer transition-colors"
@@ -209,23 +207,22 @@ export const LiveMarketDashboard = ({
                       )}
                     />
                     <div>
-                      <div className="font-medium text-slate-900 dark:text-white">
-                        {symbol}
-                      </div>
-                      <div className="text-sm text-slate-500 dark:text-slate-400">
-                        {name}
-                      </div>
+                      <div className="font-medium text-slate-900 dark:text-white">{symbol}</div>
+                      <div className="text-sm text-slate-500 dark:text-slate-400">{name}</div>
                     </div>
                   </div>
 
                   <div className="text-right">
                     <div className="font-semibold text-slate-900 dark:text-white">
-                      {data ? (
-                        dataType === 'stock_price' ? `$${data.price?.toFixed(2)}` :
-                          dataType === 'fx_rates' ? data.rate?.toFixed(4) :
-                            dataType === 'commodity_prices' ? `$${data.price?.toFixed(2)}` :
-                              `${(data.rate || data.yield || data.volatility)?.toFixed(2)}%`
-                      ) : '---'}
+                      {data
+                        ? dataType === 'stock_price'
+                          ? `$${data.price?.toFixed(2)}`
+                          : dataType === 'fx_rates'
+                            ? data.rate?.toFixed(4)
+                            : dataType === 'commodity_prices'
+                              ? `$${data.price?.toFixed(2)}`
+                              : `${(data.rate || data.yield || data.volatility)?.toFixed(2)}%`
+                        : '---'}
                     </div>
                     {data && (data.change !== undefined || data.changePercent !== undefined) && (
                       <div
@@ -244,8 +241,7 @@ export const LiveMarketDashboard = ({
                         <span>
                           {dataType === 'stock_price'
                             ? `${Math.abs(data.changePercent || 0).toFixed(2)}%`
-                            : `${Math.abs(data.change || data.changePercent || 0).toFixed(2)}%`
-                          }
+                            : `${Math.abs(data.change || data.changePercent || 0).toFixed(2)}%`}
                         </span>
                       </div>
                     )}
@@ -260,8 +256,8 @@ export const LiveMarketDashboard = ({
         {hasAnyErrors && (
           <div className="mt-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
             <div className="text-sm text-red-800 dark:text-red-200">
-              Some market data feeds are experiencing connectivity issues.
-              Prices may not reflect real-time values.
+              Some market data feeds are experiencing connectivity issues. Prices may not reflect
+              real-time values.
             </div>
           </div>
         )}

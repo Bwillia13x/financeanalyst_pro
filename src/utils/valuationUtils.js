@@ -1,15 +1,21 @@
 // Valuation Workbench - Core utilities and mathematical functions
 // Formatting utilities
 export const Num = new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 });
-export const Cur = (x, c = 0) => (x >= 1e9 ? `$${(x / 1e9).toFixed(c)}B` : x >= 1e6 ? `$${(x / 1e6).toFixed(c)}M` : `$${x.toFixed(c)}`);
+export const Cur = (x, c = 0) =>
+  x >= 1e9
+    ? `$${(x / 1e9).toFixed(c)}B`
+    : x >= 1e6
+      ? `$${(x / 1e6).toFixed(c)}M`
+      : `$${x.toFixed(c)}`;
 export const Pct = (x, d = 1) => `${(100 * x).toFixed(d)}%`;
 export const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
 
 // Core valuation math functions
 export function wacc(assumptions) {
-  const ke = assumptions.capmMode === 'capm'
-    ? (assumptions.rf + assumptions.beta * assumptions.erp)
-    : assumptions.keManual;
+  const ke =
+    assumptions.capmMode === 'capm'
+      ? assumptions.rf + assumptions.beta * assumptions.erp
+      : assumptions.keManual;
   return assumptions.wd * assumptions.kd * (1 - assumptions.taxRate) + assumptions.we * ke;
 }
 
@@ -29,7 +35,10 @@ export function project(assumptions, growthPath) {
     const ebit = rev * ebitMargin;
     const nopat = ebit * (1 - assumptions.taxRate);
 
-    let reinvest = 0, dep = rev * assumptions.depPctSales, capex = rev * assumptions.capexPctSales, dNWC = (rev - revPrev) * assumptions.nwcPctSales;
+    let reinvest = 0,
+      dep = rev * assumptions.depPctSales,
+      capex = rev * assumptions.capexPctSales,
+      dNWC = (rev - revPrev) * assumptions.nwcPctSales;
 
     if (assumptions.reinvMethod === 'salesToCapital') {
       const deltaSales = rev - revPrev;
@@ -45,7 +54,7 @@ export function project(assumptions, growthPath) {
     }
 
     const fcff = nopat - reinvest;
-    const metricForExit = (assumptions.exitMetric === 'EBITDA') ? (ebit + dep) : ebit;
+    const metricForExit = assumptions.exitMetric === 'EBITDA' ? ebit + dep : ebit;
 
     rows.push({
       year: y,
@@ -82,7 +91,7 @@ export function discount(rows, disc) {
   const pvSeries = [];
   for (let i = 0; i < rows.length; i++) {
     const t = i + 1;
-    const p = rows[i].fcff / ((1 + disc) ** t);
+    const p = rows[i].fcff / (1 + disc) ** t;
     pv += p;
     pvSeries.push(p);
   }
@@ -93,7 +102,7 @@ export function valueEquity(assumptions, rows) {
   const disc = wacc(assumptions);
   const { pv } = discount(rows, disc);
   const { tv } = terminalValue(assumptions, rows, disc);
-  const pvTV = tv / ((1 + disc) ** rows.length);
+  const pvTV = tv / (1 + disc) ** rows.length;
 
   const ev = pv + pvTV;
   const equity = ev - assumptions.netDebt - assumptions.minorityInterest + assumptions.cashAdjust;

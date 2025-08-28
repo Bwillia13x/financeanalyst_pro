@@ -31,8 +31,9 @@ const HeatmapChart = ({
             matrix[i][j] = 1; // Perfect correlation with itself
           } else {
             const correlation = data.find(
-              item => (item.symbol1 === symbol1 && item.symbol2 === symbol2) ||
-                     (item.symbol1 === symbol2 && item.symbol2 === symbol1)
+              item =>
+                (item.symbol1 === symbol1 && item.symbol2 === symbol2) ||
+                (item.symbol1 === symbol2 && item.symbol2 === symbol1)
             );
             matrix[i][j] = correlation ? correlation.correlation : Math.random() * 2 - 1;
           }
@@ -66,7 +67,7 @@ const HeatmapChart = ({
     return 'rgba(107, 114, 128, 0.5)';
   };
 
-  const getTextColor = (value) => {
+  const getTextColor = value => {
     return Math.abs(value) > 0.5 ? '#ffffff' : '#374151';
   };
 
@@ -76,11 +77,15 @@ const HeatmapChart = ({
         <div className="text-center">
           <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-2">
             <svg
-              className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor"
+              className="w-6 h-6 text-gray-400"
+              fill="none"
+              stroke="currentColor"
               viewBox="0 0 24 24"
             >
               <path
-                strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
                 d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"
               />
             </svg>
@@ -99,7 +104,10 @@ const HeatmapChart = ({
         <h3 className="text-sm font-semibold text-gray-900">{title}</h3>
         <div className="flex items-center space-x-4 mt-1">
           <div className="flex items-center space-x-2">
-            <div className="w-3 h-3 rounded" style={{ backgroundColor: 'rgba(239, 68, 68, 0.8)' }} />
+            <div
+              className="w-3 h-3 rounded"
+              style={{ backgroundColor: 'rgba(239, 68, 68, 0.8)' }}
+            />
             <span className="text-xs text-gray-600">Negative</span>
           </div>
           <div className="flex items-center space-x-2">
@@ -107,7 +115,10 @@ const HeatmapChart = ({
             <span className="text-xs text-gray-600">Neutral</span>
           </div>
           <div className="flex items-center space-x-2">
-            <div className="w-3 h-3 rounded" style={{ backgroundColor: 'rgba(34, 197, 94, 0.8)' }} />
+            <div
+              className="w-3 h-3 rounded"
+              style={{ backgroundColor: 'rgba(34, 197, 94, 0.8)' }}
+            />
             <span className="text-xs text-gray-600">Positive</span>
           </div>
         </div>
@@ -177,16 +188,27 @@ const HeatmapChart = ({
 
           {/* Correlation scale */}
           <g>
-            <text x={20} y={70} className="text-xs fill-gray-600">1.0</text>
-            <text x={20} y={50 + (processedData.labels.length * cellSize) / 2} className="text-xs fill-gray-600">0.0</text>
-            <text x={20} y={50 + processedData.labels.length * cellSize - 20} className="text-xs fill-gray-600">-1.0</text>
+            <text x={20} y={70} className="text-xs fill-gray-600">
+              1.0
+            </text>
+            <text
+              x={20}
+              y={50 + (processedData.labels.length * cellSize) / 2}
+              className="text-xs fill-gray-600"
+            >
+              0.0
+            </text>
+            <text
+              x={20}
+              y={50 + processedData.labels.length * cellSize - 20}
+              className="text-xs fill-gray-600"
+            >
+              -1.0
+            </text>
 
             {/* Scale gradient */}
             <defs>
-              <linearGradient
-                id="correlationGradient" x1="0%" y1="0%"
-                x2="0%" y2="100%"
-              >
+              <linearGradient id="correlationGradient" x1="0%" y1="0%" x2="0%" y2="100%">
                 <stop offset="0%" stopColor="rgba(34, 197, 94, 0.8)" />
                 <stop offset="50%" stopColor="rgba(156, 163, 175, 0.5)" />
                 <stop offset="100%" stopColor="rgba(239, 68, 68, 0.8)" />

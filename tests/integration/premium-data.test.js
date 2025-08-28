@@ -3,10 +3,10 @@
  * Tests Bloomberg, Refinitiv, and S&P Capital IQ integrations
  */
 
-import { describe, test, expect, beforeAll } from '@jest/globals';
+import { describe, test, expect, beforeAll } from 'vitest';
 
 describe('Premium Data Integration Tests', () => {
-  
+
   describe('1. Bloomberg Terminal Integration', () => {
     test('Should authenticate and fetch market data', async () => {
       const mockBloombergAuth = {
@@ -51,7 +51,7 @@ describe('Premium Data Integration Tests', () => {
       expect(mockBloombergResponse.success).toBe(true);
       expect(mockBloombergResponse.data['AAPL US Equity'].LAST_PRICE).toBeGreaterThan(0);
       expect(mockBloombergResponse.metadata.response_time).toBeLessThan(1000);
-      
+
       console.log('✅ Bloomberg market data integration test passed');
     });
 
@@ -77,7 +77,7 @@ describe('Premium Data Integration Tests', () => {
             REVENUE: 383285000000
           },
           {
-            date: '2022-09-24', 
+            date: '2022-09-24',
             TOTAL_EQUITY: 50672000000,
             TOTAL_DEBT: 120069000000,
             FREE_CASH_FLOW: 111443000000,
@@ -101,7 +101,7 @@ describe('Premium Data Integration Tests', () => {
       expect(mockFundamentalsResponse.success).toBe(true);
       expect(mockFundamentalsResponse.data).toHaveLength(3);
       expect(mockFundamentalsResponse.data[0].REVENUE).toBeGreaterThan(0);
-      
+
       console.log('✅ Bloomberg fundamentals data test passed');
     });
 
@@ -126,7 +126,7 @@ describe('Premium Data Integration Tests', () => {
 
       expect(mockRateLimitResponse.data.rate_limit_respected).toBe(true);
       expect(mockRateLimitResponse.data.requests_queued).toBe(5);
-      
+
       console.log('✅ Bloomberg rate limiting test passed');
     });
   });
@@ -156,7 +156,7 @@ describe('Premium Data Integration Tests', () => {
             ACVOL_1: 52847392
           },
           {
-            Instrument: 'MSFT.OQ', 
+            Instrument: 'MSFT.OQ',
             CF_LAST: 378.82,
             PCTCHNG: -0.67,
             ACVOL_1: 28473819
@@ -172,7 +172,7 @@ describe('Premium Data Integration Tests', () => {
       expect(refinitivAuth.authentication_status).toBe('authenticated');
       expect(mockRefinitivResponse.success).toBe(true);
       expect(mockRefinitivResponse.data[0].CF_LAST).toBeGreaterThan(0);
-      
+
       console.log('✅ Refinitiv pricing data test passed');
     });
 
@@ -188,7 +188,7 @@ describe('Premium Data Integration Tests', () => {
         symbol: 'AAPL.OQ',
         data: {
           'TR.TRESGScore': 89.12,          // Overall ESG Score
-          'TR.TRESGCScore': 75.43,         // Environmental Score  
+          'TR.TRESGCScore': 75.43,         // Environmental Score
           'TR.TRESGSScore': 91.88,         // Social Score
           'TR.TRESGGScore': 95.67,         // Governance Score
           carbon_emissions: 11170000,       // Scope 1+2 (tonnes CO2e)
@@ -206,13 +206,13 @@ describe('Premium Data Integration Tests', () => {
       expect(mockESGResponse.success).toBe(true);
       expect(mockESGResponse.data['TR.TRESGScore']).toBeGreaterThan(80);
       expect(mockESGResponse.data['TR.TRESGGScore']).toBeGreaterThan(90);
-      
+
       console.log('✅ Refinitiv ESG data test passed');
     });
 
     test('Should handle Refinitiv API failures with fallback', async () => {
       const failureScenario = {
-        primary_request: { 
+        primary_request: {
           status: 'failed',
           error_code: 503,
           error_message: 'Service temporarily unavailable'
@@ -239,7 +239,7 @@ describe('Premium Data Integration Tests', () => {
       expect(failureScenario.fallback_triggered).toBe(true);
       expect(mockFallbackResponse.success).toBe(true);
       expect(mockFallbackResponse.provider).toBe('bloomberg');
-      
+
       console.log('✅ Refinitiv fallback mechanism test passed');
     });
   });
@@ -264,13 +264,13 @@ describe('Premium Data Integration Tests', () => {
       expect(mockSPIQAuth.success).toBe(true);
       expect(mockSPIQAuth.session_token).toBeDefined();
       expect(mockSPIQAuth.expires_in).toBe(3600);
-      
+
       console.log('✅ S&P Capital IQ authentication test passed');
     });
 
     test('Should fetch company financials with comprehensive data', async () => {
       const financialsRequest = {
-        company_ids: ['IQ4295877'], // Apple Inc. 
+        company_ids: ['IQ4295877'], // Apple Inc.
         mnemonics: ['IQ_TOTAL_REV', 'IQ_NET_INCOME', 'IQ_TOTAL_ASSETS', 'IQ_TOTAL_EQUITY'],
         period_type: 'IY', // Annual
         period_count: 5
@@ -288,7 +288,7 @@ describe('Premium Data Integration Tests', () => {
               values: [383285000000, 96995000000, 352755000000, 62146000000]
             },
             {
-              period_end_date: '2022-09-24', 
+              period_end_date: '2022-09-24',
               values: [394328000000, 99803000000, 352583000000, 50672000000]
             },
             {
@@ -308,7 +308,7 @@ describe('Premium Data Integration Tests', () => {
       expect(mockSPIQFinancials.success).toBe(true);
       expect(mockSPIQFinancials.data.rows).toHaveLength(3);
       expect(mockSPIQFinancials.data.rows[0].values[0]).toBeGreaterThan(0);
-      
+
       console.log('✅ S&P Capital IQ financials test passed');
     });
 
@@ -332,7 +332,7 @@ describe('Premium Data Integration Tests', () => {
 
       expect(sessionScenario.refresh_attempt.status).toBe('success');
       expect(sessionScenario.retry_request.status).toBe(200);
-      
+
       console.log('✅ S&P Capital IQ token refresh test passed');
     });
   });
@@ -380,7 +380,7 @@ describe('Premium Data Integration Tests', () => {
       expect(normalizedData.unified_data.confidence_score).toBeGreaterThan(0.95);
       expect(normalizedData.source_comparison.consensus_level).toBe('high');
       expect(normalizedData.unified_data.data_sources).toHaveLength(3);
-      
+
       console.log('✅ Multi-provider data normalization test passed');
     });
 
@@ -414,7 +414,7 @@ describe('Premium Data Integration Tests', () => {
         expect(check.overall_quality_score).toBeGreaterThan(0.8);
         expect(check.checks.price_reasonableness.passed).toBe(true);
       });
-      
+
       console.log('✅ Data quality validation test passed');
     });
 
@@ -438,7 +438,7 @@ describe('Premium Data Integration Tests', () => {
       expect(mockCachePerformance.cache_hit_rate).toBeGreaterThan(0.7);
       expect(mockCachePerformance.avg_cache_response_time).toBeLessThan(50);
       expect(cachingStrategy.real_time_data.ttl).toBe(60);
-      
+
       console.log('✅ Intelligent caching strategy test passed');
     });
   });
@@ -455,7 +455,7 @@ describe('Premium Data Integration Tests', () => {
         refinitiv: {
           avg_response_time: 189,
           success_rate: 0.995,
-          data_freshness: 'real_time', 
+          data_freshness: 'real_time',
           requests_per_minute: 120
         },
         spCapitalIQ: {
@@ -471,7 +471,7 @@ describe('Premium Data Integration Tests', () => {
         expect(metrics.avg_response_time).toBeLessThan(500);
         expect(metrics.requests_per_minute).toBeGreaterThan(50);
       });
-      
+
       console.log('✅ Premium data performance test passed');
     });
 
@@ -492,7 +492,7 @@ describe('Premium Data Integration Tests', () => {
       expect(consistencyCheck.consensus_score).toBeGreaterThan(0.95);
       expect(consistencyCheck.price_variance).toBeLessThan(0.05);
       expect(consistencyCheck.outlier_detection.price_outliers).toHaveLength(0);
-      
+
       console.log('✅ Data consistency validation test passed');
     });
   });
@@ -518,7 +518,7 @@ describe('Premium Data Integration Tests', () => {
       expect(resilienceResponse.data_retrieved).toBe(true);
       expect(resilienceResponse.data_completeness).toBeGreaterThan(0.9);
       expect(resilienceResponse.fallback_used).toBe(true);
-      
+
       console.log('✅ Provider outage resilience test passed');
     });
 
@@ -549,7 +549,7 @@ describe('Premium Data Integration Tests', () => {
       expect(dataAggregation.data_completeness).toBe(1.0);
       expect(dataAggregation.field_coverage.price).toHaveLength(3);
       expect(dataAggregation.confidence_by_field.price).toBeGreaterThan(0.95);
-      
+
       console.log('✅ Partial data handling test passed');
     });
   });

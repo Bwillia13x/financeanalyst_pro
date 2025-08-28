@@ -95,10 +95,7 @@ const MeaningfulAnimations = ({
             refY="3.5"
             orient="auto"
           >
-            <polygon
-              points="0 0, 10 3.5, 0 7"
-              fill={type === 'impact' ? '#10B981' : '#3B82F6'}
-            />
+            <polygon points="0 0, 10 3.5, 0 7" fill={type === 'impact' ? '#10B981' : '#3B82F6'} />
           </marker>
         </defs>
 
@@ -171,13 +168,17 @@ const MeaningfulAnimations = ({
   const CalculationPulse = ({ children, isActive }) => {
     return (
       <motion.div
-        animate={isActive ? {
-          boxShadow: [
-            '0 0 0 0 rgba(139, 92, 246, 0.7)',
-            '0 0 0 10px rgba(139, 92, 246, 0)',
-            '0 0 0 0 rgba(139, 92, 246, 0)'
-          ]
-        } : {}}
+        animate={
+          isActive
+            ? {
+                boxShadow: [
+                  '0 0 0 0 rgba(139, 92, 246, 0.7)',
+                  '0 0 0 10px rgba(139, 92, 246, 0)',
+                  '0 0 0 0 rgba(139, 92, 246, 0)'
+                ]
+              }
+            : {}
+        }
         transition={{ duration: 1.5, repeat: isActive ? Infinity : 0 }}
       >
         {children}
@@ -197,15 +198,19 @@ const MeaningfulAnimations = ({
 
     return (
       <motion.div
-        animate={isHighlighted ? {
-          ...config.glow,
-          scale: config.scale,
-          backgroundColor: config.backgroundColor
-        } : {
-          boxShadow: '0 0 0 0 transparent',
-          scale: 1,
-          backgroundColor: 'transparent'
-        }}
+        animate={
+          isHighlighted
+            ? {
+                ...config.glow,
+                scale: config.scale,
+                backgroundColor: config.backgroundColor
+              }
+            : {
+                boxShadow: '0 0 0 0 transparent',
+                scale: 1,
+                backgroundColor: 'transparent'
+              }
+        }
         transition={{
           duration: config.duration,
           ease: 'easeInOut'
@@ -241,11 +246,7 @@ const MeaningfulAnimations = ({
         }`}
       >
         <div className="flex items-center space-x-1">
-          {isIncrease ? (
-            <TrendingUp className="w-3 h-3" />
-          ) : (
-            <TrendingDown className="w-3 h-3" />
-          )}
+          {isIncrease ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
           <span>{Math.abs(changePercent).toFixed(1)}%</span>
         </div>
       </motion.div>
@@ -356,7 +357,7 @@ const MeaningfulAnimations = ({
   };
 
   // Enhanced children with animation props
-  const enhancedChildren = React.Children.map(children, (child) => {
+  const enhancedChildren = React.Children.map(children, child => {
     if (React.isValidElement(child)) {
       return React.cloneElement(child, {
         ...child.props,
@@ -388,7 +389,8 @@ const MeaningfulAnimations = ({
       </AnimatePresence>
 
       {/* CSS for meaningful animations */}
-      <style>{`
+      <style>
+        {`
         .animate-glow {
           animation: meaningful-glow 2s ease-in-out infinite alternate;
         }
@@ -474,7 +476,7 @@ export const AssumptionInput = ({
     setLocalValue(value);
   }, [value]);
 
-  const handleChange = (newValue) => {
+  const handleChange = newValue => {
     _setPreviousValue(localValue);
     setLocalValue(newValue);
 
@@ -490,10 +492,7 @@ export const AssumptionInput = ({
   };
 
   return (
-    <GlowHighlight
-      isHighlighted={changedAssumptions?.has(id)}
-      type="assumption_change"
-    >
+    <GlowHighlight isHighlighted={changedAssumptions?.has(id)} type="assumption_change">
       <div ref={inputRef} className="meaningful-animation">
         {React.cloneElement(children, {
           value: localValue,
@@ -523,10 +522,7 @@ export const ModelOutput = ({
   }, [id, registerElement]);
 
   return (
-    <GlowHighlight
-      isHighlighted={affectedOutputs?.has(id)}
-      type="output_impact"
-    >
+    <GlowHighlight isHighlighted={affectedOutputs?.has(id)} type="output_impact">
       <div ref={outputRef} className="meaningful-animation relative">
         {children}
         <ValueChangeIndicator

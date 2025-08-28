@@ -17,24 +17,34 @@ describe('cn utility function', () => {
     });
 
     it('should filter out falsy values', () => {
-      expect(cn('class1', null, 'class2', undefined, 'class3', false, '')).toBe('class1 class2 class3');
+      expect(cn('class1', null, 'class2', undefined, 'class3', false, '')).toBe(
+        'class1 class2 class3'
+      );
     });
   });
 
   describe('Conditional classes', () => {
     it('should handle conditional classes with objects', () => {
-      expect(cn({
-        'active': true,
-        'disabled': false,
-        'highlighted': true
-      })).toBe('active highlighted');
+      expect(
+        cn({
+          active: true,
+          disabled: false,
+          highlighted: true
+        })
+      ).toBe('active highlighted');
     });
 
     it('should handle mixed string and object inputs', () => {
-      expect(cn('base-class', {
-        'active': true,
-        'disabled': false
-      }, 'another-class')).toBe('base-class active another-class');
+      expect(
+        cn(
+          'base-class',
+          {
+            active: true,
+            disabled: false
+          },
+          'another-class'
+        )
+      ).toBe('base-class active another-class');
     });
 
     it('should handle arrays of classes', () => {
@@ -67,27 +77,19 @@ describe('cn utility function', () => {
       const isDisabled = false;
       const variant = 'primary';
 
-      const result = cn(
-        'btn',
-        `btn-${variant}`,
-        {
-          'btn-active': isActive,
-          'btn-disabled': isDisabled
-        }
-      );
+      const result = cn('btn', `btn-${variant}`, {
+        'btn-active': isActive,
+        'btn-disabled': isDisabled
+      });
 
       expect(result).toBe('btn btn-primary btn-active');
     });
 
     it('should handle Tailwind CSS classes', () => {
-      const result = cn(
-        'px-4 py-2',
-        'bg-blue-500 hover:bg-blue-600',
-        {
-          'text-white': true,
-          'opacity-50': false
-        }
-      );
+      const result = cn('px-4 py-2', 'bg-blue-500 hover:bg-blue-600', {
+        'text-white': true,
+        'opacity-50': false
+      });
 
       expect(result).toBe('px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white');
     });
@@ -122,10 +124,7 @@ describe('cn utility function', () => {
     });
 
     it('should handle deeply nested structures', () => {
-      const deepArray = [
-        'level1',
-        ['level2', ['level3', ['level4', 'level5']]]
-      ];
+      const deepArray = ['level1', ['level2', ['level3', ['level4', 'level5']]]];
 
       const result = cn(deepArray);
       expect(result).toBe('level1 level2 level3 level4 level5');
@@ -140,7 +139,7 @@ describe('cn utility function', () => {
     });
 
     it('should handle function results', () => {
-      const getClass = (condition) => condition ? 'dynamic-class' : null;
+      const getClass = condition => (condition ? 'dynamic-class' : null);
       expect(cn('base', getClass(true), getClass(false))).toBe('base dynamic-class');
     });
 

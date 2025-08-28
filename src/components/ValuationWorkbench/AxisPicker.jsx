@@ -5,11 +5,13 @@ import { NumberInput, Card } from 'src/components/ui/UIHelpers.jsx';
 // Axis configuration for sensitivity analysis
 export const AxisPicker = ({ onAxisChange, currentConfig }) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [config, setConfig] = useState(currentConfig || {
-    wacc: { min: 0.06, max: 0.14, steps: 5 },
-    growth: { min: 0.015, max: 0.035, steps: 5 },
-    exitMultiple: { min: 8, max: 16, steps: 5 }
-  });
+  const [config, setConfig] = useState(
+    currentConfig || {
+      wacc: { min: 0.06, max: 0.14, steps: 5 },
+      growth: { min: 0.015, max: 0.035, steps: 5 },
+      exitMultiple: { min: 8, max: 16, steps: 5 }
+    }
+  );
 
   const updateConfig = (axis, field, value) => {
     const newConfig = {
@@ -38,7 +40,7 @@ export const AxisPicker = ({ onAxisChange, currentConfig }) => {
     }
   };
 
-  const applyPreset = (presetName) => {
+  const applyPreset = presetName => {
     const preset = presets[presetName];
     setConfig(preset);
     onAxisChange?.(preset);
@@ -92,7 +94,7 @@ export const AxisPicker = ({ onAxisChange, currentConfig }) => {
           <NumberInput
             label="Min"
             value={config.wacc.min}
-            onChange={(val) => updateConfig('wacc', 'min', val)}
+            onChange={val => updateConfig('wacc', 'min', val)}
             step={0.005}
             min={0.01}
             max={0.5}
@@ -102,7 +104,7 @@ export const AxisPicker = ({ onAxisChange, currentConfig }) => {
           <NumberInput
             label="Max"
             value={config.wacc.max}
-            onChange={(val) => updateConfig('wacc', 'max', val)}
+            onChange={val => updateConfig('wacc', 'max', val)}
             step={0.005}
             min={0.01}
             max={0.5}
@@ -112,7 +114,7 @@ export const AxisPicker = ({ onAxisChange, currentConfig }) => {
           <NumberInput
             label="Steps"
             value={config.wacc.steps}
-            onChange={(val) => updateConfig('wacc', 'steps', val)}
+            onChange={val => updateConfig('wacc', 'steps', val)}
             step={1}
             min={3}
             max={10}
@@ -129,7 +131,7 @@ export const AxisPicker = ({ onAxisChange, currentConfig }) => {
           <NumberInput
             label="Min"
             value={config.growth.min}
-            onChange={(val) => updateConfig('growth', 'min', val)}
+            onChange={val => updateConfig('growth', 'min', val)}
             step={0.0025}
             min={-0.02}
             max={0.1}
@@ -139,7 +141,7 @@ export const AxisPicker = ({ onAxisChange, currentConfig }) => {
           <NumberInput
             label="Max"
             value={config.growth.max}
-            onChange={(val) => updateConfig('growth', 'max', val)}
+            onChange={val => updateConfig('growth', 'max', val)}
             step={0.0025}
             min={-0.02}
             max={0.1}
@@ -149,7 +151,7 @@ export const AxisPicker = ({ onAxisChange, currentConfig }) => {
           <NumberInput
             label="Steps"
             value={config.growth.steps}
-            onChange={(val) => updateConfig('growth', 'steps', val)}
+            onChange={val => updateConfig('growth', 'steps', val)}
             step={1}
             min={3}
             max={10}
@@ -166,7 +168,7 @@ export const AxisPicker = ({ onAxisChange, currentConfig }) => {
           <NumberInput
             label="Min"
             value={config.exitMultiple.min}
-            onChange={(val) => updateConfig('exitMultiple', 'min', val)}
+            onChange={val => updateConfig('exitMultiple', 'min', val)}
             step={0.5}
             min={1}
             max={50}
@@ -176,7 +178,7 @@ export const AxisPicker = ({ onAxisChange, currentConfig }) => {
           <NumberInput
             label="Max"
             value={config.exitMultiple.max}
-            onChange={(val) => updateConfig('exitMultiple', 'max', val)}
+            onChange={val => updateConfig('exitMultiple', 'max', val)}
             step={0.5}
             min={1}
             max={50}
@@ -186,7 +188,7 @@ export const AxisPicker = ({ onAxisChange, currentConfig }) => {
           <NumberInput
             label="Steps"
             value={config.exitMultiple.steps}
-            onChange={(val) => updateConfig('exitMultiple', 'steps', val)}
+            onChange={val => updateConfig('exitMultiple', 'steps', val)}
             step={1}
             min={3}
             max={10}
@@ -199,9 +201,18 @@ export const AxisPicker = ({ onAxisChange, currentConfig }) => {
       {/* Current Ranges Preview */}
       <div className="pt-2 border-t border-slate-200">
         <div className="text-[11px] text-slate-600 space-y-1">
-          <div>WACC: {(config.wacc.min * 100).toFixed(1)}% → {(config.wacc.max * 100).toFixed(1)}% ({config.wacc.steps} steps)</div>
-          <div>Growth: {(config.growth.min * 100).toFixed(1)}% → {(config.growth.max * 100).toFixed(1)}% ({config.growth.steps} steps)</div>
-          <div>Exit Multiple: {config.exitMultiple.min.toFixed(1)}x → {config.exitMultiple.max.toFixed(1)}x ({config.exitMultiple.steps} steps)</div>
+          <div>
+            WACC: {(config.wacc.min * 100).toFixed(1)}% → {(config.wacc.max * 100).toFixed(1)}% (
+            {config.wacc.steps} steps)
+          </div>
+          <div>
+            Growth: {(config.growth.min * 100).toFixed(1)}% → {(config.growth.max * 100).toFixed(1)}
+            % ({config.growth.steps} steps)
+          </div>
+          <div>
+            Exit Multiple: {config.exitMultiple.min.toFixed(1)}x →{' '}
+            {config.exitMultiple.max.toFixed(1)}x ({config.exitMultiple.steps} steps)
+          </div>
         </div>
       </div>
     </Card>

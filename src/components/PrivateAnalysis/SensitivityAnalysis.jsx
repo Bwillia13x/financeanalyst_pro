@@ -1,7 +1,14 @@
 import { Activity, Settings, BarChart3, Plus, Minus } from 'lucide-react';
 import React, { useState, useMemo } from 'react';
 
-const SensitivityAnalysis = ({ data, modelInputs, onModelInputChange, calculateDCF, formatCurrency, _formatPercent }) => {
+const SensitivityAnalysis = ({
+  data,
+  modelInputs,
+  onModelInputChange,
+  calculateDCF,
+  formatCurrency,
+  _formatPercent
+}) => {
   const [selectedVariable, _setSelectedVariable] = useState(null);
 
   const sensitivityConfig = modelInputs.sensitivity || {
@@ -72,7 +79,7 @@ const SensitivityAnalysis = ({ data, modelInputs, onModelInputChange, calculateD
       const dataPoints = [];
 
       for (let i = 0; i < steps; i++) {
-        const value = range.min + (stepSize * i);
+        const value = range.min + stepSize * i;
 
         // Create modified DCF inputs based on variable type
         let modifiedData = { ...data };
@@ -96,7 +103,7 @@ const SensitivityAnalysis = ({ data, modelInputs, onModelInputChange, calculateD
               if (index === 0) {
                 modifiedRevenue[periodIndex] = baseRevenue[periodIndex];
               } else {
-                const growthRate = 1 + (value / 100);
+                const growthRate = 1 + value / 100;
                 modifiedRevenue[periodIndex] = baseRevenue[0] * Math.pow(growthRate, index);
               }
             });
@@ -115,7 +122,7 @@ const SensitivityAnalysis = ({ data, modelInputs, onModelInputChange, calculateD
               const originalIncome = baseOperating[periodIndex] || 0;
               if (revenue > 0) {
                 const baseMargin = originalIncome / revenue;
-                const adjustedMargin = baseMargin + (value / 100);
+                const adjustedMargin = baseMargin + value / 100;
                 modifiedOperating[periodIndex] = revenue * adjustedMargin;
               } else {
                 modifiedOperating[periodIndex] = originalIncome;
@@ -159,7 +166,7 @@ const SensitivityAnalysis = ({ data, modelInputs, onModelInputChange, calculateD
             if (operatingIncomes.length === 0) return { enterpriseValue: 0, equityValue: 0 };
 
             let presentValue = 0;
-            const discountFactor = 1 + (dcfParams.discountRate / 100);
+            const discountFactor = 1 + dcfParams.discountRate / 100;
 
             // Use available periods for projections
             operatingIncomes.forEach((income, index) => {
@@ -171,9 +178,14 @@ const SensitivityAnalysis = ({ data, modelInputs, onModelInputChange, calculateD
             });
 
             const lastYearIncome = operatingIncomes[operatingIncomes.length - 1] || 0;
-            const terminalCashFlow = lastYearIncome * (1 + dcfParams.terminalGrowthRate / 100) * (1 - dcfParams.taxRate / 100);
-            const terminalValue = terminalCashFlow / ((dcfParams.discountRate - dcfParams.terminalGrowthRate) / 100);
-            const presentTerminalValue = terminalValue / Math.pow(discountFactor, dcfParams.projectionYears);
+            const terminalCashFlow =
+              lastYearIncome *
+              (1 + dcfParams.terminalGrowthRate / 100) *
+              (1 - dcfParams.taxRate / 100);
+            const terminalValue =
+              terminalCashFlow / ((dcfParams.discountRate - dcfParams.terminalGrowthRate) / 100);
+            const presentTerminalValue =
+              terminalValue / Math.pow(discountFactor, dcfParams.projectionYears);
 
             const enterpriseValue = presentValue + presentTerminalValue;
 
@@ -195,7 +207,10 @@ const SensitivityAnalysis = ({ data, modelInputs, onModelInputChange, calculateD
         dataPoints.push({
           variable: value,
           valuation: result.enterpriseValue,
-          changeFromBase: ((result.enterpriseValue - baseValuation.enterpriseValue) / baseValuation.enterpriseValue) * 100
+          changeFromBase:
+            ((result.enterpriseValue - baseValuation.enterpriseValue) /
+              baseValuation.enterpriseValue) *
+            100
         });
       }
 
@@ -211,16 +226,18 @@ const SensitivityAnalysis = ({ data, modelInputs, onModelInputChange, calculateD
 
   // Tornado chart data (impact ranking)
   const tornadoData = useMemo(() => {
-    return Object.entries(sensitivityResults).map(([variable, result]) => {
-      const maxImpact = Math.max(...result.dataPoints.map(d => Math.abs(d.changeFromBase)));
-      return {
-        variable,
-        definition: result.definition,
-        maxImpact,
-        positiveImpact: Math.max(...result.dataPoints.map(d => d.changeFromBase)),
-        negativeImpact: Math.min(...result.dataPoints.map(d => d.changeFromBase))
-      };
-    }).sort((a, b) => b.maxImpact - a.maxImpact);
+    return Object.entries(sensitivityResults)
+      .map(([variable, result]) => {
+        const maxImpact = Math.max(...result.dataPoints.map(d => Math.abs(d.changeFromBase)));
+        return {
+          variable,
+          definition: result.definition,
+          maxImpact,
+          positiveImpact: Math.max(...result.dataPoints.map(d => d.changeFromBase)),
+          negativeImpact: Math.min(...result.dataPoints.map(d => d.changeFromBase))
+        };
+      })
+      .sort((a, b) => b.maxImpact - a.maxImpact);
   }, [sensitivityResults]);
 
   const updateSensitivityRange = (variable, field, value) => {
@@ -234,7 +251,7 @@ const SensitivityAnalysis = ({ data, modelInputs, onModelInputChange, calculateD
     onModelInputChange('sensitivity', 'ranges', updatedRanges);
   };
 
-  const addVariable = (variableName) => {
+  const addVariable = variableName => {
     if (!sensitivityConfig.variables.includes(variableName) && variableDefinitions[variableName]) {
       const updatedVariables = [...sensitivityConfig.variables, variableName];
       const updatedRanges = {
@@ -246,7 +263,7 @@ const SensitivityAnalysis = ({ data, modelInputs, onModelInputChange, calculateD
     }
   };
 
-  const removeVariable = (variableName) => {
+  const removeVariable = variableName => {
     const updatedVariables = sensitivityConfig.variables.filter(v => v !== variableName);
     const { [variableName]: _removed, ...updatedRanges } = sensitivityConfig.ranges;
     onModelInputChange('sensitivity', 'variables', updatedVariables);
@@ -259,8 +276,8 @@ const SensitivityAnalysis = ({ data, modelInputs, onModelInputChange, calculateD
       <div className="flex justify-between items-start">
         <div>
           <p className="text-gray-600 mb-4">
-            Analyze how changes in key variables impact enterprise valuation.
-            Higher sensitivity indicates greater risk and importance for due diligence.
+            Analyze how changes in key variables impact enterprise valuation. Higher sensitivity
+            indicates greater risk and importance for due diligence.
           </p>
           <div className="flex items-center gap-4 text-sm">
             <div className="flex items-center gap-2">
@@ -273,9 +290,7 @@ const SensitivityAnalysis = ({ data, modelInputs, onModelInputChange, calculateD
             </div>
           </div>
         </div>
-        <button
-          className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-2"
-        >
+        <button className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-2">
           <Settings size={16} />
           Configure
         </button>
@@ -292,7 +307,9 @@ const SensitivityAnalysis = ({ data, modelInputs, onModelInputChange, calculateD
           {tornadoData.map((item, index) => (
             <div key={item.variable} className="relative">
               <div className="flex items-center justify-between mb-1">
-                <span className="text-sm font-medium">{index + 1}. {item.definition.name}</span>
+                <span className="text-sm font-medium">
+                  {index + 1}. {item.definition.name}
+                </span>
                 <span className="text-xs text-gray-500">±{item.maxImpact.toFixed(1)}%</span>
               </div>
 
@@ -301,7 +318,7 @@ const SensitivityAnalysis = ({ data, modelInputs, onModelInputChange, calculateD
                 <div
                   className="absolute left-1/2 h-full bg-red-400 rounded-l"
                   style={{
-                    width: `${Math.abs(item.negativeImpact) / Math.max(Math.abs(item.negativeImpact), item.positiveImpact) * 50}%`,
+                    width: `${(Math.abs(item.negativeImpact) / Math.max(Math.abs(item.negativeImpact), item.positiveImpact)) * 50}%`,
                     transform: 'translateX(-100%)'
                   }}
                 />
@@ -310,7 +327,7 @@ const SensitivityAnalysis = ({ data, modelInputs, onModelInputChange, calculateD
                 <div
                   className="absolute left-1/2 h-full bg-green-400 rounded-r"
                   style={{
-                    width: `${item.positiveImpact / Math.max(Math.abs(item.negativeImpact), item.positiveImpact) * 50}%`
+                    width: `${(item.positiveImpact / Math.max(Math.abs(item.negativeImpact), item.positiveImpact)) * 50}%`
                   }}
                 />
 
@@ -361,7 +378,7 @@ const SensitivityAnalysis = ({ data, modelInputs, onModelInputChange, calculateD
                       type="number"
                       step="0.1"
                       value={result.range.min}
-                      onChange={(e) => updateSensitivityRange(variable, 'min', e.target.value)}
+                      onChange={e => updateSensitivityRange(variable, 'min', e.target.value)}
                       className="w-full px-2 py-1 border rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
                     />
                   </div>
@@ -373,7 +390,7 @@ const SensitivityAnalysis = ({ data, modelInputs, onModelInputChange, calculateD
                       type="number"
                       step="0.1"
                       value={result.range.max}
-                      onChange={(e) => updateSensitivityRange(variable, 'max', e.target.value)}
+                      onChange={e => updateSensitivityRange(variable, 'max', e.target.value)}
                       className="w-full px-2 py-1 border rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
                     />
                   </div>
@@ -387,11 +404,14 @@ const SensitivityAnalysis = ({ data, modelInputs, onModelInputChange, calculateD
                       <div
                         key={index}
                         className={`w-1 rounded-t ${
-                          point.changeFromBase > 0 ? 'bg-green-400' :
-                            point.changeFromBase < 0 ? 'bg-red-400' : 'bg-blue-400'
+                          point.changeFromBase > 0
+                            ? 'bg-green-400'
+                            : point.changeFromBase < 0
+                              ? 'bg-red-400'
+                              : 'bg-blue-400'
                         }`}
                         style={{
-                          height: `${Math.abs(point.changeFromBase) / 50 * 100}%`,
+                          height: `${(Math.abs(point.changeFromBase) / 50) * 100}%`,
                           minHeight: '2px'
                         }}
                         title={`${point.variable}${result.definition.unit}: ${formatCurrency(point.valuation)}`}
@@ -419,8 +439,7 @@ const SensitivityAnalysis = ({ data, modelInputs, onModelInputChange, calculateD
                     >
                       {variableDefinitions[variable].name}
                     </button>
-                  ))
-                }
+                  ))}
               </div>
             </div>
           </div>
@@ -439,16 +458,26 @@ const SensitivityAnalysis = ({ data, modelInputs, onModelInputChange, calculateD
               <h6 className="font-medium mb-3">Data Points</h6>
               <div className="space-y-2 max-h-64 overflow-y-auto">
                 {sensitivityResults[selectedVariable].dataPoints.map((point, index) => (
-                  <div key={index} className="flex justify-between items-center text-sm p-2 bg-gray-50 rounded">
-                    <span>{point.variable}{sensitivityResults[selectedVariable].definition.unit}</span>
+                  <div
+                    key={index}
+                    className="flex justify-between items-center text-sm p-2 bg-gray-50 rounded"
+                  >
+                    <span>
+                      {point.variable}
+                      {sensitivityResults[selectedVariable].definition.unit}
+                    </span>
                     <span className="font-medium">{formatCurrency(point.valuation)}</span>
                     <span
                       className={`font-medium ${
-                        point.changeFromBase > 0 ? 'text-green-600' :
-                          point.changeFromBase < 0 ? 'text-red-600' : 'text-gray-600'
+                        point.changeFromBase > 0
+                          ? 'text-green-600'
+                          : point.changeFromBase < 0
+                            ? 'text-red-600'
+                            : 'text-gray-600'
                       }`}
                     >
-                      {point.changeFromBase > 0 ? '+' : ''}{point.changeFromBase.toFixed(1)}%
+                      {point.changeFromBase > 0 ? '+' : ''}
+                      {point.changeFromBase.toFixed(1)}%
                     </span>
                   </div>
                 ))}
@@ -461,19 +490,32 @@ const SensitivityAnalysis = ({ data, modelInputs, onModelInputChange, calculateD
                 <div className="flex justify-between">
                   <span className="text-sm text-gray-600">Range Impact:</span>
                   <span className="font-medium">
-                    ±{Math.max(...sensitivityResults[selectedVariable].dataPoints.map(d => Math.abs(d.changeFromBase))).toFixed(1)}%
+                    ±
+                    {Math.max(
+                      ...sensitivityResults[selectedVariable].dataPoints.map(d =>
+                        Math.abs(d.changeFromBase)
+                      )
+                    ).toFixed(1)}
+                    %
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm text-gray-600">Max Upside:</span>
                   <span className="font-medium text-green-600">
-                    +{Math.max(...sensitivityResults[selectedVariable].dataPoints.map(d => d.changeFromBase)).toFixed(1)}%
+                    +
+                    {Math.max(
+                      ...sensitivityResults[selectedVariable].dataPoints.map(d => d.changeFromBase)
+                    ).toFixed(1)}
+                    %
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm text-gray-600">Max Downside:</span>
                   <span className="font-medium text-red-600">
-                    {Math.min(...sensitivityResults[selectedVariable].dataPoints.map(d => d.changeFromBase)).toFixed(1)}%
+                    {Math.min(
+                      ...sensitivityResults[selectedVariable].dataPoints.map(d => d.changeFromBase)
+                    ).toFixed(1)}
+                    %
                   </span>
                 </div>
               </div>

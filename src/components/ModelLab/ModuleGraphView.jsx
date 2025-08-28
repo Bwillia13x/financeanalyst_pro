@@ -5,7 +5,9 @@ const Card = ({ title, right, children, className = '' }) => (
   <section className={`rounded-2xl border border-slate-200 bg-white shadow-sm ${className}`}>
     {(title || right) && (
       <header className="flex items-center justify-between border-b border-slate-200 px-4 py-2.5">
-        {title && <h3 className="text-[13px] font-semibold tracking-wide text-slate-700">{title}</h3>}
+        {title && (
+          <h3 className="text-[13px] font-semibold tracking-wide text-slate-700">{title}</h3>
+        )}
         {right}
       </header>
     )}
@@ -27,7 +29,9 @@ const Pill = ({ children, tone = 'slate', size = 'sm' }) => {
     xs: 'text-[10px] px-1.5 py-0.5'
   };
   return (
-    <span className={`inline-flex items-center gap-1 rounded-full border ${tones[tone]} ${sizes[size]}`}>
+    <span
+      className={`inline-flex items-center gap-1 rounded-full border ${tones[tone]} ${sizes[size]}`}
+    >
       {children}
     </span>
   );
@@ -45,32 +49,42 @@ const ModuleNode = ({
   const [dragStart, setDragStart] = useState(null);
   const nodeRef = useRef(null);
 
-  const getModuleColor = (type) => {
+  const getModuleColor = type => {
     switch (type) {
-      case 'DCF': return 'border-blue-300 bg-blue-50';
-      case 'LBO': return 'border-green-300 bg-green-50';
-      case 'Comps': return 'border-amber-300 bg-amber-50';
-      case 'EPV': return 'border-purple-300 bg-purple-50';
-      case 'SOTP': return 'border-red-300 bg-red-50';
-      default: return 'border-slate-300 bg-slate-50';
+      case 'DCF':
+        return 'border-blue-300 bg-blue-50';
+      case 'LBO':
+        return 'border-green-300 bg-green-50';
+      case 'Comps':
+        return 'border-amber-300 bg-amber-50';
+      case 'EPV':
+        return 'border-purple-300 bg-purple-50';
+      case 'SOTP':
+        return 'border-red-300 bg-red-50';
+      default:
+        return 'border-slate-300 bg-slate-50';
     }
   };
 
-  const getModuleIcon = (type) => {
+  const getModuleIcon = type => {
     switch (type) {
-      case 'SOTP': return <GitBranch className="w-3 h-3" />;
-      default: return <Zap className="w-3 h-3" />;
+      case 'SOTP':
+        return <GitBranch className="w-3 h-3" />;
+      default:
+        return <Zap className="w-3 h-3" />;
     }
   };
 
-  const formatValue = (value) => {
+  const formatValue = value => {
     if (!value) return '—';
-    return value >= 1e9 ? `$${(value / 1e9).toFixed(1)}B` :
-      value >= 1e6 ? `$${(value / 1e6).toFixed(0)}M` :
-        `$${value.toLocaleString()}`;
+    return value >= 1e9
+      ? `$${(value / 1e9).toFixed(1)}B`
+      : value >= 1e6
+        ? `$${(value / 1e6).toFixed(0)}M`
+        : `$${value.toLocaleString()}`;
   };
 
-  const handleMouseDown = (e) => {
+  const handleMouseDown = e => {
     e.preventDefault();
     setDragStart({
       x: e.clientX - position.x,
@@ -79,7 +93,7 @@ const ModuleNode = ({
     onSelect(module.id);
   };
 
-  const handleMouseMove = (e) => {
+  const handleMouseMove = e => {
     if (dragStart && isDragging) {
       const newPosition = {
         x: e.clientX - dragStart.x,
@@ -110,9 +124,9 @@ const ModuleNode = ({
   return (
     <div
       ref={nodeRef}
-      className={`absolute w-40 rounded-lg border-2 transition-all cursor-move select-none ${
-        getModuleColor(module.kind)
-      } ${isSelected ? 'ring-2 ring-blue-400 ring-opacity-50' : ''} ${
+      className={`absolute w-40 rounded-lg border-2 transition-all cursor-move select-none ${getModuleColor(
+        module.kind
+      )} ${isSelected ? 'ring-2 ring-blue-400 ring-opacity-50' : ''} ${
         isDragging ? 'shadow-lg z-10' : 'shadow-sm'
       }`}
       style={{
@@ -124,7 +138,7 @@ const ModuleNode = ({
       role="button"
       tabIndex={0}
       aria-label={`Module ${module.name || module.id}`}
-      onKeyDown={(e) => {
+      onKeyDown={e => {
         if (e.key === 'Enter' || e.key === ' ') {
           handleMouseDown(e);
         }
@@ -133,10 +147,17 @@ const ModuleNode = ({
       <div className="p-3">
         <div className="flex items-center gap-2 mb-2">
           <Pill
-            tone={module.kind === 'DCF' ? 'blue' :
-              module.kind === 'LBO' ? 'green' :
-                module.kind === 'Comps' ? 'amber' :
-                  module.kind === 'EPV' ? 'purple' : 'red'}
+            tone={
+              module.kind === 'DCF'
+                ? 'blue'
+                : module.kind === 'LBO'
+                  ? 'green'
+                  : module.kind === 'Comps'
+                    ? 'amber'
+                    : module.kind === 'EPV'
+                      ? 'purple'
+                      : 'red'
+            }
             size="xs"
           >
             {getModuleIcon(module.kind)}
@@ -155,23 +176,15 @@ const ModuleNode = ({
         </div>
 
         <div className="text-[10px] text-slate-600 space-y-1">
-          {module.outputs?.ev && (
-            <div>EV: {formatValue(module.outputs.ev)}</div>
-          )}
-          {module.outputs?.perShare && (
-            <div>Per Share: {formatValue(module.outputs.perShare)}</div>
-          )}
-          {module.outputs?.irr && (
-            <div>IRR: {(module.outputs.irr * 100).toFixed(1)}%</div>
-          )}
+          {module.outputs?.ev && <div>EV: {formatValue(module.outputs.ev)}</div>}
+          {module.outputs?.perShare && <div>Per Share: {formatValue(module.outputs.perShare)}</div>}
+          {module.outputs?.irr && <div>IRR: {(module.outputs.irr * 100).toFixed(1)}%</div>}
           {module.totalValue && module.kind === 'SOTP' && (
             <div>Total: {formatValue(module.totalValue)}</div>
           )}
         </div>
 
-        <div className="mt-2 text-[9px] text-slate-500">
-          v{module.version || '1.0.0'}
-        </div>
+        <div className="mt-2 text-[9px] text-slate-500">v{module.version || '1.0.0'}</div>
       </div>
     </div>
   );
@@ -188,9 +201,9 @@ const ConnectionLine = ({ connection, modules, positions }) => {
   }
 
   const sourceX = sourcePos.x + 160; // Right edge of source node
-  const sourceY = sourcePos.y + 40;  // Middle of source node
-  const targetX = targetPos.x;       // Left edge of target node
-  const targetY = targetPos.y + 40;  // Middle of target node
+  const sourceY = sourcePos.y + 40; // Middle of source node
+  const targetX = targetPos.x; // Left edge of target node
+  const targetY = targetPos.y + 40; // Middle of target node
 
   // Create curved path
   const controlX1 = sourceX + (targetX - sourceX) * 0.3;
@@ -304,7 +317,7 @@ const ModuleGraphView = ({ models = [], sotpCompositions = [], onModuleSelect })
     }
   }, [modules.length]);
 
-  const handleModuleSelect = (moduleId) => {
+  const handleModuleSelect = moduleId => {
     setSelectedModule(moduleId);
     const module = modules.find(m => m.id === moduleId);
     if (module && onModuleSelect) {
@@ -388,7 +401,7 @@ const ModuleGraphView = ({ models = [], sotpCompositions = [], onModuleSelect })
 
           <select
             value={viewMode}
-            onChange={(e) => setViewMode(e.target.value)}
+            onChange={e => setViewMode(e.target.value)}
             className="text-[11px] px-2 py-1 border border-slate-200 rounded bg-white"
           >
             <option value="dependency">Dependencies</option>
@@ -441,10 +454,7 @@ const ModuleGraphView = ({ models = [], sotpCompositions = [], onModuleSelect })
                 refY="3.5"
                 orient="auto"
               >
-                <polygon
-                  points="0 0, 10 3.5, 0 7"
-                  fill="#94a3b8"
-                />
+                <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8" />
               </marker>
             </defs>
             {connections.map(connection => (
@@ -460,20 +470,21 @@ const ModuleGraphView = ({ models = [], sotpCompositions = [], onModuleSelect })
 
         {/* Module nodes */}
         <div className="relative w-full h-full">
-          {modules.map(module => (
-            positions[module.id] && (
-              <ModuleNode
-                key={module.id}
-                module={module}
-                position={positions[module.id]}
-                isSelected={selectedModule === module.id}
-                onSelect={handleModuleSelect}
-                onPositionChange={handlePositionChange}
-                isDragging={draggedModule === module.id}
-                connections={connections}
-              />
-            )
-          ))}
+          {modules.map(
+            module =>
+              positions[module.id] && (
+                <ModuleNode
+                  key={module.id}
+                  module={module}
+                  position={positions[module.id]}
+                  isSelected={selectedModule === module.id}
+                  onSelect={handleModuleSelect}
+                  onPositionChange={handlePositionChange}
+                  isDragging={draggedModule === module.id}
+                  connections={connections}
+                />
+              )
+          )}
         </div>
 
         {modules.length === 0 && (

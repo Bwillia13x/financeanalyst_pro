@@ -1,6 +1,6 @@
 import * as LucideIcons from 'lucide-react';
-import { HelpCircle } from 'lucide-react';
 import PropTypes from 'prop-types';
+import React from 'react';
 
 function Icon({
   name,
@@ -13,6 +13,7 @@ function Icon({
   const IconComponent = LucideIcons[name];
 
   if (!IconComponent) {
+    const HelpCircle = LucideIcons.HelpCircle;
     return (
       <HelpCircle
         size={size}

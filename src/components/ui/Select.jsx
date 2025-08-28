@@ -1,13 +1,13 @@
 // components/ui/Select.jsx - Shadcn style Select
 import { ChevronDown, Check, Search, X } from 'lucide-react';
-import React, { useState } from 'react';
+import { forwardRef, useState } from 'react';
 
 import { cn } from '../../utils/cn';
 
 import Button from './Button';
 import Input from './Input';
 
-const Select = React.forwardRef(
+const Select = forwardRef(
   (
     {
       className,
@@ -42,11 +42,11 @@ const Select = React.forwardRef(
     const filteredOptions =
       searchable && searchTerm
         ? options.filter(
-          option =>
-            option.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            option =>
+              option.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
               (option.value &&
                 option.value.toString().toLowerCase().includes(searchTerm.toLowerCase()))
-        )
+          )
         : options;
 
     // Get selected option(s) for display
@@ -161,10 +161,7 @@ const Select = React.forwardRef(
               )}
 
               {clearable && hasValue && !loading && (
-                <Button
-                  variant="ghost" size="icon" className="h-4 w-4"
-                  onClick={handleClear}
-                >
+                <Button variant="ghost" size="icon" className="h-4 w-4" onClick={handleClear}>
                   <X className="h-3 w-3" />
                 </Button>
               )}
@@ -226,7 +223,7 @@ const Select = React.forwardRef(
                         option.disabled && 'pointer-events-none opacity-50'
                       )}
                       onClick={() => !option.disabled && handleOptionSelect(option)}
-                      onKeyDown={(e) => {
+                      onKeyDown={e => {
                         if (e.key === 'Enter' || e.key === ' ') {
                           e.preventDefault();
                           if (!option.disabled) handleOptionSelect(option);

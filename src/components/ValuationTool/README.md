@@ -5,6 +5,7 @@ A comprehensive web-based tool for conducting private business valuations using 
 ## Features
 
 ### 🎯 Core Functionality
+
 - **DCF Analysis**: Complete discounted cash flow modeling with terminal value calculations
 - **LBO Analysis**: Leveraged buyout modeling with IRR and MOIC calculations
 - **Real-time Calculations**: Instant results as you adjust parameters
@@ -12,6 +13,7 @@ A comprehensive web-based tool for conducting private business valuations using 
 - **Professional UI**: Modern, responsive interface with intuitive controls
 
 ### 📊 DCF Analysis Features
+
 - **Free Cash Flow Projections**: Multi-year cash flow modeling
 - **Terminal Value Calculation**: Perpetuity growth model
 - **Present Value Analysis**: Risk-adjusted discounting
@@ -19,6 +21,7 @@ A comprehensive web-based tool for conducting private business valuations using 
 - **Key Metrics Display**: Revenue growth, margins, discount rates
 
 ### 💼 LBO Analysis Features
+
 - **Equity Investment Modeling**: Capital structure analysis
 - **Debt Financing**: Leverage and interest calculations
 - **Exit Strategy Modeling**: Multiple-based exit valuations
@@ -28,6 +31,7 @@ A comprehensive web-based tool for conducting private business valuations using 
 ## Usage
 
 ### Accessing the Tool
+
 1. Navigate to `/valuation-tool` in your application
 2. Choose between DCF or LBO analysis using the tab interface
 3. Enter your assumptions in the input panel
@@ -35,6 +39,7 @@ A comprehensive web-based tool for conducting private business valuations using 
 5. Export results using the download button
 
 ### DCF Inputs
+
 - **Current Revenue**: Starting revenue for projections
 - **Revenue Growth Rate**: Annual growth percentage
 - **EBITDA Margin**: Profitability assumption
@@ -46,6 +51,7 @@ A comprehensive web-based tool for conducting private business valuations using 
 - **Projection Years**: Number of years to model
 
 ### LBO Inputs
+
 - **Purchase Price**: Total acquisition cost
 - **Equity Contribution**: Percentage of equity vs debt
 - **Debt Amount**: Leverage amount
@@ -60,6 +66,7 @@ A comprehensive web-based tool for conducting private business valuations using 
 ## Methodology
 
 ### DCF Analysis
+
 The DCF model calculates the present value of future free cash flows:
 
 1. **Revenue Projections**: Start with current revenue and apply growth rate
@@ -70,6 +77,7 @@ The DCF model calculates the present value of future free cash flows:
 6. **Enterprise Value**: Sum of present value FCF + present value terminal value
 
 ### LBO Analysis
+
 The LBO model evaluates returns from leveraged acquisition:
 
 1. **Capital Structure**: Determine equity investment and debt financing
@@ -82,12 +90,14 @@ The LBO model evaluates returns from leveraged acquisition:
 ## Industry Benchmarks
 
 ### Typical Discount Rates
+
 - Large Cap Public: 8-12%
 - Mid Cap Private: 12-18%
 - Small Cap Private: 15-25%
 - Early Stage: 25-40%
 
 ### Exit Multiples by Sector
+
 - Technology: 8-15x EBITDA
 - Manufacturing: 6-10x EBITDA
 - Healthcare: 8-12x EBITDA
@@ -96,6 +106,7 @@ The LBO model evaluates returns from leveraged acquisition:
 ## Best Practices
 
 ### DCF Best Practices
+
 - Use conservative growth assumptions based on industry benchmarks
 - Consider multiple scenarios (base, upside, downside)
 - Validate discount rate against comparable companies
@@ -103,6 +114,7 @@ The LBO model evaluates returns from leveraged acquisition:
 - Account for industry-specific factors
 
 ### LBO Best Practices
+
 - Model realistic operational improvements
 - Consider debt capacity and interest coverage
 - Account for transaction and management fees
@@ -112,6 +124,7 @@ The LBO model evaluates returns from leveraged acquisition:
 ## Technical Implementation
 
 ### Architecture
+
 - **React Components**: Modular, reusable components
 - **State Management**: React hooks for local state
 - **Calculations**: Pure JavaScript functions for financial modeling
@@ -119,6 +132,7 @@ The LBO model evaluates returns from leveraged acquisition:
 - **Animations**: Framer Motion for smooth transitions
 
 ### Key Components
+
 - `ValuationTool.jsx`: Main application component
 - `ValuationToolDocs.jsx`: Documentation and methodology guide
 - `DCFInputs`: DCF parameter input form
@@ -128,6 +142,7 @@ The LBO model evaluates returns from leveraged acquisition:
 ### Financial Formulas
 
 #### DCF Calculations
+
 ```
 Free Cash Flow = Net Income + Depreciation - CapEx - Working Capital Changes
 Present Value = FCF / (1 + Discount Rate)^year
@@ -136,6 +151,7 @@ Enterprise Value = Σ Present Value FCF + Present Value Terminal Value
 ```
 
 #### LBO Calculations
+
 ```
 Equity Investment = Purchase Price * Equity Contribution
 Exit Value = Exit EBITDA * Exit Multiple
@@ -147,6 +163,7 @@ MOIC = Net Exit Value / Equity Investment
 ## Limitations & Disclaimers
 
 ### Important Considerations
+
 - This tool provides estimates based on simplified models
 - Results should not be considered as financial advice
 - Professional valuations require comprehensive analysis
@@ -154,7 +171,9 @@ MOIC = Net Exit Value / Equity Investment
 - Consider legal and regulatory requirements
 
 ### Professional Use
+
 For professional valuations, consider:
+
 - Detailed financial modeling and scenario analysis
 - Industry-specific benchmarks and comparables
 - Due diligence on company operations and market position
@@ -164,6 +183,7 @@ For professional valuations, consider:
 ## Development
 
 ### File Structure
+
 ```
 src/components/ValuationTool/
 ├── ValuationTool.jsx          # Main application component
@@ -173,12 +193,14 @@ src/components/ValuationTool/
 ```
 
 ### Dependencies
+
 - React 18.2.0
 - Framer Motion 10.16.4
 - Lucide React 0.484.0
 - Tailwind CSS 3.4.6
 
 ### Routes
+
 - `/valuation-tool`: Main valuation tool interface
 - `/valuation-tool/docs`: Documentation and methodology guide
 

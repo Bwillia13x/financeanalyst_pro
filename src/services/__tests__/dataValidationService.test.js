@@ -73,7 +73,9 @@ describe('DataValidationService', () => {
 
       const result = dataValidationService.validateData(invalidDCF, 'dcfModel');
       expect(result.isValid).toBe(false);
-      expect(result.errors.some(error => error.includes('Discount rate must be non-negative'))).toBe(true);
+      expect(
+        result.errors.some(error => error.includes('Discount rate must be non-negative'))
+      ).toBe(true);
     });
 
     it('should validate cash flow arrays using the new service', () => {
@@ -85,7 +87,9 @@ describe('DataValidationService', () => {
 
       const result = dataValidationService.validateData(emptyCashFlows, 'dcfModel');
       expect(result.isValid).toBe(false);
-      expect(result.errors.some(error => error.includes('Cash flows must be a non-empty array'))).toBe(true);
+      expect(
+        result.errors.some(error => error.includes('Cash flows must be a non-empty array'))
+      ).toBe(true);
     });
   });
 
@@ -249,9 +253,11 @@ describe('DataValidationService', () => {
   describe('Error Handling', () => {
     it('should handle validation errors gracefully', () => {
       const corruptData = {
-        revenue: { toString: () => {
-          throw new Error('Corrupt data');
-        } }
+        revenue: {
+          toString: () => {
+            throw new Error('Corrupt data');
+          }
+        }
       };
 
       expect(() => {

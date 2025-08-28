@@ -382,7 +382,10 @@ const ModelTemplates = ({ onTemplateSelect, onTemplateCreate }) => {
             </div>
             <div className="p-4 space-y-4">
               <div>
-                <label htmlFor="template-name" className="text-sm font-medium text-foreground mb-2 block">
+                <label
+                  htmlFor="template-name"
+                  className="text-sm font-medium text-foreground mb-2 block"
+                >
                   Template Name
                 </label>
                 <input
@@ -393,7 +396,10 @@ const ModelTemplates = ({ onTemplateSelect, onTemplateCreate }) => {
                 />
               </div>
               <div>
-                <label htmlFor="template-description" className="text-sm font-medium text-foreground mb-2 block">
+                <label
+                  htmlFor="template-description"
+                  className="text-sm font-medium text-foreground mb-2 block"
+                >
                   Description
                 </label>
                 <textarea
@@ -404,8 +410,16 @@ const ModelTemplates = ({ onTemplateSelect, onTemplateCreate }) => {
                 />
               </div>
               <div>
-                <label htmlFor="template-category" className="text-sm font-medium text-foreground mb-2 block">Category</label>
-                <select id="template-category" className="w-full px-3 py-2 bg-input border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-ring">
+                <label
+                  htmlFor="template-category"
+                  className="text-sm font-medium text-foreground mb-2 block"
+                >
+                  Category
+                </label>
+                <select
+                  id="template-category"
+                  className="w-full px-3 py-2 bg-input border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                >
                   <option value="valuation">Valuation Models</option>
                   <option value="lbo">LBO Models</option>
                   <option value="comps">Comparable Analysis</option>

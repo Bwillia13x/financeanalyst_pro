@@ -10,32 +10,32 @@ class EnergyAnalyticsService extends EventEmitter {
     super();
     this.commodityPrices = {
       oil: { current_price: 75, volatility: 0.35, mean_reversion: 0.15 },
-      gas: { current_price: 3.5, volatility: 0.45, mean_reversion: 0.20 },
-      coal: { current_price: 85, volatility: 0.30, mean_reversion: 0.12 },
+      gas: { current_price: 3.5, volatility: 0.45, mean_reversion: 0.2 },
+      coal: { current_price: 85, volatility: 0.3, mean_reversion: 0.12 },
       power: { current_price: 45, volatility: 0.25, mean_reversion: 0.18 }
     };
 
     this.reserveCategories = {
       proved_developed_producing: { risk_factor: 0.95, discount_rate: 0.08 },
-      proved_developed_nonproducing: { risk_factor: 0.90, discount_rate: 0.10 },
-      proved_undeveloped: { risk_factor: 0.80, discount_rate: 0.12 },
+      proved_developed_nonproducing: { risk_factor: 0.9, discount_rate: 0.1 },
+      proved_undeveloped: { risk_factor: 0.8, discount_rate: 0.12 },
       probable: { risk_factor: 0.65, discount_rate: 0.15 },
-      possible: { risk_factor: 0.35, discount_rate: 0.20 }
+      possible: { risk_factor: 0.35, discount_rate: 0.2 }
     };
 
     this.renewableTypes = {
       solar: { capacity_factor: 0.25, degradation_rate: 0.005, lifespan: 25 },
       wind_onshore: { capacity_factor: 0.35, degradation_rate: 0.002, lifespan: 20 },
       wind_offshore: { capacity_factor: 0.45, degradation_rate: 0.002, lifespan: 25 },
-      hydroelectric: { capacity_factor: 0.40, degradation_rate: 0.001, lifespan: 50 },
+      hydroelectric: { capacity_factor: 0.4, degradation_rate: 0.001, lifespan: 50 },
       geothermal: { capacity_factor: 0.75, degradation_rate: 0.001, lifespan: 30 }
     };
 
     this.utilitySegments = {
-      electric: { allowed_roe: 0.095, equity_ratio: 0.50, rate_base_growth: 0.04 },
-      gas_distribution: { allowed_roe: 0.090, equity_ratio: 0.55, rate_base_growth: 0.03 },
+      electric: { allowed_roe: 0.095, equity_ratio: 0.5, rate_base_growth: 0.04 },
+      gas_distribution: { allowed_roe: 0.09, equity_ratio: 0.55, rate_base_growth: 0.03 },
       water: { allowed_roe: 0.085, equity_ratio: 0.45, rate_base_growth: 0.035 },
-      renewable_developer: { target_roe: 0.12, equity_ratio: 0.30, development_risk: 0.15 }
+      renewable_developer: { target_roe: 0.12, equity_ratio: 0.3, development_risk: 0.15 }
     };
   }
 
@@ -100,8 +100,8 @@ class EnergyAnalyticsService extends EventEmitter {
       const operatingCosts = yearData.production * reserve.operating_cost_per_unit;
       const capitalCosts = yearData.capex || 0;
       const netCashFlow = revenue - operatingCosts - capitalCosts;
-      
-      const discountFactor = 1 / Math.pow(1.10, year); // 10% discount rate
+
+      const discountFactor = 1 / Math.pow(1.1, year); // 10% discount rate
       pv10 += netCashFlow * discountFactor;
     });
 
@@ -119,7 +119,7 @@ class EnergyAnalyticsService extends EventEmitter {
       const operatingCosts = yearData.production * reserve.operating_cost_per_unit;
       const capitalCosts = yearData.capex || 0;
       const netCashFlow = revenue - operatingCosts - capitalCosts;
-      
+
       const discountFactor = 1 / Math.pow(1.15, year); // 15% discount rate
       pv15 += netCashFlow * discountFactor;
     });
@@ -130,7 +130,7 @@ class EnergyAnalyticsService extends EventEmitter {
   analyzeProductionProfile(assetData) {
     const wells = assetData.wells || [];
     const aggregateProfile = this.aggregateWellProduction(wells);
-    
+
     return {
       historical_production: this.analyzeHistoricalProduction(wells),
       decline_analysis: this.analyzeDeclineRates(wells),
@@ -143,7 +143,7 @@ class EnergyAnalyticsService extends EventEmitter {
 
   analyzeDrillingEconomics(assetData) {
     const drillingProgram = assetData.drilling_program || {};
-    
+
     return {
       breakeven_analysis: this.calculateBreakevenPrices(drillingProgram),
       drilling_inventory: this.assessDrillingInventory(drillingProgram),
@@ -178,14 +178,18 @@ class EnergyAnalyticsService extends EventEmitter {
   async performRenewableEconomics(projectData) {
     const projectType = projectData.technology_type;
     const techSpecs = this.renewableTypes[projectType] || this.renewableTypes.solar;
-    
+
     const energyProduction = this.calculateAnnualEnergyProduction(projectData, techSpecs);
     const revenueProfile = this.buildRevenueProfile(projectData, energyProduction);
     const costProfile = this.buildCostProfile(projectData, techSpecs);
-    
+
     return {
       project_irr: this.calculateProjectIRR(revenueProfile, costProfile),
-      project_npv: this.calculateProjectNPV(revenueProfile, costProfile, projectData.discount_rate || 0.08),
+      project_npv: this.calculateProjectNPV(
+        revenueProfile,
+        costProfile,
+        projectData.discount_rate || 0.08
+      ),
       lcoe: this.calculateLCOE(projectData, energyProduction, costProfile),
       payback_period: this.calculatePaybackPeriod(revenueProfile, costProfile),
       debt_service_coverage: this.analyzeDSCR(revenueProfile, costProfile, projectData.debt),
@@ -198,7 +202,7 @@ class EnergyAnalyticsService extends EventEmitter {
     const capacityFactor = projectData.capacity_factor || techSpecs.capacity_factor;
     const degradationRate = techSpecs.degradation_rate;
     const lifespan = techSpecs.lifespan;
-    
+
     const productionProfile = [];
     for (let year = 1; year <= lifespan; year++) {
       const degradationFactor = Math.pow(1 - degradationRate, year - 1);
@@ -217,7 +221,7 @@ class EnergyAnalyticsService extends EventEmitter {
 
   analyzePowerPurchaseAgreement(projectData) {
     const ppa = projectData.ppa || {};
-    
+
     return {
       contract_analysis: this.analyzePPATerms(ppa),
       price_escalation: this.analyzePriceEscalation(ppa),
@@ -233,7 +237,7 @@ class EnergyAnalyticsService extends EventEmitter {
    */
   analyzeUtilityRateStructure(utilityData) {
     const segment = this.utilitySegments[utilityData.segment] || this.utilitySegments.electric;
-    
+
     return {
       rate_base_analysis: this.analyzeRateBase(utilityData, segment),
       roe_analysis: this.analyzeReturnOnEquity(utilityData, segment),
@@ -247,7 +251,7 @@ class EnergyAnalyticsService extends EventEmitter {
     const currentRateBase = utilityData.rate_base;
     const projectedGrowth = segment.rate_base_growth;
     const projectionYears = 5;
-    
+
     const rateBaseProjection = [];
     for (let year = 1; year <= projectionYears; year++) {
       const projectedRateBase = currentRateBase * Math.pow(1 + projectedGrowth, year);
@@ -291,7 +295,10 @@ class EnergyAnalyticsService extends EventEmitter {
       distribution_services: this.calculateDistributionValue(storageData)
     };
 
-    const totalValue = Object.values(valueStreams).reduce((sum, stream) => sum + stream.annual_value, 0);
+    const totalValue = Object.values(valueStreams).reduce(
+      (sum, stream) => sum + stream.annual_value,
+      0
+    );
 
     return {
       value_streams: valueStreams,
@@ -306,7 +313,7 @@ class EnergyAnalyticsService extends EventEmitter {
     const initialProduction = reserve.initial_production_rate;
     const declineRate = reserve.decline_rate || 0.15; // 15% annual decline
     const economicLimit = reserve.economic_limit || initialProduction * 0.05;
-    
+
     const profile = [];
     let currentProduction = initialProduction;
     let year = 1;
@@ -318,8 +325,8 @@ class EnergyAnalyticsService extends EventEmitter {
         decline_rate: declineRate,
         cumulative_production: profile.reduce((sum, p) => sum + p.production, 0) + currentProduction
       });
-      
-      currentProduction *= (1 - declineRate);
+
+      currentProduction *= 1 - declineRate;
       year++;
     }
 
@@ -341,7 +348,7 @@ class EnergyAnalyticsService extends EventEmitter {
     // Simplified price strip - would typically come from market data
     const basPrice = this.commodityPrices.oil.current_price;
     const priceStrip = [];
-    
+
     for (let year = 1; year <= 20; year++) {
       // Apply mean reversion and inflation
       const meanReversionFactor = Math.pow(0.95, year - 1);
@@ -361,7 +368,7 @@ class EnergyAnalyticsService extends EventEmitter {
     energyProduction.forEach((yearData, index) => {
       const year = index + 1;
       const discountFactor = 1 / Math.pow(1 + discountRate, year);
-      
+
       presentValueCosts += (costProfile[index]?.total_costs || 0) * discountFactor;
       presentValueEnergy += yearData.energy_production_mwh * discountFactor;
     });
@@ -393,7 +400,7 @@ class EnergyAnalyticsService extends EventEmitter {
       cashFlows.forEach((cf, period) => {
         npv += cf / Math.pow(1 + rate, period);
         if (period > 0) {
-          dnpv -= period * cf / Math.pow(1 + rate, period + 1);
+          dnpv -= (period * cf) / Math.pow(1 + rate, period + 1);
         }
       });
 
@@ -408,58 +415,162 @@ class EnergyAnalyticsService extends EventEmitter {
   }
 
   // Additional helper methods would be implemented here...
-  calculateRiskedValue() { /* Implementation */ }
-  createDevelopmentTimeline() { /* Implementation */ }
-  summarizePortfolioValue() { /* Implementation */ }
-  performReserveSensitivity() { /* Implementation */ }
-  analyzeReservePriceScenarios() { /* Implementation */ }
-  analyzeHistoricalProduction() { /* Implementation */ }
-  analyzeDeclineRates() { /* Implementation */ }
-  performTypeCurveAnalysis() { /* Implementation */ }
-  aggregateWellProduction() { /* Implementation */ }
-  analyzeEstimatedUltimateRecovery() { /* Implementation */ }
-  analyzeProductivityTrends() { /* Implementation */ }
-  calculateBreakevenPrices() { /* Implementation */ }
-  assessDrillingInventory() { /* Implementation */ }
-  rankLocationEconomics() { /* Implementation */ }
-  analyzCapitalEfficiency() { /* Implementation */ }
-  optimizeDevelopmentSequence() { /* Implementation */ }
-  analyzeHedgingStrategy() { /* Implementation */ }
-  performESGAssessment() { /* Implementation */ }
-  optimizePortfolio() { /* Implementation */ }
-  modelEnergyProduction() { /* Implementation */ }
-  assessGridIntegration() { /* Implementation */ }
-  assessEnvironmentalImpact() { /* Implementation */ }
-  optimizeProjectFinancing() { /* Implementation */ }
-  buildRevenueProfile() { /* Implementation */ }
-  buildCostProfile() { /* Implementation */ }
-  calculateProjectNPV() { /* Implementation */ }
-  calculatePaybackPeriod() { /* Implementation */ }
-  analyzeDSCR() { /* Implementation */ }
-  performRenewableSensitivity() { /* Implementation */ }
-  analyzePPATerms() { /* Implementation */ }
-  analyzePriceEscalation() { /* Implementation */ }
-  assessCurtailmentRisk() { /* Implementation */ }
-  assessCounterpartyRisk() { /* Implementation */ }
-  analyzeMerchantExposure() { /* Implementation */ }
-  identifyPPAOptimizations() { /* Implementation */ }
-  analyzeReturnOnEquity() { /* Implementation */ }
-  analyzeCostRecovery() { /* Implementation */ }
-  assessRegulatoryEnvironment() { /* Implementation */ }
-  projectUtilityGrowth() { /* Implementation */ }
-  analyzeCapexProgram() { /* Implementation */ }
-  analyzeDepreciation() { /* Implementation */ }
-  compareStorageTechnologies() { /* Implementation */ }
-  assessGridServices() { /* Implementation */ }
-  analyzeCyclingEconomics() { /* Implementation */ }
-  modelBatteryDegradation() { /* Implementation */ }
-  calculateArbitrageValue() { /* Implementation */ }
-  calculateRegulationValue() { /* Implementation */ }
-  calculateReservesValue() { /* Implementation */ }
-  calculateCapacityValue() { /* Implementation */ }
-  calculateDeferralValue() { /* Implementation */ }
-  calculateDistributionValue() { /* Implementation */ }
-  optimizeValueStacking() { /* Implementation */ }
+  calculateRiskedValue() {
+    /* Implementation */
+  }
+  createDevelopmentTimeline() {
+    /* Implementation */
+  }
+  summarizePortfolioValue() {
+    /* Implementation */
+  }
+  performReserveSensitivity() {
+    /* Implementation */
+  }
+  analyzeReservePriceScenarios() {
+    /* Implementation */
+  }
+  analyzeHistoricalProduction() {
+    /* Implementation */
+  }
+  analyzeDeclineRates() {
+    /* Implementation */
+  }
+  performTypeCurveAnalysis() {
+    /* Implementation */
+  }
+  aggregateWellProduction() {
+    /* Implementation */
+  }
+  analyzeEstimatedUltimateRecovery() {
+    /* Implementation */
+  }
+  analyzeProductivityTrends() {
+    /* Implementation */
+  }
+  calculateBreakevenPrices() {
+    /* Implementation */
+  }
+  assessDrillingInventory() {
+    /* Implementation */
+  }
+  rankLocationEconomics() {
+    /* Implementation */
+  }
+  analyzCapitalEfficiency() {
+    /* Implementation */
+  }
+  optimizeDevelopmentSequence() {
+    /* Implementation */
+  }
+  analyzeHedgingStrategy() {
+    /* Implementation */
+  }
+  performESGAssessment() {
+    /* Implementation */
+  }
+  optimizePortfolio() {
+    /* Implementation */
+  }
+  modelEnergyProduction() {
+    /* Implementation */
+  }
+  assessGridIntegration() {
+    /* Implementation */
+  }
+  assessEnvironmentalImpact() {
+    /* Implementation */
+  }
+  optimizeProjectFinancing() {
+    /* Implementation */
+  }
+  buildRevenueProfile() {
+    /* Implementation */
+  }
+  buildCostProfile() {
+    /* Implementation */
+  }
+  calculateProjectNPV() {
+    /* Implementation */
+  }
+  calculatePaybackPeriod() {
+    /* Implementation */
+  }
+  analyzeDSCR() {
+    /* Implementation */
+  }
+  performRenewableSensitivity() {
+    /* Implementation */
+  }
+  analyzePPATerms() {
+    /* Implementation */
+  }
+  analyzePriceEscalation() {
+    /* Implementation */
+  }
+  assessCurtailmentRisk() {
+    /* Implementation */
+  }
+  assessCounterpartyRisk() {
+    /* Implementation */
+  }
+  analyzeMerchantExposure() {
+    /* Implementation */
+  }
+  identifyPPAOptimizations() {
+    /* Implementation */
+  }
+  analyzeReturnOnEquity() {
+    /* Implementation */
+  }
+  analyzeCostRecovery() {
+    /* Implementation */
+  }
+  assessRegulatoryEnvironment() {
+    /* Implementation */
+  }
+  projectUtilityGrowth() {
+    /* Implementation */
+  }
+  analyzeCapexProgram() {
+    /* Implementation */
+  }
+  analyzeDepreciation() {
+    /* Implementation */
+  }
+  compareStorageTechnologies() {
+    /* Implementation */
+  }
+  assessGridServices() {
+    /* Implementation */
+  }
+  analyzeCyclingEconomics() {
+    /* Implementation */
+  }
+  modelBatteryDegradation() {
+    /* Implementation */
+  }
+  calculateArbitrageValue() {
+    /* Implementation */
+  }
+  calculateRegulationValue() {
+    /* Implementation */
+  }
+  calculateReservesValue() {
+    /* Implementation */
+  }
+  calculateCapacityValue() {
+    /* Implementation */
+  }
+  calculateDeferralValue() {
+    /* Implementation */
+  }
+  calculateDistributionValue() {
+    /* Implementation */
+  }
+  optimizeValueStacking() {
+    /* Implementation */
+  }
 }
 
 export default new EnergyAnalyticsService();

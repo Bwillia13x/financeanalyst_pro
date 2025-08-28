@@ -1,151 +1,118 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
-import { dataFetchingService } from '../dataFetching.js';
 import realTimeDataService from '../realTimeDataService.js';
 
-// Mock dependencies
-vi.mock('../utils/apiLogger.js', () => ({
-  apiLogger: {
-    log: vi.fn(),
-    error: vi.fn(),
-    warn: vi.fn()
-  }
-}));
-
-vi.mock('../dataFetching.js', () => ({
-  dataFetchingService: {
-    fetchMarketData: vi.fn(),
-    fetchCompanyProfile: vi.fn(),
-    fetchFinancialStatements: vi.fn()
-  }
-}));
+// No external dependencies are used by realTimeDataService; tests focus on simulated feeds
 
 describe('RealTimeDataService', () => {
   beforeEach(() => {
-    vi.clearAllMocks();
     vi.useFakeTimers();
+    vi.clearAllMocks();
+    vi.clearAllTimers();
     realTimeDataService.cleanup(); // Clean up any existing subscriptions
   });
 
-  afterEach(() => {
-    vi.useRealTimers();
+  afterEach(async () => {
+    // Ensure all intervals/timers are cleared while still under fake timers
     realTimeDataService.cleanup();
+    await vi.runOnlyPendingTimersAsync();
+    vi.clearAllTimers();
+    vi.useRealTimers();
   });
 
   describe('Subscription Management', () => {
-    it('should subscribe to real-time data and start polling', async() => {
+    it('should subscribe to real-time data and start polling', async () => {
       const callback = vi.fn();
-      dataFetchingService.fetchMarketData.mockResolvedValue({ price: 150 });
 
-      const subscriptionId = realTimeDataService.subscribe('AAPL', 'marketData', callback);
+      const unsubscribe = realTimeDataService.subscribe('stock_price', 'AAPL', callback);
 
-      expect(subscriptionId).toContain('AAPL_marketData');
+      expect(typeof unsubscribe).toBe('function');
       expect(realTimeDataService.getActiveSubscriptions()).toHaveLength(1);
 
-      // Fast-forward timers to trigger polling
-      await vi.advanceTimersByTimeAsync(5000);
+      // Fast-forward timers to trigger simulated updates (interval = 500ms)
+      await vi.advanceTimersByTimeAsync(2500);
 
-      expect(dataFetchingService.fetchMarketData).toHaveBeenCalledWith('AAPL');
-      expect(callback).toHaveBeenCalledWith(expect.objectContaining({
-        symbol: 'AAPL',
-        dataType: 'marketData',
-        price: 150
-      }));
+      expect(callback).toHaveBeenCalled();
+      expect(callback).toHaveBeenCalledWith(
+        expect.objectContaining({
+          symbol: 'AAPL',
+          price: expect.any(Number)
+        })
+      );
     });
 
-    it('should unsubscribe from real-time data and stop polling', () => {
+    it('should unsubscribe from real-time data and stop polling', async () => {
       const callback = vi.fn();
-      const subscriptionId = realTimeDataService.subscribe('AAPL', 'marketData', callback);
+      const unsubscribe = realTimeDataService.subscribe('stock_price', 'AAPL', callback);
 
-      realTimeDataService.unsubscribe(subscriptionId);
+      await vi.advanceTimersByTimeAsync(1000);
+      const callsBefore = callback.mock.calls.length;
+
+      unsubscribe();
 
       expect(realTimeDataService.getActiveSubscriptions()).toHaveLength(0);
 
-      // Reset mock to clear the initial fetch call
-      vi.clearAllMocks();
-
-      // Verify polling is stopped
-      vi.advanceTimersByTime(10000);
-      expect(dataFetchingService.fetchMarketData).not.toHaveBeenCalled();
+      // Verify no more updates after unsubscribe
+      await vi.advanceTimersByTimeAsync(1500);
+      expect(callback.mock.calls.length).toBe(callsBefore);
     });
 
-    it('should handle multiple subscribers for the same symbol and data type', async() => {
+    it('should handle multiple subscribers for the same symbol and data type', async () => {
       const callback1 = vi.fn();
       const callback2 = vi.fn();
-      dataFetchingService.fetchMarketData.mockResolvedValue({ price: 155 });
 
-      // Mock Date.now to ensure unique subscription IDs
-      let now = Date.now();
-      vi.spyOn(Date, 'now').mockImplementation(() => ++now);
-
-      realTimeDataService.subscribe('AAPL', 'marketData', callback1);
-      realTimeDataService.subscribe('AAPL', 'marketData', callback2);
+      realTimeDataService.subscribe('stock_price', 'AAPL', callback1);
+      realTimeDataService.subscribe('stock_price', 'AAPL', callback2);
 
       const activeSubscriptions = realTimeDataService.getActiveSubscriptions();
       expect(activeSubscriptions).toHaveLength(1);
       expect(activeSubscriptions[0].subscriberCount).toBe(2);
 
-      await vi.advanceTimersByTimeAsync(5000);
+      await vi.advanceTimersByTimeAsync(2000);
 
-      expect(callback1).toHaveBeenCalledTimes(2);
-      expect(callback2).toHaveBeenCalledTimes(2);
+      expect(callback1).toHaveBeenCalled();
+      expect(callback2).toHaveBeenCalled();
+      expect(callback1.mock.calls.length).toBe(callback2.mock.calls.length);
     });
   });
 
   describe('Data Fetching and Broadcasting', () => {
-    it('should fetch and broadcast market data', async() => {
+    it('should broadcast simulated market data', async () => {
       const callback = vi.fn();
-      dataFetchingService.fetchMarketData.mockResolvedValue({ currentPrice: 160 });
 
-      realTimeDataService.subscribe('TSLA', 'marketData', callback);
-      await vi.advanceTimersByTimeAsync(5000);
+      realTimeDataService.subscribe('stock_price', 'TSLA', callback);
+      await vi.advanceTimersByTimeAsync(2000);
 
-      expect(dataFetchingService.fetchMarketData).toHaveBeenCalledWith('TSLA');
-      expect(callback).toHaveBeenCalledWith(expect.objectContaining({
-        symbol: 'TSLA',
-        dataType: 'marketData',
-        currentPrice: 160
-      }));
+      expect(callback).toHaveBeenCalledWith(
+        expect.objectContaining({
+          symbol: 'TSLA',
+          price: expect.any(Number)
+        })
+      );
     });
 
-    it('should fetch and broadcast quotes', async() => {
+    it('should expose the latest snapshot via getCurrentData', async () => {
       const callback = vi.fn();
-      dataFetchingService.fetchCompanyProfile.mockResolvedValue({ companyName: 'Tesla Inc.' });
 
-      realTimeDataService.subscribe('TSLA', 'quotes', callback);
+      realTimeDataService.subscribe('stock_price', 'AAPL', callback);
       await vi.advanceTimersByTimeAsync(1000);
 
-      expect(dataFetchingService.fetchCompanyProfile).toHaveBeenCalledWith('TSLA');
-      expect(callback).toHaveBeenCalledWith(expect.objectContaining({
-        symbol: 'TSLA',
-        dataType: 'quotes',
-        companyName: 'Tesla Inc.'
-      }));
-    });
-
-    it('should handle data fetching errors gracefully', async() => {
-      const callback = vi.fn();
-      const error = new Error('API limit reached');
-      dataFetchingService.fetchMarketData.mockRejectedValue(error);
-
-      realTimeDataService.subscribe('NVDA', 'marketData', callback);
-      await vi.advanceTimersByTimeAsync(5000);
-
-      expect(callback).not.toHaveBeenCalled();
-      // You can also check if the error was logged
+      const snapshot = realTimeDataService.getCurrentData('stock_price', 'AAPL');
+      expect(snapshot).toEqual(
+        expect.objectContaining({ symbol: 'AAPL', price: expect.any(Number) })
+      );
     });
   });
 
   describe('Connection Status', () => {
-    it('should report connection status for active streams', async() => {
-      dataFetchingService.fetchMarketData.mockResolvedValue({ price: 200 });
-      realTimeDataService.subscribe('MSFT', 'marketData', vi.fn());
+    it('should report connection status for active streams', async () => {
+      realTimeDataService.subscribe('stock_price', 'MSFT', vi.fn());
 
-      await vi.advanceTimersByTimeAsync(100); // Let the initial fetch complete
+      await vi.advanceTimersByTimeAsync(600); // allow at least one interval tick
 
       const status = realTimeDataService.getConnectionStatus();
-      expect(status.MSFT.marketData.status).toBe('connected');
-      expect(status.MSFT.marketData.subscriberCount).toBe(1);
+      expect(status.MSFT.stock_price.status).toBe('connected');
+      expect(status.MSFT.stock_price.subscriberCount).toBe(1);
     });
   });
 });

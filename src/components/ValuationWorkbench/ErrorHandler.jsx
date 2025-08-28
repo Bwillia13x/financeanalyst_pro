@@ -69,7 +69,8 @@ export function validateAssumptions(assumptions) {
     warnings.push({
       type: 'negative_rf',
       message: 'Negative Risk-Free Rate',
-      guidance: 'Negative risk-free rates can create unusual WACC dynamics. Verify your rate source.',
+      guidance:
+        'Negative risk-free rates can create unusual WACC dynamics. Verify your rate source.',
       severity: 'warning'
     });
   }
@@ -99,7 +100,10 @@ export const ErrorDisplay = ({ validation }) => {
       ))}
 
       {validation.warnings.map((warning, index) => (
-        <div key={`warning-${index}`} className="rounded-lg border border-amber-200 bg-amber-50 p-3">
+        <div
+          key={`warning-${index}`}
+          className="rounded-lg border border-amber-200 bg-amber-50 p-3"
+        >
           <div className="flex items-start gap-2">
             <div className="mt-0.5 h-4 w-4 rounded-full bg-amber-500 flex items-center justify-center">
               <span className="text-white text-[10px] font-bold">?</span>

@@ -22,12 +22,17 @@ import {
 } from 'lucide-react';
 import React, { useState, useRef } from 'react';
 
-const CommentingAnnotations = ({ modelData: _modelData, currentUser, onDataChange: _onDataChange }) => {
+const CommentingAnnotations = ({
+  modelData: _modelData,
+  currentUser,
+  onDataChange: _onDataChange
+}) => {
   const [comments, setComments] = useState([
     {
       id: 1,
       type: 'comment',
-      content: 'The WACC assumption of 9.2% seems high for this industry. Should we benchmark against peer companies?',
+      content:
+        'The WACC assumption of 9.2% seems high for this industry. Should we benchmark against peer companies?',
       author: {
         name: 'Sarah Johnson',
         email: 'sarah@company.com',
@@ -46,7 +51,7 @@ const CommentingAnnotations = ({ modelData: _modelData, currentUser, onDataChang
       replies: [
         {
           id: 11,
-          content: 'Good point. I\'ll research industry averages and update accordingly.',
+          content: "Good point. I'll research industry averages and update accordingly.",
           author: {
             name: 'Mike Chen',
             email: 'mike@company.com',
@@ -112,7 +117,8 @@ const CommentingAnnotations = ({ modelData: _modelData, currentUser, onDataChang
   const filteredComments = comments.filter(comment => {
     const matchesStatus = filterStatus === 'all' || comment.status === filterStatus;
     const matchesPriority = filterPriority === 'all' || comment.priority === filterPriority;
-    const matchesSearch = searchTerm === '' ||
+    const matchesSearch =
+      searchTerm === '' ||
       comment.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
       comment.author.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       comment.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
@@ -154,7 +160,7 @@ const CommentingAnnotations = ({ modelData: _modelData, currentUser, onDataChang
     }
   };
 
-  const handleAddReply = (commentId) => {
+  const handleAddReply = commentId => {
     if (replyContent.trim()) {
       const reply = {
         id: Date.now(),
@@ -168,44 +174,52 @@ const CommentingAnnotations = ({ modelData: _modelData, currentUser, onDataChang
         timestamp: new Date()
       };
 
-      setComments(prev => prev.map(comment =>
-        comment.id === commentId
-          ? { ...comment, replies: [...comment.replies, reply] }
-          : comment
-      ));
+      setComments(prev =>
+        prev.map(comment =>
+          comment.id === commentId ? { ...comment, replies: [...comment.replies, reply] } : comment
+        )
+      );
 
       setReplyContent('');
       setReplyingTo(null);
     }
   };
 
-  const handleResolveComment = (commentId) => {
-    setComments(prev => prev.map(comment =>
-      comment.id === commentId
-        ? { ...comment, resolved: !comment.resolved, status: comment.resolved ? 'open' : 'resolved' }
-        : comment
-    ));
+  const handleResolveComment = commentId => {
+    setComments(prev =>
+      prev.map(comment =>
+        comment.id === commentId
+          ? {
+              ...comment,
+              resolved: !comment.resolved,
+              status: comment.resolved ? 'open' : 'resolved'
+            }
+          : comment
+      )
+    );
   };
 
   const handleReaction = (commentId, reactionType) => {
-    setComments(prev => prev.map(comment =>
-      comment.id === commentId
-        ? {
-          ...comment,
-          reactions: {
-            ...comment.reactions,
-            [reactionType]: comment.reactions[reactionType] + 1
-          }
-        }
-        : comment
-    ));
+    setComments(prev =>
+      prev.map(comment =>
+        comment.id === commentId
+          ? {
+              ...comment,
+              reactions: {
+                ...comment.reactions,
+                [reactionType]: comment.reactions[reactionType] + 1
+              }
+            }
+          : comment
+      )
+    );
   };
 
-  const formatDate = (date) => {
+  const formatDate = date => {
     return date.toLocaleString();
   };
 
-  const getPriorityColor = (priority) => {
+  const getPriorityColor = priority => {
     switch (priority) {
       case 'high':
         return 'text-red-600 bg-red-50';
@@ -259,7 +273,7 @@ const CommentingAnnotations = ({ modelData: _modelData, currentUser, onDataChang
                 <Filter className="w-4 h-4 text-gray-500" />
                 <select
                   value={filterStatus}
-                  onChange={(e) => setFilterStatus(e.target.value)}
+                  onChange={e => setFilterStatus(e.target.value)}
                   className="border border-gray-300 rounded px-3 py-1 text-sm"
                 >
                   <option value="all">All Status</option>
@@ -269,7 +283,7 @@ const CommentingAnnotations = ({ modelData: _modelData, currentUser, onDataChang
 
                 <select
                   value={filterPriority}
-                  onChange={(e) => setFilterPriority(e.target.value)}
+                  onChange={e => setFilterPriority(e.target.value)}
                   className="border border-gray-300 rounded px-3 py-1 text-sm"
                 >
                   <option value="all">All Priority</option>
@@ -286,7 +300,7 @@ const CommentingAnnotations = ({ modelData: _modelData, currentUser, onDataChang
                 type="text"
                 placeholder="Search comments..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={e => setSearchTerm(e.target.value)}
                 className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm w-64"
               />
             </div>
@@ -297,10 +311,18 @@ const CommentingAnnotations = ({ modelData: _modelData, currentUser, onDataChang
         <div className="border-b border-gray-200">
           <nav className="-mb-px flex space-x-8 px-6">
             {[
-              { id: 'comments', label: 'Comments', count: filteredComments.filter(c => c.type === 'comment').length },
-              { id: 'annotations', label: 'Annotations', count: filteredComments.filter(c => c.type === 'annotation').length },
+              {
+                id: 'comments',
+                label: 'Comments',
+                count: filteredComments.filter(c => c.type === 'comment').length
+              },
+              {
+                id: 'annotations',
+                label: 'Annotations',
+                count: filteredComments.filter(c => c.type === 'annotation').length
+              },
               { id: 'reviews', label: 'Reviews', count: 0 }
-            ].map((tab) => (
+            ].map(tab => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
@@ -338,7 +360,7 @@ const CommentingAnnotations = ({ modelData: _modelData, currentUser, onDataChang
                 <textarea
                   ref={commentFormRef}
                   value={newComment}
-                  onChange={(e) => setNewComment(e.target.value)}
+                  onChange={e => setNewComment(e.target.value)}
                   placeholder="Enter your comment..."
                   className="w-full border border-gray-300 rounded-lg p-3 h-24 resize-none"
                   autoFocus
@@ -381,14 +403,17 @@ const CommentingAnnotations = ({ modelData: _modelData, currentUser, onDataChang
                 <p className="text-gray-600">Start a conversation by adding the first comment.</p>
               </div>
             ) : (
-              filteredComments.map((comment) => (
+              filteredComments.map(comment => (
                 <motion.div
                   key={comment.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   className={`bg-gray-50 rounded-lg p-6 border-l-4 ${
-                    comment.pinned ? 'border-l-yellow-500 bg-yellow-50' :
-                      comment.resolved ? 'border-l-green-500' : 'border-l-blue-500'
+                    comment.pinned
+                      ? 'border-l-yellow-500 bg-yellow-50'
+                      : comment.resolved
+                        ? 'border-l-green-500'
+                        : 'border-l-blue-500'
                   }`}
                 >
                   {/* Comment Header */}
@@ -406,14 +431,18 @@ const CommentingAnnotations = ({ modelData: _modelData, currentUser, onDataChang
                         <div className="text-sm text-gray-600 flex items-center space-x-2">
                           <span>{formatDate(comment.timestamp)}</span>
                           <span>•</span>
-                          <span>{comment.location.sheet} - {comment.location.section}</span>
+                          <span>
+                            {comment.location.sheet} - {comment.location.section}
+                          </span>
                         </div>
                       </div>
                     </div>
 
                     <div className="flex items-center space-x-2">
                       {getStatusIcon(comment.status, comment.resolved)}
-                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${getPriorityColor(comment.priority)}`}>
+                      <span
+                        className={`px-2 py-1 text-xs font-medium rounded-full ${getPriorityColor(comment.priority)}`}
+                      >
                         {comment.priority}
                       </span>
                       <button className="text-gray-400 hover:text-gray-600">
@@ -429,8 +458,11 @@ const CommentingAnnotations = ({ modelData: _modelData, currentUser, onDataChang
                     {comment.tags.length > 0 && (
                       <div className="flex items-center space-x-2 mt-3">
                         <Tag className="w-4 h-4 text-gray-400" />
-                        {comment.tags.map((tag) => (
-                          <span key={tag} className="bg-gray-200 text-gray-700 px-2 py-1 rounded text-xs">
+                        {comment.tags.map(tag => (
+                          <span
+                            key={tag}
+                            className="bg-gray-200 text-gray-700 px-2 py-1 rounded text-xs"
+                          >
                             {tag}
                           </span>
                         ))}
@@ -440,8 +472,11 @@ const CommentingAnnotations = ({ modelData: _modelData, currentUser, onDataChang
                     {comment.attachments.length > 0 && (
                       <div className="flex items-center space-x-2 mt-3">
                         <PaperclipIcon className="w-4 h-4 text-gray-400" />
-                        {comment.attachments.map((attachment) => (
-                          <span key={attachment} className="text-blue-600 hover:text-blue-800 text-sm underline cursor-pointer">
+                        {comment.attachments.map(attachment => (
+                          <span
+                            key={attachment}
+                            className="text-blue-600 hover:text-blue-800 text-sm underline cursor-pointer"
+                          >
                             {attachment}
                           </span>
                         ))}
@@ -492,7 +527,7 @@ const CommentingAnnotations = ({ modelData: _modelData, currentUser, onDataChang
                   {/* Replies */}
                   {comment.replies.length > 0 && (
                     <div className="mt-4 space-y-3">
-                      {comment.replies.map((reply) => (
+                      {comment.replies.map(reply => (
                         <div key={reply.id} className="bg-white rounded-lg p-4 ml-6 border">
                           <div className="flex items-start space-x-3">
                             <div className="w-6 h-6 bg-gray-600 text-white rounded-full flex items-center justify-center text-xs font-medium">
@@ -500,8 +535,12 @@ const CommentingAnnotations = ({ modelData: _modelData, currentUser, onDataChang
                             </div>
                             <div className="flex-1">
                               <div className="flex items-center space-x-2 mb-1">
-                                <span className="font-medium text-gray-900 text-sm">{reply.author.name}</span>
-                                <span className="text-xs text-gray-500">{formatDate(reply.timestamp)}</span>
+                                <span className="font-medium text-gray-900 text-sm">
+                                  {reply.author.name}
+                                </span>
+                                <span className="text-xs text-gray-500">
+                                  {formatDate(reply.timestamp)}
+                                </span>
                               </div>
                               <p className="text-gray-900 text-sm">{reply.content}</p>
                             </div>
@@ -516,7 +555,7 @@ const CommentingAnnotations = ({ modelData: _modelData, currentUser, onDataChang
                     <div className="mt-4 ml-6">
                       <textarea
                         value={replyContent}
-                        onChange={(e) => setReplyContent(e.target.value)}
+                        onChange={e => setReplyContent(e.target.value)}
                         placeholder="Write a reply..."
                         className="w-full border border-gray-300 rounded-lg p-3 h-20 resize-none text-sm"
                       />

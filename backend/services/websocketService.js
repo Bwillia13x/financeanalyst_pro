@@ -1,6 +1,6 @@
 // WebSocket Service - Real-Time Collaboration Backend
-const WebSocket = require('ws');
 const { v4: uuidv4 } = require('uuid');
+const WebSocket = require('ws');
 
 class WebSocketService {
   constructor(server) {
@@ -13,9 +13,9 @@ class WebSocketService {
   }
 
   initialize() {
-    this.wss.on('connection', (ws, request) => {
+    this.wss.on('connection', (ws, _request) => {
       const clientId = uuidv4();
-      
+
       // Store client connection
       this.clients.set(clientId, {
         id: clientId,
@@ -75,51 +75,51 @@ class WebSocketService {
       case 'auth':
         this.handleAuth(clientId, message.payload);
         break;
-        
+
       case 'join:room':
         this.handleJoinRoom(clientId, message.payload);
         break;
-        
+
       case 'leave:room':
         this.handleLeaveRoom(clientId, message.payload);
         break;
-        
+
       case 'presence:update':
         this.handlePresenceUpdate(clientId, message.payload);
         break;
-        
+
       case 'cursor:update':
         this.handleCursorUpdate(clientId, message.payload);
         break;
-        
+
       case 'selection:update':
         this.handleSelectionUpdate(clientId, message.payload);
         break;
-        
+
       case 'comment:add':
         this.handleCommentAdd(clientId, message.payload);
         break;
-        
+
       case 'comment:update':
         this.handleCommentUpdate(clientId, message.payload);
         break;
-        
+
       case 'version:create':
         this.handleVersionCreate(clientId, message.payload);
         break;
-        
+
       case 'dashboard:update':
         this.handleDashboardUpdate(clientId, message.payload);
         break;
-        
+
       case 'data:update':
         this.handleDataUpdate(clientId, message.payload);
         break;
-        
+
       case 'heartbeat':
         this.handleHeartbeat(clientId);
         break;
-        
+
       default:
         console.warn(`Unknown message type: ${message.type}`);
         this.sendError(clientId, `Unknown message type: ${message.type}`);
@@ -162,7 +162,7 @@ class WebSocketService {
     }
 
     const { roomId } = payload;
-    
+
     // Create room if it doesn't exist
     if (!this.rooms.has(roomId)) {
       this.rooms.set(roomId, {
@@ -174,7 +174,7 @@ class WebSocketService {
     }
 
     const room = this.rooms.get(roomId);
-    
+
     // Add client to room
     room.clients.add(clientId);
     client.rooms.add(roomId);
@@ -215,7 +215,7 @@ class WebSocketService {
 
     const { roomId } = payload;
     const room = this.rooms.get(roomId);
-    
+
     if (room && room.clients.has(clientId)) {
       room.clients.delete(clientId);
       client.rooms.delete(roomId);
@@ -261,9 +261,9 @@ class WebSocketService {
     // Throttle cursor updates (only send every 100ms per user)
     const now = Date.now();
     const lastUpdate = client.lastCursorUpdate || 0;
-    
+
     if (now - lastUpdate < 100) return;
-    
+
     client.lastCursorUpdate = now;
 
     // Broadcast cursor update to room
@@ -391,7 +391,7 @@ class WebSocketService {
     if (!client) return;
 
     client.lastHeartbeat = Date.now();
-    
+
     this.send(clientId, {
       type: 'heartbeat:ack',
       timestamp: new Date().toISOString()
@@ -409,7 +409,7 @@ class WebSocketService {
       const room = this.rooms.get(roomId);
       if (room) {
         room.clients.delete(clientId);
-        
+
         // Notify other clients
         this.broadcastToRoom(roomId, {
           type: 'user:left',
@@ -490,7 +490,7 @@ class WebSocketService {
       // For now, assume token contains user info (in production, validate JWT)
       const decoded = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
       return decoded;
-    } catch (error) {
+    } catch (_error) {
       return null;
     }
   }

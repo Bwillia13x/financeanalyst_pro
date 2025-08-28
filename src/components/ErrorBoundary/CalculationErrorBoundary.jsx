@@ -50,33 +50,37 @@ const CalculationErrorBoundary = ({ children, calculationType, onError }) => {
         <div className="flex items-start">
           <div className="flex-shrink-0">
             <svg
-              className="h-6 w-6 text-red-600" fill="none" stroke="currentColor"
+              className="h-6 w-6 text-red-600"
+              fill="none"
+              stroke="currentColor"
               viewBox="0 0 24 24"
             >
               <path
-                strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
                 d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
           </div>
 
           <div className="ml-3 flex-1">
-            <h3 className="text-lg font-medium text-red-800 mb-2">
-              {errorInfo.title}
-            </h3>
+            <h3 className="text-lg font-medium text-red-800 mb-2">{errorInfo.title}</h3>
 
-            <p className="text-red-700 mb-4">
-              {errorInfo.message}
-            </p>
+            <p className="text-red-700 mb-4">{errorInfo.message}</p>
 
             <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3 mb-4">
               <div className="flex">
                 <svg
-                  className="h-5 w-5 text-yellow-600 mr-2" fill="none" stroke="currentColor"
+                  className="h-5 w-5 text-yellow-600 mr-2"
+                  fill="none"
+                  stroke="currentColor"
                   viewBox="0 0 24 24"
                 >
                   <path
-                    strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
                     d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                   />
                 </svg>
@@ -110,9 +114,7 @@ const CalculationErrorBoundary = ({ children, calculationType, onError }) => {
 
             {import.meta.env.DEV && (
               <details className="mt-4">
-                <summary className="text-red-600 text-sm cursor-pointer">
-                  Debug Information
-                </summary>
+                <summary className="text-red-600 text-sm cursor-pointer">Debug Information</summary>
                 <pre className="mt-2 text-xs bg-gray-100 p-2 rounded overflow-auto">
                   {error.stack}
                 </pre>
@@ -125,10 +127,7 @@ const CalculationErrorBoundary = ({ children, calculationType, onError }) => {
   };
 
   return (
-    <ErrorBoundaryProvider
-      fallback={CalculationErrorFallback}
-      onError={onError}
-    >
+    <ErrorBoundaryProvider fallback={CalculationErrorFallback} onError={onError}>
       {children}
     </ErrorBoundaryProvider>
   );

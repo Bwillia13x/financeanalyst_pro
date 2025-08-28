@@ -255,11 +255,7 @@ class LBOModelingEngine {
       equityCashFlows,
       exitAnalysis,
       returnsAnalysis,
-      keyMetrics: this.calculateLBOKeyMetrics(
-        transactionStructure,
-        exitAnalysis,
-        returnsAnalysis
-      )
+      keyMetrics: this.calculateLBOKeyMetrics(transactionStructure, exitAnalysis, returnsAnalysis)
     };
   }
 
@@ -279,14 +275,16 @@ class LBOModelingEngine {
     for (let year = 1; year <= years; year++) {
       // Assume revenue grows in line with EBITDA
       const ebitdaGrowth = operatingAssumptions.ebitdaGrowthRate;
-      currentEbitda *= (1 + ebitdaGrowth);
-      currentRevenue *= (1 + ebitdaGrowth);
+      currentEbitda *= 1 + ebitdaGrowth;
+      currentRevenue *= 1 + ebitdaGrowth;
 
       const ebitdaMargin = currentEbitda / currentRevenue;
       const capex = currentRevenue * operatingAssumptions.capexAsPercentOfRevenue;
-      const nwcChange = year === 1
-        ? currentRevenue * operatingAssumptions.nwcAsPercentOfRevenue
-        : (currentRevenue - projections[year - 2].revenue) * operatingAssumptions.nwcAsPercentOfRevenue;
+      const nwcChange =
+        year === 1
+          ? currentRevenue * operatingAssumptions.nwcAsPercentOfRevenue
+          : (currentRevenue - projections[year - 2].revenue) *
+            operatingAssumptions.nwcAsPercentOfRevenue;
 
       const taxes = currentEbitda * operatingAssumptions.taxRate;
       const unleveredFCF = currentEbitda - taxes - capex - nwcChange;
@@ -336,7 +334,8 @@ class LBOModelingEngine {
 
       // Calculate interest expense
       const seniorInterest = seniorDebtBalance * debtAssumptions.seniorInterestRate;
-      const subordinatedInterest = subordinatedDebtBalance * debtAssumptions.subordinatedInterestRate;
+      const subordinatedInterest =
+        subordinatedDebtBalance * debtAssumptions.subordinatedInterestRate;
       const totalInterest = seniorInterest + subordinatedInterest;
 
       // Calculate available cash for debt paydown
@@ -362,7 +361,8 @@ class LBOModelingEngine {
       subordinatedDebtBalance = Math.max(0, subordinatedDebtBalance - subordinatedPaydown);
 
       // Enhanced debt covenant testing
-      const leverageRatio = (seniorDebtBalance + subordinatedDebtBalance + revolvingDebtBalance) / projection.ebitda;
+      const leverageRatio =
+        (seniorDebtBalance + subordinatedDebtBalance + revolvingDebtBalance) / projection.ebitda;
       const coverageRatio = projection.ebitda / totalInterest;
       const capexRatio = (projection.capex || 0) / projection.revenue;
 
@@ -381,15 +381,22 @@ class LBOModelingEngine {
       schedule.push({
         year,
         beginningBalance: {
-          senior: year === 1 ? transactionStructure.seniorDebt : schedule[year - 2].endingBalance.senior,
-          subordinated: year === 1 ? transactionStructure.subordinatedDebt : schedule[year - 2].endingBalance.subordinated,
-          revolving: year === 1 ? (transactionStructure.revolvingDebt || 0) : schedule[year - 2].endingBalance.revolving
+          senior:
+            year === 1 ? transactionStructure.seniorDebt : schedule[year - 2].endingBalance.senior,
+          subordinated:
+            year === 1
+              ? transactionStructure.subordinatedDebt
+              : schedule[year - 2].endingBalance.subordinated,
+          revolving:
+            year === 1
+              ? transactionStructure.revolvingDebt || 0
+              : schedule[year - 2].endingBalance.revolving
         },
         interestExpense: {
           senior: seniorInterest,
           subordinated: subordinatedInterest,
           revolving: revolvingDebtBalance * enhancedAssumptions.revolvingRate,
-          total: totalInterest + (revolvingDebtBalance * enhancedAssumptions.revolvingRate)
+          total: totalInterest + revolvingDebtBalance * enhancedAssumptions.revolvingRate
         },
         principalPayment: {
           senior: seniorPaydown,
@@ -410,7 +417,8 @@ class LBOModelingEngine {
         dscr,
         covenantTests,
         // Additional debt metrics
-        netDebtToEbitda: (seniorDebtBalance + subordinatedDebtBalance + revolvingDebtBalance) / projection.ebitda,
+        netDebtToEbitda:
+          (seniorDebtBalance + subordinatedDebtBalance + revolvingDebtBalance) / projection.ebitda,
         ebitdaToInterest: projection.ebitda / totalInterest
       });
     }
@@ -428,8 +436,8 @@ class LBOModelingEngine {
   calculateEquityCashFlows(operatingProjections, debtSchedule, assumptions) {
     return operatingProjections.map((projection, index) => {
       const debt = debtSchedule[index];
-      const managementFees = assumptions.fees.managementFeeRate *
-        (assumptions.transaction.sponsorEquity || 0);
+      const managementFees =
+        assumptions.fees.managementFeeRate * (assumptions.transaction.sponsorEquity || 0);
 
       const cashFlowToEquity = debt.excessCash - managementFees;
 
@@ -476,7 +484,9 @@ class LBOModelingEngine {
       grossProceeds,
       carriedInterest,
       netProceeds,
-      managementProceeds: grossProceeds * (transactionStructure.managementRollover / transactionStructure.equityContribution)
+      managementProceeds:
+        grossProceeds *
+        (transactionStructure.managementRollover / transactionStructure.equityContribution)
     };
   }
 
@@ -511,7 +521,7 @@ class LBOModelingEngine {
 
     // Add exit proceeds to final year
     if (cashFlows.length > 1) {
-      cashFlows[cashFlows.length - 1] += (exitProceeds || 0);
+      cashFlows[cashFlows.length - 1] += exitProceeds || 0;
     } else {
       cashFlows.push(exitProceeds || 0);
     }
@@ -520,7 +530,9 @@ class LBOModelingEngine {
     const irr = this.calculateIRR(cashFlows);
 
     // Calculate MOIC (Multiple of Invested Capital)
-    const totalCashReturned = equityCashFlows.reduce((sum, cf) => sum + (cf.cashFlowToEquity || 0), 0) + (exitProceeds || 0);
+    const totalCashReturned =
+      equityCashFlows.reduce((sum, cf) => sum + (cf.cashFlowToEquity || 0), 0) +
+      (exitProceeds || 0);
     const moic = totalCashReturned / Math.abs(initialInvestment);
 
     return {
@@ -592,7 +604,7 @@ class LBOModelingEngine {
         const factor = Math.pow(1 + rate, j);
         npv += cashFlows[j] / factor;
         if (j > 0) {
-          dnpv -= j * cashFlows[j] / (factor * (1 + rate));
+          dnpv -= (j * cashFlows[j]) / (factor * (1 + rate));
         }
       }
 
@@ -680,7 +692,7 @@ class LBOModelingEngine {
         break;
       }
 
-      const x2 = x1 - f1 * (x1 - x0) / (f1 - f0);
+      const x2 = x1 - (f1 * (x1 - x0)) / (f1 - f0);
 
       if (Math.abs(x2 - x1) < tolerance) {
         return x2;
@@ -712,14 +724,18 @@ class LBOModelingEngine {
    */
   calculateLBOKeyMetrics(transactionStructure, exitAnalysis, returnsAnalysis, debtSchedule = []) {
     // Calculate entry EBITDA multiple
-    const impliedEntryEbitda = transactionStructure.purchasePrice / (transactionStructure.entryMultiple || 10);
-    const actualEntryMultiple = impliedEntryEbitda > 0 ? transactionStructure.purchasePrice / impliedEntryEbitda : null;
+    const impliedEntryEbitda =
+      transactionStructure.purchasePrice / (transactionStructure.entryMultiple || 10);
+    const actualEntryMultiple =
+      impliedEntryEbitda > 0 ? transactionStructure.purchasePrice / impliedEntryEbitda : null;
 
     // Calculate leverage metrics
     const peakLeverage = Math.max(...debtSchedule.map(d => d.netDebtToEbitda || 0));
     const minCoverage = Math.min(...debtSchedule.map(d => d.ebitdaToInterest || Infinity));
-    const avgDSCR = debtSchedule.length > 0 ?
-      debtSchedule.reduce((sum, d) => sum + (d.dscr || 0), 0) / debtSchedule.length : 0;
+    const avgDSCR =
+      debtSchedule.length > 0
+        ? debtSchedule.reduce((sum, d) => sum + (d.dscr || 0), 0) / debtSchedule.length
+        : 0;
 
     // Calculate multiple arbitrage components
     const multipleExpansion = exitAnalysis.exitMultiple - (actualEntryMultiple || 10);
@@ -751,18 +767,24 @@ class LBOModelingEngine {
       // Value creation analysis
       multipleExpansion,
       operationalImprovement,
-      leverageContribution: leverage > 1 ? (returnsAnalysis.moic - 1) * (leverage - 1) / leverage : 0,
+      leverageContribution:
+        leverage > 1 ? ((returnsAnalysis.moic - 1) * (leverage - 1)) / leverage : 0,
 
       // Risk metrics
-      breakdownLeverage: debtSchedule.length > 0 ?
-        Math.max(...debtSchedule.map(d => d.leverageRatio || 0)) : null,
-      covenantBreaches: debtSchedule.filter(d =>
-        d.covenantTests && (!d.covenantTests.leverageCompliance || !d.covenantTests.coverageCompliance)
+      breakdownLeverage:
+        debtSchedule.length > 0 ? Math.max(...debtSchedule.map(d => d.leverageRatio || 0)) : null,
+      covenantBreaches: debtSchedule.filter(
+        d =>
+          d.covenantTests &&
+          (!d.covenantTests.leverageCompliance || !d.covenantTests.coverageCompliance)
       ).length,
 
       // Efficiency ratios
       equityEfficiency: returnsAnalysis.totalCashReturned / transactionStructure.equityContribution,
-      timeToRecoverEquity: this.calculateTimeToRecoverEquity(returnsAnalysis.cashFlows, transactionStructure.equityContribution)
+      timeToRecoverEquity: this.calculateTimeToRecoverEquity(
+        returnsAnalysis.cashFlows,
+        transactionStructure.equityContribution
+      )
     };
   }
 
@@ -777,7 +799,8 @@ class LBOModelingEngine {
 
     let cumulativeCashFlow = 0;
 
-    for (let i = 1; i < cashFlows.length; i++) { // Skip initial investment
+    for (let i = 1; i < cashFlows.length; i++) {
+      // Skip initial investment
       cumulativeCashFlow += cashFlows[i];
       if (cumulativeCashFlow >= initialEquity) {
         return i;
@@ -810,20 +833,27 @@ class LBOModelingEngine {
         if (variable === 'ebitdaGrowthRate') {
           adjustedAssumptions.operating.ebitdaGrowthRate += variation;
         } else if (variable === 'exitMultiple') {
-          adjustedAssumptions.exit.exitMultiple = (adjustedAssumptions.exit.exitMultiple || 10) + variation;
+          adjustedAssumptions.exit.exitMultiple =
+            (adjustedAssumptions.exit.exitMultiple || 10) + variation;
         } else if (variable === 'debtMultiple') {
           // Adjust transaction structure for debt multiple sensitivity
           const newDebtMultiple = transactionStructure.debtToEbitda + variation;
           const adjustedStructure = {
             ...transactionStructure,
-            totalDebt: (inputs.ebitda * newDebtMultiple),
+            totalDebt: inputs.ebitda * newDebtMultiple,
             debtToEbitda: newDebtMultiple
           };
-          adjustedStructure.equityContribution = transactionStructure.totalUses - adjustedStructure.totalDebt;
+          adjustedStructure.equityContribution =
+            transactionStructure.totalUses - adjustedStructure.totalDebt;
         }
 
         try {
-          const scenario = this.calculateLBOScenario(inputs, transactionStructure, adjustedAssumptions, `${variable}_${variation}`);
+          const scenario = this.calculateLBOScenario(
+            inputs,
+            transactionStructure,
+            adjustedAssumptions,
+            `${variable}_${variation}`
+          );
           return {
             variation,
             irr: scenario.returnsAnalysis.irr,
@@ -889,7 +919,9 @@ class LBOModelingEngine {
     }
 
     if (transactionStructure.debtToEbitda < 5) {
-      highlights.push(`Conservative leverage at ${transactionStructure.debtToEbitda.toFixed(1)}x EBITDA`);
+      highlights.push(
+        `Conservative leverage at ${transactionStructure.debtToEbitda.toFixed(1)}x EBITDA`
+      );
     }
 
     return highlights;

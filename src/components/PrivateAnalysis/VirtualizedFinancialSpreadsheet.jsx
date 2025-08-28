@@ -37,10 +37,13 @@ const VirtualizedFinancialSpreadsheet = ({
             formula: item.formula,
             isCalculated: !!item.formula,
             type: item.formula ? 'calculated' : 'manual',
-            ...periods.reduce((acc, period, index) => ({
-              ...acc,
-              [`period_${index}`]: item.values?.[index] || 0
-            }), {})
+            ...periods.reduce(
+              (acc, period, index) => ({
+                ...acc,
+                [`period_${index}`]: item.values?.[index] || 0
+              }),
+              {}
+            )
           };
           flatData.push(row);
 
@@ -94,89 +97,98 @@ const VirtualizedFinancialSpreadsheet = ({
   }, [data.periods]);
 
   // Cell formatters for different data types
-  const formatters = useMemo(() => ({
-    account: (value, row) => (
-      <div className={`flex items-center gap-2 pl-${row.level * 4}`}>
-        {row.level > 0 && <div className="w-4 h-px bg-slate-300" />}
-        <span className={row.level === 0 ? 'font-semibold text-slate-900' : 'text-slate-700'}>
-          {value}
+  const formatters = useMemo(
+    () => ({
+      account: (value, row) => (
+        <div className={`flex items-center gap-2 pl-${row.level * 4}`}>
+          {row.level > 0 && <div className="w-4 h-px bg-slate-300" />}
+          <span className={row.level === 0 ? 'font-semibold text-slate-900' : 'text-slate-700'}>
+            {value}
+          </span>
+        </div>
+      ),
+      type: (value, row) => (
+        <span
+          className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
+            row.isCalculated
+              ? 'bg-blue-100 text-blue-800 border border-blue-200'
+              : 'bg-slate-100 text-slate-700 border border-slate-200'
+          }`}
+        >
+          {row.isCalculated ? (
+            <>
+              <Calculator size={10} className="mr-1" />
+              Auto
+            </>
+          ) : (
+            <>
+              <Edit2 size={10} className="mr-1" />
+              Manual
+            </>
+          )}
         </span>
-      </div>
-    ),
-    type: (value, row) => (
-      <span
-        className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
-          row.isCalculated
-            ? 'bg-blue-100 text-blue-800 border border-blue-200'
-            : 'bg-slate-100 text-slate-700 border border-slate-200'
-        }`}
-      >
-        {row.isCalculated ? (
-          <>
-            <Calculator size={10} className="mr-1" />
-            Auto
-          </>
-        ) : (
-          <>
-            <Edit2 size={10} className="mr-1" />
-            Manual
-          </>
-        )}
-      </span>
-    ),
-    ...data.periods?.reduce((acc, _, index) => ({
-      ...acc,
-      [`period_${index}`]: (value) => {
-        const numValue = parseFloat(value) || 0;
-        return new Intl.NumberFormat('en-US', {
-          style: 'currency',
-          currency: 'USD',
-          minimumFractionDigits: 0,
-          maximumFractionDigits: 0
-        }).format(numValue);
-      }
-    }), {})
-  }), [data.periods]);
+      ),
+      ...data.periods?.reduce(
+        (acc, _, index) => ({
+          ...acc,
+          [`period_${index}`]: value => {
+            const numValue = parseFloat(value) || 0;
+            return new Intl.NumberFormat('en-US', {
+              style: 'currency',
+              currency: 'USD',
+              minimumFractionDigits: 0,
+              maximumFractionDigits: 0
+            }).format(numValue);
+          }
+        }),
+        {}
+      )
+    }),
+    [data.periods]
+  );
 
   // Handle cell editing
-  const handleCellEdit = useCallback((rowIndex, columnKey, newValue) => {
-    const row = tableData[rowIndex];
-    if (!row || row.isCalculated) return;
+  const handleCellEdit = useCallback(
+    (rowIndex, columnKey, newValue) => {
+      const row = tableData[rowIndex];
+      if (!row || row.isCalculated) return;
 
-    const periodMatch = columnKey.match(/period_(\d+)/);
-    if (periodMatch) {
-      const periodIndex = parseInt(periodMatch[1]);
-      const numericValue = parseFloat(newValue) || 0;
+      const periodMatch = columnKey.match(/period_(\d+)/);
+      if (periodMatch) {
+        const periodIndex = parseInt(periodMatch[1]);
+        const numericValue = parseFloat(newValue) || 0;
 
-      // Update the data through the parent component
-      if (onDataChange) {
-        const updatedData = { ...data };
-        const statement = updatedData[activeStatement];
+        // Update the data through the parent component
+        if (onDataChange) {
+          const updatedData = { ...data };
+          const statement = updatedData[activeStatement];
 
-        // Navigate to the specific item and update its value
-        const updateNestedValue = (obj, path, _value) => {
-          const keys = path.split('_');
-          let current = obj;
+          // Navigate to the specific item and update its value
+          const updateNestedValue = (obj, path, _value) => {
+            const keys = path.split('_');
+            let current = obj;
 
-          for (let i = 0; i < keys.length - 1; i++) {
-            if (!current[keys[i]]) return;
-            current = current[keys[i]];
-          }
+            for (let i = 0; i < keys.length - 1; i++) {
+              if (!current[keys[i]]) return;
+              current = current[keys[i]];
+            }
 
-          const finalKey = keys[keys.length - 1];
-          if (current[finalKey] && current[finalKey].values) {
-            current[finalKey].values[periodIndex] = numericValue;
-          }
-        };
+            const finalKey = keys[keys.length - 1];
+            if (current[finalKey] && current[finalKey].values) {
+              current[finalKey].values[periodIndex] = numericValue;
+            }
+          };
 
-        updateNestedValue(statement, row.id, numericValue);
-        onDataChange(updatedData);
+          updateNestedValue(statement, row.id, numericValue);
+          onDataChange(updatedData);
+        }
       }
-    }
-  }, [tableData, data, activeStatement, onDataChange]);
+    },
+    [tableData, data, activeStatement, onDataChange]
+  );
 
   // Handle sorting
-  const handleSort = useCallback((columnKey) => {
+  const handleSort = useCallback(columnKey => {
     setSortConfig(prevConfig => ({
       key: columnKey,
       direction: prevConfig?.key === columnKey && prevConfig.direction === 'asc' ? 'desc' : 'asc'
@@ -216,9 +228,7 @@ const VirtualizedFinancialSpreadsheet = ({
     } else {
       // Select/deselect individual row
       setSelectedRows(prev =>
-        isSelected
-          ? [...prev, rowIndices]
-          : prev.filter(index => index !== rowIndices)
+        isSelected ? [...prev, rowIndices] : prev.filter(index => index !== rowIndices)
       );
     }
   }, []);
@@ -237,7 +247,10 @@ const VirtualizedFinancialSpreadsheet = ({
   }, [data, onDataChange]);
 
   return (
-    <div className="bg-slate-900 rounded-lg shadow-lg">
+    <section
+      aria-labelledby="virtualized-spreadsheet-title"
+      className="bg-slate-900 rounded-lg shadow-lg"
+    >
       {/* Header */}
       <div className="p-4 sm:p-6 border-b border-slate-700">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -246,7 +259,10 @@ const VirtualizedFinancialSpreadsheet = ({
               <TrendingUp className="w-6 h-6 text-blue-600" />
             </div>
             <div>
-              <h2 className="text-lg sm:text-xl font-semibold text-white">
+              <h2
+                id="virtualized-spreadsheet-title"
+                className="text-lg sm:text-xl font-semibold text-white"
+              >
                 Virtualized Financial Statements
               </h2>
               <p className="text-xs sm:text-sm text-slate-400">
@@ -267,7 +283,7 @@ const VirtualizedFinancialSpreadsheet = ({
 
             <select
               value={activeStatement}
-              onChange={(e) => setActiveStatement(e.target.value)}
+              onChange={e => setActiveStatement(e.target.value)}
               className="px-3 py-2 sm:px-4 sm:py-2.5 bg-white border border-slate-300 rounded-lg text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium shadow-sm text-sm sm:text-base"
             >
               <option value="incomeStatement">Income Statement</option>
@@ -309,7 +325,7 @@ const VirtualizedFinancialSpreadsheet = ({
           overscanCount={10}
         />
       </div>
-    </div>
+    </section>
   );
 };
 

@@ -24,7 +24,7 @@ const WorkflowNavigation = ({
   const [showHelpFor, setShowHelpFor] = useState(null);
 
   // Calculate step statuses based on progress
-  const getStepStatus = (stepId) => {
+  const getStepStatus = stepId => {
     switch (stepId) {
       case 'data':
         if (dataCompleteness >= 80) return 'completed';
@@ -55,7 +55,8 @@ const WorkflowNavigation = ({
       subtitle: 'Financial statements & inputs',
       icon: Database,
       progress: dataCompleteness,
-      description: 'Import or manually input your company\'s financial statements including income statement, balance sheet, and cash flow data.',
+      description:
+        "Import or manually input your company's financial statements including income statement, balance sheet, and cash flow data.",
       validationFields: ['revenue', 'expenses', 'assets'],
       helpContent: {
         title: 'Data Entry Guidelines',
@@ -73,7 +74,8 @@ const WorkflowNavigation = ({
       subtitle: 'DCF, LBO & scenario analysis',
       icon: Calculator,
       progress: modelingProgress,
-      description: 'Configure valuation parameters, build financial models, and run scenario analyses to understand value drivers.',
+      description:
+        'Configure valuation parameters, build financial models, and run scenario analyses to understand value drivers.',
       validationFields: ['discountRate', 'growthAssumptions', 'margins'],
       helpContent: {
         title: 'Modeling Best Practices',
@@ -91,7 +93,8 @@ const WorkflowNavigation = ({
       subtitle: 'Insights, reports & recommendations',
       icon: BarChart3,
       progress: analysisProgress,
-      description: 'Review valuation results, sensitivity analysis, and generate comprehensive reports with actionable insights.',
+      description:
+        'Review valuation results, sensitivity analysis, and generate comprehensive reports with actionable insights.',
       validationFields: ['valuation', 'sensitivity', 'recommendations'],
       helpContent: {
         title: 'Analysis Interpretation',
@@ -105,24 +108,34 @@ const WorkflowNavigation = ({
     }
   ];
 
-  const getStatusColor = (status) => {
+  const getStatusColor = status => {
     switch (status) {
-      case 'completed': return 'text-emerald-400';
-      case 'in-progress': return 'text-blue-400';
-      case 'available': return 'text-slate-300';
-      case 'disabled': return 'text-slate-500';
-      default: return 'text-slate-400';
+      case 'completed':
+        return 'text-emerald-400';
+      case 'in-progress':
+        return 'text-blue-400';
+      case 'available':
+        return 'text-slate-300';
+      case 'disabled':
+        return 'text-slate-500';
+      default:
+        return 'text-slate-400';
     }
   };
 
   const getStatusBg = (status, isActive) => {
     if (isActive) return 'bg-blue-600';
     switch (status) {
-      case 'completed': return 'bg-emerald-500/10 border-emerald-400/20';
-      case 'in-progress': return 'bg-blue-500/10 border-blue-400/20';
-      case 'available': return 'bg-slate-700/30 border-slate-600/20';
-      case 'disabled': return 'bg-slate-800/30 border-slate-700/10';
-      default: return 'bg-slate-700/20 border-slate-600/10';
+      case 'completed':
+        return 'bg-emerald-500/10 border-emerald-400/20';
+      case 'in-progress':
+        return 'bg-blue-500/10 border-blue-400/20';
+      case 'available':
+        return 'bg-slate-700/30 border-slate-600/20';
+      case 'disabled':
+        return 'bg-slate-800/30 border-slate-700/10';
+      default:
+        return 'bg-slate-700/20 border-slate-600/10';
     }
   };
 
@@ -187,9 +200,7 @@ const WorkflowNavigation = ({
           />
         </svg>
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-xs font-medium text-slate-300">
-            {Math.round(progress)}%
-          </span>
+          <span className="text-xs font-medium text-slate-300">{Math.round(progress)}%</span>
         </div>
       </div>
     );
@@ -278,10 +289,11 @@ const WorkflowNavigation = ({
                 disabled={isDisabled}
                 className={`
                   w-full p-4 rounded-xl border transition-all duration-200 text-left relative overflow-hidden
-                  ${isActive
-              ? 'bg-blue-600 border-blue-500 shadow-lg shadow-blue-600/20'
-              : getStatusBg(status, false)
-            }
+                  ${
+                    isActive
+                      ? 'bg-blue-600 border-blue-500 shadow-lg shadow-blue-600/20'
+                      : getStatusBg(status, false)
+                  }
                   ${!isDisabled && !isActive ? 'hover:border-slate-500 hover:bg-slate-700/40' : ''}
                   ${isDisabled ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'}
                   ${hasErrors ? 'border-amber-400/40' : 'border-slate-600/30'}
@@ -295,42 +307,33 @@ const WorkflowNavigation = ({
                     <div
                       className={`
                       flex items-center justify-center w-10 h-10 rounded-lg transition-all
-                      ${isActive
-              ? 'bg-white/20'
-              : status === 'completed'
-                ? 'bg-emerald-500/20'
-                : 'bg-slate-600/30'
-            }
+                      ${
+                        isActive
+                          ? 'bg-white/20'
+                          : status === 'completed'
+                            ? 'bg-emerald-500/20'
+                            : 'bg-slate-600/30'
+                      }
                     `}
                     >
                       {renderStatusIcon(step, status, isActive)}
                     </div>
-                    <div className="text-xs font-medium text-slate-400">
-                      Step {index + 1}
-                    </div>
+                    <div className="text-xs font-medium text-slate-400">Step {index + 1}</div>
                   </div>
 
                   {step.progress > 0 && (
-                    <div className="flex-shrink-0">
-                      {renderProgressRing(step.progress, status)}
-                    </div>
+                    <div className="flex-shrink-0">{renderProgressRing(step.progress, status)}</div>
                   )}
                 </div>
 
                 {/* Step Content */}
                 <div className="space-y-1">
                   <h4
-                    className={`font-semibold ${
-                      isActive ? 'text-white' : getStatusColor(status)
-                    }`}
+                    className={`font-semibold ${isActive ? 'text-white' : getStatusColor(status)}`}
                   >
                     {step.title}
                   </h4>
-                  <p
-                    className={`text-sm ${
-                      isActive ? 'text-blue-100' : 'text-slate-400'
-                    }`}
-                  >
+                  <p className={`text-sm ${isActive ? 'text-blue-100' : 'text-slate-400'}`}>
                     {step.subtitle}
                   </p>
                 </div>
@@ -353,7 +356,7 @@ const WorkflowNavigation = ({
 
               {/* Help Button */}
               <button
-                onClick={(e) => {
+                onClick={e => {
                   e.stopPropagation();
                   setShowHelpFor(showHelpFor === step.id ? null : step.id);
                 }}
@@ -375,10 +378,11 @@ const WorkflowNavigation = ({
                   <ChevronRight
                     size={16}
                     className={`
-                      ${getStepStatus(steps[index + 1].id) !== 'disabled'
-                  ? 'text-slate-400'
-                  : 'text-slate-600'
-                }
+                      ${
+                        getStepStatus(steps[index + 1].id) !== 'disabled'
+                          ? 'text-slate-400'
+                          : 'text-slate-600'
+                      }
                     `}
                   />
                 </div>

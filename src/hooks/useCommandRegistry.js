@@ -27,8 +27,16 @@ const NATURAL_LANGUAGE_PATTERNS = {
 
   // Analysis patterns
   analysis: [
-    { pattern: /(?:create|new|build|make)\s+(?:a\s+)?(?:dcf|valuation|model)(?:\s+for\s+(.+))?/i, category: 'analysis', command: 'create-dcf' },
-    { pattern: /(?:run|perform|do)\s+(?:a\s+)?sensitivity\s+(?:analysis\s+)?(?:on\s+(.+))?/i, category: 'analysis', command: 'sensitivity-analysis' },
+    {
+      pattern: /(?:create|new|build|make)\s+(?:a\s+)?(?:dcf|valuation|model)(?:\s+for\s+(.+))?/i,
+      category: 'analysis',
+      command: 'create-dcf'
+    },
+    {
+      pattern: /(?:run|perform|do)\s+(?:a\s+)?sensitivity\s+(?:analysis\s+)?(?:on\s+(.+))?/i,
+      category: 'analysis',
+      command: 'sensitivity-analysis'
+    },
     { pattern: /(?:calculate|compute)\s+(.+)/i, category: 'analysis' },
     { pattern: /(?:analyze|analyse)\s+(.+)/i, category: 'analysis' }
   ],
@@ -42,7 +50,11 @@ const NATURAL_LANGUAGE_PATTERNS = {
 
   // Chart patterns
   charts: [
-    { pattern: /(?:create|make|build|show)\s+(?:a\s+)?(?:chart|graph|plot)(?:\s+for\s+(.+))?/i, category: 'charts', command: 'create-chart' },
+    {
+      pattern: /(?:create|make|build|show)\s+(?:a\s+)?(?:chart|graph|plot)(?:\s+for\s+(.+))?/i,
+      category: 'charts',
+      command: 'create-chart'
+    },
     { pattern: /(?:visualize|plot)\s+(.+)/i, category: 'charts', command: 'create-chart' }
   ]
 };
@@ -155,7 +167,12 @@ const COMMAND_REGISTRY = {
     shortcut: 'Ctrl+Shift+S',
     keywords: ['sensitivity', 'analysis', 'assumptions', 'wacc', 'growth', 'test'],
     parameters: [
-      { name: 'variable', type: 'string', description: 'Variable to analyze (WACC, growth rate, etc.)', optional: true }
+      {
+        name: 'variable',
+        type: 'string',
+        description: 'Variable to analyze (WACC, growth rate, etc.)',
+        optional: true
+      }
     ],
     execute: (params, _context) => ({
       action: 'run-sensitivity',
@@ -182,7 +199,12 @@ const COMMAND_REGISTRY = {
     shortcut: 'Ctrl+Shift+L',
     keywords: ['lbo', 'leveraged', 'buyout', 'private', 'equity', 'debt', 'returns'],
     parameters: [
-      { name: 'company', type: 'string', description: 'Target company for LBO analysis', optional: true }
+      {
+        name: 'company',
+        type: 'string',
+        description: 'Target company for LBO analysis',
+        optional: true
+      }
     ],
     execute: (params, _context) => ({
       action: 'create-model',
@@ -200,7 +222,12 @@ const COMMAND_REGISTRY = {
     shortcut: 'Ctrl+Shift+3',
     keywords: ['three', 'statement', 'income', 'balance', 'cash', 'flow', 'integrated'],
     parameters: [
-      { name: 'company', type: 'string', description: 'Company for financial modeling', optional: true }
+      {
+        name: 'company',
+        type: 'string',
+        description: 'Company for financial modeling',
+        optional: true
+      }
     ],
     execute: (params, _context) => ({
       action: 'create-model',
@@ -218,7 +245,12 @@ const COMMAND_REGISTRY = {
     shortcut: 'Ctrl+Shift+A',
     keywords: ['scenario', 'analysis', 'multiple', 'assumptions', 'bull', 'bear', 'base'],
     parameters: [
-      { name: 'scenarios', type: 'array', description: 'Number of scenarios to create', optional: true }
+      {
+        name: 'scenarios',
+        type: 'array',
+        description: 'Number of scenarios to create',
+        optional: true
+      }
     ],
     execute: (params, _context) => ({
       action: 'create-scenarios',
@@ -264,7 +296,12 @@ const COMMAND_REGISTRY = {
     shortcut: 'Ctrl+E',
     keywords: ['export', 'download', 'pdf', 'excel', 'powerpoint', 'save'],
     parameters: [
-      { name: 'format', type: 'string', description: 'Export format (PDF, Excel, PowerPoint)', optional: true }
+      {
+        name: 'format',
+        type: 'string',
+        description: 'Export format (PDF, Excel, PowerPoint)',
+        optional: true
+      }
     ],
     execute: (params, _context) => ({
       action: 'export',
@@ -281,7 +318,12 @@ const COMMAND_REGISTRY = {
     icon: BarChart3,
     keywords: ['chart', 'graph', 'visualization', 'plot', 'visualize'],
     parameters: [
-      { name: 'type', type: 'string', description: 'Chart type (line, bar, pie, etc.)', optional: true },
+      {
+        name: 'type',
+        type: 'string',
+        description: 'Chart type (line, bar, pie, etc.)',
+        optional: true
+      },
       { name: 'data', type: 'string', description: 'Data to visualize', optional: true }
     ],
     execute: (params, _context) => ({
@@ -368,7 +410,7 @@ const COMMAND_REGISTRY = {
     execute: (_params, _context) => ({ action: 'toggle-insights' })
   },
 
-  'settings': {
+  settings: {
     id: 'settings',
     title: 'Open Settings',
     description: 'Configure application preferences',
@@ -378,7 +420,7 @@ const COMMAND_REGISTRY = {
     execute: (_params, _context) => ({ action: 'open-settings' })
   },
 
-  'help': {
+  help: {
     id: 'help',
     title: 'Get Help',
     description: 'Access help documentation and tutorials',
@@ -402,7 +444,7 @@ export const useCommandRegistry = (currentContext = {}) => {
   });
 
   // Parse natural language query
-  const parseNaturalLanguage = useCallback((query) => {
+  const parseNaturalLanguage = useCallback(query => {
     const results = [];
 
     for (const [_category, patterns] of Object.entries(NATURAL_LANGUAGE_PATTERNS)) {
@@ -423,75 +465,77 @@ export const useCommandRegistry = (currentContext = {}) => {
   }, []);
 
   // Search commands with intelligent matching
-  const searchCommands = useCallback((query) => {
-    if (!query.trim()) return [];
+  const searchCommands = useCallback(
+    query => {
+      if (!query.trim()) return [];
 
-    const normalizedQuery = query.toLowerCase().trim();
-    const results = [];
+      const normalizedQuery = query.toLowerCase().trim();
+      const results = [];
 
-    // First, try natural language parsing
-    const nlResults = parseNaturalLanguage(query);
+      // First, try natural language parsing
+      const nlResults = parseNaturalLanguage(query);
 
-    // Score and rank commands
-    Object.values(COMMAND_REGISTRY).forEach(command => {
-      let score = 0;
+      // Score and rank commands
+      Object.values(COMMAND_REGISTRY).forEach(command => {
+        let score = 0;
 
-      // Exact title match
-      if (command.title.toLowerCase() === normalizedQuery) {
-        score += 100;
-      }
-
-      // Title contains query
-      if (command.title.toLowerCase().includes(normalizedQuery)) {
-        score += 50;
-      }
-
-      // Description contains query
-      if (command.description.toLowerCase().includes(normalizedQuery)) {
-        score += 30;
-      }
-
-      // Keyword matches
-      const keywordMatches = command.keywords.filter(keyword =>
-        keyword.toLowerCase().includes(normalizedQuery) ||
-        normalizedQuery.includes(keyword.toLowerCase())
-      );
-      score += keywordMatches.length * 20;
-
-      // Usage frequency boost
-      const usageCount = commandUsage[command.id] || 0;
-      score += Math.min(usageCount * 2, 20);
-
-      // Context relevance
-      if (currentContext.activeTab) {
-        if (command.category === 'navigation' && command.id.includes(currentContext.activeTab)) {
-          score += 15;
+        // Exact title match
+        if (command.title.toLowerCase() === normalizedQuery) {
+          score += 100;
         }
-        if (command.category === currentContext.activeTab) {
-          score += 10;
+
+        // Title contains query
+        if (command.title.toLowerCase().includes(normalizedQuery)) {
+          score += 50;
         }
-      }
 
-      // Natural language match boost
-      const nlMatch = nlResults.find(nl => nl.command === command.id);
-      if (nlMatch) {
-        score += nlMatch.confidence * 40;
-      }
+        // Description contains query
+        if (command.description.toLowerCase().includes(normalizedQuery)) {
+          score += 30;
+        }
 
-      if (score > 0) {
-        results.push({
-          ...command,
-          score,
-          usageCount,
-          isRecommended: score > 60
-        });
-      }
-    });
+        // Keyword matches
+        const keywordMatches = command.keywords.filter(
+          keyword =>
+            keyword.toLowerCase().includes(normalizedQuery) ||
+            normalizedQuery.includes(keyword.toLowerCase())
+        );
+        score += keywordMatches.length * 20;
 
-    return results
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 8); // Limit to top 8 results
-  }, [parseNaturalLanguage, commandUsage, currentContext]);
+        // Usage frequency boost
+        const usageCount = commandUsage[command.id] || 0;
+        score += Math.min(usageCount * 2, 20);
+
+        // Context relevance
+        if (currentContext.activeTab) {
+          if (command.category === 'navigation' && command.id.includes(currentContext.activeTab)) {
+            score += 15;
+          }
+          if (command.category === currentContext.activeTab) {
+            score += 10;
+          }
+        }
+
+        // Natural language match boost
+        const nlMatch = nlResults.find(nl => nl.command === command.id);
+        if (nlMatch) {
+          score += nlMatch.confidence * 40;
+        }
+
+        if (score > 0) {
+          results.push({
+            ...command,
+            score,
+            usageCount,
+            isRecommended: score > 60
+          });
+        }
+      });
+
+      return results.sort((a, b) => b.score - a.score).slice(0, 8); // Limit to top 8 results
+    },
+    [parseNaturalLanguage, commandUsage, currentContext]
+  );
 
   // Get contextual commands based on current state
   const getContextualCommands = useCallback(() => {
@@ -568,27 +612,30 @@ export const useCommandRegistry = (currentContext = {}) => {
   }, [currentContext, commandUsage]);
 
   // Execute command
-  const executeCommand = useCallback(async(commandName, _params) => {
-    const command = COMMAND_REGISTRY[commandName];
-    if (!command) {
-      throw new Error(`Command not found: ${commandName}`);
-    }
+  const executeCommand = useCallback(
+    async (commandName, _params) => {
+      const command = COMMAND_REGISTRY[commandName];
+      if (!command) {
+        throw new Error(`Command not found: ${commandName}`);
+      }
 
-    try {
-      const result = await command.execute(_params, currentContext);
+      try {
+        const result = await command.execute(_params, currentContext);
 
-      // Track usage
-      setCommandUsage(prev => ({
-        ...prev,
-        [commandName]: (prev[commandName] || 0) + 1
-      }));
+        // Track usage
+        setCommandUsage(prev => ({
+          ...prev,
+          [commandName]: (prev[commandName] || 0) + 1
+        }));
 
-      return result;
-    } catch (error) {
-      console.error(`Command execution failed: ${commandName}`, error);
-      throw error;
-    }
-  }, [currentContext]);
+        return result;
+      } catch (error) {
+        console.error(`Command execution failed: ${commandName}`, error);
+        throw error;
+      }
+    },
+    [currentContext]
+  );
 
   // Learn from user behavior
   const learnFromUsage = useCallback((commandId, query) => {

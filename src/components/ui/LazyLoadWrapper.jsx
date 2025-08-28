@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react';
+import { forwardRef, lazy, Suspense } from 'react';
 
 import { trackLazyLoad } from '../../utils/performanceMonitor';
 
@@ -34,35 +34,26 @@ const LazyLoadWrapper = ({
   const defaultFallback = fallback || (
     <div className="space-y-4">
       {getSkeletonComponent()}
-      <div className="text-center text-sm text-slate-500">
-        Loading {componentName}...
-      </div>
+      <div className="text-center text-sm text-slate-500">Loading {componentName}...</div>
     </div>
   );
 
-  return (
-    <Suspense fallback={defaultFallback}>
-      {children}
-    </Suspense>
-  );
+  return <Suspense fallback={defaultFallback}>{children}</Suspense>;
 };
 
 /**
  * Higher-order component for creating lazy-loaded components with tracking
  */
 export const withLazyLoading = (importFunction, componentName, skeletonType = 'table') => {
-  const LazyComponent = React.lazy(() =>
-    trackLazyLoad(importFunction, componentName)
-  );
+  const LazyComponent = lazy(() => trackLazyLoad(importFunction, componentName));
 
-  return React.forwardRef((_props, ref) => (
-    <LazyLoadWrapper
-      skeletonType={skeletonType}
-      componentName={componentName}
-    >
+  const Forwarded = forwardRef((_props, ref) => (
+    <LazyLoadWrapper skeletonType={skeletonType} componentName={componentName}>
       <LazyComponent {..._props} ref={ref} />
     </LazyLoadWrapper>
   ));
+  Forwarded.displayName = `withLazyLoading(${componentName})`;
+  return Forwarded;
 };
 
 export default LazyLoadWrapper;

@@ -16,13 +16,16 @@ const LBOInputs = ({ inputs, setInputs }) => {
             id="purchasePrice"
             type="number"
             value={inputs.purchasePrice}
-            onChange={(e) => handleChange('purchasePrice', e.target.value)}
+            onChange={e => handleChange('purchasePrice', e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
 
         <div>
-          <label htmlFor="equityContribution" className="block text-sm font-medium text-gray-700 mb-1">
+          <label
+            htmlFor="equityContribution"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
             Equity Contribution (%)
           </label>
           <input
@@ -30,7 +33,7 @@ const LBOInputs = ({ inputs, setInputs }) => {
             type="number"
             step="0.01"
             value={inputs.equityContribution * 100}
-            onChange={(e) => handleChange('equityContribution', e.target.value / 100)}
+            onChange={e => handleChange('equityContribution', e.target.value / 100)}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
@@ -43,7 +46,7 @@ const LBOInputs = ({ inputs, setInputs }) => {
             id="debtAmount"
             type="number"
             value={inputs.debtAmount}
-            onChange={(e) => handleChange('debtAmount', e.target.value)}
+            onChange={e => handleChange('debtAmount', e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
@@ -57,7 +60,7 @@ const LBOInputs = ({ inputs, setInputs }) => {
             type="number"
             step="0.01"
             value={inputs.interestRate * 100}
-            onChange={(e) => handleChange('interestRate', e.target.value / 100)}
+            onChange={e => handleChange('interestRate', e.target.value / 100)}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
@@ -71,7 +74,7 @@ const LBOInputs = ({ inputs, setInputs }) => {
             type="number"
             step="0.1"
             value={inputs.exitMultiple}
-            onChange={(e) => handleChange('exitMultiple', e.target.value)}
+            onChange={e => handleChange('exitMultiple', e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
@@ -84,7 +87,7 @@ const LBOInputs = ({ inputs, setInputs }) => {
             id="exitYear"
             type="number"
             value={inputs.exitYear}
-            onChange={(e) => handleChange('exitYear', e.target.value)}
+            onChange={e => handleChange('exitYear', e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
@@ -98,7 +101,7 @@ const LBOInputs = ({ inputs, setInputs }) => {
             type="number"
             step="0.01"
             value={inputs.ebitdaGrowth * 100}
-            onChange={(e) => handleChange('ebitdaGrowth', e.target.value / 100)}
+            onChange={e => handleChange('ebitdaGrowth', e.target.value / 100)}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
@@ -112,7 +115,7 @@ const LBOInputs = ({ inputs, setInputs }) => {
             type="number"
             step="0.01"
             value={inputs.ebitdaMargin * 100}
-            onChange={(e) => handleChange('ebitdaMargin', e.target.value / 100)}
+            onChange={e => handleChange('ebitdaMargin', e.target.value / 100)}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
@@ -126,7 +129,7 @@ const LBOInputs = ({ inputs, setInputs }) => {
             type="number"
             step="0.01"
             value={inputs.transactionFees * 100}
-            onChange={(e) => handleChange('transactionFees', e.target.value / 100)}
+            onChange={e => handleChange('transactionFees', e.target.value / 100)}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
@@ -140,7 +143,7 @@ const LBOInputs = ({ inputs, setInputs }) => {
             type="number"
             step="0.01"
             value={inputs.managementFees * 100}
-            onChange={(e) => handleChange('managementFees', e.target.value / 100)}
+            onChange={e => handleChange('managementFees', e.target.value / 100)}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>

@@ -8,7 +8,7 @@ const DCFWaterfall = ({
   data = [],
   className,
   title = 'DCF Cash Flow Components',
-  formatValue = (value) => `$${(value / 1000000).toFixed(1)}M`
+  formatValue = value => `$${(value / 1000000).toFixed(1)}M`
 }) => {
   // Calculate cumulative values for waterfall effect
   const processedData = data.reduce((acc, item, index) => {
@@ -26,7 +26,7 @@ const DCFWaterfall = ({
     return acc;
   }, []);
 
-  const CustomBar = (props) => {
+  const CustomBar = props => {
     const { payload, x, y, width, height } = props;
     if (!payload) return null;
 
@@ -61,7 +61,8 @@ const DCFWaterfall = ({
         </p>
         {!data.isTotal && (
           <p className="text-sm text-muted-foreground">
-            Cumulative: <span className="font-mono font-medium">{formatValue(data.cumulative)}</span>
+            Cumulative:{' '}
+            <span className="font-mono font-medium">{formatValue(data.cumulative)}</span>
           </p>
         )}
       </div>
@@ -76,10 +77,7 @@ const DCFWaterfall = ({
       <CardContent className="pt-0">
         <div className="h-80 w-full">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart
-              data={processedData}
-              margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
-            >
+            <BarChart data={processedData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
               <XAxis
                 dataKey="name"
                 axisLine={false}
@@ -96,11 +94,7 @@ const DCFWaterfall = ({
                 tickFormatter={formatValue}
               />
               <ReferenceLine y={0} stroke="var(--color-border)" strokeWidth={1} />
-              <Bar
-                dataKey="value"
-                shape={<CustomBar />}
-                radius={[2, 2, 0, 0]}
-              />
+              <Bar dataKey="value" shape={<CustomBar />} radius={[2, 2, 0, 0]} />
               <CustomTooltip />
             </BarChart>
           </ResponsiveContainer>

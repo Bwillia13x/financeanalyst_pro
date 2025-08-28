@@ -12,7 +12,7 @@ const ApiStatusPanel = ({
   dataSources = [],
   dataQuality = {}
 }) => {
-  const getStatusIcon = (status) => {
+  const getStatusIcon = status => {
     switch (status) {
       case 'healthy':
       case 'connected':
@@ -27,7 +27,7 @@ const ApiStatusPanel = ({
     }
   };
 
-  const getStatusColor = (status) => {
+  const getStatusColor = status => {
     switch (status) {
       case 'healthy':
       case 'connected':
@@ -72,7 +72,9 @@ const ApiStatusPanel = ({
         <div className="space-y-2">
           <div className="flex items-center justify-between text-sm">
             <span>Connection Health</span>
-            <span>{connectedSources}/{totalSources} sources</span>
+            <span>
+              {connectedSources}/{totalSources} sources
+            </span>
           </div>
           <Progress value={connectionPercentage} className="h-2" />
         </div>
@@ -81,7 +83,7 @@ const ApiStatusPanel = ({
         <div className="space-y-2">
           <h4 className="text-sm font-medium">Data Sources</h4>
           <div className="space-y-2">
-            {dataSources.map((source) => (
+            {dataSources.map(source => (
               <div key={source.id} className="flex items-center justify-between text-sm">
                 <div className="flex items-center gap-2">
                   {getStatusIcon(source.status)}
@@ -91,10 +93,7 @@ const ApiStatusPanel = ({
                   )}
                 </div>
                 <div className="flex items-center gap-2">
-                  <Badge
-                    variant="outline"
-                    className={`text-xs ${getStatusColor(source.status)}`}
-                  >
+                  <Badge variant="outline" className={`text-xs ${getStatusColor(source.status)}`}>
                     {source.status}
                   </Badge>
                   {source.status === 'connected' && (

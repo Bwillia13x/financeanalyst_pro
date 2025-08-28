@@ -38,15 +38,15 @@ class CacheService {
     if (process.env.NODE_ENV !== 'production') {
       [this.marketDataCache, this.financialDataCache, this.companyDataCache, this.economicDataCache]
         .forEach(cache => {
-          cache.on('set', (key, value) => {
+          cache.on('set', (key, _value) => {
             console.log(`Cache SET: ${key}`);
           });
 
-          cache.on('del', (key, value) => {
+          cache.on('del', (key, _value) => {
             console.log(`Cache DEL: ${key}`);
           });
 
-          cache.on('expired', (key, value) => {
+          cache.on('expired', (key, _value) => {
             console.log(`Cache EXPIRED: ${key}`);
           });
         });

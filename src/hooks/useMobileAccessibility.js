@@ -21,13 +21,18 @@ export function useMobileAccessibility(options = {}) {
   // Detect mobile device and orientation
   useEffect(() => {
     const checkMobile = () => {
-      const mobile = window.innerWidth <= 768 ||
-                    /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      const mobile =
+        window.innerWidth <= 768 ||
+        /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
       setIsMobile(mobile);
       setIsLandscape(window.innerWidth > window.innerHeight);
 
       if (debugMode) {
-        console.log('Mobile detection:', { mobile, width: window.innerWidth, userAgent: navigator.userAgent });
+        console.log('Mobile detection:', {
+          mobile,
+          width: window.innerWidth,
+          userAgent: navigator.userAgent
+        });
       }
     };
 
@@ -95,7 +100,7 @@ export function useMobileAccessibility(options = {}) {
 
     // Report to performance monitoring
     import('../utils/performanceMonitoring')
-      .then((mod) => {
+      .then(mod => {
         if (mod?.reportPerformanceMetric) {
           mod.reportPerformanceMetric('mobile_accessibility_audit', {
             totalTouchTargets: targets.length,
@@ -114,77 +119,86 @@ export function useMobileAccessibility(options = {}) {
   }, [enableTouchOptimization, isMobile, minTouchTarget, debugMode]);
 
   // Enhanced touch event handling
-  const handleTouchStart = useCallback((event) => {
-    if (!enableTouchOptimization) return;
+  const handleTouchStart = useCallback(
+    event => {
+      if (!enableTouchOptimization) return;
 
-    touchStartRef.current = {
-      x: event.touches[0].clientX,
-      y: event.touches[0].clientY,
-      timestamp: Date.now()
-    };
+      touchStartRef.current = {
+        x: event.touches[0].clientX,
+        y: event.touches[0].clientY,
+        timestamp: Date.now()
+      };
 
-    gestureRef.current = {
-      isGesturing: true,
-      startTime: Date.now()
-    };
-  }, [enableTouchOptimization]);
+      gestureRef.current = {
+        isGesturing: true,
+        startTime: Date.now()
+      };
+    },
+    [enableTouchOptimization]
+  );
 
-  const handleTouchEnd = useCallback((event) => {
-    if (!enableTouchOptimization || !touchStartRef.current) return;
+  const handleTouchEnd = useCallback(
+    event => {
+      if (!enableTouchOptimization || !touchStartRef.current) return;
 
-    const touchEnd = {
-      x: event.changedTouches[0].clientX,
-      y: event.changedTouches[0].clientY,
-      timestamp: Date.now()
-    };
+      const touchEnd = {
+        x: event.changedTouches[0].clientX,
+        y: event.changedTouches[0].clientY,
+        timestamp: Date.now()
+      };
 
-    const distance = Math.sqrt(
-      Math.pow(touchEnd.x - touchStartRef.current.x, 2) +
-      Math.pow(touchEnd.y - touchStartRef.current.y, 2)
-    );
+      const distance = Math.sqrt(
+        Math.pow(touchEnd.x - touchStartRef.current.x, 2) +
+          Math.pow(touchEnd.y - touchStartRef.current.y, 2)
+      );
 
-    const duration = touchEnd.timestamp - touchStartRef.current.timestamp;
+      const duration = touchEnd.timestamp - touchStartRef.current.timestamp;
 
-    // Track gesture performance
-    import('../utils/performanceMonitoring')
-      .then((mod) => {
-        if (mod?.reportPerformanceMetric) {
-          mod.reportPerformanceMetric('mobile_gesture_performance', {
-            distance,
-            duration,
-            type: distance < 10 ? 'tap' : 'swipe',
-            isMobile,
-            timestamp: Date.now()
-          });
-        }
-      })
-      .catch(() => {});
+      // Track gesture performance
+      import('../utils/performanceMonitoring')
+        .then(mod => {
+          if (mod?.reportPerformanceMetric) {
+            mod.reportPerformanceMetric('mobile_gesture_performance', {
+              distance,
+              duration,
+              type: distance < 10 ? 'tap' : 'swipe',
+              isMobile,
+              timestamp: Date.now()
+            });
+          }
+        })
+        .catch(() => {});
 
-    gestureRef.current.isGesturing = false;
-    touchStartRef.current = null;
-  }, [enableTouchOptimization, isMobile]);
+      gestureRef.current.isGesturing = false;
+      touchStartRef.current = null;
+    },
+    [enableTouchOptimization, isMobile]
+  );
 
   // Voice-over optimization
-  const announceToScreenReader = useCallback((message, priority = 'polite') => {
-    if (!enableVoiceOver) return;
+  const announceToScreenReader = useCallback(
+    (message, priority = 'polite') => {
+      if (!enableVoiceOver) return;
 
-    const announcement = document.createElement('div');
-    announcement.setAttribute('aria-live', priority);
-    announcement.setAttribute('aria-atomic', 'true');
-    announcement.className = 'sr-only';
-    announcement.textContent = message;
+      const announcement = document.createElement('div');
+      announcement.setAttribute('aria-live', priority);
+      announcement.setAttribute('aria-atomic', 'true');
+      announcement.className = 'sr-only';
+      announcement.textContent = message;
 
-    document.body.appendChild(announcement);
+      document.body.appendChild(announcement);
 
-    // Remove after announcement
-    setTimeout(() => {
-      document.body.removeChild(announcement);
-    }, 1000);
+      // Remove after announcement
+      setTimeout(() => {
+        document.body.removeChild(announcement);
+      }, 1000);
 
-    if (debugMode) {
-      console.log('Screen reader announcement:', message);
-    }
-  }, [enableVoiceOver, debugMode]);
+      if (debugMode) {
+        console.log('Screen reader announcement:', message);
+      }
+    },
+    [enableVoiceOver, debugMode]
+  );
 
   // High contrast mode toggle
   const toggleHighContrast = useCallback(() => {
@@ -206,51 +220,62 @@ export function useMobileAccessibility(options = {}) {
   }, [announceToScreenReader]);
 
   // Focus management for mobile
-  const manageFocus = useCallback((element, options = {}) => {
-    if (!isMobile || !element) return;
+  const manageFocus = useCallback(
+    (element, options = {}) => {
+      if (!isMobile || !element) return;
 
-    const { smooth = true, preventScroll = false } = options;
+      const { smooth = true, preventScroll = false } = options;
 
-    if (smooth) {
-      element.scrollIntoView({
-        behavior: 'smooth',
-        block: 'nearest',
-        inline: 'nearest'
-      });
-    }
-
-    // Delay focus to ensure scrolling completes
-    setTimeout(() => {
-      element.focus({ preventScroll });
-
-      // Announce focus change for screen readers
-      const label = element.getAttribute('aria-label') ||
-                   element.getAttribute('title') ||
-                   element.textContent?.slice(0, 50);
-
-      if (label) {
-        announceToScreenReader(`Focused on ${label}`);
+      if (smooth) {
+        element.scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest',
+          inline: 'nearest'
+        });
       }
-    }, smooth ? 300 : 0);
-  }, [isMobile, announceToScreenReader]);
+
+      // Delay focus to ensure scrolling completes
+      setTimeout(
+        () => {
+          element.focus({ preventScroll });
+
+          // Announce focus change for screen readers
+          const label =
+            element.getAttribute('aria-label') ||
+            element.getAttribute('title') ||
+            element.textContent?.slice(0, 50);
+
+          if (label) {
+            announceToScreenReader(`Focused on ${label}`);
+          }
+        },
+        smooth ? 300 : 0
+      );
+    },
+    [isMobile, announceToScreenReader]
+  );
 
   // Skip link functionality for mobile
-  const createSkipLink = useCallback((targetId, label = 'Skip to main content') => {
-    const skipLink = document.createElement('a');
-    skipLink.href = `#${targetId}`;
-    skipLink.textContent = label;
-    skipLink.className = 'skip-link sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:bg-blue-600 focus:text-white focus:px-4 focus:py-2 focus:rounded';
+  const createSkipLink = useCallback(
+    (targetId, label = 'Skip to main content') => {
+      const skipLink = document.createElement('a');
+      skipLink.href = `#${targetId}`;
+      skipLink.textContent = label;
+      skipLink.className =
+        'skip-link sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:bg-blue-600 focus:text-white focus:px-4 focus:py-2 focus:rounded';
 
-    skipLink.addEventListener('click', (e) => {
-      e.preventDefault();
-      const target = document.getElementById(targetId);
-      if (target) {
-        manageFocus(target, { smooth: false });
-      }
-    });
+      skipLink.addEventListener('click', e => {
+        e.preventDefault();
+        const target = document.getElementById(targetId);
+        if (target) {
+          manageFocus(target, { smooth: false });
+        }
+      });
 
-    return skipLink;
-  }, [manageFocus]);
+      return skipLink;
+    },
+    [manageFocus]
+  );
 
   // Viewport meta tag optimization
   useEffect(() => {
@@ -265,7 +290,8 @@ export function useMobileAccessibility(options = {}) {
     }
 
     // Optimize viewport for accessibility
-    viewportMeta.content = 'width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes';
+    viewportMeta.content =
+      'width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes';
   }, [isMobile]);
 
   // Periodic accessibility audit
@@ -308,9 +334,9 @@ export function useMobileAccessibility(options = {}) {
     createSkipLink,
 
     // Utilities
-    isValidTouchTarget: (element) => {
+    isValidTouchTarget: element => {
       const rect = element.getBoundingClientRect();
-      return (rect.width * rect.height) >= (minTouchTarget * minTouchTarget);
+      return rect.width * rect.height >= minTouchTarget * minTouchTarget;
     },
 
     addTouchTargetPadding: (element, padding = 8) => {
@@ -323,10 +349,12 @@ export function useMobileAccessibility(options = {}) {
 
 // Utility function to check if two rectangles overlap
 function isOverlapping(rect1, rect2) {
-  return !(rect1.right < rect2.left ||
-           rect2.right < rect1.left ||
-           rect1.bottom < rect2.top ||
-           rect2.bottom < rect1.top);
+  return !(
+    rect1.right < rect2.left ||
+    rect2.right < rect1.left ||
+    rect1.bottom < rect2.top ||
+    rect2.bottom < rect1.top
+  );
 }
 
 // HOC for mobile accessibility
@@ -334,12 +362,7 @@ export function withMobileAccessibility(WrappedComponent, options = {}) {
   return function MobileAccessibilityWrapper(props) {
     const mobileA11y = useMobileAccessibility(options);
 
-    return (
-      <WrappedComponent
-        {...props}
-        mobileAccessibility={mobileA11y}
-      />
-    );
+    return <WrappedComponent {...props} mobileAccessibility={mobileA11y} />;
   };
 }
 

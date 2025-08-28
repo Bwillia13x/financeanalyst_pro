@@ -5,7 +5,9 @@ const Card = ({ title, right, children, className = '' }) => (
   <section className={`rounded-2xl border border-slate-200 bg-white shadow-sm ${className}`}>
     {(title || right) && (
       <header className="flex items-center justify-between border-b border-slate-200 px-4 py-2.5">
-        {title && <h3 className="text-[13px] font-semibold tracking-wide text-slate-700">{title}</h3>}
+        {title && (
+          <h3 className="text-[13px] font-semibold tracking-wide text-slate-700">{title}</h3>
+        )}
         {right}
       </header>
     )}
@@ -27,7 +29,9 @@ const Pill = ({ children, tone = 'slate', size = 'sm' }) => {
     xs: 'text-[10px] px-1.5 py-0.5'
   };
   return (
-    <span className={`inline-flex items-center gap-1 rounded-full border ${tones[tone]} ${sizes[size]}`}>
+    <span
+      className={`inline-flex items-center gap-1 rounded-full border ${tones[tone]} ${sizes[size]}`}
+    >
       {children}
     </span>
   );
@@ -36,14 +40,16 @@ const Pill = ({ children, tone = 'slate', size = 'sm' }) => {
 const PeerCompany = ({ peer, onUpdate, onRemove, isEditable = true }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const _formatCurrency = (value) => {
+  const _formatCurrency = value => {
     if (!value) return '—';
-    return value >= 1e9 ? `$${(value / 1e9).toFixed(1)}B` :
-      value >= 1e6 ? `$${(value / 1e6).toFixed(0)}M` :
-        `$${value.toLocaleString()}`;
+    return value >= 1e9
+      ? `$${(value / 1e9).toFixed(1)}B`
+      : value >= 1e6
+        ? `$${(value / 1e6).toFixed(0)}M`
+        : `$${value.toLocaleString()}`;
   };
 
-  const formatMultiple = (value) => {
+  const formatMultiple = value => {
     if (!value) return '—';
     return `${value.toFixed(1)}x`;
   };
@@ -82,27 +88,33 @@ const PeerCompany = ({ peer, onUpdate, onRemove, isEditable = true }) => {
           <div className="mt-3 pt-3 border-t border-slate-200 space-y-3">
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label htmlFor={`peer-${peer.id}-name`} className="block text-[10px] font-medium text-slate-600 mb-1">
+                <label
+                  htmlFor={`peer-${peer.id}-name`}
+                  className="block text-[10px] font-medium text-slate-600 mb-1"
+                >
                   Company Name
                 </label>
                 <input
                   id={`peer-${peer.id}-name`}
                   type="text"
                   value={peer.name}
-                  onChange={(e) => onUpdate(peer.id, { name: e.target.value })}
+                  onChange={e => onUpdate(peer.id, { name: e.target.value })}
                   className="w-full text-[11px] px-2 py-1 border border-slate-200 rounded"
                   disabled={!isEditable}
                 />
               </div>
               <div>
-                <label htmlFor={`peer-${peer.id}-ticker`} className="block text-[10px] font-medium text-slate-600 mb-1">
+                <label
+                  htmlFor={`peer-${peer.id}-ticker`}
+                  className="block text-[10px] font-medium text-slate-600 mb-1"
+                >
                   Ticker
                 </label>
                 <input
                   id={`peer-${peer.id}-ticker`}
                   type="text"
                   value={peer.ticker}
-                  onChange={(e) => onUpdate(peer.id, { ticker: e.target.value.toUpperCase() })}
+                  onChange={e => onUpdate(peer.id, { ticker: e.target.value.toUpperCase() })}
                   className="w-full text-[11px] px-2 py-1 border border-slate-200 rounded"
                   disabled={!isEditable}
                 />
@@ -111,33 +123,42 @@ const PeerCompany = ({ peer, onUpdate, onRemove, isEditable = true }) => {
 
             <div className="grid grid-cols-3 gap-2">
               <div>
-                <label htmlFor={`peer-${peer.id}-marketcap`} className="block text-[10px] font-medium text-slate-600 mb-1">
+                <label
+                  htmlFor={`peer-${peer.id}-marketcap`}
+                  className="block text-[10px] font-medium text-slate-600 mb-1"
+                >
                   Market Cap
                 </label>
                 <input
                   id={`peer-${peer.id}-marketcap`}
                   type="number"
                   value={peer.marketCap || 0}
-                  onChange={(e) => onUpdate(peer.id, { marketCap: parseFloat(e.target.value) || 0 })}
+                  onChange={e => onUpdate(peer.id, { marketCap: parseFloat(e.target.value) || 0 })}
                   className="w-full text-[11px] px-2 py-1 border border-slate-200 rounded"
                   disabled={!isEditable}
                 />
               </div>
               <div>
-                <label htmlFor={`peer-${peer.id}-revenue`} className="block text-[10px] font-medium text-slate-600 mb-1">
+                <label
+                  htmlFor={`peer-${peer.id}-revenue`}
+                  className="block text-[10px] font-medium text-slate-600 mb-1"
+                >
                   Revenue
                 </label>
                 <input
                   id={`peer-${peer.id}-revenue`}
                   type="number"
                   value={peer.revenue || 0}
-                  onChange={(e) => onUpdate(peer.id, { revenue: parseFloat(e.target.value) || 0 })}
+                  onChange={e => onUpdate(peer.id, { revenue: parseFloat(e.target.value) || 0 })}
                   className="w-full text-[11px] px-2 py-1 border border-slate-200 rounded"
                   disabled={!isEditable}
                 />
               </div>
               <div>
-                <label htmlFor={`peer-${peer.id}-evmultiple`} className="block text-[10px] font-medium text-slate-600 mb-1">
+                <label
+                  htmlFor={`peer-${peer.id}-evmultiple`}
+                  className="block text-[10px] font-medium text-slate-600 mb-1"
+                >
                   EV/Revenue
                 </label>
                 <input
@@ -145,7 +166,7 @@ const PeerCompany = ({ peer, onUpdate, onRemove, isEditable = true }) => {
                   type="number"
                   step="0.1"
                   value={peer.evMultiple || 0}
-                  onChange={(e) => onUpdate(peer.id, { evMultiple: parseFloat(e.target.value) || 0 })}
+                  onChange={e => onUpdate(peer.id, { evMultiple: parseFloat(e.target.value) || 0 })}
                   className="w-full text-[11px] px-2 py-1 border border-slate-200 rounded"
                   disabled={!isEditable}
                 />
@@ -154,13 +175,16 @@ const PeerCompany = ({ peer, onUpdate, onRemove, isEditable = true }) => {
 
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label htmlFor={`peer-${peer.id}-sector`} className="block text-[10px] font-medium text-slate-600 mb-1">
+                <label
+                  htmlFor={`peer-${peer.id}-sector`}
+                  className="block text-[10px] font-medium text-slate-600 mb-1"
+                >
                   Sector
                 </label>
                 <select
                   id={`peer-${peer.id}-sector`}
                   value={peer.sector || ''}
-                  onChange={(e) => onUpdate(peer.id, { sector: e.target.value })}
+                  onChange={e => onUpdate(peer.id, { sector: e.target.value })}
                   className="w-full text-[11px] px-2 py-1 border border-slate-200 rounded"
                   disabled={!isEditable}
                 >
@@ -177,13 +201,16 @@ const PeerCompany = ({ peer, onUpdate, onRemove, isEditable = true }) => {
                 </select>
               </div>
               <div>
-                <label htmlFor={`peer-${peer.id}-geography`} className="block text-[10px] font-medium text-slate-600 mb-1">
+                <label
+                  htmlFor={`peer-${peer.id}-geography`}
+                  className="block text-[10px] font-medium text-slate-600 mb-1"
+                >
                   Geography
                 </label>
                 <select
                   id={`peer-${peer.id}-geography`}
                   value={peer.geography || ''}
-                  onChange={(e) => onUpdate(peer.id, { geography: e.target.value })}
+                  onChange={e => onUpdate(peer.id, { geography: e.target.value })}
                   className="w-full text-[11px] px-2 py-1 border border-slate-200 rounded"
                   disabled={!isEditable}
                 >
@@ -198,13 +225,16 @@ const PeerCompany = ({ peer, onUpdate, onRemove, isEditable = true }) => {
             </div>
 
             <div>
-              <label htmlFor={`peer-${peer.id}-notes`} className="block text-[10px] font-medium text-slate-600 mb-1">
+              <label
+                htmlFor={`peer-${peer.id}-notes`}
+                className="block text-[10px] font-medium text-slate-600 mb-1"
+              >
                 Notes
               </label>
               <textarea
                 id={`peer-${peer.id}-notes`}
                 value={peer.notes || ''}
-                onChange={(e) => onUpdate(peer.id, { notes: e.target.value })}
+                onChange={e => onUpdate(peer.id, { notes: e.target.value })}
                 className="w-full text-[11px] px-2 py-1 border border-slate-200 rounded h-12 resize-none"
                 disabled={!isEditable}
                 placeholder="Additional notes about this peer..."
@@ -241,7 +271,7 @@ const PeerSetsManager = ({ models = [], onPeerSetSave }) => {
     setShowNewSet(false);
   };
 
-  const addPeerToPeerSet = (peerSetId) => {
+  const addPeerToPeerSet = peerSetId => {
     const newPeer = {
       id: `peer_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
       name: '',
@@ -255,44 +285,48 @@ const PeerSetsManager = ({ models = [], onPeerSetSave }) => {
       createdAt: new Date().toISOString()
     };
 
-    setPeerSets(prev => prev.map(set =>
-      set.id === peerSetId
-        ? {
-          ...set,
-          peers: [...set.peers, newPeer],
-          lastUpdated: new Date().toISOString()
-        }
-        : set
-    ));
+    setPeerSets(prev =>
+      prev.map(set =>
+        set.id === peerSetId
+          ? {
+              ...set,
+              peers: [...set.peers, newPeer],
+              lastUpdated: new Date().toISOString()
+            }
+          : set
+      )
+    );
   };
 
   const updatePeer = (peerSetId, peerId, updates) => {
-    setPeerSets(prev => prev.map(set =>
-      set.id === peerSetId
-        ? {
-          ...set,
-          peers: set.peers.map(peer =>
-            peer.id === peerId ? { ...peer, ...updates } : peer
-          ),
-          lastUpdated: new Date().toISOString()
-        }
-        : set
-    ));
+    setPeerSets(prev =>
+      prev.map(set =>
+        set.id === peerSetId
+          ? {
+              ...set,
+              peers: set.peers.map(peer => (peer.id === peerId ? { ...peer, ...updates } : peer)),
+              lastUpdated: new Date().toISOString()
+            }
+          : set
+      )
+    );
   };
 
   const removePeer = (peerSetId, peerId) => {
-    setPeerSets(prev => prev.map(set =>
-      set.id === peerSetId
-        ? {
-          ...set,
-          peers: set.peers.filter(peer => peer.id !== peerId),
-          lastUpdated: new Date().toISOString()
-        }
-        : set
-    ));
+    setPeerSets(prev =>
+      prev.map(set =>
+        set.id === peerSetId
+          ? {
+              ...set,
+              peers: set.peers.filter(peer => peer.id !== peerId),
+              lastUpdated: new Date().toISOString()
+            }
+          : set
+      )
+    );
   };
 
-  const deletePeerSet = (peerSetId) => {
+  const deletePeerSet = peerSetId => {
     setPeerSets(prev => prev.filter(set => set.id !== peerSetId));
     if (selectedSet === peerSetId) {
       setSelectedSet(null);
@@ -316,16 +350,17 @@ const PeerSetsManager = ({ models = [], onPeerSetSave }) => {
       count: multiples.length,
       min: multiples[0],
       max: multiples[multiples.length - 1],
-      median: multiples.length % 2 === 0
-        ? (multiples[multiples.length / 2 - 1] + multiples[multiples.length / 2]) / 2
-        : multiples[Math.floor(multiples.length / 2)],
+      median:
+        multiples.length % 2 === 0
+          ? (multiples[multiples.length / 2 - 1] + multiples[multiples.length / 2]) / 2
+          : multiples[Math.floor(multiples.length / 2)],
       average: multiples.reduce((sum, val) => sum + val, 0) / multiples.length,
       percentile25: multiples[Math.floor(multiples.length * 0.25)],
       percentile75: multiples[Math.floor(multiples.length * 0.75)]
     };
   }, [currentSet]);
 
-  const applyPeerSetToModel = (modelId) => {
+  const applyPeerSetToModel = modelId => {
     if (!currentSet || !peerSetStats) return;
 
     const model = models.find(m => m.id === modelId);
@@ -361,9 +396,7 @@ const PeerSetsManager = ({ models = [], onPeerSetSave }) => {
       right={
         <div className="flex items-center gap-2">
           <Pill tone="blue">{peerSets.length} sets</Pill>
-          {currentSet && (
-            <Pill tone="green">{currentSet.peers.length} peers</Pill>
-          )}
+          {currentSet && <Pill tone="green">{currentSet.peers.length} peers</Pill>}
           <button
             onClick={() => setShowNewSet(true)}
             className="flex items-center gap-1 px-2 py-1 text-[11px] bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors"
@@ -390,10 +423,10 @@ const PeerSetsManager = ({ models = [], onPeerSetSave }) => {
             <input
               type="text"
               value={newSetName}
-              onChange={(e) => setNewSetName(e.target.value)}
+              onChange={e => setNewSetName(e.target.value)}
               placeholder="Peer set name..."
               className="flex-1 text-[11px] px-2 py-1 border border-slate-200 rounded"
-              onKeyPress={(e) => e.key === 'Enter' && createNewPeerSet()}
+              onKeyPress={e => e.key === 'Enter' && createNewPeerSet()}
             />
             <button
               onClick={createNewPeerSet}
@@ -433,16 +466,24 @@ const PeerSetsManager = ({ models = [], onPeerSetSave }) => {
             <input
               type="text"
               value={currentSet.name}
-              onChange={(e) => setPeerSets(prev => prev.map(set =>
-                set.id === currentSet.id ? { ...set, name: e.target.value } : set
-              ))}
+              onChange={e =>
+                setPeerSets(prev =>
+                  prev.map(set =>
+                    set.id === currentSet.id ? { ...set, name: e.target.value } : set
+                  )
+                )
+              }
               className="w-full text-[12px] font-medium px-2 py-1 border border-slate-200 rounded mb-2"
             />
             <textarea
               value={currentSet.description}
-              onChange={(e) => setPeerSets(prev => prev.map(set =>
-                set.id === currentSet.id ? { ...set, description: e.target.value } : set
-              ))}
+              onChange={e =>
+                setPeerSets(prev =>
+                  prev.map(set =>
+                    set.id === currentSet.id ? { ...set, description: e.target.value } : set
+                  )
+                )
+              }
               className="w-full text-[11px] px-2 py-1 border border-slate-200 rounded h-16 resize-none"
               placeholder="Peer set description..."
             />
@@ -461,7 +502,9 @@ const PeerSetsManager = ({ models = [], onPeerSetSave }) => {
                   <div className="text-emerald-700">Min</div>
                 </div>
                 <div className="text-center">
-                  <div className="font-bold text-[12px]">{peerSetStats.percentile25.toFixed(1)}x</div>
+                  <div className="font-bold text-[12px]">
+                    {peerSetStats.percentile25.toFixed(1)}x
+                  </div>
                   <div className="text-emerald-700">P25</div>
                 </div>
                 <div className="text-center">
@@ -469,7 +512,9 @@ const PeerSetsManager = ({ models = [], onPeerSetSave }) => {
                   <div className="text-emerald-700">Median</div>
                 </div>
                 <div className="text-center">
-                  <div className="font-bold text-[12px]">{peerSetStats.percentile75.toFixed(1)}x</div>
+                  <div className="font-bold text-[12px]">
+                    {peerSetStats.percentile75.toFixed(1)}x
+                  </div>
                   <div className="text-emerald-700">P75</div>
                 </div>
                 <div className="text-center">
@@ -499,7 +544,7 @@ const PeerSetsManager = ({ models = [], onPeerSetSave }) => {
                   key={peer.id}
                   peer={peer}
                   onUpdate={(peerId, updates) => updatePeer(currentSet.id, peerId, updates)}
-                  onRemove={(peerId) => removePeer(currentSet.id, peerId)}
+                  onRemove={peerId => removePeer(currentSet.id, peerId)}
                 />
               ))}
 
@@ -518,9 +563,7 @@ const PeerSetsManager = ({ models = [], onPeerSetSave }) => {
           {/* Apply to models */}
           {models.length > 0 && peerSetStats && (
             <div className="p-3 border border-amber-200 bg-amber-50 rounded-lg">
-              <div className="text-[11px] font-medium text-amber-800 mb-2">
-                Apply to Models
-              </div>
+              <div className="text-[11px] font-medium text-amber-800 mb-2">Apply to Models</div>
               <div className="grid grid-cols-2 gap-2">
                 {models.map(model => (
                   <button

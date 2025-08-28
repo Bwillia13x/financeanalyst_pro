@@ -291,7 +291,9 @@ export class CompressionUtils {
   async performanceTest() {
     const testData = JSON.stringify({
       test: 'compression performance',
-      data: new Array(1000).fill('This is test data for compression performance testing. '.repeat(10)),
+      data: new Array(1000).fill(
+        'This is test data for compression performance testing. '.repeat(10)
+      ),
       numbers: new Array(100).fill(0).map((_, i) => i),
       timestamp: Date.now()
     });
@@ -327,7 +329,6 @@ export class CompressionUtils {
         iterations,
         method: this.isNativeCompressed(compressed) ? 'native' : 'lz-string'
       };
-
     } catch (error) {
       console.error('Compression performance test failed:', error);
       return null;

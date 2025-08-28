@@ -7,7 +7,9 @@ const Card = ({ title, right, children, className = '' }) => (
   <section className={`rounded-2xl border border-slate-200 bg-white shadow-sm ${className}`}>
     {(title || right) && (
       <header className="flex items-center justify-between border-b border-slate-200 px-4 py-2.5">
-        {title && <h3 className="text-[13px] font-semibold tracking-wide text-slate-700">{title}</h3>}
+        {title && (
+          <h3 className="text-[13px] font-semibold tracking-wide text-slate-700">{title}</h3>
+        )}
         {right}
       </header>
     )}
@@ -29,7 +31,9 @@ const Pill = ({ children, tone = 'slate', size = 'sm' }) => {
     xs: 'text-[10px] px-1.5 py-0.5'
   };
   return (
-    <span className={`inline-flex items-center gap-1 rounded-full border ${tones[tone]} ${sizes[size]}`}>
+    <span
+      className={`inline-flex items-center gap-1 rounded-full border ${tones[tone]} ${sizes[size]}`}
+    >
       {children}
     </span>
   );
@@ -38,29 +42,40 @@ const Pill = ({ children, tone = 'slate', size = 'sm' }) => {
 const ScenarioCard = ({ scenario, onUpdate, onDelete, onRun, isRunning = false }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const formatCurrency = (value) => {
+  const formatCurrency = value => {
     if (!value) return '—';
-    return value >= 1e9 ? `$${(value / 1e9).toFixed(1)}B` :
-      value >= 1e6 ? `$${(value / 1e6).toFixed(0)}M` :
-        `$${value.toLocaleString()}`;
+    return value >= 1e9
+      ? `$${(value / 1e9).toFixed(1)}B`
+      : value >= 1e6
+        ? `$${(value / 1e6).toFixed(0)}M`
+        : `$${value.toLocaleString()}`;
   };
 
-  const getScenarioColor = (type) => {
+  const getScenarioColor = type => {
     switch (type) {
-      case 'bull': return 'green';
-      case 'bear': return 'red';
-      case 'base': return 'blue';
-      case 'stress': return 'amber';
-      default: return 'slate';
+      case 'bull':
+        return 'green';
+      case 'bear':
+        return 'red';
+      case 'base':
+        return 'blue';
+      case 'stress':
+        return 'amber';
+      default:
+        return 'slate';
     }
   };
 
-  const getScenarioIcon = (type) => {
+  const getScenarioIcon = type => {
     switch (type) {
-      case 'bull': return <TrendingUp className="w-3 h-3" />;
-      case 'bear': return <AlertTriangle className="w-3 h-3" />;
-      case 'stress': return <Zap className="w-3 h-3" />;
-      default: return <BarChart3 className="w-3 h-3" />;
+      case 'bull':
+        return <TrendingUp className="w-3 h-3" />;
+      case 'bear':
+        return <AlertTriangle className="w-3 h-3" />;
+      case 'stress':
+        return <Zap className="w-3 h-3" />;
+      default:
+        return <BarChart3 className="w-3 h-3" />;
     }
   };
 
@@ -121,25 +136,31 @@ const ScenarioCard = ({ scenario, onUpdate, onDelete, onRun, isRunning = false }
             {/* Basic settings */}
             <div className="grid grid-cols-3 gap-3">
               <div>
-                <label htmlFor={`scenario-name-${scenario.id}`} className="block text-[10px] font-medium text-slate-600 mb-1">
+                <label
+                  htmlFor={`scenario-name-${scenario.id}`}
+                  className="block text-[10px] font-medium text-slate-600 mb-1"
+                >
                   Scenario Name
                 </label>
                 <input
                   id={`scenario-name-${scenario.id}`}
                   type="text"
                   value={scenario.name}
-                  onChange={(e) => onUpdate(scenario.id, { name: e.target.value })}
+                  onChange={e => onUpdate(scenario.id, { name: e.target.value })}
                   className="w-full text-[11px] px-2 py-1 border border-slate-200 rounded"
                 />
               </div>
               <div>
-                <label htmlFor={`scenario-type-${scenario.id}`} className="block text-[10px] font-medium text-slate-600 mb-1">
+                <label
+                  htmlFor={`scenario-type-${scenario.id}`}
+                  className="block text-[10px] font-medium text-slate-600 mb-1"
+                >
                   Type
                 </label>
                 <select
                   id={`scenario-type-${scenario.id}`}
                   value={scenario.type}
-                  onChange={(e) => onUpdate(scenario.id, { type: e.target.value })}
+                  onChange={e => onUpdate(scenario.id, { type: e.target.value })}
                   className="w-full text-[11px] px-2 py-1 border border-slate-200 rounded"
                 >
                   <option value="base">Base Case</option>
@@ -150,7 +171,10 @@ const ScenarioCard = ({ scenario, onUpdate, onDelete, onRun, isRunning = false }
                 </select>
               </div>
               <div>
-                <label htmlFor={`scenario-prob-${scenario.id}`} className="block text-[10px] font-medium text-slate-600 mb-1">
+                <label
+                  htmlFor={`scenario-prob-${scenario.id}`}
+                  className="block text-[10px] font-medium text-slate-600 mb-1"
+                >
                   Probability (%)
                 </label>
                 <input
@@ -159,7 +183,9 @@ const ScenarioCard = ({ scenario, onUpdate, onDelete, onRun, isRunning = false }
                   min="0"
                   max="100"
                   value={scenario.probability}
-                  onChange={(e) => onUpdate(scenario.id, { probability: parseInt(e.target.value) || 0 })}
+                  onChange={e =>
+                    onUpdate(scenario.id, { probability: parseInt(e.target.value) || 0 })
+                  }
                   className="w-full text-[11px] px-2 py-1 border border-slate-200 rounded"
                 />
               </div>
@@ -167,19 +193,26 @@ const ScenarioCard = ({ scenario, onUpdate, onDelete, onRun, isRunning = false }
 
             {/* Scenario adjustments */}
             <div>
-              <div className="text-[11px] font-medium text-slate-700 mb-2">Assumption Adjustments</div>
+              <div className="text-[11px] font-medium text-slate-700 mb-2">
+                Assumption Adjustments
+              </div>
               <div className="space-y-2">
                 {Object.entries(scenario.adjustments || {}).map(([key, adjustment]) => (
-                  <div key={key} className="grid grid-cols-4 gap-2 items-center p-2 bg-slate-50 rounded">
+                  <div
+                    key={key}
+                    className="grid grid-cols-4 gap-2 items-center p-2 bg-slate-50 rounded"
+                  >
                     <div className="text-[10px] font-medium">{key}</div>
                     <select
                       value={adjustment.type}
-                      onChange={(e) => onUpdate(scenario.id, {
-                        adjustments: {
-                          ...scenario.adjustments,
-                          [key]: { ...adjustment, type: e.target.value }
-                        }
-                      })}
+                      onChange={e =>
+                        onUpdate(scenario.id, {
+                          adjustments: {
+                            ...scenario.adjustments,
+                            [key]: { ...adjustment, type: e.target.value }
+                          }
+                        })
+                      }
                       className="text-[10px] px-1 py-1 border border-slate-200 rounded"
                     >
                       <option value="multiply">Multiply</option>
@@ -191,12 +224,14 @@ const ScenarioCard = ({ scenario, onUpdate, onDelete, onRun, isRunning = false }
                       type="number"
                       step="0.01"
                       value={adjustment.value}
-                      onChange={(e) => onUpdate(scenario.id, {
-                        adjustments: {
-                          ...scenario.adjustments,
-                          [key]: { ...adjustment, value: parseFloat(e.target.value) || 0 }
-                        }
-                      })}
+                      onChange={e =>
+                        onUpdate(scenario.id, {
+                          adjustments: {
+                            ...scenario.adjustments,
+                            [key]: { ...adjustment, value: parseFloat(e.target.value) || 0 }
+                          }
+                        })
+                      }
                       className="text-[10px] px-1 py-1 border border-slate-200 rounded"
                     />
                     <button
@@ -255,13 +290,16 @@ const ScenarioCard = ({ scenario, onUpdate, onDelete, onRun, isRunning = false }
             )}
 
             <div>
-              <label htmlFor={`scenario-desc-${scenario.id}`} className="block text-[10px] font-medium text-slate-600 mb-1">
+              <label
+                htmlFor={`scenario-desc-${scenario.id}`}
+                className="block text-[10px] font-medium text-slate-600 mb-1"
+              >
                 Description
               </label>
               <textarea
                 id={`scenario-desc-${scenario.id}`}
                 value={scenario.description || ''}
-                onChange={(e) => onUpdate(scenario.id, { description: e.target.value })}
+                onChange={e => onUpdate(scenario.id, { description: e.target.value })}
                 className="w-full text-[10px] px-2 py-1 border border-slate-200 rounded h-12 resize-none"
                 placeholder="Scenario description and assumptions..."
               />
@@ -283,16 +321,16 @@ const ScenariosIntegration = ({ baseModel, onScenarioSave }) => {
       bull: {
         name: 'Bull Case',
         adjustments: {
-          'rev0': { type: 'multiply', value: 1.2 },
-          'margin': { type: 'multiply', value: 1.1 }
+          rev0: { type: 'multiply', value: 1.2 },
+          margin: { type: 'multiply', value: 1.1 }
         },
         probability: 25
       },
       bear: {
         name: 'Bear Case',
         adjustments: {
-          'rev0': { type: 'multiply', value: 0.8 },
-          'margin': { type: 'multiply', value: 0.9 }
+          rev0: { type: 'multiply', value: 0.8 },
+          margin: { type: 'multiply', value: 0.9 }
         },
         probability: 25
       },
@@ -304,9 +342,9 @@ const ScenariosIntegration = ({ baseModel, onScenarioSave }) => {
       stress: {
         name: 'Stress Test',
         adjustments: {
-          'rev0': { type: 'multiply', value: 0.6 },
-          'margin': { type: 'multiply', value: 0.7 },
-          'wacc': { type: 'add', value: 0.02 }
+          rev0: { type: 'multiply', value: 0.6 },
+          margin: { type: 'multiply', value: 0.7 },
+          wacc: { type: 'add', value: 0.02 }
         },
         probability: 10
       }
@@ -329,16 +367,16 @@ const ScenariosIntegration = ({ baseModel, onScenarioSave }) => {
   };
 
   const updateScenario = (scenarioId, updates) => {
-    setScenarios(prev => prev.map(scenario =>
-      scenario.id === scenarioId ? { ...scenario, ...updates } : scenario
-    ));
+    setScenarios(prev =>
+      prev.map(scenario => (scenario.id === scenarioId ? { ...scenario, ...updates } : scenario))
+    );
   };
 
-  const deleteScenario = (scenarioId) => {
+  const deleteScenario = scenarioId => {
     setScenarios(prev => prev.filter(scenario => scenario.id !== scenarioId));
   };
 
-  const runScenario = async(scenario) => {
+  const runScenario = async scenario => {
     if (!baseModel) return;
 
     setRunningScenario(scenario.id);
@@ -381,7 +419,6 @@ const ScenariosIntegration = ({ baseModel, onScenarioSave }) => {
         results,
         lastRun: new Date().toISOString()
       });
-
     } catch (error) {
       console.error('Error running scenario:', error);
       alert('Error running scenario: ' + error.message);
@@ -390,7 +427,7 @@ const ScenariosIntegration = ({ baseModel, onScenarioSave }) => {
     }
   };
 
-  const runAllScenarios = async() => {
+  const runAllScenarios = async () => {
     for (const scenario of scenarios) {
       await runScenario(scenario);
       // Small delay to prevent overwhelming the system
@@ -410,8 +447,8 @@ const ScenariosIntegration = ({ baseModel, onScenarioSave }) => {
     }));
 
     // Probability-weighted values
-    const weightedEV = values.reduce((sum, v) => sum + (v.ev * v.probability), 0);
-    const weightedPerShare = values.reduce((sum, v) => sum + (v.perShare * v.probability), 0);
+    const weightedEV = values.reduce((sum, v) => sum + v.ev * v.probability, 0);
+    const weightedPerShare = values.reduce((sum, v) => sum + v.perShare * v.probability, 0);
 
     // Min/Max values
     const evValues = values.map(v => v.ev).sort((a, b) => a - b);
@@ -427,11 +464,13 @@ const ScenariosIntegration = ({ baseModel, onScenarioSave }) => {
     };
   }, [scenarios]);
 
-  const formatCurrency = (value) => {
+  const formatCurrency = value => {
     if (!value) return '—';
-    return value >= 1e9 ? `$${(value / 1e9).toFixed(1)}B` :
-      value >= 1e6 ? `$${(value / 1e6).toFixed(0)}M` :
-        `$${value.toLocaleString()}`;
+    return value >= 1e9
+      ? `$${(value / 1e9).toFixed(1)}B`
+      : value >= 1e6
+        ? `$${(value / 1e6).toFixed(0)}M`
+        : `$${value.toLocaleString()}`;
   };
 
   if (!baseModel) {
@@ -464,7 +503,7 @@ const ScenariosIntegration = ({ baseModel, onScenarioSave }) => {
           </button>
 
           <select
-            onChange={(e) => e.target.value && createScenario(e.target.value)}
+            onChange={e => e.target.value && createScenario(e.target.value)}
             value=""
             className="text-[11px] px-2 py-1 border border-slate-200 rounded bg-white"
           >
@@ -504,21 +543,28 @@ const ScenariosIntegration = ({ baseModel, onScenarioSave }) => {
           <div className="grid grid-cols-2 gap-4 text-[10px]">
             <div>
               <div className="text-purple-700">Probability-Weighted EV</div>
-              <div className="font-bold text-[12px]">{formatCurrency(scenarioSummary.weightedEV)}</div>
+              <div className="font-bold text-[12px]">
+                {formatCurrency(scenarioSummary.weightedEV)}
+              </div>
             </div>
             <div>
               <div className="text-purple-700">Probability-Weighted Per Share</div>
-              <div className="font-bold text-[12px]">{formatCurrency(scenarioSummary.weightedPerShare)}</div>
+              <div className="font-bold text-[12px]">
+                {formatCurrency(scenarioSummary.weightedPerShare)}
+              </div>
             </div>
             <div>
               <div className="text-purple-700">EV Range</div>
               <div className="font-medium">
-                {formatCurrency(scenarioSummary.evRange.min)} - {formatCurrency(scenarioSummary.evRange.max)}
+                {formatCurrency(scenarioSummary.evRange.min)} -{' '}
+                {formatCurrency(scenarioSummary.evRange.max)}
               </div>
             </div>
             <div>
               <div className="text-purple-700">Total Probability</div>
-              <div className="font-medium">{(scenarioSummary.totalProbability * 100).toFixed(0)}%</div>
+              <div className="font-medium">
+                {(scenarioSummary.totalProbability * 100).toFixed(0)}%
+              </div>
             </div>
           </div>
         </div>

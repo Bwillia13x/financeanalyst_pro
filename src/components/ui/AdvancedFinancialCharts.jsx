@@ -1,4 +1,10 @@
-import { TrendingUp, BarChart3, LineChart as LineChartIcon, PieChart, Settings } from 'lucide-react';
+import {
+  TrendingUp,
+  BarChart3,
+  LineChart as LineChartIcon,
+  PieChart,
+  Settings
+} from 'lucide-react';
 import React, { useState, useMemo } from 'react';
 import {
   ResponsiveContainer,
@@ -56,10 +62,7 @@ const FinancialTooltip = ({ active, payload, label, formatType = 'currency' }) =
       {payload.map((entry, index) => (
         <div key={index} className="flex items-center justify-between space-x-3 mb-1">
           <div className="flex items-center space-x-2">
-            <div
-              className="w-3 h-3 rounded-sm"
-              style={{ backgroundColor: entry.color }}
-            />
+            <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: entry.color }} />
             <span className="text-sm text-slate-600">{entry.name}</span>
           </div>
           <span className="text-sm font-medium text-slate-900">
@@ -72,19 +75,16 @@ const FinancialTooltip = ({ active, payload, label, formatType = 'currency' }) =
 };
 
 // Revenue and Profit Trends Chart
-export const RevenueProfitChart = ({
-  data = [],
-  height = 300,
-  showBrush = true,
-  className
-}) => {
+export const RevenueProfitChart = ({ data = [], height = 300, showBrush = true, className }) => {
   const [selectedPeriod, _setSelectedPeriod] = useState(null);
 
-  const chartData = useMemo(() =>
-    data.map(item => ({
-      ...item,
-      profitMargin: item.revenue > 0 ? (item.netIncome / item.revenue) * 100 : 0
-    })), [data]
+  const chartData = useMemo(
+    () =>
+      data.map(item => ({
+        ...item,
+        profitMargin: item.revenue > 0 ? (item.netIncome / item.revenue) * 100 : 0
+      })),
+    [data]
   );
 
   return (
@@ -103,11 +103,7 @@ export const RevenueProfitChart = ({
       <ResponsiveContainer width="100%" height={height}>
         <ComposedChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-          <XAxis
-            dataKey="period"
-            stroke="#64748b"
-            fontSize={12}
-          />
+          <XAxis dataKey="period" stroke="#64748b" fontSize={12} />
           <YAxis
             yAxisId="currency"
             stroke="#64748b"
@@ -166,11 +162,7 @@ export const RevenueProfitChart = ({
 };
 
 // Cash Flow Waterfall Chart
-export const CashFlowWaterfallChart = ({
-  data = [],
-  height = 300,
-  className
-}) => {
+export const CashFlowWaterfallChart = ({ data = [], height = 300, className }) => {
   const waterfallData = useMemo(() => {
     let runningTotal = 0;
     return data.map((item, _index) => {
@@ -215,10 +207,7 @@ export const CashFlowWaterfallChart = ({
 
           <Bar dataKey="value" name="Cash Flow">
             {waterfallData.map((entry, index) => (
-              <Cell
-                key={`cell-${index}`}
-                fill={entry.isPositive ? '#10b981' : '#ef4444'}
-              />
+              <Cell key={`cell-${index}`} fill={entry.isPositive ? '#10b981' : '#ef4444'} />
             ))}
           </Bar>
         </BarChart>
@@ -253,7 +242,7 @@ export const ValuationMultiplesChart = ({
         </div>
         <select
           value={selectedMetric}
-          onChange={(e) => setSelectedMetric(e.target.value)}
+          onChange={e => setSelectedMetric(e.target.value)}
           className="px-3 py-1 border border-slate-300 rounded text-sm"
         >
           {metrics.map(metric => (
@@ -275,19 +264,11 @@ export const ValuationMultiplesChart = ({
             textAnchor="end"
             height={80}
           />
-          <YAxis
-            stroke="#64748b"
-            fontSize={12}
-            tickFormatter={value => `${value.toFixed(1)}x`}
-          />
+          <YAxis stroke="#64748b" fontSize={12} tickFormatter={value => `${value.toFixed(1)}x`} />
 
           <Tooltip content={<FinancialTooltip formatType="decimal" />} />
 
-          <Bar
-            dataKey={selectedMetric}
-            name={metricLabels[selectedMetric]}
-            fill="#3b82f6"
-          />
+          <Bar dataKey={selectedMetric} name={metricLabels[selectedMetric]} fill="#3b82f6" />
 
           {benchmarks[selectedMetric] && (
             <ReferenceLine
@@ -313,8 +294,16 @@ export const PortfolioAllocationChart = ({
   const [_activeIndex, _setActiveIndex] = useState(-1);
 
   const colors = [
-    '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6',
-    '#06b6d4', '#84cc16', '#f97316', '#ec4899', '#6b7280'
+    '#3b82f6',
+    '#10b981',
+    '#f59e0b',
+    '#ef4444',
+    '#8b5cf6',
+    '#06b6d4',
+    '#84cc16',
+    '#f97316',
+    '#ec4899',
+    '#6b7280'
   ];
 
   const total = data.reduce((sum, item) => sum + item.value, 0);
@@ -351,19 +340,14 @@ export const PortfolioAllocationChart = ({
           {pieData.map((item, index) => (
             <div key={index} className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <div
-                  className="w-4 h-4 rounded-sm"
-                  style={{ backgroundColor: item.color }}
-                />
+                <div className="w-4 h-4 rounded-sm" style={{ backgroundColor: item.color }} />
                 <span className="text-sm text-slate-700">{item.name}</span>
               </div>
               <div className="text-right">
                 <div className="text-sm font-medium text-slate-900">
                   ${item.value.toLocaleString()}
                 </div>
-                <div className="text-xs text-slate-500">
-                  {item.percentage.toFixed(1)}%
-                </div>
+                <div className="text-xs text-slate-500">{item.percentage.toFixed(1)}%</div>
               </div>
             </div>
           ))}
@@ -374,18 +358,15 @@ export const PortfolioAllocationChart = ({
 };
 
 // Monte Carlo Simulation Results
-export const MonteCarloChart = ({
-  data = [],
-  confidence = 95,
-  height = 300,
-  className
-}) => {
+export const MonteCarloChart = ({ data = [], confidence = 95, height = 300, className }) => {
   const [_selectedPath, _setSelectedPath] = useState(null);
 
   const confidenceData = useMemo(() => {
     const sortedValues = [...data].sort((a, b) => a.finalValue - b.finalValue);
-    const lowerIndex = Math.floor(((100 - confidence) / 2) * sortedValues.length / 100);
-    const upperIndex = Math.ceil((confidence + (100 - confidence) / 2) * sortedValues.length / 100);
+    const lowerIndex = Math.floor((((100 - confidence) / 2) * sortedValues.length) / 100);
+    const upperIndex = Math.ceil(
+      ((confidence + (100 - confidence) / 2) * sortedValues.length) / 100
+    );
 
     return {
       lower: sortedValues[lowerIndex]?.finalValue || 0,
@@ -400,27 +381,22 @@ export const MonteCarloChart = ({
         <div>
           <h3 className="text-lg font-semibold text-slate-900">Monte Carlo Analysis</h3>
           <p className="text-sm text-slate-600">
-            {confidence}% confidence interval: ${confidenceData.lower.toLocaleString()} - ${confidenceData.upper.toLocaleString()}
+            {confidence}% confidence interval: ${confidenceData.lower.toLocaleString()} - $
+            {confidenceData.upper.toLocaleString()}
           </p>
         </div>
         <div className="text-right">
           <div className="text-sm font-medium text-slate-900">
             Median: ${confidenceData.median.toLocaleString()}
           </div>
-          <div className="text-xs text-slate-500">
-            {data.length} simulations
-          </div>
+          <div className="text-xs text-slate-500">{data.length} simulations</div>
         </div>
       </div>
 
       <ResponsiveContainer width="100%" height={height}>
         <AreaChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-          <XAxis
-            dataKey="period"
-            stroke="#64748b"
-            fontSize={12}
-          />
+          <XAxis dataKey="period" stroke="#64748b" fontSize={12} />
           <YAxis
             stroke="#64748b"
             fontSize={12}
@@ -530,9 +506,7 @@ export const FinancialChartContainer = ({
       </div>
 
       {/* Chart Content */}
-      <div className="p-0">
-        {renderChart()}
-      </div>
+      <div className="p-0">{renderChart()}</div>
     </div>
   );
 };

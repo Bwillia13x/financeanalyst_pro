@@ -7,7 +7,9 @@ const Card = ({ title, right, children, className = '' }) => (
   <section className={`rounded-2xl border border-slate-200 bg-white shadow-sm ${className}`}>
     {(title || right) && (
       <header className="flex items-center justify-between border-b border-slate-200 px-4 py-2.5">
-        {title && <h3 className="text-[13px] font-semibold tracking-wide text-slate-700">{title}</h3>}
+        {title && (
+          <h3 className="text-[13px] font-semibold tracking-wide text-slate-700">{title}</h3>
+        )}
         {right}
       </header>
     )}
@@ -24,7 +26,9 @@ const Pill = ({ children, tone = 'slate' }) => {
     red: 'bg-rose-50 text-rose-700 border-rose-200'
   };
   return (
-    <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] ${tones[tone]}`}>
+    <span
+      className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] ${tones[tone]}`}
+    >
       {children}
     </span>
   );
@@ -69,23 +73,29 @@ const EnhancedLibrary = ({ models, setModels, onSelect, selectedModelId }) => {
   // Filter and sort models
   const filteredModels = models
     .filter(m => {
-      const matchesQuery = !q || m.name.toLowerCase().includes(q.toLowerCase()) ||
-                          m.tags.some(t => t.toLowerCase().includes(q.toLowerCase()));
+      const matchesQuery =
+        !q ||
+        m.name.toLowerCase().includes(q.toLowerCase()) ||
+        m.tags.some(t => t.toLowerCase().includes(q.toLowerCase()));
       const matchesTag = !tag || m.tags.includes(tag);
       return matchesQuery && matchesTag;
     })
     .sort((a, b) => {
       switch (sortBy) {
-        case 'name': return a.name.localeCompare(b.name);
-        case 'kind': return a.kind.localeCompare(b.kind);
-        case 'updated': return new Date(b.updated) - new Date(a.updated);
-        default: return 0;
+        case 'name':
+          return a.name.localeCompare(b.name);
+        case 'kind':
+          return a.kind.localeCompare(b.kind);
+        case 'updated':
+          return new Date(b.updated) - new Date(a.updated);
+        default:
+          return 0;
       }
     });
 
   // Keyboard navigation
   useEffect(() => {
-    const handleKeyDown = (e) => {
+    const handleKeyDown = e => {
       if (document.activeElement === searchInputRef.current) {
         if (e.key === 'Escape') {
           searchInputRef.current.blur();
@@ -129,67 +139,83 @@ const EnhancedLibrary = ({ models, setModels, onSelect, selectedModelId }) => {
   }, [selectedIndex, filteredModels, onSelect]);
 
   // Actions
-  const toggleSelection = useCallback((model) => {
-    setModels(models.map(m => m.id === model.id ? { ...m, selected: !m.selected } : m));
-  }, [models, setModels]);
+  const toggleSelection = useCallback(
+    model => {
+      setModels(models.map(m => (m.id === model.id ? { ...m, selected: !m.selected } : m)));
+    },
+    [models, setModels]
+  );
 
-  const deleteModel = useCallback((model) => {
-    if (deleteConfirm === model.id) {
-      modelStore.delete(model.id);
-      setModels(models.filter(m => m.id !== model.id));
-      setDeleteConfirm(null);
-    } else {
-      setDeleteConfirm(model.id);
-    }
-  }, [models, setModels, deleteConfirm]);
-
-  const cloneModel = useCallback((model) => {
-    const cloned = modelStore.clone(model.id);
-    if (cloned) {
-      setModels([cloned, ...models]);
-      onSelect(cloned.id);
-    }
-  }, [models, setModels, onSelect]);
-
-  const bumpVersion = useCallback((model) => {
-    const updated = modelStore.bumpVersion(model.id);
-    if (updated) {
-      setModels(models.map(m => m.id === model.id ? updated : m));
-    }
-  }, [models, setModels]);
-
-  const exportModels = useCallback((selectedOnly = false) => {
-    const idsToExport = selectedOnly ?
-      models.filter(m => m.selected).map(m => m.id) :
-      null;
-
-    const blob = modelStore.export(idsToExport);
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `valor-models-${new Date().toISOString().split('T')[0]}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  }, [models]);
-
-  const handleImport = useCallback((file) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const imported = modelStore.import(e.target.result);
-        setModels([...imported, ...models]);
-        setShowImportModal(false);
-        // Show success message
-        console.log(`Imported ${imported.length} models successfully`);
-      } catch (error) {
-        console.error('Import failed:', error);
-        alert(`Import failed: ${error.message}`);
+  const deleteModel = useCallback(
+    model => {
+      if (deleteConfirm === model.id) {
+        modelStore.delete(model.id);
+        setModels(models.filter(m => m.id !== model.id));
+        setDeleteConfirm(null);
+      } else {
+        setDeleteConfirm(model.id);
       }
-    };
-    reader.readAsText(file);
-  }, [models, setModels]);
+    },
+    [models, setModels, deleteConfirm]
+  );
+
+  const cloneModel = useCallback(
+    model => {
+      const cloned = modelStore.clone(model.id);
+      if (cloned) {
+        setModels([cloned, ...models]);
+        onSelect(cloned.id);
+      }
+    },
+    [models, setModels, onSelect]
+  );
+
+  const bumpVersion = useCallback(
+    model => {
+      const updated = modelStore.bumpVersion(model.id);
+      if (updated) {
+        setModels(models.map(m => (m.id === model.id ? updated : m)));
+      }
+    },
+    [models, setModels]
+  );
+
+  const exportModels = useCallback(
+    (selectedOnly = false) => {
+      const idsToExport = selectedOnly ? models.filter(m => m.selected).map(m => m.id) : null;
+
+      const blob = modelStore.export(idsToExport);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `valor-models-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    },
+    [models]
+  );
+
+  const handleImport = useCallback(
+    file => {
+      const reader = new FileReader();
+      reader.onload = e => {
+        try {
+          const imported = modelStore.import(e.target.result);
+          setModels([...imported, ...models]);
+          setShowImportModal(false);
+          // Show success message
+          console.log(`Imported ${imported.length} models successfully`);
+        } catch (error) {
+          console.error('Import failed:', error);
+          alert(`Import failed: ${error.message}`);
+        }
+      };
+      reader.readAsText(file);
+    },
+    [models, setModels]
+  );
 
   return (
     <>
@@ -198,7 +224,9 @@ const EnhancedLibrary = ({ models, setModels, onSelect, selectedModelId }) => {
         right={
           <div className="flex items-center gap-2">
             <Pill tone="blue">{models.filter(m => m.selected).length} selected</Pill>
-            <Pill tone="slate">{filteredModels.length} / {models.length}</Pill>
+            <Pill tone="slate">
+              {filteredModels.length} / {models.length}
+            </Pill>
           </div>
         }
       >
@@ -209,7 +237,7 @@ const EnhancedLibrary = ({ models, setModels, onSelect, selectedModelId }) => {
             <input
               ref={searchInputRef}
               value={q}
-              onChange={(e) => setQ(e.target.value)}
+              onChange={e => setQ(e.target.value)}
               placeholder="Name or tag…"
               className="w-full rounded-md border border-slate-300 bg-white px-2 py-1 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
             />
@@ -218,18 +246,22 @@ const EnhancedLibrary = ({ models, setModels, onSelect, selectedModelId }) => {
             <span className="mb-1 block text-slate-600">Filter tag</span>
             <select
               value={tag}
-              onChange={(e) => setTag(e.target.value)}
+              onChange={e => setTag(e.target.value)}
               className="w-full rounded-md border border-slate-300 bg-white px-2 py-1"
             >
               <option value="">All</option>
-              {tags.map(t => <option key={t} value={t}>{t}</option>)}
+              {tags.map(t => (
+                <option key={t} value={t}>
+                  {t}
+                </option>
+              ))}
             </select>
           </label>
           <label className="text-[12px]">
             <span className="mb-1 block text-slate-600">Sort by</span>
             <select
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
+              onChange={e => setSortBy(e.target.value)}
               className="w-full rounded-md border border-slate-300 bg-white px-2 py-1"
             >
               <option value="updated">Updated</option>
@@ -286,7 +318,12 @@ const EnhancedLibrary = ({ models, setModels, onSelect, selectedModelId }) => {
                   {m.tags.includes('imported') && <Pill tone="blue">Imported</Pill>}
                 </div>
                 <div className="text-[11px] text-slate-500">
-                  Updated {new Date(m.updated).toLocaleString()} • {m.tags.map(t => <span key={t} className="mr-1">#{t}</span>)}
+                  Updated {new Date(m.updated).toLocaleString()} •{' '}
+                  {m.tags.map(t => (
+                    <span key={t} className="mr-1">
+                      #{t}
+                    </span>
+                  ))}
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -348,7 +385,7 @@ const EnhancedLibrary = ({ models, setModels, onSelect, selectedModelId }) => {
               ref={fileInputRef}
               type="file"
               accept=".json"
-              onChange={(e) => {
+              onChange={e => {
                 const file = e.target.files[0];
                 if (file) handleImport(file);
               }}

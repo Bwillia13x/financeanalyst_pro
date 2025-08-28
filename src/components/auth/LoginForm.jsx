@@ -3,16 +3,7 @@
  * Provides user authentication interface with comprehensive security features
  */
 
-import {
-  Eye,
-  EyeOff,
-  Lock,
-  Mail,
-  AlertCircle,
-  CheckCircle,
-  Loader2,
-  Shield
-} from 'lucide-react';
+import { Eye, EyeOff, Lock, Mail, AlertCircle, CheckCircle, Loader2, Shield } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
 import { authService } from '../../services/authService.js';
@@ -66,7 +57,7 @@ const LoginForm = ({ onLoginSuccess, onSwitchToRegister }) => {
     return Object.keys(errors).length === 0;
   };
 
-  const handleSubmit = async(e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
 
     if (!validateForm()) {
@@ -114,7 +105,7 @@ const LoginForm = ({ onLoginSuccess, onSwitchToRegister }) => {
     }));
   };
 
-  const fillDemoCredentials = (account) => {
+  const fillDemoCredentials = account => {
     setFormData(prev => ({
       ...prev,
       email: account.email,
@@ -131,12 +122,8 @@ const LoginForm = ({ onLoginSuccess, onSwitchToRegister }) => {
           <div className="mx-auto h-12 w-12 bg-blue-600 rounded-lg flex items-center justify-center">
             <Shield className="h-6 w-6 text-white" />
           </div>
-          <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
-            Sign in to your account
-          </h2>
-          <p className="mt-2 text-sm text-gray-600">
-            Access your financial analysis workspace
-          </p>
+          <h2 className="mt-6 text-3xl font-extrabold text-gray-900">Sign in to your account</h2>
+          <p className="mt-2 text-sm text-gray-600">Access your financial analysis workspace</p>
         </div>
 
         {/* Demo Credentials Helper */}
@@ -188,7 +175,7 @@ const LoginForm = ({ onLoginSuccess, onSwitchToRegister }) => {
                   type="email"
                   autoComplete="email"
                   value={formData.email}
-                  onChange={(e) => handleInputChange('email', e.target.value)}
+                  onChange={e => handleInputChange('email', e.target.value)}
                   className={`block w-full pl-10 pr-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
                     validationErrors.email ? 'border-red-300' : 'border-gray-300'
                   }`}
@@ -218,7 +205,7 @@ const LoginForm = ({ onLoginSuccess, onSwitchToRegister }) => {
                   type={showPassword ? 'text' : 'password'}
                   autoComplete="current-password"
                   value={formData.password}
-                  onChange={(e) => handleInputChange('password', e.target.value)}
+                  onChange={e => handleInputChange('password', e.target.value)}
                   className={`block w-full pl-10 pr-10 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
                     validationErrors.password ? 'border-red-300' : 'border-gray-300'
                   }`}
@@ -253,7 +240,7 @@ const LoginForm = ({ onLoginSuccess, onSwitchToRegister }) => {
                 name="remember-me"
                 type="checkbox"
                 checked={formData.rememberMe}
-                onChange={(e) => handleInputChange('rememberMe', e.target.checked)}
+                onChange={e => handleInputChange('rememberMe', e.target.checked)}
                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
               />
               <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
@@ -291,7 +278,8 @@ const LoginForm = ({ onLoginSuccess, onSwitchToRegister }) => {
               <div className="flex">
                 <AlertCircle className="h-5 w-5 text-amber-400 mr-2 mt-0.5" />
                 <div className="text-sm text-amber-700">
-                  Multiple failed attempts detected. Account may be temporarily locked after 5 failed attempts.
+                  Multiple failed attempts detected. Account may be temporarily locked after 5
+                  failed attempts.
                 </div>
               </div>
             </div>

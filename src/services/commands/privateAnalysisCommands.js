@@ -4,21 +4,18 @@
  */
 
 import defaultFinancialData from '../../data/defaultFinancialData.js';
-import {
-  formatCurrency,
-  formatPercentage,
-  formatNumber
-} from '../../utils/dataTransformation.js';
+import { formatCurrency, formatPercentage, formatNumber } from '../../utils/dataTransformation.js';
 
 // Helper functions for risk and quality analysis
-const calculateVolatility = (values) => {
+const calculateVolatility = values => {
   if (values.length < 2) return 0;
   const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
-  const variance = values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / (values.length - 1);
-  return Math.sqrt(variance) / mean * 100;
+  const variance =
+    values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / (values.length - 1);
+  return (Math.sqrt(variance) / mean) * 100;
 };
 
-const assessGrowthSustainability = (revenues) => {
+const assessGrowthSustainability = revenues => {
   const growthRates = [];
   for (let i = 1; i < revenues.length; i++) {
     if (revenues[i - 1] > 0) growthRates.push((revenues[i] / revenues[i - 1] - 1) * 100);
@@ -28,7 +25,7 @@ const assessGrowthSustainability = (revenues) => {
   return avgGrowth > 10 ? '✅ Strong' : avgGrowth > 0 ? '📈 Moderate' : '📉 Weak';
 };
 
-const assessCashFlowTrend = (cashFlows) => {
+const assessCashFlowTrend = cashFlows => {
   if (cashFlows.length < 2) return 'Insufficient data';
   const fcfs = cashFlows.map(cf => cf.freeCashFlow);
   const isIncreasing = fcfs.every((fcf, i) => i === 0 || fcf >= fcfs[i - 1]);
@@ -36,23 +33,27 @@ const assessCashFlowTrend = (cashFlows) => {
   return isIncreasing ? '📈 Improving' : isDecreasing ? '📉 Declining' : '📊 Variable';
 };
 
-const calculateOperatingLeverage = (cashFlows) => {
+const calculateOperatingLeverage = cashFlows => {
   if (cashFlows.length < 2) return 'N/A';
-  const revenueGrowth = ((cashFlows[cashFlows.length - 1].revenue / cashFlows[0].revenue) - 1) * 100;
-  const fcfGrowth = ((cashFlows[cashFlows.length - 1].freeCashFlow / cashFlows[0].freeCashFlow) - 1) * 100;
-  const leverage = revenueGrowth !== 0 ? (fcfGrowth / revenueGrowth) : 0;
+  const revenueGrowth = (cashFlows[cashFlows.length - 1].revenue / cashFlows[0].revenue - 1) * 100;
+  const fcfGrowth =
+    (cashFlows[cashFlows.length - 1].freeCashFlow / cashFlows[0].freeCashFlow - 1) * 100;
+  const leverage = revenueGrowth !== 0 ? fcfGrowth / revenueGrowth : 0;
   return leverage > 1 ? '🟢 High' : leverage > 0.5 ? '🟡 Moderate' : '🔴 Low';
 };
 
 // Quality assessment helper functions
-const calculateGrowthConsistency = (revenues) => {
+const calculateGrowthConsistency = revenues => {
   if (revenues.length < 3) return 50;
   const growthRates = [];
   for (let i = 1; i < revenues.length; i++) {
     if (revenues[i - 1] > 0) growthRates.push((revenues[i] / revenues[i - 1] - 1) * 100);
   }
   const avgGrowth = growthRates.reduce((sum, rate) => sum + rate, 0) / growthRates.length;
-  const volatility = Math.sqrt(growthRates.reduce((sum, rate) => sum + Math.pow(rate - avgGrowth, 2), 0) / (growthRates.length - 1));
+  const volatility = Math.sqrt(
+    growthRates.reduce((sum, rate) => sum + Math.pow(rate - avgGrowth, 2), 0) /
+      (growthRates.length - 1)
+  );
   return Math.max(0, Math.min(100, 80 - volatility * 2));
 };
 
@@ -64,60 +65,76 @@ const estimateRecurringRevenue = (statements, latestIndex) => {
   return Math.min(100, recurringPortion * 100 + 20);
 };
 
-const calculateMarginStability = (margins) => {
+const calculateMarginStability = margins => {
   if (margins.length < 2) return 50;
   const avgMargin = margins.reduce((sum, margin) => sum + margin, 0) / margins.length;
-  const volatility = Math.sqrt(margins.reduce((sum, margin) => sum + Math.pow(margin - avgMargin, 2), 0) / (margins.length - 1));
+  const volatility = Math.sqrt(
+    margins.reduce((sum, margin) => sum + Math.pow(margin - avgMargin, 2), 0) / (margins.length - 1)
+  );
   return Math.max(0, Math.min(100, 90 - volatility * 5));
 };
 
-const calculateProfitabilityTrend = (margins) => {
+const calculateProfitabilityTrend = margins => {
   if (margins.length < 2) return 50;
   const trend = (margins[margins.length - 1] - margins[0]) / margins.length;
   return Math.max(0, Math.min(100, 60 + trend * 10));
 };
 
-const assessMarketPosition = (_data) => {
+const assessMarketPosition = _data => {
   return 75; // Moderate market position
 };
 
-const assessScalability = (revenues) => {
-  const growthRate = revenues.length > 1 ? (revenues[revenues.length - 1] / revenues[0] - 1) * 100 / (revenues.length - 1) : 0;
+const assessScalability = revenues => {
+  const growthRate =
+    revenues.length > 1
+      ? ((revenues[revenues.length - 1] / revenues[0] - 1) * 100) / (revenues.length - 1)
+      : 0;
   return Math.min(100, Math.max(0, 50 + growthRate * 2));
 };
 
-const identifyStrengths = (metrics) => {
-  return metrics.filter(m => m.score >= 80).map(m => `• ${m.metric}: Strong performance`).join('\n') || '• Need to improve overall performance';
+const identifyStrengths = metrics => {
+  return (
+    metrics
+      .filter(m => m.score >= 80)
+      .map(m => `• ${m.metric}: Strong performance`)
+      .join('\n') || '• Need to improve overall performance'
+  );
 };
 
-const identifyWeaknesses = (metrics) => {
-  return metrics.filter(m => m.score < 70).map(m => `• ${m.metric}: Below target performance`).join('\n') || '• No major weaknesses identified';
+const identifyWeaknesses = metrics => {
+  return (
+    metrics
+      .filter(m => m.score < 70)
+      .map(m => `• ${m.metric}: Below target performance`)
+      .join('\n') || '• No major weaknesses identified'
+  );
 };
 
 // Workflow helper functions
-const estimateStepTime = (step) => {
+const estimateStepTime = step => {
   const timeMap = {
     'Data Quality': '2-3 minutes',
     'Company Overview': '3-5 minutes',
     'Financial Analysis': '5-8 minutes',
     'Valuation Models': '8-12 minutes',
     'Risk Assessment': '5-7 minutes',
-    'Benchmarking': '4-6 minutes',
+    Benchmarking: '4-6 minutes',
     'Advanced Models': '10-15 minutes',
     'Final Report': '2-3 minutes'
   };
   return timeMap[step] || '5 minutes';
 };
 
-const assessDataCompleteness = (data) => {
+const assessDataCompleteness = data => {
   const totalFields = 50;
-  const presentFields = Object.keys(data.statements.incomeStatement).length +
-                      Object.keys(data.statements.balanceSheet).length +
-                      Object.keys(data.statements.cashFlow).length;
+  const presentFields =
+    Object.keys(data.statements.incomeStatement).length +
+    Object.keys(data.statements.balanceSheet).length +
+    Object.keys(data.statements.cashFlow).length;
   return Math.min(100, (presentFields / totalFields) * 100);
 };
 
-const assessAnalysisDepth = (steps) => {
+const assessAnalysisDepth = steps => {
   const completedSteps = steps.filter(s => s.completed).length;
   if (completedSteps >= 6) return 'Comprehensive';
   if (completedSteps >= 4) return 'Detailed';
@@ -126,7 +143,7 @@ const assessAnalysisDepth = (steps) => {
 };
 
 // Dashboard helper functions
-const calculatePerformanceScore = (metrics) => {
+const calculatePerformanceScore = metrics => {
   let score = 0;
   score += Math.min(25, Math.max(0, 15 + metrics.revenueGrowth));
   score += Math.min(25, metrics.grossMargin * 0.5);
@@ -135,7 +152,8 @@ const calculatePerformanceScore = (metrics) => {
   return Math.round(score);
 };
 
-const getGrowthIcon = (growth) => growth >= 15 ? '🚀' : growth >= 5 ? '📈' : growth >= 0 ? '➡️' : '📉';
+const getGrowthIcon = growth =>
+  growth >= 15 ? '🚀' : growth >= 5 ? '📈' : growth >= 0 ? '➡️' : '📉';
 
 const getMarginIcon = (margin, type) => {
   const thresholds = {
@@ -147,7 +165,7 @@ const getMarginIcon = (margin, type) => {
   return margin >= t.excellent ? '🟢' : margin >= t.good ? '🟡' : margin >= t.fair ? '🟠' : '🔴';
 };
 
-const getPerformanceRating = (score) => {
+const getPerformanceRating = score => {
   if (score >= 80) return '🏆 Excellent';
   if (score >= 70) return '🥇 Very Good';
   if (score >= 60) return '🥈 Good';
@@ -157,9 +175,10 @@ const getPerformanceRating = (score) => {
 
 export const privateAnalysisCommands = {
   PRIVATE_DCF: {
-    execute: async(_parsedCommand, _context, _processor) => {
+    execute: async (_parsedCommand, _context, _processor) => {
       try {
-        const loadingMessage = '🔄 Running DCF analysis on private company data...\n• Loading financial statements\n• Calculating free cash flows\n• Computing terminal value\n• Analyzing projections...\n✅ Using private financial data';
+        const loadingMessage =
+          '🔄 Running DCF analysis on private company data...\n• Loading financial statements\n• Calculating free cash flows\n• Computing terminal value\n• Analyzing projections...\n✅ Using private financial data';
 
         // Loading message would be shown by context if available
         console.log('DCF Analysis:', loadingMessage);
@@ -193,15 +212,17 @@ export const privateAnalysisCommands = {
         // Simple DCF calculation
         const latestRevenue = revenues[revenues.length - 1];
         // const latestOperatingIncome = operatingIncomes[operatingIncomes.length - 1];
-        const revenueGrowthRate = revenues.length > 1 ?
-          ((revenues[revenues.length - 1] / revenues[revenues.length - 2]) - 1) * 100 : 15;
+        const revenueGrowthRate =
+          revenues.length > 1
+            ? (revenues[revenues.length - 1] / revenues[revenues.length - 2] - 1) * 100
+            : 15;
 
         // Project future cash flows
         const projections = [];
         let projectedRevenue = latestRevenue;
 
         for (let i = 1; i <= assumptions.projectionYears; i++) {
-          projectedRevenue *= (1 + revenueGrowthRate / 100);
+          projectedRevenue *= 1 + revenueGrowthRate / 100;
           const projectedOperatingIncome = projectedRevenue * (margins[margins.length - 1] / 100);
           const projectedFCF = projectedOperatingIncome * (1 - assumptions.taxRate / 100);
 
@@ -215,9 +236,11 @@ export const privateAnalysisCommands = {
         }
 
         const totalPresentValue = projections.reduce((sum, proj) => sum + proj.presentValue, 0);
-        const terminalValue = (projections[projections.length - 1].fcf * (1 + assumptions.terminalGrowthRate / 100))
-          / ((assumptions.discountRate - assumptions.terminalGrowthRate) / 100);
-        const terminalPresentValue = terminalValue / Math.pow(1 + assumptions.discountRate / 100, assumptions.projectionYears);
+        const terminalValue =
+          (projections[projections.length - 1].fcf * (1 + assumptions.terminalGrowthRate / 100)) /
+          ((assumptions.discountRate - assumptions.terminalGrowthRate) / 100);
+        const terminalPresentValue =
+          terminalValue / Math.pow(1 + assumptions.discountRate / 100, assumptions.projectionYears);
         const enterpriseValue = totalPresentValue + terminalPresentValue;
 
         const content = `Private Company DCF Valuation Analysis\n\n📊 HISTORICAL PERFORMANCE:\n${periods.map((period, i) => `• ${period}: Revenue ${formatCurrency(revenues[i], 'USD', true)}, Operating Income ${formatCurrency(operatingIncomes[i], 'USD', true)} (${formatPercentage(margins[i] / 100)})`).join('\n')}\n\n💰 DCF VALUATION RESULTS:\n• Enterprise Value: ${formatCurrency(enterpriseValue, 'USD', true)}\n• Terminal Value: ${formatCurrency(terminalValue, 'USD', true)} (${formatPercentage(terminalPresentValue / enterpriseValue)})\n• PV of Projections: ${formatCurrency(totalPresentValue, 'USD', true)} (${formatPercentage(totalPresentValue / enterpriseValue)})\n\n📈 KEY ASSUMPTIONS:\n• Discount Rate: ${formatPercentage(assumptions.discountRate / 100)}\n• Terminal Growth: ${formatPercentage(assumptions.terminalGrowthRate / 100)}\n• Revenue Growth: ${formatPercentage(revenueGrowthRate / 100)}\n• Tax Rate: ${formatPercentage(assumptions.taxRate / 100)}\n\n🎯 5-YEAR PROJECTIONS:\n${projections.map(proj => `Year ${proj.year}: Revenue ${formatCurrency(proj.revenue, 'USD', true)}, FCF ${formatCurrency(proj.fcf, 'USD', true)}, PV ${formatCurrency(proj.presentValue, 'USD', true)}`).join('\n')}\n\n✅ Analysis based on private financial data`;
@@ -233,7 +256,6 @@ export const privateAnalysisCommands = {
             assumptions
           }
         };
-
       } catch (error) {
         return {
           type: 'error',
@@ -248,7 +270,7 @@ export const privateAnalysisCommands = {
   },
 
   PRIVATE_RATIOS: {
-    execute: async(_parsedCommand, _context, _processor) => {
+    execute: async (_parsedCommand, _context, _processor) => {
       try {
         const data = defaultFinancialData;
         const periods = data.periods;
@@ -282,9 +304,13 @@ export const privateAnalysisCommands = {
 
           growthRates.push({
             period: periods[i],
-            revenueGrowth: previousRevenue ? ((currentRevenue - previousRevenue) / previousRevenue) * 100 : 0,
-            operatingGrowth: previousOperating && Math.abs(previousOperating) > 0.01 ?
-              ((currentOperating - previousOperating) / Math.abs(previousOperating)) * 100 : 0
+            revenueGrowth: previousRevenue
+              ? ((currentRevenue - previousRevenue) / previousRevenue) * 100
+              : 0,
+            operatingGrowth:
+              previousOperating && Math.abs(previousOperating) > 0.01
+                ? ((currentOperating - previousOperating) / Math.abs(previousOperating)) * 100
+                : 0
           });
         }
 
@@ -299,7 +325,6 @@ export const privateAnalysisCommands = {
             growthRates
           }
         };
-
       } catch (error) {
         return {
           type: 'error',
@@ -314,7 +339,7 @@ export const privateAnalysisCommands = {
   },
 
   PRIVATE_SUMMARY: {
-    execute: async(_parsedCommand, _context, _processor) => {
+    execute: async (_parsedCommand, _context, _processor) => {
       try {
         const data = defaultFinancialData;
         const periods = data.periods;
@@ -333,7 +358,9 @@ export const privateAnalysisCommands = {
 
         // Calculate key metrics
         const grossMargin = latest.revenue ? (latest.grossProfit / latest.revenue) * 100 : 0;
-        const operatingMargin = latest.revenue ? (latest.operatingIncome / latest.revenue) * 100 : 0;
+        const operatingMargin = latest.revenue
+          ? (latest.operatingIncome / latest.revenue) * 100
+          : 0;
         const netMargin = latest.revenue ? (latest.netIncome / latest.revenue) * 100 : 0;
 
         // Revenue breakdown (top revenue streams)
@@ -346,7 +373,7 @@ export const privateAnalysisCommands = {
           { name: 'Energy Devices', value: statements.energyDevices?.[latestIndex] || 0 }
         ].sort((a, b) => b.value - a.value);
 
-        const content = `Private Company Financial Summary (${latest.period})\n\n🏢 COMPANY OVERVIEW:\n• Period: ${latest.period}\n• Total Revenue: ${formatCurrency(latest.revenue, 'USD', true)}\n• Operating Status: ${latest.operatingIncome >= 0 ? '✅ Profitable' : '⚠️ Operating Loss'}\n\n💰 FINANCIAL PERFORMANCE:\n• Gross Profit: ${formatCurrency(latest.grossProfit, 'USD', true)} (${formatPercentage(grossMargin / 100)})\n• Operating Income: ${formatCurrency(latest.operatingIncome, 'USD', true)} (${formatPercentage(operatingMargin / 100)})\n• Net Income: ${formatCurrency(latest.netIncome, 'USD', true)} (${formatPercentage(netMargin / 100)})\n• Cost of Goods Sold: ${formatCurrency(latest.totalCOGS, 'USD', true)}\n\n📊 REVENUE BREAKDOWN:\n${revenueBreakdown.map((item, i) => `${i + 1}. ${item.name}: ${formatCurrency(item.value, 'USD', true)} (${formatPercentage(item.value / latest.revenue)})`).join('\n')}\n\n📈 HISTORICAL TRENDS:\n${periods.map((period, i) => `• ${period}: ${formatCurrency(statements.totalRevenue?.[i] || 0, 'USD', true)}`).join('\n')}\n\n🎯 KEY METRICS:\n• Revenue Growth (YoY): ${periods.length > 1 ? formatPercentage(((statements.totalRevenue?.[latestIndex] || 0) / (statements.totalRevenue?.[latestIndex - 1] || 1) - 1)) : 'N/A'}\n• Gross Margin Trend: ${grossMargin >= 70 ? '🟢 Strong' : grossMargin >= 50 ? '🟡 Moderate' : '🔴 Low'}\n• Operating Efficiency: ${operatingMargin >= 15 ? '🟢 Excellent' : operatingMargin >= 5 ? '🟡 Fair' : operatingMargin >= 0 ? '🟠 Break-even' : '🔴 Loss'}\n\n✅ Analysis based on private financial data`;
+        const content = `Private Company Financial Summary (${latest.period})\n\n🏢 COMPANY OVERVIEW:\n• Period: ${latest.period}\n• Total Revenue: ${formatCurrency(latest.revenue, 'USD', true)}\n• Operating Status: ${latest.operatingIncome >= 0 ? '✅ Profitable' : '⚠️ Operating Loss'}\n\n💰 FINANCIAL PERFORMANCE:\n• Gross Profit: ${formatCurrency(latest.grossProfit, 'USD', true)} (${formatPercentage(grossMargin / 100)})\n• Operating Income: ${formatCurrency(latest.operatingIncome, 'USD', true)} (${formatPercentage(operatingMargin / 100)})\n• Net Income: ${formatCurrency(latest.netIncome, 'USD', true)} (${formatPercentage(netMargin / 100)})\n• Cost of Goods Sold: ${formatCurrency(latest.totalCOGS, 'USD', true)}\n\n📊 REVENUE BREAKDOWN:\n${revenueBreakdown.map((item, i) => `${i + 1}. ${item.name}: ${formatCurrency(item.value, 'USD', true)} (${formatPercentage(item.value / latest.revenue)})`).join('\n')}\n\n📈 HISTORICAL TRENDS:\n${periods.map((period, i) => `• ${period}: ${formatCurrency(statements.totalRevenue?.[i] || 0, 'USD', true)}`).join('\n')}\n\n🎯 KEY METRICS:\n• Revenue Growth (YoY): ${periods.length > 1 ? formatPercentage((statements.totalRevenue?.[latestIndex] || 0) / (statements.totalRevenue?.[latestIndex - 1] || 1) - 1) : 'N/A'}\n• Gross Margin Trend: ${grossMargin >= 70 ? '🟢 Strong' : grossMargin >= 50 ? '🟡 Moderate' : '🔴 Low'}\n• Operating Efficiency: ${operatingMargin >= 15 ? '🟢 Excellent' : operatingMargin >= 5 ? '🟡 Fair' : operatingMargin >= 0 ? '🟠 Break-even' : '🔴 Loss'}\n\n✅ Analysis based on private financial data`;
 
         return {
           type: 'success',
@@ -358,7 +385,6 @@ export const privateAnalysisCommands = {
             margins: { grossMargin, operatingMargin, netMargin }
           }
         };
-
       } catch (error) {
         return {
           type: 'error',
@@ -373,7 +399,7 @@ export const privateAnalysisCommands = {
   },
 
   PRIVATE_LOAD: {
-    execute: async(_parsedCommand, _context, _processor) => {
+    execute: async (_parsedCommand, _context, _processor) => {
       try {
         const data = defaultFinancialData;
 
@@ -392,7 +418,6 @@ export const privateAnalysisCommands = {
             }
           }
         };
-
       } catch (error) {
         return { type: 'error', content: `Failed to load private data: ${error.message}` };
       }
@@ -404,7 +429,7 @@ export const privateAnalysisCommands = {
   },
 
   PRIVATE_MONTE_CARLO: {
-    execute: async(_parsedCommand, _context, _processor) => {
+    execute: async (_parsedCommand, _context, _processor) => {
       try {
         const data = defaultFinancialData;
         const statements = data.statements.incomeStatement;
@@ -417,8 +442,8 @@ export const privateAnalysisCommands = {
         const results = [];
 
         for (let i = 0; i < simulations; i++) {
-          const revenueGrowth = (Math.random() * 0.3 + 0.85);
-          const marginChange = (Math.random() * 0.2 + 0.9);
+          const revenueGrowth = Math.random() * 0.3 + 0.85;
+          const marginChange = Math.random() * 0.2 + 0.9;
           const projectedRevenue = baseRevenue * revenueGrowth;
           const projectedOperatingIncome = baseOperatingIncome * marginChange;
           const valuation = projectedOperatingIncome * 8;
@@ -441,7 +466,7 @@ export const privateAnalysisCommands = {
   },
 
   PRIVATE_SCENARIO: {
-    execute: async(_parsedCommand, _context, _processor) => {
+    execute: async (_parsedCommand, _context, _processor) => {
       try {
         const data = defaultFinancialData;
         const statements = data.statements.incomeStatement;
@@ -450,8 +475,8 @@ export const privateAnalysisCommands = {
         const baseOperatingIncome = statements.operatingIncome?.[latestPeriod] || 0;
 
         const scenarios = {
-          bear: { growth: -0.15, margin: -0.20 },
-          base: { growth: 0.10, margin: 0.00 },
+          bear: { growth: -0.15, margin: -0.2 },
+          base: { growth: 0.1, margin: 0.0 },
           bull: { growth: 0.35, margin: 0.15 }
         };
 
@@ -472,7 +497,7 @@ export const privateAnalysisCommands = {
   },
 
   PRIVATE_GROWTH: {
-    execute: async(_parsedCommand, _context, _processor) => {
+    execute: async (_parsedCommand, _context, _processor) => {
       try {
         const data = defaultFinancialData;
         const statements = data.statements.incomeStatement;
@@ -482,13 +507,17 @@ export const privateAnalysisCommands = {
         const growthRates = [];
         for (let i = 1; i < revenues.length; i++) {
           if (revenues[i - 1] > 0) {
-            growthRates.push(((revenues[i] / revenues[i - 1]) - 1) * 100);
+            growthRates.push((revenues[i] / revenues[i - 1] - 1) * 100);
           }
         }
 
         const avgGrowth = growthRates.reduce((sum, rate) => sum + rate, 0) / growthRates.length;
-        const cagr = revenues.length > 1 && revenues[0] > 0 ?
-          (Math.pow(revenues[revenues.length - 1] / revenues[0], 1 / (revenues.length - 1)) - 1) * 100 : 0;
+        const cagr =
+          revenues.length > 1 && revenues[0] > 0
+            ? (Math.pow(revenues[revenues.length - 1] / revenues[0], 1 / (revenues.length - 1)) -
+                1) *
+              100
+            : 0;
 
         const content = `Growth Analysis\n\n📈 GROWTH METRICS:\n• Revenue CAGR: ${formatPercentage(cagr / 100)}\n• Average YoY Growth: ${formatPercentage(avgGrowth / 100)}\n• Latest Revenue: ${formatCurrency(revenues[revenues.length - 1])}\n\n🎯 GROWTH ASSESSMENT:\n• Trajectory: ${avgGrowth > 15 ? '🚀 High Growth' : avgGrowth > 5 ? '📈 Moderate Growth' : '📉 Slow Growth'}\n• Consistency: ${growthRates.every(rate => rate > 0) ? '✅ Consistent' : '⚠️ Variable'}`;
 
@@ -501,7 +530,7 @@ export const privateAnalysisCommands = {
   },
 
   PRIVATE_RISK: {
-    execute: async(_parsedCommand, _context, _processor) => {
+    execute: async (_parsedCommand, _context, _processor) => {
       try {
         const data = defaultFinancialData;
         const statements = data.statements.incomeStatement;
@@ -515,8 +544,9 @@ export const privateAnalysisCommands = {
         const revenueVolatility = revenues.length > 1 ? calculateVolatility(revenues) : 0;
         const marginVolatility = margins.length > 1 ? calculateVolatility(margins) : 0;
 
-        const riskScore = (revenueVolatility > 20 ? 3 : revenueVolatility > 10 ? 2 : 1) +
-                         (marginVolatility > 5 ? 2 : marginVolatility > 2 ? 1 : 0);
+        const riskScore =
+          (revenueVolatility > 20 ? 3 : revenueVolatility > 10 ? 2 : 1) +
+          (marginVolatility > 5 ? 2 : marginVolatility > 2 ? 1 : 0);
 
         const riskLevel = riskScore >= 4 ? 'HIGH' : riskScore >= 2 ? 'MEDIUM' : 'LOW';
 
@@ -531,7 +561,7 @@ export const privateAnalysisCommands = {
   },
 
   PRIVATE_VALIDATE: {
-    execute: async(_parsedCommand, _context, _processor) => {
+    execute: async (_parsedCommand, _context, _processor) => {
       try {
         const data = defaultFinancialData;
         const _statements = data.financialStatements || [];
@@ -554,7 +584,9 @@ export const privateAnalysisCommands = {
         });
 
         // Check for negative revenues
-        const revenues = periods.map((_, index) => data.statements.incomeStatement.totalRevenue?.[index] || 0);
+        const revenues = periods.map(
+          (_, index) => data.statements.incomeStatement.totalRevenue?.[index] || 0
+        );
         const hasNegativeRevenue = revenues.some(rev => rev < 0);
 
         validationResults.push({
@@ -595,7 +627,7 @@ export const privateAnalysisCommands = {
   },
 
   PRIVATE_EXPORT: {
-    execute: async(_parsedCommand, _context, _processor) => {
+    execute: async (_parsedCommand, _context, _processor) => {
       try {
         const data = defaultFinancialData;
         const timestamp = new Date().toISOString().slice(0, 16).replace('T', '_');
@@ -630,7 +662,7 @@ export const privateAnalysisCommands = {
   },
 
   PRIVATE_BENCHMARKS: {
-    execute: async(_parsedCommand, _context, _processor) => {
+    execute: async (_parsedCommand, _context, _processor) => {
       try {
         const data = defaultFinancialData;
         const _statements = data.statements.incomeStatement;
@@ -645,34 +677,52 @@ export const privateAnalysisCommands = {
         const benchmarks = data.assumptions?.industryBenchmarks || {
           revenuePerSqFt: { min: 800, target: 1200, current: 1490.44 },
           revenuePerProvider: { min: 300, target: 400, current: 1242.03 },
-          injectableMargin: { min: 0.75, target: 0.80, current: 0.70 },
-          ebitdaMargin: { min: 0.20, target: 0.25, current: 0.185 },
+          injectableMargin: { min: 0.75, target: 0.8, current: 0.7 },
+          ebitdaMargin: { min: 0.2, target: 0.25, current: 0.185 },
           customerRetention: { min: 0.65, target: 0.75, current: 0.72 }
         };
 
         let content = 'Industry Benchmark Analysis\n\n📊 CURRENT vs BENCHMARKS:\n';
 
         Object.entries(benchmarks).forEach(([metric, values]) => {
-          const performance = values.current >= values.target ? '🟢 Above Target' :
-            values.current >= values.min ? '🟡 Meets Minimum' : '🔴 Below Standard';
+          const performance =
+            values.current >= values.target
+              ? '🟢 Above Target'
+              : values.current >= values.min
+                ? '🟡 Meets Minimum'
+                : '🔴 Below Standard';
           const percentage = ((values.current / values.target) * 100).toFixed(1);
 
           content += `• ${metric.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}:\n`;
-          content += `  Current: ${typeof values.current === 'number' && values.current < 1 ?
-            formatPercentage(values.current) : formatNumber(values.current)}\n`;
-          content += `  Target: ${typeof values.target === 'number' && values.target < 1 ?
-            formatPercentage(values.target) : formatNumber(values.target)}\n`;
+          content += `  Current: ${
+            typeof values.current === 'number' && values.current < 1
+              ? formatPercentage(values.current)
+              : formatNumber(values.current)
+          }\n`;
+          content += `  Target: ${
+            typeof values.target === 'number' && values.target < 1
+              ? formatPercentage(values.target)
+              : formatNumber(values.target)
+          }\n`;
           content += `  Performance: ${performance} (${percentage}% of target)\n\n`;
         });
 
         // Competitive positioning
         const overallScore = Object.values(benchmarks).reduce((score, benchmark) => {
-          return score + (benchmark.current >= benchmark.target ? 2 : benchmark.current >= benchmark.min ? 1 : 0);
+          return (
+            score +
+            (benchmark.current >= benchmark.target ? 2 : benchmark.current >= benchmark.min ? 1 : 0)
+          );
         }, 0);
         const maxScore = Object.keys(benchmarks).length * 2;
-        const competitiveGrade = overallScore >= maxScore * 0.8 ? 'A' :
-          overallScore >= maxScore * 0.6 ? 'B' :
-            overallScore >= maxScore * 0.4 ? 'C' : 'D';
+        const competitiveGrade =
+          overallScore >= maxScore * 0.8
+            ? 'A'
+            : overallScore >= maxScore * 0.6
+              ? 'B'
+              : overallScore >= maxScore * 0.4
+                ? 'C'
+                : 'D';
 
         content += `🎯 COMPETITIVE POSITIONING:\n• Overall Score: ${overallScore}/${maxScore} (${((overallScore / maxScore) * 100).toFixed(1)}%)\n• Industry Grade: ${competitiveGrade}\n• Market Position: ${competitiveGrade === 'A' ? '🏆 Industry Leader' : competitiveGrade === 'B' ? '📈 Above Average' : competitiveGrade === 'C' ? '📊 Market Average' : '📉 Below Average'}`;
 
@@ -694,7 +744,7 @@ export const privateAnalysisCommands = {
   },
 
   PRIVATE_CASHFLOW: {
-    execute: async(_parsedCommand, _context, _processor) => {
+    execute: async (_parsedCommand, _context, _processor) => {
       try {
         const data = defaultFinancialData;
         const statements = data.statements.incomeStatement;
@@ -705,8 +755,12 @@ export const privateAnalysisCommands = {
           const revenue = statements.totalRevenue?.[index] || 0;
           const operatingIncome = statements.operatingIncome?.[index] || 0;
           const depreciation = statements.depreciation?.[index] || 0;
-          const workingCapitalChange = index > 0 ?
-            ((statements.totalRevenue?.[index] || 0) - (statements.totalRevenue?.[index - 1] || 0)) * 0.1 : 0; // Estimate
+          const workingCapitalChange =
+            index > 0
+              ? ((statements.totalRevenue?.[index] || 0) -
+                  (statements.totalRevenue?.[index - 1] || 0)) *
+                0.1
+              : 0; // Estimate
 
           const operatingCashFlow = operatingIncome + depreciation - workingCapitalChange;
           const fcf = operatingCashFlow; // Simplified - would subtract capex
@@ -723,19 +777,25 @@ export const privateAnalysisCommands = {
         });
 
         // Cash flow trends
-        const avgFCFMargin = cashFlowAnalysis.reduce((sum, cf) => sum + cf.fcfMargin, 0) / cashFlowAnalysis.length;
+        const avgFCFMargin =
+          cashFlowAnalysis.reduce((sum, cf) => sum + cf.fcfMargin, 0) / cashFlowAnalysis.length;
         const latestFCF = cashFlowAnalysis[cashFlowAnalysis.length - 1];
 
         let content = 'Cash Flow Analysis\n\n💰 CASH FLOW SUMMARY:\n';
-        content += cashFlowAnalysis.map(cf =>
-          `• ${cf.period}:\n  Operating CF: ${formatCurrency(cf.operatingCashFlow)}\n  Free Cash Flow: ${formatCurrency(cf.freeCashFlow)}\n  FCF Margin: ${formatPercentage(cf.fcfMargin / 100)}`
-        ).join('\n\n');
+        content += cashFlowAnalysis
+          .map(
+            cf =>
+              `• ${cf.period}:\n  Operating CF: ${formatCurrency(cf.operatingCashFlow)}\n  Free Cash Flow: ${formatCurrency(cf.freeCashFlow)}\n  FCF Margin: ${formatPercentage(cf.fcfMargin / 100)}`
+          )
+          .join('\n\n');
 
         content += `\n\n📊 CASH FLOW METRICS:\n• Latest FCF: ${formatCurrency(latestFCF.freeCashFlow)}\n• Average FCF Margin: ${formatPercentage(avgFCFMargin / 100)}\n• Cash Generation: ${latestFCF.freeCashFlow > 0 ? '✅ Positive' : '❌ Negative'}\n• FCF Trend: ${assessCashFlowTrend(cashFlowAnalysis)}`;
 
         // Cash flow adequacy analysis
-        const fcfGrowth = cashFlowAnalysis.length > 1 ?
-          ((latestFCF.freeCashFlow / cashFlowAnalysis[0].freeCashFlow) - 1) * 100 : 0;
+        const fcfGrowth =
+          cashFlowAnalysis.length > 1
+            ? (latestFCF.freeCashFlow / cashFlowAnalysis[0].freeCashFlow - 1) * 100
+            : 0;
 
         content += `\n\n🎯 CASH FLOW QUALITY:\n• FCF Growth (Total): ${formatPercentage(fcfGrowth / 100)}\n• Operating Leverage: ${calculateOperatingLeverage(cashFlowAnalysis)}\n• Cash Conversion: ${avgFCFMargin > 15 ? '🟢 Strong' : avgFCFMargin > 5 ? '🟡 Moderate' : '🔴 Weak'}`;
 
@@ -756,7 +816,7 @@ export const privateAnalysisCommands = {
   },
 
   PRIVATE_MULTIPLES: {
-    execute: async(_parsedCommand, _context, _processor) => {
+    execute: async (_parsedCommand, _context, _processor) => {
       try {
         const data = defaultFinancialData;
         const statements = data.statements.incomeStatement;
@@ -764,7 +824,9 @@ export const privateAnalysisCommands = {
 
         // Current metrics
         const revenue = statements.totalRevenue?.[latestIndex] || 0;
-        const ebitda = (statements.operatingIncome?.[latestIndex] || 0) + (statements.depreciation?.[latestIndex] || 0);
+        const ebitda =
+          (statements.operatingIncome?.[latestIndex] || 0) +
+          (statements.depreciation?.[latestIndex] || 0);
         const _operatingIncome = statements.operatingIncome?.[latestIndex] || 0;
         const netIncome = statements.netIncome?.[latestIndex] || 0;
 
@@ -782,16 +844,22 @@ export const privateAnalysisCommands = {
             typical: revenue * industryMultiples.evRevenue.typical,
             premium: revenue * industryMultiples.evRevenue.premium
           },
-          ebitdaMultiple: ebitda > 0 ? {
-            conservative: ebitda * industryMultiples.evEbitda.min,
-            typical: ebitda * industryMultiples.evEbitda.typical,
-            premium: ebitda * industryMultiples.evEbitda.premium
-          } : null,
-          earningsMultiple: netIncome > 0 ? {
-            conservative: netIncome * industryMultiples.peRatio.min,
-            typical: netIncome * industryMultiples.peRatio.typical,
-            premium: netIncome * industryMultiples.peRatio.premium
-          } : null
+          ebitdaMultiple:
+            ebitda > 0
+              ? {
+                  conservative: ebitda * industryMultiples.evEbitda.min,
+                  typical: ebitda * industryMultiples.evEbitda.typical,
+                  premium: ebitda * industryMultiples.evEbitda.premium
+                }
+              : null,
+          earningsMultiple:
+            netIncome > 0
+              ? {
+                  conservative: netIncome * industryMultiples.peRatio.min,
+                  typical: netIncome * industryMultiples.peRatio.typical,
+                  premium: netIncome * industryMultiples.peRatio.premium
+                }
+              : null
         };
 
         let content = `Valuation Multiples Analysis\n\n📊 CURRENT METRICS:\n• Revenue (TTM): ${formatCurrency(revenue)}\n• EBITDA (TTM): ${formatCurrency(ebitda)}\n• Net Income: ${formatCurrency(netIncome)}\n\n💰 VALUATION SCENARIOS:\n`;
@@ -825,11 +893,12 @@ export const privateAnalysisCommands = {
           valuations.earningsMultiple?.typical
         ].filter(v => v);
 
-        const avgValuation = typicalValuations.reduce((sum, val) => sum + val, 0) / typicalValuations.length;
+        const avgValuation =
+          typicalValuations.reduce((sum, val) => sum + val, 0) / typicalValuations.length;
         const minValuation = Math.min(...typicalValuations);
         const maxValuation = Math.max(...typicalValuations);
 
-        content += `🎯 VALUATION SUMMARY:\n• Average Valuation: ${formatCurrency(avgValuation)}\n• Valuation Range: ${formatCurrency(minValuation)} - ${formatCurrency(maxValuation)}\n• Method Consistency: ${(maxValuation / minValuation) < 2 ? '✅ Consistent' : '⚠️ Wide Range'}\n• Recommended Range: ${formatCurrency(avgValuation * 0.8)} - ${formatCurrency(avgValuation * 1.2)}`;
+        content += `🎯 VALUATION SUMMARY:\n• Average Valuation: ${formatCurrency(avgValuation)}\n• Valuation Range: ${formatCurrency(minValuation)} - ${formatCurrency(maxValuation)}\n• Method Consistency: ${maxValuation / minValuation < 2 ? '✅ Consistent' : '⚠️ Wide Range'}\n• Recommended Range: ${formatCurrency(avgValuation * 0.8)} - ${formatCurrency(avgValuation * 1.2)}`;
 
         return {
           type: 'success',
@@ -848,13 +917,15 @@ export const privateAnalysisCommands = {
   },
 
   PRIVATE_SENSITIVITY: {
-    execute: async(_parsedCommand, _context, _processor) => {
+    execute: async (_parsedCommand, _context, _processor) => {
       try {
         const data = defaultFinancialData;
         const statements = data.statements.incomeStatement;
         const latestIndex = data.periods.length - 1;
         const baseRevenue = statements.totalRevenue?.[latestIndex] || 0;
-        const baseEbitda = (statements.operatingIncome?.[latestIndex] || 0) + (statements.depreciation?.[latestIndex] || 0);
+        const baseEbitda =
+          (statements.operatingIncome?.[latestIndex] || 0) +
+          (statements.depreciation?.[latestIndex] || 0);
 
         // Sensitivity variables
         const revenueChanges = [-20, -10, 0, 10, 20]; // % changes
@@ -869,7 +940,7 @@ export const privateAnalysisCommands = {
           const _newRevenue = baseRevenue * (1 + change / 100);
           const newEbitda = baseEbitda * (1 + change / 100); // Assuming operating leverage
           const newValuation = newEbitda * multipleBase;
-          const valuationChange = ((newValuation / (baseEbitda * multipleBase)) - 1) * 100;
+          const valuationChange = (newValuation / (baseEbitda * multipleBase) - 1) * 100;
           content += `• Revenue ${change >= 0 ? '+' : ''}${change}%: Valuation ${formatCurrency(newValuation)} (${valuationChange >= 0 ? '+' : ''}${valuationChange.toFixed(1)}%)\n`;
         });
 
@@ -880,7 +951,8 @@ export const privateAnalysisCommands = {
           const newMargin = (baseMargin + change) / 100;
           const newEbitda = baseRevenue * newMargin;
           const newValuation = newEbitda * multipleBase;
-          const valuationChange = newEbitda > 0 ? ((newValuation / (baseEbitda * multipleBase)) - 1) * 100 : -100;
+          const valuationChange =
+            newEbitda > 0 ? (newValuation / (baseEbitda * multipleBase) - 1) * 100 : -100;
           content += `• Margin ${change >= 0 ? '+' : ''}${change}pp: EBITDA ${formatCurrency(newEbitda)}, Valuation ${formatCurrency(newValuation)} (${valuationChange >= 0 ? '+' : ''}${valuationChange.toFixed(1)}%)\n`;
         });
 
@@ -889,7 +961,7 @@ export const privateAnalysisCommands = {
         const multiples = [8, 9, 10, 11, 12];
         multiples.forEach(multiple => {
           const valuation = baseEbitda * multiple;
-          const change = ((multiple / multipleBase) - 1) * 100;
+          const change = (multiple / multipleBase - 1) * 100;
           content += `• ${multiple}x EBITDA: ${formatCurrency(valuation)} (${change >= 0 ? '+' : ''}${change.toFixed(1)}%)\n`;
         });
 
@@ -904,7 +976,11 @@ export const privateAnalysisCommands = {
           content,
           data: {
             analysis: 'private_sensitivity',
-            baseCase: { revenue: baseRevenue, ebitda: baseEbitda, valuation: baseEbitda * multipleBase },
+            baseCase: {
+              revenue: baseRevenue,
+              ebitda: baseEbitda,
+              valuation: baseEbitda * multipleBase
+            },
             sensitivities: { revenueElasticity, marginElasticity }
           }
         };
@@ -916,7 +992,7 @@ export const privateAnalysisCommands = {
   },
 
   PRIVATE_WATERFALL: {
-    execute: async(_parsedCommand, _context, _processor) => {
+    execute: async (_parsedCommand, _context, _processor) => {
       try {
         const data = defaultFinancialData;
         const statements = data.statements.incomeStatement;
@@ -932,15 +1008,36 @@ export const privateAnalysisCommands = {
         // Waterfall components
         const waterfallSteps = [
           { step: 'Base Revenue', value: revenue, cumulative: revenue },
-          { step: 'Operating Leverage', value: operatingIncome - revenue * 0.15, cumulative: operatingIncome },
-          { step: 'Tax Shield', value: -operatingIncome * taxRate, cumulative: operatingIncome * (1 - taxRate) },
-          { step: 'Working Capital', value: -revenue * 0.02, cumulative: operatingIncome * (1 - taxRate) - revenue * 0.02 },
-          { step: 'CapEx', value: -revenue * 0.03, cumulative: operatingIncome * (1 - taxRate) - revenue * 0.05 },
-          { step: 'Free Cash Flow', value: 0, cumulative: operatingIncome * (1 - taxRate) - revenue * 0.05 }
+          {
+            step: 'Operating Leverage',
+            value: operatingIncome - revenue * 0.15,
+            cumulative: operatingIncome
+          },
+          {
+            step: 'Tax Shield',
+            value: -operatingIncome * taxRate,
+            cumulative: operatingIncome * (1 - taxRate)
+          },
+          {
+            step: 'Working Capital',
+            value: -revenue * 0.02,
+            cumulative: operatingIncome * (1 - taxRate) - revenue * 0.02
+          },
+          {
+            step: 'CapEx',
+            value: -revenue * 0.03,
+            cumulative: operatingIncome * (1 - taxRate) - revenue * 0.05
+          },
+          {
+            step: 'Free Cash Flow',
+            value: 0,
+            cumulative: operatingIncome * (1 - taxRate) - revenue * 0.05
+          }
         ];
 
         const fcf = waterfallSteps[waterfallSteps.length - 1].cumulative;
-        const terminalValue = (fcf * (1 + terminalGrowthRate)) / (discountRate - terminalGrowthRate);
+        const terminalValue =
+          (fcf * (1 + terminalGrowthRate)) / (discountRate - terminalGrowthRate);
         const pv5Years = fcf * 4.5; // Simplified 5-year PV
         const pvTerminal = terminalValue / Math.pow(1 + discountRate, 5);
         const enterpriseValue = pv5Years + pvTerminal;
@@ -970,14 +1067,16 @@ export const privateAnalysisCommands = {
   },
 
   PRIVATE_COMPS: {
-    execute: async(_parsedCommand, _context, _processor) => {
+    execute: async (_parsedCommand, _context, _processor) => {
       try {
         const data = defaultFinancialData;
         const statements = data.statements.incomeStatement;
         const latestIndex = data.periods.length - 1;
 
         const revenue = statements.totalRevenue?.[latestIndex] || 0;
-        const ebitda = (statements.operatingIncome?.[latestIndex] || 0) + (statements.depreciation?.[latestIndex] || 0);
+        const ebitda =
+          (statements.operatingIncome?.[latestIndex] || 0) +
+          (statements.depreciation?.[latestIndex] || 0);
 
         // Comparable companies (medispa/aesthetic medicine sector)
         const comparables = [
@@ -992,9 +1091,12 @@ export const privateAnalysisCommands = {
         const currentMargin = revenue > 0 ? (ebitda / revenue) * 100 : 0;
 
         // Peer statistics
-        const avgEvRevenue = comparables.reduce((sum, comp) => sum + comp.evRevenue, 0) / comparables.length;
-        const avgEvEbitda = comparables.reduce((sum, comp) => sum + comp.evEbitda, 0) / comparables.length;
-        const avgMargin = comparables.reduce((sum, comp) => sum + comp.margin, 0) / comparables.length;
+        const avgEvRevenue =
+          comparables.reduce((sum, comp) => sum + comp.evRevenue, 0) / comparables.length;
+        const avgEvEbitda =
+          comparables.reduce((sum, comp) => sum + comp.evEbitda, 0) / comparables.length;
+        const avgMargin =
+          comparables.reduce((sum, comp) => sum + comp.margin, 0) / comparables.length;
 
         // Trading multiples valuation
         const tradingValuationRevenue = revenue * avgEvRevenue;
@@ -1011,7 +1113,7 @@ export const privateAnalysisCommands = {
 
         content += `\n💰 IMPLIED VALUATION:\n• Revenue Multiple: ${formatCurrency(tradingValuationRevenue)} (${avgEvRevenue.toFixed(1)}x)\n• EBITDA Multiple: ${formatCurrency(tradingValuationEbitda)} (${avgEvEbitda.toFixed(1)}x)\n• Average Trading Value: ${formatCurrency(avgTradingValuation)}\n• Current EBITDA Margin: ${formatPercentage(currentMargin / 100)}\n• Peer Margin Delta: ${(currentMargin - avgMargin).toFixed(1)}pp`;
 
-        content += `\n🎯 RELATIVE POSITIONING:\n• Multiple Premium/Discount: ${((avgTradingValuation / ((revenue * 2.5) + (ebitda * 12))) - 1) * 100 > 0 ? '+' : ''}${(((avgTradingValuation / ((revenue * 2.5) + (ebitda * 12))) - 1) * 100).toFixed(1)}%\n• Margin Competitiveness: ${currentMargin >= avgMargin ? '🟢 Above Peers' : '🟡 Below Peers'}\n• Size Adjustment: ${revenue < 50000000 ? 'Small-cap discount may apply' : 'Mid-cap positioning'}`;
+        content += `\n🎯 RELATIVE POSITIONING:\n• Multiple Premium/Discount: ${(avgTradingValuation / (revenue * 2.5 + ebitda * 12) - 1) * 100 > 0 ? '+' : ''}${((avgTradingValuation / (revenue * 2.5 + ebitda * 12) - 1) * 100).toFixed(1)}%\n• Margin Competitiveness: ${currentMargin >= avgMargin ? '🟢 Above Peers' : '🟡 Below Peers'}\n• Size Adjustment: ${revenue < 50000000 ? 'Small-cap discount may apply' : 'Mid-cap positioning'}`;
 
         return {
           type: 'success',
@@ -1020,7 +1122,11 @@ export const privateAnalysisCommands = {
             analysis: 'private_comps',
             comparables,
             peerAverages: { avgEvRevenue, avgEvEbitda, avgMargin },
-            impliedValuation: { tradingValuationRevenue, tradingValuationEbitda, avgTradingValuation }
+            impliedValuation: {
+              tradingValuationRevenue,
+              tradingValuationEbitda,
+              avgTradingValuation
+            }
           }
         };
       } catch (error) {
@@ -1031,14 +1137,16 @@ export const privateAnalysisCommands = {
   },
 
   PRIVATE_LBO: {
-    execute: async(_parsedCommand, _context, _processor) => {
+    execute: async (_parsedCommand, _context, _processor) => {
       try {
         const data = defaultFinancialData;
         const statements = data.statements.incomeStatement;
         const latestIndex = data.periods.length - 1;
 
         const _revenue = statements.totalRevenue?.[latestIndex] || 0;
-        const ebitda = (statements.operatingIncome?.[latestIndex] || 0) + (statements.depreciation?.[latestIndex] || 0);
+        const ebitda =
+          (statements.operatingIncome?.[latestIndex] || 0) +
+          (statements.depreciation?.[latestIndex] || 0);
 
         // LBO assumptions
         const purchasePrice = ebitda * 10; // 10x EBITDA entry multiple
@@ -1063,7 +1171,12 @@ export const privateAnalysisCommands = {
           const interestPayment = remainingDebt * interestRate;
           const debtReduction = Math.min((fcf - interestPayment) * 0.5, remainingDebt * 0.2);
           remainingDebt = Math.max(0, remainingDebt - debtReduction);
-          debtPaydown.push({ year: i + 1, ebitda: yearEbitda, debt: remainingDebt, reduction: debtReduction });
+          debtPaydown.push({
+            year: i + 1,
+            ebitda: yearEbitda,
+            debt: remainingDebt,
+            reduction: debtReduction
+          });
         });
 
         // Exit valuation
@@ -1106,7 +1219,7 @@ export const privateAnalysisCommands = {
   },
 
   PRIVATE_QUALITY: {
-    execute: async(_parsedCommand, _context, _processor) => {
+    execute: async (_parsedCommand, _context, _processor) => {
       try {
         const data = defaultFinancialData;
         const statements = data.statements.incomeStatement;
@@ -1119,7 +1232,11 @@ export const privateAnalysisCommands = {
         const revenues = periods.map((_, i) => statements.totalRevenue?.[i] || 0);
         const revenueGrowthConsistency = calculateGrowthConsistency(revenues);
         const revenueRecurring = estimateRecurringRevenue(statements, periods.length - 1);
-        qualityMetrics.push({ metric: 'Revenue Quality', score: revenueGrowthConsistency * 0.6 + revenueRecurring * 0.4, weight: 25 });
+        qualityMetrics.push({
+          metric: 'Revenue Quality',
+          score: revenueGrowthConsistency * 0.6 + revenueRecurring * 0.4,
+          weight: 25
+        });
 
         // Profitability Quality
         const margins = revenues.map((rev, i) => {
@@ -1128,31 +1245,60 @@ export const privateAnalysisCommands = {
         });
         const marginStability = calculateMarginStability(margins);
         const profitabilityTrend = calculateProfitabilityTrend(margins);
-        qualityMetrics.push({ metric: 'Profitability Quality', score: marginStability * 0.7 + profitabilityTrend * 0.3, weight: 30 });
+        qualityMetrics.push({
+          metric: 'Profitability Quality',
+          score: marginStability * 0.7 + profitabilityTrend * 0.3,
+          weight: 30
+        });
 
         // Cash Generation Quality
         const cashConversion = 85; // Estimated from medispa characteristics
         const workingCapitalEfficiency = 90; // Asset-light model
-        qualityMetrics.push({ metric: 'Cash Generation', score: (cashConversion + workingCapitalEfficiency) / 2, weight: 20 });
+        qualityMetrics.push({
+          metric: 'Cash Generation',
+          score: (cashConversion + workingCapitalEfficiency) / 2,
+          weight: 20
+        });
 
         // Competitive Position
         const marketPosition = assessMarketPosition(data);
         const scalability = assessScalability(revenues);
-        qualityMetrics.push({ metric: 'Competitive Position', score: marketPosition * 0.6 + scalability * 0.4, weight: 15 });
+        qualityMetrics.push({
+          metric: 'Competitive Position',
+          score: marketPosition * 0.6 + scalability * 0.4,
+          weight: 15
+        });
 
         // Financial Strength
         const debtLevels = 75; // Assumed moderate debt levels
         const liquidityPosition = 80; // Cash generation business
-        qualityMetrics.push({ metric: 'Financial Strength', score: (debtLevels + liquidityPosition) / 2, weight: 10 });
+        qualityMetrics.push({
+          metric: 'Financial Strength',
+          score: (debtLevels + liquidityPosition) / 2,
+          weight: 10
+        });
 
         // Calculate overall quality score
-        const overallScore = qualityMetrics.reduce((sum, metric) => sum + (metric.score * metric.weight / 100), 0);
-        const qualityGrade = overallScore >= 80 ? 'A' : overallScore >= 70 ? 'B' : overallScore >= 60 ? 'C' : overallScore >= 50 ? 'D' : 'F';
+        const overallScore = qualityMetrics.reduce(
+          (sum, metric) => sum + (metric.score * metric.weight) / 100,
+          0
+        );
+        const qualityGrade =
+          overallScore >= 80
+            ? 'A'
+            : overallScore >= 70
+              ? 'B'
+              : overallScore >= 60
+                ? 'C'
+                : overallScore >= 50
+                  ? 'D'
+                  : 'F';
 
         let content = `Business Quality Assessment\n\n🏆 OVERALL QUALITY SCORE: ${overallScore.toFixed(1)}/100 (Grade: ${qualityGrade})\n\n📊 QUALITY BREAKDOWN:\n`;
 
         qualityMetrics.forEach(metric => {
-          const grade = metric.score >= 80 ? 'A' : metric.score >= 70 ? 'B' : metric.score >= 60 ? 'C' : 'D';
+          const grade =
+            metric.score >= 80 ? 'A' : metric.score >= 70 ? 'B' : metric.score >= 60 ? 'C' : 'D';
           content += `• ${metric.metric}: ${metric.score.toFixed(1)}/100 (${grade}) - Weight: ${metric.weight}%\n`;
         });
 
@@ -1176,7 +1322,7 @@ export const privateAnalysisCommands = {
   },
 
   PRIVATE_HELP: {
-    execute: async(_parsedCommand, _context, _processor) => {
+    execute: async (_parsedCommand, _context, _processor) => {
       const commands = [
         { cmd: 'PRIVATE_LOAD()', desc: 'Load and validate private financial data' },
         { cmd: 'PRIVATE_SUMMARY()', desc: 'Generate executive summary of company performance' },
@@ -1214,7 +1360,8 @@ export const privateAnalysisCommands = {
       content += '5. Execute PRIVATE_BENCHMARKS() for competitive analysis\n';
       content += '6. Use PRIVATE_EXPORT() to save results\n\n';
 
-      content += '💡 TIPS:\n• Commands are case-sensitive\n• Most commands work with default parameters\n• Use PRIVATE_VALIDATE() if you encounter errors\n• Results include detailed analysis and insights';
+      content +=
+        '💡 TIPS:\n• Commands are case-sensitive\n• Most commands work with default parameters\n• Use PRIVATE_VALIDATE() if you encounter errors\n• Results include detailed analysis and insights';
 
       return {
         type: 'success',
@@ -1229,7 +1376,7 @@ export const privateAnalysisCommands = {
   },
 
   PRIVATE_WORKFLOW: {
-    execute: async(_parsedCommand, _context, _processor) => {
+    execute: async (_parsedCommand, _context, _processor) => {
       try {
         const data = defaultFinancialData;
         const _statements = data.statements.incomeStatement;
@@ -1240,20 +1387,45 @@ export const privateAnalysisCommands = {
           { step: 'Data Quality', completed: true, score: 85, next: 'PRIVATE_VALIDATE()' },
           { step: 'Company Overview', completed: false, score: 0, next: 'PRIVATE_SUMMARY()' },
           { step: 'Financial Analysis', completed: false, score: 0, next: 'PRIVATE_RATIOS()' },
-          { step: 'Valuation Models', completed: false, score: 0, next: 'PRIVATE_DCF() & PRIVATE_MULTIPLES()' },
-          { step: 'Risk Assessment', completed: false, score: 0, next: 'PRIVATE_RISK() & PRIVATE_SCENARIO()' },
-          { step: 'Benchmarking', completed: false, score: 0, next: 'PRIVATE_BENCHMARKS() & PRIVATE_COMPS()' },
-          { step: 'Advanced Models', completed: false, score: 0, next: 'PRIVATE_LBO() & PRIVATE_MONTE_CARLO()' },
+          {
+            step: 'Valuation Models',
+            completed: false,
+            score: 0,
+            next: 'PRIVATE_DCF() & PRIVATE_MULTIPLES()'
+          },
+          {
+            step: 'Risk Assessment',
+            completed: false,
+            score: 0,
+            next: 'PRIVATE_RISK() & PRIVATE_SCENARIO()'
+          },
+          {
+            step: 'Benchmarking',
+            completed: false,
+            score: 0,
+            next: 'PRIVATE_BENCHMARKS() & PRIVATE_COMPS()'
+          },
+          {
+            step: 'Advanced Models',
+            completed: false,
+            score: 0,
+            next: 'PRIVATE_LBO() & PRIVATE_MONTE_CARLO()'
+          },
           { step: 'Final Report', completed: false, score: 0, next: 'PRIVATE_EXPORT()' }
         ];
 
-        const overallProgress = workflowSteps.filter(step => step.completed).length / workflowSteps.length * 100;
+        const overallProgress =
+          (workflowSteps.filter(step => step.completed).length / workflowSteps.length) * 100;
         const nextStep = workflowSteps.find(step => !step.completed);
 
         let content = `Private Analysis Workflow\n\n📋 WORKFLOW PROGRESS: ${overallProgress.toFixed(0)}% Complete\n\n🔄 ANALYSIS STEPS:\n`;
 
         workflowSteps.forEach((step, i) => {
-          const status = step.completed ? '✅' : i === workflowSteps.findIndex(s => !s.completed) ? '🔄' : '⏳';
+          const status = step.completed
+            ? '✅'
+            : i === workflowSteps.findIndex(s => !s.completed)
+              ? '🔄'
+              : '⏳';
           content += `${i + 1}. ${status} ${step.step} ${step.completed ? `(${step.score}%)` : ''}\n   Next: ${step.next}\n\n`;
         });
 
@@ -1277,7 +1449,7 @@ export const privateAnalysisCommands = {
   },
 
   PRIVATE_DASHBOARD: {
-    execute: async(_parsedCommand, _context, _processor) => {
+    execute: async (_parsedCommand, _context, _processor) => {
       try {
         const data = defaultFinancialData;
         const statements = data.statements.incomeStatement;
@@ -1290,8 +1462,10 @@ export const privateAnalysisCommands = {
         const ebitda = operatingIncome + (statements.depreciation?.[latestIndex] || revenue * 0.02);
 
         // Growth metrics
-        const revenueGrowth = latestIndex > 0 && statements.totalRevenue?.[latestIndex - 1] > 0 ?
-          ((revenue / statements.totalRevenue[latestIndex - 1]) - 1) * 100 : 0;
+        const revenueGrowth =
+          latestIndex > 0 && statements.totalRevenue?.[latestIndex - 1] > 0
+            ? (revenue / statements.totalRevenue[latestIndex - 1] - 1) * 100
+            : 0;
 
         // Margins
         const grossMargin = revenue > 0 ? (grossProfit / revenue) * 100 : 0;
@@ -1305,7 +1479,10 @@ export const privateAnalysisCommands = {
 
         // Performance scoring
         const performanceScore = calculatePerformanceScore({
-          revenueGrowth, grossMargin, operatingMargin, ebitdaMargin
+          revenueGrowth,
+          grossMargin,
+          operatingMargin,
+          ebitdaMargin
         });
 
         let content = `📊 EXECUTIVE DASHBOARD\n\n💰 FINANCIAL SNAPSHOT (${data.periods[latestIndex]}):\n`;
@@ -1325,7 +1502,8 @@ export const privateAnalysisCommands = {
         content += `🎯 PERFORMANCE SCORE: ${performanceScore}/100\n`;
         content += `Rating: ${getPerformanceRating(performanceScore)}\n\n`;
 
-        content += '🔍 QUICK ACTIONS:\n• Run PRIVATE_DCF() for detailed valuation\n• Execute PRIVATE_BENCHMARKS() for peer comparison\n• Use PRIVATE_SCENARIO() for risk modeling\n• Try PRIVATE_QUALITY() for investment grade analysis';
+        content +=
+          '🔍 QUICK ACTIONS:\n• Run PRIVATE_DCF() for detailed valuation\n• Execute PRIVATE_BENCHMARKS() for peer comparison\n• Use PRIVATE_SCENARIO() for risk modeling\n• Try PRIVATE_QUALITY() for investment grade analysis';
 
         return {
           type: 'success',
@@ -1345,42 +1523,126 @@ export const privateAnalysisCommands = {
   },
 
   PRIVATE: {
-    execute: async(_parsedCommand, _context, _processor) => {
+    execute: async (_parsedCommand, _context, _processor) => {
       const commands = [
         // Core Analysis Commands
-        { cmd: 'PRIVATE_LOAD()', desc: 'Load and validate private financial data', cat: '📊 CORE ANALYSIS' },
-        { cmd: 'PRIVATE_SUMMARY()', desc: 'Generate executive summary of company performance', cat: '📊 CORE ANALYSIS' },
-        { cmd: 'PRIVATE_DCF()', desc: 'Run discounted cash flow valuation analysis', cat: '📊 CORE ANALYSIS' },
-        { cmd: 'PRIVATE_RATIOS()', desc: 'Calculate comprehensive financial ratios', cat: '📊 CORE ANALYSIS' },
+        {
+          cmd: 'PRIVATE_LOAD()',
+          desc: 'Load and validate private financial data',
+          cat: '📊 CORE ANALYSIS'
+        },
+        {
+          cmd: 'PRIVATE_SUMMARY()',
+          desc: 'Generate executive summary of company performance',
+          cat: '📊 CORE ANALYSIS'
+        },
+        {
+          cmd: 'PRIVATE_DCF()',
+          desc: 'Run discounted cash flow valuation analysis',
+          cat: '📊 CORE ANALYSIS'
+        },
+        {
+          cmd: 'PRIVATE_RATIOS()',
+          desc: 'Calculate comprehensive financial ratios',
+          cat: '📊 CORE ANALYSIS'
+        },
 
         // Valuation Commands
-        { cmd: 'PRIVATE_WATERFALL()', desc: 'DCF waterfall and value bridge analysis', cat: '💰 VALUATION' },
-        { cmd: 'PRIVATE_COMPS()', desc: 'Comparable company trading multiples analysis', cat: '💰 VALUATION' },
-        { cmd: 'PRIVATE_LBO()', desc: 'Leveraged buyout model and returns analysis', cat: '💰 VALUATION' },
-        { cmd: 'PRIVATE_MULTIPLES()', desc: 'Valuation using industry multiples approach', cat: '💰 VALUATION' },
+        {
+          cmd: 'PRIVATE_WATERFALL()',
+          desc: 'DCF waterfall and value bridge analysis',
+          cat: '💰 VALUATION'
+        },
+        {
+          cmd: 'PRIVATE_COMPS()',
+          desc: 'Comparable company trading multiples analysis',
+          cat: '💰 VALUATION'
+        },
+        {
+          cmd: 'PRIVATE_LBO()',
+          desc: 'Leveraged buyout model and returns analysis',
+          cat: '💰 VALUATION'
+        },
+        {
+          cmd: 'PRIVATE_MULTIPLES()',
+          desc: 'Valuation using industry multiples approach',
+          cat: '💰 VALUATION'
+        },
 
         // Analytics Commands
-        { cmd: 'PRIVATE_QUALITY()', desc: 'Business quality and investment grade assessment', cat: '📈 ANALYTICS' },
-        { cmd: 'PRIVATE_BENCHMARKS()', desc: 'Compare metrics against industry benchmarks', cat: '📈 ANALYTICS' },
-        { cmd: 'PRIVATE_CASHFLOW()', desc: 'Analyze cash flow generation and quality', cat: '📈 ANALYTICS' },
-        { cmd: 'PRIVATE_GROWTH()', desc: 'Assess revenue growth trends and sustainability', cat: '📈 ANALYTICS' },
-        { cmd: 'PRIVATE_RISK()', desc: 'Evaluate business risk factors and volatility', cat: '📈 ANALYTICS' },
-        { cmd: 'PRIVATE_MONTE_CARLO()', desc: 'Monte Carlo simulation for valuation ranges', cat: '📈 ANALYTICS' },
-        { cmd: 'PRIVATE_SCENARIO()', desc: 'Run bull/base/bear case scenario analysis', cat: '📈 ANALYTICS' },
-        { cmd: 'PRIVATE_SENSITIVITY()', desc: 'Sensitivity analysis on key variables', cat: '📈 ANALYTICS' },
+        {
+          cmd: 'PRIVATE_QUALITY()',
+          desc: 'Business quality and investment grade assessment',
+          cat: '📈 ANALYTICS'
+        },
+        {
+          cmd: 'PRIVATE_BENCHMARKS()',
+          desc: 'Compare metrics against industry benchmarks',
+          cat: '📈 ANALYTICS'
+        },
+        {
+          cmd: 'PRIVATE_CASHFLOW()',
+          desc: 'Analyze cash flow generation and quality',
+          cat: '📈 ANALYTICS'
+        },
+        {
+          cmd: 'PRIVATE_GROWTH()',
+          desc: 'Assess revenue growth trends and sustainability',
+          cat: '📈 ANALYTICS'
+        },
+        {
+          cmd: 'PRIVATE_RISK()',
+          desc: 'Evaluate business risk factors and volatility',
+          cat: '📈 ANALYTICS'
+        },
+        {
+          cmd: 'PRIVATE_MONTE_CARLO()',
+          desc: 'Monte Carlo simulation for valuation ranges',
+          cat: '📈 ANALYTICS'
+        },
+        {
+          cmd: 'PRIVATE_SCENARIO()',
+          desc: 'Run bull/base/bear case scenario analysis',
+          cat: '📈 ANALYTICS'
+        },
+        {
+          cmd: 'PRIVATE_SENSITIVITY()',
+          desc: 'Sensitivity analysis on key variables',
+          cat: '📈 ANALYTICS'
+        },
 
         // Automation Commands
-        { cmd: 'PRIVATE_WORKFLOW()', desc: 'Interactive analysis workflow with recommendations', cat: '🤖 AUTOMATION' },
+        {
+          cmd: 'PRIVATE_WORKFLOW()',
+          desc: 'Interactive analysis workflow with recommendations',
+          cat: '🤖 AUTOMATION'
+        },
 
         // Reporting Commands
-        { cmd: 'PRIVATE_DASHBOARD()', desc: 'Executive dashboard with key metrics summary', cat: '📋 REPORTING' },
+        {
+          cmd: 'PRIVATE_DASHBOARD()',
+          desc: 'Executive dashboard with key metrics summary',
+          cat: '📋 REPORTING'
+        },
 
         // Data Management Commands
-        { cmd: 'PRIVATE_VALIDATE()', desc: 'Validate data quality and completeness', cat: '💾 DATA MANAGEMENT' },
-        { cmd: 'PRIVATE_EXPORT()', desc: 'Export analysis data and results', cat: '💾 DATA MANAGEMENT' },
+        {
+          cmd: 'PRIVATE_VALIDATE()',
+          desc: 'Validate data quality and completeness',
+          cat: '💾 DATA MANAGEMENT'
+        },
+        {
+          cmd: 'PRIVATE_EXPORT()',
+          desc: 'Export analysis data and results',
+          cat: '💾 DATA MANAGEMENT'
+        },
 
         // Utility Commands
-        { cmd: 'PRIVATE_HELP()', desc: 'Show all available private analysis commands', cat: '🛠️ UTILITY' }
+        {
+          cmd: 'PRIVATE_HELP()',
+          desc: 'Show all available private analysis commands',
+          cat: '🛠️ UTILITY'
+        }
       ];
 
       let content = `🚀 **Private Analysis CLI Commands (${commands.length} Total)**\n\n`;
@@ -1408,7 +1670,8 @@ export const privateAnalysisCommands = {
       content += 'PRIVATE_WORKFLOW()      # Guided analysis\n';
       content += '```\n\n';
 
-      content += '**All commands work with the default private financial data and provide professional-grade analysis suitable for investment banking, private equity, and corporate finance workflows.**';
+      content +=
+        '**All commands work with the default private financial data and provide professional-grade analysis suitable for investment banking, private equity, and corporate finance workflows.**';
 
       return {
         type: 'success',

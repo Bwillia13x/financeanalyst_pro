@@ -41,11 +41,7 @@ class MonteCarloEngine {
       }
 
       // Generate correlated random samples
-      const samples = this.generateCorrelatedSamples(
-        distributions,
-        iterations,
-        correlationMatrix
-      );
+      const samples = this.generateCorrelatedSamples(distributions, iterations, correlationMatrix);
 
       // Run simulation iterations
       const results = [];
@@ -93,7 +89,6 @@ class MonteCarloEngine {
         analysis,
         duration: endTime - startTime
       };
-
     } catch (error) {
       this.isRunning = false;
       apiLogger.log('ERROR', 'DCF Monte Carlo simulation failed', { error: error.message });
@@ -131,11 +126,7 @@ class MonteCarloEngine {
         this.setSeed(randomSeed);
       }
 
-      const samples = this.generateCorrelatedSamples(
-        distributions,
-        iterations,
-        correlationMatrix
-      );
+      const samples = this.generateCorrelatedSamples(distributions, iterations, correlationMatrix);
 
       const results = [];
       const progressCallback = options.onProgress;
@@ -161,7 +152,11 @@ class MonteCarloEngine {
         }
       }
 
-      const analysis = this.analyzeResults(results, confidenceLevel, ['irr', 'moic', 'totalReturn']);
+      const analysis = this.analyzeResults(results, confidenceLevel, [
+        'irr',
+        'moic',
+        'totalReturn'
+      ]);
 
       const endTime = Date.now();
       apiLogger.log('INFO', 'LBO Monte Carlo simulation completed', {
@@ -178,7 +173,6 @@ class MonteCarloEngine {
         analysis,
         duration: endTime - startTime
       };
-
     } catch (error) {
       this.isRunning = false;
       apiLogger.log('ERROR', 'LBO Monte Carlo simulation failed', { error: error.message });
@@ -429,7 +423,9 @@ class MonteCarloEngine {
    */
   choleskyDecomposition(matrix) {
     const n = matrix.length;
-    const L = Array(n).fill().map(() => Array(n).fill(0));
+    const L = Array(n)
+      .fill()
+      .map(() => Array(n).fill(0));
 
     for (let i = 0; i < n; i++) {
       for (let j = 0; j <= i; j++) {
@@ -520,7 +516,7 @@ class MonteCarloEngine {
     let revenue = currentRevenue;
 
     for (let year = 1; year <= projectionYears; year++) {
-      revenue *= (1 + revenueGrowthRate);
+      revenue *= 1 + revenueGrowthRate;
       const fcf = revenue * fcfMargin;
       const pv = fcf / Math.pow(1 + wacc, year);
       totalPV += pv;
@@ -584,7 +580,11 @@ class MonteCarloEngine {
    * @param {Array} metrics - Metrics to analyze
    * @returns {Object} Comprehensive statistical analysis
    */
-  analyzeResults(results, confidenceLevel, metrics = ['pricePerShare', 'enterpriseValue', 'upside']) {
+  analyzeResults(
+    results,
+    confidenceLevel,
+    metrics = ['pricePerShare', 'enterpriseValue', 'upside']
+  ) {
     const analysis = {
       statistics: {},
       percentiles: {},
@@ -595,14 +595,17 @@ class MonteCarloEngine {
     };
 
     metrics.forEach(metric => {
-      const values = results.map(r => r[metric]).filter(v => v !== null && !isNaN(v)).sort((a, b) => a - b);
+      const values = results
+        .map(r => r[metric])
+        .filter(v => v !== null && !isNaN(v))
+        .sort((a, b) => a - b);
 
       if (values.length === 0) return;
 
       const mean = values.reduce((sum, v) => sum + v, 0) / values.length;
       const variance = values.reduce((sum, v) => sum + Math.pow(v - mean, 2), 0) / values.length;
       const stdDev = Math.sqrt(variance);
-      const sampleStdDev = Math.sqrt(variance * values.length / (values.length - 1)); // Bessel's correction
+      const sampleStdDev = Math.sqrt((variance * values.length) / (values.length - 1)); // Bessel's correction
 
       analysis.statistics[metric] = {
         mean,
@@ -624,11 +627,11 @@ class MonteCarloEngine {
       analysis.percentiles[metric] = {
         p1: this.percentile(values, 0.01),
         p5: this.percentile(values, 0.05),
-        p10: this.percentile(values, 0.10),
+        p10: this.percentile(values, 0.1),
         p25: this.percentile(values, 0.25),
         p50: this.percentile(values, 0.5),
         p75: this.percentile(values, 0.75),
-        p90: this.percentile(values, 0.90),
+        p90: this.percentile(values, 0.9),
         p95: this.percentile(values, 0.95),
         p99: this.percentile(values, 0.99)
       };
@@ -648,8 +651,12 @@ class MonteCarloEngine {
 
       const var95 = this.percentile(values, 0.05);
       const var99 = this.percentile(values, 0.01);
-      const cvar95 = values.slice(0, Math.floor(values.length * 0.05)).reduce((sum, v) => sum + v, 0) / Math.floor(values.length * 0.05);
-      const cvar99 = values.slice(0, Math.floor(values.length * 0.01)).reduce((sum, v) => sum + v, 0) / Math.floor(values.length * 0.01);
+      const cvar95 =
+        values.slice(0, Math.floor(values.length * 0.05)).reduce((sum, v) => sum + v, 0) /
+        Math.floor(values.length * 0.05);
+      const cvar99 =
+        values.slice(0, Math.floor(values.length * 0.01)).reduce((sum, v) => sum + v, 0) /
+        Math.floor(values.length * 0.01);
 
       analysis.riskMetrics[metric] = {
         var95, // Value at Risk (5%)
@@ -868,14 +875,14 @@ class MonteCarloEngine {
    */
   logGamma(x) {
     const coef = [
-      76.18009172947144, -86.50532032941676, 24.01409824083091,
-      -1.231739572450155, 0.1208650973866179e-2, -0.5395239384953e-5
+      76.18009172947144, -86.50532032941676, 24.01409824083091, -1.231739572450155,
+      0.1208650973866179e-2, -0.5395239384953e-5
     ];
 
     let j = 0;
     let ser = 1.0000000001900151;
     let xx = x;
-    let y = xx = x;
+    let y = (xx = x);
     let tmp = x + 5.5;
     tmp -= (x + 0.5) * Math.log(tmp);
 
@@ -883,7 +890,7 @@ class MonteCarloEngine {
       ser += coef[j] / ++y;
     }
 
-    return -tmp + Math.log(2.506628274631001 * ser / xx);
+    return -tmp + Math.log((2.506628274631001 * ser) / xx);
   }
 
   /**
@@ -924,18 +931,18 @@ class MonteCarloEngine {
    * Error function approximation
    */
   erf(x) {
-    const a1 =  0.254829592;
+    const a1 = 0.254829592;
     const a2 = -0.284496736;
-    const a3 =  1.421413741;
+    const a3 = 1.421413741;
     const a4 = -1.453152027;
-    const a5 =  1.061405429;
-    const p  =  0.3275911;
+    const a5 = 1.061405429;
+    const p = 0.3275911;
 
     const sign = x < 0 ? -1 : 1;
     x = Math.abs(x);
 
     const t = 1.0 / (1.0 + p * x);
-    const y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
+    const y = 1.0 - ((((a5 * t + a4) * t + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
 
     return sign * y;
   }
@@ -1059,7 +1066,10 @@ class MonteCarloEngine {
   calculateKurtosis(values, mean, stdDev) {
     const n = values.length;
     const sum = values.reduce((sum, v) => sum + Math.pow((v - mean) / stdDev, 4), 0);
-    return ((n * (n + 1)) / ((n - 1) * (n - 2) * (n - 3))) * sum - (3 * Math.pow(n - 1, 2)) / ((n - 2) * (n - 3));
+    return (
+      ((n * (n + 1)) / ((n - 1) * (n - 2) * (n - 3))) * sum -
+      (3 * Math.pow(n - 1, 2)) / ((n - 2) * (n - 3))
+    );
   }
 
   /**

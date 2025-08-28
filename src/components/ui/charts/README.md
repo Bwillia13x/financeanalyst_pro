@@ -14,15 +14,18 @@ A collection of minimal, professional chart components specifically designed for
 ## Components
 
 ### DCFWaterfall
+
 A clean waterfall chart for displaying DCF cash flow components.
 
 **Props:**
+
 - `data` (array): Array of objects with `name`, `value`, and optional `type` properties
 - `title` (string): Chart title
 - `formatValue` (function): Value formatting function
 - `className` (string): Additional CSS classes
 
 **Data Format:**
+
 ```javascript
 const dcfData = [
   { name: 'Free Cash Flow', value: 120, type: 'flow' },
@@ -34,15 +37,18 @@ const dcfData = [
 ```
 
 ### RevenueBreakdown
+
 A minimal pie chart for revenue analysis with hover states and detailed legend.
 
 **Props:**
+
 - `data` (array): Array of objects with `name` and `value` properties
 - `title` (string): Chart title
 - `formatValue` (function): Value formatting function
 - `className` (string): Additional CSS classes
 
 **Data Format:**
+
 ```javascript
 const revenueData = [
   { name: 'Product Sales', value: 450000000 },
@@ -52,9 +58,11 @@ const revenueData = [
 ```
 
 ### TrendLine
+
 A subtle line chart for growth analysis with key metrics display.
 
 **Props:**
+
 - `data` (array): Array of objects with `period` and data key properties
 - `title` (string): Chart title
 - `dataKey` (string): Key for the data values (default: 'value')
@@ -63,6 +71,7 @@ A subtle line chart for growth analysis with key metrics display.
 - `className` (string): Additional CSS classes
 
 **Data Format:**
+
 ```javascript
 const trendData = [
   { period: 'Q1 2023', value: 12.5 },
@@ -72,9 +81,11 @@ const trendData = [
 ```
 
 ### SensitivityHeatmap
+
 A professional heatmap for sensitivity analysis with color-coded cells.
 
 **Props:**
+
 - `data` (array): 2D array of numeric values
 - `xAxisLabels` (array): Labels for x-axis
 - `yAxisLabels` (array): Labels for y-axis
@@ -84,6 +95,7 @@ A professional heatmap for sensitivity analysis with color-coded cells.
 - `className` (string): Additional CSS classes
 
 **Data Format:**
+
 ```javascript
 const sensitivityData = [
   [5.2, 8.7, 12.1, 15.6, 19.0],
@@ -95,15 +107,18 @@ const yAxisLabels = ['Revenue Growth', 'EBITDA Margin', 'Terminal Growth'];
 ```
 
 ### MetricsDashboard
+
 A clean dashboard for displaying key financial metrics with trend indicators.
 
 **Props:**
+
 - `metrics` (array): Array of metric objects
 - `title` (string): Dashboard title
 - `columns` (number): Number of columns (2-6, default: 4)
 - `className` (string): Additional CSS classes
 
 **Metric Object Format:**
+
 ```javascript
 const metrics = [
   {
@@ -121,6 +136,7 @@ const metrics = [
 ```
 
 **Supported Formats:**
+
 - `currency`: Displays as $XXXm format
 - `percentage`: Displays with % symbol
 - `ratio`: Displays with 2 decimal places
@@ -130,47 +146,41 @@ const metrics = [
 ## Usage Examples
 
 ### Basic Usage
+
 ```jsx
 import { DCFWaterfall, RevenueBreakdown, TrendLine } from '@/components/ui/charts';
 
 function AnalysisPage() {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <DCFWaterfall 
-        data={dcfData}
-        title="DCF Valuation Components"
-      />
-      <RevenueBreakdown 
-        data={revenueData}
-        title="Revenue Analysis"
-      />
+      <DCFWaterfall data={dcfData} title="DCF Valuation Components" />
+      <RevenueBreakdown data={revenueData} title="Revenue Analysis" />
     </div>
   );
 }
 ```
 
 ### Custom Formatting
+
 ```jsx
-<TrendLine 
+<TrendLine
   data={trendData}
   title="Revenue Growth"
-  formatValue={(value) => `${value.toFixed(1)}%`}
+  formatValue={value => `${value.toFixed(1)}%`}
   showGrowthRate={true}
 />
 ```
 
 ### Metrics Dashboard with Categories
+
 ```jsx
-<MetricsDashboard 
-  metrics={metricsWithCategories}
-  title="Q4 2024 Performance"
-  columns={3}
-/>
+<MetricsDashboard metrics={metricsWithCategories} title="Q4 2024 Performance" columns={3} />
 ```
 
 ## Styling
 
 Components use the application's design system CSS variables:
+
 - `--color-primary`: Main brand color
 - `--color-secondary`: Accent color
 - `--color-foreground`: Text color
@@ -191,6 +201,7 @@ All components are fully responsive and include hover states, tooltips, and acce
 ## Accessibility
 
 All components include:
+
 - Proper ARIA labels
 - Keyboard navigation support
 - High contrast color ratios

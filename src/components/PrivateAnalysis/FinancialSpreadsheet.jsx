@@ -1,4 +1,12 @@
-import { Plus, ChevronDown, ChevronRight, Calculator, FileText, TrendingUp, Edit2 } from 'lucide-react';
+import {
+  Plus,
+  ChevronDown,
+  ChevronRight,
+  Calculator,
+  FileText,
+  TrendingUp,
+  Edit2
+} from 'lucide-react';
 import React, { useState, useRef, useEffect } from 'react';
 
 import { useFinancialAccessibility } from '../../hooks/useAccessibility';
@@ -8,7 +16,8 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
   const [adjustedValues, setAdjustedValues] = useState({});
 
   // Add accessibility monitoring for financial spreadsheet
-  const { elementRef: _elementRef, testFinancialFeatures: _testFinancialFeatures } = useFinancialAccessibility('spreadsheet');
+  const { elementRef: _elementRef, testFinancialFeatures: _testFinancialFeatures } =
+    useFinancialAccessibility('spreadsheet');
   const [expandedSections, setExpandedSections] = useState({
     // Income Statement
     revenue: true,
@@ -54,6 +63,27 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
     }
   }, [data, adjustedValues, onAdjustedValuesChange]);
 
+  useEffect(() => {
+    if (editingCell && inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.select();
+    }
+  }, [editingCell]);
+
+  // Early return if data is not available yet - AFTER all hooks are called
+  if (!data || !data.periods || !data.statements) {
+    return (
+      <section aria-busy="true" aria-label="Financial Spreadsheet" data-testid="financial-spreadsheet">
+        <div className="bg-slate-900 rounded-lg shadow-lg p-8">
+          <div className="text-center text-gray-400">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-4" />
+            <p>Loading financial data...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   // Get current template based on active statement
   const getCurrentTemplate = () => {
     switch (activeStatement) {
@@ -65,7 +95,6 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
         return incomeStatementTemplate;
     }
   };
-
 
   // Income Statement Template Structure with Enhanced Color Coding
   const incomeStatementTemplate = {
@@ -96,7 +125,13 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
         { key: 'weightlossCogs', label: 'Weightloss', level: 1 },
         { key: 'retailProducts', label: 'Retail Products', level: 1 },
         { key: 'surgicalSupplies', label: 'Surgical Supplies', level: 1 },
-        { key: 'totalCostOfGoodsSold', label: 'Total Cost of Goods Sold', level: 0, bold: true, formula: true }
+        {
+          key: 'totalCostOfGoodsSold',
+          label: 'Total Cost of Goods Sold',
+          level: 0,
+          bold: true,
+          formula: true
+        }
       ]
     },
     grossProfit: {
@@ -104,9 +139,7 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
       color: 'bg-blue-50 border-blue-300',
       headerBg: 'bg-blue-600',
       textColor: 'text-blue-900',
-      items: [
-        { key: 'grossProfit', label: 'Gross Profit', level: 0, bold: true, formula: true }
-      ]
+      items: [{ key: 'grossProfit', label: 'Gross Profit', level: 0, bold: true, formula: true }]
     },
     salariesBenefits: {
       title: 'Salaries & Benefits',
@@ -117,7 +150,13 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
         { key: 'employeeBenefits', label: 'Employee Benefits', level: 1 },
         { key: 'payroll', label: 'Payroll', level: 1 },
         { key: 'payrollTaxes', label: 'Payroll Taxes', level: 1 },
-        { key: 'totalSalariesBenefits', label: 'Total Salaries & Benefits', level: 0, bold: true, formula: true }
+        {
+          key: 'totalSalariesBenefits',
+          label: 'Total Salaries & Benefits',
+          level: 0,
+          bold: true,
+          formula: true
+        }
       ]
     },
     operatingExpenses: {
@@ -130,7 +169,11 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
         { key: 'automobile', label: 'Automobile', level: 1 },
         { key: 'creditCardBankCharges', label: 'Credit Card and Bank Charges', level: 1 },
         { key: 'donations', label: 'Donations', level: 1 },
-        { key: 'computerTelephoneUtilities', label: 'Computer, Telephone, and Utilities', level: 1 },
+        {
+          key: 'computerTelephoneUtilities',
+          label: 'Computer, Telephone, and Utilities',
+          level: 1
+        },
         { key: 'depreciation', label: 'Depreciation', level: 1 },
         { key: 'duesSubscriptions', label: 'Dues & Subscriptions', level: 1 },
         { key: 'education', label: 'Education', level: 1 },
@@ -144,7 +187,13 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
         { key: 'repairsMaintenance', label: 'Repairs & Maintenance', level: 1 },
         { key: 'localTax', label: 'Local Tax', level: 1 },
         { key: 'stateTax', label: 'State Tax', level: 1 },
-        { key: 'totalOperatingExpense', label: 'Total Operating Expense', level: 0, bold: true, formula: true }
+        {
+          key: 'totalOperatingExpense',
+          label: 'Total Operating Expense',
+          level: 0,
+          bold: true,
+          formula: true
+        }
       ]
     },
     operatingIncome: {
@@ -152,9 +201,7 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
       color: 'bg-teal-50 border-teal-300',
       headerBg: 'bg-teal-600',
       textColor: 'text-teal-900',
-      items: [
-        { key: 'operatingIncome', label: 'Operating Income', level: 0, bold: true }
-      ]
+      items: [{ key: 'operatingIncome', label: 'Operating Income', level: 0, bold: true }]
     },
     otherIncomeExpense: {
       title: 'Other Income / (Expense)',
@@ -165,7 +212,13 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
         { key: 'gainOnAssetSale', label: 'Gain (Loss) On Asset Sale', level: 1 },
         { key: 'interestIncome', label: 'Interest Income', level: 1 },
         { key: 'otherExpenses', label: 'Other Expenses', level: 1 },
-        { key: 'totalOtherIncomeExpense', label: 'Total Other Income / (Expenses)', level: 0, bold: true, formula: true }
+        {
+          key: 'totalOtherIncomeExpense',
+          label: 'Total Other Income / (Expenses)',
+          level: 0,
+          bold: true,
+          formula: true
+        }
       ]
     },
     incomeBeforeTax: {
@@ -173,9 +226,7 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
       color: 'bg-amber-50 border-amber-300',
       headerBg: 'bg-amber-600',
       textColor: 'text-amber-900',
-      items: [
-        { key: 'incomeBeforeTax', label: 'Net Income Before Taxes', level: 0, bold: true }
-      ]
+      items: [{ key: 'incomeBeforeTax', label: 'Net Income Before Taxes', level: 0, bold: true }]
     }
   };
 
@@ -192,7 +243,13 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
         { key: 'inventory', label: 'Inventory', level: 1 },
         { key: 'prepaidExpenses', label: 'Prepaid Expenses', level: 1 },
         { key: 'otherCurrentAssets', label: 'Other Current Assets', level: 1 },
-        { key: 'totalCurrentAssets', label: 'Total Current Assets', level: 0, formula: true, bold: true }
+        {
+          key: 'totalCurrentAssets',
+          label: 'Total Current Assets',
+          level: 0,
+          formula: true,
+          bold: true
+        }
       ]
     },
     nonCurrentAssets: {
@@ -207,7 +264,13 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
         { key: 'intangibleAssets', label: 'Intangible Assets', level: 1 },
         { key: 'goodwill', label: 'Goodwill', level: 1 },
         { key: 'otherNonCurrentAssets', label: 'Other Non-Current Assets', level: 1 },
-        { key: 'totalNonCurrentAssets', label: 'Total Non-Current Assets', level: 0, formula: true, bold: true }
+        {
+          key: 'totalNonCurrentAssets',
+          label: 'Total Non-Current Assets',
+          level: 0,
+          formula: true,
+          bold: true
+        }
       ]
     },
     totalAssets: {
@@ -215,9 +278,7 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
       color: 'bg-slate-50 border-slate-300',
       headerBg: 'bg-slate-700',
       textColor: 'text-slate-900',
-      items: [
-        { key: 'totalAssets', label: 'Total Assets', level: 0, formula: true, bold: true }
-      ]
+      items: [{ key: 'totalAssets', label: 'Total Assets', level: 0, formula: true, bold: true }]
     },
     currentLiabilities: {
       title: 'Current Liabilities',
@@ -230,7 +291,13 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
         { key: 'shortTermDebt', label: 'Short-term Debt', level: 1 },
         { key: 'currentPortionLongTermDebt', label: 'Current Portion of Long-term Debt', level: 1 },
         { key: 'otherCurrentLiabilities', label: 'Other Current Liabilities', level: 1 },
-        { key: 'totalCurrentLiabilities', label: 'Total Current Liabilities', level: 0, formula: true, bold: true }
+        {
+          key: 'totalCurrentLiabilities',
+          label: 'Total Current Liabilities',
+          level: 0,
+          formula: true,
+          bold: true
+        }
       ]
     },
     nonCurrentLiabilities: {
@@ -242,7 +309,13 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
         { key: 'longTermDebt', label: 'Long-term Debt', level: 1 },
         { key: 'deferredTaxLiabilities', label: 'Deferred Tax Liabilities', level: 1 },
         { key: 'otherNonCurrentLiabilities', label: 'Other Non-Current Liabilities', level: 1 },
-        { key: 'totalNonCurrentLiabilities', label: 'Total Non-Current Liabilities', level: 0, formula: true, bold: true }
+        {
+          key: 'totalNonCurrentLiabilities',
+          label: 'Total Non-Current Liabilities',
+          level: 0,
+          formula: true,
+          bold: true
+        }
       ]
     },
     totalLiabilities: {
@@ -255,7 +328,7 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
       ]
     },
     equity: {
-      title: 'Shareholders\' Equity',
+      title: "Shareholders' Equity",
       color: 'bg-purple-50 border-purple-300',
       headerBg: 'bg-purple-600',
       textColor: 'text-purple-900',
@@ -263,7 +336,13 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
         { key: 'commonStock', label: 'Common Stock', level: 1 },
         { key: 'retainedEarnings', label: 'Retained Earnings', level: 1 },
         { key: 'otherEquity', label: 'Other Comprehensive Income', level: 1 },
-        { key: 'totalEquity', label: 'Total Shareholders\' Equity', level: 0, formula: true, bold: true }
+        {
+          key: 'totalEquity',
+          label: "Total Shareholders' Equity",
+          level: 0,
+          formula: true,
+          bold: true
+        }
       ]
     },
     totalLiabilitiesEquity: {
@@ -272,7 +351,13 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
       headerBg: 'bg-slate-700',
       textColor: 'text-slate-900',
       items: [
-        { key: 'totalLiabilitiesEquity', label: 'Total Liabilities and Shareholders\' Equity', level: 0, formula: true, bold: true }
+        {
+          key: 'totalLiabilitiesEquity',
+          label: "Total Liabilities and Shareholders' Equity",
+          level: 0,
+          formula: true,
+          bold: true
+        }
       ]
     }
   };
@@ -291,7 +376,13 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
         { key: 'inventoryChange', label: 'Change in Inventory', level: 1 },
         { key: 'payablesChange', label: 'Change in Accounts Payable', level: 1 },
         { key: 'otherOperatingChanges', label: 'Other Operating Changes', level: 1 },
-        { key: 'netCashFromOperating', label: 'Net Cash from Operating Activities', level: 0, formula: true, bold: true }
+        {
+          key: 'netCashFromOperating',
+          label: 'Net Cash from Operating Activities',
+          level: 0,
+          formula: true,
+          bold: true
+        }
       ]
     },
     investingActivities: {
@@ -304,7 +395,13 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
         { key: 'acquisitions', label: 'Acquisitions', level: 1 },
         { key: 'assetSales', label: 'Asset Sales', level: 1 },
         { key: 'otherInvestingActivities', label: 'Other Investing Activities', level: 1 },
-        { key: 'netCashFromInvesting', label: 'Net Cash from Investing Activities', level: 0, formula: true, bold: true }
+        {
+          key: 'netCashFromInvesting',
+          label: 'Net Cash from Investing Activities',
+          level: 0,
+          formula: true,
+          bold: true
+        }
       ]
     },
     financingActivities: {
@@ -318,7 +415,13 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
         { key: 'equityIssuance', label: 'Equity Issuance', level: 1 },
         { key: 'dividends', label: 'Dividends Paid', level: 1 },
         { key: 'otherFinancingActivities', label: 'Other Financing Activities', level: 1 },
-        { key: 'netCashFromFinancing', label: 'Net Cash from Financing Activities', level: 0, formula: true, bold: true }
+        {
+          key: 'netCashFromFinancing',
+          label: 'Net Cash from Financing Activities',
+          level: 0,
+          formula: true,
+          bold: true
+        }
       ]
     },
     netCashFlow: {
@@ -336,7 +439,7 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
 
   const currentTemplate = getCurrentTemplate();
 
-  const toggleSection = (section) => {
+  const toggleSection = section => {
     setExpandedSections(prev => ({
       ...prev,
       [section]: !prev[section]
@@ -386,7 +489,7 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
     }
   };
 
-  const handleKeyPress = (e) => {
+  const handleKeyPress = e => {
     if (e.key === 'Enter') {
       e.preventDefault();
       handleCellBlur();
@@ -402,13 +505,13 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
   };
 
   // Input validation for numeric values
-  const validateNumericInput = (value) => {
+  const validateNumericInput = value => {
     // Allow negative numbers, decimals, and empty strings
     const numericRegex = /^-?\d*\.?\d*$/;
     return numericRegex.test(value) || value === '';
   };
 
-  const formatNumber = (value) => {
+  const formatNumber = value => {
     if (!value && value !== 0) return '';
 
     // Convert to number if it's a string
@@ -461,14 +564,7 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
     }
   };
 
-  useEffect(() => {
-    if (editingCell && inputRef.current) {
-      inputRef.current.focus();
-      inputRef.current.select();
-    }
-  }, [editingCell]);
-
-  const renderRow = (item) => {
+  const renderRow = item => {
     const { key, label, level, formula, bold } = item;
 
     // Enhanced spacing and visual hierarchy
@@ -480,9 +576,10 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
     const borderColor = level === 0 ? 'border-slate-200' : 'border-slate-100';
 
     // Screen reader context
-    const ariaLabel = level === 0
-      ? `${label}, total or summary line item${formula ? ', calculated automatically' : ''}`
-      : `${label}, detail line item${formula ? ', calculated automatically' : ', editable'}`;
+    const ariaLabel =
+      level === 0
+        ? `${label}, total or summary line item${formula ? ', calculated automatically' : ''}`
+        : `${label}, detail line item${formula ? ', calculated automatically' : ', editable'}`;
 
     return (
       <tr
@@ -511,12 +608,13 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
             {formula && (
               <div className="flex items-center gap-1">
                 <Calculator size={14} className="text-blue-500/80 flex-shrink-0" />
-                <span className="text-xs text-blue-600 font-medium px-1.5 py-0.5 bg-blue-50 rounded-md">AUTO</span>
+                <span className="text-xs text-blue-600 font-medium px-1.5 py-0.5 bg-blue-50 rounded-md">
+                  AUTO
+                </span>
               </div>
             )}
           </div>
         </td>
-
         {/* Units Column */}
         <td
           className="px-4 py-4 text-center"
@@ -541,13 +639,15 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
               headers={`period-${periodIndex}-header account-header`}
               aria-label={cellAriaLabel}
             >
-              {editingCell?.rowKey === key && editingCell?.periodIndex === periodIndex && !editingCell?.isAdjusted ? (
+              {editingCell?.rowKey === key &&
+              editingCell?.periodIndex === periodIndex &&
+              !editingCell?.isAdjusted ? (
                 <div className="relative">
                   <input
                     ref={inputRef}
                     type="text"
                     value={cellValue}
-                    onChange={(e) => {
+                    onChange={e => {
                       const newValue = e.target.value;
                       if (validateNumericInput(newValue)) {
                         setCellValue(newValue);
@@ -557,6 +657,7 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
                     onKeyDown={handleKeyPress}
                     className="w-full px-3 py-2.5 bg-white border-2 border-blue-400 rounded-lg text-slate-900 text-right font-mono text-sm focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 shadow-lg"
                     placeholder="0.00"
+                    data-metric={key}
                   />
                   <div className="absolute -top-2 -right-2 flex gap-1">
                     <button
@@ -588,7 +689,8 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
                   tabIndex={formula ? -1 : 0}
                   aria-label={cellAriaLabel}
                   aria-readonly={formula}
-                  onKeyDown={(e) => {
+                  data-metric={key}
+                  onKeyDown={e => {
                     if ((e.key === 'Enter' || e.key === ' ') && !formula) {
                       e.preventDefault();
                       handleCellClick(key, periodIndex);
@@ -599,7 +701,10 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
                     {formatNumber(data.statements.incomeStatement[key]?.[periodIndex]) || '—'}
                   </span>
                   {!formula && (
-                    <Edit2 size={12} className="ml-2 opacity-0 group-hover:opacity-40 text-slate-400 transition-opacity" />
+                    <Edit2
+                      size={12}
+                      className="ml-2 opacity-0 group-hover:opacity-40 text-slate-400 transition-opacity"
+                    />
                   )}
                 </div>
               )}
@@ -619,7 +724,7 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
                 ref={inputRef}
                 type="text"
                 value={cellValue}
-                onChange={(e) => {
+                onChange={e => {
                   const newValue = e.target.value;
                   if (validateNumericInput(newValue)) {
                     setCellValue(newValue);
@@ -629,6 +734,7 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
                 onKeyDown={handleKeyPress}
                 className="w-full px-3 py-2.5 bg-white border-2 border-amber-400 rounded-lg text-slate-900 text-right font-mono text-sm focus:outline-none focus:ring-4 focus:ring-amber-100 focus:border-amber-500 shadow-lg"
                 placeholder="0.00"
+                data-metric={key}
               />
               <div className="absolute -top-2 -right-2 flex gap-1">
                 <button
@@ -660,7 +766,8 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
               tabIndex={formula ? -1 : 0}
               aria-label={`${label} adjusted value: ${formatNumber(adjustedValues[key] || 0) || 'no value'} thousand dollars${formula ? ', calculated automatically' : ', click to edit'}`}
               aria-readonly={formula}
-              onKeyDown={(e) => {
+              data-metric={key}
+              onKeyDown={e => {
                 if ((e.key === 'Enter' || e.key === ' ') && !formula) {
                   e.preventDefault();
                   handleCellClick(key, null, true);
@@ -671,7 +778,10 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
                 {formatNumber(adjustedValues[key] || 0) || '—'}
               </span>
               {!formula && (
-                <Edit2 size={12} className="ml-2 opacity-0 group-hover:opacity-40 text-amber-500 transition-opacity" />
+                <Edit2
+                  size={12}
+                  className="ml-2 opacity-0 group-hover:opacity-40 text-amber-500 transition-opacity"
+                />
               )}
             </div>
           )}
@@ -707,12 +817,21 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
     );
   };
 
-  return (
-    <div className="bg-slate-900 rounded-lg shadow-lg">
+return (
+  <section
+    aria-labelledby="financial-spreadsheet-title"
+    className="bg-slate-900 rounded-lg shadow-lg"
+    data-testid="financial-spreadsheet"
+  >
       {/* Header */}
       <div className="p-4 sm:p-6 border-b border-slate-700">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <h2 className="text-lg sm:text-xl font-semibold text-white">Financial Statements</h2>
+          <h2
+            id="financial-spreadsheet-title"
+            className="text-lg sm:text-xl font-semibold text-white"
+          >
+            Financial Statements
+          </h2>
           <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
             <button
               onClick={addPeriod}
@@ -724,7 +843,7 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
             </button>
             <select
               value={activeStatement}
-              onChange={(e) => setActiveStatement(e.target.value)}
+              onChange={e => setActiveStatement(e.target.value)}
               className="px-3 py-2 sm:px-4 sm:py-2.5 bg-white border border-slate-300 rounded-lg text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium shadow-sm text-sm sm:text-base"
             >
               <option value="incomeStatement">Income Statement</option>
@@ -749,8 +868,8 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
                 <tr className="sr-only">
                   <td colSpan={data.periods.length + 4}>
                     <div className="p-2 text-sm">
-                      Financial spreadsheet table. Use arrow keys to navigate between cells.
-                      Press Enter or Space to edit values. Press Tab to move to next editable cell.
+                      Financial spreadsheet table. Use arrow keys to navigate between cells. Press
+                      Enter or Space to edit values. Press Tab to move to next editable cell.
                       Formula cells are calculated automatically and cannot be edited.
                     </div>
                   </td>
@@ -824,8 +943,11 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
                       role="rowheader"
                       aria-label={`${section.title} section header`}
                       data-tour={
-                        sectionKey === 'revenue' ? 'revenue-section' :
-                          sectionKey === 'operatingExpenses' ? 'expense-section' : undefined
+                        sectionKey === 'revenue'
+                          ? 'revenue-section'
+                          : sectionKey === 'operatingExpenses'
+                            ? 'expense-section'
+                            : undefined
                       }
                     >
                       <td colSpan={data.periods.length + 4} className="py-4 px-6">
@@ -835,15 +957,16 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
                             className="flex items-center gap-3 text-white hover:text-slate-200 transition-colors flex-1"
                           >
                             <div className="flex items-center justify-center w-6 h-6 rounded-full bg-white/20 group-hover:bg-white/30 transition-colors">
-                              {expandedSections[sectionKey] ?
-                                <ChevronDown size={14} /> :
+                              {expandedSections[sectionKey] ? (
+                                <ChevronDown size={14} />
+                              ) : (
                                 <ChevronRight size={14} />
-                              }
+                              )}
                             </div>
                             <span className="font-bold text-lg">{section.title}</span>
                           </button>
                           <button
-                            onClick={(e) => {
+                            onClick={e => {
                               e.stopPropagation();
                               addNewRow();
                             }}
@@ -857,9 +980,7 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
                     </tr>
 
                     {/* Section Rows */}
-                    {expandedSections[sectionKey] && section.items.map(item =>
-                      renderRow(item)
-                    )}
+                    {expandedSections[sectionKey] && section.items.map(item => renderRow(item))}
                   </React.Fragment>
                 ))}
               </tbody>
@@ -924,8 +1045,8 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
           </div>
         </div>
       </div>
-    </div>
-  );
+  </section>
+);
 };
 
 export default FinancialSpreadsheet;

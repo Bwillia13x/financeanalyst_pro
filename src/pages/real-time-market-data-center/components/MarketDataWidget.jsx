@@ -1,4 +1,3 @@
-
 import Icon from '../../../components/AppIcon';
 
 const MarketDataWidget = ({ widget, onResize, onRemove }) => {

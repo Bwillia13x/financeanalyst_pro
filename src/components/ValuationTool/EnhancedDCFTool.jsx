@@ -1,7 +1,16 @@
 import { motion } from 'framer-motion';
 import { Calculator, Download, BarChart3, TrendingUp, AlertCircle, ArrowLeft } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer
+} from 'recharts';
 
 import { calculateEnhancedDCF, calculateSensitivityAnalysis } from '../../utils/dcfCalculations';
 
@@ -30,7 +39,7 @@ const EnhancedDCFTool = ({ onBack }) => {
     return () => clearTimeout(timer);
   }, [inputs]);
 
-  const calculateDCF = async() => {
+  const calculateDCF = async () => {
     if (!inputs.currentRevenue || inputs.currentRevenue <= 0) {
       setResults(null);
       setSensitivityResults(null);
@@ -53,7 +62,7 @@ const EnhancedDCFTool = ({ onBack }) => {
     setLoading(false);
   };
 
-  const formatCurrency = (value) => {
+  const formatCurrency = value => {
     if (!value && value !== 0) return '$0';
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -63,9 +72,9 @@ const EnhancedDCFTool = ({ onBack }) => {
     }).format(value);
   };
 
-  const formatPercent = (value) => {
+  const formatPercent = value => {
     if (!value && value !== 0) return '0%';
-    return `${(value).toFixed(1)}%`;
+    return `${value.toFixed(1)}%`;
   };
 
   const generateChartData = () => {
@@ -94,7 +103,10 @@ const EnhancedDCFTool = ({ onBack }) => {
                   Metric
                 </th>
                 {results.projectionTable.map((row, index) => (
-                  <th key={index} className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th
+                    key={index}
+                    className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
                     Year {row.year}
                   </th>
                 ))}
@@ -102,65 +114,105 @@ const EnhancedDCFTool = ({ onBack }) => {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               <tr>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Revenue</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  Revenue
+                </td>
                 {results.projectionTable.map((row, index) => (
-                  <td key={index} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
+                  <td
+                    key={index}
+                    className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right"
+                  >
                     {formatCurrency(row.revenue)}
                   </td>
                 ))}
               </tr>
               <tr className="bg-gray-50">
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Revenue Growth %</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  Revenue Growth %
+                </td>
                 {results.projectionTable.map((row, index) => (
-                  <td key={index} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
+                  <td
+                    key={index}
+                    className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right"
+                  >
                     {formatPercent(row.revenueGrowth)}
                   </td>
                 ))}
               </tr>
               <tr>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">EBITDA</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  EBITDA
+                </td>
                 {results.projectionTable.map((row, index) => (
-                  <td key={index} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
+                  <td
+                    key={index}
+                    className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right"
+                  >
                     {formatCurrency(row.ebitda)}
                   </td>
                 ))}
               </tr>
               <tr className="bg-gray-50">
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">EBIT</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  EBIT
+                </td>
                 {results.projectionTable.map((row, index) => (
-                  <td key={index} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
+                  <td
+                    key={index}
+                    className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right"
+                  >
                     {formatCurrency(row.ebit)}
                   </td>
                 ))}
               </tr>
               <tr>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">NOPAT</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  NOPAT
+                </td>
                 {results.projectionTable.map((row, index) => (
-                  <td key={index} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
+                  <td
+                    key={index}
+                    className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right"
+                  >
                     {formatCurrency(row.nopat)}
                   </td>
                 ))}
               </tr>
               <tr className="bg-gray-50">
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">CapEx</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  CapEx
+                </td>
                 {results.projectionTable.map((row, index) => (
-                  <td key={index} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
+                  <td
+                    key={index}
+                    className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right"
+                  >
                     {formatCurrency(row.capex)}
                   </td>
                 ))}
               </tr>
               <tr>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Δ Working Capital</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  Δ Working Capital
+                </td>
                 {results.projectionTable.map((row, index) => (
-                  <td key={index} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
+                  <td
+                    key={index}
+                    className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right"
+                  >
                     {formatCurrency(row.deltaWorkingCapital)}
                   </td>
                 ))}
               </tr>
               <tr className="bg-blue-50">
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-blue-900">Free Cash Flow</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-blue-900">
+                  Free Cash Flow
+                </td>
                 {results.projectionTable.map((row, index) => (
-                  <td key={index} className="px-6 py-4 whitespace-nowrap text-sm font-bold text-blue-900 text-right">
+                  <td
+                    key={index}
+                    className="px-6 py-4 whitespace-nowrap text-sm font-bold text-blue-900 text-right"
+                  >
                     {formatCurrency(row.freeCashFlow)}
                   </td>
                 ))}
@@ -195,7 +247,10 @@ const EnhancedDCFTool = ({ onBack }) => {
                   WACC \ Terminal Growth
                 </th>
                 {terminalGrowthRange.map(rate => (
-                  <th key={rate} className="px-4 py-3 text-center text-xs font-medium text-gray-500 bg-gray-50">
+                  <th
+                    key={rate}
+                    className="px-4 py-3 text-center text-xs font-medium text-gray-500 bg-gray-50"
+                  >
                     {formatPercent(rate)}
                   </th>
                 ))}
@@ -208,8 +263,9 @@ const EnhancedDCFTool = ({ onBack }) => {
                     {formatPercent(waccRange[rowIndex])}
                   </td>
                   {row.map((cell, cellIndex) => {
-                    const isBaseCase = rowIndex === Math.floor(matrix.length / 2) &&
-                                      cellIndex === Math.floor(row.length / 2);
+                    const isBaseCase =
+                      rowIndex === Math.floor(matrix.length / 2) &&
+                      cellIndex === Math.floor(row.length / 2);
                     return (
                       <td
                         key={cellIndex}
@@ -253,18 +309,17 @@ const EnhancedDCFTool = ({ onBack }) => {
               </button>
             )}
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Enhanced DCF Analysis Tool
-          </h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Enhanced DCF Analysis Tool</h1>
           <p className="text-gray-600">
-            Professional discounted cash flow modeling with year-by-year projections and sensitivity analysis
+            Professional discounted cash flow modeling with year-by-year projections and sensitivity
+            analysis
           </p>
         </div>
 
         {/* Navigation Tabs */}
         <div className="border-b border-gray-200 mb-8">
           <nav className="-mb-px flex space-x-8">
-            {tabs.map((tab) => {
+            {tabs.map(tab => {
               const Icon = tab.icon;
               return (
                 <button
@@ -345,15 +400,21 @@ const EnhancedDCFTool = ({ onBack }) => {
                     <div className="space-y-3">
                       <div className="flex justify-between items-center">
                         <span className="text-gray-600">PV of Projection Period FCFs</span>
-                        <span className="font-semibold">{formatCurrency(results.cumulativePV)}</span>
+                        <span className="font-semibold">
+                          {formatCurrency(results.cumulativePV)}
+                        </span>
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-gray-600">PV of Terminal Value</span>
-                        <span className="font-semibold">{formatCurrency(results.presentValueTerminal)}</span>
+                        <span className="font-semibold">
+                          {formatCurrency(results.presentValueTerminal)}
+                        </span>
                       </div>
                       <div className="border-t pt-3 flex justify-between items-center">
                         <span className="text-gray-900 font-semibold">Enterprise Value</span>
-                        <span className="font-bold text-lg">{formatCurrency(results.enterpriseValue)}</span>
+                        <span className="font-bold text-lg">
+                          {formatCurrency(results.enterpriseValue)}
+                        </span>
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-gray-600">Less: Net Debt</span>
@@ -361,7 +422,9 @@ const EnhancedDCFTool = ({ onBack }) => {
                       </div>
                       <div className="border-t pt-3 flex justify-between items-center">
                         <span className="text-gray-900 font-semibold">Equity Value</span>
-                        <span className="font-bold text-lg text-blue-600">{formatCurrency(results.equityValue)}</span>
+                        <span className="font-bold text-lg text-blue-600">
+                          {formatCurrency(results.equityValue)}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -384,7 +447,7 @@ const EnhancedDCFTool = ({ onBack }) => {
                           <CartesianGrid strokeDasharray="3 3" />
                           <XAxis dataKey="year" />
                           <YAxis
-                            tickFormatter={(value) =>
+                            tickFormatter={value =>
                               new Intl.NumberFormat('en-US', {
                                 style: 'currency',
                                 currency: 'USD',
@@ -393,7 +456,7 @@ const EnhancedDCFTool = ({ onBack }) => {
                             }
                           />
                           <Tooltip
-                            formatter={(value) => [
+                            formatter={value => [
                               new Intl.NumberFormat('en-US', {
                                 style: 'currency',
                                 currency: 'USD'
@@ -425,9 +488,7 @@ const EnhancedDCFTool = ({ onBack }) => {
           )}
 
           {activeTab === 'sensitivity' && (
-            <div className="space-y-6">
-              {sensitivityResults && renderSensitivityTable()}
-            </div>
+            <div className="space-y-6">{sensitivityResults && renderSensitivityTable()}</div>
           )}
         </motion.div>
 

@@ -205,20 +205,20 @@ const FormulaBuilder = ({ onFormulaCreate, variables: _variables }) => {
 
       {/* Function Categories */}
       <div className="flex border-b border-border">
-        {Object.entries(functionCategories).map(([key, category]) => (
-          <button
-            key={key}
-            onClick={() => setSelectedCategory(key)}
-            className={`flex items-center space-x-2 px-4 py-3 text-sm font-medium transition-smooth ${
-              selectedCategory === key
-                ? 'bg-primary text-primary-foreground border-b-2 border-primary'
-                : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-            }`}
-          >
-            <Icon name={category.icon} size={16} />
-            <span>{category.name}</span>
-          </button>
-        ))}
+        {Object.entries(functionCategories).map(([key, category]) => {
+          const tabClasses = [
+            'flex items-center space-x-2 px-4 py-3 text-sm font-medium transition-smooth',
+            selectedCategory === key
+              ? 'bg-primary text-primary-foreground border-b-2 border-primary'
+              : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+          ].join(' ');
+          return (
+            <button key={key} onClick={() => setSelectedCategory(key)} className={tabClasses}>
+              <Icon name={category.icon} size={16} />
+              <span>{category.name}</span>
+            </button>
+          );
+        })}
       </div>
 
       {/* Function Library */}
@@ -299,7 +299,12 @@ const FormulaBuilder = ({ onFormulaCreate, variables: _variables }) => {
         <div className="border-t border-border bg-background">
           <div className="p-4 space-y-4">
             <div>
-              <label htmlFor="formula-name-input" className="text-sm font-medium text-foreground mb-2 block">Formula Name</label>
+              <label
+                htmlFor="formula-name-input"
+                className="text-sm font-medium text-foreground mb-2 block"
+              >
+                Formula Name
+              </label>
               <input
                 id="formula-name-input"
                 type="text"
@@ -311,7 +316,10 @@ const FormulaBuilder = ({ onFormulaCreate, variables: _variables }) => {
             </div>
 
             <div>
-              <label htmlFor="formula-expression-input" className="text-sm font-medium text-foreground mb-2 block">
+              <label
+                htmlFor="formula-expression-input"
+                className="text-sm font-medium text-foreground mb-2 block"
+              >
                 Formula Expression
               </label>
               <div
@@ -349,17 +357,11 @@ const FormulaBuilder = ({ onFormulaCreate, variables: _variables }) => {
             </div>
 
             <div className="flex items-center justify-between">
-              <Button
-                variant="outline" size="sm" iconName="Trash2"
-                onClick={clearFormula}
-              >
+              <Button variant="outline" size="sm" iconName="Trash2" onClick={clearFormula}>
                 Clear
               </Button>
               <div className="flex items-center space-x-2">
-                <Button
-                  variant="outline" size="sm" iconName="Eye"
-                  disabled={!validateFormula()}
-                >
+                <Button variant="outline" size="sm" iconName="Eye" disabled={!validateFormula()}>
                   Preview
                 </Button>
                 <Button

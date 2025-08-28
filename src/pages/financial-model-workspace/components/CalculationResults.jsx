@@ -54,7 +54,7 @@ const CalculationResults = ({ results: _results, onExport }) => {
     { id: 'multiples', label: 'Multiples', icon: 'Layers' }
   ];
 
-  const _toggleSection = (sectionId) => {
+  const _toggleSection = sectionId => {
     const newExpanded = new Set(expandedSections);
     if (newExpanded.has(sectionId)) {
       newExpanded.delete(sectionId);

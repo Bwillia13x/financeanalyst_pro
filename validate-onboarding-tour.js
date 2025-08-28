@@ -17,7 +17,7 @@ console.log('🚀 Onboarding Tour Validation\n');
 // 1. Verify all tour targets exist in the codebase
 const tourTargets = [
   'financial-spreadsheet-tab',
-  'financial-modeling-tab', 
+  'financial-modeling-tab',
   'analysis-results-tab',
   'revenue-section',
   'expense-section'
@@ -31,7 +31,7 @@ function findDataTourAttribute(target, dir) {
   for (const file of files) {
     const filePath = path.join(dir, file);
     const stat = fs.statSync(filePath);
-    
+
     if (stat.isDirectory()) {
       const result = findDataTourAttribute(target, filePath);
       if (result) return result;

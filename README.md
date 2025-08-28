@@ -214,7 +214,7 @@ src/
 
 ### Cache Settings
 - **Market Data**: 15 minutes TTL
-- **Financial Statements**: 6 hours TTL  
+- **Financial Statements**: 6 hours TTL
 - **Company Profiles**: 24 hours TTL
 - **SEC Filings**: 12 hours TTL
 

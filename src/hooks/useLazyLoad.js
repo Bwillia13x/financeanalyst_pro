@@ -28,8 +28,8 @@ export function useLazyLoad(options = {}) {
       rootMargin
     };
 
-    observerRef.current = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
+    observerRef.current = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
         if (entry.isIntersecting) {
           loadStartTime.current = performance.now();
           setIsVisible(true);
@@ -46,12 +46,15 @@ export function useLazyLoad(options = {}) {
   }, [threshold, rootMargin]);
 
   // Handle element ref changes
-  const setElementRef = useCallback((element) => {
-    elementRef.current = element;
-    if (element) {
-      initObserver();
-    }
-  }, [initObserver]);
+  const setElementRef = useCallback(
+    element => {
+      elementRef.current = element;
+      if (element) {
+        initObserver();
+      }
+    },
+    [initObserver]
+  );
 
   // Preload based on priority
   useEffect(() => {
@@ -78,7 +81,7 @@ export function useLazyLoad(options = {}) {
       const loadTime = performance.now() - loadStartTime.current;
 
       import('../utils/performanceMonitoring')
-        .then((mod) => {
+        .then(mod => {
           if (mod?.trackFinancialComponentPerformance) {
             mod.trackFinancialComponentPerformance(componentName, {
               loadTime,
@@ -94,25 +97,28 @@ export function useLazyLoad(options = {}) {
   }, [componentName, priority, performanceTracking]);
 
   // Handle load errors
-  const markAsError = useCallback((error) => {
-    setLoadError(error);
+  const markAsError = useCallback(
+    error => {
+      setLoadError(error);
 
-    if (performanceTracking) {
-      import('../utils/performanceMonitoring')
-        .then((mod) => {
-          if (mod?.trackFinancialComponentPerformance) {
-            mod.trackFinancialComponentPerformance(componentName, {
-              loadError: error?.message || 'Unknown error',
-              priority,
-              lazy: true,
-              componentType: 'lazy-loaded',
-              timestamp: Date.now()
-            });
-          }
-        })
-        .catch(() => {});
-    }
-  }, [componentName, priority, performanceTracking]);
+      if (performanceTracking) {
+        import('../utils/performanceMonitoring')
+          .then(mod => {
+            if (mod?.trackFinancialComponentPerformance) {
+              mod.trackFinancialComponentPerformance(componentName, {
+                loadError: error?.message || 'Unknown error',
+                priority,
+                lazy: true,
+                componentType: 'lazy-loaded',
+                timestamp: Date.now()
+              });
+            }
+          })
+          .catch(() => {});
+      }
+    },
+    [componentName, priority, performanceTracking]
+  );
 
   // Reset lazy loading state
   const reset = useCallback(() => {
@@ -163,11 +169,11 @@ export function usePreloadComponents() {
   useEffect(() => {
     if (preloadQueue.length === 0) return;
 
-    const processQueue = async() => {
+    const processQueue = async () => {
       // Sort by priority (critical > high > normal > low)
       const priorityOrder = { critical: 0, high: 1, normal: 2, low: 3 };
-      const sortedQueue = [...preloadQueue].sort((a, b) =>
-        priorityOrder[a.priority] - priorityOrder[b.priority]
+      const sortedQueue = [...preloadQueue].sort(
+        (a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]
       );
 
       for (const { componentName, loadFunction } of sortedQueue) {
@@ -179,7 +185,7 @@ export function usePreloadComponents() {
           const loadTime = performance.now() - startTime;
 
           import('../utils/performanceMonitoring')
-            .then((mod) => {
+            .then(mod => {
               if (mod?.trackFinancialComponentPerformance) {
                 mod.trackFinancialComponentPerformance(componentName, {
                   loadTime,
@@ -196,7 +202,7 @@ export function usePreloadComponents() {
           console.error(`Failed to preload ${componentName}:`, error);
 
           import('../utils/performanceMonitoring')
-            .then((mod) => {
+            .then(mod => {
               if (mod?.trackFinancialComponentPerformance) {
                 mod.trackFinancialComponentPerformance(componentName, {
                   preloadError: error.message,
@@ -222,9 +228,12 @@ export function usePreloadComponents() {
   }, [preloadQueue, preloadedComponents]);
 
   // Check if component is preloaded
-  const isPreloaded = useCallback((componentName) => {
-    return preloadedComponents.has(componentName);
-  }, [preloadedComponents]);
+  const isPreloaded = useCallback(
+    componentName => {
+      return preloadedComponents.has(componentName);
+    },
+    [preloadedComponents]
+  );
 
   return {
     queuePreload,
@@ -236,31 +245,31 @@ export function usePreloadComponents() {
 // Hook for financial component lazy loading with specific optimizations
 export function useFinancialLazyLoad(componentType, options = {}) {
   const componentConfigs = {
-    'spreadsheet': {
+    spreadsheet: {
       priority: 'high',
       preloadDelay: 1000,
       threshold: 0.2,
       rootMargin: '100px'
     },
-    'chart': {
+    chart: {
       priority: 'normal',
       preloadDelay: 2000,
       threshold: 0.1,
       rootMargin: '50px'
     },
-    'calculator': {
+    calculator: {
       priority: 'critical',
       preloadDelay: null,
       threshold: 0.1,
       rootMargin: '25px'
     },
-    'report': {
+    report: {
       priority: 'normal',
       preloadDelay: 3000,
       threshold: 0.1,
       rootMargin: '75px'
     },
-    'analysis': {
+    analysis: {
       priority: 'high',
       preloadDelay: 1500,
       threshold: 0.15,
@@ -281,7 +290,7 @@ export function useFinancialLazyLoad(componentType, options = {}) {
   useEffect(() => {
     if (lazyLoad.isLoaded) {
       import('../utils/performanceMonitoring')
-        .then((mod) => {
+        .then(mod => {
           if (mod?.trackFinancialComponentPerformance) {
             mod.trackFinancialComponentPerformance(`financial-${componentType}`, {
               componentType,
@@ -303,11 +312,11 @@ export function useLazyLoadManager() {
   const [loadedComponents, setLoadedComponents] = useState(new Set());
   const [failedComponents, setFailedComponents] = useState(new Map());
 
-  const registerLoading = useCallback((componentName) => {
+  const registerLoading = useCallback(componentName => {
     setLoadingComponents(prev => new Map(prev.set(componentName, Date.now())));
   }, []);
 
-  const registerLoaded = useCallback((componentName) => {
+  const registerLoaded = useCallback(componentName => {
     setLoadingComponents(prev => {
       const newMap = new Map(prev);
       newMap.delete(componentName);
@@ -325,7 +334,7 @@ export function useLazyLoadManager() {
     setFailedComponents(prev => new Map(prev.set(componentName, error)));
   }, []);
 
-  const retry = useCallback((componentName) => {
+  const retry = useCallback(componentName => {
     setFailedComponents(prev => {
       const newMap = new Map(prev);
       newMap.delete(componentName);

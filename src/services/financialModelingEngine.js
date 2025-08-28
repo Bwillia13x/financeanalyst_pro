@@ -122,13 +122,7 @@ class FinancialModelingEngine {
    * @returns {Object} DCF calculation results
    */
   calculateDCFScenario(inputs, assumptions, scenarioName) {
-    const {
-      currentRevenue,
-      currentPrice,
-      sharesOutstanding,
-      totalDebt = 0,
-      cash = 0
-    } = inputs;
+    const { currentRevenue, currentPrice, sharesOutstanding, totalDebt = 0, cash = 0 } = inputs;
 
     // Project revenues
     const revenueProjections = this.projectRevenues(
@@ -138,16 +132,10 @@ class FinancialModelingEngine {
     );
 
     // Project operating metrics
-    const operatingProjections = this.projectOperatingMetrics(
-      revenueProjections,
-      assumptions
-    );
+    const operatingProjections = this.projectOperatingMetrics(revenueProjections, assumptions);
 
     // Calculate free cash flows
-    const fcfProjections = this.calculateFreeCashFlows(
-      operatingProjections,
-      assumptions
-    );
+    const fcfProjections = this.calculateFreeCashFlows(operatingProjections, assumptions);
 
     // Calculate terminal value
     const finalFCF = fcfProjections[fcfProjections.length - 1]?.unleveredFCF || 0;
@@ -160,7 +148,11 @@ class FinancialModelingEngine {
     // Calculate present values
     const fcfValues = fcfProjections.map(fcf => fcf?.unleveredFCF || 0);
     const pvOfCashFlows = this.calculatePresentValue(fcfValues, assumptions.wacc);
-    const pvOfTerminalValue = this.calculatePresentValue([terminalValue], assumptions.wacc, assumptions.projectionYears);
+    const pvOfTerminalValue = this.calculatePresentValue(
+      [terminalValue],
+      assumptions.wacc,
+      assumptions.projectionYears
+    );
 
     // Calculate enterprise and equity values
     const enterpriseValue = pvOfCashFlows + pvOfTerminalValue;
@@ -205,7 +197,7 @@ class FinancialModelingEngine {
         ? growthRates[i] || growthRates[growthRates.length - 1]
         : growthRates * Math.pow(0.95, i); // Declining growth rate
 
-      currentRevenue *= (1 + growthRate);
+      currentRevenue *= 1 + growthRate;
       projections.push({
         year: i + 1,
         revenue: currentRevenue,
@@ -253,12 +245,19 @@ class FinancialModelingEngine {
     return operatingProjections.map((projection, index) => {
       // More sophisticated CapEx modeling
       const maintenanceCapex = projection.revenue * (assumptions.maintenanceCapexRate || 0.015);
-      const growthCapex = index > 0 ?
-        (projection.revenue - operatingProjections[index - 1].revenue) * (assumptions.growthCapexRate || 0.8) : 0;
+      const growthCapex =
+        index > 0
+          ? (projection.revenue - operatingProjections[index - 1].revenue) *
+            (assumptions.growthCapexRate || 0.8)
+          : 0;
       const totalCapex = maintenanceCapex + growthCapex;
 
       // Enhanced working capital calculation
-      const nwcChange = this.calculateWorkingCapitalChange(projection, operatingProjections[index - 1], assumptions);
+      const nwcChange = this.calculateWorkingCapitalChange(
+        projection,
+        operatingProjections[index - 1],
+        assumptions
+      );
 
       // Add non-cash charges beyond depreciation
       const stockBasedComp = projection.revenue * (assumptions.stockBasedCompRate || 0.005);
@@ -303,13 +302,17 @@ class FinancialModelingEngine {
     const payablesDays = assumptions.payablesDays || 35;
 
     const currentReceivables = (currentProjection.revenue * receivablesDays) / 365;
-    const currentInventory = (currentProjection.revenue * inventoryDays) / 365 * (assumptions.cogsPct || 0.6);
-    const currentPayables = (currentProjection.revenue * payablesDays) / 365 * (assumptions.cogsPct || 0.6);
+    const currentInventory =
+      ((currentProjection.revenue * inventoryDays) / 365) * (assumptions.cogsPct || 0.6);
+    const currentPayables =
+      ((currentProjection.revenue * payablesDays) / 365) * (assumptions.cogsPct || 0.6);
     const currentNWC = currentReceivables + currentInventory - currentPayables;
 
     const priorReceivables = (priorProjection.revenue * receivablesDays) / 365;
-    const priorInventory = (priorProjection.revenue * inventoryDays) / 365 * (assumptions.cogsPct || 0.6);
-    const priorPayables = (priorProjection.revenue * payablesDays) / 365 * (assumptions.cogsPct || 0.6);
+    const priorInventory =
+      ((priorProjection.revenue * inventoryDays) / 365) * (assumptions.cogsPct || 0.6);
+    const priorPayables =
+      ((priorProjection.revenue * payablesDays) / 365) * (assumptions.cogsPct || 0.6);
     const priorNWC = priorReceivables + priorInventory - priorPayables;
 
     return currentNWC - priorNWC;
@@ -330,11 +333,15 @@ class FinancialModelingEngine {
     }
 
     if (terminalGrowthRate < 0 || terminalGrowthRate > 0.05) {
-      console.warn(`Terminal growth rate ${(terminalGrowthRate * 100).toFixed(2)}% is outside typical range (0-5%)`);
+      console.warn(
+        `Terminal growth rate ${(terminalGrowthRate * 100).toFixed(2)}% is outside typical range (0-5%)`
+      );
     }
 
     if (finalFCF <= 0) {
-      console.warn('Final year FCF is negative or zero, terminal value calculation may be unreliable');
+      console.warn(
+        'Final year FCF is negative or zero, terminal value calculation may be unreliable'
+      );
     }
 
     // Multiple terminal value methods
@@ -358,8 +365,9 @@ class FinancialModelingEngine {
         let terminalValue = 0;
 
         for (let year = 1; year <= fadeYears; year++) {
-          const fadeRate = terminalGrowthRate * Math.pow((fadeYears - year + 1) / fadeYears, 2) +
-                          longTermGrowth * Math.pow(year / fadeYears, 2);
+          const fadeRate =
+            terminalGrowthRate * Math.pow((fadeYears - year + 1) / fadeYears, 2) +
+            longTermGrowth * Math.pow(year / fadeYears, 2);
           const yearFCF = finalFCF * Math.pow(1 + fadeRate, year);
           terminalValue += yearFCF / Math.pow(1 + discountRate, year);
         }
@@ -399,7 +407,12 @@ class FinancialModelingEngine {
    * @param {number} currentRevenue - Current year revenue
    * @returns {Object} Comprehensive implied multiples
    */
-  calculateImpliedMultiples(enterpriseValue, operatingProjections, fcfProjections = [], currentRevenue = 0) {
+  calculateImpliedMultiples(
+    enterpriseValue,
+    operatingProjections,
+    fcfProjections = [],
+    currentRevenue = 0
+  ) {
     const currentYearEbitda = operatingProjections[0]?.ebitda || 0;
     const nextYearEbitda = operatingProjections[1]?.ebitda || 0;
     const currentYearEbit = operatingProjections[0]?.ebit || 0;
@@ -444,7 +457,8 @@ class FinancialModelingEngine {
 
     if (currentEarnings <= 0 || futureEarnings <= 0) return null;
 
-    const growthRate = Math.pow(futureEarnings / currentEarnings, 1 / (operatingProjections.length - 1)) - 1;
+    const growthRate =
+      Math.pow(futureEarnings / currentEarnings, 1 / (operatingProjections.length - 1)) - 1;
     const peRatio = enterpriseValue / currentEarnings;
 
     return growthRate > 0 ? peRatio / (growthRate * 100) : null;
@@ -474,7 +488,11 @@ class FinancialModelingEngine {
         };
 
         try {
-          const scenario = this.calculateDCFScenario(inputs, adjustedAssumptions, `${variable}_${variation}`);
+          const scenario = this.calculateDCFScenario(
+            inputs,
+            adjustedAssumptions,
+            `${variable}_${variation}`
+          );
           return {
             variation,
             pricePerShare: scenario.pricePerShare,

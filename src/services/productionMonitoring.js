@@ -26,11 +26,14 @@ class ProductionMonitoring {
     try {
       return (
         (typeof navigator !== 'undefined' && navigator.webdriver === true) ||
-        (typeof window !== 'undefined' && window.location &&
+        (typeof window !== 'undefined' &&
+          window.location &&
           new URLSearchParams(window.location.search).has('lhci')) ||
-        (typeof window !== 'undefined' && window.location &&
+        (typeof window !== 'undefined' &&
+          window.location &&
           new URLSearchParams(window.location.search).has('ci')) ||
-        (typeof window !== 'undefined' && window.location &&
+        (typeof window !== 'undefined' &&
+          window.location &&
           new URLSearchParams(window.location.search).has('audit'))
       );
     } catch {
@@ -59,46 +62,64 @@ class ProductionMonitoring {
 
       this.isInitialized = true;
       console.log('🚀 Production monitoring initialized');
-
     } catch (error) {
       console.warn('Failed to initialize monitoring:', error);
     }
   }
 
   initSentry() {
-    if (typeof window !== 'undefined' && window.Sentry) {
+    // Defer to the global Sentry initialized in src/index.jsx. Avoid double-init.
+    if (typeof window === 'undefined' || !window.Sentry) return;
+
+    // If Sentry client already initialized, just set context and return
+    try {
+      const hub =
+        typeof window.Sentry.getCurrentHub === 'function' ? window.Sentry.getCurrentHub() : null;
+      const client = hub && typeof hub.getClient === 'function' ? hub.getClient() : null;
+      if (client) {
+        if (this.userId) {
+          window.Sentry.setUser({ id: this.userId });
+        }
+        return;
+      }
+    } catch {
+      // fallthrough to best-effort init below
+    }
+
+    // Best-effort initialization only if DSN is present; use Vite env
+    const dsn = import.meta?.env?.VITE_SENTRY_DSN;
+    if (!dsn) return;
+
+    try {
       window.Sentry.init({
-        dsn: process.env.VITE_SENTRY_DSN,
-        environment: process.env.VITE_APP_ENV || 'development',
+        dsn,
+        environment: import.meta?.env?.VITE_APP_ENV || import.meta?.env?.MODE || 'development',
         tracesSampleRate: 0.1,
         beforeSend: (event, _hint) => {
-          // Filter out known non-critical errors
           const ignoredErrors = [
             'ResizeObserver loop limit exceeded',
             'Non-Error promise rejection captured',
             'Network request failed'
           ];
-
-          if (ignoredErrors.some(ignored =>
-            event.exception?.values?.[0]?.value?.includes(ignored)
-          )) {
+          if (
+            ignoredErrors.some(ignored => event.exception?.values?.[0]?.value?.includes(ignored))
+          ) {
             return null;
           }
-
           return event;
         }
       });
-
-      // Set user context if available
       if (this.userId) {
         window.Sentry.setUser({ id: this.userId });
       }
+    } catch (e) {
+      console.warn('Sentry initialization (fallback) failed:', e);
     }
   }
 
   setupErrorListeners() {
     // Global error handler
-    window.addEventListener('error', (event) => {
+    window.addEventListener('error', event => {
       this.logError({
         type: 'javascript',
         message: event.message,
@@ -111,7 +132,7 @@ class ProductionMonitoring {
     });
 
     // Promise rejection handler
-    window.addEventListener('unhandledrejection', (event) => {
+    window.addEventListener('unhandledrejection', event => {
       this.logError({
         type: 'promise',
         message: event.reason?.message || 'Unhandled promise rejection',
@@ -121,24 +142,28 @@ class ProductionMonitoring {
     });
 
     // Resource loading errors
-    window.addEventListener('error', (event) => {
-      if (event.target !== window) {
-        this.logError({
-          type: 'resource',
-          message: `Failed to load ${event.target.tagName}: ${event.target.src || event.target.href}`,
-          element: event.target.tagName,
-          source: event.target.src || event.target.href,
-          timestamp: new Date().toISOString()
-        });
-      }
-    }, true);
+    window.addEventListener(
+      'error',
+      event => {
+        if (event.target !== window) {
+          this.logError({
+            type: 'resource',
+            message: `Failed to load ${event.target.tagName}: ${event.target.src || event.target.href}`,
+            element: event.target.tagName,
+            source: event.target.src || event.target.href,
+            timestamp: new Date().toISOString()
+          });
+        }
+      },
+      true
+    );
   }
 
   setupPerformanceMonitoring() {
     // Web Vitals
     if ('PerformanceObserver' in window) {
       // Cumulative Layout Shift
-      new PerformanceObserver((entryList) => {
+      new PerformanceObserver(entryList => {
         for (const entry of entryList.getEntries()) {
           if (!entry.hadRecentInput) {
             this.logPerformance({
@@ -151,7 +176,7 @@ class ProductionMonitoring {
       }).observe({ entryTypes: ['layout-shift'] });
 
       // Largest Contentful Paint
-      new PerformanceObserver((entryList) => {
+      new PerformanceObserver(entryList => {
         const entries = entryList.getEntries();
         const lastEntry = entries[entries.length - 1];
         this.logPerformance({
@@ -162,7 +187,7 @@ class ProductionMonitoring {
       }).observe({ entryTypes: ['largest-contentful-paint'] });
 
       // First Input Delay
-      new PerformanceObserver((entryList) => {
+      new PerformanceObserver(entryList => {
         for (const entry of entryList.getEntries()) {
           this.logPerformance({
             metric: 'FID',
@@ -181,7 +206,8 @@ class ProductionMonitoring {
 
         this.logPerformance({
           metric: 'page_load',
-          domContentLoaded: navigation.domContentLoadedEventEnd - navigation.domContentLoadedEventStart,
+          domContentLoaded:
+            navigation.domContentLoadedEventEnd - navigation.domContentLoadedEventStart,
           loadComplete: navigation.loadEventEnd - navigation.loadEventStart,
           firstPaint: paint.find(p => p.name === 'first-paint')?.startTime,
           firstContentfulPaint: paint.find(p => p.name === 'first-contentful-paint')?.startTime,
@@ -213,7 +239,8 @@ class ProductionMonitoring {
 
     // Check for inactivity
     setInterval(() => {
-      if (Date.now() - lastActivity > 300000 && isActive) { // 5 minutes
+      if (Date.now() - lastActivity > 300000 && isActive) {
+        // 5 minutes
         isActive = false;
         this.logUserActivity({
           type: 'session_idle',

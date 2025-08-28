@@ -142,10 +142,15 @@ const Integrations = () => {
     }
   ];
 
-  const getStatusInfo = (status) => {
+  const getStatusInfo = status => {
     switch (status) {
       case 'connected':
-        return { icon: CheckCircle, color: 'text-green-500', bg: 'bg-green-100', text: 'Connected' };
+        return {
+          icon: CheckCircle,
+          color: 'text-green-500',
+          bg: 'bg-green-100',
+          text: 'Connected'
+        };
       case 'configured':
         return { icon: Settings, color: 'text-blue-500', bg: 'bg-blue-100', text: 'Configured' };
       case 'error':
@@ -157,9 +162,10 @@ const Integrations = () => {
     }
   };
 
-  const filteredIntegrations = activeCategory === 'all'
-    ? integrations
-    : integrations.filter(integration => integration.category === activeCategory);
+  const filteredIntegrations =
+    activeCategory === 'all'
+      ? integrations
+      : integrations.filter(integration => integration.category === activeCategory);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -232,7 +238,7 @@ const Integrations = () => {
           {/* Category Filter */}
           <div className="mb-6">
             <div className="flex flex-wrap gap-2">
-              {categories.map((category) => (
+              {categories.map(category => (
                 <button
                   key={category.id}
                   onClick={() => setActiveCategory(category.id)}
@@ -250,7 +256,7 @@ const Integrations = () => {
 
           {/* Integrations Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredIntegrations.map((integration) => {
+            {filteredIntegrations.map(integration => {
               const statusInfo = getStatusInfo(integration.status);
 
               return (
@@ -280,7 +286,9 @@ const Integrations = () => {
                     <div className="space-y-3 mb-4">
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-600">Status</span>
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusInfo.bg} ${statusInfo.color}`}>
+                        <span
+                          className={`px-2 py-1 rounded-full text-xs font-medium ${statusInfo.bg} ${statusInfo.color}`}
+                        >
                           {statusInfo.text}
                         </span>
                       </div>
@@ -327,7 +335,11 @@ const Integrations = () => {
                           </Button>
                         </>
                       ) : integration.status === 'error' ? (
-                        <Button variant="outline" size="sm" className="flex-1 text-red-600 border-red-200">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="flex-1 text-red-600 border-red-200"
+                        >
                           <AlertTriangle className="w-4 h-4 mr-1" />
                           Fix Error
                         </Button>
@@ -352,19 +364,20 @@ const Integrations = () => {
                   <Code className="w-8 h-8 text-gray-600" />
                 </div>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Need a Custom Integration?</h3>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                Need a Custom Integration?
+              </h3>
               <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
-                We can help you build custom integrations with your specific data sources,
-                trading platforms, or internal systems. Contact our integration team to discuss your requirements.
+                We can help you build custom integrations with your specific data sources, trading
+                platforms, or internal systems. Contact our integration team to discuss your
+                requirements.
               </p>
               <div className="flex justify-center space-x-4">
                 <Button variant="outline">
                   <Key className="w-4 h-4 mr-2" />
                   API Documentation
                 </Button>
-                <Button>
-                  Contact Integration Team
-                </Button>
+                <Button>Contact Integration Team</Button>
               </div>
             </Card>
           </div>

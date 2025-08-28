@@ -16,17 +16,17 @@ describe('ApiKeyValidator', () => {
   });
 
   describe('validateAlphaVantage', () => {
-    it('should return missing status for no API key', async() => {
+    it('should return missing status for no API key', async () => {
       const result = await validator.validateAlphaVantage(null);
       expect(result.status).toBe('missing');
     });
 
-    it('should return missing status for demo API key', async() => {
+    it('should return missing status for demo API key', async () => {
       const result = await validator.validateAlphaVantage('demo');
       expect(result.status).toBe('missing');
     });
 
-    it('should return valid status for successful API response', async() => {
+    it('should return valid status for successful API response', async () => {
       axios.get.mockResolvedValue({
         data: {
           'Global Quote': {
@@ -50,7 +50,7 @@ describe('ApiKeyValidator', () => {
       );
     });
 
-    it('should return invalid status for error response', async() => {
+    it('should return invalid status for error response', async () => {
       axios.get.mockResolvedValue({
         data: {
           'Error Message': 'Invalid API call'
@@ -61,7 +61,7 @@ describe('ApiKeyValidator', () => {
       expect(result.status).toBe('invalid');
     });
 
-    it('should return rate_limited status for rate limit response', async() => {
+    it('should return rate_limited status for rate limit response', async () => {
       axios.get.mockResolvedValue({
         data: {
           Note: 'Thank you for using Alpha Vantage! Our standard API call frequency is 5 calls per minute'
@@ -72,7 +72,7 @@ describe('ApiKeyValidator', () => {
       expect(result.status).toBe('rate_limited');
     });
 
-    it('should handle network errors', async() => {
+    it('should handle network errors', async () => {
       axios.get.mockRejectedValue(new Error('ENOTFOUND'));
 
       const result = await validator.validateAlphaVantage('network_error_key');
@@ -81,12 +81,12 @@ describe('ApiKeyValidator', () => {
   });
 
   describe('validateFMP', () => {
-    it('should return missing status for no API key', async() => {
+    it('should return missing status for no API key', async () => {
       const result = await validator.validateFMP(null);
       expect(result.status).toBe('missing');
     });
 
-    it('should return valid status for successful API response', async() => {
+    it('should return valid status for successful API response', async () => {
       axios.get.mockResolvedValue({
         data: [
           {
@@ -100,7 +100,7 @@ describe('ApiKeyValidator', () => {
       expect(result.status).toBe('valid');
     });
 
-    it('should return invalid status for 401 error', async() => {
+    it('should return invalid status for 401 error', async () => {
       axios.get.mockRejectedValue({
         response: { status: 401 }
       });
@@ -109,7 +109,7 @@ describe('ApiKeyValidator', () => {
       expect(result.status).toBe('invalid');
     });
 
-    it('should return rate_limited status for 429 error', async() => {
+    it('should return rate_limited status for 429 error', async () => {
       axios.get.mockRejectedValue({
         response: { status: 429 }
       });
@@ -120,7 +120,7 @@ describe('ApiKeyValidator', () => {
   });
 
   describe('validateAllKeys', () => {
-    it('should validate all services and return overall status', async() => {
+    it('should validate all services and return overall status', async () => {
       // Mock successful validation for Alpha Vantage
       axios.get.mockImplementation(url => {
         if (url.includes('alphavantage')) {
@@ -147,7 +147,7 @@ describe('ApiKeyValidator', () => {
       expect(result.services).toHaveProperty('fred');
     });
 
-    it('should return demo status when no valid keys are found', async() => {
+    it('should return demo status when no valid keys are found', async () => {
       // Mock all validations to return missing status
       axios.get.mockRejectedValue(new Error('No API key'));
 
@@ -159,7 +159,7 @@ describe('ApiKeyValidator', () => {
       );
     });
 
-    it('should return partial status when some keys are valid', async() => {
+    it('should return partial status when some keys are valid', async () => {
       // Create a mock result that simulates what we want to test
       const mockResults = {
         timestamp: new Date(),

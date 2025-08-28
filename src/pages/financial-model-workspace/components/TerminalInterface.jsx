@@ -55,7 +55,7 @@ const TerminalInterface = ({ onCommandExecute, calculationResults: _calculationR
     }
 
     // Initialize persistence layer
-    const initializePersistence = async() => {
+    const initializePersistence = async () => {
       try {
         await persistenceManager.initialize();
         console.log('✅ Persistence layer initialized in terminal');
@@ -77,9 +77,8 @@ const TerminalInterface = ({ onCommandExecute, calculationResults: _calculationR
       const commandSuggestions = suggestions.map(s => s.usage);
 
       // Also include partial matches from available commands
-      const partialMatches = availableCommands.filter(cmd =>
-        cmd.toLowerCase().includes(value.toLowerCase()) &&
-        !commandSuggestions.includes(cmd)
+      const partialMatches = availableCommands.filter(
+        cmd => cmd.toLowerCase().includes(value.toLowerCase()) && !commandSuggestions.includes(cmd)
       );
 
       const allSuggestions = [...commandSuggestions, ...partialMatches];
@@ -110,7 +109,7 @@ const TerminalInterface = ({ onCommandExecute, calculationResults: _calculationR
     }
   };
 
-  const executeCommand = async() => {
+  const executeCommand = async () => {
     if (!currentInput.trim()) return;
 
     const newCommand = {
@@ -129,7 +128,7 @@ const TerminalInterface = ({ onCommandExecute, calculationResults: _calculationR
       // Use the new command processor
       const context = {
         demoMode: dataFetchingService.demoMode,
-        showLoading: (message) => {
+        showLoading: message => {
           const loadingCommand = {
             id: commands.length + 2,
             type: 'info',

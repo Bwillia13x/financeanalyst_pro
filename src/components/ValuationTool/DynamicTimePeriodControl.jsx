@@ -15,32 +15,41 @@ const DynamicTimePeriodControl = ({
   const [dragStartX, setDragStartX] = useState(0);
   const [dragStartYears, setDragStartYears] = useState(0);
 
-  const handleYearsChange = useCallback((newYears) => {
-    const clampedYears = Math.max(minYears, Math.min(maxYears, Math.round(newYears)));
-    if (clampedYears !== years) {
-      setYears(clampedYears);
-      onYearsChange?.(clampedYears);
-    }
-  }, [years, minYears, maxYears, onYearsChange]);
+  const handleYearsChange = useCallback(
+    newYears => {
+      const clampedYears = Math.max(minYears, Math.min(maxYears, Math.round(newYears)));
+      if (clampedYears !== years) {
+        setYears(clampedYears);
+        onYearsChange?.(clampedYears);
+      }
+    },
+    [years, minYears, maxYears, onYearsChange]
+  );
 
-  const handleMouseDown = useCallback((e) => {
-    e.preventDefault();
-    setIsDragging(true);
-    setDragStartX(e.clientX);
-    setDragStartYears(years);
-    document.body.style.cursor = 'ew-resize';
-  }, [years]);
+  const handleMouseDown = useCallback(
+    e => {
+      e.preventDefault();
+      setIsDragging(true);
+      setDragStartX(e.clientX);
+      setDragStartYears(years);
+      document.body.style.cursor = 'ew-resize';
+    },
+    [years]
+  );
 
-  const handleMouseMove = useCallback((e) => {
-    if (!isDragging) return;
+  const handleMouseMove = useCallback(
+    e => {
+      if (!isDragging) return;
 
-    const deltaX = e.clientX - dragStartX;
-    const sensitivity = 0.02; // Adjust sensitivity
-    const deltaYears = deltaX * sensitivity;
-    const newYears = dragStartYears + deltaYears;
+      const deltaX = e.clientX - dragStartX;
+      const sensitivity = 0.02; // Adjust sensitivity
+      const deltaYears = deltaX * sensitivity;
+      const newYears = dragStartYears + deltaYears;
 
-    handleYearsChange(newYears);
-  }, [isDragging, dragStartX, dragStartYears, handleYearsChange]);
+      handleYearsChange(newYears);
+    },
+    [isDragging, dragStartX, dragStartYears, handleYearsChange]
+  );
 
   const handleMouseUp = useCallback(() => {
     setIsDragging(false);
@@ -59,12 +68,12 @@ const DynamicTimePeriodControl = ({
     }
   }, [isDragging, handleMouseMove, handleMouseUp]);
 
-  const handleSliderChange = (e) => {
+  const handleSliderChange = e => {
     const newYears = parseInt(e.target.value);
     handleYearsChange(newYears);
   };
 
-  const handleQuickSelect = (selectedYears) => {
+  const handleQuickSelect = selectedYears => {
     handleYearsChange(selectedYears);
   };
 
@@ -126,7 +135,7 @@ const DynamicTimePeriodControl = ({
               aria-valuemin={1}
               aria-valuemax={maxYears}
               aria-label="Time period selector"
-              onKeyDown={(e) => {
+              onKeyDown={e => {
                 if (e.key === 'ArrowLeft' && years > 1) setYears(years - 1);
                 if (e.key === 'ArrowRight' && years < maxYears) setYears(years + 1);
               }}
@@ -156,19 +165,21 @@ const DynamicTimePeriodControl = ({
 
         {/* Quick Select Buttons */}
         <div className="flex justify-center space-x-2">
-          {[3, 5, 7, 10, 12, 15].filter(y => y >= minYears && y <= maxYears).map(quickYears => (
-            <button
-              key={quickYears}
-              onClick={() => handleQuickSelect(quickYears)}
-              className={`px-3 py-1 rounded-full text-sm font-medium transition-all duration-200 ${
-                years === quickYears
-                  ? 'bg-blue-600 text-white shadow-lg'
-                  : 'bg-gray-700 text-gray-300 hover:bg-gray-600 hover:text-white'
-              }`}
-            >
-              {quickYears}Y
-            </button>
-          ))}
+          {[3, 5, 7, 10, 12, 15]
+            .filter(y => y >= minYears && y <= maxYears)
+            .map(quickYears => (
+              <button
+                key={quickYears}
+                onClick={() => handleQuickSelect(quickYears)}
+                className={`px-3 py-1 rounded-full text-sm font-medium transition-all duration-200 ${
+                  years === quickYears
+                    ? 'bg-blue-600 text-white shadow-lg'
+                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600 hover:text-white'
+                }`}
+              >
+                {quickYears}Y
+              </button>
+            ))}
         </div>
 
         {/* Period Description */}
@@ -188,7 +199,8 @@ const DynamicTimePeriodControl = ({
         </div>
       </div>
 
-      <style>{`
+      <style>
+        {`
         .slider::-webkit-slider-thumb {
           appearance: none;
           width: 20px;
@@ -200,18 +212,18 @@ const DynamicTimePeriodControl = ({
           box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
           transition: all 0.2s ease;
         }
-        
+
         .slider::-webkit-slider-thumb:hover {
           background: #2563eb;
           transform: scale(1.1);
         }
-        
+
         .slider::-webkit-slider-track {
           height: 8px;
           border-radius: 4px;
           background: transparent;
         }
-        
+
         .slider::-moz-range-thumb {
           width: 20px;
           height: 20px;
@@ -221,7 +233,7 @@ const DynamicTimePeriodControl = ({
           cursor: pointer;
           box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
-        
+
         .slider::-moz-range-track {
           height: 8px;
           border-radius: 4px;

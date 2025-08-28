@@ -11,11 +11,13 @@ export class CurveBuilder {
     const { instruments, rates, maturities } = marketData;
 
     // Sort by maturity
-    const sortedData = instruments.map((instrument, index) => ({
-      instrument,
-      rate: rates[index],
-      maturity: maturities[index]
-    })).sort((a, b) => a.maturity - b.maturity);
+    const sortedData = instruments
+      .map((instrument, index) => ({
+        instrument,
+        rate: rates[index],
+        maturity: maturities[index]
+      }))
+      .sort((a, b) => a.maturity - b.maturity);
 
     const curve = [];
 
@@ -92,19 +94,21 @@ export class PricingEngines {
     if (optionType === 'call') {
       price = S * Math.exp(-q * T) * N(d1) - K * Math.exp(-r * T) * N(d2);
       delta = Math.exp(-q * T) * N(d1);
-      rho = K * T * Math.exp(-r * T) * N(d2) / 100;
+      rho = (K * T * Math.exp(-r * T) * N(d2)) / 100;
     } else {
       price = K * Math.exp(-r * T) * N(-d2) - S * Math.exp(-q * T) * N(-d1);
       delta = -Math.exp(-q * T) * N(-d1);
-      rho = -K * T * Math.exp(-r * T) * N(-d2) / 100;
+      rho = (-K * T * Math.exp(-r * T) * N(-d2)) / 100;
     }
 
     const nPrime = this.normalPDF;
-    const gamma = Math.exp(-q * T) * nPrime(d1) / (S * sigma * Math.sqrt(T));
-    const theta = (-S * Math.exp(-q * T) * nPrime(d1) * sigma / (2 * Math.sqrt(T))
-            - r * K * Math.exp(-r * T) * (optionType === 'call' ? N(d2) : N(-d2))
-            + q * S * Math.exp(-q * T) * (optionType === 'call' ? N(d1) : N(-d1))) / 365;
-    const vega = S * Math.exp(-q * T) * nPrime(d1) * Math.sqrt(T) / 100;
+    const gamma = (Math.exp(-q * T) * nPrime(d1)) / (S * sigma * Math.sqrt(T));
+    const theta =
+      ((-S * Math.exp(-q * T) * nPrime(d1) * sigma) / (2 * Math.sqrt(T)) -
+        r * K * Math.exp(-r * T) * (optionType === 'call' ? N(d2) : N(-d2)) +
+        q * S * Math.exp(-q * T) * (optionType === 'call' ? N(d1) : N(-d1))) /
+      365;
+    const vega = (S * Math.exp(-q * T) * nPrime(d1) * Math.sqrt(T)) / 100;
 
     return { price, delta, gamma, theta, vega, rho };
   }
@@ -121,14 +125,14 @@ export class PricingEngines {
     const p = (Math.exp(r * dt) - d) / (u - d);
 
     // Build tree
-    const tree = Array(steps + 1).fill(null).map(() => Array(steps + 1).fill(0));
+    const tree = Array(steps + 1)
+      .fill(null)
+      .map(() => Array(steps + 1).fill(0));
 
     // Terminal payoffs
     for (let i = 0; i <= steps; i++) {
       const ST = S * Math.pow(u, 2 * i - steps);
-      tree[steps][i] = optionType === 'call'
-        ? Math.max(ST - K, 0)
-        : Math.max(K - ST, 0);
+      tree[steps][i] = optionType === 'call' ? Math.max(ST - K, 0) : Math.max(K - ST, 0);
     }
 
     // Backward induction
@@ -212,7 +216,8 @@ export class PricingEngines {
     }
 
     // Floating leg PV (simplified)
-    const pvFloatingLeg = notional - notional / Math.pow(1 + discountRate / periodsPerYear, totalPeriods);
+    const pvFloatingLeg =
+      notional - notional / Math.pow(1 + discountRate / periodsPerYear, totalPeriods);
 
     return {
       swapValue: pvFixedLeg - pvFloatingLeg,
@@ -239,18 +244,18 @@ export class PricingEngines {
    * Error function approximation
    */
   static erf(x) {
-    const a1 =  0.254829592;
+    const a1 = 0.254829592;
     const a2 = -0.284496736;
-    const a3 =  1.421413741;
+    const a3 = 1.421413741;
     const a4 = -1.453152027;
-    const a5 =  1.061405429;
-    const p  =  0.3275911;
+    const a5 = 1.061405429;
+    const p = 0.3275911;
 
     const sign = x < 0 ? -1 : 1;
     x = Math.abs(x);
 
     const t = 1.0 / (1.0 + p * x);
-    const y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
+    const y = 1.0 - ((((a5 * t + a4) * t + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
 
     return sign * y;
   }
@@ -282,7 +287,9 @@ export class RiskMetrics {
   static calculateCorrelationMatrix(dataMatrix) {
     const n = dataMatrix.length;
     const _columns = dataMatrix[0].length;
-    const correlationMatrix = Array(n).fill(null).map(() => Array(n).fill(0));
+    const correlationMatrix = Array(n)
+      .fill(null)
+      .map(() => Array(n).fill(0));
 
     for (let i = 0; i < n; i++) {
       for (let j = 0; j < n; j++) {

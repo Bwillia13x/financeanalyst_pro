@@ -1,12 +1,12 @@
 import { AlertTriangle, RefreshCw, Home, Bug, ExternalLink } from 'lucide-react';
-import React from 'react';
+import { Component, isValidElement, forwardRef, useState, useCallback, useEffect } from 'react';
 
 import Button from './Button';
 
 /**
  * Enhanced Error Boundary with user-friendly error handling and recovery options
  */
-class ErrorBoundary extends React.Component {
+class ErrorBoundary extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -96,12 +96,12 @@ class ErrorBoundary extends React.Component {
     const subject = encodeURIComponent(`FinanceAnalyst Pro Error Report - ${errorId}`);
     const body = encodeURIComponent(
       'Error Details:\n\n' +
-      `Error ID: ${errorId}\n` +
-      `Message: ${error?.message}\n` +
-      `Timestamp: ${new Date().toISOString()}\n` +
-      `URL: ${window.location.href}\n\n` +
-      `Technical Details:\n${error?.stack}\n\n` +
-      `Component Stack:\n${errorInfo?.componentStack}`
+        `Error ID: ${errorId}\n` +
+        `Message: ${error?.message}\n` +
+        `Timestamp: ${new Date().toISOString()}\n` +
+        `URL: ${window.location.href}\n\n` +
+        `Technical Details:\n${error?.stack}\n\n` +
+        `Component Stack:\n${errorInfo?.componentStack}`
     );
 
     window.open(`mailto:support@financeanalystpro.com?subject=${subject}&body=${body}`);
@@ -114,7 +114,7 @@ class ErrorBoundary extends React.Component {
 
       // Use custom fallback if provided
       if (FallbackComponent) {
-        if (React.isValidElement(FallbackComponent)) {
+        if (isValidElement(FallbackComponent)) {
           return FallbackComponent;
         }
         if (typeof FallbackComponent === 'function') {
@@ -123,13 +123,20 @@ class ErrorBoundary extends React.Component {
       }
 
       // Determine error severity and appropriate response
-      const isNetworkError = error?.message?.includes('fetch') || error?.message?.includes('network');
-      const isDataError = error?.message?.includes('Cannot read') || error?.message?.includes('undefined');
+      const isNetworkError =
+        error?.message?.includes('fetch') || error?.message?.includes('network');
+      const isDataError =
+        error?.message?.includes('Cannot read') || error?.message?.includes('undefined');
       const isCriticalError = retryCount > 2;
 
       if (variant === 'minimal') {
         return (
-          <div className="flex items-center justify-center p-4 bg-red-50 border border-red-200 rounded-lg">
+          <div
+            className="flex items-center justify-center p-4 bg-red-50 border border-red-200 rounded-lg"
+            role="alert"
+            aria-live="assertive"
+            data-testid="error-minimal"
+          >
             <AlertTriangle className="w-5 h-5 text-red-600 mr-2" />
             <span className="text-red-800 text-sm">Something went wrong</span>
             <Button
@@ -137,6 +144,7 @@ class ErrorBoundary extends React.Component {
               size="sm"
               onClick={this.handleRetry}
               className="ml-3 text-red-700 hover:text-red-900"
+              data-testid="error-minimal-try"
             >
               <RefreshCw className="w-4 h-4" />
             </Button>
@@ -146,7 +154,12 @@ class ErrorBoundary extends React.Component {
 
       if (variant === 'inline') {
         return (
-          <div className="p-4 bg-red-50 border-l-4 border-red-400 rounded-r-lg">
+          <div
+            className="p-4 bg-red-50 border-l-4 border-red-400 rounded-r-lg"
+            role="alert"
+            aria-live="assertive"
+            data-testid="error-inline"
+          >
             <div className="flex items-start">
               <AlertTriangle className="w-5 h-5 text-red-600 mt-0.5 mr-3 flex-shrink-0" />
               <div className="flex-1">
@@ -154,9 +167,11 @@ class ErrorBoundary extends React.Component {
                   Unable to load this section
                 </h4>
                 <p className="text-sm text-red-700 mb-2">
-                  {isNetworkError ? 'Check your internet connection and try again.' :
-                    isDataError ? 'There was an issue with the data format.' :
-                      'An unexpected error occurred.'}
+                  {isNetworkError
+                    ? 'Check your internet connection and try again.'
+                    : isDataError
+                      ? 'There was an issue with the data format.'
+                      : 'An unexpected error occurred.'}
                 </p>
                 <div className="flex items-center space-x-2">
                   <Button
@@ -164,6 +179,7 @@ class ErrorBoundary extends React.Component {
                     size="sm"
                     onClick={this.handleRetry}
                     className="text-red-700 border-red-300 hover:bg-red-100"
+                    data-testid="error-inline-try"
                   >
                     <RefreshCw className="w-3 h-3 mr-1" />
                     Try Again
@@ -177,7 +193,12 @@ class ErrorBoundary extends React.Component {
 
       // Full-page error boundary (default)
       return (
-        <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+        <div
+          className="min-h-screen bg-slate-50 flex items-center justify-center p-4"
+          role="alert"
+          aria-live="assertive"
+          data-testid="error-fallback"
+        >
           <div className="max-w-lg w-full bg-white rounded-lg shadow-lg border border-slate-200 p-8 text-center">
             {/* Error Icon */}
             <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -191,20 +212,18 @@ class ErrorBoundary extends React.Component {
 
             {/* Error Message */}
             <p className="text-slate-600 mb-6">
-              {isCriticalError ? (
-                'The application encountered a critical error. Please refresh the page or contact support.'
-              ) : isNetworkError ? (
-                'Unable to connect to our servers. Please check your internet connection and try again.'
-              ) : isDataError ? (
-                'There was an issue processing the data. This might be a temporary problem.'
-              ) : (
-                'An unexpected error occurred. Our team has been notified and is working on a fix.'
-              )}
+              {isCriticalError
+                ? 'The application encountered a critical error. Please refresh the page or contact support.'
+                : isNetworkError
+                  ? 'Unable to connect to our servers. Please check your internet connection and try again.'
+                  : isDataError
+                    ? 'There was an issue processing the data. This might be a temporary problem.'
+                    : 'An unexpected error occurred. Our team has been notified and is working on a fix.'}
             </p>
 
             {/* Error ID for support */}
             {errorId && (
-              <div className="bg-slate-100 rounded-lg p-3 mb-6 text-left">
+              <div className="bg-slate-100 rounded-lg p-3 mb-6 text-left" data-testid="error-id">
                 <div className="text-xs font-mono text-slate-500 mb-1">Error ID (for support):</div>
                 <div className="text-sm font-mono text-slate-700 break-all">{errorId}</div>
               </div>
@@ -217,6 +236,7 @@ class ErrorBoundary extends React.Component {
                   onClick={this.handleRetry}
                   className="flex items-center justify-center"
                   variant="primary"
+                  data-testid="error-try-again-btn"
                 >
                   <RefreshCw className="w-4 h-4 mr-2" />
                   Try Again
@@ -224,9 +244,10 @@ class ErrorBoundary extends React.Component {
               )}
 
               <Button
-                onClick={() => window.location.href = '/'}
+                onClick={() => (window.location.href = '/')}
                 variant="outline"
                 className="flex items-center justify-center"
+                data-testid="error-go-home-btn"
               >
                 <Home className="w-4 h-4 mr-2" />
                 Go Home
@@ -236,6 +257,7 @@ class ErrorBoundary extends React.Component {
                 onClick={this.handleReportError}
                 variant="ghost"
                 className="flex items-center justify-center text-slate-600 hover:text-slate-800"
+                data-testid="error-report-issue-btn"
               >
                 <Bug className="w-4 h-4 mr-2" />
                 Report Issue
@@ -281,18 +303,18 @@ class ErrorBoundary extends React.Component {
 
 // Hook for functional component error handling
 export const useErrorHandler = () => {
-  const [error, setError] = React.useState(null);
+  const [error, setError] = useState(null);
 
-  const resetError = React.useCallback(() => {
+  const resetError = useCallback(() => {
     setError(null);
   }, []);
 
-  const captureError = React.useCallback((error, errorInfo = {}) => {
+  const captureError = useCallback((error, errorInfo = {}) => {
     console.error('Error captured:', error);
     setError({ error, errorInfo });
   }, []);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (error) {
       // Log error to monitoring service
       console.error('Captured error:', error);
@@ -304,7 +326,7 @@ export const useErrorHandler = () => {
 
 // Higher-order component for adding error boundaries
 export const withErrorBoundary = (Component, errorBoundaryConfig = {}) => {
-  const WrappedComponent = React.forwardRef((props, ref) => (
+  const WrappedComponent = forwardRef((props, ref) => (
     <ErrorBoundary {...errorBoundaryConfig}>
       <Component {...props} ref={ref} />
     </ErrorBoundary>

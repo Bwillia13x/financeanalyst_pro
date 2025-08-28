@@ -5,9 +5,42 @@ import { Cur, Pct } from '../../utils/valuationUtils';
 const ProjectionsTable = ({ _projections, _onUpdate, _currency = 'USD', _financialMetrics }) => {
   // Mock data for demonstration
   const rows = [
-    { year: 2024, revenue: 100000, ebitMargin: 0.25, ebit: 25000, nopat: 18750, reinvest: 5000, fcff: 13750, dep: 3000, capex: 6000, dNWC: 2000 },
-    { year: 2025, revenue: 110000, ebitMargin: 0.26, ebit: 28600, nopat: 21450, reinvest: 5500, fcff: 15950, dep: 3300, capex: 6600, dNWC: 2200 },
-    { year: 2026, revenue: 121000, ebitMargin: 0.27, ebit: 32670, nopat: 24502, reinvest: 6050, fcff: 18452, dep: 3630, capex: 7260, dNWC: 2420 }
+    {
+      year: 2024,
+      revenue: 100000,
+      ebitMargin: 0.25,
+      ebit: 25000,
+      nopat: 18750,
+      reinvest: 5000,
+      fcff: 13750,
+      dep: 3000,
+      capex: 6000,
+      dNWC: 2000
+    },
+    {
+      year: 2025,
+      revenue: 110000,
+      ebitMargin: 0.26,
+      ebit: 28600,
+      nopat: 21450,
+      reinvest: 5500,
+      fcff: 15950,
+      dep: 3300,
+      capex: 6600,
+      dNWC: 2200
+    },
+    {
+      year: 2026,
+      revenue: 121000,
+      ebitMargin: 0.27,
+      ebit: 32670,
+      nopat: 24502,
+      reinvest: 6050,
+      fcff: 18452,
+      dep: 3630,
+      capex: 7260,
+      dNWC: 2420
+    }
   ];
   return (
     <div className="overflow-auto rounded-xl border border-slate-200">

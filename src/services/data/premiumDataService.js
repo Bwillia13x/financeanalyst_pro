@@ -3,11 +3,11 @@ export class PremiumDataService {
   constructor() {
     this.providers = {
       bloomberg: new BloombergApiService(),
-      refinitiv: new RefinitivApiService(), 
+      refinitiv: new RefinitivApiService(),
       sp_capital_iq: new SPCapitalIQService(),
       factset: new FactSetService()
     };
-    
+
     this.cache = new Map();
     this.rateLimiters = new Map();
     this.fallbackChain = ['bloomberg', 'refinitiv', 'sp_capital_iq'];
@@ -15,15 +15,15 @@ export class PremiumDataService {
 
   // Unified data request with provider fallback
   async getData(dataType, params, options = {}) {
-    const { 
+    const {
       preferredProvider = 'bloomberg',
       useCache = true,
       fallback = true,
-      timeout = 30000 
+      timeout = 30000
     } = options;
 
     const cacheKey = this.getCacheKey(dataType, params);
-    
+
     if (useCache && this.cache.has(cacheKey)) {
       const cached = this.cache.get(cacheKey);
       if (Date.now() - cached.timestamp < cached.ttl) {
@@ -31,14 +31,14 @@ export class PremiumDataService {
       }
     }
 
-    let providers = fallback 
+    const providers = fallback
       ? [preferredProvider, ...this.fallbackChain.filter(p => p !== preferredProvider)]
       : [preferredProvider];
 
     for (const providerName of providers) {
       try {
         await this.checkRateLimit(providerName);
-        
+
         const provider = this.providers[providerName];
         const data = await Promise.race([
           provider.getData(dataType, params),
@@ -46,7 +46,7 @@ export class PremiumDataService {
         ]);
 
         const normalizedData = this.normalizeData(dataType, data, providerName);
-        
+
         if (useCache) {
           this.cache.set(cacheKey, {
             data: normalizedData,
@@ -57,7 +57,6 @@ export class PremiumDataService {
         }
 
         return { ...normalizedData, source: providerName };
-        
       } catch (error) {
         console.warn(`Provider ${providerName} failed for ${dataType}:`, error.message);
         if (providerName === providers[providers.length - 1]) {
@@ -71,15 +70,15 @@ export class PremiumDataService {
   async getMarketData(symbols, fields = []) {
     const params = {
       symbols: Array.isArray(symbols) ? symbols : [symbols],
-      fields: fields.length > 0 ? fields : [
-        'LAST_PRICE', 'CHG_NET_1D', 'CHG_PCT_1D', 
-        'VOLUME', 'HIGH', 'LOW', 'OPEN'
-      ]
+      fields:
+        fields.length > 0
+          ? fields
+          : ['LAST_PRICE', 'CHG_NET_1D', 'CHG_PCT_1D', 'VOLUME', 'HIGH', 'LOW', 'OPEN']
     };
 
-    return await this.getData('market_data', params, { 
+    return await this.getData('market_data', params, {
       preferredProvider: 'bloomberg',
-      useCache: false 
+      useCache: false
     });
   }
 
@@ -89,15 +88,13 @@ export class PremiumDataService {
     return await this.getData('fundamentals', params);
   }
 
-  // Estimates data  
+  // Estimates data
   async getEstimates(symbol, metrics = []) {
     const params = {
       symbol,
-      metrics: metrics.length > 0 ? metrics : [
-        'REVENUE', 'EPS', 'EBITDA', 'FCF'
-      ]
+      metrics: metrics.length > 0 ? metrics : ['REVENUE', 'EPS', 'EBITDA', 'FCF']
     };
-    
+
     return await this.getData('estimates', params);
   }
 
@@ -143,7 +140,7 @@ export class PremiumDataService {
   }
 
   // Bloomberg normalizers
-  normalizeBloombergMarketData = (data) => {
+  normalizeBloombergMarketData = data => {
     return data.map(item => ({
       symbol: item.security,
       price: item.LAST_PRICE,
@@ -157,7 +154,7 @@ export class PremiumDataService {
     }));
   };
 
-  normalizeBloombergFundamentals = (data) => {
+  normalizeBloombergFundamentals = data => {
     return {
       symbol: data.ticker,
       currency: data.CRNCY,
@@ -180,9 +177,9 @@ export class PremiumDataService {
   async checkRateLimit(provider) {
     const limits = {
       bloomberg: { requests: 1000, window: 3600000 }, // 1000/hour
-      refinitiv: { requests: 500, window: 3600000 },   // 500/hour
+      refinitiv: { requests: 500, window: 3600000 }, // 500/hour
       sp_capital_iq: { requests: 100, window: 60000 }, // 100/minute
-      factset: { requests: 200, window: 60000 }        // 200/minute
+      factset: { requests: 200, window: 60000 } // 200/minute
     };
 
     const limit = limits[provider];
@@ -190,7 +187,7 @@ export class PremiumDataService {
 
     const key = `${provider}_rate_limit`;
     const now = Date.now();
-    
+
     if (!this.rateLimiters.has(key)) {
       this.rateLimiters.set(key, { requests: [], window: limit.window });
     }
@@ -213,12 +210,12 @@ export class PremiumDataService {
 
   getCacheTTL(dataType) {
     const ttls = {
-      market_data: 5000,      // 5 seconds
-      fundamentals: 3600000,  // 1 hour
-      estimates: 1800000,     // 30 minutes
+      market_data: 5000, // 5 seconds
+      fundamentals: 3600000, // 1 hour
+      estimates: 1800000, // 30 minutes
       peer_analysis: 7200000, // 2 hours
-      credit_data: 3600000,   // 1 hour
-      esg_data: 86400000      // 24 hours
+      credit_data: 3600000, // 1 hour
+      esg_data: 86400000 // 24 hours
     };
     return ttls[dataType] || 3600000;
   }
@@ -236,14 +233,14 @@ class BloombergApiService {
     const requestConfig = {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${this.apiKey}`,
+        Authorization: `Bearer ${this.apiKey}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(params)
     };
 
     const response = await fetch(`${this.baseUrl}${endpoint}`, requestConfig);
-    
+
     if (!response.ok) {
       throw new Error(`Bloomberg API error: ${response.status}`);
     }
@@ -272,7 +269,7 @@ class RefinitivApiService {
     this.accessToken = null;
   }
 
-  async getData(dataType, params) {
+  async getData(dataType, _params) {
     if (!this.accessToken) {
       await this.authenticate();
     }
@@ -281,7 +278,7 @@ class RefinitivApiService {
     const response = await fetch(`${this.baseUrl}${endpoint}`, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${this.accessToken}`,
+        Authorization: `Bearer ${this.accessToken}`,
         'Content-Type': 'application/json'
       }
     });
@@ -307,7 +304,7 @@ class RefinitivApiService {
   getEndpoint(dataType) {
     const endpoints = {
       market_data: '/data/pricing/snapshots/v1',
-      fundamentals: '/data/fundamentals/v1', 
+      fundamentals: '/data/fundamentals/v1',
       estimates: '/data/estimates/v1',
       esg_data: '/data/environmental-social-governance/v1'
     };
@@ -330,7 +327,7 @@ class SPCapitalIQService {
     const response = await fetch(`${this.baseUrl}${endpoint}`, {
       method: 'POST',
       headers: {
-        'Authorization': `Basic ${auth}`,
+        Authorization: `Basic ${auth}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(params)
@@ -369,7 +366,7 @@ class FactSetService {
     const response = await fetch(`${this.baseUrl}${endpoint}`, {
       method: 'POST',
       headers: {
-        'Authorization': `Basic ${auth}`,
+        Authorization: `Basic ${auth}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(params)
@@ -381,10 +378,10 @@ class FactSetService {
   getEndpoint(dataType) {
     const endpoints = {
       market_data: '/factset-prices/v1/prices',
-      fundamentals: '/factset-fundamentals/v2/fundamentals', 
+      fundamentals: '/factset-fundamentals/v2/fundamentals',
       estimates: '/factset-estimates/v2/consensus'
     };
-    return endpoints[dataType];
+    return endpoints[dataType] || '/factset-data/v1/default';
   }
 }
 

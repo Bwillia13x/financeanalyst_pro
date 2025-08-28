@@ -11,18 +11,12 @@ const Breadcrumb = ({ items, className }) => {
   const breadcrumbItems = items || generateBreadcrumbsFromPath(location.pathname);
 
   return (
-    <nav
-      aria-label="Breadcrumb"
-      className={cn('flex items-center space-x-2 text-sm', className)}
-    >
+    <nav aria-label="Breadcrumb" className={cn('flex items-center space-x-2 text-sm', className)}>
       <ol className="flex items-center space-x-2">
         {breadcrumbItems.map((item, index) => (
           <li key={item.path || index} className="flex items-center">
             {index > 0 && (
-              <ChevronRight
-                className="w-4 h-4 text-muted-foreground mx-2"
-                aria-hidden="true"
-              />
+              <ChevronRight className="w-4 h-4 text-muted-foreground mx-2" aria-hidden="true" />
             )}
 
             {item.path && index < breadcrumbItems.length - 1 ? (
@@ -37,10 +31,7 @@ const Breadcrumb = ({ items, className }) => {
                 {item.label}
               </Link>
             ) : (
-              <span
-                className="text-foreground font-medium"
-                aria-current="page"
-              >
+              <span className="text-foreground font-medium" aria-current="page">
                 {index === 0 && item.icon && (
                   <item.icon className="w-4 h-4 mr-1 inline" aria-hidden="true" />
                 )}
@@ -55,11 +46,9 @@ const Breadcrumb = ({ items, className }) => {
 };
 
 // Auto-generate breadcrumbs from URL path
-const generateBreadcrumbsFromPath = (pathname) => {
+const generateBreadcrumbsFromPath = pathname => {
   const pathSegments = pathname.split('/').filter(Boolean);
-  const breadcrumbs = [
-    { label: 'Home', path: '/', icon: Home }
-  ];
+  const breadcrumbs = [{ label: 'Home', path: '/', icon: Home }];
 
   // Map common paths to user-friendly labels
   const pathLabels = {
@@ -70,13 +59,14 @@ const generateBreadcrumbsFromPath = (pathname) => {
     'real-time-market-data-center': 'Market Data',
     'valuation-workbench': 'Valuation Workbench',
     'model-lab': 'Model Lab',
-    'canvas': 'Canvas'
+    canvas: 'Canvas'
   };
 
   let currentPath = '';
-  pathSegments.forEach((segment) => {
+  pathSegments.forEach(segment => {
     currentPath += `/${segment}`;
-    const label = pathLabels[segment] || segment.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+    const label =
+      pathLabels[segment] || segment.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
 
     breadcrumbs.push({
       label,

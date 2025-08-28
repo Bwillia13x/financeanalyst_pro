@@ -32,7 +32,7 @@ export class VersionControlService {
 
     this.versions.set(initialVersion.id, initialVersion);
     this.currentVersion = initialVersion.id;
-    
+
     // Initialize main branch
     this.branches.set('main', {
       name: 'main',
@@ -61,7 +61,7 @@ export class VersionControlService {
 
     // Apply changes to create new data state
     const newData = this.applyChanges(parentVersion.data, changes);
-    
+
     // Validate changes
     const validation = await this.validateChanges(changes, parentVersion.data, newData);
     if (!validation.isValid) {
@@ -75,7 +75,7 @@ export class VersionControlService {
       parentVersion: parentVersion.id,
       branch: parentVersion.branch,
       data: newData,
-      changes: changes,
+      changes,
       metadata: {
         ...metadata,
         createdBy: userId,
@@ -89,7 +89,7 @@ export class VersionControlService {
 
     this.versions.set(newVersion.id, newVersion);
     this.currentVersion = newVersion.id;
-    
+
     // Update branch head
     const branch = this.branches.get(newVersion.branch);
     if (branch) {
@@ -108,7 +108,7 @@ export class VersionControlService {
       userId,
       changeCount: changes.length,
       timestamp: new Date().toISOString(),
-      metadata: metadata
+      metadata
     });
 
     return newVersion;
@@ -186,18 +186,18 @@ export class VersionControlService {
 
     // Find common ancestor
     const commonAncestor = this.findCommonAncestor(sourceVersion.id, targetVersion.id);
-    
+
     // Collect changes from both branches
     const sourceChanges = this.getChangesSince(commonAncestor.id, sourceVersion.id);
     const targetChanges = this.getChangesSince(commonAncestor.id, targetVersion.id);
 
     // Detect conflicts
     const conflicts = this.detectConflicts(sourceChanges, targetChanges);
-    
+
     if (conflicts.length > 0 && strategy === 'auto') {
       return {
         success: false,
-        conflicts: conflicts,
+        conflicts,
         requiresManualResolution: true
       };
     }
@@ -244,7 +244,7 @@ export class VersionControlService {
 
     return {
       success: true,
-      mergeVersion: mergeVersion,
+      mergeVersion,
       conflictsResolved: conflicts.length
     };
   }
@@ -270,7 +270,7 @@ export class VersionControlService {
       includeMetadata = true,
       filterByType = null,
       filterByUser = null,
-      since = null
+      since: _since = null
     } = options;
 
     let changes = version.changes || [];
@@ -283,13 +283,13 @@ export class VersionControlService {
       changes = changes.filter(change => change.userId === filterByUser);
     }
 
-    if (since) {
-      const sinceDate = new Date(since);
+    if (_since) {
+      const sinceDate = new Date(_since);
       changes = changes.filter(change => new Date(change.timestamp) >= sinceDate);
     }
 
     if (!includeMetadata) {
-      changes = changes.map(({ metadata, ...change }) => change);
+      changes = changes.map(({ metadata: _metadata, ...change }) => change);
     }
 
     return changes;
@@ -363,7 +363,7 @@ export class VersionControlService {
     };
 
     this.auditLog.push(auditEvent);
-    
+
     // Emit event for real-time updates
     this.emitEvent('audit_event', auditEvent);
   }
@@ -378,7 +378,7 @@ export class VersionControlService {
     }
 
     const diff = this.calculateDiff(version1.data, version2.data, options);
-    
+
     return {
       version1: {
         id: version1.id,
@@ -401,10 +401,10 @@ export class VersionControlService {
 
     const compare = (obj1, obj2, path = '') => {
       const keys = new Set([...Object.keys(obj1 || {}), ...Object.keys(obj2 || {})]);
-      
+
       for (const key of keys) {
         const fullPath = path ? `${path}.${key}` : key;
-        
+
         if (ignoreFields.includes(fullPath)) continue;
 
         const val1 = obj1 ? obj1[key] : undefined;
@@ -421,10 +421,10 @@ export class VersionControlService {
             const rounded1 = Math.round(val1 * Math.pow(10, precision)) / Math.pow(10, precision);
             const rounded2 = Math.round(val2 * Math.pow(10, precision)) / Math.pow(10, precision);
             if (rounded1 !== rounded2) {
-              diff.push({ 
-                type: 'modified', 
-                path: fullPath, 
-                oldValue: val1, 
+              diff.push({
+                type: 'modified',
+                path: fullPath,
+                oldValue: val1,
                 newValue: val2,
                 change: val2 - val1,
                 percentChange: val1 !== 0 ? ((val2 - val1) / val1) * 100 : null
@@ -449,10 +449,10 @@ export class VersionControlService {
     }
 
     const currentVersion = this.getVersion(this.currentVersion);
-    
+
     // Create rollback version
     const rollbackChanges = this.generateRollbackChanges(currentVersion.data, targetVersion.data);
-    
+
     const rollbackVersion = await this.createVersion(
       currentVersion.modelId,
       rollbackChanges,
@@ -494,7 +494,7 @@ export class VersionControlService {
 
   getVersionHistory(modelId, options = {}) {
     const { branch = null, limit = null, since = null } = options;
-    
+
     let versions = Array.from(this.versions.values()).filter(v => v.modelId === modelId);
 
     if (branch) {
@@ -535,7 +535,7 @@ export class VersionControlService {
     while (currentVersionId) {
       const version = this.getVersion(currentVersionId);
       if (!version) break;
-      
+
       ancestors.push(version);
       currentVersionId = version.parentVersion;
     }
@@ -558,7 +558,7 @@ export class VersionControlService {
 
   incrementVersion(currentVersion, changeType) {
     const [major, minor, patch] = currentVersion.split('.').map(Number);
-    
+
     switch (changeType) {
       case 'major':
         return `${major + 1}.0.0`;
@@ -597,11 +597,11 @@ export class VersionControlService {
 
   applyChanges(data, changes) {
     const newData = this.deepClone(data);
-    
+
     changes.forEach(change => {
-      const { path, type, value, oldValue } = change;
+      const { path, type, value, oldValue: _oldValue } = change;
       const pathArray = path.split('.');
-      
+
       let current = newData;
       for (let i = 0; i < pathArray.length - 1; i++) {
         if (!current[pathArray[i]]) {
@@ -609,9 +609,9 @@ export class VersionControlService {
         }
         current = current[pathArray[i]];
       }
-      
+
       const finalKey = pathArray[pathArray.length - 1];
-      
+
       switch (type) {
         case 'add':
         case 'modify':
@@ -628,7 +628,7 @@ export class VersionControlService {
 
   async validateChanges(changes, oldData, newData) {
     const errors = [];
-    
+
     // Basic validation
     changes.forEach(change => {
       if (!change.path) {
@@ -642,7 +642,7 @@ export class VersionControlService {
     // Data integrity checks
     try {
       JSON.stringify(newData);
-    } catch (e) {
+    } catch (_e) {
       errors.push('New data is not serializable');
     }
 
@@ -654,7 +654,7 @@ export class VersionControlService {
 
   detectConflicts(changes1, changes2) {
     const conflicts = [];
-    
+
     changes1.forEach(change1 => {
       changes2.forEach(change2 => {
         if (change1.path === change2.path && change1.type !== change2.type) {

@@ -1,11 +1,4 @@
-import {
-  TrendingUp,
-  Shield,
-  Target,
-  Activity,
-  Download,
-  RefreshCw
-} from 'lucide-react';
+import { TrendingUp, Shield, Target, Activity, Download, RefreshCw } from 'lucide-react';
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   LineChart,
@@ -44,7 +37,7 @@ const PortfolioAnalytics = ({
   const [riskTimeframe, _setRiskTimeframe] = useState('252');
 
   // Calculate portfolio risk metrics using existing portfolio commands
-  const calculateRiskMetrics = useCallback(async() => {
+  const calculateRiskMetrics = useCallback(async () => {
     if (!portfolio || !portfolio.holdings.length || loading.risk) return;
 
     setLoading(prev => ({ ...prev, risk: true }));
@@ -53,7 +46,7 @@ const PortfolioAnalytics = ({
       const weights = portfolio.holdings.map(h => (h.allocation || 0) / 100);
 
       // Calculate individual stock risk metrics
-      const individualRiskPromises = symbols.map(async(symbol) => {
+      const individualRiskPromises = symbols.map(async symbol => {
         try {
           const riskCommand = portfolioCommands.RISK_METRICS;
           const mockCommand = { parameters: [symbol, parseInt(riskTimeframe)] };
@@ -70,25 +63,41 @@ const PortfolioAnalytics = ({
       // Aggregate risk metrics
       const validRisks = individualRiskResults.filter(r => r);
       const aggregatedMetrics = {
-        portfolioVolatility: calculateWeightedAverage(validRisks.map(r => r.volatility || 0), weights),
-        portfolioBeta: calculateWeightedAverage(validRisks.map(r => r.beta || 1), weights),
-        portfolioSharpe: calculateWeightedAverage(validRisks.map(r => r.sharpeRatio || 0), weights),
-        portfolioVar95: calculateWeightedAverage(validRisks.map(r => r.var95 || 0), weights),
-        portfolioVar99: calculateWeightedAverage(validRisks.map(r => r.var99 || 0), weights),
+        portfolioVolatility: calculateWeightedAverage(
+          validRisks.map(r => r.volatility || 0),
+          weights
+        ),
+        portfolioBeta: calculateWeightedAverage(
+          validRisks.map(r => r.beta || 1),
+          weights
+        ),
+        portfolioSharpe: calculateWeightedAverage(
+          validRisks.map(r => r.sharpeRatio || 0),
+          weights
+        ),
+        portfolioVar95: calculateWeightedAverage(
+          validRisks.map(r => r.var95 || 0),
+          weights
+        ),
+        portfolioVar99: calculateWeightedAverage(
+          validRisks.map(r => r.var99 || 0),
+          weights
+        ),
         maxDrawdown: Math.max(...validRisks.map(r => r.maxDrawdown || 0)),
         concentrationRisk: calculateConcentrationRisk(weights),
-        individualMetrics: symbols.map((symbol, index) => ({
-          symbol,
-          weight: weights[index],
-          ...individualRiskResults[index]
-        })).filter(item => item.symbol)
+        individualMetrics: symbols
+          .map((symbol, index) => ({
+            symbol,
+            weight: weights[index],
+            ...individualRiskResults[index]
+          }))
+          .filter(item => item.symbol)
       };
 
       setAnalyticsData(prev => ({
         ...prev,
         riskMetrics: aggregatedMetrics
       }));
-
     } catch (error) {
       console.error('Risk metrics calculation failed:', error);
     } finally {
@@ -97,7 +106,7 @@ const PortfolioAnalytics = ({
   }, [portfolio, loading.risk, riskTimeframe]);
 
   // Calculate correlation matrix
-  const calculateCorrelationMatrix = useCallback(async() => {
+  const calculateCorrelationMatrix = useCallback(async () => {
     if (!portfolio || !portfolio.holdings.length || loading.correlation) return;
 
     setLoading(prev => ({ ...prev, correlation: true }));
@@ -122,7 +131,6 @@ const PortfolioAnalytics = ({
           correlationMatrix: result.data
         }));
       }
-
     } catch (error) {
       console.error('Correlation calculation failed:', error);
     } finally {
@@ -164,7 +172,7 @@ const PortfolioAnalytics = ({
     if (!portfolio || !metrics) return;
 
     const attribution = portfolio.holdings.map(holding => {
-      const contribution = (holding.allocation || 0) * (holding.gainLossPercent || 0) / 100;
+      const contribution = ((holding.allocation || 0) * (holding.gainLossPercent || 0)) / 100;
       return {
         symbol: holding.symbol,
         name: holding.name,
@@ -236,11 +244,13 @@ const PortfolioAnalytics = ({
 
         <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-2">
-            <label htmlFor="timeframe-select" className="text-sm font-medium text-gray-600">Timeframe:</label>
+            <label htmlFor="timeframe-select" className="text-sm font-medium text-gray-600">
+              Timeframe:
+            </label>
             <select
               id="timeframe-select"
               value={selectedTimeframe}
-              onChange={(e) => onTimeframeChange(e.target.value)}
+              onChange={e => onTimeframeChange(e.target.value)}
               className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               {timeframeOptions.map(option => (
@@ -273,21 +283,24 @@ const PortfolioAnalytics = ({
                       dataKey="date"
                       stroke="#6b7280"
                       fontSize={12}
-                      tickFormatter={(value) => new Date(value).toLocaleDateString()}
+                      tickFormatter={value => new Date(value).toLocaleDateString()}
                     />
                     <YAxis
                       stroke="#6b7280"
                       fontSize={12}
-                      tickFormatter={(value) => {
-                        const _formatCurrency = (value) => {
+                      tickFormatter={value => {
+                        const _formatCurrency = value => {
                           return formatCurrency(value, 0);
                         };
                         return _formatCurrency(value);
                       }}
                     />
                     <Tooltip
-                      formatter={(value, name) => [formatCurrency(value), name === 'portfolioValue' ? 'Portfolio' : 'Benchmark']}
-                      labelFormatter={(value) => new Date(value).toLocaleDateString()}
+                      formatter={(value, name) => [
+                        formatCurrency(value),
+                        name === 'portfolioValue' ? 'Portfolio' : 'Benchmark'
+                      ]}
+                      labelFormatter={value => new Date(value).toLocaleDateString()}
                     />
                     <Line
                       type="monotone"
@@ -334,9 +347,7 @@ const PortfolioAnalytics = ({
         <div className="bg-white rounded-xl shadow-sm border p-6">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-semibold text-gray-900">Correlation Matrix</h3>
-            {loading.correlation && (
-              <RefreshCw className="w-4 h-4 text-gray-400 animate-spin" />
-            )}
+            {loading.correlation && <RefreshCw className="w-4 h-4 text-gray-400 animate-spin" />}
           </div>
 
           {analyticsData.correlationMatrix && (
@@ -354,8 +365,12 @@ const PortfolioAnalytics = ({
               <BarChart data={analyticsData.performanceAttribution}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                 <XAxis dataKey="symbol" stroke="#6b7280" fontSize={12} />
-                <YAxis stroke="#6b7280" fontSize={12} tickFormatter={(value) => formatPercentage(value)} />
-                <Tooltip formatter={(value) => [formatPercentage(value), 'Contribution']} />
+                <YAxis
+                  stroke="#6b7280"
+                  fontSize={12}
+                  tickFormatter={value => formatPercentage(value)}
+                />
+                <Tooltip formatter={value => [formatPercentage(value), 'Contribution']} />
                 <Bar dataKey="contribution" fill="#3B82F6" radius={[2, 2, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
@@ -375,21 +390,23 @@ const PerformanceMetricsCard = ({ metrics }) => (
     <div className="space-y-3">
       <div className="flex justify-between">
         <span className="text-gray-600">Total Return:</span>
-        <span className={`font-medium ${metrics.totalGainLossPercent >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+        <span
+          className={`font-medium ${metrics.totalGainLossPercent >= 0 ? 'text-green-600' : 'text-red-600'}`}
+        >
           {formatPercentage(metrics.totalGainLossPercent)}
         </span>
       </div>
       <div className="flex justify-between">
         <span className="text-gray-600">Day Change:</span>
-        <span className={`font-medium ${metrics.dailyChangePercent >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+        <span
+          className={`font-medium ${metrics.dailyChangePercent >= 0 ? 'text-green-600' : 'text-red-600'}`}
+        >
           {formatPercentage(metrics.dailyChangePercent)}
         </span>
       </div>
       <div className="flex justify-between">
         <span className="text-gray-600">Dividend Yield:</span>
-        <span className="font-medium text-gray-900">
-          {formatPercentage(metrics.dividendYield)}
-        </span>
+        <span className="font-medium text-gray-900">{formatPercentage(metrics.dividendYield)}</span>
       </div>
     </div>
   </div>
@@ -399,10 +416,12 @@ const PerformanceAttributionCard = ({ attribution }) => (
   <div className="bg-white rounded-xl shadow-sm border p-6">
     <h3 className="text-lg font-semibold text-gray-900 mb-4">Top Contributors</h3>
     <div className="space-y-2">
-      {attribution.slice(0, 5).map((item) => (
+      {attribution.slice(0, 5).map(item => (
         <div key={item.symbol} className="flex items-center justify-between">
           <span className="text-sm text-gray-600">{item.symbol}</span>
-          <span className={`text-sm font-medium ${item.contribution >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+          <span
+            className={`text-sm font-medium ${item.contribution >= 0 ? 'text-green-600' : 'text-red-600'}`}
+          >
             {formatPercentage(item.contribution)}
           </span>
         </div>
@@ -452,19 +471,22 @@ const RiskDecompositionCard = ({ riskMetrics }) => (
     <h3 className="text-lg font-semibold text-gray-900 mb-4">Risk Decomposition</h3>
     {riskMetrics?.individualMetrics && (
       <div className="space-y-3">
-        {riskMetrics.individualMetrics.slice(0, 5).map((item) => (
-          <div key={item.symbol} className="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
+        {riskMetrics.individualMetrics.slice(0, 5).map(item => (
+          <div
+            key={item.symbol}
+            className="flex items-center justify-between p-3 border border-gray-200 rounded-lg"
+          >
             <div>
               <div className="font-medium text-gray-900">{item.symbol}</div>
-              <div className="text-sm text-gray-500">Weight: {formatPercentage(item.weight * 100)}</div>
+              <div className="text-sm text-gray-500">
+                Weight: {formatPercentage(item.weight * 100)}
+              </div>
             </div>
             <div className="text-right">
               <div className="text-sm font-medium text-gray-900">
                 Vol: {formatPercentage((item.volatility || 0) * 100)}
               </div>
-              <div className="text-sm text-gray-500">
-                Beta: {formatNumber(item.beta || 0, 2)}
-              </div>
+              <div className="text-sm text-gray-500">Beta: {formatNumber(item.beta || 0, 2)}</div>
             </div>
           </div>
         ))}
@@ -475,17 +497,26 @@ const RiskDecompositionCard = ({ riskMetrics }) => (
 
 const CorrelationMatrix = ({ data }) => {
   if (!data.correlationMatrix) {
-    return <div className="text-center py-8 text-gray-500">Insufficient data for correlation analysis</div>;
+    return (
+      <div className="text-center py-8 text-gray-500">
+        Insufficient data for correlation analysis
+      </div>
+    );
   }
 
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {data.correlationMatrix.slice(0, 6).map((correlation, index) => (
-          <div key={index} className="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
+          <div
+            key={index}
+            className="flex items-center justify-between p-3 border border-gray-200 rounded-lg"
+          >
             <span className="text-sm text-gray-600">{correlation.pair}</span>
             <div className="text-right">
-              <div className={`text-sm font-medium ${Math.abs(correlation.correlation) > 0.7 ? 'text-red-600' : 'text-green-600'}`}>
+              <div
+                className={`text-sm font-medium ${Math.abs(correlation.correlation) > 0.7 ? 'text-red-600' : 'text-green-600'}`}
+              >
                 {formatNumber(correlation.correlation, 2)}
               </div>
               <div className="text-xs text-gray-500">{correlation.strength}</div>
@@ -501,19 +532,24 @@ const AttributionBreakdownCard = ({ attribution }) => (
   <div className="bg-white rounded-xl shadow-sm border p-6">
     <h3 className="text-lg font-semibold text-gray-900 mb-6">Attribution Breakdown</h3>
     <div className="space-y-3">
-      {attribution.map((item) => (
-        <div key={item.symbol} className="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
+      {attribution.map(item => (
+        <div
+          key={item.symbol}
+          className="flex items-center justify-between p-3 border border-gray-200 rounded-lg"
+        >
           <div>
             <div className="font-medium text-gray-900">{item.symbol}</div>
-            <div className="text-sm text-gray-500">{formatPercentage(item.allocation)} allocation</div>
+            <div className="text-sm text-gray-500">
+              {formatPercentage(item.allocation)} allocation
+            </div>
           </div>
           <div className="text-right">
-            <div className={`font-medium ${item.contribution >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+            <div
+              className={`font-medium ${item.contribution >= 0 ? 'text-green-600' : 'text-red-600'}`}
+            >
               {formatPercentage(item.contribution)}
             </div>
-            <div className="text-sm text-gray-500">
-              {formatPercentage(item.return)} return
-            </div>
+            <div className="text-sm text-gray-500">{formatPercentage(item.return)} return</div>
           </div>
         </div>
       ))}
@@ -522,10 +558,15 @@ const AttributionBreakdownCard = ({ attribution }) => (
 );
 
 // Helper functions
-const getDaysFromTimeframe = (timeframe) => {
+const getDaysFromTimeframe = timeframe => {
   const timeframes = {
-    '1D': 1, '1W': 7, '1M': 30, '3M': 90, '6M': 180, '1Y': 365,
-    'YTD': Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 1)) / (1000 * 60 * 60 * 24))
+    '1D': 1,
+    '1W': 7,
+    '1M': 30,
+    '3M': 90,
+    '6M': 180,
+    '1Y': 365,
+    YTD: Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 1)) / (1000 * 60 * 60 * 24))
   };
   return timeframes[timeframe] || 30;
 };
@@ -534,7 +575,7 @@ const calculateWeightedAverage = (values, weights) => {
   return values.reduce((sum, value, index) => sum + value * (weights[index] || 0), 0);
 };
 
-const calculateConcentrationRisk = (weights) => {
+const calculateConcentrationRisk = weights => {
   return Math.max(...weights);
 };
 

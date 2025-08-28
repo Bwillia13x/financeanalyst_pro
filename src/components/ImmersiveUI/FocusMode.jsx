@@ -5,14 +5,7 @@
  */
 
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  Focus,
-  Minimize2,
-  Moon,
-  Sun,
-  Wind,
-  Feather
-} from 'lucide-react';
+import { Focus, Minimize2, Moon, Sun, Wind, Feather } from 'lucide-react';
 import React, { useState, useEffect, useCallback } from 'react';
 
 const FocusMode = ({ children, onFocusChange }) => {
@@ -41,7 +34,15 @@ const FocusMode = ({ children, onFocusChange }) => {
     deep: {
       name: 'Deep Focus',
       description: 'Maximum concentration, only core content',
-      hideElements: ['sidebar', 'notifications', 'footer', 'secondary-nav', 'breadcrumbs', 'header-extras', 'toolbar'],
+      hideElements: [
+        'sidebar',
+        'notifications',
+        'footer',
+        'secondary-nav',
+        'breadcrumbs',
+        'header-extras',
+        'toolbar'
+      ],
       dimOpacity: 0.05,
       breathingIntensity: 0.6
     }
@@ -63,9 +64,12 @@ const FocusMode = ({ children, onFocusChange }) => {
     const inactivityTimer = setInterval(() => {
       const timeSinceActivity = Date.now() - userActivity;
       // Suggest focus mode after 2 minutes of inactivity on analysis tasks
-      if (timeSinceActivity > 120000 && !isFocusMode &&
-          (window.location.pathname.includes('private-analysis') ||
-           window.location.pathname.includes('modeling'))) {
+      if (
+        timeSinceActivity > 120000 &&
+        !isFocusMode &&
+        (window.location.pathname.includes('private-analysis') ||
+          window.location.pathname.includes('modeling'))
+      ) {
         // Could show subtle suggestion here
       }
     }, 30000);
@@ -80,7 +84,7 @@ const FocusMode = ({ children, onFocusChange }) => {
 
   // Keyboard shortcut for focus mode
   useEffect(() => {
-    const handleKeyDown = (event) => {
+    const handleKeyDown = event => {
       // Cmd/Ctrl + Shift + F for focus mode
       if ((event.metaKey || event.ctrlKey) && event.shiftKey && event.key.toLowerCase() === 'f') {
         event.preventDefault();
@@ -114,7 +118,7 @@ const FocusMode = ({ children, onFocusChange }) => {
     }
   }, [isFocusMode, focusLevel, zenMode, onFocusChange]);
 
-  const handleFocusLevelChange = (newLevel) => {
+  const handleFocusLevelChange = newLevel => {
     setFocusLevel(newLevel);
     if (isFocusMode && onFocusChange) {
       onFocusChange(true, newLevel);
@@ -122,14 +126,16 @@ const FocusMode = ({ children, onFocusChange }) => {
   };
 
   // Breathing animation for deep focus
-  const breathingAnimation = breathingMode ? {
-    scale: [1, 1.02, 1],
-    transition: {
-      duration: 4,
-      repeat: Infinity,
-      ease: 'easeInOut'
-    }
-  } : {};
+  const breathingAnimation = breathingMode
+    ? {
+        scale: [1, 1.02, 1],
+        transition: {
+          duration: 4,
+          repeat: Infinity,
+          ease: 'easeInOut'
+        }
+      }
+    : {};
 
   return (
     <div className="relative">
@@ -189,11 +195,9 @@ const FocusMode = ({ children, onFocusChange }) => {
                   {/* Focus Level Selector */}
                   <select
                     value={focusLevel}
-                    onChange={(e) => handleFocusLevelChange(e.target.value)}
+                    onChange={e => handleFocusLevelChange(e.target.value)}
                     className={`text-xs rounded px-2 py-1 border-0 ${
-                      zenMode
-                        ? 'bg-gray-800 text-gray-200'
-                        : 'bg-gray-50 text-gray-700'
+                      zenMode ? 'bg-gray-800 text-gray-200' : 'bg-gray-50 text-gray-700'
                     }`}
                   >
                     <option value="minimal">Minimal</option>
@@ -205,9 +209,7 @@ const FocusMode = ({ children, onFocusChange }) => {
                   <button
                     onClick={() => setZenMode(!zenMode)}
                     className={`p-1 rounded ${
-                      zenMode
-                        ? 'bg-yellow-600 text-white'
-                        : 'text-gray-600 hover:bg-gray-100'
+                      zenMode ? 'bg-yellow-600 text-white' : 'text-gray-600 hover:bg-gray-100'
                     }`}
                     title="Zen Mode"
                   >
@@ -220,7 +222,9 @@ const FocusMode = ({ children, onFocusChange }) => {
                     className={`p-1 rounded ${
                       breathingMode
                         ? 'bg-blue-600 text-white'
-                        : zenMode ? 'text-gray-400 hover:bg-gray-800' : 'text-gray-600 hover:bg-gray-100'
+                        : zenMode
+                          ? 'text-gray-400 hover:bg-gray-800'
+                          : 'text-gray-600 hover:bg-gray-100'
                     }`}
                     title="Breathing Mode"
                   >
@@ -258,22 +262,19 @@ const FocusMode = ({ children, onFocusChange }) => {
                 <div className="flex items-center space-x-2">
                   <div
                     className={`w-2 h-2 rounded-full animate-pulse ${
-                      focusLevel === 'deep' ? 'bg-red-400' :
-                        focusLevel === 'moderate' ? 'bg-yellow-400' : 'bg-green-400'
+                      focusLevel === 'deep'
+                        ? 'bg-red-400'
+                        : focusLevel === 'moderate'
+                          ? 'bg-yellow-400'
+                          : 'bg-green-400'
                     }`}
                   />
                   <span
-                    className={`text-xs font-medium ${
-                      zenMode ? 'text-gray-200' : 'text-gray-700'
-                    }`}
+                    className={`text-xs font-medium ${zenMode ? 'text-gray-200' : 'text-gray-700'}`}
                   >
                     {currentFocusConfig.name}
                   </span>
-                  <Feather
-                    className={`w-3 h-3 ${
-                      zenMode ? 'text-gray-400' : 'text-gray-500'
-                    }`}
-                  />
+                  <Feather className={`w-3 h-3 ${zenMode ? 'text-gray-400' : 'text-gray-500'}`} />
                 </div>
               </div>
             </motion.div>
@@ -283,12 +284,10 @@ const FocusMode = ({ children, onFocusChange }) => {
 
       {/* Main Content with Focus Mode Styling */}
       <motion.div
-        className={`transition-all duration-500 ${
-          isFocusMode ? 'focus-mode-content' : ''
-        }`}
+        className={`transition-all duration-500 ${isFocusMode ? 'focus-mode-content' : ''}`}
         animate={breathingMode && isFocusMode ? breathingAnimation : {}}
       >
-        {React.Children.map(children, (child) => {
+        {React.Children.map(children, child => {
           if (React.isValidElement(child)) {
             return React.cloneElement(child, {
               ...child.props,
@@ -303,7 +302,8 @@ const FocusMode = ({ children, onFocusChange }) => {
       </motion.div>
 
       {/* Focus Mode CSS Injection */}
-      <style>{`
+      <style>
+        {`
         .focus-mode {
           overflow: hidden !important;
         }

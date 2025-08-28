@@ -107,7 +107,12 @@ class VisualizationService {
         sizeKey: 'size',
         colorKey: 'asset',
         showQuadrants: true,
-        quadrantLabels: ['Low Risk/Low Return', 'High Risk/Low Return', 'Low Risk/High Return', 'High Risk/High Return']
+        quadrantLabels: [
+          'Low Risk/Low Return',
+          'High Risk/Low Return',
+          'Low Risk/High Return',
+          'High Risk/High Return'
+        ]
       }
     });
 
@@ -531,7 +536,7 @@ class VisualizationService {
 
     // Type-specific configurations
     if (axisConfig.type === 'currency') {
-      options.ticks.callback = function(value) {
+      options.ticks.callback = function (value) {
         return new Intl.NumberFormat('en-US', {
           style: 'currency',
           currency: 'USD',
@@ -540,7 +545,7 @@ class VisualizationService {
         }).format(value);
       };
     } else if (axisConfig.type === 'percentage') {
-      options.ticks.callback = function(value) {
+      options.ticks.callback = function (value) {
         return value + '%';
       };
     }
@@ -554,7 +559,7 @@ class VisualizationService {
     if (config.showTrendLine) {
       plugins.push({
         id: 'trendline',
-        afterDraw: (chart) => {
+        afterDraw: chart => {
           this.drawTrendLine(chart);
         }
       });
@@ -563,7 +568,7 @@ class VisualizationService {
     if (config.showAnnotations) {
       plugins.push({
         id: 'annotations',
-        afterDraw: (chart) => {
+        afterDraw: chart => {
           this.drawAnnotations(chart, config.annotations);
         }
       });

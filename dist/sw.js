@@ -48,7 +48,7 @@ const CACHE_FIRST_PATTERNS = [
 // Install event - cache static assets
 self.addEventListener('install', (event) => {
   console.log('[SW] Installing service worker...');
-  
+
   event.waitUntil(
     Promise.all([
       // Cache static assets
@@ -65,7 +65,7 @@ self.addEventListener('install', (event) => {
 // Activate event - clean up old caches
 self.addEventListener('activate', (event) => {
   console.log('[SW] Activating service worker...');
-  
+
   event.waitUntil(
     Promise.all([
       // Clean up old caches
@@ -89,57 +89,57 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
-  
+
   // Skip non-GET requests
   if (request.method !== 'GET') {
     return;
   }
-  
+
   // Skip cross-origin requests except for fonts and images
   if (url.origin !== location.origin && !isSafeExternalResource(url)) {
     return;
   }
-  
+
   // Never cache sensitive routes
   if (SENSITIVE_ROUTES.some(route => url.pathname.startsWith(route))) {
     console.log('[SW] Bypassing cache for sensitive route:', url.pathname);
     return;
   }
-  
+
   event.respondWith(handleRequest(request));
 });
 
 // Handle different types of requests with appropriate strategies
 async function handleRequest(request) {
   const url = new URL(request.url);
-  
+
   try {
     // Special handling for financial API calls
     if (url.pathname.startsWith('/api/')) {
       return await handleFinancialApiRequest(request);
     }
-    
+
     // Network-first for API calls and dynamic data
     if (NETWORK_FIRST_PATTERNS.some(pattern => pattern.test(url.pathname))) {
       return await networkFirst(request);
     }
-    
+
     // Cache-first for static assets
     if (CACHE_FIRST_PATTERNS.some(pattern => pattern.test(url.pathname))) {
       return await cacheFirst(request);
     }
-    
+
     // Stale-while-revalidate for HTML pages
     return await staleWhileRevalidate(request);
-    
+
   } catch (error) {
     console.error('[SW] Request failed:', error);
-    
+
     // Return offline fallback for navigation requests
     if (request.destination === 'document') {
       return await getOfflineFallback(url.pathname);
     }
-    
+
     throw error;
   }
 }
@@ -148,23 +148,23 @@ async function handleRequest(request) {
 async function handleFinancialApiRequest(request) {
   const url = new URL(request.url);
   const cacheKey = `api-${url.pathname}${url.search}`;
-  
+
   // Check if this is sensitive data that shouldn't be cached
   if (isSensitiveFinancialData(url.pathname)) {
     console.log('[SW] Bypassing cache for sensitive financial data:', url.pathname);
     return await fetch(request);
   }
-  
+
   // For market data, use short TTL cache
   if (url.pathname.includes('/market/') || url.pathname.includes('/quote/')) {
     return await handleMarketDataRequest(request, cacheKey);
   }
-  
+
   // For reference data, use long TTL cache
   if (url.pathname.includes('/reference/') || url.pathname.includes('/symbols/')) {
     return await handleReferenceDataRequest(request, cacheKey);
   }
-  
+
   // Default API handling
   return await networkFirst(request);
 }
@@ -173,22 +173,22 @@ async function handleFinancialApiRequest(request) {
 async function handleMarketDataRequest(request, cacheKey) {
   const cache = await caches.open(DYNAMIC_CACHE);
   const cachedResponse = await cache.match(request);
-  
+
   // Check cache timestamp
   if (cachedResponse) {
     const cacheTime = cachedResponse.headers.get('sw-cache-time');
     const age = Date.now() - parseInt(cacheTime || '0');
-    
+
     // If less than 30 seconds old, return cached
     if (age < 30000) {
       console.log('[SW] Serving fresh market data from cache');
       return cachedResponse;
     }
-    
+
     // If less than 2 minutes old, return stale but refresh in background
     if (age < 120000) {
       console.log('[SW] Serving stale market data, refreshing in background');
-      
+
       // Refresh in background
       fetch(request).then(async (response) => {
         if (response.ok) {
@@ -199,11 +199,11 @@ async function handleMarketDataRequest(request, cacheKey) {
       }).catch(error => {
         console.warn('[SW] Background market data refresh failed:', error);
       });
-      
+
       return cachedResponse;
     }
   }
-  
+
   // Fetch fresh data
   try {
     const response = await fetch(request);
@@ -227,18 +227,18 @@ async function handleMarketDataRequest(request, cacheKey) {
 async function handleReferenceDataRequest(request, cacheKey) {
   const cache = await caches.open(DYNAMIC_CACHE);
   const cachedResponse = await cache.match(request);
-  
+
   if (cachedResponse) {
     const cacheTime = cachedResponse.headers.get('sw-cache-time');
     const age = Date.now() - parseInt(cacheTime || '0');
-    
+
     // Reference data is valid for 24 hours
     if (age < 24 * 60 * 60 * 1000) {
       console.log('[SW] Serving reference data from cache');
       return cachedResponse;
     }
   }
-  
+
   // Fetch fresh reference data
   try {
     const response = await fetch(request);
@@ -267,7 +267,7 @@ function isSensitiveFinancialData(pathname) {
     '/api/analysis/',
     '/api/auth/'
   ];
-  
+
   return sensitivePatterns.some(pattern => pathname.includes(pattern));
 }
 
@@ -275,13 +275,13 @@ function isSensitiveFinancialData(pathname) {
 async function networkFirst(request) {
   try {
     const networkResponse = await fetch(request);
-    
+
     // Only cache successful responses for non-sensitive data
     if (networkResponse.ok && !isSensitiveData(request.url)) {
       const cache = await caches.open(DYNAMIC_CACHE);
       cache.put(request, networkResponse.clone());
     }
-    
+
     return networkResponse;
   } catch (error) {
     const cachedResponse = await caches.match(request);
@@ -296,26 +296,26 @@ async function networkFirst(request) {
 // Cache-first strategy
 async function cacheFirst(request) {
   const cachedResponse = await caches.match(request);
-  
+
   if (cachedResponse) {
     console.log('[SW] Serving from cache:', request.url);
     return cachedResponse;
   }
-  
+
   const networkResponse = await fetch(request);
-  
+
   if (networkResponse.ok) {
     const cache = await caches.open(STATIC_CACHE);
     cache.put(request, networkResponse.clone());
   }
-  
+
   return networkResponse;
 }
 
 // Stale-while-revalidate strategy
 async function staleWhileRevalidate(request) {
   const cachedResponse = await caches.match(request);
-  
+
   const networkResponsePromise = fetch(request).then(async (networkResponse) => {
     if (networkResponse.ok && !isSensitiveData(request.url)) {
       const cache = await caches.open(DYNAMIC_CACHE);
@@ -326,7 +326,7 @@ async function staleWhileRevalidate(request) {
     console.log('[SW] Network request failed:', error);
     return null;
   });
-  
+
   // Return cached version immediately if available
   if (cachedResponse) {
     console.log('[SW] Serving from cache (stale-while-revalidate):', request.url);
@@ -334,7 +334,7 @@ async function staleWhileRevalidate(request) {
     networkResponsePromise;
     return cachedResponse;
   }
-  
+
   // Wait for network if no cache available
   return await networkResponsePromise || await getOfflineFallback(request.url);
 }
@@ -348,7 +348,7 @@ async function getOfflineFallback(pathname) {
       return cachedResponse;
     }
   }
-  
+
   // Return a simple offline page
   return new Response(
     `
@@ -393,8 +393,8 @@ function isSensitiveData(url) {
     'portfolio', 'account', 'balance', 'transaction', 'price', 'quote',
     'market-data', 'private', 'personal', 'auth', 'login', 'api'
   ];
-  
-  return sensitiveKeywords.some(keyword => 
+
+  return sensitiveKeywords.some(keyword =>
     url.toLowerCase().includes(keyword)
   );
 }
@@ -406,9 +406,9 @@ function isSafeExternalResource(url) {
     'fonts.gstatic.com',
     'cdn.jsdelivr.net'
   ];
-  
+
   const safeExtensions = ['.woff', '.woff2', '.ttf', '.otf'];
-  
+
   return safeDomains.some(domain => url.hostname.includes(domain)) ||
          safeExtensions.some(ext => url.pathname.endsWith(ext));
 }
@@ -416,7 +416,7 @@ function isSafeExternalResource(url) {
 // Background sync for when connection is restored
 self.addEventListener('sync', (event) => {
   console.log('[SW] Background sync triggered:', event.tag);
-  
+
   if (event.tag === 'background-sync') {
     event.waitUntil(doBackgroundSync());
   }
@@ -431,9 +431,9 @@ async function doBackgroundSync() {
 // Push notification handling (if needed for market alerts)
 self.addEventListener('push', (event) => {
   if (!event.data) return;
-  
+
   const data = event.data.json();
-  
+
   // Only show notifications for important financial alerts
   if (data.type === 'market-alert' || data.type === 'portfolio-update') {
     const options = {
@@ -444,7 +444,7 @@ self.addEventListener('push', (event) => {
       requireInteraction: data.urgent || false,
       data: data
     };
-    
+
     event.waitUntil(
       self.registration.showNotification(data.title, options)
     );
@@ -454,7 +454,7 @@ self.addEventListener('push', (event) => {
 // Handle notification clicks
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-  
+
   const data = event.notification.data;
   if (data && data.url) {
     event.waitUntil(

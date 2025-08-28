@@ -7,7 +7,7 @@ export const Heatmap = ({ grid, xLabels, yLabels }) => {
   const vMin = Math.min(...grid.flat());
   const vMax = Math.max(...grid.flat());
 
-  const color = (v) => {
+  const color = v => {
     const t = (v - vMin) / (vMax - vMin + 1e-9);
     const h = 220 - 220 * t;
     return `hsl(${h} 80% 55%)`;
@@ -15,7 +15,10 @@ export const Heatmap = ({ grid, xLabels, yLabels }) => {
 
   return (
     <div className="overflow-hidden rounded-xl border border-slate-200">
-      <div className="grid" style={{ gridTemplateColumns: `auto repeat(${xLabels.length}, minmax(0,1fr))` }}>
+      <div
+        className="grid"
+        style={{ gridTemplateColumns: `auto repeat(${xLabels.length}, minmax(0,1fr))` }}
+      >
         <div className="bg-slate-50 px-2 py-1 text-[11px] text-slate-600" />
         {xLabels.map((x, i) => (
           <div key={i} className="bg-slate-50 px-2 py-1 text-center text-[11px] text-slate-600">
@@ -71,9 +74,9 @@ export function generateHeatmap(assumptions, waccVals, termVals, termIsGrowth) {
       }
 
       // Force wacc for the run by overriding keManual to hit target
-      const ke = aa.capmMode === 'capm' ? (aa.rf + aa.beta * aa.erp) : aa.keManual;
+      const ke = aa.capmMode === 'capm' ? aa.rf + aa.beta * aa.erp : aa.keManual;
       const _curW = aa.wd * aa.kd * (1 - aa.taxRate) + aa.we * ke;
-      const deltaKe = (waccVals[i] - (aa.wd * aa.kd * (1 - aa.taxRate))) / (aa.we || 1e-9);
+      const deltaKe = (waccVals[i] - aa.wd * aa.kd * (1 - aa.taxRate)) / (aa.we || 1e-9);
       aa.capmMode = 'manualKe';
       aa.keManual = deltaKe;
 
@@ -96,7 +99,11 @@ export function generateHeatmapsWithConfig(assumptions, axisConfig = null) {
 
   const waccVals = generateRange(config.wacc.min, config.wacc.max, config.wacc.steps);
   const growthVals = generateRange(config.growth.min, config.growth.max, config.growth.steps);
-  const exitMultipleVals = generateRange(config.exitMultiple.min, config.exitMultiple.max, config.exitMultiple.steps);
+  const exitMultipleVals = generateRange(
+    config.exitMultiple.min,
+    config.exitMultiple.max,
+    config.exitMultiple.steps
+  );
 
   return {
     waccGrowth: {

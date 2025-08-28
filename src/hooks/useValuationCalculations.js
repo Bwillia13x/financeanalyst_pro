@@ -1,5 +1,5 @@
 export const useValuationCalculations = () => {
-  const calculateDCF = (dcfInputs) => {
+  const calculateDCF = dcfInputs => {
     const {
       currentRevenue,
       revenueGrowthRate,
@@ -17,7 +17,7 @@ export const useValuationCalculations = () => {
 
     // Calculate projected free cash flows
     for (let year = 1; year <= projectionYears; year++) {
-      revenue *= (1 + revenueGrowthRate);
+      revenue *= 1 + revenueGrowthRate;
       const ebitda = revenue * ebitdaMargin;
       const ebit = ebitda * 0.8; // Assuming 20% of EBITDA is depreciation
       const taxes = ebit * taxRate;
@@ -53,7 +53,7 @@ export const useValuationCalculations = () => {
     };
   };
 
-  const calculateLBO = (lboInputs) => {
+  const calculateLBO = lboInputs => {
     const {
       purchasePrice,
       equityContribution,
@@ -75,7 +75,7 @@ export const useValuationCalculations = () => {
     // Calculate exit EBITDA with growth
     let exitEBITDA = initialEBITDA;
     for (let year = 1; year <= exitYear; year++) {
-      exitEBITDA *= (1 + ebitdaGrowth);
+      exitEBITDA *= 1 + ebitdaGrowth;
     }
 
     // Exit value
@@ -90,7 +90,8 @@ export const useValuationCalculations = () => {
     const managementFeesAmount = purchasePrice * managementFees * exitYear;
 
     // Returns
-    const netExitValue = exitValue - remainingDebt - totalInterest - transactionFeesAmount - managementFeesAmount;
+    const netExitValue =
+      exitValue - remainingDebt - totalInterest - transactionFeesAmount - managementFeesAmount;
     const irr = Math.pow(netExitValue / equityInvestment, 1 / exitYear) - 1;
     const moic = netExitValue / equityInvestment;
 

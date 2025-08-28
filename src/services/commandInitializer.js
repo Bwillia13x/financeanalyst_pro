@@ -487,7 +487,11 @@ export function initializeCommands() {
     category: 'AUTOMATION',
     description: 'Create and manage stock watchlists with analysis',
     usage: 'WATCHLIST(action, name, tickers)',
-    examples: ['WATCHLIST(list)', 'WATCHLIST(create, "Tech", [AAPL,MSFT])', 'WATCHLIST(analyze, "Tech")'],
+    examples: [
+      'WATCHLIST(list)',
+      'WATCHLIST(create, "Tech", [AAPL,MSFT])',
+      'WATCHLIST(analyze, "Tech")'
+    ],
     tags: ['watchlist', 'portfolio', 'tracking'],
     parameterSchema: {
       required: ['action'],
@@ -524,7 +528,11 @@ export function initializeCommands() {
     category: 'AUTOMATION',
     description: 'Create and manage stock watchlists with analysis',
     usage: 'WATCHLIST(action, name, tickers)',
-    examples: ['WATCHLIST(list)', 'WATCHLIST(create, "Tech", [AAPL,MSFT])', 'WATCHLIST(analyze, "Tech")'],
+    examples: [
+      'WATCHLIST(list)',
+      'WATCHLIST(create, "Tech", [AAPL,MSFT])',
+      'WATCHLIST(analyze, "Tech")'
+    ],
     tags: ['watchlist', 'portfolio', 'tracking'],
     parameterSchema: {
       required: ['action'],
@@ -740,130 +748,145 @@ export function initializeCommands() {
   });
 
   // Register Utility Commands
-  commandRegistry.register('HELP', {
-    execute: async(parsedCommand, _context, _processor) => {
-      const [category] = parsedCommand.parameters;
+  commandRegistry.register(
+    'HELP',
+    {
+      execute: async (parsedCommand, _context, _processor) => {
+        const [category] = parsedCommand.parameters;
 
-      // Show ALL commands in detail
-      if (category && category.toLowerCase() === 'all') {
-        const allCommands = commandRegistry.getAllCommands();
-        const categories = commandRegistry.getAllCategories();
+        // Show ALL commands in detail
+        if (category && category.toLowerCase() === 'all') {
+          const allCommands = commandRegistry.getAllCommands();
+          const categories = commandRegistry.getAllCategories();
 
-        let content = '📚 COMPREHENSIVE COMMAND REFERENCE\n';
-        content += 'FinanceAnalyst Pro Terminal v2.4.0 - Complete Command Suite\n';
-        content += '═════════════════════════════════════════════════════════════\n\n';
+          let content = '📚 COMPREHENSIVE COMMAND REFERENCE\n';
+          content += 'FinanceAnalyst Pro Terminal v2.4.0 - Complete Command Suite\n';
+          content += '═════════════════════════════════════════════════════════════\n\n';
 
-        // Group commands by category
-        categories.forEach(cat => {
-          const categoryCommands = commandRegistry.getCommandsByCategory(cat.key);
-          if (categoryCommands.length > 0) {
-            content += `${cat.icon} ${cat.name.toUpperCase()} COMMANDS (${categoryCommands.length})\n`;
-            content += `${cat.description}\n`;
-            content += '─'.repeat(50) + '\n';
+          // Group commands by category
+          categories.forEach(cat => {
+            const categoryCommands = commandRegistry.getCommandsByCategory(cat.key);
+            if (categoryCommands.length > 0) {
+              content += `${cat.icon} ${cat.name.toUpperCase()} COMMANDS (${categoryCommands.length})\n`;
+              content += `${cat.description}\n`;
+              content += '─'.repeat(50) + '\n';
 
-            categoryCommands.forEach(cmd => {
-              content += `\n• ${cmd.usage}\n`;
-              content += `  ${cmd.description}\n`;
-              if (cmd.examples && cmd.examples.length > 0) {
-                content += `  Examples: ${cmd.examples.join(', ')}\n`;
-              }
-              if (cmd.tags && cmd.tags.length > 0) {
-                content += `  Tags: ${cmd.tags.join(', ')}\n`;
-              }
-            });
-            content += '\n';
-          }
-        });
+              categoryCommands.forEach(cmd => {
+                content += `\n• ${cmd.usage}\n`;
+                content += `  ${cmd.description}\n`;
+                if (cmd.examples && cmd.examples.length > 0) {
+                  content += `  Examples: ${cmd.examples.join(', ')}\n`;
+                }
+                if (cmd.tags && cmd.tags.length > 0) {
+                  content += `  Tags: ${cmd.tags.join(', ')}\n`;
+                }
+              });
+              content += '\n';
+            }
+          });
 
-        content += `\n📊 SUMMARY: ${allCommands.length} total commands across ${categories.length} categories\n`;
-        content += '\n💡 TIP: Use HELP(category) for specific category details\n';
-        content += '💡 TIP: Use HELP() for quick overview and featured commands';
+          content += `\n📊 SUMMARY: ${allCommands.length} total commands across ${categories.length} categories\n`;
+          content += '\n💡 TIP: Use HELP(category) for specific category details\n';
+          content += '💡 TIP: Use HELP() for quick overview and featured commands';
 
-        return {
-          type: 'system',
-          content
-        };
-      }
-
-      if (category) {
-        // Show commands for specific category
-        const categoryCommands = commandRegistry.getCommandsByCategory(category.toUpperCase());
-        if (categoryCommands.length === 0) {
           return {
-            type: 'error',
-            content: `Unknown category: ${category}. Use HELP() to see all categories or HELP(ALL) for complete command list.`
+            type: 'system',
+            content
           };
         }
 
-        let content = `📋 ${category.toUpperCase()} COMMANDS (${categoryCommands.length})\n`;
-        content += '═'.repeat(40) + '\n\n';
-
-        categoryCommands.forEach(cmd => {
-          content += `• ${cmd.usage}\n`;
-          content += `  ${cmd.description}\n`;
-          if (cmd.examples && cmd.examples.length > 0) {
-            content += `  Examples: ${cmd.examples.join(', ')}\n`;
+        if (category) {
+          // Show commands for specific category
+          const categoryCommands = commandRegistry.getCommandsByCategory(category.toUpperCase());
+          if (categoryCommands.length === 0) {
+            return {
+              type: 'error',
+              content: `Unknown category: ${category}. Use HELP() to see all categories or HELP(ALL) for complete command list.`
+            };
           }
-          content += '\n';
-        });
 
-        content += 'Use HELP() for overview or HELP(ALL) for all commands.';
+          let content = `📋 ${category.toUpperCase()} COMMANDS (${categoryCommands.length})\n`;
+          content += '═'.repeat(40) + '\n\n';
+
+          categoryCommands.forEach(cmd => {
+            content += `• ${cmd.usage}\n`;
+            content += `  ${cmd.description}\n`;
+            if (cmd.examples && cmd.examples.length > 0) {
+              content += `  Examples: ${cmd.examples.join(', ')}\n`;
+            }
+            content += '\n';
+          });
+
+          content += 'Use HELP() for overview or HELP(ALL) for all commands.';
+
+          return {
+            type: 'system',
+            content
+          };
+        }
+
+        // Show all categories and featured commands (default view)
+        const categories = commandRegistry.getAllCategories();
+        const stats = commandRegistry.getCommandStats();
+        const totalCommands = Object.values(stats).reduce((sum, cat) => sum + cat.count, 0);
+
+        const content = `🚀 FinanceAnalyst Pro Terminal v2.4.0 - Enhanced Command Suite\n\n📊 COMMAND CATEGORIES:\n${categories
+          .map(
+            cat =>
+              `${cat.icon} ${cat.name} (${stats[cat.key]?.count || 0} commands)\n   ${cat.description}`
+          )
+          .join(
+            '\n\n'
+          )}\n\n⭐ FEATURED COMMANDS:\n• DCF(AAPL) - Discounted Cash Flow with live data\n• LBO(TSLA) - Leveraged Buyout analysis\n• PORTFOLIO([AAPL,MSFT], [0.5,0.5]) - Portfolio analysis\n• RISK_METRICS(GOOGL) - Comprehensive risk analysis\n• CORRELATION_MATRIX([AAPL,MSFT,GOOGL]) - Cross-asset correlations\n• PRIVATE_DCF() - Private company DCF valuation\n• PRIVATE_RATIOS() - Private company financial ratios\n• PRIVATE_SUMMARY() - Private company analysis summary\n\n🔧 PRIVATE ANALYSIS COMMANDS:\n• PRIVATE_LOAD() - Load private company data\n• PRIVATE_DCF() - DCF valuation for private companies\n• PRIVATE_RATIOS() - Calculate private company ratios\n• PRIVATE_SUMMARY() - Generate private company summary\n\n💡 HELP COMMANDS:\n• HELP() - Show this overview (current)\n• HELP(category) - Show commands for specific category\n• HELP(ALL) - Show complete list of ALL ${totalCommands} commands\n\n📋 AVAILABLE CATEGORIES:\n${categories.map(cat => `• ${cat.key}`).join(' • ')}\n\n🚀 ENHANCED FEATURES:\n• Watchlists: Create and track custom stock lists\n• Alerts: Set price and metric notifications\n• Batch Analysis: Analyze multiple stocks simultaneously\n• ESG Scoring: Environmental, social, governance analysis\n• Technical Analysis: RSI, MACD, support/resistance\n• Advanced Valuation: DDM, residual income, asset-based models\n• Private Company Analysis: Full financial modeling suite\n\n📊 ${categories.length} categories • ${totalCommands} total commands available\n\n💡 Pro Tip: Use HELP(ALL) to see every single command with examples!`;
 
         return {
           type: 'system',
           content
         };
+      },
+      parameterSchema: {
+        required: [],
+        optional: ['category']
       }
-
-      // Show all categories and featured commands (default view)
-      const categories = commandRegistry.getAllCategories();
-      const stats = commandRegistry.getCommandStats();
-      const totalCommands = Object.values(stats).reduce((sum, cat) => sum + cat.count, 0);
-
-      const content = `🚀 FinanceAnalyst Pro Terminal v2.4.0 - Enhanced Command Suite\n\n📊 COMMAND CATEGORIES:\n${categories.map(cat =>
-        `${cat.icon} ${cat.name} (${stats[cat.key]?.count || 0} commands)\n   ${cat.description}`
-      ).join('\n\n')}\n\n⭐ FEATURED COMMANDS:\n• DCF(AAPL) - Discounted Cash Flow with live data\n• LBO(TSLA) - Leveraged Buyout analysis\n• PORTFOLIO([AAPL,MSFT], [0.5,0.5]) - Portfolio analysis\n• RISK_METRICS(GOOGL) - Comprehensive risk analysis\n• CORRELATION_MATRIX([AAPL,MSFT,GOOGL]) - Cross-asset correlations\n• PRIVATE_DCF() - Private company DCF valuation\n• PRIVATE_RATIOS() - Private company financial ratios\n• PRIVATE_SUMMARY() - Private company analysis summary\n\n🔧 PRIVATE ANALYSIS COMMANDS:\n• PRIVATE_LOAD() - Load private company data\n• PRIVATE_DCF() - DCF valuation for private companies\n• PRIVATE_RATIOS() - Calculate private company ratios\n• PRIVATE_SUMMARY() - Generate private company summary\n\n💡 HELP COMMANDS:\n• HELP() - Show this overview (current)\n• HELP(category) - Show commands for specific category\n• HELP(ALL) - Show complete list of ALL ${totalCommands} commands\n\n📋 AVAILABLE CATEGORIES:\n${categories.map(cat => `• ${cat.key}`).join(' • ')}\n\n🚀 ENHANCED FEATURES:\n• Watchlists: Create and track custom stock lists\n• Alerts: Set price and metric notifications\n• Batch Analysis: Analyze multiple stocks simultaneously\n• ESG Scoring: Environmental, social, governance analysis\n• Technical Analysis: RSI, MACD, support/resistance\n• Advanced Valuation: DDM, residual income, asset-based models\n• Private Company Analysis: Full financial modeling suite\n\n📊 ${categories.length} categories • ${totalCommands} total commands available\n\n💡 Pro Tip: Use HELP(ALL) to see every single command with examples!`;
-
-      return {
-        type: 'system',
-        content
-      };
     },
-    parameterSchema: {
-      required: [],
-      optional: ['category']
+    {
+      category: 'UTILITY',
+      description: 'Show available commands and usage information',
+      usage: 'HELP(category)',
+      examples: ['HELP()', 'HELP(PORTFOLIO)', 'HELP(CORE)', 'HELP(ALL)'],
+      tags: ['help', 'documentation', 'commands']
     }
-  }, {
-    category: 'UTILITY',
-    description: 'Show available commands and usage information',
-    usage: 'HELP(category)',
-    examples: ['HELP()', 'HELP(PORTFOLIO)', 'HELP(CORE)', 'HELP(ALL)'],
-    tags: ['help', 'documentation', 'commands']
-  });
+  );
 
-  commandRegistry.register('CLEAR', {
-    execute: async(_parsedCommand, _context, _processor) => {
-      return {
-        type: 'system',
-        content: 'clear_terminal', // Special flag for terminal to clear
-        action: 'clear'
-      };
+  commandRegistry.register(
+    'CLEAR',
+    {
+      execute: async (_parsedCommand, _context, _processor) => {
+        return {
+          type: 'system',
+          content: 'clear_terminal', // Special flag for terminal to clear
+          action: 'clear'
+        };
+      }
+    },
+    {
+      category: 'UTILITY',
+      description: 'Clear the terminal screen',
+      usage: 'CLEAR()',
+      examples: ['CLEAR()'],
+      tags: ['utility', 'clear', 'terminal']
     }
-  }, {
-    category: 'UTILITY',
-    description: 'Clear the terminal screen',
-    usage: 'CLEAR()',
-    examples: ['CLEAR()'],
-    tags: ['utility', 'clear', 'terminal']
-  });
+  );
 
-  commandRegistry.register('STATUS', {
-    execute: async(parsedCommand, context, processor) => {
-      const settings = processor.getAllSettings();
-      const variables = processor.getAllVariables();
-      const history = processor.getHistory(5);
+  commandRegistry.register(
+    'STATUS',
+    {
+      execute: async (parsedCommand, context, processor) => {
+        const settings = processor.getAllSettings();
+        const variables = processor.getAllVariables();
+        const history = processor.getHistory(5);
 
-      const content = `System Status Report
+        const content = `System Status Report
 
 🔧 SYSTEM CONFIGURATION:
 • Currency: ${settings.currency}
@@ -888,20 +911,26 @@ export function initializeCommands() {
 
 ✅ All systems operational`;
 
-      return {
-        type: 'system',
-        content
-      };
+        return {
+          type: 'system',
+          content
+        };
+      }
+    },
+    {
+      category: 'UTILITY',
+      description: 'Show system status and configuration',
+      usage: 'STATUS()',
+      examples: ['STATUS()'],
+      tags: ['status', 'system', 'configuration']
     }
-  }, {
-    category: 'UTILITY',
-    description: 'Show system status and configuration',
-    usage: 'STATUS()',
-    examples: ['STATUS()'],
-    tags: ['status', 'system', 'configuration']
-  });
+  );
 
-  console.log('✅ Command registry initialized with', commandRegistry.getAllCommands().length, 'commands');
+  console.log(
+    '✅ Command registry initialized with',
+    commandRegistry.getAllCommands().length,
+    'commands'
+  );
 }
 
 // Auto-initialize when module is imported

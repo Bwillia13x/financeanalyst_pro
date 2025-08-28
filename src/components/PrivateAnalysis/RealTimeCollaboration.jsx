@@ -113,13 +113,18 @@ const RealTimeCollaboration = ({ _modelId, currentUser, _onDataChange }) => {
   useEffect(() => {
     const interval = setInterval(() => {
       // Simulate cursor movements
-      setActiveUsers(prev => prev.map(user => ({
-        ...user,
-        cursor: user.status === 'online' ? {
-          x: Math.random() * 800,
-          y: Math.random() * 600
-        } : user.cursor
-      })));
+      setActiveUsers(prev =>
+        prev.map(user => ({
+          ...user,
+          cursor:
+            user.status === 'online'
+              ? {
+                  x: Math.random() * 800,
+                  y: Math.random() * 600
+                }
+              : user.cursor
+        }))
+      );
     }, 3000);
 
     return () => clearInterval(interval);
@@ -144,11 +149,11 @@ const RealTimeCollaboration = ({ _modelId, currentUser, _onDataChange }) => {
     }
   };
 
-  const formatTime = (date) => {
+  const formatTime = date => {
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
-  const getStatusColor = (status) => {
+  const getStatusColor = status => {
     switch (status) {
       case 'online':
         return 'bg-green-500';
@@ -208,7 +213,7 @@ const RealTimeCollaboration = ({ _modelId, currentUser, _onDataChange }) => {
                   { id: 'presence', label: 'Presence', icon: Users },
                   { id: 'changes', label: 'Live Changes', icon: Edit3 },
                   { id: 'permissions', label: 'Permissions', icon: Settings }
-                ].map((tab) => {
+                ].map(tab => {
                   const Icon = tab.icon;
                   return (
                     <button
@@ -230,7 +235,7 @@ const RealTimeCollaboration = ({ _modelId, currentUser, _onDataChange }) => {
               {/* Presence Tab */}
               {activeTab === 'presence' && (
                 <div className="space-y-4">
-                  {activeUsers.map((user) => (
+                  {activeUsers.map(user => (
                     <motion.div
                       key={user.id}
                       initial={{ opacity: 0, x: -20 }}
@@ -245,7 +250,9 @@ const RealTimeCollaboration = ({ _modelId, currentUser, _onDataChange }) => {
                           >
                             {user.avatar}
                           </div>
-                          <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white ${getStatusColor(user.status)}`} />
+                          <div
+                            className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white ${getStatusColor(user.status)}`}
+                          />
                         </div>
                         <div>
                           <div className="font-medium text-gray-900">{user.name}</div>
@@ -291,14 +298,18 @@ const RealTimeCollaboration = ({ _modelId, currentUser, _onDataChange }) => {
                       <div>
                         <h4 className="font-medium text-blue-900">Live Sync Enabled</h4>
                         <p className="text-sm text-blue-700 mt-1">
-                          All changes are automatically synchronized across all collaborators in real-time.
+                          All changes are automatically synchronized across all collaborators in
+                          real-time.
                         </p>
                       </div>
                     </div>
                   </div>
 
-                  {notifications.map((notification) => (
-                    <div key={notification.id} className="flex items-start space-x-3 p-4 bg-gray-50 rounded-lg">
+                  {notifications.map(notification => (
+                    <div
+                      key={notification.id}
+                      className="flex items-start space-x-3 p-4 bg-gray-50 rounded-lg"
+                    >
                       <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
                         {notification.type === 'change' ? (
                           <Edit3 className="w-4 h-4 text-blue-600" />
@@ -313,9 +324,7 @@ const RealTimeCollaboration = ({ _modelId, currentUser, _onDataChange }) => {
                           {formatTime(notification.timestamp)}
                         </div>
                       </div>
-                      {!notification.read && (
-                        <div className="w-2 h-2 bg-blue-600 rounded-full" />
-                      )}
+                      {!notification.read && <div className="w-2 h-2 bg-blue-600 rounded-full" />}
                     </div>
                   ))}
                 </div>
@@ -324,8 +333,11 @@ const RealTimeCollaboration = ({ _modelId, currentUser, _onDataChange }) => {
               {/* Permissions Tab */}
               {activeTab === 'permissions' && (
                 <div className="space-y-4">
-                  {activeUsers.map((user) => (
-                    <div key={user.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  {activeUsers.map(user => (
+                    <div
+                      key={user.id}
+                      className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
+                    >
                       <div className="flex items-center space-x-3">
                         <div
                           className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium"
@@ -378,34 +390,36 @@ const RealTimeCollaboration = ({ _modelId, currentUser, _onDataChange }) => {
                 </div>
 
                 {/* Live cursors */}
-                {activeUsers.filter(u => u.status === 'online' && u.cursor).map((user) => (
-                  <motion.div
-                    key={user.id}
-                    className="absolute pointer-events-none"
-                    style={{
-                      left: user.cursor.x,
-                      top: user.cursor.y,
-                      color: user.color
-                    }}
-                    animate={{
-                      x: [0, 10, 0],
-                      y: [0, 5, 0]
-                    }}
-                    transition={{
-                      duration: 2,
-                      repeat: Infinity,
-                      ease: 'easeInOut'
-                    }}
-                  >
-                    <MousePointer2 className="w-5 h-5" style={{ color: user.color }} />
-                    <div
-                      className="absolute left-6 top-0 px-2 py-1 rounded text-xs font-medium text-white whitespace-nowrap"
-                      style={{ backgroundColor: user.color }}
+                {activeUsers
+                  .filter(u => u.status === 'online' && u.cursor)
+                  .map(user => (
+                    <motion.div
+                      key={user.id}
+                      className="absolute pointer-events-none"
+                      style={{
+                        left: user.cursor.x,
+                        top: user.cursor.y,
+                        color: user.color
+                      }}
+                      animate={{
+                        x: [0, 10, 0],
+                        y: [0, 5, 0]
+                      }}
+                      transition={{
+                        duration: 2,
+                        repeat: Infinity,
+                        ease: 'easeInOut'
+                      }}
                     >
-                      {user.name}
-                    </div>
-                  </motion.div>
-                ))}
+                      <MousePointer2 className="w-5 h-5" style={{ color: user.color }} />
+                      <div
+                        className="absolute left-6 top-0 px-2 py-1 rounded text-xs font-medium text-white whitespace-nowrap"
+                        style={{ backgroundColor: user.color }}
+                      >
+                        {user.name}
+                      </div>
+                    </motion.div>
+                  ))}
               </div>
             </div>
           </div>
@@ -437,9 +451,10 @@ const RealTimeCollaboration = ({ _modelId, currentUser, _onDataChange }) => {
                   className="overflow-hidden"
                 >
                   <div className="h-64 overflow-y-auto p-4 space-y-3">
-                    {chatMessages.map((message) => (
+                    {chatMessages.map(message => (
                       <div
-                        key={message.id} className={`flex ${
+                        key={message.id}
+                        className={`flex ${
                           message.type === 'system' ? 'justify-center' : 'justify-start'
                         }`}
                       >
@@ -468,8 +483,8 @@ const RealTimeCollaboration = ({ _modelId, currentUser, _onDataChange }) => {
                       <input
                         type="text"
                         value={newMessage}
-                        onChange={(e) => setNewMessage(e.target.value)}
-                        onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                        onChange={e => setNewMessage(e.target.value)}
+                        onKeyPress={e => e.key === 'Enter' && handleSendMessage()}
                         placeholder="Type a message..."
                         className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
@@ -516,7 +531,7 @@ const RealTimeCollaboration = ({ _modelId, currentUser, _onDataChange }) => {
               Recent Activity
             </h3>
             <div className="space-y-3">
-              {notifications.slice(0, 3).map((notification) => (
+              {notifications.slice(0, 3).map(notification => (
                 <div key={notification.id} className="text-sm">
                   <div className="font-medium text-gray-900">{notification.user}</div>
                   <div className="text-gray-600">{notification.message}</div>

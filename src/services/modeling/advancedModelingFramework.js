@@ -16,7 +16,7 @@ class AdvancedModelingFramework extends EventEmitter {
 
   // Monte Carlo Analysis
   async runMonteCarloSimulation(model, parameters, options = {}) {
-    const { 
+    const {
       iterations = 10000,
       confidenceLevels = [0.05, 0.25, 0.5, 0.75, 0.95],
       correlations = null,
@@ -24,7 +24,7 @@ class AdvancedModelingFramework extends EventEmitter {
     } = options;
 
     this.emit('simulation:start', { model: model.name, iterations });
-    
+
     const results = await this.monteCarlo.simulate(model, parameters, {
       iterations,
       confidenceLevels,
@@ -39,9 +39,9 @@ class AdvancedModelingFramework extends EventEmitter {
   // Portfolio Optimization
   async optimizePortfolio(assets, constraints, objective = 'sharpe') {
     this.emit('optimization:start', { assets: assets.length, objective });
-    
+
     const result = await this.optimizer.optimizePortfolio(assets, constraints, objective);
-    
+
     this.emit('optimization:complete', { objective, result });
     return result;
   }
@@ -49,9 +49,9 @@ class AdvancedModelingFramework extends EventEmitter {
   // Scenario Planning
   async createScenarioAnalysis(baseCase, scenarios, weights = null) {
     this.emit('scenario:start', { scenarios: scenarios.length });
-    
+
     const analysis = await this.scenarioPlanner.analyze(baseCase, scenarios, weights);
-    
+
     this.emit('scenario:complete', { analysis });
     return analysis;
   }
@@ -59,9 +59,9 @@ class AdvancedModelingFramework extends EventEmitter {
   // Sensitivity Analysis
   async analyzeSensitivity(model, variables, ranges) {
     this.emit('sensitivity:start', { variables: variables.length });
-    
+
     const analysis = await this.sensitivity.analyze(model, variables, ranges);
-    
+
     this.emit('sensitivity:complete', { analysis });
     return analysis;
   }
@@ -77,20 +77,20 @@ class MonteCarloEngine {
 
   async simulate(model, parameters, options) {
     const { iterations, confidenceLevels, correlations, seed } = options;
-    
+
     if (seed) {
       this.seedRandom(seed);
     }
 
     const samples = this.generateSamples(parameters, iterations, correlations);
     const results = this.runModel(model, samples);
-    
+
     return this.analyzeResults(results, confidenceLevels);
   }
 
   generateSamples(parameters, iterations, correlations) {
-    const samples = {};
-    
+    let samples = {};
+
     // Generate independent samples first
     for (const [param, config] of Object.entries(parameters)) {
       samples[param] = this.distributions.sample(config.distribution, config.params, iterations);
@@ -113,7 +113,7 @@ class MonteCarloEngine {
       for (const param of Object.keys(samples)) {
         inputs[param] = samples[param][i];
       }
-      
+
       const output = model.calculate(inputs);
       results.push(output);
     }
@@ -124,7 +124,8 @@ class MonteCarloEngine {
   analyzeResults(results, confidenceLevels) {
     const sortedResults = [...results].sort((a, b) => a - b);
     const mean = results.reduce((sum, val) => sum + val, 0) / results.length;
-    const variance = results.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / results.length;
+    const variance =
+      results.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / results.length;
     const stdDev = Math.sqrt(variance);
 
     const percentiles = {};
@@ -153,7 +154,7 @@ class MonteCarloEngine {
     // Cholesky decomposition for correlated random variables
     const variables = Object.keys(samples);
     const L = this.choleskyDecomposition(correlationMatrix);
-    
+
     const correlatedSamples = {};
     variables.forEach(variable => {
       correlatedSamples[variable] = [...samples[variable]];
@@ -162,7 +163,7 @@ class MonteCarloEngine {
     for (let i = 0; i < samples[variables[0]].length; i++) {
       const uncorrelated = variables.map(v => samples[v][i]);
       const correlated = this.multiplyMatrixVector(L, uncorrelated);
-      
+
       variables.forEach((variable, index) => {
         correlatedSamples[variable][i] = correlated[index];
       });
@@ -173,7 +174,9 @@ class MonteCarloEngine {
 
   choleskyDecomposition(matrix) {
     const n = matrix.length;
-    const L = Array(n).fill().map(() => Array(n).fill(0));
+    const L = Array(n)
+      .fill()
+      .map(() => Array(n).fill(0));
 
     for (let i = 0; i < n; i++) {
       for (let j = 0; j <= i; j++) {
@@ -197,9 +200,7 @@ class MonteCarloEngine {
   }
 
   multiplyMatrixVector(matrix, vector) {
-    return matrix.map(row => 
-      row.reduce((sum, val, index) => sum + val * vector[index], 0)
-    );
+    return matrix.map(row => row.reduce((sum, val, index) => sum + val * vector[index], 0));
   }
 
   calculateSkewness(data, mean, stdDev) {
@@ -211,18 +212,21 @@ class MonteCarloEngine {
   calculateKurtosis(data, mean, stdDev) {
     const n = data.length;
     const sum = data.reduce((acc, val) => acc + Math.pow((val - mean) / stdDev, 4), 0);
-    return (n * (n + 1) / ((n - 1) * (n - 2) * (n - 3))) * sum - (3 * (n - 1) * (n - 1)) / ((n - 2) * (n - 3));
+    return (
+      ((n * (n + 1)) / ((n - 1) * (n - 2) * (n - 3))) * sum -
+      (3 * (n - 1) * (n - 1)) / ((n - 2) * (n - 3))
+    );
   }
 
-  createHistogram(data, bins = 50) {
+  createHistogram(data, _bins = 50) {
     const min = Math.min(...data);
     const max = Math.max(...data);
-    const binWidth = (max - min) / bins;
-    
-    const histogram = Array(bins).fill(0);
-    
+    const binWidth = (max - min) / 50;
+
+    const histogram = Array(50).fill(0);
+
     data.forEach(value => {
-      const binIndex = Math.min(Math.floor((value - min) / binWidth), bins - 1);
+      const binIndex = Math.min(Math.floor((value - min) / binWidth), 49);
       histogram[binIndex]++;
     });
 
@@ -234,12 +238,12 @@ class MonteCarloEngine {
 
   seedRandom(seed) {
     // Simple seeded random number generator
-    let m = 0x80000000;
-    let a = 1103515245;
-    let c = 12345;
+    const m = 0x80000000;
+    const a = 1103515245;
+    const c = 12345;
     let state = seed;
-    
-    Math.random = function() {
+
+    Math.random = function () {
       state = (a * state + c) % m;
       return state / (m - 1);
     };
@@ -252,22 +256,22 @@ class MonteCarloEngine {
 class DistributionLibrary {
   sample(distribution, params, count) {
     const samples = [];
-    
+
     for (let i = 0; i < count; i++) {
       samples.push(this[distribution](params));
     }
-    
+
     return samples;
   }
 
   normal(params) {
     const { mean = 0, stdDev = 1 } = params;
-    
+
     // Box-Muller transformation
     const u1 = Math.random();
     const u2 = Math.random();
     const z0 = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
-    
+
     return mean + z0 * stdDev;
   }
 
@@ -279,7 +283,7 @@ class DistributionLibrary {
   triangular(params) {
     const { min, max, mode } = params;
     const u = Math.random();
-    
+
     if (u < (mode - min) / (max - min)) {
       return min + Math.sqrt(u * (max - min) * (mode - min));
     } else {
@@ -299,42 +303,43 @@ class DistributionLibrary {
 
   beta(params) {
     const { alpha, beta } = params;
-    
+
     // Using gamma distribution approximation
     const x = this.gamma({ shape: alpha, scale: 1 });
     const y = this.gamma({ shape: beta, scale: 1 });
-    
+
     return x / (x + y);
   }
 
   gamma(params) {
     const { shape, scale = 1 } = params;
-    
+
     // Marsaglia and Tsang method
     if (shape < 1) {
       return this.gamma({ shape: shape + 1, scale }) * Math.pow(Math.random(), 1 / shape);
     }
-    
-    const d = shape - 1/3;
+
+    const d = shape - 1 / 3;
     const c = 1 / Math.sqrt(9 * d);
-    
+
     let v, x;
     do {
       do {
         x = this.normal({ mean: 0, stdDev: 1 });
         v = 1 + c * x;
       } while (v <= 0);
-      
+
       v = v * v * v;
       const u = Math.random();
-      
+
       if (u < 1 - 0.0331 * x * x * x * x) {
         return d * v * scale;
       }
-      
+
       if (Math.log(u) < 0.5 * x * x + d * (1 - v + Math.log(v))) {
         return d * v * scale;
       }
+      // eslint-disable-next-line no-constant-condition
     } while (true);
   }
 }
@@ -350,11 +355,11 @@ class OptimizationEngine {
 
   async optimizePortfolio(assets, constraints, objective) {
     const n = assets.length;
-    
+
     // Extract expected returns and covariance matrix
     const expectedReturns = assets.map(asset => asset.expectedReturn);
     const covarianceMatrix = this.buildCovarianceMatrix(assets);
-    
+
     const result = await this.solveOptimization({
       expectedReturns,
       covarianceMatrix,
@@ -369,14 +374,14 @@ class OptimizationEngine {
       volatility: this.calculatePortfolioVolatility(result.weights, covarianceMatrix),
       sharpeRatio: result.sharpeRatio,
       metrics: result.metrics,
-      constraints: constraints,
+      constraints,
       objective
     };
   }
 
   async solveOptimization(params) {
-    const { expectedReturns, covarianceMatrix, constraints, objective, n } = params;
-    
+    const { expectedReturns, covarianceMatrix, constraints, objective, n: _n } = params;
+
     switch (objective) {
       case 'sharpe':
         return this.maximizeSharpe(expectedReturns, covarianceMatrix, constraints);
@@ -394,20 +399,19 @@ class OptimizationEngine {
   maximizeSharpe(returns, covariance, constraints) {
     // Convert to quadratic programming problem
     // Maximize: w^T * μ / sqrt(w^T * Σ * w)
-    
+
     const riskFreeRate = constraints.riskFreeRate || 0.02;
-    const excessReturns = returns.map(r => r - riskFreeRate);
-    
+
     // Use iterative approach for non-linear Sharpe ratio optimization
     let bestWeights = null;
     let bestSharpe = -Infinity;
-    
+
     for (let i = 0; i < this.maxIterations; i++) {
       const weights = this.generateFeasibleWeights(returns.length, constraints);
       const portfolioReturn = this.calculatePortfolioReturn(weights, returns);
       const portfolioVol = this.calculatePortfolioVolatility(weights, covariance);
       const sharpe = (portfolioReturn - riskFreeRate) / portfolioVol;
-      
+
       if (sharpe > bestSharpe) {
         bestSharpe = sharpe;
         bestWeights = [...weights];
@@ -426,11 +430,11 @@ class OptimizationEngine {
     const n = returns.length;
     let bestWeights = null;
     let bestVolatility = Infinity;
-    
+
     for (let i = 0; i < this.maxIterations; i++) {
       const weights = this.generateFeasibleWeights(n, constraints);
       const volatility = this.calculatePortfolioVolatility(weights, covariance);
-      
+
       if (volatility < bestVolatility) {
         bestVolatility = volatility;
         bestWeights = [...weights];
@@ -445,28 +449,28 @@ class OptimizationEngine {
   }
 
   generateFeasibleWeights(n, constraints) {
-    const weights = Array(n).fill().map(() => Math.random());
+    const weights = Array(n)
+      .fill()
+      .map(() => Math.random());
     const sum = weights.reduce((a, b) => a + b, 0);
-    
+
     // Normalize to sum to 1
     const normalizedWeights = weights.map(w => w / sum);
-    
+
     // Apply constraints
     return this.applyConstraints(normalizedWeights, constraints);
   }
 
   applyConstraints(weights, constraints) {
-    const { 
+    const {
       minWeight = 0,
       maxWeight = 1,
-      maxSectorExposure = {},
-      turnoverLimit = null
+      maxSectorExposure: _maxSectorExposure = {},
+      turnoverLimit: _turnoverLimit = null
     } = constraints;
 
     // Apply min/max weight constraints
-    const constrainedWeights = weights.map(w => 
-      Math.max(minWeight, Math.min(maxWeight, w))
-    );
+    const constrainedWeights = weights.map(w => Math.max(minWeight, Math.min(maxWeight, w)));
 
     // Renormalize
     const sum = constrainedWeights.reduce((a, b) => a + b, 0);
@@ -475,8 +479,10 @@ class OptimizationEngine {
 
   buildCovarianceMatrix(assets) {
     const n = assets.length;
-    const matrix = Array(n).fill().map(() => Array(n).fill(0));
-    
+    const matrix = Array(n)
+      .fill()
+      .map(() => Array(n).fill(0));
+
     for (let i = 0; i < n; i++) {
       for (let j = 0; j < n; j++) {
         if (i === j) {
@@ -487,7 +493,7 @@ class OptimizationEngine {
         }
       }
     }
-    
+
     return matrix;
   }
 
@@ -497,20 +503,20 @@ class OptimizationEngine {
 
   calculatePortfolioVolatility(weights, covariance) {
     let variance = 0;
-    
+
     for (let i = 0; i < weights.length; i++) {
       for (let j = 0; j < weights.length; j++) {
         variance += weights[i] * weights[j] * covariance[i][j];
       }
     }
-    
+
     return Math.sqrt(variance);
   }
 
   calculateMetrics(weights, returns, covariance) {
     const portfolioReturn = this.calculatePortfolioReturn(weights, returns);
     const portfolioVol = this.calculatePortfolioVolatility(weights, covariance);
-    
+
     return {
       expectedReturn: portfolioReturn,
       volatility: portfolioVol,
@@ -522,10 +528,12 @@ class OptimizationEngine {
   }
 
   calculateDiversificationRatio(weights, covariance) {
-    const weightedAvgVol = weights.reduce((sum, weight, index) => 
-      sum + weight * Math.sqrt(covariance[index][index]), 0);
+    const weightedAvgVol = weights.reduce(
+      (sum, weight, index) => sum + weight * Math.sqrt(covariance[index][index]),
+      0
+    );
     const portfolioVol = this.calculatePortfolioVolatility(weights, covariance);
-    
+
     return weightedAvgVol / portfolioVol;
   }
 
@@ -534,11 +542,11 @@ class OptimizationEngine {
     return -2.326 * volatility; // 99% confidence level
   }
 
-  calculateBeta(weights, returns, covariance) {
+  calculateBeta(weights, returns, _covariance) {
     // Assuming market return is average of all assets
     const marketReturn = returns.reduce((sum, r) => sum + r, 0) / returns.length;
     const portfolioReturn = this.calculatePortfolioReturn(weights, returns);
-    
+
     // Simplified beta calculation
     return portfolioReturn / marketReturn;
   }
@@ -550,7 +558,7 @@ class OptimizationEngine {
 class ScenarioPlanningEngine {
   async analyze(baseCase, scenarios, weights = null) {
     const defaultWeights = weights || scenarios.map(() => 1 / scenarios.length);
-    
+
     const results = {
       baseCase: this.evaluateScenario(baseCase),
       scenarios: scenarios.map((scenario, index) => ({
@@ -568,7 +576,7 @@ class ScenarioPlanningEngine {
 
   evaluateScenario(scenario) {
     const { inputs, model } = scenario;
-    
+
     return {
       inputs,
       outputs: model.calculate(inputs),
@@ -582,25 +590,29 @@ class ScenarioPlanningEngine {
     const weightedOutputs = {};
 
     outputKeys.forEach(key => {
-      weightedOutputs[key] = scenarios.reduce((sum, scenario, index) => 
-        sum + (scenario.outputs[key] * weights[index]), 0);
+      weightedOutputs[key] = scenarios.reduce(
+        (sum, scenario, index) => sum + scenario.outputs[key] * weights[index],
+        0
+      );
     });
 
     return {
       outputs: weightedOutputs,
-      weights: weights
+      weights
     };
   }
 
   calculateRiskMetrics(scenarios, weights) {
     const values = scenarios.map(s => s.outputs.value || 0);
     const mean = values.reduce((sum, val, index) => sum + val * weights[index], 0);
-    const variance = values.reduce((sum, val, index) => 
-      sum + weights[index] * Math.pow(val - mean, 2), 0);
-    
+    const variance = values.reduce(
+      (sum, val, index) => sum + weights[index] * Math.pow(val - mean, 2),
+      0
+    );
+
     return {
       expectedValue: mean,
-      variance: variance,
+      variance,
       standardDeviation: Math.sqrt(variance),
       worstCase: Math.min(...values),
       bestCase: Math.max(...values),
@@ -615,7 +627,7 @@ class ScenarioPlanningEngine {
     inputKeys.forEach(key => {
       const inputValues = scenarios.map(s => s.inputs[key]);
       const outputValues = scenarios.map(s => s.outputs.value || 0);
-      
+
       sensitivity[key] = this.calculateCorrelation(inputValues, outputValues);
     });
 
@@ -626,20 +638,20 @@ class ScenarioPlanningEngine {
     const n = x.length;
     const meanX = x.reduce((sum, val) => sum + val, 0) / n;
     const meanY = y.reduce((sum, val) => sum + val, 0) / n;
-    
+
     let numerator = 0;
     let denomX = 0;
     let denomY = 0;
-    
+
     for (let i = 0; i < n; i++) {
       const deltaX = x[i] - meanX;
       const deltaY = y[i] - meanY;
-      
+
       numerator += deltaX * deltaY;
       denomX += deltaX * deltaX;
       denomY += deltaY * deltaY;
     }
-    
+
     return numerator / Math.sqrt(denomX * denomY);
   }
 }
@@ -673,7 +685,7 @@ class SensitivityAnalyzer {
         const value = min + i * stepSize;
         const inputs = { ...model.baseInputs, [variable]: value };
         const output = model.calculate(inputs);
-        
+
         analysis.push({
           input: value,
           output: output.value || output,
@@ -711,17 +723,17 @@ class SensitivityAnalyzer {
     const steps2 = range2.steps || 10;
 
     const results = [];
-    
+
     for (let i = 0; i < steps1; i++) {
-      const value1 = range1.min + i * (range1.max - range1.min) / (steps1 - 1);
-      
+      const value1 = range1.min + (i * (range1.max - range1.min)) / (steps1 - 1);
+
       for (let j = 0; j < steps2; j++) {
-        const value2 = range2.min + j * (range2.max - range2.min) / (steps2 - 1);
-        
-        const inputs = { 
-          ...model.baseInputs, 
-          [variable1]: value1, 
-          [variable2]: value2 
+        const value2 = range2.min + (j * (range2.max - range2.min)) / (steps2 - 1);
+
+        const inputs = {
+          ...model.baseInputs,
+          [variable1]: value1,
+          [variable2]: value2
         };
         const output = model.calculate(inputs);
 
@@ -742,16 +754,16 @@ class SensitivityAnalyzer {
 
     for (const variable of variables) {
       const range = ranges[variable];
-      
+
       // Calculate output at min and max values
       const inputsMin = { ...model.baseInputs, [variable]: range.min };
       const inputsMax = { ...model.baseInputs, [variable]: range.max };
-      
+
       const outputMin = model.calculate(inputsMin);
       const outputMax = model.calculate(inputsMax);
-      
+
       const impact = Math.abs((outputMax.value || outputMax) - (outputMin.value || outputMin));
-      
+
       sensitivities.push({
         variable,
         impact,

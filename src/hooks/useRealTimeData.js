@@ -23,23 +23,26 @@ export const useRealTimeData = (dataType, symbol, options = {}) => {
   }, [options]);
 
   // Handle data updates
-  const handleDataUpdate = useCallback((newData) => {
-    setData(newData);
-    setLastUpdated(new Date());
-    setError(null);
+  const handleDataUpdate = useCallback(
+    newData => {
+      setData(newData);
+      setLastUpdated(new Date());
+      setError(null);
 
-    if (!isConnected) {
-      setIsConnected(true);
-    }
+      if (!isConnected) {
+        setIsConnected(true);
+      }
 
-    // Call external update handler if provided
-    if (optionsRef.current.onUpdate) {
-      optionsRef.current.onUpdate(newData);
-    }
-  }, [isConnected]);
+      // Call external update handler if provided
+      if (optionsRef.current.onUpdate) {
+        optionsRef.current.onUpdate(newData);
+      }
+    },
+    [isConnected]
+  );
 
   // Handle connection errors
-  const handleError = useCallback((err) => {
+  const handleError = useCallback(err => {
     setError(err);
     setIsConnected(false);
 
@@ -63,11 +66,7 @@ export const useRealTimeData = (dataType, symbol, options = {}) => {
     if (!dataType || !symbol) return;
 
     try {
-      unsubscribeRef.current = realTimeDataService.subscribe(
-        dataType,
-        symbol,
-        handleDataUpdate
-      );
+      unsubscribeRef.current = realTimeDataService.subscribe(dataType, symbol, handleDataUpdate);
       setIsConnected(true);
       setError(null);
     } catch (err) {
@@ -145,7 +144,7 @@ export const useMultipleRealTimeData = (subscriptions = []) => {
     const subscriptionConfigs = subscriptions.map(({ dataType, symbol, options = {} }) => ({
       dataType,
       symbol,
-      callback: (data) => {
+      callback: data => {
         const key = `${dataType}_${symbol}`;
         updateData(key, data);
         updateConnectionState(key, true);
@@ -182,20 +181,29 @@ export const useMultipleRealTimeData = (subscriptions = []) => {
     };
   }, [subscriptions, updateData, updateConnectionState, updateError]);
 
-  const getData = useCallback((dataType, symbol) => {
-    const key = `${dataType}_${symbol}`;
-    return dataMap.get(key);
-  }, [dataMap]);
+  const getData = useCallback(
+    (dataType, symbol) => {
+      const key = `${dataType}_${symbol}`;
+      return dataMap.get(key);
+    },
+    [dataMap]
+  );
 
-  const getConnectionState = useCallback((dataType, symbol) => {
-    const key = `${dataType}_${symbol}`;
-    return connectionStates.get(key) || false;
-  }, [connectionStates]);
+  const getConnectionState = useCallback(
+    (dataType, symbol) => {
+      const key = `${dataType}_${symbol}`;
+      return connectionStates.get(key) || false;
+    },
+    [connectionStates]
+  );
 
-  const getError = useCallback((dataType, symbol) => {
-    const key = `${dataType}_${symbol}`;
-    return errors.get(key);
-  }, [errors]);
+  const getError = useCallback(
+    (dataType, symbol) => {
+      const key = `${dataType}_${symbol}`;
+      return errors.get(key);
+    },
+    [errors]
+  );
 
   return {
     getData,

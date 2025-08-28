@@ -4,11 +4,11 @@ import { useSelector, useDispatch } from 'react-redux';
 import { login, logout } from '../store/slices/userSlice';
 
 const UserDisplay = () => {
-  const { name, isAuthenticated } = useSelector((state) => state.user);
+  const { name, isAuthenticated } = useSelector(state => state.user);
   const dispatch = useDispatch();
   const [userName, setUserName] = useState('');
 
-  const handleLogin = (e) => {
+  const handleLogin = e => {
     e.preventDefault();
     if (userName.trim()) {
       dispatch(login({ name: userName }));
@@ -26,7 +26,7 @@ const UserDisplay = () => {
           <input
             type="text"
             value={userName}
-            onChange={(e) => setUserName(e.target.value)}
+            onChange={e => setUserName(e.target.value)}
             placeholder="Enter your name"
           />
           <button type="submit">Login</button>

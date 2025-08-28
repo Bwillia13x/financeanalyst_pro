@@ -5,12 +5,7 @@ import { useCallback, useEffect, useRef } from 'react';
  * Handles focus trapping, restoration, and keyboard navigation
  */
 export const useFocusManagement = (options = {}) => {
-  const {
-    trapFocus = false,
-    restoreFocus = true,
-    initialFocus = null,
-    onEscape = null
-  } = options;
+  const { trapFocus = false, restoreFocus = true, initialFocus = null, onEscape = null } = options;
 
   const containerRef = useRef(null);
   const previousActiveElement = useRef(null);
@@ -32,9 +27,10 @@ export const useFocusManagement = (options = {}) => {
   // Set initial focus
   useEffect(() => {
     if (initialFocus) {
-      const element = typeof initialFocus === 'string'
-        ? document.querySelector(initialFocus)
-        : initialFocus.current;
+      const element =
+        typeof initialFocus === 'string'
+          ? document.querySelector(initialFocus)
+          : initialFocus.current;
 
       if (element?.focus) {
         setTimeout(() => element.focus(), 0);
@@ -57,50 +53,54 @@ export const useFocusManagement = (options = {}) => {
       '[contenteditable="true"]'
     ].join(', ');
 
-    return Array.from(container.querySelectorAll(focusableSelectors))
-      .filter(element => {
-        return element.offsetWidth > 0 &&
-               element.offsetHeight > 0 &&
-               getComputedStyle(element).visibility !== 'hidden';
-      });
+    return Array.from(container.querySelectorAll(focusableSelectors)).filter(element => {
+      return (
+        element.offsetWidth > 0 &&
+        element.offsetHeight > 0 &&
+        getComputedStyle(element).visibility !== 'hidden'
+      );
+    });
   }, []);
 
   // Handle keyboard navigation
-  const handleKeyDown = useCallback((event) => {
-    const { key, shiftKey } = event;
+  const handleKeyDown = useCallback(
+    event => {
+      const { key, shiftKey } = event;
 
-    // Handle Escape key
-    if (key === 'Escape' && onEscape) {
-      event.preventDefault();
-      onEscape();
-      return;
-    }
-
-    // Handle Tab for focus trapping
-    if (key === 'Tab' && trapFocus) {
-      const focusableElements = getFocusableElements();
-      if (focusableElements.length === 0) return;
-
-      const firstElement = focusableElements[0];
-      const lastElement = focusableElements[focusableElements.length - 1];
-
-      if (shiftKey && document.activeElement === firstElement) {
+      // Handle Escape key
+      if (key === 'Escape' && onEscape) {
         event.preventDefault();
-        lastElement.focus();
-      } else if (!shiftKey && document.activeElement === lastElement) {
-        event.preventDefault();
-        firstElement.focus();
+        onEscape();
+        return;
       }
-    }
 
-    // Handle arrow keys for financial data tables
-    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(key)) {
-      handleArrowKeyNavigation(event);
-    }
-  }, [trapFocus, onEscape, getFocusableElements]);
+      // Handle Tab for focus trapping
+      if (key === 'Tab' && trapFocus) {
+        const focusableElements = getFocusableElements();
+        if (focusableElements.length === 0) return;
+
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+
+        if (shiftKey && document.activeElement === firstElement) {
+          event.preventDefault();
+          lastElement.focus();
+        } else if (!shiftKey && document.activeElement === lastElement) {
+          event.preventDefault();
+          firstElement.focus();
+        }
+      }
+
+      // Handle arrow keys for financial data tables
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(key)) {
+        handleArrowKeyNavigation(event);
+      }
+    },
+    [trapFocus, onEscape, getFocusableElements]
+  );
 
   // Enhanced arrow key navigation for financial tables
-  const handleArrowKeyNavigation = useCallback((event) => {
+  const handleArrowKeyNavigation = useCallback(event => {
     const { key, target } = event;
     const isInTable = target.closest('table');
 
@@ -183,7 +183,7 @@ export const useFocusManagement = (options = {}) => {
 /**
  * Hook for managing modal focus
  */
-export const useModalFocus = (isOpen) => {
+export const useModalFocus = isOpen => {
   return useFocusManagement({
     trapFocus: isOpen,
     restoreFocus: true,

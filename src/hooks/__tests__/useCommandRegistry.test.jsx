@@ -14,7 +14,7 @@ function HookHarness({ context = {}, onAPI }) {
   return null;
 }
 
-const nextTick = () => new Promise((r) => setTimeout(r, 0));
+const nextTick = () => new Promise(r => setTimeout(r, 0));
 
 describe('useCommandRegistry', () => {
   beforeEach(() => {
@@ -26,11 +26,11 @@ describe('useCommandRegistry', () => {
     cleanup();
   });
 
-  it('searchCommands returns relevant results for simple queries', async() => {
+  it('searchCommands returns relevant results for simple queries', async () => {
     let latestApi;
     render(
       <HookHarness
-        onAPI={(api) => {
+        onAPI={api => {
           latestApi = api;
         }}
       />
@@ -46,11 +46,11 @@ describe('useCommandRegistry', () => {
     expect(results2.map(r => r.id)).toContain('sensitivity-analysis');
   });
 
-  it('executeCommand runs command and increments usage', async() => {
+  it('executeCommand runs command and increments usage', async () => {
     let latestApi;
     render(
       <HookHarness
-        onAPI={(api) => {
+        onAPI={api => {
           latestApi = api;
         }}
       />
@@ -66,15 +66,15 @@ describe('useCommandRegistry', () => {
     await nextTick();
 
     // After re-render, onAPI will provide updated api instance
-    expect((latestApi.commandUsage['create-dcf'] || 0)).toBe(beforeUsage + 1);
+    expect(latestApi.commandUsage['create-dcf'] || 0).toBe(beforeUsage + 1);
   });
 
-  it('getContextualCommands reflects activeTab context', async() => {
+  it('getContextualCommands reflects activeTab context', async () => {
     let latestApi;
     render(
       <HookHarness
         context={{ activeTab: 'modeling' }}
-        onAPI={(api) => {
+        onAPI={api => {
           latestApi = api;
         }}
       />
@@ -83,6 +83,8 @@ describe('useCommandRegistry', () => {
 
     const contextual = latestApi.getContextualCommands();
     const ids = contextual.map(c => c.id);
-    expect(ids).toEqual(expect.arrayContaining(['create-dcf', 'sensitivity-analysis', 'go-to-analysis']));
+    expect(ids).toEqual(
+      expect.arrayContaining(['create-dcf', 'sensitivity-analysis', 'go-to-analysis'])
+    );
   });
 });

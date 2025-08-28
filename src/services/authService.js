@@ -5,7 +5,6 @@
 
 import { apiLogger } from '../utils/apiLogger.js';
 
-
 // Authentication configuration
 const AUTH_CONFIG = {
   tokenKey: 'financeanalyst_auth_token',
@@ -59,13 +58,8 @@ const ROLE_PERMISSIONS = {
     PERMISSIONS.IMPORT_DATA,
     PERMISSIONS.API_ACCESS
   ],
-  [USER_ROLES.VIEWER]: [
-    PERMISSIONS.READ_MODELS,
-    PERMISSIONS.EXPORT_DATA
-  ],
-  [USER_ROLES.GUEST]: [
-    PERMISSIONS.READ_MODELS
-  ]
+  [USER_ROLES.VIEWER]: [PERMISSIONS.READ_MODELS, PERMISSIONS.EXPORT_DATA],
+  [USER_ROLES.GUEST]: [PERMISSIONS.READ_MODELS]
 };
 
 /**
@@ -279,13 +273,15 @@ class AuthService {
    */
   generateMockToken(user) {
     const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
-    const payload = btoa(JSON.stringify({
-      sub: user.id,
-      email: user.email,
-      role: user.role,
-      iat: Math.floor(Date.now() / 1000),
-      exp: Math.floor((Date.now() + AUTH_CONFIG.sessionTimeout) / 1000)
-    }));
+    const payload = btoa(
+      JSON.stringify({
+        sub: user.id,
+        email: user.email,
+        role: user.role,
+        iat: Math.floor(Date.now() / 1000),
+        exp: Math.floor((Date.now() + AUTH_CONFIG.sessionTimeout) / 1000)
+      })
+    );
     const signature = btoa('mock_signature_' + Date.now());
 
     return `${header}.${payload}.${signature}`;
@@ -487,7 +483,7 @@ class AuthService {
         // Check if token needs refresh
         const tokenData = this.getTokenData();
         if (tokenData) {
-          const timeToExpiry = (tokenData.exp * 1000) - Date.now();
+          const timeToExpiry = tokenData.exp * 1000 - Date.now();
 
           if (timeToExpiry < AUTH_CONFIG.refreshThreshold && this.refreshToken) {
             this.refreshAuthToken();
@@ -557,7 +553,7 @@ class AuthService {
   getAuthHeader() {
     if (this.authToken) {
       return {
-        'Authorization': `Bearer ${this.authToken}`
+        Authorization: `Bearer ${this.authToken}`
       };
     }
     return {};

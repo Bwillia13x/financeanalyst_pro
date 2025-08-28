@@ -22,7 +22,7 @@ describe('Basic Testing Infrastructure', () => {
     expect(obj.name).toBe('test');
   });
 
-  it('should handle async operations', async() => {
+  it('should handle async operations', async () => {
     const promise = Promise.resolve('async result');
     await expect(promise).resolves.toBe('async result');
   });

@@ -362,7 +362,7 @@ class UserContextService {
         throw new Error('No user context available');
       }
 
-      const allItems = storageService.listItems(type);
+      const allItems = await storageService.listItems(type);
       const userPrefix = `${CONTEXT_CONFIG.userPrefix}${this.currentContext.userId}_${type}_`;
 
       return allItems
@@ -383,14 +383,18 @@ class UserContextService {
         return [];
       }
 
-      const allItems = storageService.listItems(type);
+      const allItems = await storageService.listItems(type);
       const sharedPrefix = `${CONTEXT_CONFIG.sharedPrefix}${sharingLevel}_${type}_`;
 
       return allItems
         .filter(key => key.startsWith(sharedPrefix))
         .map(key => key.replace(sharedPrefix, ''));
     } catch (error) {
-      apiLogger.log('ERROR', 'Failed to list shared data', { type, sharingLevel, error: error.message });
+      apiLogger.log('ERROR', 'Failed to list shared data', {
+        type,
+        sharingLevel,
+        error: error.message
+      });
       return [];
     }
   }

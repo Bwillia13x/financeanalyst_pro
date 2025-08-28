@@ -199,7 +199,8 @@ const IndustrySpecificModules = ({ currentIndustry, _modelData, _onDataChange })
                 <div key={index} className="flex items-center text-sm">
                   <div className="w-2 h-2 bg-blue-600 rounded-full mr-2" />
                   {metric}
-                </div>))}
+                </div>
+              ))}
             </div>
           </div>
 
@@ -213,7 +214,8 @@ const IndustrySpecificModules = ({ currentIndustry, _modelData, _onDataChange })
                 <div key={index} className="flex items-center text-sm">
                   <div className="w-2 h-2 bg-green-600 rounded-full mr-2" />
                   {multiple}
-                </div>))}
+                </div>
+              ))}
             </div>
           </div>
 
@@ -227,7 +229,8 @@ const IndustrySpecificModules = ({ currentIndustry, _modelData, _onDataChange })
                 <div key={index} className="flex items-center text-sm">
                   <div className="w-2 h-2 bg-purple-600 rounded-full mr-2" />
                   {feature}
-                </div>))}
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -244,9 +247,7 @@ const IndustrySpecificModules = ({ currentIndustry, _modelData, _onDataChange })
                 <div className="font-medium text-gray-900 capitalize">
                   {module.replace('-', ' ')}
                 </div>
-                <div className="text-sm text-gray-600 mt-1">
-                  Industry-specific analysis module
-                </div>
+                <div className="text-sm text-gray-600 mt-1">Industry-specific analysis module</div>
               </button>
             ))}
           </div>
@@ -286,7 +287,7 @@ const IndustrySpecificModules = ({ currentIndustry, _modelData, _onDataChange })
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {industries.map((industry) => {
+            {industries.map(industry => {
               const Icon = industry.icon;
               return (
                 <motion.div
@@ -325,7 +326,7 @@ const IndustrySpecificModules = ({ currentIndustry, _modelData, _onDataChange })
               { id: 'metrics', label: 'Key Metrics', icon: BarChart3 },
               { id: 'analysis', label: 'Analysis', icon: TrendingUp },
               { id: 'benchmarks', label: 'Benchmarks', icon: Target }
-            ].map((tab) => {
+            ].map(tab => {
               const Icon = tab.icon;
               return (
                 <button
@@ -356,24 +357,34 @@ const IndustrySpecificModules = ({ currentIndustry, _modelData, _onDataChange })
               transition={{ duration: 0.2 }}
             >
               {activeModule === 'overview' && renderIndustryOverview()}
-              {activeModule === 'metrics' && selectedIndustry === 'technology' && renderSaaSMetrics()}
+              {activeModule === 'metrics' &&
+                selectedIndustry === 'technology' &&
+                renderSaaSMetrics()}
 
-              {((activeModule === 'metrics' || activeModule === 'analysis') && selectedIndustry !== 'technology') ||
-               (activeModule === 'benchmarks') && (
-                 <div className="text-center py-12">
-                   <div className={`w-16 h-16 ${currentIndustryData?.color} rounded-full flex items-center justify-center mx-auto mb-4`}>
-                     {currentIndustryData && React.createElement(currentIndustryData.icon, { className: 'w-8 h-8 text-white' })}
-                   </div>
-                   <h3 className="text-lg font-medium text-gray-900 mb-2">
-                     {currentIndustryData?.name} Module Coming Soon
-                   </h3>
-                   <p className="text-gray-600 mb-4">
-                     Specialized {activeModule} for the {currentIndustryData?.name.toLowerCase()} industry are in development.
-                   </p>
-                   <button className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg font-medium">
-                     Request Early Access
-                   </button>
-                 </div>)}
+              {((activeModule === 'metrics' || activeModule === 'analysis') &&
+                selectedIndustry !== 'technology') ||
+                (activeModule === 'benchmarks' && (
+                  <div className="text-center py-12">
+                    <div
+                      className={`w-16 h-16 ${currentIndustryData?.color} rounded-full flex items-center justify-center mx-auto mb-4`}
+                    >
+                      {currentIndustryData &&
+                        React.createElement(currentIndustryData.icon, {
+                          className: 'w-8 h-8 text-white'
+                        })}
+                    </div>
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">
+                      {currentIndustryData?.name} Module Coming Soon
+                    </h3>
+                    <p className="text-gray-600 mb-4">
+                      Specialized {activeModule} for the {currentIndustryData?.name.toLowerCase()}{' '}
+                      industry are in development.
+                    </p>
+                    <button className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg font-medium">
+                      Request Early Access
+                    </button>
+                  </div>
+                ))}
             </motion.div>
           </AnimatePresence>
         </div>

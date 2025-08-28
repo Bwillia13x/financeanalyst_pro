@@ -2,10 +2,8 @@
 
 const isLocalhost = Boolean(
   window.location.hostname === 'localhost' ||
-  window.location.hostname === '[::1]' ||
-  window.location.hostname.match(
-    /^127(?:\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}$/
-  )
+    window.location.hostname === '[::1]' ||
+    window.location.hostname.match(/^127(?:\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}$/)
 );
 
 export function registerSW() {
@@ -33,7 +31,7 @@ export function registerSW() {
 function registerValidSW(swUrl) {
   navigator.serviceWorker
     .register(swUrl)
-    .then((registration) => {
+    .then(registration => {
       console.warn('PWA: Service Worker registered successfully:', registration);
 
       // Check for updates
@@ -56,7 +54,7 @@ function registerValidSW(swUrl) {
         });
       });
     })
-    .catch((error) => {
+    .catch(error => {
       console.error('PWA: Service Worker registration failed:', error);
     });
 }
@@ -65,13 +63,13 @@ function checkValidServiceWorker(swUrl) {
   fetch(swUrl, {
     headers: { 'Service-Worker': 'script' }
   })
-    .then((response) => {
+    .then(response => {
       const contentType = response.headers.get('content-type');
       if (
         response.status === 404 ||
         (contentType != null && contentType.indexOf('javascript') === -1)
       ) {
-        navigator.serviceWorker.ready.then((registration) => {
+        navigator.serviceWorker.ready.then(registration => {
           registration.unregister().then(() => {
             window.location.reload();
           });
@@ -89,10 +87,10 @@ function checkValidServiceWorker(swUrl) {
 export function unregisterSW() {
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.ready
-      .then((registration) => {
+      .then(registration => {
         registration.unregister();
       })
-      .catch((error) => {
+      .catch(error => {
         console.error('PWA: Service Worker unregistration failed:', error);
       });
   }
@@ -128,7 +126,7 @@ function showCachedNotification() {
 function showOfflineNotification() {
   showInAppNotification(
     'Offline Mode',
-    'You\'re currently offline. Some features may be limited.',
+    "You're currently offline. Some features may be limited.",
     'warning'
   );
 }
@@ -175,7 +173,7 @@ function showInAppNotification(title, message, type = 'info') {
 // Request notification permission
 export function requestNotificationPermission() {
   if ('Notification' in window && Notification.permission === 'default') {
-    Notification.requestPermission().then((permission) => {
+    Notification.requestPermission().then(permission => {
       console.log('PWA: Notification permission:', permission);
     });
   }
@@ -184,7 +182,7 @@ export function requestNotificationPermission() {
 // Install prompt handling
 let deferredPrompt;
 
-window.addEventListener('beforeinstallprompt', (e) => {
+window.addEventListener('beforeinstallprompt', e => {
   e.preventDefault();
   deferredPrompt = e;
   showInstallPrompt();
@@ -216,7 +214,7 @@ function showInstallPrompt() {
   document.body.appendChild(installBanner);
 
   // Handle install button click
-  installBanner.querySelector('#install-btn').addEventListener('click', async() => {
+  installBanner.querySelector('#install-btn').addEventListener('click', async () => {
     if (deferredPrompt) {
       deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
@@ -253,13 +251,13 @@ export function setupNetworkHandling() {
     if (!isOnline) {
       showInAppNotification(
         'Connection Lost',
-        'You\'re now offline. Cached content will be used.',
+        "You're now offline. Cached content will be used.",
         'warning'
       );
     } else {
       showInAppNotification(
         'Connection Restored',
-        'You\'re back online. Syncing latest data...',
+        "You're back online. Syncing latest data...",
         'success'
       );
     }

@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useLayoutEffect } from 'react';
 
 // Hook for managing performance dashboard visibility and hotkey
 export function usePerformanceDashboard() {
@@ -17,20 +17,65 @@ export function usePerformanceDashboard() {
   }, []);
 
   // Keyboard shortcut for dashboard (Ctrl/Cmd + Shift + P)
-  useEffect(() => {
-    const handleKeyDown = (event) => {
-      if ((event.ctrlKey || event.metaKey) && event.shiftKey && event.key === 'P') {
+  // Use layout effect so the handler is attached before synchronous test events
+  useLayoutEffect(() => {
+    const handleKeyDown = event => {
+      const key = (event.key || '').toLowerCase();
+      const isP = key === 'p' || event.code === 'KeyP';
+      if ((event.ctrlKey || event.metaKey) && event.shiftKey && isP) {
         event.preventDefault();
-        toggleDashboard();
+        // Idempotent open to avoid StrictMode double-invocation toggling closed
+        setIsVisible(true);
       }
     };
 
-    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('keydown', handleKeyDown, true);
+    window.addEventListener('keydown', handleKeyDown, true);
 
     return () => {
-      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('keydown', handleKeyDown, true);
+      window.removeEventListener('keydown', handleKeyDown, true);
     };
   }, [toggleDashboard]);
+
+  // Listen for global command event from KeyboardShortcutsProvider
+  // Use layout effect to avoid missing synchronous test-dispatched events
+  useLayoutEffect(() => {
+    const handleOpen = () => setIsVisible(true);
+    window.addEventListener('open-performance-dashboard', handleOpen);
+    return () => window.removeEventListener('open-performance-dashboard', handleOpen);
+  }, []);
+
+  // Test-only imperative API to deterministically open/close the dashboard
+  useLayoutEffect(() => {
+    if (import.meta.env.MODE !== 'test') return;
+    const g = window;
+    g.__openPerformanceDashboard = () => setIsVisible(true);
+    g.__closePerformanceDashboard = () => setIsVisible(false);
+    return () => {
+      try {
+        delete g.__openPerformanceDashboard;
+        delete g.__closePerformanceDashboard;
+      } catch {
+        g.__openPerformanceDashboard = undefined;
+        g.__closePerformanceDashboard = undefined;
+      }
+    };
+  }, []);
+
+  // Test-only debug flag to observe visibility state from tests
+  // Use layout effect so changes are visible synchronously to test assertions
+  useLayoutEffect(() => {
+    if (import.meta.env.MODE !== 'test') return;
+    window.__isPerformanceDashboardVisible = isVisible;
+    return () => {
+      try {
+        delete window.__isPerformanceDashboardVisible;
+      } catch {
+        window.__isPerformanceDashboardVisible = undefined;
+      }
+    };
+  }, [isVisible]);
 
   // Show dashboard automatically in development if there are performance issues
   useEffect(() => {
@@ -46,7 +91,9 @@ export function usePerformanceDashboard() {
             (webVitals.CLS && webVitals.CLS > 0.1);
 
           if (hasIssues) {
-            console.warn('Performance issues detected. Press Ctrl/Cmd + Shift + P to open dashboard.');
+            console.warn(
+              'Performance issues detected. Press Ctrl/Cmd + Shift + P to open dashboard.'
+            );
           }
         }
       };

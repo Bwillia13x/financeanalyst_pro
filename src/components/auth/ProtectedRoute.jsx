@@ -42,7 +42,7 @@ const ProtectedRoute = ({
     return unsubscribe;
   }, [requiredRoles, requiredPermissions]);
 
-  const checkAuthentication = async() => {
+  const checkAuthentication = async () => {
     try {
       const authenticated = authService.isAuthenticated();
       const currentUser = authService.getCurrentUser();
@@ -64,18 +64,19 @@ const ProtectedRoute = ({
     }
   };
 
-  const checkAccess = (currentUser) => {
+  const checkAccess = currentUser => {
     if (!currentUser) {
       setHasAccess(false);
       return;
     }
 
     // Check role requirements
-    const hasRequiredRole = requiredRoles.length === 0 ||
-      requiredRoles.some(role => authService.hasRole(role));
+    const hasRequiredRole =
+      requiredRoles.length === 0 || requiredRoles.some(role => authService.hasRole(role));
 
     // Check permission requirements
-    const hasRequiredPermissions = requiredPermissions.length === 0 ||
+    const hasRequiredPermissions =
+      requiredPermissions.length === 0 ||
       requiredPermissions.every(permission => authService.hasPermission(permission));
 
     const access = hasRequiredRole && hasRequiredPermissions;
@@ -107,13 +108,7 @@ const ProtectedRoute = ({
 
   // Not authenticated - redirect to login
   if (!isAuthenticated) {
-    return (
-      <Navigate
-        to={redirectTo}
-        state={{ from: location.pathname }}
-        replace
-      />
-    );
+    return <Navigate to={redirectTo} state={{ from: location.pathname }} replace />;
   }
 
   // Authenticated but no access - show access denied
@@ -122,7 +117,13 @@ const ProtectedRoute = ({
       return fallbackComponent;
     }
 
-    return <AccessDenied user={user} requiredRoles={requiredRoles} requiredPermissions={requiredPermissions} />;
+    return (
+      <AccessDenied
+        user={user}
+        requiredRoles={requiredRoles}
+        requiredPermissions={requiredPermissions}
+      />
+    );
   }
 
   // Authenticated and has access - render children
@@ -142,9 +143,7 @@ const AccessDenied = ({ user, requiredRoles, requiredPermissions }) => {
           <Shield className="h-8 w-8 text-red-600" />
         </div>
 
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">
-          Access Denied
-        </h2>
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">Access Denied</h2>
 
         <p className="text-gray-600 mb-6">
           You don&apos;t have permission to access this resource.
@@ -153,8 +152,12 @@ const AccessDenied = ({ user, requiredRoles, requiredPermissions }) => {
         <div className="bg-gray-50 rounded-lg p-4 mb-6 text-left">
           <h3 className="font-medium text-gray-900 mb-2">Your Access Level:</h3>
           <div className="space-y-1 text-sm text-gray-600">
-            <div>Role: <span className="font-medium">{user?.role || 'Unknown'}</span></div>
-            <div>Permissions: <span className="font-medium">{userPermissions.length}</span></div>
+            <div>
+              Role: <span className="font-medium">{user?.role || 'Unknown'}</span>
+            </div>
+            <div>
+              Permissions: <span className="font-medium">{userPermissions.length}</span>
+            </div>
           </div>
         </div>
 
@@ -188,7 +191,7 @@ const AccessDenied = ({ user, requiredRoles, requiredPermissions }) => {
           </button>
 
           <button
-            onClick={() => window.location.href = '/dashboard'}
+            onClick={() => (window.location.href = '/dashboard')}
             className="w-full bg-gray-200 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-300 transition-colors"
           >
             Return to Dashboard
@@ -240,7 +243,7 @@ export const useAuth = () => {
   return {
     user,
     isAuthenticated,
-    hasPermission: (permission) => authService.hasPermission(permission),
+    hasPermission: permission => authService.hasPermission(permission),
     hasRole: (...roles) => authService.hasRole(...roles),
     getUserPermissions: () => authService.getUserPermissions(),
     login: authService.login.bind(authService),
@@ -261,18 +264,18 @@ export const PermissionGate = ({
   const { hasPermission, hasRole } = useAuth();
 
   // Check permissions
-  const permissionCheck = requiredPermissions.length === 0 ||
+  const permissionCheck =
+    requiredPermissions.length === 0 ||
     (requireAll
       ? requiredPermissions.every(permission => hasPermission(permission))
-      : requiredPermissions.some(permission => hasPermission(permission))
-    );
+      : requiredPermissions.some(permission => hasPermission(permission)));
 
   // Check roles
-  const roleCheck = requiredRoles.length === 0 ||
+  const roleCheck =
+    requiredRoles.length === 0 ||
     (requireAll
       ? requiredRoles.every(role => hasRole(role))
-      : requiredRoles.some(role => hasRole(role))
-    );
+      : requiredRoles.some(role => hasRole(role)));
 
   const hasAccess = permissionCheck && roleCheck;
 

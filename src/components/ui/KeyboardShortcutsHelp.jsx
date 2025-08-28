@@ -112,14 +112,10 @@ export const KeyboardShortcutsHelp = ({ isOpen, onClose }) => {
                           {shortcut.description}
                         </div>
                         {shortcut.target && (
-                          <div className="text-xs text-slate-500">
-                            Target: {shortcut.target}
-                          </div>
+                          <div className="text-xs text-slate-500">Target: {shortcut.target}</div>
                         )}
                         {shortcut.company && (
-                          <div className="text-xs text-slate-500">
-                            Company: {shortcut.company}
-                          </div>
+                          <div className="text-xs text-slate-500">Company: {shortcut.company}</div>
                         )}
                       </div>
                       <div className="ml-4">
@@ -144,11 +140,10 @@ export const KeyboardShortcutsHelp = ({ isOpen, onClose }) => {
         <div className="px-6 py-4 border-t border-slate-200 bg-slate-50">
           <div className="flex items-center justify-between text-sm text-slate-600">
             <div>
-              Press <kbd className="px-2 py-1 bg-white border border-slate-300 rounded">Esc</kbd> to close
+              Press <kbd className="px-2 py-1 bg-white border border-slate-300 rounded">Esc</kbd> to
+              close
             </div>
-            <div>
-              Total: {Object.values(shortcuts).flat().length} shortcuts
-            </div>
+            <div>Total: {Object.values(shortcuts).flat().length} shortcuts</div>
           </div>
         </div>
       </div>

@@ -12,8 +12,13 @@ class RealTimeDataService {
     this.updateInterval = 500; // 500ms updates for smoother experience
     this.isActive = false;
     this.marketDataTypes = new Set([
-      'stock_price', 'interest_rates', 'fx_rates', 'commodity_prices',
-      'volatility_index', 'bond_yields', 'economic_indicators'
+      'stock_price',
+      'interest_rates',
+      'fx_rates',
+      'commodity_prices',
+      'volatility_index',
+      'bond_yields',
+      'economic_indicators'
     ]);
   }
 
@@ -176,21 +181,21 @@ class RealTimeDataService {
 
   getBasePrice(symbol) {
     const basePrices = {
-      'AAPL': 175.84,
-      'MSFT': 378.85,
-      'GOOGL': 142.56,
-      'TSLA': 248.42,
-      'AMZN': 151.94
+      AAPL: 175.84,
+      MSFT: 378.85,
+      GOOGL: 142.56,
+      TSLA: 248.42,
+      AMZN: 151.94
     };
     return basePrices[symbol] || 100;
   }
 
   getBaseInterestRate(symbol) {
     const rates = {
-      'USD_3M': 5.25,
-      'USD_10Y': 4.15,
-      'EUR_3M': 3.85,
-      'EUR_10Y': 2.45
+      USD_3M: 5.25,
+      USD_10Y: 4.15,
+      EUR_3M: 3.85,
+      EUR_10Y: 2.45
     };
     return rates[symbol] || 4.0;
   }
@@ -318,52 +323,52 @@ class RealTimeDataService {
 
   getBaseFXRate(symbol) {
     const rates = {
-      'EURUSD': 1.0850,
-      'GBPUSD': 1.2650,
-      'USDJPY': 149.50,
-      'USDCHF': 0.8750,
-      'AUDUSD': 0.6580
+      EURUSD: 1.085,
+      GBPUSD: 1.265,
+      USDJPY: 149.5,
+      USDCHF: 0.875,
+      AUDUSD: 0.658
     };
     return rates[symbol] || 1.0;
   }
 
   getBaseCommodityPrice(symbol) {
     const prices = {
-      'OIL': 85.50,
-      'GOLD': 2050.00,
-      'SILVER': 24.80,
-      'COPPER': 8.20,
-      'NATGAS': 3.15
+      OIL: 85.5,
+      GOLD: 2050.0,
+      SILVER: 24.8,
+      COPPER: 8.2,
+      NATGAS: 3.15
     };
     return prices[symbol] || 50.0;
   }
 
   getBaseBondYield(symbol) {
     const yields = {
-      'US10Y': 4.25,
-      'US2Y': 4.85,
-      'DE10Y': 2.35,
-      'GB10Y': 4.15,
-      'JP10Y': 0.75
+      US10Y: 4.25,
+      US2Y: 4.85,
+      DE10Y: 2.35,
+      GB10Y: 4.15,
+      JP10Y: 0.75
     };
     return yields[symbol] || 3.0;
   }
 
   getBaseVolatility(symbol) {
     const volatilities = {
-      'VIX': 18.5,
-      'VVIX': 95.2,
-      'MOVE': 105.8
+      VIX: 18.5,
+      VVIX: 95.2,
+      MOVE: 105.8
     };
     return volatilities[symbol] || 20.0;
   }
 
   getBaseEconomicIndicator(symbol) {
     const indicators = {
-      'GDP_GROWTH': 2.4,
-      'INFLATION': 3.2,
-      'UNEMPLOYMENT': 3.8,
-      'CONSUMER_CONF': 102.5
+      GDP_GROWTH: 2.4,
+      INFLATION: 3.2,
+      UNEMPLOYMENT: 3.8,
+      CONSUMER_CONF: 102.5
     };
     return indicators[symbol] || 100.0;
   }
@@ -394,6 +399,66 @@ class RealTimeDataService {
     return () => {
       unsubscribeFunctions.forEach(fn => fn());
     };
+  }
+
+  /**
+   * Cleanup method for tests
+   */
+  cleanup() {
+    // Clear all subscribers
+    this.subscribers.clear();
+
+    // Clear all connections
+    this.connections.forEach(interval => {
+      clearInterval(interval);
+    });
+    this.connections.clear();
+
+    // Clear data cache
+    this.dataCache.clear();
+
+    this.isActive = false;
+  }
+
+  /**
+   * Get active subscriptions (for testing)
+   */
+  getActiveSubscriptions() {
+    const activeSubs = [];
+    this.subscribers.forEach((callbacks, key) => {
+      if (callbacks.size > 0) {
+        const idx = key.lastIndexOf('_');
+        const dataType = key.slice(0, idx);
+        const symbol = key.slice(idx + 1);
+        activeSubs.push({
+          id: key,
+          symbol,
+          dataType,
+          subscriberCount: callbacks.size
+        });
+      }
+    });
+    return activeSubs;
+  }
+
+  /**
+   * Get connection status (for testing)
+   */
+  getConnectionStatus() {
+    const status = {};
+    this.connections.forEach((interval, key) => {
+      const idx = key.lastIndexOf('_');
+      const dataType = key.slice(0, idx);
+      const symbol = key.slice(idx + 1);
+      if (!status[symbol]) {
+        status[symbol] = {};
+      }
+      status[symbol][dataType] = {
+        status: 'connected',
+        subscriberCount: this.subscribers.get(key)?.size || 0
+      };
+    });
+    return status;
   }
 }
 

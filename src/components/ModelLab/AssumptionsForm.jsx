@@ -6,7 +6,9 @@ const Card = ({ title, right, children, className = '' }) => (
   <section className={`rounded-2xl border border-slate-200 bg-white shadow-sm ${className}`}>
     {(title || right) && (
       <header className="flex items-center justify-between border-b border-slate-200 px-4 py-2.5">
-        {title && <h3 className="text-[13px] font-semibold tracking-wide text-slate-700">{title}</h3>}
+        {title && (
+          <h3 className="text-[13px] font-semibold tracking-wide text-slate-700">{title}</h3>
+        )}
         {right}
       </header>
     )}
@@ -23,7 +25,9 @@ const Pill = ({ children, tone = 'slate' }) => {
     red: 'bg-rose-50 text-rose-700 border-rose-200'
   };
   return (
-    <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] ${tones[tone]}`}>
+    <span
+      className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] ${tones[tone]}`}
+    >
       {children}
     </span>
   );
@@ -43,7 +47,9 @@ function NumberInput({ label, value, onChange, suffix, step = 0.01, min, max }) 
           step={step}
           min={min}
           max={max}
-          onChange={(e) => onChange(clamp(parseFloat(e.target.value || '0'), min ?? -Infinity, max ?? Infinity))}
+          onChange={e =>
+            onChange(clamp(parseFloat(e.target.value || '0'), min ?? -Infinity, max ?? Infinity))
+          }
         />
         {suffix && <span className="text-slate-500">{suffix}</span>}
       </span>
@@ -53,7 +59,7 @@ function NumberInput({ label, value, onChange, suffix, step = 0.01, min, max }) 
 
 const AssumptionsForm = ({ model, onChange }) => {
   const tmpl = templates.find(t => t.kind === model.kind);
-  const set = (k) => (v) => onChange({ ...model.assumptions, [k]: v });
+  const set = k => v => onChange({ ...model.assumptions, [k]: v });
 
   if (!tmpl) return null;
 
@@ -79,10 +85,12 @@ const AssumptionsForm = ({ model, onChange }) => {
                 <select
                   className="rounded-md border border-slate-300 bg-white px-2 py-1"
                   value={model.assumptions[f.key] || ''}
-                  onChange={(e) => set(f.key)(e.target.value)}
+                  onChange={e => set(f.key)(e.target.value)}
                 >
                   {(f.options || []).map(opt => (
-                    <option key={opt} value={opt}>{opt}</option>
+                    <option key={opt} value={opt}>
+                      {opt}
+                    </option>
                   ))}
                 </select>
               </label>

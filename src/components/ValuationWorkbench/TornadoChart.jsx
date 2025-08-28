@@ -24,7 +24,8 @@ export const TornadoChart = ({ items }) => {
               <div className="absolute left-1/2 top-0 h-5 w-px bg-white/60" />
             </div>
             <div className={`w-20 text-right ${pos ? 'text-emerald-700' : 'text-rose-700'}`}>
-              {item.delta >= 0 ? '+' : ''}{item.delta.toFixed(2)}
+              {item.delta >= 0 ? '+' : ''}
+              {item.delta.toFixed(2)}
             </div>
           </div>
         );
@@ -37,33 +38,42 @@ export function generateTornadoData(assumptions, baseRows, basePerShare) {
   const one = (label, tweak) => {
     const aa = { ...assumptions };
     tweak(aa);
-    const rows = project(aa, growthVector(
-      aa.growthYears > 0 ? (aa.ebitMarginT > aa.ebitMargin0 ? 0.06 : 0.03) : 0,
-      aa.years,
-      aa.growthYears
-    ));
+    const rows = project(
+      aa,
+      growthVector(
+        aa.growthYears > 0 ? (aa.ebitMarginT > aa.ebitMargin0 ? 0.06 : 0.03) : 0,
+        aa.years,
+        aa.growthYears
+      )
+    );
     const v = valueEquity(aa, rows).perShare;
     return { label, delta: v - basePerShare };
   };
 
   const items = [
     one('WACC +100 bps', x => {
-      if (x.capmMode === 'capm') x.rf += 0.01; else x.keManual += 0.01;
+      if (x.capmMode === 'capm') x.rf += 0.01;
+      else x.keManual += 0.01;
     }),
     one('WACC −100 bps', x => {
-      if (x.capmMode === 'capm') x.rf -= 0.01; else x.keManual -= 0.01;
+      if (x.capmMode === 'capm') x.rf -= 0.01;
+      else x.keManual -= 0.01;
     }),
     one('Terminal g +50 bps', x => {
-      x.terminalMethod = 'gordon'; x.tg += 0.005;
+      x.terminalMethod = 'gordon';
+      x.tg += 0.005;
     }),
     one('Terminal g −50 bps', x => {
-      x.terminalMethod = 'gordon'; x.tg -= 0.005;
+      x.terminalMethod = 'gordon';
+      x.tg -= 0.005;
     }),
     one('Exit multiple +1x', x => {
-      x.terminalMethod = 'exitMultiple'; x.exitEVMultiple += 1;
+      x.terminalMethod = 'exitMultiple';
+      x.exitEVMultiple += 1;
     }),
     one('Exit multiple −1x', x => {
-      x.terminalMethod = 'exitMultiple'; x.exitEVMultiple -= 1;
+      x.terminalMethod = 'exitMultiple';
+      x.exitEVMultiple -= 1;
     }),
     one('EBIT margin +100 bps', x => {
       x.ebitMarginT += 0.01;
@@ -72,10 +82,12 @@ export function generateTornadoData(assumptions, baseRows, basePerShare) {
       x.ebitMarginT -= 0.01;
     }),
     one('Sales‑to‑Capital +0.5', x => {
-      x.reinvMethod = 'salesToCapital'; x.salesToCapital += 0.5;
+      x.reinvMethod = 'salesToCapital';
+      x.salesToCapital += 0.5;
     }),
     one('Sales‑to‑Capital −0.5', x => {
-      x.reinvMethod = 'salesToCapital'; x.salesToCapital = Math.max(0.1, x.salesToCapital - 0.5);
+      x.reinvMethod = 'salesToCapital';
+      x.salesToCapital = Math.max(0.1, x.salesToCapital - 0.5);
     })
   ];
 

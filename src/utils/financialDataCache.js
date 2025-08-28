@@ -274,9 +274,10 @@ class FinancialDataCache {
     // In production, use Web Crypto API for proper encryption
     // For now, just base64 encode with simple obfuscation
     const key = this.getEncryptionKey();
-    const obfuscated = data.split('').map((char, i) =>
-      String.fromCharCode(char.charCodeAt(0) ^ key.charCodeAt(i % key.length))
-    ).join('');
+    const obfuscated = data
+      .split('')
+      .map((char, i) => String.fromCharCode(char.charCodeAt(0) ^ key.charCodeAt(i % key.length)))
+      .join('');
     return btoa(obfuscated);
   }
 
@@ -284,9 +285,10 @@ class FinancialDataCache {
     // Reverse the simple obfuscation
     const key = this.getEncryptionKey();
     const deobfuscated = atob(encryptedData);
-    return deobfuscated.split('').map((char, i) =>
-      String.fromCharCode(char.charCodeAt(0) ^ key.charCodeAt(i % key.length))
-    ).join('');
+    return deobfuscated
+      .split('')
+      .map((char, i) => String.fromCharCode(char.charCodeAt(0) ^ key.charCodeAt(i % key.length)))
+      .join('');
   }
 
   getEncryptionKey() {
@@ -327,7 +329,7 @@ class FinancialDataCache {
     const newDataSize = this.calculateSize(newData);
     const maxSize = this.options.maxSize * 1024 * 1024; // Convert to bytes
 
-    return (currentSize + newDataSize) <= maxSize;
+    return currentSize + newDataSize <= maxSize;
   }
 
   getCurrentCacheSize() {
@@ -340,8 +342,9 @@ class FinancialDataCache {
 
   async evictOldestItems() {
     // Sort by last accessed time and remove oldest 20%
-    const entries = Array.from(this.metadata.entries())
-      .sort(([, a], [, b]) => a.lastAccessed - b.lastAccessed);
+    const entries = Array.from(this.metadata.entries()).sort(
+      ([, a], [, b]) => a.lastAccessed - b.lastAccessed
+    );
 
     const toEvict = Math.ceil(entries.length * 0.2);
 
@@ -354,8 +357,9 @@ class FinancialDataCache {
   enforCacheSizeLimit() {
     if (this.cache.size > this.options.maxSize) {
       const toRemove = this.cache.size - this.options.maxSize;
-      const entries = Array.from(this.metadata.entries())
-        .sort(([, a], [, b]) => a.lastAccessed - b.lastAccessed);
+      const entries = Array.from(this.metadata.entries()).sort(
+        ([, a], [, b]) => a.lastAccessed - b.lastAccessed
+      );
 
       for (let i = 0; i < toRemove; i++) {
         const [key] = entries[i];
@@ -366,9 +370,12 @@ class FinancialDataCache {
 
   startCleanupInterval() {
     // Clean up expired items every 5 minutes
-    setInterval(() => {
-      this.cleanupExpiredItems();
-    }, 5 * 60 * 1000);
+    setInterval(
+      () => {
+        this.cleanupExpiredItems();
+      },
+      5 * 60 * 1000
+    );
   }
 
   cleanupExpiredItems() {
@@ -463,8 +470,9 @@ export const getUserModel = (modelId, fetchFn) =>
   });
 
 export const clearSensitiveData = () =>
-  financialDataCache.clear((key, metadata) =>
-    metadata.dataType === 'private-analysis' || metadata.dataType === 'user-models'
+  financialDataCache.clear(
+    (key, metadata) =>
+      metadata.dataType === 'private-analysis' || metadata.dataType === 'user-models'
   );
 
 export const getCacheStats = () => financialDataCache.getStats();

@@ -76,7 +76,7 @@ const CandlestickChart = ({
     const candleColor = isGreen ? colors.green : colors.red;
 
     // Mock x coordinate calculation (in real implementation, use scale)
-    const x = 50 + (index * 10);
+    const x = 50 + index * 10;
     const yScale = 100; // Mock scale
 
     return (
@@ -114,7 +114,9 @@ const CandlestickChart = ({
     return (
       <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
         <p className="font-semibold text-gray-900">{symbol}</p>
-        <p className="text-sm text-gray-600">{data.date} {data.time}</p>
+        <p className="text-sm text-gray-600">
+          {data.date} {data.time}
+        </p>
         <div className="mt-2 space-y-1">
           <div className="flex justify-between items-center">
             <span className="text-sm text-gray-600">Open:</span>
@@ -134,8 +136,11 @@ const CandlestickChart = ({
           </div>
           <div className="flex justify-between items-center">
             <span className="text-sm text-gray-600">Change:</span>
-            <span className={`font-mono text-sm ${data.isGreen ? 'text-green-600' : 'text-red-600'}`}>
-              {data.change >= 0 ? '+' : ''}${data.change.toFixed(2)} ({data.changePercent.toFixed(2)}%)
+            <span
+              className={`font-mono text-sm ${data.isGreen ? 'text-green-600' : 'text-red-600'}`}
+            >
+              {data.change >= 0 ? '+' : ''}${data.change.toFixed(2)} (
+              {data.changePercent.toFixed(2)}%)
             </span>
           </div>
           {showVolume && (
@@ -155,11 +160,15 @@ const CandlestickChart = ({
         <div className="text-center">
           <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-2">
             <svg
-              className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor"
+              className="w-6 h-6 text-gray-400"
+              fill="none"
+              stroke="currentColor"
               viewBox="0 0 24 24"
             >
               <path
-                strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
                 d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
               />
             </svg>
@@ -175,19 +184,13 @@ const CandlestickChart = ({
       <ResponsiveContainer width="100%" height="100%">
         <ComposedChart data={processedData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-          <XAxis
-            dataKey="date"
-            stroke="#6b7280"
-            fontSize={12}
-            tickLine={false}
-            axisLine={false}
-          />
+          <XAxis dataKey="date" stroke="#6b7280" fontSize={12} tickLine={false} axisLine={false} />
           <YAxis
             stroke="#6b7280"
             fontSize={12}
             tickLine={false}
             axisLine={false}
-            tickFormatter={(value) => `$${value.toFixed(0)}`}
+            tickFormatter={value => `$${value.toFixed(0)}`}
           />
           <Tooltip content={<CustomTooltip />} />
 
@@ -202,14 +205,7 @@ const CandlestickChart = ({
           />
 
           {/* Volume bars if enabled */}
-          {showVolume && (
-            <Bar
-              dataKey="volume"
-              fill="#e5e7eb"
-              opacity={0.3}
-              yAxisId="volume"
-            />
-          )}
+          {showVolume && <Bar dataKey="volume" fill="#e5e7eb" opacity={0.3} yAxisId="volume" />}
         </ComposedChart>
       </ResponsiveContainer>
     </div>

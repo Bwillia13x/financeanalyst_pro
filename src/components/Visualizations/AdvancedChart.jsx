@@ -1,10 +1,9 @@
 // Advanced Chart Component - Phase 2 Integration
-import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  BarChart3, 
-  LineChart, 
-  PieChart, 
+import {
+  BarChart3,
+  LineChart,
+  PieChart,
   TrendingUp,
   Download,
   Settings,
@@ -12,18 +11,19 @@ import {
   RefreshCw,
   Info
 } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
 
 // Import Phase 2 service
 import { dataVisualizationService } from '../../services/visualization/dataVisualizationComponents';
 
-export default function AdvancedChart({ 
-  data, 
-  type = 'line', 
-  config = {}, 
+export default function AdvancedChart({
+  data,
+  type = 'line',
+  config = {},
   onExport,
   className = '',
   title,
-  subtitle 
+  subtitle
 }) {
   const chartRef = useRef(null);
   const containerRef = useRef(null);
@@ -72,40 +72,32 @@ export default function AdvancedChart({
       switch (type) {
         case 'line':
           newChartId = dataVisualizationService.createAdvancedLineChart(
-            containerId, 
-            data, 
+            containerId,
+            data,
             chartConfig
           );
           break;
 
         case 'bar':
           newChartId = dataVisualizationService.createAdvancedBarChart(
-            containerId, 
-            data, 
+            containerId,
+            data,
             chartConfig
           );
           break;
 
         case 'scatter':
-          newChartId = dataVisualizationService.createScatterPlot(
-            containerId, 
-            data, 
-            chartConfig
-          );
+          newChartId = dataVisualizationService.createScatterPlot(containerId, data, chartConfig);
           break;
 
         case 'heatmap':
-          newChartId = dataVisualizationService.createHeatmap(
-            containerId, 
-            data, 
-            chartConfig
-          );
+          newChartId = dataVisualizationService.createHeatmap(containerId, data, chartConfig);
           break;
 
         case 'dashboard':
           newChartId = dataVisualizationService.createFinancialDashboard(
-            containerId, 
-            data, 
+            containerId,
+            data,
             chartConfig
           );
           break;
@@ -116,7 +108,6 @@ export default function AdvancedChart({
 
       setChartId(newChartId);
       setIsLoading(false);
-
     } catch (err) {
       console.error('Failed to create chart:', err);
       setError(err.message);
@@ -149,41 +140,40 @@ export default function AdvancedChart({
     try {
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
-      
+
       // Get chart dimensions
       const rect = chartRef.current.getBoundingClientRect();
       canvas.width = rect.width * 2; // High DPI
       canvas.height = rect.height * 2;
-      
+
       // Scale for high DPI
       ctx.scale(2, 2);
-      
+
       // Convert SVG to canvas (simplified - would need proper implementation)
       const svgData = new XMLSerializer().serializeToString(chartRef.current.querySelector('svg'));
       const img = new Image();
-      
+
       img.onload = () => {
         ctx.drawImage(img, 0, 0);
-        
+
         // Download
         const link = document.createElement('a');
         link.download = `chart-${Date.now()}.${format}`;
         link.href = canvas.toDataURL(`image/${format}`);
         link.click();
-        
+
         if (onExport) {
           onExport({ format, data: canvas.toDataURL(`image/${format}`) });
         }
       };
-      
+
       img.src = 'data:image/svg+xml;base64,' + btoa(svgData);
-      
     } catch (err) {
       console.error('Failed to export chart:', err);
     }
   };
 
-  const handleResize = () => {
+  const _handleResize = () => {
     if (chartId && containerRef.current) {
       const rect = containerRef.current.getBoundingClientRect();
       dataVisualizationService.resizeChart(chartId, rect.width, rect.height - 60); // Account for header
@@ -192,11 +182,16 @@ export default function AdvancedChart({
 
   const getChartIcon = () => {
     switch (type) {
-      case 'line': return LineChart;
-      case 'bar': return BarChart3;
-      case 'scatter': return TrendingUp;
-      case 'heatmap': return PieChart;
-      default: return BarChart3;
+      case 'line':
+        return LineChart;
+      case 'bar':
+        return BarChart3;
+      case 'scatter':
+        return TrendingUp;
+      case 'heatmap':
+        return PieChart;
+      default:
+        return BarChart3;
     }
   };
 
@@ -239,12 +234,8 @@ export default function AdvancedChart({
             <ChartIcon className="w-5 h-5 text-blue-600" />
           </div>
           <div>
-            {title && (
-              <h3 className="font-semibold text-gray-900">{title}</h3>
-            )}
-            {subtitle && (
-              <p className="text-sm text-gray-500">{subtitle}</p>
-            )}
+            {title && <h3 className="font-semibold text-gray-900">{title}</h3>}
+            {subtitle && <p className="text-sm text-gray-500">{subtitle}</p>}
           </div>
         </div>
 
@@ -256,7 +247,7 @@ export default function AdvancedChart({
           >
             <Download className="w-4 h-4" />
           </button>
-          
+
           <button
             onClick={refreshChart}
             className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors"
@@ -264,7 +255,7 @@ export default function AdvancedChart({
           >
             <RefreshCw className="w-4 h-4" />
           </button>
-          
+
           <button
             onClick={() => setShowSettings(!showSettings)}
             className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors"
@@ -272,9 +263,11 @@ export default function AdvancedChart({
           >
             <Settings className="w-4 h-4" />
           </button>
-          
+
           <button
-            onClick={() => {/* Handle fullscreen */}}
+            onClick={() => {
+              /* Handle fullscreen */
+            }}
             className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors"
             title="Fullscreen"
           >
@@ -288,57 +281,59 @@ export default function AdvancedChart({
         <motion.div
           initial={{ height: 0, opacity: 0 }}
           animate={{ height: 'auto', opacity: 1 }}
-          exit={{ height: 0, opacity: 0 }}
-          className="border-b border-gray-200 bg-gray-50 p-4"
+          className="bg-gray-50 border-t border-gray-200 p-4 space-y-4"
         >
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Theme
+              <label htmlFor="chart-style" className="block text-sm font-medium text-gray-700 mb-2">
+                Chart Style
               </label>
               <select
+                id="chart-style"
                 value={chartConfig.theme}
-                onChange={(e) => setChartConfig(prev => ({ ...prev, theme: e.target.value }))}
-                className="w-full border border-gray-300 rounded px-3 py-1 text-sm"
+                onChange={e => setChartConfig(prev => ({ ...prev, theme: e.target.value }))}
+                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
               >
                 <option value="professional">Professional</option>
                 <option value="dark">Dark</option>
                 <option value="financial">Financial</option>
               </select>
             </div>
-            
+          </div>
+
+          <div className="space-y-3">
             <div className="flex items-center">
               <input
                 type="checkbox"
                 id="showGrid"
                 checked={chartConfig.showGrid}
-                onChange={(e) => setChartConfig(prev => ({ ...prev, showGrid: e.target.checked }))}
+                onChange={e => setChartConfig(prev => ({ ...prev, showGrid: e.target.checked }))}
                 className="mr-2"
               />
               <label htmlFor="showGrid" className="text-sm text-gray-700">
                 Show Grid
               </label>
             </div>
-            
+
             <div className="flex items-center">
               <input
                 type="checkbox"
                 id="showLegend"
                 checked={chartConfig.showLegend}
-                onChange={(e) => setChartConfig(prev => ({ ...prev, showLegend: e.target.checked }))}
+                onChange={e => setChartConfig(prev => ({ ...prev, showLegend: e.target.checked }))}
                 className="mr-2"
               />
               <label htmlFor="showLegend" className="text-sm text-gray-700">
                 Show Legend
               </label>
             </div>
-            
+
             <div className="flex items-center">
               <input
                 type="checkbox"
                 id="animations"
                 checked={chartConfig.animations}
-                onChange={(e) => setChartConfig(prev => ({ ...prev, animations: e.target.checked }))}
+                onChange={e => setChartConfig(prev => ({ ...prev, animations: e.target.checked }))}
                 className="mr-2"
               />
               <label htmlFor="animations" className="text-sm text-gray-700">
@@ -354,17 +349,13 @@ export default function AdvancedChart({
         {isLoading && (
           <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75 z-10">
             <div className="flex items-center space-x-3">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600" />
               <span className="text-gray-600">Loading chart...</span>
             </div>
           </div>
         )}
-        
-        <div
-          ref={chartRef}
-          className="w-full"
-          style={{ minHeight: '300px' }}
-        />
+
+        <div ref={chartRef} className="w-full" style={{ minHeight: '300px' }} />
       </div>
 
       {/* Chart Info */}

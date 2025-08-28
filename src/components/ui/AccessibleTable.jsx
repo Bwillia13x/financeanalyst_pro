@@ -67,7 +67,9 @@ const AccessibleTable = ({
         tabIndex={0}
         aria-label={getAriaLabel()}
       >
-        {column.render ? column.render(cellValue, item, rowIndex) : formatCellValue(cellValue, column)}
+        {column.render
+          ? column.render(cellValue, item, rowIndex)
+          : formatCellValue(cellValue, column)}
       </CellComponent>
     );
   };
@@ -99,12 +101,11 @@ const AccessibleTable = ({
     }
   };
 
-  const handleSort = (column) => {
+  const handleSort = column => {
     if (!sortable || !onSort || !column.sortable) return;
 
-    const newDirection = sortColumn === column.accessor
-      ? (sortDirection === 'asc' ? 'desc' : 'asc')
-      : 'asc';
+    const newDirection =
+      sortColumn === column.accessor ? (sortDirection === 'asc' ? 'desc' : 'asc') : 'asc';
 
     onSort(column.accessor, newDirection);
   };
@@ -140,12 +141,14 @@ const AccessibleTable = ({
                   'px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider',
                   column.align === 'right' && 'text-right',
                   column.align === 'center' && 'text-center',
-                  sortable && column.sortable && 'cursor-pointer hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-inset',
+                  sortable &&
+                    column.sortable &&
+                    'cursor-pointer hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-inset',
                   column.headerClassName
                 )}
                 tabIndex={sortable && column.sortable ? 0 : -1}
                 onClick={() => handleSort(column)}
-                onKeyDown={(e) => {
+                onKeyDown={e => {
                   if ((e.key === 'Enter' || e.key === ' ') && sortable && column.sortable) {
                     e.preventDefault();
                     handleSort(column);
@@ -163,11 +166,11 @@ const AccessibleTable = ({
                   {column.header}
                   {sortable && column.sortable && (
                     <span className="ml-2" aria-hidden="true">
-                      {sortColumn === column.accessor ? (
-                        sortDirection === 'asc' ? '↑' : '↓'
-                      ) : (
-                        '↕'
-                      )}
+                      {sortColumn === column.accessor
+                        ? sortDirection === 'asc'
+                          ? '↑'
+                          : '↓'
+                        : '↕'}
                     </span>
                   )}
                 </div>
@@ -179,22 +182,14 @@ const AccessibleTable = ({
         <tbody className="divide-y divide-border">
           {data.length === 0 ? (
             <tr>
-              <td
-                colSpan={columns.length}
-                className="px-4 py-8 text-center text-muted-foreground"
-              >
+              <td colSpan={columns.length} className="px-4 py-8 text-center text-muted-foreground">
                 No data available
               </td>
             </tr>
           ) : (
             data.map((item, rowIndex) => (
-              <tr
-                key={item.id || rowIndex}
-                className="hover:bg-muted/30 focus-within:bg-muted/50"
-              >
-                {columns.map((column, cellIndex) =>
-                  renderCell(item, column, rowIndex, cellIndex)
-                )}
+              <tr key={item.id || rowIndex} className="hover:bg-muted/30 focus-within:bg-muted/50">
+                {columns.map((column, cellIndex) => renderCell(item, column, rowIndex, cellIndex))}
               </tr>
             ))
           )}
@@ -268,7 +263,9 @@ export const PortfolioTable = ({ holdings, className, ...props }) => {
           <div className={value >= 0 ? 'text-success' : 'text-destructive'}>
             {value.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}
           </div>
-          <div className={`text-xs ${item.gainLossPercent >= 0 ? 'text-success' : 'text-destructive'}`}>
+          <div
+            className={`text-xs ${item.gainLossPercent >= 0 ? 'text-success' : 'text-destructive'}`}
+          >
             ({item.gainLossPercent?.toFixed(2)}%)
           </div>
         </div>

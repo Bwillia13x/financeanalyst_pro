@@ -29,38 +29,43 @@ const ContextualInsightsSidebar = ({
   });
 
   // Industry benchmark data (in real implementation, this would come from APIs)
-  const _industryBenchmarks = useMemo(() => ({
-    healthcare: {
-      revenueGrowth: { min: 8, median: 15, max: 25, unit: '%' },
-      ebitdaMargin: { min: 18, median: 28, max: 40, unit: '%' },
-      grossMargin: { min: 65, median: 75, max: 85, unit: '%' },
-      roe: { min: 12, median: 18, max: 25, unit: '%' }
-    },
-    technology: {
-      revenueGrowth: { min: 15, median: 25, max: 50, unit: '%' },
-      ebitdaMargin: { min: 20, median: 35, max: 50, unit: '%' },
-      grossMargin: { min: 70, median: 80, max: 90, unit: '%' },
-      roe: { min: 15, median: 22, max: 35, unit: '%' }
-    },
-    manufacturing: {
-      revenueGrowth: { min: 3, median: 8, max: 15, unit: '%' },
-      ebitdaMargin: { min: 10, median: 18, max: 25, unit: '%' },
-      grossMargin: { min: 25, median: 35, max: 45, unit: '%' },
-      roe: { min: 8, median: 15, max: 22, unit: '%' }
-    }
-  }), []);
+  const _industryBenchmarks = useMemo(
+    () => ({
+      healthcare: {
+        revenueGrowth: { min: 8, median: 15, max: 25, unit: '%' },
+        ebitdaMargin: { min: 18, median: 28, max: 40, unit: '%' },
+        grossMargin: { min: 65, median: 75, max: 85, unit: '%' },
+        roe: { min: 12, median: 18, max: 25, unit: '%' }
+      },
+      technology: {
+        revenueGrowth: { min: 15, median: 25, max: 50, unit: '%' },
+        ebitdaMargin: { min: 20, median: 35, max: 50, unit: '%' },
+        grossMargin: { min: 70, median: 80, max: 90, unit: '%' },
+        roe: { min: 15, median: 22, max: 35, unit: '%' }
+      },
+      manufacturing: {
+        revenueGrowth: { min: 3, median: 8, max: 15, unit: '%' },
+        ebitdaMargin: { min: 10, median: 18, max: 25, unit: '%' },
+        grossMargin: { min: 25, median: 35, max: 45, unit: '%' },
+        roe: { min: 8, median: 15, max: 22, unit: '%' }
+      }
+    }),
+    []
+  );
 
   // Generate contextual insights based on current analysis
   const generateContextualInsights = () => {
     const insights = [];
 
     if (!financialData?.statements?.incomeStatement) {
-      return [{
-        type: 'info',
-        title: 'Getting Started',
-        content: 'Import financial data to see contextual insights and benchmarks.',
-        action: 'Import Data'
-      }];
+      return [
+        {
+          type: 'info',
+          title: 'Getting Started',
+          content: 'Import financial data to see contextual insights and benchmarks.',
+          action: 'Import Data'
+        }
+      ];
     }
 
     const income = financialData.statements.incomeStatement;
@@ -113,7 +118,7 @@ const ContextualInsightsSidebar = ({
 
   const contextualInsights = generateContextualInsights();
 
-  const toggleSection = (section) => {
+  const toggleSection = section => {
     setExpandedSections(prev => ({
       ...prev,
       [section]: !prev[section]
@@ -183,7 +188,12 @@ const ContextualInsightsSidebar = ({
                   <span>Current: {insight.metric.toFixed(1)}%</span>
                   <span>Benchmark: {insight.benchmark}%</span>
                 </div>
-                {renderBenchmarkBar(insight.metric, insight.benchmark, 0, Math.max(insight.benchmark * 1.5, insight.metric * 1.2))}
+                {renderBenchmarkBar(
+                  insight.metric,
+                  insight.benchmark,
+                  0,
+                  Math.max(insight.benchmark * 1.5, insight.metric * 1.2)
+                )}
               </div>
             )}
 
@@ -254,10 +264,11 @@ const ContextualInsightsSidebar = ({
                 <Target size={16} className="text-amber-600" />
                 <span className="font-medium text-slate-900">Key Assumptions</span>
               </div>
-              {expandedSections.assumptions ?
-                <ChevronDown size={16} className="text-slate-400" /> :
+              {expandedSections.assumptions ? (
+                <ChevronDown size={16} className="text-slate-400" />
+              ) : (
                 <ChevronRight size={16} className="text-slate-400" />
-              }
+              )}
             </button>
 
             <AnimatePresence>
@@ -297,10 +308,11 @@ const ContextualInsightsSidebar = ({
                 <Users size={16} className="text-emerald-600" />
                 <span className="font-medium text-slate-900">Industry Benchmarks</span>
               </div>
-              {expandedSections.benchmarks ?
-                <ChevronDown size={16} className="text-slate-400" /> :
+              {expandedSections.benchmarks ? (
+                <ChevronDown size={16} className="text-slate-400" />
+              ) : (
                 <ChevronRight size={16} className="text-slate-400" />
-              }
+              )}
             </button>
 
             <AnimatePresence>
@@ -358,10 +370,11 @@ const ContextualInsightsSidebar = ({
                 <Lightbulb size={16} className="text-purple-600" />
                 <span className="font-medium text-slate-900">Smart Suggestions</span>
               </div>
-              {expandedSections.suggestions ?
-                <ChevronDown size={16} className="text-slate-400" /> :
+              {expandedSections.suggestions ? (
+                <ChevronDown size={16} className="text-slate-400" />
+              ) : (
                 <ChevronRight size={16} className="text-slate-400" />
-              }
+              )}
             </button>
 
             <AnimatePresence>

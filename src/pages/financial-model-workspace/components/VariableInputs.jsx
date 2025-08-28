@@ -194,10 +194,7 @@ const VariableInputs = ({ onVariableChange, onBulkEdit }) => {
           >
             {editMode ? 'Done' : 'Edit'}
           </Button>
-          <Button
-            variant="outline" size="sm" iconName="Download"
-            onClick={exportVariables}
-          >
+          <Button variant="outline" size="sm" iconName="Download" onClick={exportVariables}>
             Export
           </Button>
         </div>
@@ -323,10 +320,7 @@ const VariableInputs = ({ onVariableChange, onBulkEdit }) => {
             <span>Changes auto-save every 30 seconds</span>
           </div>
           <div className="flex items-center space-x-2">
-            <Button
-              variant="outline" size="sm" iconName="RotateCcw"
-              onClick={resetToDefaults}
-            >
+            <Button variant="outline" size="sm" iconName="RotateCcw" onClick={resetToDefaults}>
               Reset
             </Button>
             <Button

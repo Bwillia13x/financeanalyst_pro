@@ -1,3 +1,4 @@
+import React from 'react';
 import { Helmet } from 'react-helmet-async';
 
 const SEOHead = ({
@@ -12,7 +13,7 @@ const SEOHead = ({
   publishedTime,
   modifiedTime
 }) => {
-  const siteUrl = (import.meta?.env?.VITE_SITE_URL) || 'https://valor-ivx.com';
+  const siteUrl = import.meta?.env?.VITE_SITE_URL || 'https://valor-ivx.com';
   const fullCanonical = canonical ? `${siteUrl}${canonical}` : siteUrl;
   const fullImage = image.startsWith('http') ? image : `${siteUrl}${image}`;
 
@@ -50,7 +51,10 @@ const SEOHead = ({
       {modifiedTime && <meta property="article:modified_time" content={modifiedTime} />}
 
       {/* Additional SEO meta tags */}
-      <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+      <meta
+        name="robots"
+        content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"
+      />
       <meta name="googlebot" content="index, follow" />
 
       {/* Language and geo targeting */}
@@ -62,18 +66,18 @@ const SEOHead = ({
         {JSON.stringify({
           '@context': 'https://schema.org',
           '@type': 'WebApplication',
-          'name': 'FinanceAnalyst Pro',
+          name: 'FinanceAnalyst Pro',
           description,
-          'url': siteUrl,
-          'author': {
+          url: siteUrl,
+          author: {
             '@type': 'Organization',
-            'name': author
+            name: author
           },
-          'applicationCategory': 'FinanceApplication',
-          'operatingSystem': 'Web',
-          'offers': {
+          applicationCategory: 'FinanceApplication',
+          operatingSystem: 'Web',
+          offers: {
             '@type': 'Offer',
-            'category': 'Financial Software'
+            category: 'Financial Software'
           }
         })}
       </script>

@@ -1,5 +1,6 @@
+import { AlertTriangle as _AlertTriangle, X as _X, AlertCircle, Crown, Users, Calendar as _Calendar, ArrowRight } from 'lucide-react';
 import React from 'react';
-import { AlertCircle, Crown, Users, Calendar, ArrowRight } from 'lucide-react';
+
 import { useLicense } from '../../services/licensing';
 
 export const LicenseBanner = () => {
@@ -18,7 +19,7 @@ export const LicenseBanner = () => {
           bgColor: license.isTrialExpiringSoon ? 'bg-red-50 border-red-200' : 'bg-amber-50 border-amber-200',
           textColor: license.isTrialExpiringSoon ? 'text-red-800' : 'text-amber-800',
           iconColor: license.isTrialExpiringSoon ? 'text-red-500' : 'text-amber-500',
-          message: license.isTrialExpiringSoon 
+          message: license.isTrialExpiringSoon
             ? `Trial expires in ${license.daysUntilExpiry} days`
             : `${license.daysUntilExpiry} days left in trial`,
           cta: 'Upgrade Now'

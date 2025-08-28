@@ -36,7 +36,7 @@ const ReportBuilder = ({ financialData, onReportGenerated }) => {
     loadExistingReports();
   }, []);
 
-  const loadTemplatesAndThemes = async() => {
+  const loadTemplatesAndThemes = async () => {
     try {
       const availableTemplates = reportingEngine.getTemplates();
       const availableThemes = reportingEngine.getThemes();
@@ -52,7 +52,7 @@ const ReportBuilder = ({ financialData, onReportGenerated }) => {
     }
   };
 
-  const loadExistingReports = async() => {
+  const loadExistingReports = async () => {
     try {
       const reports = reportingEngine.listReports();
       setGeneratedReports(reports);
@@ -61,7 +61,7 @@ const ReportBuilder = ({ financialData, onReportGenerated }) => {
     }
   };
 
-  const handleTemplateSelect = (template) => {
+  const handleTemplateSelect = template => {
     setSelectedTemplate(template);
     // Auto-select all required sections
     const requiredSections = template.sections
@@ -70,13 +70,14 @@ const ReportBuilder = ({ financialData, onReportGenerated }) => {
 
     setReportOptions(prev => ({
       ...prev,
-      includedSections: [...requiredSections, ...prev.includedSections.filter(id =>
-        !requiredSections.includes(id)
-      )]
+      includedSections: [
+        ...requiredSections,
+        ...prev.includedSections.filter(id => !requiredSections.includes(id))
+      ]
     }));
   };
 
-  const handleSectionToggle = (sectionId) => {
+  const handleSectionToggle = sectionId => {
     setReportOptions(prev => ({
       ...prev,
       includedSections: prev.includedSections.includes(sectionId)
@@ -97,16 +98,16 @@ const ReportBuilder = ({ financialData, onReportGenerated }) => {
   };
 
   const updateCustomSection = (index, updates) => {
-    setCustomSections(prev => prev.map((section, i) =>
-      i === index ? { ...section, ...updates } : section
-    ));
+    setCustomSections(prev =>
+      prev.map((section, i) => (i === index ? { ...section, ...updates } : section))
+    );
   };
 
-  const removeCustomSection = (index) => {
+  const removeCustomSection = index => {
     setCustomSections(prev => prev.filter((_, i) => i !== index));
   };
 
-  const generateReport = async() => {
+  const generateReport = async () => {
     if (!selectedTemplate) return;
 
     setIsGenerating(true);
@@ -119,19 +120,14 @@ const ReportBuilder = ({ financialData, onReportGenerated }) => {
         reportTitle: selectedTemplate.name
       };
 
-      const report = await reportingEngine.generateReport(
-        selectedTemplate.id,
-        reportData,
-        {
-          theme: selectedTheme,
-          customSections,
-          ...reportOptions
-        }
-      );
+      const report = await reportingEngine.generateReport(selectedTemplate.id, reportData, {
+        theme: selectedTheme,
+        customSections,
+        ...reportOptions
+      });
 
       setGeneratedReports(prev => [report, ...prev]);
       onReportGenerated?.(report);
-
     } catch (error) {
       console.error('Error generating report:', error);
       alert('Failed to generate report: ' + error.message);
@@ -140,7 +136,7 @@ const ReportBuilder = ({ financialData, onReportGenerated }) => {
     }
   };
 
-  const exportReport = async(reportId, format) => {
+  const exportReport = async (reportId, format) => {
     try {
       const exportedReport = await reportingEngine.exportReport(reportId, format);
 
@@ -161,7 +157,7 @@ const ReportBuilder = ({ financialData, onReportGenerated }) => {
     }
   };
 
-  const getContentType = (format) => {
+  const getContentType = format => {
     const types = {
       pdf: 'application/pdf',
       docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
@@ -172,7 +168,7 @@ const ReportBuilder = ({ financialData, onReportGenerated }) => {
     return types[format] || 'application/octet-stream';
   };
 
-  const getStatusColor = (status) => {
+  const getStatusColor = status => {
     const colors = {
       completed: 'text-green-600 bg-green-100',
       generating: 'text-blue-600 bg-blue-100',
@@ -181,7 +177,7 @@ const ReportBuilder = ({ financialData, onReportGenerated }) => {
     return colors[status] || 'text-gray-600 bg-gray-100';
   };
 
-  const getStatusIcon = (status) => {
+  const getStatusIcon = status => {
     const icons = {
       completed: Check,
       generating: Clock,
@@ -221,7 +217,7 @@ const ReportBuilder = ({ financialData, onReportGenerated }) => {
             </h2>
 
             <div className="space-y-3">
-              {templates.map((template) => (
+              {templates.map(template => (
                 <motion.div
                   key={template.id}
                   whileHover={{ scale: 1.02 }}
@@ -256,7 +252,7 @@ const ReportBuilder = ({ financialData, onReportGenerated }) => {
             </h2>
 
             <div className="grid grid-cols-1 gap-3">
-              {themes.map((theme) => (
+              {themes.map(theme => (
                 <motion.div
                   key={theme.id}
                   whileHover={{ scale: 1.02 }}
@@ -303,8 +299,11 @@ const ReportBuilder = ({ financialData, onReportGenerated }) => {
               <div className="mb-6">
                 <h3 className="font-semibold text-gray-900 mb-3">Sections</h3>
                 <div className="space-y-3">
-                  {selectedTemplate.sections.map((section) => (
-                    <div key={section.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  {selectedTemplate.sections.map(section => (
+                    <div
+                      key={section.id}
+                      className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                    >
                       <div>
                         <div className="flex items-center space-x-2">
                           <span className="font-medium">{section.name}</span>
@@ -318,7 +317,9 @@ const ReportBuilder = ({ financialData, onReportGenerated }) => {
                       </div>
                       <input
                         type="checkbox"
-                        checked={section.required || reportOptions.includedSections.includes(section.id)}
+                        checked={
+                          section.required || reportOptions.includedSections.includes(section.id)
+                        }
                         disabled={section.required}
                         onChange={() => handleSectionToggle(section.id)}
                         className="w-5 h-5 text-blue-600 rounded"
@@ -348,7 +349,7 @@ const ReportBuilder = ({ financialData, onReportGenerated }) => {
                         <input
                           type="text"
                           value={section.name}
-                          onChange={(e) => updateCustomSection(index, { name: e.target.value })}
+                          onChange={e => updateCustomSection(index, { name: e.target.value })}
                           className="font-medium bg-transparent border-none p-0 focus:ring-0"
                         />
                         <button
@@ -360,7 +361,7 @@ const ReportBuilder = ({ financialData, onReportGenerated }) => {
                       </div>
                       <textarea
                         value={section.content}
-                        onChange={(e) => updateCustomSection(index, { content: e.target.value })}
+                        onChange={e => updateCustomSection(index, { content: e.target.value })}
                         placeholder="Section content..."
                         className="w-full text-sm bg-white border border-gray-200 rounded p-2 resize-none"
                         rows={3}
@@ -378,10 +379,12 @@ const ReportBuilder = ({ financialData, onReportGenerated }) => {
                     <input
                       type="checkbox"
                       checked={reportOptions.includeCharts}
-                      onChange={(e) => setReportOptions(prev => ({
-                        ...prev,
-                        includeCharts: e.target.checked
-                      }))}
+                      onChange={e =>
+                        setReportOptions(prev => ({
+                          ...prev,
+                          includeCharts: e.target.checked
+                        }))
+                      }
                       className="w-5 h-5 text-blue-600 rounded"
                     />
                     <span>Include charts and visualizations</span>
@@ -390,10 +393,12 @@ const ReportBuilder = ({ financialData, onReportGenerated }) => {
                     <input
                       type="checkbox"
                       checked={reportOptions.includeRawData}
-                      onChange={(e) => setReportOptions(prev => ({
-                        ...prev,
-                        includeRawData: e.target.checked
-                      }))}
+                      onChange={e =>
+                        setReportOptions(prev => ({
+                          ...prev,
+                          includeRawData: e.target.checked
+                        }))
+                      }
                       className="w-5 h-5 text-blue-600 rounded"
                     />
                     <span>Include raw data tables</span>
@@ -432,7 +437,7 @@ const ReportBuilder = ({ financialData, onReportGenerated }) => {
               <h2 className="text-xl font-semibold text-gray-900 mb-4">Generated Reports</h2>
 
               <div className="space-y-3">
-                {generatedReports.map((report) => {
+                {generatedReports.map(report => {
                   const StatusIcon = getStatusIcon(report.status);
 
                   return (

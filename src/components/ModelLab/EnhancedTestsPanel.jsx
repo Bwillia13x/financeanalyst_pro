@@ -5,7 +5,9 @@ const Card = ({ title, right, children, className = '' }) => (
   <section className={`rounded-2xl border border-slate-200 bg-white shadow-sm ${className}`}>
     {(title || right) && (
       <header className="flex items-center justify-between border-b border-slate-200 px-4 py-2.5">
-        {title && <h3 className="text-[13px] font-semibold tracking-wide text-slate-700">{title}</h3>}
+        {title && (
+          <h3 className="text-[13px] font-semibold tracking-wide text-slate-700">{title}</h3>
+        )}
         {right}
       </header>
     )}
@@ -22,7 +24,9 @@ const Pill = ({ children, tone = 'slate' }) => {
     red: 'bg-rose-50 text-rose-700 border-rose-200'
   };
   return (
-    <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] ${tones[tone]}`}>
+    <span
+      className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] ${tones[tone]}`}
+    >
       {children}
     </span>
   );
@@ -33,21 +37,31 @@ const TestResult = ({ test, onRerun }) => {
 
   const getStatusIcon = () => {
     switch (status) {
-      case 'pass': return <CheckCircle className="w-4 h-4 text-emerald-600" />;
-      case 'fail': return <XCircle className="w-4 h-4 text-red-600" />;
-      case 'warning': return <AlertTriangle className="w-4 h-4 text-amber-600" />;
-      case 'running': return <RefreshCw className="w-4 h-4 text-blue-600 animate-spin" />;
-      default: return <div className="w-4 h-4 rounded-full bg-slate-300" />;
+      case 'pass':
+        return <CheckCircle className="w-4 h-4 text-emerald-600" />;
+      case 'fail':
+        return <XCircle className="w-4 h-4 text-red-600" />;
+      case 'warning':
+        return <AlertTriangle className="w-4 h-4 text-amber-600" />;
+      case 'running':
+        return <RefreshCw className="w-4 h-4 text-blue-600 animate-spin" />;
+      default:
+        return <div className="w-4 h-4 rounded-full bg-slate-300" />;
     }
   };
 
   const getStatusColor = () => {
     switch (status) {
-      case 'pass': return 'border-emerald-200 bg-emerald-50';
-      case 'fail': return 'border-red-200 bg-red-50';
-      case 'warning': return 'border-amber-200 bg-amber-50';
-      case 'running': return 'border-blue-200 bg-blue-50';
-      default: return 'border-slate-200 bg-slate-50';
+      case 'pass':
+        return 'border-emerald-200 bg-emerald-50';
+      case 'fail':
+        return 'border-red-200 bg-red-50';
+      case 'warning':
+        return 'border-amber-200 bg-amber-50';
+      case 'running':
+        return 'border-blue-200 bg-blue-50';
+      default:
+        return 'border-slate-200 bg-slate-50';
     }
   };
 
@@ -57,9 +71,7 @@ const TestResult = ({ test, onRerun }) => {
         <div className="flex items-center gap-2">
           {getStatusIcon()}
           <span className="text-[12px] font-medium">{name}</span>
-          {executionTime && (
-            <span className="text-[10px] text-slate-500">({executionTime}ms)</span>
-          )}
+          {executionTime && <span className="text-[10px] text-slate-500">({executionTime}ms)</span>}
         </div>
         {onRerun && (
           <button
@@ -76,17 +88,21 @@ const TestResult = ({ test, onRerun }) => {
       {status === 'fail' && (
         <div className="mt-2 text-[10px] space-y-1">
           {expected !== undefined && (
-            <div>Expected: <span className="font-mono text-emerald-700">{expected}</span></div>
+            <div>
+              Expected: <span className="font-mono text-emerald-700">{expected}</span>
+            </div>
           )}
           {actual !== undefined && (
-            <div>Actual: <span className="font-mono text-red-700">{actual}</span></div>
+            <div>
+              Actual: <span className="font-mono text-red-700">{actual}</span>
+            </div>
           )}
           {tolerance && (
-            <div>Tolerance: <span className="font-mono text-slate-600">±{tolerance}</span></div>
+            <div>
+              Tolerance: <span className="font-mono text-slate-600">±{tolerance}</span>
+            </div>
           )}
-          {error && (
-            <div className="text-red-600 bg-red-100 p-1 rounded font-mono">{error}</div>
-          )}
+          {error && <div className="text-red-600 bg-red-100 p-1 rounded font-mono">{error}</div>}
         </div>
       )}
 
@@ -106,10 +122,10 @@ const EnhancedTestsPanel = ({ model, onRunTests }) => {
   const testSuites = {
     DCF: {
       categories: {
-        'calculations': 'Calculation Accuracy',
-        'assumptions': 'Assumption Validation',
-        'sensitivity': 'Sensitivity Analysis',
-        'sanity': 'Sanity Checks'
+        calculations: 'Calculation Accuracy',
+        assumptions: 'Assumption Validation',
+        sensitivity: 'Sensitivity Analysis',
+        sanity: 'Sanity Checks'
       },
       tests: [
         // Calculation tests
@@ -118,7 +134,7 @@ const EnhancedTestsPanel = ({ model, onRunTests }) => {
           category: 'calculations',
           name: 'FCFF Calculation',
           description: 'Free Cash Flow to Firm calculation accuracy',
-          test: (model) => {
+          test: model => {
             const { rev0, margin, tax, capexPct, nwcPct } = model.assumptions;
             const revenue = rev0 || 0;
             const ebit = revenue * (margin || 0);
@@ -135,7 +151,7 @@ const EnhancedTestsPanel = ({ model, onRunTests }) => {
           category: 'calculations',
           name: 'Present Value Calculation',
           description: 'Discount rate application to future cash flows',
-          test: (model) => {
+          test: model => {
             const { wacc, years } = model.assumptions;
             if (!wacc || !years) return false;
 
@@ -149,7 +165,7 @@ const EnhancedTestsPanel = ({ model, onRunTests }) => {
           category: 'calculations',
           name: 'Terminal Value Calculation',
           description: 'Gordon Growth Model terminal value',
-          test: (model) => {
+          test: model => {
             const { wacc, tg } = model.assumptions;
             if (!wacc || !tg) return false;
 
@@ -164,7 +180,7 @@ const EnhancedTestsPanel = ({ model, onRunTests }) => {
           category: 'assumptions',
           name: 'WACC Range Check',
           description: 'WACC should be within reasonable range (3-25%)',
-          test: (model) => {
+          test: model => {
             const wacc = model.assumptions.wacc || 0;
             return wacc >= 0.03 && wacc <= 0.25;
           }
@@ -174,7 +190,7 @@ const EnhancedTestsPanel = ({ model, onRunTests }) => {
           category: 'assumptions',
           name: 'Terminal Growth Range',
           description: 'Terminal growth should be 0-4%',
-          test: (model) => {
+          test: model => {
             const tg = model.assumptions.tg || 0;
             return tg >= 0 && tg <= 0.04;
           }
@@ -184,7 +200,7 @@ const EnhancedTestsPanel = ({ model, onRunTests }) => {
           category: 'assumptions',
           name: 'Margin Consistency',
           description: 'Operating margin should be reasonable (0-50%)',
-          test: (model) => {
+          test: model => {
             const margin = model.assumptions.margin || 0;
             return margin >= 0 && margin <= 0.5;
           }
@@ -196,7 +212,7 @@ const EnhancedTestsPanel = ({ model, onRunTests }) => {
           category: 'sensitivity',
           name: 'WACC Sensitivity',
           description: 'EV should decrease when WACC increases',
-          test: (model) => {
+          test: model => {
             // This would require running the model with different WACC values
             // Simplified test
             return model.outputs?.ev > 0;
@@ -209,14 +225,14 @@ const EnhancedTestsPanel = ({ model, onRunTests }) => {
           category: 'sanity',
           name: 'Positive Enterprise Value',
           description: 'Enterprise value should be positive',
-          test: (model) => (model.outputs?.ev || 0) > 0
+          test: model => (model.outputs?.ev || 0) > 0
         },
         {
           id: 'dcf_reasonable_multiple',
           category: 'sanity',
           name: 'Reasonable EV/Revenue',
           description: 'EV/Revenue multiple should be 0.5x-20x',
-          test: (model) => {
+          test: model => {
             const ev = model.outputs?.ev || 0;
             const revenue = model.assumptions?.rev0 || 0;
             if (!revenue) return false;
@@ -229,10 +245,10 @@ const EnhancedTestsPanel = ({ model, onRunTests }) => {
 
     LBO: {
       categories: {
-        'calculations': 'Calculation Accuracy',
-        'assumptions': 'Assumption Validation',
-        'returns': 'Return Analysis',
-        'sanity': 'Sanity Checks'
+        calculations: 'Calculation Accuracy',
+        assumptions: 'Assumption Validation',
+        returns: 'Return Analysis',
+        sanity: 'Sanity Checks'
       },
       tests: [
         {
@@ -240,7 +256,7 @@ const EnhancedTestsPanel = ({ model, onRunTests }) => {
           category: 'calculations',
           name: 'IRR Calculation',
           description: 'Internal Rate of Return accuracy',
-          test: (model) => {
+          test: model => {
             const irr = model.outputs?.irr || 0;
             return irr > 0 && irr < 1; // Between 0% and 100%
           }
@@ -250,7 +266,7 @@ const EnhancedTestsPanel = ({ model, onRunTests }) => {
           category: 'calculations',
           name: 'MOIC Calculation',
           description: 'Multiple of Invested Capital accuracy',
-          test: (model) => {
+          test: model => {
             const moic = model.outputs?.moic || 0;
             return moic > 0 && moic < 20; // Reasonable range
           }
@@ -260,7 +276,7 @@ const EnhancedTestsPanel = ({ model, onRunTests }) => {
           category: 'assumptions',
           name: 'Debt Capacity Check',
           description: 'Debt percentage should be 30-90%',
-          test: (model) => {
+          test: model => {
             const debtPct = model.assumptions?.debtPct || 0;
             return debtPct >= 0.3 && debtPct <= 0.9;
           }
@@ -270,7 +286,7 @@ const EnhancedTestsPanel = ({ model, onRunTests }) => {
           category: 'assumptions',
           name: 'Hold Period Range',
           description: 'Hold period should be 3-10 years',
-          test: (model) => {
+          test: model => {
             const years = model.assumptions?.years || 0;
             return years >= 3 && years <= 10;
           }
@@ -280,7 +296,7 @@ const EnhancedTestsPanel = ({ model, onRunTests }) => {
           category: 'returns',
           name: 'Target Returns Check',
           description: 'IRR should exceed 15% for LBO',
-          test: (model) => {
+          test: model => {
             const irr = model.outputs?.irr || 0;
             return irr >= 0.15;
           }
@@ -290,7 +306,7 @@ const EnhancedTestsPanel = ({ model, onRunTests }) => {
           category: 'sanity',
           name: 'Multiple Arbitrage',
           description: 'Exit multiple should create value',
-          test: (model) => {
+          test: model => {
             const entryX = model.assumptions?.entryX || 0;
             const exitX = model.assumptions?.exitX || 0;
             const _ebitdaCAGR = 0; // Simplified CAGR calculation - would need historical data
@@ -304,10 +320,10 @@ const EnhancedTestsPanel = ({ model, onRunTests }) => {
 
     Comps: {
       categories: {
-        'calculations': 'Calculation Accuracy',
-        'assumptions': 'Assumption Validation',
-        'benchmarking': 'Benchmarking Analysis',
-        'sanity': 'Sanity Checks'
+        calculations: 'Calculation Accuracy',
+        assumptions: 'Assumption Validation',
+        benchmarking: 'Benchmarking Analysis',
+        sanity: 'Sanity Checks'
       },
       tests: [
         {
@@ -315,7 +331,7 @@ const EnhancedTestsPanel = ({ model, onRunTests }) => {
           category: 'calculations',
           name: 'EV Calculation',
           description: 'Enterprise Value from multiples',
-          test: (model) => {
+          test: model => {
             const metric = model.assumptions?.metric || 0;
             const multiple = model.assumptions?.multiple || 0;
             const expectedEV = metric * multiple;
@@ -328,7 +344,7 @@ const EnhancedTestsPanel = ({ model, onRunTests }) => {
           category: 'assumptions',
           name: 'Multiple Range Check',
           description: 'Trading multiple should be reasonable (1x-50x)',
-          test: (model) => {
+          test: model => {
             const multiple = model.assumptions?.multiple || 0;
             return multiple >= 1 && multiple <= 50;
           }
@@ -338,7 +354,7 @@ const EnhancedTestsPanel = ({ model, onRunTests }) => {
           category: 'assumptions',
           name: 'Positive Metric',
           description: 'Financial metric should be positive',
-          test: (model) => {
+          test: model => {
             const metric = model.assumptions?.metric || 0;
             return metric > 0;
           }
@@ -348,7 +364,7 @@ const EnhancedTestsPanel = ({ model, onRunTests }) => {
           category: 'benchmarking',
           name: 'Peer Consistency',
           description: 'Multiple should be within peer range',
-          test: (model) => {
+          test: model => {
             // Simplified - would need peer data
             const multiple = model.assumptions?.multiple || 0;
             return multiple > 0;
@@ -359,10 +375,10 @@ const EnhancedTestsPanel = ({ model, onRunTests }) => {
 
     EPV: {
       categories: {
-        'calculations': 'Calculation Accuracy',
-        'assumptions': 'Assumption Validation',
-        'perpetuity': 'Perpetuity Analysis',
-        'sanity': 'Sanity Checks'
+        calculations: 'Calculation Accuracy',
+        assumptions: 'Assumption Validation',
+        perpetuity: 'Perpetuity Analysis',
+        sanity: 'Sanity Checks'
       },
       tests: [
         {
@@ -370,7 +386,7 @@ const EnhancedTestsPanel = ({ model, onRunTests }) => {
           category: 'calculations',
           name: 'NOPAT Calculation',
           description: 'Net Operating Profit After Tax accuracy',
-          test: (model) => {
+          test: model => {
             const ebit = model.assumptions?.ebit || 0;
             const tax = model.assumptions?.tax || 0;
             const expectedNOPAT = ebit * (1 - tax);
@@ -383,7 +399,7 @@ const EnhancedTestsPanel = ({ model, onRunTests }) => {
           category: 'perpetuity',
           name: 'Perpetuity Assumption',
           description: 'No growth assumption validation',
-          test: (model) => {
+          test: model => {
             // EPV assumes no growth, so terminal growth should be 0
             const tg = model.assumptions?.tg || 0;
             return tg === 0;
@@ -394,7 +410,7 @@ const EnhancedTestsPanel = ({ model, onRunTests }) => {
           category: 'assumptions',
           name: 'Conservative WACC',
           description: 'WACC should be conservative for EPV',
-          test: (model) => {
+          test: model => {
             const wacc = model.assumptions?.wacc || 0;
             return wacc >= 0.08 && wacc <= 0.15; // Conservative range
           }
@@ -404,7 +420,7 @@ const EnhancedTestsPanel = ({ model, onRunTests }) => {
   };
 
   // Run tests for the current model
-  const runModelTests = async() => {
+  const runModelTests = async () => {
     if (!model || !testSuites[model.kind]) return;
 
     setRunningTests(true);
@@ -446,8 +462,8 @@ const EnhancedTestsPanel = ({ model, onRunTests }) => {
     if (!model || !testSuites[model.kind]) return [];
 
     const suite = testSuites[model.kind];
-    return suite.tests.filter(test =>
-      selectedCategory === 'all' || test.category === selectedCategory
+    return suite.tests.filter(
+      test => selectedCategory === 'all' || test.category === selectedCategory
     );
   }, [model, selectedCategory]);
 
@@ -525,7 +541,9 @@ const EnhancedTestsPanel = ({ model, onRunTests }) => {
               key={key}
               onClick={() => setSelectedCategory(key)}
               className={`text-[11px] px-2 py-1 rounded transition-colors ${
-                selectedCategory === key ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600'
+                selectedCategory === key
+                  ? 'bg-blue-100 text-blue-700'
+                  : 'bg-slate-100 text-slate-600'
               }`}
             >
               {label} ({count})

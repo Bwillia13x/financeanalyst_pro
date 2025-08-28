@@ -11,7 +11,7 @@ describe('Data Normalizer Contract Tests', () => {
   describe('normalizeQuote contract', () => {
     it('should always return required fields with proper types', () => {
       const result = normalizeQuote({});
-      
+
       // Contract: Must always return an object with these fields
       expect(result).toHaveProperty('symbol');
       expect(result).toHaveProperty('currentPrice');
@@ -24,18 +24,18 @@ describe('Data Normalizer Contract Tests', () => {
       expect(result).toHaveProperty('dayLow');
       expect(result).toHaveProperty('source');
       expect(result).toHaveProperty('timestamp');
-      
+
       // Contract: String fields should be string or undefined/null
       expect(['string', 'undefined'].includes(typeof result.symbol)).toBe(true);
       expect(['string'].includes(typeof result.source)).toBe(true);
       expect(['string'].includes(typeof result.timestamp)).toBe(true);
-      
+
       // Contract: Numeric fields should be number, null, or undefined
       expect(['number', 'undefined'].includes(typeof result.currentPrice)).toBe(true);
       expect(['number', 'undefined'].includes(typeof result.previousClose)).toBe(true);
       expect(['number', 'undefined'].includes(typeof result.change)).toBe(true);
       expect(['number', 'undefined'].includes(typeof result.changePercent)).toBe(true);
-      
+
       // Contract: Optional fields can be null
       expect([null, 'number'].includes(result.volume)).toBe(true);
       expect([null, 'number'].includes(result.marketCap)).toBe(true);
@@ -47,11 +47,11 @@ describe('Data Normalizer Contract Tests', () => {
       const yahooData = {
         symbol: 'AAPL',
         price: 150.25,
-        previousClose: 148.50,
+        previousClose: 148.5,
         volume: 45000000,
         marketCap: 2400000000000,
-        dayHigh: 151.20,
-        dayLow: 149.80,
+        dayHigh: 151.2,
+        dayLow: 149.8,
         source: 'YAHOO'
       };
 
@@ -59,7 +59,7 @@ describe('Data Normalizer Contract Tests', () => {
 
       expect(result.symbol).toBe('AAPL');
       expect(result.currentPrice).toBe(150.25);
-      expect(result.previousClose).toBe(148.50);
+      expect(result.previousClose).toBe(148.5);
       expect(result.change).toBeCloseTo(1.75, 2);
       expect(result.changePercent).toBeCloseTo(1.178, 2);
       expect(result.volume).toBe(45000000);
@@ -70,7 +70,7 @@ describe('Data Normalizer Contract Tests', () => {
       const alphaVantageData = {
         symbol: 'MSFT',
         currentPrice: 280.45,
-        previousClose: 275.30,
+        previousClose: 275.3,
         volume: 25000000,
         source: 'ALPHA_VANTAGE'
       };
@@ -79,7 +79,7 @@ describe('Data Normalizer Contract Tests', () => {
 
       expect(result.symbol).toBe('MSFT');
       expect(result.currentPrice).toBe(280.45);
-      expect(result.previousClose).toBe(275.30);
+      expect(result.previousClose).toBe(275.3);
       expect(result.change).toBeCloseTo(5.15, 2);
       expect(result.changePercent).toBeCloseTo(1.871, 2);
     });
@@ -87,8 +87,8 @@ describe('Data Normalizer Contract Tests', () => {
     it('should handle Polygon.io API format', () => {
       const polygonData = {
         symbol: 'GOOGL',
-        price: 2650.80,
-        change: 25.40,
+        price: 2650.8,
+        change: 25.4,
         changePercent: 0.967,
         volume: 1200000,
         marketCap: 1800000000000,
@@ -98,8 +98,8 @@ describe('Data Normalizer Contract Tests', () => {
       const result = normalizeQuote(polygonData);
 
       expect(result.symbol).toBe('GOOGL');
-      expect(result.currentPrice).toBe(2650.80);
-      expect(result.change).toBe(25.40);
+      expect(result.currentPrice).toBe(2650.8);
+      expect(result.change).toBe(25.4);
       expect(result.changePercent).toBe(0.967);
     });
 
@@ -107,7 +107,7 @@ describe('Data Normalizer Contract Tests', () => {
       const dataWithMissingChange = {
         symbol: 'TSLA',
         price: 750.25,
-        previousClose: 725.00
+        previousClose: 725.0
       };
 
       const result = normalizeQuote(dataWithMissingChange);
@@ -135,27 +135,27 @@ describe('Data Normalizer Contract Tests', () => {
     it('should preserve fallback from previous widget data', () => {
       const newData = {
         symbol: 'AMD',
-        price: 95.30
+        price: 95.3
       };
 
       const prevWidget = {
         symbol: 'AMD',
-        currentValue: 92.80,
+        currentValue: 92.8,
         volume: 15000000,
         marketCap: 150000000000,
-        dayHigh: 96.50,
-        dayLow: 91.20
+        dayHigh: 96.5,
+        dayLow: 91.2
       };
 
       const result = normalizeQuote(newData, prevWidget);
 
       expect(result.symbol).toBe('AMD');
-      expect(result.currentPrice).toBe(95.30);
-      expect(result.previousClose).toBe(92.80);
+      expect(result.currentPrice).toBe(95.3);
+      expect(result.previousClose).toBe(92.8);
       expect(result.volume).toBe(15000000);
       expect(result.marketCap).toBe(150000000000);
-      expect(result.dayHigh).toBe(96.50);
-      expect(result.dayLow).toBe(91.20);
+      expect(result.dayHigh).toBe(96.5);
+      expect(result.dayLow).toBe(91.2);
     });
 
     it('should handle edge cases and invalid data', () => {
@@ -213,14 +213,14 @@ describe('Data Normalizer Contract Tests', () => {
       const preciseData = {
         symbol: 'BTC',
         price: 42356.789123,
-        previousClose: 41234.567890,
+        previousClose: 41234.56789,
         volume: 1234567890.123456
       };
 
       const result = normalizeQuote(preciseData);
 
       expect(result.currentPrice).toBe(42356.789123);
-      expect(result.previousClose).toBe(41234.567890);
+      expect(result.previousClose).toBe(41234.56789);
       expect(result.volume).toBe(1234567890.123456);
       expect(result.change).toBeCloseTo(1122.221233, 6);
     });
@@ -230,8 +230,8 @@ describe('Data Normalizer Contract Tests', () => {
     it('should produce consistent output formats across normalizers', () => {
       const sampleData = {
         symbol: 'TEST',
-        price: 100.50,
-        previousClose: 99.00
+        price: 100.5,
+        previousClose: 99.0
       };
 
       const result = normalizeQuote(sampleData);
@@ -244,8 +244,17 @@ describe('Data Normalizer Contract Tests', () => {
       // 5. No unexpected additional fields
 
       const expectedFields = [
-        'symbol', 'currentPrice', 'previousClose', 'change', 'changePercent',
-        'volume', 'marketCap', 'dayHigh', 'dayLow', 'source', 'timestamp'
+        'symbol',
+        'currentPrice',
+        'previousClose',
+        'change',
+        'changePercent',
+        'volume',
+        'marketCap',
+        'dayHigh',
+        'dayLow',
+        'source',
+        'timestamp'
       ];
 
       const actualFields = Object.keys(result);
@@ -263,7 +272,7 @@ describe('Data Normalizer Contract Tests', () => {
       const normalizedData = normalizeQuote({
         symbol: 'AAPL',
         price: 150.25,
-        previousClose: 148.50
+        previousClose: 148.5
       });
 
       // Should be serializable for Redux
@@ -278,7 +287,7 @@ describe('Data Normalizer Contract Tests', () => {
       const input = {
         symbol: 'AAPL',
         price: 150.25,
-        previousClose: 148.50
+        previousClose: 148.5
       };
 
       const result1 = normalizeQuote(input);
@@ -295,11 +304,11 @@ describe('Data Normalizer Contract Tests', () => {
       const rawData = {
         symbol: 'AAPL',
         price: 150.25,
-        previousClose: 148.50
+        previousClose: 148.5
       };
 
       const normalized = normalizeQuote(rawData);
-      
+
       // Should be transformable for different use cases
       const forChart = {
         x: normalized.timestamp,

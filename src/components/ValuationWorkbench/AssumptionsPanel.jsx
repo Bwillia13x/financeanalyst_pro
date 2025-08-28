@@ -1,7 +1,7 @@
 import { Card, Pill, NumberInput, Switch } from 'src/components/ui/UIHelpers.jsx';
 
 const AssumptionsPanel = ({ assumptions, setAssumptions }) => {
-  const set = (key) => (value) => setAssumptions({ ...assumptions, [key]: value });
+  const set = key => value => setAssumptions({ ...assumptions, [key]: value });
 
   return (
     <Card title="Assumptions" right={<Pill tone="blue">{assumptions.currency}</Pill>}>
@@ -112,7 +112,7 @@ const AssumptionsPanel = ({ assumptions, setAssumptions }) => {
             <Switch
               label="Use Sales‑to‑Capital"
               on={assumptions.reinvMethod === 'salesToCapital'}
-              setOn={(v) => set('reinvMethod')(v ? 'salesToCapital' : 'components')}
+              setOn={v => set('reinvMethod')(v ? 'salesToCapital' : 'components')}
             />
             {assumptions.reinvMethod === 'salesToCapital' ? (
               <NumberInput
@@ -161,7 +161,7 @@ const AssumptionsPanel = ({ assumptions, setAssumptions }) => {
             <Switch
               label="Use CAPM for Ke"
               on={assumptions.capmMode === 'capm'}
-              setOn={(v) => set('capmMode')(v ? 'capm' : 'manualKe')}
+              setOn={v => set('capmMode')(v ? 'capm' : 'manualKe')}
             />
             {assumptions.capmMode === 'capm' ? (
               <>
@@ -197,7 +197,7 @@ const AssumptionsPanel = ({ assumptions, setAssumptions }) => {
                 onChange={set('keManual')}
                 step={0.0025}
                 min={0.02}
-                max={0.30}
+                max={0.3}
               />
             )}
             <NumberInput
@@ -206,7 +206,7 @@ const AssumptionsPanel = ({ assumptions, setAssumptions }) => {
               onChange={set('kd')}
               step={0.0025}
               min={0.01}
-              max={0.20}
+              max={0.2}
             />
             <NumberInput
               label="W_d"
@@ -234,7 +234,7 @@ const AssumptionsPanel = ({ assumptions, setAssumptions }) => {
             <Switch
               label="Gordon Growth"
               on={assumptions.terminalMethod === 'gordon'}
-              setOn={(v) => set('terminalMethod')(v ? 'gordon' : 'exitMultiple')}
+              setOn={v => set('terminalMethod')(v ? 'gordon' : 'exitMultiple')}
             />
             {assumptions.terminalMethod === 'gordon' ? (
               <NumberInput
@@ -260,7 +260,7 @@ const AssumptionsPanel = ({ assumptions, setAssumptions }) => {
                   <select
                     className="rounded-md border border-slate-300 bg-white px-2 py-1"
                     value={assumptions.exitMetric}
-                    onChange={(e) => set('exitMetric')(e.target.value)}
+                    onChange={e => set('exitMetric')(e.target.value)}
                   >
                     <option value="EBITDA">EBITDA</option>
                     <option value="EBIT">EBIT</option>

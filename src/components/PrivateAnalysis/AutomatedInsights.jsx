@@ -34,14 +34,19 @@ import {
   Line
 } from 'recharts';
 
-const AutomatedInsights = ({ modelData: _modelData, financialData: _financialData, onDataChange: _onDataChange }) => {
+const AutomatedInsights = ({
+  modelData: _modelData,
+  financialData: _financialData,
+  onDataChange: _onDataChange
+}) => {
   const [activeTab, setActiveTab] = useState('insights');
   const [insights, _setInsights] = useState([
     {
       id: 1,
       type: 'opportunity',
       title: 'WACC Optimization Opportunity',
-      description: 'Current WACC of 9.2% is 180bps above industry median. Optimizing capital structure could increase valuation by 15-20%.',
+      description:
+        'Current WACC of 9.2% is 180bps above industry median. Optimizing capital structure could increase valuation by 15-20%.',
       impact: 'high',
       confidence: 85,
       category: 'valuation',
@@ -57,7 +62,8 @@ const AutomatedInsights = ({ modelData: _modelData, financialData: _financialDat
       id: 2,
       type: 'risk',
       title: 'Revenue Concentration Risk',
-      description: 'Top 3 customers represent 62% of total revenue, creating concentration risk that affects valuation multiple.',
+      description:
+        'Top 3 customers represent 62% of total revenue, creating concentration risk that affects valuation multiple.',
       impact: 'medium',
       confidence: 92,
       category: 'risk',
@@ -73,7 +79,8 @@ const AutomatedInsights = ({ modelData: _modelData, financialData: _financialDat
       id: 3,
       type: 'trend',
       title: 'Market Multiple Expansion',
-      description: 'Industry EV/EBITDA multiples have expanded 25% over last 12 months, suggesting valuation upside.',
+      description:
+        'Industry EV/EBITDA multiples have expanded 25% over last 12 months, suggesting valuation upside.',
       impact: 'high',
       confidence: 78,
       category: 'market',
@@ -154,7 +161,7 @@ const AutomatedInsights = ({ modelData: _modelData, financialData: _financialDat
     { driver: 'WACC', scenario: 'Downside', value: 1110, impact: -8 }
   ]);
 
-  const getImpactColor = (impact) => {
+  const getImpactColor = impact => {
     switch (impact) {
       case 'high':
         return 'text-red-600 bg-red-50 border-red-200';
@@ -167,7 +174,7 @@ const AutomatedInsights = ({ modelData: _modelData, financialData: _financialDat
     }
   };
 
-  const getTypeIcon = (type) => {
+  const getTypeIcon = type => {
     switch (type) {
       case 'opportunity':
         return <TrendingUp className="w-5 h-5 text-green-600" />;
@@ -180,7 +187,7 @@ const AutomatedInsights = ({ modelData: _modelData, financialData: _financialDat
     }
   };
 
-  const _formatCurrency = (value) => value;
+  const _formatCurrency = value => value;
 
   return (
     <div className="max-w-7xl mx-auto p-6 space-y-6">
@@ -200,23 +207,33 @@ const AutomatedInsights = ({ modelData: _modelData, financialData: _financialDat
         <div className="border-b border-gray-200 p-6">
           <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
             <div className="text-center">
-              <div className="text-2xl font-bold text-violet-600">{performanceMetrics.modelAccuracy}%</div>
+              <div className="text-2xl font-bold text-violet-600">
+                {performanceMetrics.modelAccuracy}%
+              </div>
               <div className="text-sm text-gray-600">Model Accuracy</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-purple-600">{performanceMetrics.predictionConfidence}%</div>
+              <div className="text-2xl font-bold text-purple-600">
+                {performanceMetrics.predictionConfidence}%
+              </div>
               <div className="text-sm text-gray-600">Prediction Confidence</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-blue-600">{performanceMetrics.insightsGenerated}</div>
+              <div className="text-2xl font-bold text-blue-600">
+                {performanceMetrics.insightsGenerated}
+              </div>
               <div className="text-sm text-gray-600">Insights Generated</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">{performanceMetrics.recommendationsImplemented}</div>
+              <div className="text-2xl font-bold text-green-600">
+                {performanceMetrics.recommendationsImplemented}
+              </div>
               <div className="text-sm text-gray-600">Recommendations Used</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-orange-600">+{performanceMetrics.valuationImprovement}%</div>
+              <div className="text-2xl font-bold text-orange-600">
+                +{performanceMetrics.valuationImprovement}%
+              </div>
               <div className="text-sm text-gray-600">Valuation Improvement</div>
             </div>
           </div>
@@ -230,7 +247,7 @@ const AutomatedInsights = ({ modelData: _modelData, financialData: _financialDat
               { id: 'drivers', label: 'Key Drivers', icon: Target, count: keyDrivers.length },
               { id: 'sensitivity', label: 'Sensitivity Analysis', icon: BarChart3, count: 0 },
               { id: 'recommendations', label: 'Recommendations', icon: CheckCircle, count: 3 }
-            ].map((tab) => {
+            ].map(tab => {
               const Icon = tab.icon;
               return (
                 <button
@@ -275,7 +292,7 @@ const AutomatedInsights = ({ modelData: _modelData, financialData: _financialDat
               </div>
 
               <div className="space-y-4">
-                {insights.map((insight) => (
+                {insights.map(insight => (
                   <motion.div
                     key={insight.id}
                     initial={{ opacity: 0, y: 20 }}
@@ -299,10 +316,14 @@ const AutomatedInsights = ({ modelData: _modelData, financialData: _financialDat
                       </div>
 
                       <div className="flex items-center space-x-2">
-                        <span className={`px-3 py-1 text-xs font-medium rounded-full border ${getImpactColor(insight.impact)}`}>
+                        <span
+                          className={`px-3 py-1 text-xs font-medium rounded-full border ${getImpactColor(insight.impact)}`}
+                        >
                           {insight.impact} impact
                         </span>
-                        <span className="text-sm text-gray-500">{insight.confidence}% confidence</span>
+                        <span className="text-sm text-gray-500">
+                          {insight.confidence}% confidence
+                        </span>
                       </div>
                     </div>
 
@@ -312,7 +333,9 @@ const AutomatedInsights = ({ modelData: _modelData, financialData: _financialDat
                         <p className="text-sm text-gray-900">{insight.recommendation}</p>
                       </div>
                       <div>
-                        <div className="text-sm font-medium text-gray-700 mb-2">Potential Impact</div>
+                        <div className="text-sm font-medium text-gray-700 mb-2">
+                          Potential Impact
+                        </div>
                         <p
                           className={`text-sm font-medium ${
                             insight.potentialValue.includes('+') ? 'text-green-600' : 'text-red-600'
@@ -326,8 +349,11 @@ const AutomatedInsights = ({ modelData: _modelData, financialData: _financialDat
                     <div className="flex items-center justify-between border-t border-gray-200 pt-4">
                       <div className="flex items-center space-x-4">
                         <div className="flex items-center space-x-2">
-                          {insight.tags.map((tag) => (
-                            <span key={tag} className="bg-gray-200 text-gray-700 px-2 py-1 rounded text-xs">
+                          {insight.tags.map(tag => (
+                            <span
+                              key={tag}
+                              className="bg-gray-200 text-gray-700 px-2 py-1 rounded text-xs"
+                            >
                               {tag}
                             </span>
                           ))}
@@ -361,13 +387,17 @@ const AutomatedInsights = ({ modelData: _modelData, financialData: _financialDat
               <h3 className="text-lg font-medium text-gray-900">Key Value Drivers</h3>
 
               <div className="space-y-4">
-                {keyDrivers.map((driver) => (
+                {keyDrivers.map(driver => (
                   <div key={driver.id} className="bg-gray-50 rounded-lg p-6">
                     <div className="flex items-center justify-between mb-4">
                       <h4 className="font-medium text-gray-900">{driver.name}</h4>
                       <div className="flex items-center space-x-4">
-                        <span className="text-2xl font-bold text-violet-600">{driver.currentValue}</span>
-                        <span className={`px-3 py-1 text-xs font-medium rounded-full border ${getImpactColor(driver.impact)}`}>
+                        <span className="text-2xl font-bold text-violet-600">
+                          {driver.currentValue}
+                        </span>
+                        <span
+                          className={`px-3 py-1 text-xs font-medium rounded-full border ${getImpactColor(driver.impact)}`}
+                        >
                           {driver.impact} impact
                         </span>
                       </div>
@@ -376,7 +406,9 @@ const AutomatedInsights = ({ modelData: _modelData, financialData: _financialDat
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                       {/* Sensitivity Metrics */}
                       <div>
-                        <div className="text-sm font-medium text-gray-700 mb-2">Sensitivity Metrics</div>
+                        <div className="text-sm font-medium text-gray-700 mb-2">
+                          Sensitivity Metrics
+                        </div>
                         <div className="space-y-2 text-sm">
                           <div className="flex justify-between">
                             <span>Sensitivity Score:</span>
@@ -395,11 +427,15 @@ const AutomatedInsights = ({ modelData: _modelData, financialData: _financialDat
                         <div className="space-y-2 text-sm">
                           <div className="flex justify-between">
                             <span>Range:</span>
-                            <span className="font-medium">{driver.range.min} - {driver.range.max}</span>
+                            <span className="font-medium">
+                              {driver.range.min} - {driver.range.max}
+                            </span>
                           </div>
                           <div className="flex justify-between">
                             <span>Value Impact:</span>
-                            <span className="font-medium">{driver.valuationImpact.min} / {driver.valuationImpact.max}</span>
+                            <span className="font-medium">
+                              {driver.valuationImpact.min} / {driver.valuationImpact.max}
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -458,13 +494,13 @@ const AutomatedInsights = ({ modelData: _modelData, financialData: _financialDat
                     <YAxis yAxisId="right" orientation="right" />
                     <Tooltip />
                     <Legend />
-                    <Bar
-                      yAxisId="left" dataKey="value" fill="#8B5CF6"
-                      name="Valuation ($M)"
-                    />
+                    <Bar yAxisId="left" dataKey="value" fill="#8B5CF6" name="Valuation ($M)" />
                     <Line
-                      yAxisId="right" type="monotone" dataKey="impact"
-                      stroke="#10B981" name="Impact %"
+                      yAxisId="right"
+                      type="monotone"
+                      dataKey="impact"
+                      stroke="#10B981"
+                      name="Impact %"
                     />
                   </BarChart>
                 </ResponsiveContainer>
@@ -483,14 +519,15 @@ const AutomatedInsights = ({ modelData: _modelData, financialData: _financialDat
                   <div>
                     <h4 className="font-medium text-violet-900">Smart Recommendations Engine</h4>
                     <p className="text-sm text-violet-700 mt-1">
-                      Our AI analyzes your model and provides intelligent recommendations to optimize valuation and reduce risk.
+                      Our AI analyzes your model and provides intelligent recommendations to
+                      optimize valuation and reduce risk.
                     </p>
                   </div>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {insights.slice(0, 3).map((insight) => (
+                {insights.slice(0, 3).map(insight => (
                   <div key={insight.id} className="bg-white border border-gray-200 rounded-lg p-6">
                     <div className="flex items-center justify-between mb-3">
                       {getTypeIcon(insight.type)}

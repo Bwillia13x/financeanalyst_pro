@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { forwardRef, useState, useRef, useEffect } from 'react';
 
 // Optimized Image component with modern format support and lazy loading
 const OptimizedImage = ({
@@ -27,9 +27,7 @@ const OptimizedImage = ({
     const baseName = baseSrc.split('.').slice(0, -1).join('.');
     const sizes = [320, 640, 768, 1024, 1280, 1920];
 
-    return sizes
-      .map(size => `${baseName}-${size}w.${format} ${size}w`)
-      .join(', ');
+    return sizes.map(size => `${baseName}-${size}w.${format} ${size}w`).join(', ');
   };
 
   // Get WebP and AVIF versions if available
@@ -42,8 +40,8 @@ const OptimizedImage = ({
     if (priority || !imgRef.current) return;
 
     observerRef.current = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
+      entries => {
+        entries.forEach(entry => {
           if (entry.isIntersecting) {
             setIsInView(true);
             observerRef.current?.unobserve(entry.target);
@@ -65,12 +63,12 @@ const OptimizedImage = ({
     };
   }, [priority]);
 
-  const handleLoad = (event) => {
+  const handleLoad = event => {
     setIsLoaded(true);
     onLoad?.(event);
   };
 
-  const handleError = (event) => {
+  const handleError = event => {
     setHasError(true);
     onError?.(event);
   };
@@ -88,10 +86,7 @@ const OptimizedImage = ({
 
     if (placeholder === 'skeleton') {
       return (
-        <div
-          className={`absolute inset-0 bg-gray-200 ${className}`}
-          style={{ width, height }}
-        >
+        <div className={`absolute inset-0 bg-gray-200 ${className}`} style={{ width, height }}>
           <div className="animate-pulse h-full w-full bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200" />
         </div>
       );
@@ -106,12 +101,7 @@ const OptimizedImage = ({
       className={`flex items-center justify-center bg-gray-100 text-gray-400 ${className}`}
       style={{ width, height }}
     >
-      <svg
-        className="w-8 h-8"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
+      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -127,41 +117,19 @@ const OptimizedImage = ({
   }
 
   return (
-    <div
-      ref={imgRef}
-      className={`relative overflow-hidden ${className}`}
-      style={{ width, height }}
-    >
+    <div ref={imgRef} className={`relative overflow-hidden ${className}`} style={{ width, height }}>
       {!isLoaded && renderPlaceholder()}
 
       {isInView && (
         <picture>
           {/* AVIF format for modern browsers */}
-          {avifSrcSet && (
-            <source
-              srcSet={avifSrcSet}
-              sizes={sizes}
-              type="image/avif"
-            />
-          )}
+          {avifSrcSet && <source srcSet={avifSrcSet} sizes={sizes} type="image/avif" />}
 
           {/* WebP format for better compression */}
-          {webpSrcSet && (
-            <source
-              srcSet={webpSrcSet}
-              sizes={sizes}
-              type="image/webp"
-            />
-          )}
+          {webpSrcSet && <source srcSet={webpSrcSet} sizes={sizes} type="image/webp" />}
 
           {/* JPEG fallback */}
-          {jpegSrcSet && (
-            <source
-              srcSet={jpegSrcSet}
-              sizes={sizes}
-              type="image/jpeg"
-            />
-          )}
+          {jpegSrcSet && <source srcSet={jpegSrcSet} sizes={sizes} type="image/jpeg" />}
 
           {/* Final fallback */}
           <img
@@ -187,8 +155,8 @@ const OptimizedImage = ({
 };
 
 // Higher-order component for automatic optimization
-export const withImageOptimization = (WrappedComponent) => {
-  const OptimizedComponent = React.forwardRef((props, ref) => {
+export const withImageOptimization = WrappedComponent => {
+  const OptimizedComponent = forwardRef((props, ref) => {
     // Automatically optimize image props
     const optimizedProps = {
       ...props,
@@ -216,7 +184,7 @@ export const useResponsiveImage = (breakpoints = {}) => {
 
   const allBreakpoints = { ...defaultBreakpoints, ...breakpoints };
 
-  const generateSizes = (sizeMap) => {
+  const generateSizes = sizeMap => {
     return Object.entries(allBreakpoints)
       .sort(([, a], [, b]) => b - a) // Sort by width descending
       .map(([breakpoint, width]) => {
@@ -231,13 +199,7 @@ export const useResponsiveImage = (breakpoints = {}) => {
 
 // Utility for generating optimized image URLs
 export const getOptimizedImageUrl = (src, options = {}) => {
-  const {
-    width,
-    height,
-    quality = 80,
-    format = 'auto',
-    fit = 'cover'
-  } = options;
+  const { width, height, quality = 80, format = 'auto', fit = 'cover' } = options;
 
   // In production, this would integrate with your image optimization service
   // For now, return the original URL with query parameters
@@ -274,7 +236,7 @@ export const preloadImage = (src, options = {}) => {
 };
 
 // Critical image preloader for above-the-fold content
-export const preloadCriticalImages = (imageList) => {
+export const preloadCriticalImages = imageList => {
   const preloadPromises = imageList.map(imageConfig => {
     const link = document.createElement('link');
     link.rel = 'preload';

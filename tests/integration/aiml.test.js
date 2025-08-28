@@ -3,10 +3,10 @@
  * Tests Predictive Analytics, NLP, and Computer Vision services
  */
 
-import { describe, test, expect, beforeAll } from '@jest/globals';
+import { describe, test, expect, beforeAll } from 'vitest';
 
 describe('AI/ML Integration Framework Tests', () => {
-  
+
   describe('1. Predictive Analytics Engine', () => {
     test('Should perform revenue forecasting with LSTM model', async () => {
       const historicalData = {
@@ -58,7 +58,7 @@ describe('AI/ML Integration Framework Tests', () => {
       expect(mockForecast.data.predictions).toHaveLength(4);
       expect(mockForecast.data.model_metrics.r_squared).toBeGreaterThan(0.8);
       expect(mockForecast.data.feature_importance.revenue_lag_1).toBeGreaterThan(0.4);
-      
+
       console.log('✅ LSTM revenue forecasting test passed');
     });
 
@@ -110,7 +110,7 @@ describe('AI/ML Integration Framework Tests', () => {
       expect(mockDefaultPrediction.data.default_probability).toBeLessThan(0.1);
       expect(mockDefaultPrediction.data.risk_category).toBe('Low');
       expect(mockDefaultPrediction.data.model_confidence).toBeGreaterThan(0.8);
-      
+
       console.log('✅ Credit default prediction test passed');
     });
   });
@@ -121,7 +121,7 @@ describe('AI/ML Integration Framework Tests', () => {
         filing_type: '10-K',
         company: 'Apple Inc.',
         filing_date: '2023-11-03',
-        document_text: `Apple's total net sales for fiscal 2023 were $383.3 billion, a decrease of 3% from fiscal 2022. iPhone net sales were $200.6 billion, Mac net sales were $29.4 billion, and Services net sales reached a new all-time high of $85.2 billion. Gross margin was 44.1% compared to 43.3% in the prior year. The company's cash and cash equivalents totaled $29.5 billion as of September 30, 2023.`
+        document_text: 'Apple\'s total net sales for fiscal 2023 were $383.3 billion, a decrease of 3% from fiscal 2022. iPhone net sales were $200.6 billion, Mac net sales were $29.4 billion, and Services net sales reached a new all-time high of $85.2 billion. Gross margin was 44.1% compared to 43.3% in the prior year. The company\'s cash and cash equivalents totaled $29.5 billion as of September 30, 2023.'
       };
 
       const mockNLPAnalysis = {
@@ -160,12 +160,12 @@ describe('AI/ML Integration Framework Tests', () => {
       expect(mockNLPAnalysis.data.key_metrics_extracted.total_net_sales.value).toBe(383300000000);
       expect(mockNLPAnalysis.data.sentiment_analysis.overall_sentiment).toBeDefined();
       expect(mockNLPAnalysis.data.entity_recognition.companies).toContain('Apple Inc.');
-      
+
       console.log('✅ SEC filing NLP analysis test passed');
     });
 
     test('Should perform earnings call sentiment analysis', async () => {
-      const earningsCallTranscript = `Thank you for joining us today. I'm pleased to report that Q3 was another strong quarter for our company. Revenue grew 12% year-over-year, driven by exceptional performance in our cloud services division. We're seeing robust demand across all geographic regions, and our new product launches are exceeding expectations. However, we remain cautious about potential headwinds in the macroeconomic environment. We're confident in our long-term strategy and continue to invest in innovation and market expansion.`;
+      const earningsCallTranscript = 'Thank you for joining us today. I\'m pleased to report that Q3 was another strong quarter for our company. Revenue grew 12% year-over-year, driven by exceptional performance in our cloud services division. We\'re seeing robust demand across all geographic regions, and our new product launches are exceeding expectations. However, we remain cautious about potential headwinds in the macroeconomic environment. We\'re confident in our long-term strategy and continue to invest in innovation and market expansion.';
 
       const mockSentimentAnalysis = {
         success: true,
@@ -205,7 +205,7 @@ describe('AI/ML Integration Framework Tests', () => {
       expect(mockSentimentAnalysis.data.overall_sentiment.sentiment).toBe('positive');
       expect(mockSentimentAnalysis.data.sentiment_breakdown.financial_performance.sentiment).toBe('positive');
       expect(mockSentimentAnalysis.data.management_tone.confidence_level).toBe('high');
-      
+
       console.log('✅ Earnings call sentiment analysis test passed');
     });
   });
@@ -267,7 +267,7 @@ describe('AI/ML Integration Framework Tests', () => {
       expect(mockChartRecognition.data.chart_type).toBe('line_chart');
       expect(mockChartRecognition.data.extracted_data.y_axis.values).toHaveLength(5);
       expect(mockChartRecognition.data.confidence).toBeGreaterThan(0.9);
-      
+
       console.log('✅ Chart recognition and data extraction test passed');
     });
 
@@ -283,7 +283,7 @@ describe('AI/ML Integration Framework Tests', () => {
       const mockOCRAnalysis = {
         success: true,
         data: {
-          extracted_text: `CONSOLIDATED BALANCE SHEETS\nAs of December 31, 2023 and 2022\n(In millions, except share data)\n\nASSETS\nCurrent assets:\nCash and cash equivalents    $29,965    $23,646\nShort-term investments       31,590     24,658\nAccounts receivable         29,508     28,184\nInventories                  6,331      4,946\nTotal current assets        97,394     81,434\n\nProperty and equipment      43,715     42,117\nGoodwill                    12,524     12,524\nTotal assets              $352,583   $352,755`,
+          extracted_text: 'CONSOLIDATED BALANCE SHEETS\nAs of December 31, 2023 and 2022\n(In millions, except share data)\n\nASSETS\nCurrent assets:\nCash and cash equivalents    $29,965    $23,646\nShort-term investments       31,590     24,658\nAccounts receivable         29,508     28,184\nInventories                  6,331      4,946\nTotal current assets        97,394     81,434\n\nProperty and equipment      43,715     42,117\nGoodwill                    12,524     12,524\nTotal assets              $352,583   $352,755',
           structured_data: {
             cash_and_equivalents_2023: 29965000000,
             cash_and_equivalents_2022: 23646000000,
@@ -318,7 +318,7 @@ describe('AI/ML Integration Framework Tests', () => {
       expect(mockOCRAnalysis.data.structured_data.total_assets_2023).toBe(352583000000);
       expect(mockOCRAnalysis.data.confidence_scores.text_extraction).toBeGreaterThan(0.9);
       expect(mockOCRAnalysis.data.data_validation.arithmetic_checks).toBe('passed');
-      
+
       console.log('✅ Financial document OCR test passed');
     });
   });
@@ -373,10 +373,10 @@ describe('AI/ML Integration Framework Tests', () => {
       };
 
       expect(mockModelMonitoring.success).toBe(true);
-      expect(mockModelMonitoring.data.drift_detection.drift_detected).toBe(true);
+      expect(mockModelMonitoring.data.drift_detection.data_drift_detected).toBe(true);
       expect(mockModelMonitoring.data.model_health.overall_health_score).toBeGreaterThan(0.7);
       expect(mockModelMonitoring.data.alerts).toHaveLength(2);
-      
+
       console.log('✅ AI model monitoring test passed');
     });
 
@@ -431,7 +431,7 @@ describe('AI/ML Integration Framework Tests', () => {
       expect(mockInterpretability.success).toBe(true);
       expect(mockInterpretability.data.feature_importance.previous_quarter_revenue).toBeGreaterThan(0.4);
       expect(mockInterpretability.data.model_transparency.explanation_quality_score).toBeGreaterThan(0.8);
-      
+
       console.log('✅ AI model interpretability test passed');
     });
   });
@@ -472,7 +472,7 @@ describe('AI/ML Integration Framework Tests', () => {
       expect(mockConcurrencyTest.data.completed_successfully).toBe(10);
       expect(mockConcurrencyTest.data.throughput_per_second).toBeGreaterThan(3.0);
       expect(mockConcurrencyTest.data.resource_utilization.gpu_usage_peak).toBeLessThan(0.9);
-      
+
       console.log('✅ AI/ML concurrent processing test passed');
     });
   });

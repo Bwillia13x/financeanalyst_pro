@@ -33,7 +33,7 @@ const TestSuiteDashboard = ({ isVisible, onClose }) => {
     }
   }, [isVisible]);
 
-  const loadTestData = async() => {
+  const loadTestData = async () => {
     try {
       const suites = testingService.getTestSuites();
       const results = testingService.getTestResults();
@@ -47,7 +47,7 @@ const TestSuiteDashboard = ({ isVisible, onClose }) => {
     }
   };
 
-  const runTestSuite = async(suiteId) => {
+  const runTestSuite = async suiteId => {
     setRunningTests(prev => new Set([...prev, suiteId]));
 
     try {
@@ -67,7 +67,7 @@ const TestSuiteDashboard = ({ isVisible, onClose }) => {
     }
   };
 
-  const runAllTests = async() => {
+  const runAllTests = async () => {
     const allSuiteIds = testSuites.map(suite => suite.id);
     setRunningTests(new Set(allSuiteIds));
 
@@ -81,7 +81,7 @@ const TestSuiteDashboard = ({ isVisible, onClose }) => {
     }
   };
 
-  const getStatusIcon = (status) => {
+  const getStatusIcon = status => {
     switch (status) {
       case 'passed':
         return <CheckCircle className="w-5 h-5 text-green-400" />;
@@ -96,7 +96,7 @@ const TestSuiteDashboard = ({ isVisible, onClose }) => {
     }
   };
 
-  const getCategoryIcon = (category) => {
+  const getCategoryIcon = category => {
     switch (category) {
       case 'unit':
         return <Settings className="w-5 h-5" />;
@@ -111,7 +111,7 @@ const TestSuiteDashboard = ({ isVisible, onClose }) => {
     }
   };
 
-  const getLatestResult = (suiteId) => {
+  const getLatestResult = suiteId => {
     return testResults.find(result => result.suiteId === suiteId);
   };
 
@@ -250,15 +250,9 @@ const TestSuiteDashboard = ({ isVisible, onClose }) => {
 
                       {latestResult && (
                         <div className="flex space-x-4 text-xs mb-4">
-                          <span className="text-green-400">
-                            ✓ {latestResult.summary.passed}
-                          </span>
-                          <span className="text-red-400">
-                            ✗ {latestResult.summary.failed}
-                          </span>
-                          <span className="text-yellow-400">
-                            ⊖ {latestResult.summary.skipped}
-                          </span>
+                          <span className="text-green-400">✓ {latestResult.summary.passed}</span>
+                          <span className="text-red-400">✗ {latestResult.summary.failed}</span>
+                          <span className="text-yellow-400">⊖ {latestResult.summary.skipped}</span>
                         </div>
                       )}
 
@@ -417,9 +411,7 @@ const TestSuiteDashboard = ({ isVisible, onClose }) => {
                           </span>
                         )}
                       </div>
-                      <div className="text-sm text-slate-400 mt-1">
-                        Timeout: {test.timeout}ms
-                      </div>
+                      <div className="text-sm text-slate-400 mt-1">Timeout: {test.timeout}ms</div>
                     </div>
                   ))}
                 </div>

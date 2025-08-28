@@ -8,12 +8,7 @@ import { cn } from '../../utils/cn';
  */
 
 // Base skeleton component
-export const Skeleton = ({
-  className,
-  animate = true,
-  variant = 'default',
-  ...props
-}) => (
+export const Skeleton = ({ className, animate = true, variant = 'default', ...props }) => (
   <div
     className={cn(
       'bg-slate-200 rounded',
@@ -29,28 +24,22 @@ export const Skeleton = ({
 );
 
 // Financial table skeleton
-export const FinancialTableSkeleton = ({
-  rows = 8,
-  columns = 5,
-  showHeader = true,
-  className
-}) => (
+export const FinancialTableSkeleton = ({ rows = 8, columns = 5, showHeader = true, className }) => (
   <div className={cn('space-y-3', className)}>
     {showHeader && (
       <div className="flex items-center space-x-4 p-4 bg-slate-50 rounded-lg">
         {Array.from({ length: columns }).map((_, index) => (
-          <Skeleton
-            key={`header-${index}`}
-            className="h-4 flex-1"
-            variant="text"
-          />
+          <Skeleton key={`header-${index}`} className="h-4 flex-1" variant="text" />
         ))}
       </div>
     )}
 
     <div className="space-y-2">
       {Array.from({ length: rows }).map((_, rowIndex) => (
-        <div key={`row-${rowIndex}`} className="flex items-center space-x-4 p-4 border border-slate-200 rounded-lg">
+        <div
+          key={`row-${rowIndex}`}
+          className="flex items-center space-x-4 p-4 border border-slate-200 rounded-lg"
+        >
           {Array.from({ length: columns }).map((_, colIndex) => (
             <Skeleton
               key={`cell-${rowIndex}-${colIndex}`}
@@ -68,11 +57,7 @@ export const FinancialTableSkeleton = ({
 );
 
 // Chart skeleton
-export const ChartSkeleton = ({
-  height = 300,
-  showLegend = true,
-  className
-}) => (
+export const ChartSkeleton = ({ height = 300, showLegend = true, className }) => (
   <div className={cn('p-6 border border-slate-200 rounded-lg', className)}>
     {/* Chart title */}
     <div className="mb-4">
@@ -161,7 +146,10 @@ export const PortfolioHoldingsSkeleton = ({ rows = 5, className }) => (
     {/* Holdings list */}
     <div className="space-y-2">
       {Array.from({ length: rows }).map((_, index) => (
-        <div key={`holding-${index}`} className="flex items-center justify-between p-4 border border-slate-200 rounded-lg">
+        <div
+          key={`holding-${index}`}
+          className="flex items-center justify-between p-4 border border-slate-200 rounded-lg"
+        >
           <div className="flex items-center space-x-3">
             <Skeleton className="w-10 h-10 rounded-lg" />
             <div className="space-y-1">
@@ -254,19 +242,9 @@ export const AnalysisResultsSkeleton = ({ className }) => (
 );
 
 // Loading state wrapper component
-export const LoadingWrapper = ({
-  isLoading,
-  skeleton,
-  children,
-  className,
-  fallback = null
-}) => {
+export const LoadingWrapper = ({ isLoading, skeleton, children, className, fallback = null }) => {
   if (isLoading) {
-    return (
-      <div className={cn('animate-pulse', className)}>
-        {skeleton || fallback}
-      </div>
-    );
+    return <div className={cn('animate-pulse', className)}>{skeleton || fallback}</div>;
   }
 
   return children;
@@ -278,12 +256,7 @@ export const ShimmerWrapper = ({
   className,
   intensity = 'normal' // 'subtle', 'normal', 'intense'
 }) => (
-  <div
-    className={cn(
-      'relative overflow-hidden',
-      className
-    )}
-  >
+  <div className={cn('relative overflow-hidden', className)}>
     {children}
     <div
       className={cn(

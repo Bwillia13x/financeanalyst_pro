@@ -2,10 +2,17 @@
 // All actual API calls now route through secure backend proxy
 // No API keys are exposed in frontend code
 
+// In test mode, always use local backend proxy to avoid external network calls
+const TEST_BASE_URL = 'http://localhost:3001/api';
+const isTestMode = import.meta && import.meta.env && import.meta.env.MODE === 'test';
+const resolvedBaseURL = isTestMode
+  ? TEST_BASE_URL
+  : import.meta.env.VITE_API_BASE_URL || TEST_BASE_URL;
+
 export const API_CONFIG = {
   // Backend proxy configuration
   BACKEND_PROXY: {
-    baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api',
+    baseURL: resolvedBaseURL,
     endpoints: {
       marketData: '/market-data',
       financialStatements: '/financial-statements',

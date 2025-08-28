@@ -7,7 +7,9 @@ const Card = ({ title, right, children, className = '' }) => (
   <section className={`rounded-2xl border border-slate-200 bg-white shadow-sm ${className}`}>
     {(title || right) && (
       <header className="flex items-center justify-between border-b border-slate-200 px-4 py-2.5">
-        {title && <h3 className="text-[13px] font-semibold tracking-wide text-slate-700">{title}</h3>}
+        {title && (
+          <h3 className="text-[13px] font-semibold tracking-wide text-slate-700">{title}</h3>
+        )}
         {right}
       </header>
     )}
@@ -28,7 +30,9 @@ const Pill = ({ children, tone = 'slate', size = 'sm' }) => {
     xs: 'text-[10px] px-1.5 py-0.5'
   };
   return (
-    <span className={`inline-flex items-center gap-1 rounded-full border ${tones[tone]} ${sizes[size]}`}>
+    <span
+      className={`inline-flex items-center gap-1 rounded-full border ${tones[tone]} ${sizes[size]}`}
+    >
       {children}
     </span>
   );
@@ -39,9 +43,11 @@ const DiffViewer = ({ diff, onClose }) => {
     if (value === undefined || value === null) return '—';
     if (typeof value === 'number') {
       if (type === 'currency') {
-        return value >= 1e9 ? `$${(value / 1e9).toFixed(1)}B` :
-          value >= 1e6 ? `$${(value / 1e6).toFixed(0)}M` :
-            `$${value.toLocaleString()}`;
+        return value >= 1e9
+          ? `$${(value / 1e9).toFixed(1)}B`
+          : value >= 1e6
+            ? `$${(value / 1e6).toFixed(0)}M`
+            : `$${value.toLocaleString()}`;
       }
       if (type === 'percentage') return `${(value * 100).toFixed(1)}%`;
       if (type === 'multiple') return `${value.toFixed(1)}x`;
@@ -50,37 +56,50 @@ const DiffViewer = ({ diff, onClose }) => {
     return String(value);
   };
 
-  const formatDifference = (difference) => {
+  const formatDifference = difference => {
     if (!difference) return null;
 
     const { absolute, percentage, direction } = difference;
     const sign = direction === 'increase' ? '+' : direction === 'decrease' ? '-' : '';
-    const color = direction === 'increase' ? 'text-green-600' :
-      direction === 'decrease' ? 'text-red-600' : 'text-slate-600';
+    const color =
+      direction === 'increase'
+        ? 'text-green-600'
+        : direction === 'decrease'
+          ? 'text-red-600'
+          : 'text-slate-600';
 
     return (
       <span className={`text-[10px] ${color}`}>
-        ({sign}{Math.abs(absolute).toLocaleString()}
+        ({sign}
+        {Math.abs(absolute).toLocaleString()}
         {percentage && `, ${sign}${Math.abs(percentage).toFixed(1)}%`})
       </span>
     );
   };
 
-  const getChangeIcon = (type) => {
+  const getChangeIcon = type => {
     switch (type) {
-      case 'added': return <span className="text-green-600">+</span>;
-      case 'removed': return <span className="text-red-600">-</span>;
-      case 'modified': return <span className="text-amber-600">~</span>;
-      default: return null;
+      case 'added':
+        return <span className="text-green-600">+</span>;
+      case 'removed':
+        return <span className="text-red-600">-</span>;
+      case 'modified':
+        return <span className="text-amber-600">~</span>;
+      default:
+        return null;
     }
   };
 
-  const getChangeColor = (type) => {
+  const getChangeColor = type => {
     switch (type) {
-      case 'added': return 'border-green-200 bg-green-50';
-      case 'removed': return 'border-red-200 bg-red-50';
-      case 'modified': return 'border-amber-200 bg-amber-50';
-      default: return 'border-slate-200 bg-slate-50';
+      case 'added':
+        return 'border-green-200 bg-green-50';
+      case 'removed':
+        return 'border-red-200 bg-red-50';
+      case 'modified':
+        return 'border-amber-200 bg-amber-50';
+      default:
+        return 'border-slate-200 bg-slate-50';
     }
   };
 
@@ -107,15 +126,21 @@ const DiffViewer = ({ diff, onClose }) => {
                 <div className="text-slate-600">Total</div>
               </div>
               <div className="text-center">
-                <div className="font-bold text-[14px] text-amber-600">{diff.summary.assumptionChanges}</div>
+                <div className="font-bold text-[14px] text-amber-600">
+                  {diff.summary.assumptionChanges}
+                </div>
                 <div className="text-slate-600">Assumptions</div>
               </div>
               <div className="text-center">
-                <div className="font-bold text-[14px] text-blue-600">{diff.summary.outputChanges}</div>
+                <div className="font-bold text-[14px] text-blue-600">
+                  {diff.summary.outputChanges}
+                </div>
                 <div className="text-slate-600">Outputs</div>
               </div>
               <div className="text-center">
-                <div className="font-bold text-[14px] text-slate-600">{diff.summary.metadataChanges}</div>
+                <div className="font-bold text-[14px] text-slate-600">
+                  {diff.summary.metadataChanges}
+                </div>
                 <div className="text-slate-600">Metadata</div>
               </div>
             </div>
@@ -226,8 +251,12 @@ const VersionHistory = ({ model, onRevert, onClose }) => {
     return versioningService.getVersionStats(model.id);
   }, [model?.id]);
 
-  const handleRevert = async(version) => {
-    if (!window.confirm(`Revert to version ${version.version}? This will create a new version with the reverted state.`)) {
+  const handleRevert = async version => {
+    if (
+      !window.confirm(
+        `Revert to version ${version.version}? This will create a new version with the reverted state.`
+      )
+    ) {
       return;
     }
 
@@ -247,7 +276,11 @@ const VersionHistory = ({ model, onRevert, onClose }) => {
     if (selectedVersions.length !== 2) return;
 
     try {
-      const diff = versioningService.calculateDiff(model.id, selectedVersions[1], selectedVersions[0]);
+      const diff = versioningService.calculateDiff(
+        model.id,
+        selectedVersions[1],
+        selectedVersions[0]
+      );
       setShowDiff(diff);
     } catch (error) {
       console.error('Error calculating diff:', error);
@@ -255,7 +288,7 @@ const VersionHistory = ({ model, onRevert, onClose }) => {
     }
   };
 
-  const handleCompareWithCurrent = (version) => {
+  const handleCompareWithCurrent = version => {
     try {
       const diff = versioningService.calculateDiffFromCurrent(model, version.id);
       setShowDiff(diff);
@@ -276,7 +309,7 @@ const VersionHistory = ({ model, onRevert, onClose }) => {
     URL.revokeObjectURL(url);
   };
 
-  const toggleVersionSelection = (versionId) => {
+  const toggleVersionSelection = versionId => {
     setSelectedVersions(prev => {
       if (prev.includes(versionId)) {
         return prev.filter(id => id !== versionId);
@@ -366,7 +399,7 @@ const VersionHistory = ({ model, onRevert, onClose }) => {
               role="button"
               tabIndex={0}
               aria-label={`Select version ${version.version}`}
-              onKeyDown={(e) => {
+              onKeyDown={e => {
                 if (e.key === 'Enter' || e.key === ' ') {
                   e.preventDefault();
                   toggleVersionSelection(version.id);
@@ -380,12 +413,16 @@ const VersionHistory = ({ model, onRevert, onClose }) => {
                     checked={selectedVersions.includes(version.id)}
                     onChange={() => toggleVersionSelection(version.id)}
                     className="w-3 h-3"
-                    onClick={(e) => e.stopPropagation()}
+                    onClick={e => e.stopPropagation()}
                   />
                   <div>
                     <div className="flex items-center gap-2">
                       <span className="text-[12px] font-medium">v{version.version}</span>
-                      {index === 0 && <Pill tone="green" size="xs">Current</Pill>}
+                      {index === 0 && (
+                        <Pill tone="green" size="xs">
+                          Current
+                        </Pill>
+                      )}
                       <Pill size="xs">{versioningService.getTimeAgo(version.timestamp)}</Pill>
                     </div>
                     <div className="text-[11px] text-slate-600 mt-1">
@@ -396,7 +433,7 @@ const VersionHistory = ({ model, onRevert, onClose }) => {
 
                 <div className="flex items-center gap-1">
                   <button
-                    onClick={(e) => {
+                    onClick={e => {
                       e.stopPropagation();
                       handleCompareWithCurrent(version);
                     }}
@@ -407,7 +444,7 @@ const VersionHistory = ({ model, onRevert, onClose }) => {
                   </button>
                   {index > 0 && (
                     <button
-                      onClick={(e) => {
+                      onClick={e => {
                         e.stopPropagation();
                         handleRevert(version);
                       }}
@@ -441,12 +478,7 @@ const VersionHistory = ({ model, onRevert, onClose }) => {
       </Card>
 
       {/* Diff viewer modal */}
-      {showDiff && (
-        <DiffViewer
-          diff={showDiff}
-          onClose={() => setShowDiff(null)}
-        />
-      )}
+      {showDiff && <DiffViewer diff={showDiff} onClose={() => setShowDiff(null)} />}
     </>
   );
 };

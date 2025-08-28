@@ -12,12 +12,21 @@ class MonitoringService {
     this.gaTrackingId = null;
     this.hotjarLoaded = false;
     this.isInitialized = false;
+    // Detect test mode (Vitest/Jest) to avoid initializing monitoring in tests
+    this.isTestMode =
+      import.meta?.env?.MODE === 'test' ||
+      (typeof process !== 'undefined' && (process.env?.VITEST || process.env?.NODE_ENV === 'test'));
 
     // Check if we're in an automated test environment
     const isAutomatedEnv = this.detectAutomatedEnvironment();
 
-    // Only initialize monitoring if not in automated test environment
-    if (!isAutomatedEnv) {
+    // Only initialize monitoring if not automated, not in test mode, and browser APIs are present
+    if (
+      !isAutomatedEnv &&
+      !this.isTestMode &&
+      typeof window !== 'undefined' &&
+      typeof document !== 'undefined'
+    ) {
       this.initializeMonitoring();
     }
   }
@@ -26,11 +35,14 @@ class MonitoringService {
     try {
       return (
         (typeof navigator !== 'undefined' && navigator.webdriver === true) ||
-        (typeof window !== 'undefined' && window.location &&
+        (typeof window !== 'undefined' &&
+          window.location &&
           new URLSearchParams(window.location.search).has('lhci')) ||
-        (typeof window !== 'undefined' && window.location &&
+        (typeof window !== 'undefined' &&
+          window.location &&
           new URLSearchParams(window.location.search).has('ci')) ||
-        (typeof window !== 'undefined' && window.location &&
+        (typeof window !== 'undefined' &&
+          window.location &&
           new URLSearchParams(window.location.search).has('audit'))
       );
     } catch {
@@ -74,7 +86,7 @@ class MonitoringService {
 
     // Dynamically import Sentry to avoid bundle bloat
     import('@sentry/browser')
-      .then(async(Sentry) => {
+      .then(async Sentry => {
         const integrations = [];
 
         Sentry.init({
@@ -112,6 +124,7 @@ class MonitoringService {
   initializeGoogleAnalytics() {
     const gaTrackingId = import.meta.env.VITE_GA_TRACKING_ID;
     if (!gaTrackingId) return;
+    if (typeof document === 'undefined' || typeof window === 'undefined') return;
 
     // Load Google Analytics script
     const script = document.createElement('script');
@@ -142,11 +155,12 @@ class MonitoringService {
   initializeHotjar() {
     const hotjarId = import.meta.env.VITE_HOTJAR_ID;
     if (!hotjarId) return;
+    if (typeof window === 'undefined' || typeof document === 'undefined') return;
 
-    (function(h, o, t, j, a, r) {
+    (function (h, o, t, j, a, r) {
       h.hj =
         h.hj ||
-        function() {
+        function () {
           (h.hj.q = h.hj.q || []).push(arguments);
         };
       h._hjSettings = { hjid: hotjarId, hjsv: 6 };
@@ -208,8 +222,9 @@ class MonitoringService {
    * Monitor API performance
    */
   monitorApiPerformance() {
+    if (typeof window === 'undefined' || !window.fetch) return;
     const originalFetch = window.fetch;
-    window.fetch = async(...args) => {
+    window.fetch = async (...args) => {
       const startTime = performance.now();
       try {
         const response = await originalFetch(...args);
@@ -242,7 +257,7 @@ class MonitoringService {
    */
   monitorComponentPerformance() {
     // Use Performance Observer to monitor long tasks
-    if ('PerformanceObserver' in window) {
+    if (typeof window !== 'undefined' && 'PerformanceObserver' in window) {
       const observer = new PerformanceObserver(list => {
         for (const entry of list.getEntries()) {
           if (entry.duration > 50) {
@@ -279,7 +294,7 @@ class MonitoringService {
    * Monitor resource loading
    */
   monitorResourceLoading() {
-    if ('PerformanceObserver' in window) {
+    if (typeof window !== 'undefined' && 'PerformanceObserver' in window) {
       const observer = new PerformanceObserver(list => {
         for (const entry of list.getEntries()) {
           if (entry.transferSize > 1000000) {
@@ -301,6 +316,7 @@ class MonitoringService {
    * Setup global error handlers
    */
   setupGlobalErrorHandlers() {
+    if (typeof window === 'undefined') return;
     // Unhandled promise rejections
     window.addEventListener('unhandledrejection', event => {
       this.trackError(event.reason, 'unhandled_promise_rejection');
@@ -337,7 +353,7 @@ class MonitoringService {
     if (!this.enableAnalytics) return;
 
     // Send to Google Analytics
-    if (window.gtag) {
+    if (typeof window !== 'undefined' && window.gtag) {
       window.gtag('event', eventName, properties);
     }
 
@@ -354,7 +370,7 @@ class MonitoringService {
     console.error(`[${category}]`, error, additionalData);
 
     // Send to Sentry if available
-    if (window.Sentry) {
+    if (typeof window !== 'undefined' && window.Sentry) {
       window.Sentry.captureException(error, {
         tags: { category },
         extra: additionalData
@@ -386,6 +402,7 @@ class MonitoringService {
    */
   sendToCustomAnalytics(eventName, properties) {
     if (!this.isProduction) return;
+    if (typeof window === 'undefined' || typeof navigator === 'undefined') return;
 
     // Send to your custom analytics endpoint
     fetch('/api/analytics', {
@@ -412,24 +429,24 @@ class MonitoringService {
    */
   trackPageView(pageName, additionalData = {}) {
     // Update GA single-page-app page view
-    if (window.gtag && this.gaTrackingId) {
+    if (typeof window !== 'undefined' && window.gtag && this.gaTrackingId) {
       window.gtag('config', this.gaTrackingId, {
-        page_title: document.title,
+        page_title: typeof document !== 'undefined' ? document.title : pageName,
         page_path: pageName,
-        page_location: window.location.href
+        page_location: typeof window !== 'undefined' ? window.location.href : ''
       });
     }
 
     // Notify Hotjar of route change
-    if (typeof window.hj === 'function') {
+    if (typeof window !== 'undefined' && typeof window.hj === 'function') {
       window.hj('stateChange', pageName);
     }
 
     // Custom analytics event
     this.trackEvent('page_view', {
       page: pageName,
-      title: document.title,
-      url: window.location.href,
+      title: typeof document !== 'undefined' ? document.title : pageName,
+      url: typeof window !== 'undefined' ? window.location.href : '',
       ...additionalData
     });
   }

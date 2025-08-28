@@ -22,12 +22,7 @@ import { useState, useCallback } from 'react';
 import { useCollaboration, useWorkspace, usePresence } from '../../hooks/useCollaboration';
 import SEOHead from '../SEO/SEOHead';
 
-const CollaborationDashboard = ({
-  userId,
-  userProfile,
-  isVisible = true,
-  onClose
-}) => {
+const CollaborationDashboard = ({ userId, userProfile, isVisible = true, onClose }) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [selectedWorkspace, setSelectedWorkspace] = useState(null);
   const [newWorkspaceName, setNewWorkspaceName] = useState('');
@@ -69,7 +64,7 @@ const CollaborationDashboard = ({
   ];
 
   // Handle workspace creation
-  const handleCreateWorkspace = useCallback(async() => {
+  const handleCreateWorkspace = useCallback(async () => {
     if (!newWorkspaceName.trim()) return;
 
     try {
@@ -90,16 +85,19 @@ const CollaborationDashboard = ({
   }, [newWorkspaceName, joinWorkspace, userProfile.name]);
 
   // Handle workspace selection
-  const handleSelectWorkspace = useCallback(async(workspaceId) => {
-    try {
-      if (currentWorkspace?.id !== workspaceId) {
-        await joinWorkspace(workspaceId);
+  const handleSelectWorkspace = useCallback(
+    async workspaceId => {
+      try {
+        if (currentWorkspace?.id !== workspaceId) {
+          await joinWorkspace(workspaceId);
+        }
+        setSelectedWorkspace(currentWorkspace || { id: workspaceId });
+      } catch (err) {
+        console.error('Failed to select workspace:', err);
       }
-      setSelectedWorkspace(currentWorkspace || { id: workspaceId });
-    } catch (err) {
-      console.error('Failed to select workspace:', err);
-    }
-  }, [currentWorkspace, joinWorkspace]);
+    },
+    [currentWorkspace, joinWorkspace]
+  );
 
   // Demo workspaces for showcase
   const demoWorkspaces = [
@@ -228,7 +226,7 @@ const CollaborationDashboard = ({
                   { id: 'workspaces', label: 'Workspaces', icon: Users },
                   { id: 'models', label: 'Shared Models', icon: Share2 },
                   { id: 'presence', label: 'Live Presence', icon: MessageCircle }
-                ].map((tab) => {
+                ].map(tab => {
                   const Icon = tab.icon;
                   return (
                     <button
@@ -342,16 +340,23 @@ const CollaborationDashboard = ({
                             type: 'comment_added'
                           }
                         ].map((activity, index) => (
-                          <div key={index} className="flex items-center space-x-3 p-3 bg-white rounded-lg">
+                          <div
+                            key={index}
+                            className="flex items-center space-x-3 p-3 bg-white rounded-lg"
+                          >
                             <div
                               className={`w-2 h-2 rounded-full ${
-                                activity.type === 'model_shared' ? 'bg-green-500' :
-                                  activity.type === 'model_updated' ? 'bg-blue-500' : 'bg-purple-500'
+                                activity.type === 'model_shared'
+                                  ? 'bg-green-500'
+                                  : activity.type === 'model_updated'
+                                    ? 'bg-blue-500'
+                                    : 'bg-purple-500'
                               }`}
                             />
                             <div className="flex-1">
                               <p className="text-sm text-gray-900">
-                                <span className="font-medium">{activity.user}</span> {activity.action}
+                                <span className="font-medium">{activity.user}</span>{' '}
+                                {activity.action}
                               </p>
                               <p className="text-xs text-gray-500">
                                 in {activity.workspace} • {activity.time}
@@ -379,7 +384,7 @@ const CollaborationDashboard = ({
                         <h3 className="text-lg font-semibold text-gray-900">Workspaces</h3>
                         <select
                           value={workspaceFilter}
-                          onChange={(e) => setWorkspaceFilter(e.target.value)}
+                          onChange={e => setWorkspaceFilter(e.target.value)}
                           className="border border-gray-300 rounded-lg px-3 py-1 text-sm"
                         >
                           <option value="all">All Workspaces</option>
@@ -410,9 +415,9 @@ const CollaborationDashboard = ({
                             type="text"
                             placeholder="Workspace name..."
                             value={newWorkspaceName}
-                            onChange={(e) => setNewWorkspaceName(e.target.value)}
+                            onChange={e => setNewWorkspaceName(e.target.value)}
                             className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                            onKeyPress={(e) => e.key === 'Enter' && handleCreateWorkspace()}
+                            onKeyPress={e => e.key === 'Enter' && handleCreateWorkspace()}
                           />
                           <div className="flex items-center space-x-3">
                             <button
@@ -435,7 +440,7 @@ const CollaborationDashboard = ({
 
                     {/* Workspace List */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {filteredWorkspaces.map((workspace) => (
+                      {filteredWorkspaces.map(workspace => (
                         <motion.div
                           key={workspace.id}
                           whileHover={{ scale: 1.02 }}
@@ -445,9 +450,13 @@ const CollaborationDashboard = ({
                           <div className="flex items-start justify-between mb-3">
                             <div className="flex-1">
                               <h4 className="font-semibold text-gray-900 mb-1">{workspace.name}</h4>
-                              <p className="text-sm text-gray-600 line-clamp-2">{workspace.description}</p>
+                              <p className="text-sm text-gray-600 line-clamp-2">
+                                {workspace.description}
+                              </p>
                             </div>
-                            <div className={`w-2 h-2 rounded-full ${workspace.isActive ? 'bg-green-500' : 'bg-gray-300'}`} />
+                            <div
+                              className={`w-2 h-2 rounded-full ${workspace.isActive ? 'bg-green-500' : 'bg-gray-300'}`}
+                            />
                           </div>
 
                           <div className="flex items-center justify-between text-sm text-gray-500">
@@ -471,9 +480,11 @@ const CollaborationDashboard = ({
                             <div className="flex items-center justify-between">
                               <span
                                 className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                  workspace.type === 'financial_analysis' ? 'bg-blue-100 text-blue-800' :
-                                    workspace.type === 'risk_analysis' ? 'bg-red-100 text-red-800' :
-                                      'bg-green-100 text-green-800'
+                                  workspace.type === 'financial_analysis'
+                                    ? 'bg-blue-100 text-blue-800'
+                                    : workspace.type === 'risk_analysis'
+                                      ? 'bg-red-100 text-red-800'
+                                      : 'bg-green-100 text-green-800'
                                 }`}
                               >
                                 {workspace.type.replace('_', ' ')}
@@ -504,7 +515,8 @@ const CollaborationDashboard = ({
                         {
                           id: 'portfolio_opt_1',
                           name: 'Portfolio Optimization Model Q4',
-                          description: 'Advanced portfolio optimization using Modern Portfolio Theory',
+                          description:
+                            'Advanced portfolio optimization using Modern Portfolio Theory',
                           sharedBy: 'Sarah Chen',
                           workspace: 'Portfolio Analysis Q4',
                           lastModified: '10 minutes ago',
@@ -534,17 +546,22 @@ const CollaborationDashboard = ({
                           collaborators: 2,
                           type: 'analysis'
                         }
-                      ].map((model) => (
-                        <div key={model.id} className="bg-white border border-gray-200 rounded-lg p-4">
+                      ].map(model => (
+                        <div
+                          key={model.id}
+                          className="bg-white border border-gray-200 rounded-lg p-4"
+                        >
                           <div className="flex items-start justify-between">
                             <div className="flex-1">
                               <div className="flex items-center space-x-3 mb-2">
                                 <h4 className="font-semibold text-gray-900">{model.name}</h4>
                                 <span
                                   className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                    model.type === 'portfolio' ? 'bg-blue-100 text-blue-800' :
-                                      model.type === 'risk' ? 'bg-red-100 text-red-800' :
-                                        'bg-green-100 text-green-800'
+                                    model.type === 'portfolio'
+                                      ? 'bg-blue-100 text-blue-800'
+                                      : model.type === 'risk'
+                                        ? 'bg-red-100 text-red-800'
+                                        : 'bg-green-100 text-green-800'
                                   }`}
                                 >
                                   {model.type}
@@ -553,8 +570,12 @@ const CollaborationDashboard = ({
                               <p className="text-sm text-gray-600 mb-3">{model.description}</p>
 
                               <div className="flex items-center space-x-6 text-sm text-gray-500">
-                                <span>Shared by <strong>{model.sharedBy}</strong></span>
-                                <span>in <strong>{model.workspace}</strong></span>
+                                <span>
+                                  Shared by <strong>{model.sharedBy}</strong>
+                                </span>
+                                <span>
+                                  in <strong>{model.workspace}</strong>
+                                </span>
                                 <span>Modified {model.lastModified}</span>
                               </div>
                             </div>
@@ -566,9 +587,15 @@ const CollaborationDashboard = ({
                               </div>
 
                               <div className="flex items-center space-x-1">
-                                {model.permissions === 'edit' && <Edit3 className="w-4 h-4 text-green-500" />}
-                                {model.permissions === 'view' && <Eye className="w-4 h-4 text-blue-500" />}
-                                {model.permissions === 'comment' && <MessageSquare className="w-4 h-4 text-purple-500" />}
+                                {model.permissions === 'edit' && (
+                                  <Edit3 className="w-4 h-4 text-green-500" />
+                                )}
+                                {model.permissions === 'view' && (
+                                  <Eye className="w-4 h-4 text-blue-500" />
+                                )}
+                                {model.permissions === 'comment' && (
+                                  <MessageSquare className="w-4 h-4 text-purple-500" />
+                                )}
                               </div>
 
                               <button className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition-colors">
@@ -591,16 +618,33 @@ const CollaborationDashboard = ({
                     exit={{ opacity: 0, x: -20 }}
                     className="space-y-6"
                   >
-                    <h3 className="text-lg font-semibold text-gray-900">Live Presence & Activity</h3>
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      Live Presence & Activity
+                    </h3>
 
                     {/* Active Users */}
                     <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-4">
                       <h4 className="font-semibold text-gray-900 mb-3">Currently Online</h4>
                       <div className="flex items-center space-x-4">
                         {[
-                          { name: 'Sarah Chen', avatar: 'SC', status: 'editing', workspace: 'Portfolio Analysis' },
-                          { name: 'Mike Rodriguez', avatar: 'MR', status: 'viewing', workspace: 'Risk Modeling' },
-                          { name: 'Emma Thompson', avatar: 'ET', status: 'commenting', workspace: 'Market Research' }
+                          {
+                            name: 'Sarah Chen',
+                            avatar: 'SC',
+                            status: 'editing',
+                            workspace: 'Portfolio Analysis'
+                          },
+                          {
+                            name: 'Mike Rodriguez',
+                            avatar: 'MR',
+                            status: 'viewing',
+                            workspace: 'Risk Modeling'
+                          },
+                          {
+                            name: 'Emma Thompson',
+                            avatar: 'ET',
+                            status: 'commenting',
+                            workspace: 'Market Research'
+                          }
                         ].map((user, index) => (
                           <div key={index} className="flex items-center space-x-2">
                             <div className="relative">
@@ -611,7 +655,9 @@ const CollaborationDashboard = ({
                             </div>
                             <div>
                               <p className="text-sm font-medium text-gray-900">{user.name}</p>
-                              <p className="text-xs text-gray-500">{user.status} in {user.workspace}</p>
+                              <p className="text-xs text-gray-500">
+                                {user.status} in {user.workspace}
+                              </p>
                             </div>
                           </div>
                         ))}
@@ -626,7 +672,8 @@ const CollaborationDashboard = ({
                           <div key={index} className="flex items-center space-x-3 text-sm">
                             <div className="w-2 h-2 bg-blue-500 rounded-full" />
                             <span className="text-gray-600">
-                              User {cursor.userId} at position ({cursor.position?.x || 0}, {cursor.position?.y || 0})
+                              User {cursor.userId} at position ({cursor.position?.x || 0},{' '}
+                              {cursor.position?.y || 0})
                             </span>
                             <span className="text-gray-400 text-xs">
                               {new Date(cursor.timestamp).toLocaleTimeString()}
@@ -634,7 +681,9 @@ const CollaborationDashboard = ({
                           </div>
                         ))}
                         {cursors.length === 0 && (
-                          <p className="text-gray-500 text-sm">No active cursors in current workspace</p>
+                          <p className="text-gray-500 text-sm">
+                            No active cursors in current workspace
+                          </p>
                         )}
                       </div>
                     </div>

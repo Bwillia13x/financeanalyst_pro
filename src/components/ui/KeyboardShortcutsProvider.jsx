@@ -31,7 +31,11 @@ export const KeyboardShortcutsProvider = ({ children }) => {
   // Define command handlers
   const commandHandlers = {
     'open-command-palette': () => setShowCommandPalette(true),
-    'navigate': (shortcut) => navigate(shortcut.target),
+    'open-performance-dashboard': () => {
+      const event = new CustomEvent('open-performance-dashboard');
+      window.dispatchEvent(event);
+    },
+    navigate: shortcut => navigate(shortcut.target),
     'create-dcf': () => {
       navigate('/private-analysis');
       // Trigger DCF creation after navigation
@@ -47,7 +51,7 @@ export const KeyboardShortcutsProvider = ({ children }) => {
         window.dispatchEvent(event);
       }, 100);
     },
-    'save': () => {
+    save: () => {
       const event = new CustomEvent('save-analysis');
       window.dispatchEvent(event);
     },
@@ -75,8 +79,8 @@ export const KeyboardShortcutsProvider = ({ children }) => {
       const event = new CustomEvent('toggle-insights-sidebar');
       window.dispatchEvent(event);
     },
-    'help': () => setShowShortcutsHelp(true),
-    'quick-company': (shortcut) => {
+    help: () => setShowShortcutsHelp(true),
+    'quick-company': shortcut => {
       navigate(`/market-analysis?symbol=${shortcut.company}`);
     },
     'open-options-pricer': () => {
@@ -120,7 +124,7 @@ export const KeyboardShortcutsProvider = ({ children }) => {
     // Expose a no-op executeCommand for compatibility; palette handles execution
     executeCommand: () => {},
     recentCommands,
-    updateCommandContext: (ctx) => setCurrentContext(prev => ({ ...prev, ...ctx }))
+    updateCommandContext: ctx => setCurrentContext(prev => ({ ...prev, ...ctx }))
   };
 
   return (

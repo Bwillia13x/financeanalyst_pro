@@ -1,6 +1,11 @@
 // Real User Monitoring, Web Vitals Tracking, and Sentry Performance Integration
 // Note: Sentry is dynamically imported to avoid bundle bloat
 
+// Environment guards to avoid side-effects in tests and SSR
+const IS_TEST_ENV =
+  typeof process !== 'undefined' && process.env && process.env.NODE_ENV === 'test';
+const HAS_WINDOW = typeof window !== 'undefined';
+
 // Web Vitals metrics tracking
 const webVitalsData = {
   CLS: null,
@@ -41,7 +46,7 @@ function initializeWebVitals() {
   let clsValue = 0;
   const clsEntries = [];
 
-  new PerformanceObserver((entryList) => {
+  new PerformanceObserver(entryList => {
     for (const entry of entryList.getEntries()) {
       if (!entry.hadRecentInput) {
         clsValue += entry.value;
@@ -53,7 +58,7 @@ function initializeWebVitals() {
   }).observe({ type: 'layout-shift', buffered: true });
 
   // First Input Delay (FID) / Interaction to Next Paint (INP)
-  new PerformanceObserver((entryList) => {
+  new PerformanceObserver(entryList => {
     for (const entry of entryList.getEntries()) {
       if (entry.name === 'first-input-delay') {
         webVitalsData.FID = entry.processingStart - entry.startTime;
@@ -72,7 +77,7 @@ function initializeWebVitals() {
   }).observe({ type: 'event', buffered: true });
 
   // First Contentful Paint (FCP)
-  new PerformanceObserver((entryList) => {
+  new PerformanceObserver(entryList => {
     for (const entry of entryList.getEntries()) {
       if (entry.name === 'first-contentful-paint') {
         webVitalsData.FCP = entry.startTime;
@@ -82,7 +87,7 @@ function initializeWebVitals() {
   }).observe({ type: 'paint', buffered: true });
 
   // Largest Contentful Paint (LCP)
-  new PerformanceObserver((entryList) => {
+  new PerformanceObserver(entryList => {
     const entries = entryList.getEntries();
     const lastEntry = entries[entries.length - 1];
     webVitalsData.LCP = lastEntry.startTime;
@@ -147,7 +152,10 @@ function trackNavigationTiming() {
         const timings = {
           dns: navigation.domainLookupEnd - navigation.domainLookupStart,
           tcp: navigation.connectEnd - navigation.connectStart,
-          ssl: navigation.secureConnectionStart > 0 ? navigation.connectEnd - navigation.secureConnectionStart : 0,
+          ssl:
+            navigation.secureConnectionStart > 0
+              ? navigation.connectEnd - navigation.secureConnectionStart
+              : 0,
           ttfb: navigation.responseStart - navigation.requestStart,
           download: navigation.responseEnd - navigation.responseStart,
           domProcessing: navigation.domComplete - navigation.domLoading,
@@ -162,14 +170,15 @@ function trackNavigationTiming() {
 
 // Resource timing tracking
 function trackResourceTiming() {
-  new PerformanceObserver((list) => {
+  new PerformanceObserver(list => {
     for (const entry of list.getEntries()) {
       // Track important resource types
-      if (entry.initiatorType === 'script' ||
-          entry.initiatorType === 'css' ||
-          entry.initiatorType === 'img' ||
-          entry.initiatorType === 'fetch') {
-
+      if (
+        entry.initiatorType === 'script' ||
+        entry.initiatorType === 'css' ||
+        entry.initiatorType === 'img' ||
+        entry.initiatorType === 'fetch'
+      ) {
         const resourceData = {
           name: entry.name,
           type: entry.initiatorType,
@@ -196,28 +205,32 @@ function trackUserInteractions() {
   const interactionEvents = ['click', 'keydown', 'touchstart'];
 
   interactionEvents.forEach(eventType => {
-    document.addEventListener(eventType, (event) => {
-      const startTime = performance.now();
+    document.addEventListener(
+      eventType,
+      event => {
+        const startTime = performance.now();
 
-      // Track interaction delay
-      requestAnimationFrame(() => {
-        const endTime = performance.now();
-        const interactionTime = endTime - startTime;
+        // Track interaction delay
+        requestAnimationFrame(() => {
+          const endTime = performance.now();
+          const interactionTime = endTime - startTime;
 
-        interactionCount++;
-        totalInteractionTime += interactionTime;
+          interactionCount++;
+          totalInteractionTime += interactionTime;
 
-        // Report slow interactions
-        if (interactionTime > 100) {
-          reportSlowInteraction({
-            type: eventType,
-            target: event.target.tagName,
-            duration: interactionTime,
-            timestamp: Date.now()
-          });
-        }
-      });
-    }, { passive: true });
+          // Report slow interactions
+          if (interactionTime > 100) {
+            reportSlowInteraction({
+              type: eventType,
+              target: event.target.tagName,
+              duration: interactionTime,
+              timestamp: Date.now()
+            });
+          }
+        });
+      },
+      { passive: true }
+    );
   });
 
   // Report interaction summary periodically
@@ -309,6 +322,34 @@ function reportInteractionSummary(summaryData) {
   sendToAnalytics('interaction-summary', summaryData);
 }
 
+// Exported proxy to track component render times safely
+export function trackComponentRender(componentName, renderTime) {
+  try {
+    // Ensure a start mark exists to avoid DOMException in measure
+    if (performance.getEntriesByName(`${componentName}-start`).length === 0) {
+      performance.mark(`${componentName}-start`);
+    }
+
+    if (typeof window !== 'undefined' && typeof window.trackComponentRender === 'function') {
+      window.trackComponentRender(componentName, renderTime);
+    } else {
+      // Fallback: still report the metric even if window tracker isn't set yet
+      reportCustomMetric('component-render', {
+        component: componentName,
+        renderTime,
+        timestamp: Date.now()
+      });
+    }
+  } catch (e) {
+    console.warn('trackComponentRender fallback error:', e);
+    reportCustomMetric('component-render', {
+      component: componentName,
+      renderTime,
+      timestamp: Date.now()
+    });
+  }
+}
+
 // Error tracking
 export function trackError(error, errorInfo) {
   const errorData = {
@@ -328,11 +369,11 @@ export function trackError(error, errorInfo) {
 // Performance budget monitoring
 export function checkPerformanceBudgets() {
   const budgets = {
-    LCP: 2500,  // 2.5s
-    FID: 100,   // 100ms
-    CLS: 0.1,   // 0.1
-    FCP: 1800,  // 1.8s
-    TTFB: 800   // 800ms
+    LCP: 2500, // 2.5s
+    FID: 100, // 100ms
+    CLS: 0.1, // 0.1
+    FCP: 1800, // 1.8s
+    TTFB: 800 // 800ms
   };
 
   const violations = [];
@@ -364,12 +405,12 @@ export function checkPerformanceBudgets() {
 // Utility functions
 function getPerformanceThreshold(metricName) {
   const thresholds = {
-    LCP: 2500,  // 2.5s
-    FID: 100,   // 100ms
-    CLS: 0.1,   // 0.1
-    FCP: 1800,  // 1.8s
-    TTFB: 800,  // 800ms
-    INP: 200    // 200ms
+    LCP: 2500, // 2.5s
+    FID: 100, // 100ms
+    CLS: 0.1, // 0.1
+    FCP: 1800, // 1.8s
+    TTFB: 800, // 800ms
+    INP: 200 // 200ms
   };
   return thresholds[metricName] || 1000;
 }
@@ -388,6 +429,9 @@ function getConnectionInfo() {
 function sendToAnalytics(type, data) {
   // In production, send to your analytics service
   // For now, we'll store locally and batch send
+
+  // No-op in tests or when window is unavailable to prevent open handles
+  if (IS_TEST_ENV || !HAS_WINDOW) return;
 
   try {
     const analyticsData = {
@@ -412,13 +456,15 @@ function sendToAnalytics(type, data) {
     if (existingData.length >= 10) {
       sendAnalyticsBatch();
     }
-
   } catch (error) {
     console.error('Failed to queue analytics data:', error);
   }
 }
 
 function sendAnalyticsBatch() {
+  // No-op in tests or when window is unavailable
+  if (IS_TEST_ENV || !HAS_WINDOW) return;
+
   try {
     const queuedData = JSON.parse(localStorage.getItem('analytics-queue') || '[]');
     if (queuedData.length === 0) return;
@@ -437,7 +483,6 @@ function sendAnalyticsBatch() {
 
     // Clear queue after successful send
     localStorage.removeItem('analytics-queue');
-
   } catch (error) {
     console.error('Failed to send analytics batch:', error);
   }
@@ -462,13 +507,16 @@ function getUserId() {
   return userId;
 }
 
-// Initialize batch sending on interval
-setInterval(sendAnalyticsBatch, 60000); // Every minute
+// Initialize batch sending on interval (guarded in tests and SSR)
+if (HAS_WINDOW && !IS_TEST_ENV) {
+  // store interval id for potential cleanup by host apps
+  window.__perfSendBatchInterval = window.setInterval(sendAnalyticsBatch, 60000); // Every minute
 
-// Send batch before page unload
-window.addEventListener('beforeunload', () => {
-  sendAnalyticsBatch();
-});
+  // Send batch before page unload
+  window.addEventListener('beforeunload', () => {
+    sendAnalyticsBatch();
+  });
+}
 
 // Accessibility metrics reporting
 export function reportPerformanceMetric(type, data) {
@@ -531,13 +579,21 @@ export function trackFinancialComponentPerformance(componentName, metrics) {
 
 // Get comprehensive performance dashboard data
 export function getPerformanceDashboardData() {
-  const accessibilityHistory = JSON.parse(localStorage.getItem('accessibility-history') || '[]');
-  const analyticsQueue = JSON.parse(localStorage.getItem('analytics-queue') || '[]');
+  const accessibilityHistory = HAS_WINDOW
+    ? JSON.parse(localStorage.getItem('accessibility-history') || '[]')
+    : [];
+  const analyticsQueue = HAS_WINDOW
+    ? JSON.parse(localStorage.getItem('analytics-queue') || '[]')
+    : [];
 
   // Calculate trends
   const recentAccessibility = accessibilityHistory.slice(-10);
-  const avgScore = recentAccessibility.reduce((sum, entry) => sum + entry.score, 0) / recentAccessibility.length || 0;
-  const avgViolations = recentAccessibility.reduce((sum, entry) => sum + entry.violations, 0) / recentAccessibility.length || 0;
+  const avgScore =
+    recentAccessibility.reduce((sum, entry) => sum + entry.score, 0) / recentAccessibility.length ||
+    0;
+  const avgViolations =
+    recentAccessibility.reduce((sum, entry) => sum + entry.violations, 0) /
+      recentAccessibility.length || 0;
 
   // Get performance metrics from queue
   const performanceMetrics = analyticsQueue
@@ -559,9 +615,10 @@ export function getPerformanceDashboardData() {
       averageViolations: Math.round(avgViolations),
       history: recentAccessibility,
       trends: {
-        scoreImproving: recentAccessibility.length >= 2 &&
+        scoreImproving:
+          recentAccessibility.length >= 2 &&
           recentAccessibility[recentAccessibility.length - 1].score >
-          recentAccessibility[recentAccessibility.length - 2].score
+            recentAccessibility[recentAccessibility.length - 2].score
       }
     },
     performance: {
@@ -579,4 +636,61 @@ export function getPerformanceData() {
     budgetViolations: checkPerformanceBudgets(),
     timestamp: Date.now()
   };
+}
+
+// Performance measurement functions
+export function measurePerformance(operationName, operationFunction) {
+  const startTime = performance.now();
+
+  try {
+    const result = operationFunction();
+    const endTime = performance.now();
+    const duration = endTime - startTime;
+
+    reportPerformanceMetric('operation-measurement', {
+      operation: operationName,
+      duration: Math.round(duration),
+      success: true,
+      timestamp: Date.now()
+    });
+
+    return result;
+  } catch (error) {
+    const endTime = performance.now();
+    const duration = endTime - startTime;
+
+    reportPerformanceMetric('operation-measurement', {
+      operation: operationName,
+      duration: Math.round(duration),
+      success: false,
+      error: error.message,
+      timestamp: Date.now()
+    });
+
+    throw error;
+  }
+}
+
+export function trackMemoryUsage(label = 'memory-usage') {
+  if ('memory' in performance) {
+    const memoryInfo = {
+      used: performance.memory.usedJSHeapSize,
+      total: performance.memory.totalJSHeapSize,
+      limit: performance.memory.jsHeapSizeLimit
+    };
+
+    reportPerformanceMetric('memory-usage', {
+      label,
+      usedMB: Math.round(memoryInfo.used / 1024 / 1024),
+      totalMB: Math.round(memoryInfo.total / 1024 / 1024),
+      limitMB: Math.round(memoryInfo.limit / 1024 / 1024),
+      usagePercent: Math.round((memoryInfo.used / memoryInfo.limit) * 100),
+      timestamp: Date.now()
+    });
+
+    return memoryInfo;
+  } else {
+    console.warn('Memory tracking not supported in this browser');
+    return null;
+  }
 }

@@ -9,8 +9,7 @@ export function generateNonce() {
   }
 
   // Fallback for server-side or older browsers
-  return Math.random().toString(36).substring(2, 15) +
-         Math.random().toString(36).substring(2, 15);
+  return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 }
 
 // Store current nonce for the session
@@ -53,16 +52,8 @@ export class CSPPolicyBuilder {
         "'unsafe-inline'", // Required for CSS-in-JS
         'https://fonts.googleapis.com'
       ],
-      'font-src': [
-        "'self'",
-        'https://fonts.gstatic.com'
-      ],
-      'img-src': [
-        "'self'",
-        'data:',
-        'blob:',
-        'https:'
-      ],
+      'font-src': ["'self'", 'https://fonts.gstatic.com'],
+      'img-src': ["'self'", 'data:', 'blob:', 'https:'],
       'connect-src': [
         "'self'",
         'https://www.alphavantage.co',
@@ -102,8 +93,7 @@ export class CSPPolicyBuilder {
 
     if (this.policies['style-src']) {
       // Keep unsafe-inline for CSS-in-JS compatibility
-      this.policies['style-src'] = this.policies['style-src']
-        .concat([`'nonce-${nonce}'`]);
+      this.policies['style-src'] = this.policies['style-src'].concat([`'nonce-${nonce}'`]);
     }
 
     return this;
@@ -123,8 +113,7 @@ export class CSPPolicyBuilder {
   // Remove source from directive
   removeSource(directive, source) {
     if (this.policies[directive]) {
-      this.policies[directive] = this.policies[directive]
-        .filter(src => src !== source);
+      this.policies[directive] = this.policies[directive].filter(src => src !== source);
     }
     return this;
   }
@@ -269,7 +258,8 @@ export function validateCSPCompliance() {
 
   // Check for inline styles without nonces (less critical due to CSS-in-JS)
   const inlineStyles = document.querySelectorAll('style:not([nonce])');
-  if (inlineStyles.length > 5) { // Allow some CSS-in-JS styles
+  if (inlineStyles.length > 5) {
+    // Allow some CSS-in-JS styles
     violations.push({
       type: 'excessive-inline-styles',
       count: inlineStyles.length,
@@ -297,7 +287,7 @@ export function validateCSPCompliance() {
 export function setupCSPReporting() {
   if (typeof document === 'undefined') return;
 
-  document.addEventListener('securitypolicyviolation', (event) => {
+  document.addEventListener('securitypolicyviolation', event => {
     const violation = {
       blockedURI: event.blockedURI,
       violatedDirective: event.violatedDirective,
@@ -350,8 +340,10 @@ export function initializeSecurity() {
   setInterval(() => {
     const currentViolations = validateCSPCompliance();
     if (currentViolations.length > violations.length) {
-      console.warn('New CSP compliance issues detected:',
-        currentViolations.slice(violations.length));
+      console.warn(
+        'New CSP compliance issues detected:',
+        currentViolations.slice(violations.length)
+      );
     }
   }, 30000); // Check every 30 seconds
 

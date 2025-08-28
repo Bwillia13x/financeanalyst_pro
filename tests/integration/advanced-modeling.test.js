@@ -6,7 +6,7 @@
 import { describe, test, expect, beforeAll } from 'vitest';
 
 describe('Advanced Modeling Framework Tests', () => {
-  
+
   describe('1. Monte Carlo Simulation Engine', () => {
     test('Should run DCF Monte Carlo with parameter distributions', async () => {
       const dcfParameters = {
@@ -55,14 +55,14 @@ describe('Advanced Modeling Framework Tests', () => {
       expect(mockMonteCarloResult.data.iterations).toBe(10000);
       expect(mockMonteCarloResult.data.summary.mean).toBeGreaterThan(0);
       expect(mockMonteCarloResult.data.percentiles.P50).toBeCloseTo(mockMonteCarloResult.data.summary.median, -9);
-      
+
       console.log('✅ Monte Carlo DCF simulation test passed');
     });
 
     test('Should handle correlated variables in simulation', async () => {
       const correlationMatrix = [
         [1.0, 0.65, -0.30, 0.20],  // Revenue growth correlations
-        [0.65, 1.0, -0.25, 0.15],  // EBITDA margin correlations  
+        [0.65, 1.0, -0.25, 0.15],  // EBITDA margin correlations
         [-0.30, -0.25, 1.0, 0.80], // Tax rate correlations
         [0.20, 0.15, 0.80, 1.0]    // Discount rate correlations
       ];
@@ -90,7 +90,7 @@ describe('Advanced Modeling Framework Tests', () => {
 
       expect(mockCorrelatedSimulation.data.correlation_preservation.correlation_accuracy).toBeGreaterThan(0.95);
       expect(mockCorrelatedSimulation.data.risk_metrics.value_at_risk_5pct).toBeGreaterThan(0);
-      
+
       console.log('✅ Correlated Monte Carlo simulation test passed');
     });
   });
@@ -127,7 +127,7 @@ describe('Advanced Modeling Framework Tests', () => {
             maxDrawdown: -0.142,
             beta: 0.92
           },
-          constraints: constraints,
+          constraints,
           objective: 'sharpe',
           iterations: 1000,
           convergence: true
@@ -138,7 +138,7 @@ describe('Advanced Modeling Framework Tests', () => {
       expect(mockOptimization.data.weights.reduce((a, b) => a + b, 0)).toBeCloseTo(1.0, 2);
       expect(mockOptimization.data.sharpeRatio).toBeGreaterThan(0.3);
       expect(Math.max(...mockOptimization.data.weights)).toBeLessThanOrEqual(0.30);
-      
+
       console.log('✅ Portfolio Sharpe optimization test passed');
     });
 
@@ -153,7 +153,7 @@ describe('Advanced Modeling Framework Tests', () => {
           diversificationRatio: 2.156, // Higher diversification
           riskContributions: {
             'AAPL': 0.185,
-            'MSFT': 0.165, 
+            'MSFT': 0.165,
             'JNJ': 0.285,
             'JPM': 0.145,
             'PG': 0.220
@@ -168,7 +168,7 @@ describe('Advanced Modeling Framework Tests', () => {
       expect(mockMinVariance.success).toBe(true);
       expect(mockMinVariance.data.volatility).toBeLessThan(0.15);
       expect(mockMinVariance.data.diversificationRatio).toBeGreaterThan(2.0);
-      
+
       console.log('✅ Minimum variance optimization test passed');
     });
 
@@ -204,7 +204,7 @@ describe('Advanced Modeling Framework Tests', () => {
       expect(mockESGOptimization.data.esgMetrics.portfolioESGScore).toBeGreaterThan(7.0);
       expect(mockESGOptimization.data.esgMetrics.carbonIntensity).toBeLessThanOrEqual(150);
       expect(mockESGOptimization.data.sustainabilityMetrics.socialImpactScore).toBeGreaterThan(7.0);
-      
+
       console.log('✅ ESG-constrained optimization test passed');
     });
   });
@@ -266,7 +266,7 @@ describe('Advanced Modeling Framework Tests', () => {
       expect(mockScenarioAnalysis.success).toBe(true);
       expect(mockScenarioAnalysis.data.weightedAverage.outputs.portfolioReturn).toBeCloseTo(0.0675, 4);
       expect(mockScenarioAnalysis.data.sensitivityAnalysis.gdpGrowth).toBeGreaterThan(0.7);
-      
+
       console.log('✅ Multi-scenario analysis test passed');
     });
 
@@ -282,25 +282,25 @@ describe('Advanced Modeling Framework Tests', () => {
         success: true,
         data: {
           stressTestResults: {
-            'Market Crash': { 
-              portfolioImpact: -0.32, 
+            'Market Crash': {
+              portfolioImpact: -0.32,
               worstAssetImpact: -0.45,
               recoveryTime: 18, // months
-              tailRisk: 0.025 
+              tailRisk: 0.025
             },
-            'Interest Rate Shock': { 
-              portfolioImpact: -0.12, 
+            'Interest Rate Shock': {
+              portfolioImpact: -0.12,
               bondPortfolioImpact: -0.18,
-              durationRisk: 0.085 
+              durationRisk: 0.085
             },
-            'Currency Crisis': { 
-              portfolioImpact: -0.08, 
-              fxHedgeEffectiveness: 0.75 
+            'Currency Crisis': {
+              portfolioImpact: -0.08,
+              fxHedgeEffectiveness: 0.75
             },
-            'Liquidity Crisis': { 
-              portfolioImpact: -0.22, 
+            'Liquidity Crisis': {
+              portfolioImpact: -0.22,
               liquidityScore: 0.65,
-              fundingRisk: 0.12 
+              fundingRisk: 0.12
             }
           },
           overallRiskAssessment: {
@@ -320,7 +320,7 @@ describe('Advanced Modeling Framework Tests', () => {
       expect(mockStressResults.success).toBe(true);
       expect(mockStressResults.data.overallRiskAssessment.stressTestPassed).toBe(true);
       expect(mockStressResults.data.stressTestResults['Market Crash'].portfolioImpact).toBeLessThan(-0.25);
-      
+
       console.log('✅ Stress testing scenarios test passed');
     });
   });
@@ -351,7 +351,7 @@ describe('Advanced Modeling Framework Tests', () => {
           },
           elasticities: {
             discount_rate: -5.25,      // 1% increase → 5.25% decrease in value
-            terminal_growth: 4.80,     // 1% increase → 4.80% increase in value  
+            terminal_growth: 4.80,     // 1% increase → 4.80% increase in value
             revenue_growth: 3.45       // 1% increase → 3.45% increase in value
           },
           rangeAnalysis: {
@@ -366,7 +366,7 @@ describe('Advanced Modeling Framework Tests', () => {
       expect(mockSensitivityAnalysis.success).toBe(true);
       expect(Math.abs(mockSensitivityAnalysis.data.elasticities.discount_rate)).toBeGreaterThan(5.0);
       expect(mockSensitivityAnalysis.data.rangeAnalysis.mostSensitive).toBe('discount_rate');
-      
+
       console.log('✅ Single-variable sensitivity analysis test passed');
     });
 
@@ -385,12 +385,12 @@ describe('Advanced Modeling Framework Tests', () => {
       // Verify tornado diagram is sorted by impact (descending)
       const impacts = mockTornadoDiagram.data.map(item => item.impact);
       for (let i = 1; i < impacts.length; i++) {
-        expect(impacts[i]).toBeLessThanOrEqual(impacts[i-1]);
+        expect(impacts[i]).toBeLessThanOrEqual(impacts[i - 1]);
       }
 
       expect(mockTornadoDiagram.data[0].variable).toBe('discount_rate'); // Highest impact
       expect(mockTornadoDiagram.data[0].impact).toBeGreaterThan(700000000000);
-      
+
       console.log('✅ Tornado diagram analysis test passed');
     });
 
@@ -422,7 +422,7 @@ describe('Advanced Modeling Framework Tests', () => {
       expect(mockTwoVariableAnalysis.success).toBe(true);
       expect(mockTwoVariableAnalysis.data.discount_rate_vs_terminal_growth).toHaveLength(6);
       expect(mockTwoVariableAnalysis.data.interactionEffect.significance).toBeLessThan(0.05);
-      
+
       console.log('✅ Two-variable sensitivity analysis test passed');
     });
   });
@@ -458,7 +458,7 @@ describe('Advanced Modeling Framework Tests', () => {
       });
 
       expect(mockIntegration.data.crossValidation.overallConsistency).toBeGreaterThan(0.9);
-      
+
       console.log('✅ Integrated modeling framework test passed');
     });
   });

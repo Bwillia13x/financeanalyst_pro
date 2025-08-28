@@ -24,13 +24,13 @@ const validateRequest = (req, res, next) => {
 router.get('/fred/:seriesId',
   param('seriesId').isAlphanumeric().isLength({ min: 1, max: 20 }).toUpperCase(),
   query('limit').optional().isInt({ min: 1, max: 1000 }),
-  query('start_date').optional().isISO8601(),
-  query('end_date').optional().isISO8601(),
+  query('startDate').optional().isISO8601(),
+  query('endDate').optional().isISO8601(),
   validateRequest,
   async(req, res) => {
     try {
       const { seriesId } = req.params;
-      const { limit = 100, start_date, end_date } = req.query;
+      const { limit = 100, startDate, endDate } = req.query;
 
       const fredData = await apiService.makeApiRequest({
         service: 'fred',
@@ -39,8 +39,8 @@ router.get('/fred/:seriesId',
           series_id: seriesId,
           limit,
           sort_order: 'desc',
-          ...(start_date && { observation_start: start_date }),
-          ...(end_date && { observation_end: end_date })
+          ...(startDate && { observation_start: startDate }),
+          ...(endDate && { observation_end: endDate })
         },
         cacheType: 'economic',
         cacheTtl: 3600 // 1 hour cache

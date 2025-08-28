@@ -1,10 +1,18 @@
 import { useState, useMemo } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer
+} from 'recharts';
 
 import { Card } from '../ui/Card';
 import Input from '../ui/Input';
 import Select from '../ui/Select';
-
 
 const FixedIncomeAnalytics = () => {
   const [inputs, setInputs] = useState({
@@ -28,7 +36,13 @@ const FixedIncomeAnalytics = () => {
 
   // Bond pricing calculations
   const bondAnalytics = useMemo(() => {
-    const { faceValue: FV, couponRate: C, maturity: T, paymentFrequency: n, marketYield: Y } = inputs;
+    const {
+      faceValue: FV,
+      couponRate: C,
+      maturity: T,
+      paymentFrequency: n,
+      marketYield: Y
+    } = inputs;
 
     if (!FV || !T || !n) return null;
 
@@ -126,9 +140,7 @@ const FixedIncomeAnalytics = () => {
 
   const handleYieldCurveChange = (index, field, value) => {
     setYieldCurveInputs(prev =>
-      prev.map((item, i) =>
-        i === index ? { ...item, [field]: parseFloat(value) || 0 } : item
-      )
+      prev.map((item, i) => (i === index ? { ...item, [field]: parseFloat(value) || 0 } : item))
     );
   };
 
@@ -149,12 +161,15 @@ const FixedIncomeAnalytics = () => {
                   type="number"
                   step="1"
                   value={inputs.faceValue}
-                  onChange={(e) => handleInputChange('faceValue', e.target.value)}
+                  onChange={e => handleInputChange('faceValue', e.target.value)}
                 />
               </div>
 
               <div>
-                <label htmlFor="couponRate" className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="couponRate"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   Coupon Rate (%)
                 </label>
                 <Input
@@ -162,7 +177,7 @@ const FixedIncomeAnalytics = () => {
                   type="number"
                   step="0.001"
                   value={inputs.couponRate * 100}
-                  onChange={(e) => handleInputChange('couponRate', e.target.value / 100)}
+                  onChange={e => handleInputChange('couponRate', e.target.value / 100)}
                 />
               </div>
 
@@ -175,18 +190,21 @@ const FixedIncomeAnalytics = () => {
                   type="number"
                   step="0.25"
                   value={inputs.maturity}
-                  onChange={(e) => handleInputChange('maturity', e.target.value)}
+                  onChange={e => handleInputChange('maturity', e.target.value)}
                 />
               </div>
 
               <div>
-                <label htmlFor="paymentFrequency" className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="paymentFrequency"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   Payment Frequency
                 </label>
                 <Select
                   id="paymentFrequency"
                   value={inputs.paymentFrequency}
-                  onChange={(e) => handleInputChange('paymentFrequency', e.target.value)}
+                  onChange={e => handleInputChange('paymentFrequency', e.target.value)}
                   options={[
                     { value: 1, label: 'Annual' },
                     { value: 2, label: 'Semi-Annual' },
@@ -197,7 +215,10 @@ const FixedIncomeAnalytics = () => {
               </div>
 
               <div>
-                <label htmlFor="marketYield" className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="marketYield"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   Market Yield (%)
                 </label>
                 <Input
@@ -205,7 +226,7 @@ const FixedIncomeAnalytics = () => {
                   type="number"
                   step="0.001"
                   value={inputs.marketYield * 100}
-                  onChange={(e) => handleInputChange('marketYield', e.target.value / 100)}
+                  onChange={e => handleInputChange('marketYield', e.target.value / 100)}
                 />
               </div>
             </div>
@@ -289,15 +310,15 @@ const FixedIncomeAnalytics = () => {
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis
                     dataKey="yieldShock"
-                    tickFormatter={(value) => `${value > 0 ? '+' : ''}${value}`}
+                    tickFormatter={value => `${value > 0 ? '+' : ''}${value}`}
                   />
-                  <YAxis tickFormatter={(value) => `${value.toFixed(1)}%`} />
+                  <YAxis tickFormatter={value => `${value.toFixed(1)}%`} />
                   <Tooltip
                     formatter={(value, name) => [
                       `${value.toFixed(2)}%`,
                       name === 'priceChange1st' ? 'Duration Only' : 'Duration + Convexity'
                     ]}
-                    labelFormatter={(value) => `Yield Shock: ${value > 0 ? '+' : ''}${value} bps`}
+                    labelFormatter={value => `Yield Shock: ${value > 0 ? '+' : ''}${value} bps`}
                   />
                   <Legend />
                   <Line
@@ -326,16 +347,11 @@ const FixedIncomeAnalytics = () => {
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={yieldCurveInputs}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis
-                  dataKey="maturity"
-                  tickFormatter={(value) => `${value}Y`}
-                />
-                <YAxis
-                  tickFormatter={(value) => `${(value * 100).toFixed(1)}%`}
-                />
+                <XAxis dataKey="maturity" tickFormatter={value => `${value}Y`} />
+                <YAxis tickFormatter={value => `${(value * 100).toFixed(1)}%`} />
                 <Tooltip
-                  formatter={(value) => [`${(value * 100).toFixed(2)}%`, 'Yield']}
-                  labelFormatter={(value) => `Maturity: ${value} Years`}
+                  formatter={value => [`${(value * 100).toFixed(2)}%`, 'Yield']}
+                  labelFormatter={value => `Maturity: ${value} Years`}
                 />
                 <Line
                   type="monotone"
@@ -357,7 +373,7 @@ const FixedIncomeAnalytics = () => {
                       type="number"
                       step="0.001"
                       value={point.yield * 100}
-                      onChange={(e) => handleYieldCurveChange(index, 'yield', e.target.value / 100)}
+                      onChange={e => handleYieldCurveChange(index, 'yield', e.target.value / 100)}
                       className="text-xs h-8"
                     />
                     <span className="text-gray-500">%</span>

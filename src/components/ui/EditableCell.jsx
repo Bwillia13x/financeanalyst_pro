@@ -34,7 +34,7 @@ const EditableCell = ({
   const inputRef = useRef(null);
 
   // Format value for display
-  const formatValue = (val) => {
+  const formatValue = val => {
     if (!val && val !== 0) return '—';
 
     const numValue = typeof val === 'string' ? parseFloat(val) : val;
@@ -52,10 +52,12 @@ const EditableCell = ({
         // For large numbers, add suffix
         const absValue = Math.abs(numValue);
         if (absValue >= 1000000) {
-          return new Intl.NumberFormat(locale, {
-            minimumFractionDigits: 1,
-            maximumFractionDigits: 1
-          }).format(numValue / 1000000) + 'M';
+          return (
+            new Intl.NumberFormat(locale, {
+              minimumFractionDigits: 1,
+              maximumFractionDigits: 1
+            }).format(numValue / 1000000) + 'M'
+          );
         } else if (absValue >= 1000) {
           return new Intl.NumberFormat(locale, {
             minimumFractionDigits: 0,
@@ -84,20 +86,18 @@ const EditableCell = ({
   };
 
   // Parse display value to raw number
-  const parseValue = (val) => {
+  const parseValue = val => {
     if (!val) return 0;
 
     // Remove currency symbols, commas, and spaces
-    const cleanValue = val
-      .replace(/[^\d.-]/g, '')
-      .replace(/,/g, '');
+    const cleanValue = val.replace(/[^\d.-]/g, '').replace(/,/g, '');
 
     const numValue = parseFloat(cleanValue);
     return isNaN(numValue) ? 0 : numValue;
   };
 
   // Validate input
-  const validateInput = (val) => {
+  const validateInput = val => {
     const numValue = type === 'text' ? val : parseValue(val);
 
     if (type === 'text') return true;
@@ -169,7 +169,7 @@ const EditableCell = ({
   };
 
   // Handle input change
-  const handleChange = (e) => {
+  const handleChange = e => {
     const newValue = e.target.value;
 
     if (type !== 'text') {
@@ -183,7 +183,7 @@ const EditableCell = ({
   };
 
   // Handle key press
-  const handleKeyPress = (e) => {
+  const handleKeyPress = e => {
     if (e.key === 'Enter') {
       e.preventDefault();
       handleSave();
@@ -308,7 +308,7 @@ const EditableCell = ({
       role="button"
       tabIndex={0}
       onClick={handleEdit}
-      onKeyDown={(e) => {
+      onKeyDown={e => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
           handleEdit();
@@ -328,14 +328,10 @@ const EditableCell = ({
         className
       )}
     >
-      <span className={styles.text}>
-        {formatValue(value)}
-      </span>
+      <span className={styles.text}>{formatValue(value)}</span>
 
       {/* Formula indicator */}
-      {isFormula && (
-        <Calculator size={12} className="ml-2 text-blue-500/80" />
-      )}
+      {isFormula && <Calculator size={12} className="ml-2 text-blue-500/80" />}
 
       {/* Edit icon */}
       {!isFormula && !disabled && showEditIcon && (
@@ -350,9 +346,7 @@ const EditableCell = ({
       )}
 
       {/* Error indicator */}
-      {error && (
-        <AlertCircle size={12} className="ml-2 text-destructive" />
-      )}
+      {error && <AlertCircle size={12} className="ml-2 text-destructive" />}
 
       {/* Loading indicator */}
       {loading && (

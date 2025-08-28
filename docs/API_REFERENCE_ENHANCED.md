@@ -5,7 +5,7 @@ The FinanceAnalyst Pro API provides comprehensive financial modeling, data retri
 
 ## Base URL
 - Production: `https://api.financeanalyst-pro.com/v1`
-- Staging: `https://staging-api.financeanalyst-pro.com/v1` 
+- Staging: `https://staging-api.financeanalyst-pro.com/v1`
 - Development: `http://localhost:8080/api/v1`
 
 ## Authentication
@@ -381,6 +381,12 @@ X-RateLimit-Reset: 1724459652
 | 429 | `RATE_LIMIT_EXCEEDED` | Too many requests - retry after rate limit reset |
 | 500 | `INTERNAL_ERROR` | Server error - please retry or contact support |
 | 503 | `SERVICE_UNAVAILABLE` | Service temporarily unavailable |
+
+### Company Profile fetch behavior
+
+- The frontend `DataFetchingService.fetchCompanyProfile(ticker)` will return an object even if some fields are missing.
+- It throws with the exact message `Company profile not found` only when the upstream response is null, undefined, non-object, or an empty array after normalization.
+- Operation label used in retry/circuit-breaker logs: `Company profile fetch for {TICKER}`.
 
 ## SDK Integration
 

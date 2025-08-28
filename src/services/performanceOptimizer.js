@@ -257,21 +257,15 @@ class PerformanceOptimizer {
 
     switch (cache.config.strategy) {
       case 'lru': // Least Recently Used
-        toEvict = entries
-          .sort(([, a], [, b]) => a.lastAccessed - b.lastAccessed)
-          .slice(0, count);
+        toEvict = entries.sort(([, a], [, b]) => a.lastAccessed - b.lastAccessed).slice(0, count);
         break;
 
       case 'lfu': // Least Frequently Used
-        toEvict = entries
-          .sort(([, a], [, b]) => a.accessCount - b.accessCount)
-          .slice(0, count);
+        toEvict = entries.sort(([, a], [, b]) => a.accessCount - b.accessCount).slice(0, count);
         break;
 
       case 'fifo': // First In, First Out
-        toEvict = entries
-          .sort(([, a], [, b]) => a.createdAt - b.createdAt)
-          .slice(0, count);
+        toEvict = entries.sort(([, a], [, b]) => a.createdAt - b.createdAt).slice(0, count);
         break;
 
       default:
@@ -446,7 +440,7 @@ class PerformanceOptimizer {
   setupPerformanceObservers() {
     if ('PerformanceObserver' in window) {
       // Largest Contentful Paint
-      const lcpObserver = new PerformanceObserver((list) => {
+      const lcpObserver = new PerformanceObserver(list => {
         for (const entry of list.getEntries()) {
           this.recordMetric('lcp', entry.startTime);
         }
@@ -454,7 +448,7 @@ class PerformanceOptimizer {
       lcpObserver.observe({ entryTypes: ['largest-contentful-paint'] });
 
       // First Input Delay
-      const fidObserver = new PerformanceObserver((list) => {
+      const fidObserver = new PerformanceObserver(list => {
         for (const entry of list.getEntries()) {
           this.recordMetric('fid', entry.processingStart - entry.startTime);
         }
@@ -462,7 +456,7 @@ class PerformanceOptimizer {
       fidObserver.observe({ entryTypes: ['first-input'] });
 
       // Cumulative Layout Shift
-      const clsObserver = new PerformanceObserver((list) => {
+      const clsObserver = new PerformanceObserver(list => {
         let clsValue = 0;
         for (const entry of list.getEntries()) {
           if (!entry.hadRecentInput) {
@@ -512,8 +506,8 @@ class PerformanceOptimizer {
   }
 
   async waitForViewport(element) {
-    return new Promise((resolve) => {
-      const observer = new IntersectionObserver((entries) => {
+    return new Promise(resolve => {
+      const observer = new IntersectionObserver(entries => {
         if (entries[0].isIntersecting) {
           observer.disconnect();
           resolve();
@@ -524,7 +518,7 @@ class PerformanceOptimizer {
   }
 
   async waitForInteraction(element) {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       const handler = () => {
         element.removeEventListener('click', handler);
         element.removeEventListener('focus', handler);

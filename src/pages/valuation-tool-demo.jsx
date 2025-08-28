@@ -11,8 +11,8 @@ const ValuationToolDemo = () => {
       dcf: {
         revenue: 2000000,
         growth: 0.25,
-        margin: 0.30,
-        discount: 0.20
+        margin: 0.3,
+        discount: 0.2
       },
       lbo: {
         price: 15000000,
@@ -42,13 +42,13 @@ const ValuationToolDemo = () => {
       description: 'Medical practice with predictable patient volumes',
       dcf: {
         revenue: 3000000,
-        growth: 0.10,
-        margin: 0.20,
+        growth: 0.1,
+        margin: 0.2,
         discount: 0.15
       },
       lbo: {
         price: 18000000,
-        equity: 0.40,
+        equity: 0.4,
         exit: 10,
         irr: '18-25%'
       }
@@ -59,12 +59,14 @@ const ValuationToolDemo = () => {
     {
       icon: <Calculator className="w-6 h-6" />,
       title: 'DCF Analysis',
-      description: 'Complete discounted cash flow modeling with terminal value calculations and sensitivity analysis'
+      description:
+        'Complete discounted cash flow modeling with terminal value calculations and sensitivity analysis'
     },
     {
       icon: <TrendingUp className="w-6 h-6" />,
       title: 'LBO Modeling',
-      description: 'Leveraged buyout analysis with IRR and MOIC calculations for private equity scenarios'
+      description:
+        'Leveraged buyout analysis with IRR and MOIC calculations for private equity scenarios'
     },
     {
       icon: <CheckCircle className="w-6 h-6" />,
@@ -82,12 +84,10 @@ const ValuationToolDemo = () => {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-12"
         >
-          <h1 className="text-5xl font-bold text-gray-900 mb-6">
-            Business Valuation Tool
-          </h1>
+          <h1 className="text-5xl font-bold text-gray-900 mb-6">Business Valuation Tool</h1>
           <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-            Professional-grade DCF and LBO analysis for privately held companies.
-            Built for investment professionals, private equity firms, and corporate finance teams.
+            Professional-grade DCF and LBO analysis for privately held companies. Built for
+            investment professionals, private equity firms, and corporate finance teams.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
@@ -119,12 +119,8 @@ const ValuationToolDemo = () => {
               className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow"
             >
               <div className="text-blue-600 mb-4">{feature.icon}</div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                {feature.title}
-              </h3>
-              <p className="text-gray-600 leading-relaxed">
-                {feature.description}
-              </p>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">{feature.title}</h3>
+              <p className="text-gray-600 leading-relaxed">{feature.description}</p>
             </div>
           ))}
         </motion.div>
@@ -135,21 +131,15 @@ const ValuationToolDemo = () => {
           animate={{ opacity: 1, y: 0 }}
           className="mb-16"
         >
-          <h2 className="text-3xl font-bold text-gray-900 text-center mb-8">
-            Example Scenarios
-          </h2>
+          <h2 className="text-3xl font-bold text-gray-900 text-center mb-8">Example Scenarios</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {exampleScenarios.map((scenario, index) => (
               <div
                 key={index}
                 className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow"
               >
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                  {scenario.title}
-                </h3>
-                <p className="text-gray-600 mb-4">
-                  {scenario.description}
-                </p>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">{scenario.title}</h3>
+                <p className="text-gray-600 mb-4">{scenario.description}</p>
 
                 <div className="space-y-3">
                   <div className="border-t pt-3">
@@ -157,19 +147,27 @@ const ValuationToolDemo = () => {
                     <div className="grid grid-cols-2 gap-2 text-sm">
                       <div className="flex justify-between">
                         <span className="text-gray-600">Revenue:</span>
-                        <span className="font-medium">${(scenario.dcf.revenue / 1000000).toFixed(1)}M</span>
+                        <span className="font-medium">
+                          ${(scenario.dcf.revenue / 1000000).toFixed(1)}M
+                        </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600">Growth:</span>
-                        <span className="font-medium">{(scenario.dcf.growth * 100).toFixed(0)}%</span>
+                        <span className="font-medium">
+                          {(scenario.dcf.growth * 100).toFixed(0)}%
+                        </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600">Margin:</span>
-                        <span className="font-medium">{(scenario.dcf.margin * 100).toFixed(0)}%</span>
+                        <span className="font-medium">
+                          {(scenario.dcf.margin * 100).toFixed(0)}%
+                        </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600">Discount:</span>
-                        <span className="font-medium">{(scenario.dcf.discount * 100).toFixed(0)}%</span>
+                        <span className="font-medium">
+                          {(scenario.dcf.discount * 100).toFixed(0)}%
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -179,11 +177,15 @@ const ValuationToolDemo = () => {
                     <div className="grid grid-cols-2 gap-2 text-sm">
                       <div className="flex justify-between">
                         <span className="text-gray-600">Price:</span>
-                        <span className="font-medium">${(scenario.lbo.price / 1000000).toFixed(0)}M</span>
+                        <span className="font-medium">
+                          ${(scenario.lbo.price / 1000000).toFixed(0)}M
+                        </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600">Equity:</span>
-                        <span className="font-medium">{(scenario.lbo.equity * 100).toFixed(0)}%</span>
+                        <span className="font-medium">
+                          {(scenario.lbo.equity * 100).toFixed(0)}%
+                        </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600">Exit Multiple:</span>
@@ -218,8 +220,8 @@ const ValuationToolDemo = () => {
                 Discounted Cash Flow (DCF)
               </h3>
               <p className="text-gray-600 mb-4">
-                DCF analysis estimates the value of a business based on its expected future cash flows,
-                discounted back to present value using a risk-adjusted rate.
+                DCF analysis estimates the value of a business based on its expected future cash
+                flows, discounted back to present value using a risk-adjusted rate.
               </p>
               <ul className="space-y-2 text-gray-600">
                 <li className="flex items-start">
@@ -279,11 +281,10 @@ const ValuationToolDemo = () => {
           className="text-center"
         >
           <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl p-8 text-white">
-            <h2 className="text-3xl font-bold mb-4">
-              Ready to Start Your Valuation?
-            </h2>
+            <h2 className="text-3xl font-bold mb-4">Ready to Start Your Valuation?</h2>
             <p className="text-xl mb-6 opacity-90">
-              Access professional-grade financial modeling tools designed for private company analysis.
+              Access professional-grade financial modeling tools designed for private company
+              analysis.
             </p>
             <Link
               to="/valuation-tool"

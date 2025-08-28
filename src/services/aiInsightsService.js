@@ -22,43 +22,43 @@ class AIInsightsService {
   initializeInsightGenerators() {
     // Revenue Analysis
     this.insightGenerators.set('revenue', {
-      analyze: (data) => this.analyzeRevenueTrends(data),
-      suggest: (data) => this.suggestRevenueImprovements(data),
+      analyze: data => this.analyzeRevenueTrends(data),
+      suggest: data => this.suggestRevenueImprovements(data),
       priority: 'high'
     });
 
     // Profitability Analysis
     this.insightGenerators.set('profitability', {
-      analyze: (data) => this.analyzeProfitability(data),
-      suggest: (data) => this.suggestProfitabilityEnhancements(data),
+      analyze: data => this.analyzeProfitability(data),
+      suggest: data => this.suggestProfitabilityEnhancements(data),
       priority: 'high'
     });
 
     // Valuation Analysis
     this.insightGenerators.set('valuation', {
-      analyze: (data) => this.analyzeValuationMetrics(data),
-      suggest: (data) => this.suggestValuationAdjustments(data),
+      analyze: data => this.analyzeValuationMetrics(data),
+      suggest: data => this.suggestValuationAdjustments(data),
       priority: 'medium'
     });
 
     // Risk Assessment
     this.insightGenerators.set('risk', {
-      analyze: (data) => this.assessFinancialRisks(data),
-      suggest: (data) => this.suggestRiskMitigation(data),
+      analyze: data => this.assessFinancialRisks(data),
+      suggest: data => this.suggestRiskMitigation(data),
       priority: 'high'
     });
 
     // Growth Analysis
     this.insightGenerators.set('growth', {
-      analyze: (data) => this.analyzeGrowthPatterns(data),
-      suggest: (data) => this.suggestGrowthStrategies(data),
+      analyze: data => this.analyzeGrowthPatterns(data),
+      suggest: data => this.suggestGrowthStrategies(data),
       priority: 'medium'
     });
 
     // Efficiency Analysis
     this.insightGenerators.set('efficiency', {
-      analyze: (data) => this.analyzeOperationalEfficiency(data),
-      suggest: (data) => this.suggestEfficiencyImprovements(data),
+      analyze: data => this.analyzeOperationalEfficiency(data),
+      suggest: data => this.suggestEfficiencyImprovements(data),
       priority: 'medium'
     });
   }
@@ -197,7 +197,9 @@ class AIInsightsService {
     }
 
     if (seasonality.isDetected) {
-      insights.push(`Revenue shows ${seasonality.pattern} seasonal pattern - plan cash flow accordingly`);
+      insights.push(
+        `Revenue shows ${seasonality.pattern} seasonal pattern - plan cash flow accordingly`
+      );
     }
 
     return {
@@ -298,7 +300,12 @@ class AIInsightsService {
     const marketRisk = this.assessMarketRisk(data);
 
     const insights = [];
-    const overallRisk = Math.max(liquidityRisk.score, leverageRisk.score, concentrationRisk.score, marketRisk.score);
+    const overallRisk = Math.max(
+      liquidityRisk.score,
+      leverageRisk.score,
+      concentrationRisk.score,
+      marketRisk.score
+    );
 
     if (overallRisk > 0.7) {
       insights.push('High risk profile requires careful monitoring and mitigation strategies');
@@ -388,7 +395,9 @@ class AIInsightsService {
    */
   suggestRevenueImprovements(data) {
     const suggestions = [];
-    const currentGrowth = this.calculateGrowthRate(this.extractTimeSeriesData(data, 'totalRevenue'));
+    const currentGrowth = this.calculateGrowthRate(
+      this.extractTimeSeriesData(data, 'totalRevenue')
+    );
 
     if (currentGrowth < 5) {
       suggestions.push({
@@ -420,6 +429,219 @@ class AIInsightsService {
       effort: 'high',
       timeframe: '12-24 months'
     });
+
+    return suggestions;
+  }
+
+  /**
+   * Suggest profitability enhancements
+   */
+  suggestProfitabilityEnhancements(data) {
+    const suggestions = [];
+    const grossMargin = this.calculateMargin(data, 'gross');
+    const operatingMargin = this.calculateMargin(data, 'operating');
+    const netMargin = this.calculateMargin(data, 'net');
+
+    // Cost reduction opportunities
+    if (grossMargin < 60) {
+      suggestions.push({
+        category: 'cost_reduction',
+        title: 'Optimize Cost of Goods Sold',
+        description:
+          'Review supplier contracts, negotiate better terms, or explore alternative sourcing',
+        impact: 'high',
+        effort: 'medium',
+        timeframe: '3-6 months',
+        potentialImprovement: `${Math.round((60 - grossMargin) * 0.5)}% margin improvement possible`
+      });
+    }
+
+    // Operating expense optimization
+    if (operatingMargin < 15) {
+      suggestions.push({
+        category: 'efficiency',
+        title: 'Streamline Operating Expenses',
+        description:
+          'Implement process automation, reduce overhead, and optimize workforce allocation',
+        impact: 'high',
+        effort: 'high',
+        timeframe: '6-12 months',
+        potentialImprovement: '5-10% reduction in operating expenses'
+      });
+    }
+
+    // Pricing strategy improvements
+    if (netMargin < 10) {
+      suggestions.push({
+        category: 'pricing_strategy',
+        title: 'Implement Value-Based Pricing',
+        description: 'Shift from cost-plus to value-based pricing to capture more margin',
+        impact: 'medium',
+        effort: 'low',
+        timeframe: '2-4 months',
+        potentialImprovement: '3-5% improvement in net margins'
+      });
+    }
+
+    // Asset utilization
+    const assetTurnover = this.calculateAssetTurnover(data);
+    if (assetTurnover < 1.2) {
+      suggestions.push({
+        category: 'asset_optimization',
+        title: 'Improve Asset Utilization',
+        description:
+          'Optimize inventory levels, improve receivables collection, and maximize fixed asset usage',
+        impact: 'medium',
+        effort: 'medium',
+        timeframe: '4-8 months',
+        potentialImprovement: `${Math.round((1.2 - assetTurnover) * 50)}% improvement in asset turnover`
+      });
+    }
+
+    return suggestions;
+  }
+
+  /**
+   * Suggest valuation adjustments
+   */
+  suggestValuationAdjustments(data) {
+    const suggestions = [];
+    const peRatio = this.calculatePERatio(data);
+    const pbRatio = this.calculatePBRatio(data);
+
+    if (peRatio > 30) {
+      suggestions.push({
+        category: 'valuation_concern',
+        title: 'High P/E Ratio Management',
+        description:
+          'Monitor growth expectations and consider strategies to meet market projections',
+        impact: 'medium',
+        effort: 'low',
+        timeframe: 'Ongoing'
+      });
+    } else if (peRatio < 15) {
+      suggestions.push({
+        category: 'valuation_opportunity',
+        title: 'Potential Undervaluation',
+        description:
+          'Consider if current valuation reflects true business potential and growth prospects',
+        impact: 'medium',
+        effort: 'low',
+        timeframe: '1-3 months'
+      });
+    }
+
+    if (pbRatio > 4) {
+      suggestions.push({
+        category: 'valuation_concern',
+        title: 'High Price-to-Book Ratio',
+        description: 'Evaluate if premium valuation is justified by future growth prospects',
+        impact: 'medium',
+        effort: 'low',
+        timeframe: 'Ongoing'
+      });
+    }
+
+    return suggestions;
+  }
+
+  /**
+   * Suggest risk mitigation strategies
+   */
+  suggestRiskMitigation(data) {
+    const suggestions = [];
+    const liquidityRisk = this.assessLiquidityRisk(data);
+    const leverageRisk = this.assessLeverageRisk(data);
+
+    if (liquidityRisk.score > 0.3) {
+      suggestions.push({
+        category: 'liquidity_management',
+        title: 'Strengthen Liquidity Position',
+        description: 'Build cash reserves, optimize working capital, and establish credit lines',
+        impact: 'high',
+        effort: 'medium',
+        timeframe: '3-6 months'
+      });
+    }
+
+    if (leverageRisk.score > 0.3) {
+      suggestions.push({
+        category: 'debt_management',
+        title: 'Optimize Capital Structure',
+        description:
+          'Consider debt refinancing, equity issuance, or asset sales to reduce leverage',
+        impact: 'high',
+        effort: 'high',
+        timeframe: '6-12 months'
+      });
+    }
+
+    return suggestions;
+  }
+
+  /**
+   * Suggest growth strategies
+   */
+  suggestGrowthStrategies(data) {
+    const suggestions = [];
+    const revenueGrowth = this.analyzeRevenueGrowth(data);
+    const profitGrowth = this.analyzeProfitGrowth(data);
+
+    if (revenueGrowth < 8) {
+      suggestions.push({
+        category: 'organic_growth',
+        title: 'Accelerate Organic Growth',
+        description: 'Invest in marketing, sales expansion, and product development',
+        impact: 'high',
+        effort: 'high',
+        timeframe: '12-24 months'
+      });
+    }
+
+    if (profitGrowth < revenueGrowth - 2) {
+      suggestions.push({
+        category: 'profitability_focus',
+        title: 'Balance Growth with Profitability',
+        description:
+          'Ensure profit growth keeps pace with revenue expansion through efficient scaling',
+        impact: 'medium',
+        effort: 'medium',
+        timeframe: '6-12 months'
+      });
+    }
+
+    return suggestions;
+  }
+
+  /**
+   * Suggest efficiency improvements
+   */
+  suggestEfficiencyImprovements(data) {
+    const suggestions = [];
+    const assetTurnover = this.calculateAssetTurnover(data);
+    const inventoryTurnover = this.calculateInventoryTurnover(data);
+
+    if (assetTurnover < 1.5) {
+      suggestions.push({
+        category: 'asset_utilization',
+        title: 'Maximize Asset Efficiency',
+        description: 'Implement lean manufacturing principles and optimize production processes',
+        impact: 'medium',
+        effort: 'high',
+        timeframe: '6-18 months'
+      });
+    }
+
+    if (inventoryTurnover < 4) {
+      suggestions.push({
+        category: 'inventory_management',
+        title: 'Optimize Inventory Levels',
+        description: 'Implement just-in-time inventory systems and improve demand forecasting',
+        impact: 'medium',
+        effort: 'medium',
+        timeframe: '3-9 months'
+      });
+    }
 
     return suggestions;
   }
@@ -518,7 +740,8 @@ class AIInsightsService {
     }
 
     const avgDiff = diffs.reduce((sum, diff) => sum + diff, 0) / diffs.length;
-    const variance = diffs.reduce((sum, diff) => sum + Math.pow(diff - avgDiff, 2), 0) / diffs.length;
+    const variance =
+      diffs.reduce((sum, diff) => sum + Math.pow(diff - avgDiff, 2), 0) / diffs.length;
 
     if (variance < Math.abs(avgDiff) * 0.1) {
       return avgDiff > 0 ? 'steady_growth' : 'steady_decline';
@@ -565,9 +788,9 @@ class AIInsightsService {
     // Simplified DCF estimation
     const fcf = this.getLatestPeriod(data)?.freeCashFlow || 0;
     const growthRate = 0.05; // Assume 5% terminal growth
-    const discountRate = 0.10; // Assume 10% WACC
+    const discountRate = 0.1; // Assume 10% WACC
 
-    return fcf > 0 ? fcf * (1 + growthRate) / (discountRate - growthRate) : 0;
+    return fcf > 0 ? (fcf * (1 + growthRate)) / (discountRate - growthRate) : 0;
   }
 
   calculatePERatio(data) {
@@ -590,7 +813,8 @@ class AIInsightsService {
 
   calculateEVEBITDA(data) {
     const ebitda = this.getLatestPeriod(data)?.ebitda || 0;
-    const marketCap = (data.assumptions?.sharesOutstanding || 1000000) * (data.assumptions?.sharePrice || 50);
+    const marketCap =
+      (data.assumptions?.sharesOutstanding || 1000000) * (data.assumptions?.sharePrice || 50);
     const debt = this.getLatestPeriod(data)?.totalDebt || 0;
     const cash = this.getLatestPeriod(data)?.cash || 0;
 
@@ -702,7 +926,8 @@ class AIInsightsService {
   }
 
   compareToIndustry(analyses, industry) {
-    const benchmarks = this.industryBenchmarks.get(industry) || this.industryBenchmarks.get('technology');
+    const benchmarks =
+      this.industryBenchmarks.get(industry) || this.industryBenchmarks.get('technology');
 
     return {
       industry,

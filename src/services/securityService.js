@@ -201,17 +201,17 @@ class SecurityService {
    */
   setupSecurityEventListeners() {
     // Login attempts
-    window.addEventListener('login-attempt', (event) => {
+    window.addEventListener('login-attempt', event => {
       this.logSecurityEvent('login_attempt', event.detail);
     });
 
     // Data access
-    window.addEventListener('data-access', (event) => {
+    window.addEventListener('data-access', event => {
       this.logSecurityEvent('data_access', event.detail);
     });
 
     // Configuration changes
-    window.addEventListener('config-change', (event) => {
+    window.addEventListener('config-change', event => {
       this.logSecurityEvent('config_change', event.detail);
     });
   }
@@ -229,7 +229,10 @@ class SecurityService {
 
     try {
       // Validate credentials
-      const isValidPassword = await this.validatePassword(credentials.username, credentials.password);
+      const isValidPassword = await this.validatePassword(
+        credentials.username,
+        credentials.password
+      );
       if (!isValidPassword) {
         attempt.reason = 'invalid_credentials';
         this.logSecurityEvent('login_failed', attempt);
@@ -260,7 +263,6 @@ class SecurityService {
 
       this.logSecurityEvent('login_success', attempt);
       return session;
-
     } catch (error) {
       this.incrementFailedAttempts(credentials.username);
       throw error;
@@ -467,7 +469,8 @@ class SecurityService {
       // Check audit trail requirement
       if (rule.requirements.auditTrail) {
         const auditCoverage = this.checkAuditTrailCoverage();
-        if (auditCoverage < 0.95) { // 95% coverage required
+        if (auditCoverage < 0.95) {
+          // 95% coverage required
           compliance.status = 'non-compliant';
           compliance.issues.push('Insufficient audit trail coverage');
           compliance.recommendations.push('Ensure all critical actions are logged');
@@ -576,9 +579,23 @@ class SecurityService {
     return ['read', 'write', 'analyze'];
   }
 
-  setSecureSessionCookie(sessionId) {
-    const policy = this.securityPolicies.get('session');
-    document.cookie = `session=${sessionId}; secure; httponly; samesite=strict; max-age=${policy.maxDuration / 1000}`;
+  setSecureSessionCookie(_sessionId) {
+    // HttpOnly cannot be set from client-side JavaScript. Cookies that must be protected
+    // should be issued by the server with the HttpOnly flag. This client method acts as a
+    // no-op to avoid a false sense of security and logs guidance for integration.
+    try {
+      const policy = this.securityPolicies.get('session');
+      console.warn(
+        'setSecureSessionCookie must be set by the server with HttpOnly. ' +
+          'Avoid storing session identifiers in client-accessible storage.'
+      );
+      // Optional: set a short-lived, non-sensitive hint cookie without HttpOnly for UX-only purposes.
+      // Do NOT store secrets/tokens here.
+      const maxAge = Math.max(1, Math.floor((policy?.maxDuration || 0) / 1000));
+      document.cookie = `fa_session_present=1; path=/; secure; samesite=strict; max-age=${maxAge}`;
+    } catch (e) {
+      console.warn('setSecureSessionCookie skipped:', e);
+    }
   }
 
   terminateSession(sessionId, reason) {

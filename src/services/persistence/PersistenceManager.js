@@ -73,7 +73,6 @@ export class PersistenceManager {
         storageQuota: this.storageQuota,
         availableStorage: await this.getAvailableStorage()
       };
-
     } catch (error) {
       console.error('❌ Failed to initialize Persistence Manager:', error);
       throw new Error(`Persistence initialization failed: ${error.message}`);
@@ -117,7 +116,6 @@ export class PersistenceManager {
       this.notifyListeners('store', { key, storage, metadata });
 
       return result;
-
     } catch (error) {
       console.error(`Failed to store data for key "${key}":`, error);
       throw error;
@@ -130,10 +128,7 @@ export class PersistenceManager {
   async retrieve(key, options = {}) {
     await this.ensureInitialized();
 
-    const {
-      storage = this.determineStorageLayer(key),
-      decrypt = false
-    } = options;
+    const { storage = this.determineStorageLayer(key), decrypt = false } = options;
 
     try {
       let result;
@@ -144,8 +139,9 @@ export class PersistenceManager {
         result = await this.indexedDB.retrieve(key);
       } else {
         // Try both storage layers
-        result = await this.localStorage.retrieve(key, { decrypt }) ||
-                 await this.indexedDB.retrieve(key);
+        result =
+          (await this.localStorage.retrieve(key, { decrypt })) ||
+          (await this.indexedDB.retrieve(key));
       }
 
       // Check TTL if applicable
@@ -160,7 +156,6 @@ export class PersistenceManager {
       }
 
       return result ? result.data || result : null;
-
     } catch (error) {
       console.error(`Failed to retrieve data for key "${key}":`, error);
       return null;
@@ -192,7 +187,6 @@ export class PersistenceManager {
       this.notifyListeners('remove', { key, storage });
 
       return true;
-
     } catch (error) {
       console.error(`Failed to remove data for key "${key}":`, error);
       throw error;
@@ -228,7 +222,6 @@ export class PersistenceManager {
       this.notifyListeners('clear', { storage });
 
       return true;
-
     } catch (error) {
       console.error('Failed to clear storage:', error);
       throw error;
@@ -260,7 +253,6 @@ export class PersistenceManager {
           usagePercentage: this.storageQuota ? (totalUsed / this.storageQuota) * 100 : 0
         }
       };
-
     } catch (error) {
       console.error('Failed to get storage stats:', error);
       return null;
@@ -273,11 +265,7 @@ export class PersistenceManager {
   async exportData(options = {}) {
     await this.ensureInitialized();
 
-    const {
-      format = 'json',
-      includeMetadata = true,
-      _compress = false
-    } = options;
+    const { format = 'json', includeMetadata = true, _compress = false } = options;
 
     try {
       const [localStorageData, indexedDBData] = await Promise.all([
@@ -305,7 +293,6 @@ export class PersistenceManager {
         size: JSON.stringify(exportData).length,
         format
       };
-
     } catch (error) {
       console.error('Failed to export data:', error);
       throw error;
@@ -318,11 +305,7 @@ export class PersistenceManager {
   async importData(importData, options = {}) {
     await this.ensureInitialized();
 
-    const {
-      overwrite = false,
-      validate = true,
-      backup = true
-    } = options;
+    const { overwrite = false, validate = true, backup = true } = options;
 
     try {
       // Validate import data
@@ -359,7 +342,6 @@ export class PersistenceManager {
           indexedDB: Object.keys(importData.indexedDB || {}).length
         }
       };
-
     } catch (error) {
       console.error('Failed to import data:', error);
       throw error;
@@ -436,10 +418,9 @@ export class PersistenceManager {
   }
 
   validateImportData(data) {
-    return data &&
-           typeof data === 'object' &&
-           data.version &&
-           (data.localStorage || data.indexedDB);
+    return (
+      data && typeof data === 'object' && data.version && (data.localStorage || data.indexedDB)
+    );
   }
 
   notifyListeners(event, data) {

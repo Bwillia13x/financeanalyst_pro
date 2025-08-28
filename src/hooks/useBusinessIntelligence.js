@@ -26,7 +26,7 @@ export function useBusinessIntelligence(config = {}) {
   useEffect(() => {
     if (initialized.current) return;
 
-    const initializeService = async() => {
+    const initializeService = async () => {
       try {
         setIsLoading(true);
         setError(null);
@@ -66,15 +66,15 @@ export function useBusinessIntelligence(config = {}) {
   useEffect(() => {
     if (!isInitialized) return;
 
-    const handleAutomatedReport = (report) => {
+    const handleAutomatedReport = report => {
       setReports(prev => [report, ...prev.slice(0, 19)]); // Keep last 20 reports
     };
 
-    const handleIntelligentInsights = (newInsights) => {
+    const handleIntelligentInsights = newInsights => {
       setInsights(prev => [newInsights, ...prev.slice(0, 9)]); // Keep last 10 insights
     };
 
-    const handleAnalyticsUpdate = (data) => {
+    const handleAnalyticsUpdate = data => {
       setAnalytics(prev => ({ ...prev, ...data }));
     };
 
@@ -84,7 +84,7 @@ export function useBusinessIntelligence(config = {}) {
     businessIntelligenceService.on('analyticsUpdate', handleAnalyticsUpdate);
 
     // Load initial data
-    const loadInitialData = async() => {
+    const loadInitialData = async () => {
       try {
         const currentAnalytics = businessIntelligenceService.getCurrentAnalytics();
         setAnalytics(currentAnalytics);
@@ -107,55 +107,82 @@ export function useBusinessIntelligence(config = {}) {
   }, [isInitialized]);
 
   // Track page view
-  const trackPageView = useCallback((page, metadata = {}) => {
-    if (isInitialized && businessIntelligenceService.trackPageView) {
-      businessIntelligenceService.trackPageView(page, metadata);
-    }
-  }, [isInitialized]);
+  const trackPageView = useCallback(
+    (page, metadata = {}) => {
+      if (isInitialized && businessIntelligenceService.trackPageView) {
+        businessIntelligenceService.trackPageView(page, metadata);
+      }
+    },
+    [isInitialized]
+  );
 
   // Track feature usage
-  const trackFeatureUsage = useCallback((feature, action, metadata = {}) => {
-    if (isInitialized && businessIntelligenceService.trackFeatureUsage) {
-      businessIntelligenceService.trackFeatureUsage(feature, action, metadata);
-    }
-  }, [isInitialized]);
+  const trackFeatureUsage = useCallback(
+    (feature, action, metadata = {}) => {
+      if (isInitialized && businessIntelligenceService.trackFeatureUsage) {
+        businessIntelligenceService.trackFeatureUsage(feature, action, metadata);
+      }
+    },
+    [isInitialized]
+  );
 
   // Track user interaction
-  const trackUserInteraction = useCallback((interaction, target, metadata = {}) => {
-    if (isInitialized && businessIntelligenceService.trackUserInteraction) {
-      businessIntelligenceService.trackUserInteraction(interaction, target, metadata);
-    }
-  }, [isInitialized]);
+  const trackUserInteraction = useCallback(
+    (interaction, target, metadata = {}) => {
+      if (isInitialized && businessIntelligenceService.trackUserInteraction) {
+        businessIntelligenceService.trackUserInteraction(interaction, target, metadata);
+      }
+    },
+    [isInitialized]
+  );
+
+  // Track user action (explicit, high-level actions)
+  const trackUserAction = useCallback(
+    (action, target, metadata = {}) => {
+      if (isInitialized && businessIntelligenceService.trackUserAction) {
+        businessIntelligenceService.trackUserAction(action, target, metadata);
+      }
+    },
+    [isInitialized]
+  );
 
   // Generate report on demand
-  const generateReport = useCallback(async() => {
+  const generateReport = useCallback(async () => {
     if (!isInitialized) return null;
 
     try {
       setIsLoading(true);
-      const report = await businessIntelligenceService.generateAutomatedReports();
+      const report = await (typeof businessIntelligenceService.generateReport === 'function'
+        ? businessIntelligenceService.generateReport()
+        : businessIntelligenceService.generateAutomatedReports());
       return report;
     } catch (err) {
       setError(err.message);
-      throw err;
+      return null;
     } finally {
       setIsLoading(false);
     }
   }, [isInitialized]);
 
   // Get historical trends
-  const getHistoricalTrends = useCallback((metric, period = '30d') => {
-    if (!isInitialized) return [];
+  const getHistoricalTrends = useCallback(
+    (metric, period = '30d') => {
+      if (!isInitialized) return [];
 
-    return businessIntelligenceService.getHistoricalTrends(metric, period);
-  }, [isInitialized]);
+      return businessIntelligenceService.getHistoricalTrends(metric, period);
+    },
+    [isInitialized]
+  );
 
   // Export data
-  const exportData = useCallback((format = 'json', filters = {}) => {
-    if (!isInitialized) return null;
+  const exportData = useCallback(
+    (format = 'json', filters = {}) => {
+      if (!isInitialized) return null;
 
-    return businessIntelligenceService.exportData(format, filters);
-  }, [isInitialized]);
+      return businessIntelligenceService.exportData(format, filters);
+    },
+    [isInitialized]
+  );
 
   return {
     isInitialized,
@@ -168,6 +195,7 @@ export function useBusinessIntelligence(config = {}) {
     trackPageView,
     trackFeatureUsage,
     trackUserInteraction,
+    trackUserAction,
     generateReport,
     getHistoricalTrends,
     exportData
@@ -189,7 +217,7 @@ export function useUsageAnalytics() {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const loadUsageData = async() => {
+    const loadUsageData = async () => {
       setIsLoading(true);
       try {
         // Simulate loading usage analytics
@@ -198,11 +226,11 @@ export function useUsageAnalytics() {
           users: 892,
           pageViews: 5673,
           features: {
-            'portfolio_analysis': 456,
-            'risk_modeling': 324,
-            'market_data': 789,
-            'ai_analytics': 234,
-            'collaboration': 123
+            portfolio_analysis: 456,
+            risk_modeling: 324,
+            market_data: 789,
+            ai_analytics: 234,
+            collaboration: 123
           },
           engagement: {
             avgSessionDuration: 1856, // seconds
@@ -248,7 +276,7 @@ export function usePerformanceAnalytics() {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const loadPerformanceData = async() => {
+    const loadPerformanceData = async () => {
       setIsLoading(true);
       try {
         // Simulate loading performance analytics
@@ -314,7 +342,7 @@ export function useMarketIntelligence() {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const loadMarketIntelligence = async() => {
+    const loadMarketIntelligence = async () => {
       setIsLoading(true);
       try {
         // Simulate loading market intelligence
@@ -389,7 +417,7 @@ export function useUserBehaviorAnalytics() {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const loadBehaviorData = async() => {
+    const loadBehaviorData = async () => {
       setIsLoading(true);
       try {
         // Simulate loading behavior analytics
@@ -421,15 +449,20 @@ export function useUserBehaviorAnalytics() {
             { step: 'model_creation', rate: 0.15 }
           ],
           conversionFunnels: {
-            'trial_to_paid': 0.12,
-            'visitor_to_signup': 0.08,
-            'signup_to_active': 0.67
+            trial_to_paid: 0.12,
+            visitor_to_signup: 0.08,
+            signup_to_active: 0.67
           }
         };
 
         const mockChurnRisk = [
           { userId: 'user_123', risk: 0.78, lastActive: '2 weeks ago', reason: 'low_engagement' },
-          { userId: 'user_456', risk: 0.65, lastActive: '1 week ago', reason: 'feature_abandonment' },
+          {
+            userId: 'user_456',
+            risk: 0.65,
+            lastActive: '1 week ago',
+            reason: 'feature_abandonment'
+          },
           { userId: 'user_789', risk: 0.72, lastActive: '10 days ago', reason: 'support_issues' }
         ];
 
@@ -466,7 +499,7 @@ export function useAutomatedInsights() {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const loadInsights = async() => {
+    const loadInsights = async () => {
       setIsLoading(true);
       try {
         // Simulate loading automated insights

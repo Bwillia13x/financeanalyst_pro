@@ -36,7 +36,10 @@ class FinancialDataStorage {
 
       await this.storage.setItem('dcfModel', symbol.toUpperCase(), dcfData);
 
-      apiLogger.log('INFO', 'DCF model saved', { symbol, valuation: dcfData.valuation.intrinsicValue });
+      apiLogger.log('INFO', 'DCF model saved', {
+        symbol,
+        valuation: dcfData.valuation.intrinsicValue
+      });
       return true;
     } catch (error) {
       apiLogger.log('ERROR', 'Failed to save DCF model', { symbol, error: error.message });
@@ -45,6 +48,12 @@ class FinancialDataStorage {
   }
 
   async getDCFModel(symbol) {
+    // Handle null, undefined, empty string, or non-string symbol input
+    if (!symbol || typeof symbol !== 'string' || symbol.trim() === '') {
+      apiLogger.log('DEBUG', 'Invalid symbol provided for DCF model retrieval', { symbol });
+      return null;
+    }
+
     try {
       const data = await this.storage.getItem('dcfModel', symbol.toUpperCase());
       if (data) {
@@ -147,7 +156,10 @@ class FinancialDataStorage {
       });
       return true;
     } catch (error) {
-      apiLogger.log('ERROR', 'Failed to save Monte Carlo results', { modelId, error: error.message });
+      apiLogger.log('ERROR', 'Failed to save Monte Carlo results', {
+        modelId,
+        error: error.message
+      });
       throw error;
     }
   }
@@ -160,7 +172,10 @@ class FinancialDataStorage {
       }
       return data;
     } catch (error) {
-      apiLogger.log('ERROR', 'Failed to retrieve Monte Carlo results', { modelId, error: error.message });
+      apiLogger.log('ERROR', 'Failed to retrieve Monte Carlo results', {
+        modelId,
+        error: error.message
+      });
       return null;
     }
   }
@@ -183,7 +198,7 @@ class FinancialDataStorage {
         data: marketData,
         timestamp: Date.now(),
         source: marketData.source || 'unknown',
-        expiresAt: Date.now() + (ttlMinutes * 60 * 1000)
+        expiresAt: Date.now() + ttlMinutes * 60 * 1000
       };
 
       await this.storage.setItem('marketData', symbol.toUpperCase(), data);
@@ -441,14 +456,30 @@ class FinancialDataStorage {
    * Clean up expired market data
    */
   async cleanupExpiredMarketData() {
-    const marketDataKeys = this.storage.listItems('marketData');
+    const marketDataKeys = await this.storage.listItems('marketData');
     let cleanedCount = 0;
 
+    // Ensure marketDataKeys is an array and iterable
+    if (!Array.isArray(marketDataKeys)) {
+      apiLogger.log('WARN', 'Market data keys not available or not iterable', {
+        keysType: typeof marketDataKeys,
+        keysValue: marketDataKeys
+      });
+      return 0;
+    }
+
     for (const symbol of marketDataKeys) {
-      const data = await this.storage.getItem('marketData', symbol);
-      if (data && data.expiresAt <= Date.now()) {
-        await this.deleteMarketData(symbol);
-        cleanedCount++;
+      try {
+        const data = await this.storage.getItem('marketData', symbol);
+        if (data && data.expiresAt && data.expiresAt <= Date.now()) {
+          await this.deleteMarketData(symbol);
+          cleanedCount++;
+        }
+      } catch (error) {
+        apiLogger.log('ERROR', 'Failed to process market data during cleanup', {
+          symbol,
+          error: error.message
+        });
       }
     }
 

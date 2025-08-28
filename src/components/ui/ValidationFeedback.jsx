@@ -1,5 +1,5 @@
 import { AlertCircle, CheckCircle, AlertTriangle, Info, X } from 'lucide-react';
-import React from 'react';
+import { useState } from 'react';
 
 import { cn } from '../../utils/cn';
 
@@ -120,24 +120,13 @@ const ValidationFeedback = ({
     >
       {/* Icon */}
       {showIcon && Icon && (
-        <Icon
-          size={config.icon}
-          className={cn('flex-shrink-0 mt-0.5', styles.icon)}
-        />
+        <Icon size={config.icon} className={cn('flex-shrink-0 mt-0.5', styles.icon)} />
       )}
 
       {/* Content */}
       <div className="flex-1 min-w-0">
-        {message && (
-          <p className={cn(config.text, styles.text, 'font-medium')}>
-            {message}
-          </p>
-        )}
-        {children && (
-          <div className={cn(config.text, styles.text)}>
-            {children}
-          </div>
-        )}
+        {message && <p className={cn(config.text, styles.text, 'font-medium')}>{message}</p>}
+        {children && <div className={cn(config.text, styles.text)}>{children}</div>}
       </div>
 
       {/* Dismiss button */}
@@ -158,14 +147,7 @@ const ValidationFeedback = ({
 };
 
 // Field-specific validation component
-const FieldValidation = ({
-  error,
-  warning,
-  success,
-  info,
-  className,
-  ...props
-}) => {
+const FieldValidation = ({ error, warning, success, info, className, ...props }) => {
   // Determine the highest priority message
   let type, message;
 
@@ -198,12 +180,7 @@ const FieldValidation = ({
 };
 
 // List of validation errors/warnings
-const ValidationList = ({
-  items = [],
-  className,
-  showNumbers = false,
-  ...props
-}) => {
+const ValidationList = ({ items = [], className, showNumbers = false, ...props }) => {
   if (!items.length) return null;
 
   return (
@@ -230,7 +207,7 @@ const ValidationSummary = ({
   collapsible = false,
   ...props
 }) => {
-  const [isCollapsed, setIsCollapsed] = React.useState(collapsible);
+  const [isCollapsed, setIsCollapsed] = useState(collapsible);
 
   const totalIssues = errors.length + warnings.length;
 
@@ -245,9 +222,7 @@ const ValidationSummary = ({
     <div className={cn('space-y-3', className)} {...props}>
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h4 className="text-sm font-semibold text-foreground">
-          {title}
-        </h4>
+        <h4 className="text-sm font-semibold text-foreground">{title}</h4>
         {collapsible && (
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
@@ -259,12 +234,7 @@ const ValidationSummary = ({
       </div>
 
       {/* Issues list */}
-      {!isCollapsed && (
-        <ValidationList
-          items={allItems}
-          showNumbers
-        />
-      )}
+      {!isCollapsed && <ValidationList items={allItems} showNumbers />}
 
       {/* Collapsed summary */}
       {isCollapsed && (

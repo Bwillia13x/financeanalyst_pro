@@ -52,7 +52,7 @@ export function useAuditTrail(assumptions, setAssumptions) {
   const [auditLog, setAuditLog] = useState([]);
   const [previousAssumptions, setPreviousAssumptions] = useState(assumptions);
 
-  const updateAssumptions = (newAssumptions) => {
+  const updateAssumptions = newAssumptions => {
     const entries = [];
 
     // Compare each field and create audit entries for changes
@@ -173,15 +173,11 @@ export const AuditTrail = ({ auditLog, onClear, onExport }) => {
       </div>
 
       {auditLog.length === 0 ? (
-        <div className="text-[12px] text-slate-500 text-center py-4">
-          No changes recorded yet
-        </div>
+        <div className="text-[12px] text-slate-500 text-center py-4">No changes recorded yet</div>
       ) : (
         <>
           <div className="flex items-center justify-between">
-            <div className="text-[12px] text-slate-600">
-              {auditLog.length} changes recorded
-            </div>
+            <div className="text-[12px] text-slate-600">{auditLog.length} changes recorded</div>
             <div className="flex gap-2">
               <button
                 onClick={() => onExport?.('json')}
@@ -216,9 +212,7 @@ export const AuditTrail = ({ auditLog, onClear, onExport }) => {
                       {entry.timestamp.toLocaleString()}
                     </div>
                   </div>
-                  <div className="text-[10px] text-slate-500">
-                    #{auditLog.length - index}
-                  </div>
+                  <div className="text-[10px] text-slate-500">#{auditLog.length - index}</div>
                 </div>
               </div>
             ))}

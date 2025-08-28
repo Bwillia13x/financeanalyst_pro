@@ -68,7 +68,6 @@ export class PrivacyService {
 
       console.warn('✅ Privacy service initialized');
       return { success: true, settings: this.privacySettings };
-
     } catch (error) {
       console.error('❌ Failed to initialize privacy service:', error);
       const message = error instanceof Error ? error.message : String(error);
@@ -95,7 +94,6 @@ export class PrivacyService {
       await this.handlePrivacySettingChanges(oldSettings, this.privacySettings);
 
       return { success: true, settings: this.privacySettings };
-
     } catch (error) {
       console.error('Failed to update privacy settings:', error);
       throw error;
@@ -144,7 +142,6 @@ export class PrivacyService {
       await this.cleanupExpiredData(dataType);
 
       return { success: true, policy: { [dataType]: days } };
-
     } catch (error) {
       console.error('Failed to set retention policy:', error);
       throw error;
@@ -176,7 +173,6 @@ export class PrivacyService {
           const cleaned = await this.cleanupDataType(dataType, retentionDays);
           results.cleaned += cleaned;
           results.details[dataType] = cleaned;
-
         } catch (error) {
           console.error(`Failed to cleanup ${dataType}:`, error);
           results.errors++;
@@ -186,7 +182,6 @@ export class PrivacyService {
       }
 
       return results;
-
     } catch (error) {
       console.error('Failed to cleanup expired data:', error);
       throw error;
@@ -200,7 +195,7 @@ export class PrivacyService {
    * @returns {Promise<number>}
    */
   async cleanupDataType(dataType, retentionDays) {
-    const cutoffTime = Date.now() - (retentionDays * 24 * 60 * 60 * 1000);
+    const cutoffTime = Date.now() - retentionDays * 24 * 60 * 60 * 1000;
     let cleaned = 0;
 
     try {
@@ -230,7 +225,6 @@ export class PrivacyService {
       }
 
       return cleaned;
-
     } catch (error) {
       console.error(`Failed to cleanup ${dataType}:`, error);
       return 0;
@@ -243,12 +237,11 @@ export class PrivacyService {
    * @returns {Promise<number>}
    */
   async cleanupCommandHistory(cutoffTime) {
-    const history = /** @type {Array<{ timestamp: number | string }>} */ (
-      await persistenceManager.retrieve('command_history')
-    ) || [];
-    const filtered = history.filter(entry =>
-      new Date(entry.timestamp).getTime() > cutoffTime
-    );
+    const history =
+      /** @type {Array<{ timestamp: number | string }>} */ (
+        await persistenceManager.retrieve('command_history')
+      ) || [];
+    const filtered = history.filter(entry => new Date(entry.timestamp).getTime() > cutoffTime);
 
     if (filtered.length < history.length) {
       await persistenceManager.store('command_history', filtered, {
@@ -444,7 +437,6 @@ export class PrivacyService {
         size: JSON.stringify(exportData).length,
         format
       };
-
     } catch (error) {
       console.error('Failed to export user data:', error);
       throw error;
@@ -490,7 +482,6 @@ export class PrivacyService {
         backup: backup.backupId,
         timestamp: new Date().toISOString()
       };
-
     } catch (error) {
       console.error('Failed to delete user data:', error);
       throw error;
@@ -517,7 +508,6 @@ export class PrivacyService {
           retentionPoliciesActive: Object.keys(this.retentionPolicies).length > 0
         }
       };
-
     } catch (error) {
       console.error('Failed to generate privacy report:', error);
       throw error;
@@ -529,14 +519,17 @@ export class PrivacyService {
    */
   scheduleCleanup() {
     // Run cleanup daily
-    setInterval(async() => {
-      try {
-        await this.cleanupExpiredData();
-        console.warn('✅ Scheduled privacy cleanup completed');
-      } catch (error) {
-        console.error('❌ Scheduled privacy cleanup failed:', error);
-      }
-    }, 24 * 60 * 60 * 1000); // 24 hours
+    setInterval(
+      async () => {
+        try {
+          await this.cleanupExpiredData();
+          console.warn('✅ Scheduled privacy cleanup completed');
+        } catch (error) {
+          console.error('❌ Scheduled privacy cleanup failed:', error);
+        }
+      },
+      24 * 60 * 60 * 1000
+    ); // 24 hours
 
     // Run cleanup on page load
     setTimeout(() => {

@@ -1,6 +1,7 @@
 // Tests for Button component
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
+import React from 'react';
 
 import Button from '../Button';
 
@@ -121,5 +122,28 @@ describe('Button', () => {
     // Should show loading spinner
     const spinner = button.querySelector('[data-loading="true"]');
     expect(spinner).toBeInTheDocument();
+  });
+
+  it('should default type to "button" when no type is provided', () => {
+    render(<Button>Default type</Button>);
+
+    const button = screen.getByRole('button', { name: /default type/i });
+    expect(button).toHaveAttribute('type', 'button');
+  });
+
+  it('should set accessibility attributes when loading', () => {
+    render(<Button loading>Loading a11y</Button>);
+
+    const button = screen.getByRole('button', { name: /loading a11y/i });
+    expect(button).toHaveAttribute('aria-busy', 'true');
+    expect(button).toHaveAttribute('aria-disabled', 'true');
+
+    // Live region for screen readers
+    const status = screen.getByRole('status');
+    expect(status).toBeInTheDocument();
+
+    // Spinner should be aria-hidden
+    const spinner = button.querySelector('[data-loading="true"]');
+    expect(spinner).toHaveAttribute('aria-hidden', 'true');
   });
 });

@@ -124,6 +124,18 @@ class BusinessIntelligenceService extends EventEmitter {
         metadata
       });
     };
+
+    // Track explicit user actions (e.g., refresh, export, tab_change)
+    this.trackUserAction = (action, target, metadata = {}) => {
+      this.addToQueue('analytics', {
+        type: 'user_action',
+        action,
+        target,
+        timestamp: Date.now(),
+        sessionId: this.getSessionId(),
+        metadata
+      });
+    };
   }
 
   /**
@@ -155,7 +167,7 @@ class BusinessIntelligenceService extends EventEmitter {
       return sessionId;
     };
 
-    this.endSession = (sessionId) => {
+    this.endSession = sessionId => {
       const session = this.behaviorPatterns.sessionDuration.get(sessionId);
       if (session) {
         session.endTime = Date.now();
@@ -209,7 +221,7 @@ class BusinessIntelligenceService extends EventEmitter {
     };
 
     // Market data analysis
-    this.analyzeMarketData = (data) => {
+    this.analyzeMarketData = data => {
       const analysis = {
         timestamp: Date.now(),
         trends: this.identifyTrends(data),
@@ -229,30 +241,42 @@ class BusinessIntelligenceService extends EventEmitter {
   async initializeBenchmarks() {
     // Industry benchmarks for financial metrics
     this.benchmarks = new Map([
-      ['portfolio_performance', {
-        excellent: { returns: 0.12, sharpe: 1.5, volatility: 0.15 },
-        good: { returns: 0.08, sharpe: 1.0, volatility: 0.18 },
-        average: { returns: 0.06, sharpe: 0.7, volatility: 0.22 },
-        poor: { returns: 0.03, sharpe: 0.4, volatility: 0.28 }
-      }],
-      ['risk_metrics', {
-        excellent: { var_95: 0.02, cvar_95: 0.03, max_drawdown: 0.05 },
-        good: { var_95: 0.04, cvar_95: 0.06, max_drawdown: 0.08 },
-        average: { var_95: 0.06, cvar_95: 0.09, max_drawdown: 0.12 },
-        poor: { var_95: 0.08, cvar_95: 0.12, max_drawdown: 0.18 }
-      }],
-      ['user_engagement', {
-        excellent: { session_duration: 1800, pages_per_session: 8, bounce_rate: 0.2 },
-        good: { session_duration: 1200, pages_per_session: 6, bounce_rate: 0.3 },
-        average: { session_duration: 600, pages_per_session: 4, bounce_rate: 0.5 },
-        poor: { session_duration: 300, pages_per_session: 2, bounce_rate: 0.7 }
-      }],
-      ['system_performance', {
-        excellent: { response_time: 200, error_rate: 0.001, uptime: 0.999 },
-        good: { response_time: 500, error_rate: 0.005, uptime: 0.995 },
-        average: { response_time: 1000, error_rate: 0.01, uptime: 0.99 },
-        poor: { response_time: 2000, error_rate: 0.02, uptime: 0.95 }
-      }]
+      [
+        'portfolio_performance',
+        {
+          excellent: { returns: 0.12, sharpe: 1.5, volatility: 0.15 },
+          good: { returns: 0.08, sharpe: 1.0, volatility: 0.18 },
+          average: { returns: 0.06, sharpe: 0.7, volatility: 0.22 },
+          poor: { returns: 0.03, sharpe: 0.4, volatility: 0.28 }
+        }
+      ],
+      [
+        'risk_metrics',
+        {
+          excellent: { var_95: 0.02, cvar_95: 0.03, max_drawdown: 0.05 },
+          good: { var_95: 0.04, cvar_95: 0.06, max_drawdown: 0.08 },
+          average: { var_95: 0.06, cvar_95: 0.09, max_drawdown: 0.12 },
+          poor: { var_95: 0.08, cvar_95: 0.12, max_drawdown: 0.18 }
+        }
+      ],
+      [
+        'user_engagement',
+        {
+          excellent: { session_duration: 1800, pages_per_session: 8, bounce_rate: 0.2 },
+          good: { session_duration: 1200, pages_per_session: 6, bounce_rate: 0.3 },
+          average: { session_duration: 600, pages_per_session: 4, bounce_rate: 0.5 },
+          poor: { session_duration: 300, pages_per_session: 2, bounce_rate: 0.7 }
+        }
+      ],
+      [
+        'system_performance',
+        {
+          excellent: { response_time: 200, error_rate: 0.001, uptime: 0.999 },
+          good: { response_time: 500, error_rate: 0.005, uptime: 0.995 },
+          average: { response_time: 1000, error_rate: 0.01, uptime: 0.99 },
+          poor: { response_time: 2000, error_rate: 0.02, uptime: 0.95 }
+        }
+      ]
     ]);
   }
 
@@ -330,6 +354,10 @@ class BusinessIntelligenceService extends EventEmitter {
           this.updateFeatureUsageMetrics(item);
           break;
         case 'user_interaction':
+          this.updateInteractionMetrics(item);
+          break;
+        case 'user_action':
+          // Route user_action to interaction metrics for aggregation
           this.updateInteractionMetrics(item);
           break;
       }
@@ -560,9 +588,7 @@ class BusinessIntelligenceService extends EventEmitter {
     const data = this.analytics.get(metric) || [];
     const cutoff = Date.now() - this.parsePeriod(period);
 
-    return data
-      .filter(item => item.timestamp > cutoff)
-      .sort((a, b) => a.timestamp - b.timestamp);
+    return data.filter(item => item.timestamp > cutoff).sort((a, b) => a.timestamp - b.timestamp);
   }
 
   /**

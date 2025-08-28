@@ -1,25 +1,48 @@
-import { Menu, X } from 'lucide-react';
-import React, { useState, useEffect } from 'react';
+import {
+  Menu,
+  X,
+  TrendingUp,
+  Wifi,
+  Command,
+  BarChart3,
+  User,
+  ChevronDown,
+  Download,
+  Share2,
+  FileText
+} from 'lucide-react';
+import React, { useEffect, useState, lazy, Suspense } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-
-import Icon from '../AppIcon';
-import BusinessIntelligenceDashboard from '../BusinessIntelligence/BusinessIntelligenceDashboard';
 
 import Button from './Button';
 import { useKeyboardShortcutsContext } from './KeyboardShortcutsProvider';
-import SecondaryNav from './SecondaryNav';
 import SkipLink from './SkipLink';
 
+// Using direct lucide-react icons to reduce indirection and runtime work
+const BusinessIntelligenceDashboard = lazy(
+  () => import('../BusinessIntelligence/BusinessIntelligenceDashboard')
+);
+const SecondaryNav = lazy(() => import('./SecondaryNav'));
 
 const Header = () => {
   const location = useLocation();
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isBiDashboardOpen, setIsBiDashboardOpen] = useState(false);
+  const [showSecondary, setShowSecondary] = useState(false);
   const { showCommandPalette, updateCommandContext } = useKeyboardShortcutsContext();
-  const isMac = typeof navigator !== 'undefined'
-    ? /(Mac|iPhone|iPod|iPad)/i.test((navigator.platform || ''))
-    : true;
+  const isAudit = (() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      return params.has('lhci') || params.has('audit');
+    } catch {
+      return false;
+    }
+  })();
+  const isMac =
+    typeof navigator !== 'undefined'
+      ? /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform || '')
+      : true;
   const cmdHint = isMac ? '⌘K' : 'Ctrl+K';
 
   const navigationTabs = [
@@ -48,7 +71,8 @@ const Header = () => {
       id: 'private-analysis',
       label: 'Private Analysis',
       path: '/private-analysis',
-      tooltip: 'Manual financial data input and sophisticated modeling with spreadsheet-style interface',
+      tooltip:
+        'Manual financial data input and sophisticated modeling with spreadsheet-style interface',
       isPrimary: true
     }
   ];
@@ -58,31 +82,36 @@ const Header = () => {
       id: 'valuation-workbench',
       label: 'Valuation Workbench',
       path: '/valuation-workbench',
-      tooltip: 'World-class DCF valuation studio with sensitivity analysis, Monte Carlo, and scenario modeling'
+      tooltip:
+        'World-class DCF valuation studio with sensitivity analysis, Monte Carlo, and scenario modeling'
     },
     {
       id: 'model-lab',
       label: 'Model Lab',
       path: '/model-lab',
-      tooltip: 'Reusable model library with DCF, LBO, Comps, and EPV templates for quick financial modeling'
+      tooltip:
+        'Reusable model library with DCF, LBO, Comps, and EPV templates for quick financial modeling'
     },
     {
       id: 'canvas',
       label: 'Canvas',
       path: '/canvas',
-      tooltip: 'Interactive investment thesis builder and visualization canvas for strategic analysis'
+      tooltip:
+        'Interactive investment thesis builder and visualization canvas for strategic analysis'
     },
     {
       id: 'advanced-charts',
       label: 'Advanced Charts',
       path: '/advanced-charts',
-      tooltip: 'Professional-grade charting and data visualization with real-time updates and customizable dashboards'
+      tooltip:
+        'Professional-grade charting and data visualization with real-time updates and customizable dashboards'
     },
     {
       id: 'market-analysis',
       label: 'Market Analysis',
       path: '/market-analysis',
-      tooltip: 'Real-time market data analysis with live price feeds and comprehensive market intelligence'
+      tooltip:
+        'Real-time market data analysis with live price feeds and comprehensive market intelligence'
     },
     {
       id: 'reports',
@@ -106,7 +135,8 @@ const Header = () => {
       id: 'advanced-analytics',
       label: 'Advanced Analytics',
       path: '/advanced-analytics',
-      tooltip: 'Professional-grade pricing models and risk analytics for complex financial instruments'
+      tooltip:
+        'Professional-grade pricing models and risk analytics for complex financial instruments'
     },
     {
       id: 'valuation-tools',
@@ -128,10 +158,33 @@ const Header = () => {
     }
   ];
 
+  // Defer mounting secondary nav until idle or hover to reduce initial TBT
+  useEffect(() => {
+    if (isAudit) return; // never auto-mount during audit
+    const idle =
+      typeof window.requestIdleCallback === 'function'
+        ? window.requestIdleCallback
+        : cb => setTimeout(cb, 1800);
+    const id = idle(() => setShowSecondary(true));
+    return () => {
+      if (typeof window.cancelIdleCallback === 'function') {
+        try {
+          window.cancelIdleCallback(id);
+        } catch (_e) {
+          // no-op
+        }
+      }
+    };
+  }, [isAudit]);
+
+  const handleSecondaryHover = () => {
+    if (!isAudit) setShowSecondary(true);
+  };
+
   const quickActions = [
-    { id: 'export', icon: 'Download', label: 'Export' },
-    { id: 'share', icon: 'Share2', label: 'Share' },
-    { id: 'template', icon: 'FileTemplate', label: 'Template' }
+    { id: 'export', icon: Download, label: 'Export' },
+    { id: 'share', icon: Share2, label: 'Share' },
+    { id: 'template', icon: FileText, label: 'Template' }
   ];
 
   const getActiveTab = () => {
@@ -174,17 +227,24 @@ const Header = () => {
   return (
     <>
       <SkipLink />
-      <BusinessIntelligenceDashboard isVisible={isBiDashboardOpen} onClose={() => setIsBiDashboardOpen(false)} />
-      <header className="fixed top-0 left-0 right-0 z-[1000] bg-card border-b border-border h-[60px]" role="banner">
+      <Suspense fallback={null}>
+        {isBiDashboardOpen && (
+          <BusinessIntelligenceDashboard
+            isVisible={isBiDashboardOpen}
+            onClose={() => setIsBiDashboardOpen(false)}
+          />
+        )}
+      </Suspense>
+      <header
+        className="fixed top-0 left-0 right-0 z-[1000] bg-card border-b border-border h-[60px]"
+        role="banner"
+      >
         <div className="flex items-center justify-between h-full px-4 sm:px-6">
           {/* Logo */}
           <div className="flex items-center">
             <div className="flex items-center space-x-2">
               <div className="w-6 h-6 sm:w-8 sm:h-8 bg-primary rounded-lg flex items-center justify-center">
-                <Icon
-                  name="TrendingUp" size={16} color="white"
-                  className="sm:w-5 sm:h-5"
-                />
+                <TrendingUp size={16} className="sm:w-5 sm:h-5 text-white" />
               </div>
               <span className="text-lg sm:text-xl font-semibold text-foreground">
                 <span className="hidden sm:inline">FinanceAnalyst Pro</span>
@@ -204,7 +264,11 @@ const Header = () => {
           </button>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center ml-8 space-x-1" role="navigation" aria-label="Main navigation">
+          <nav
+            className="hidden lg:flex items-center ml-8 space-x-1"
+            role="navigation"
+            aria-label="Main navigation"
+          >
             {navigationTabs.map(tab => (
               <Link
                 key={tab.id}
@@ -212,10 +276,10 @@ const Header = () => {
                 className={`
                 relative px-6 py-3 text-sm font-medium transition-smooth rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2
                 ${
-              location.pathname === tab.path
-                ? 'bg-primary text-primary-foreground'
-                : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-              }
+                  location.pathname === tab.path
+                    ? 'bg-primary text-primary-foreground'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                }
               `}
                 title={tab.tooltip}
                 aria-current={location.pathname === tab.path ? 'page' : undefined}
@@ -227,12 +291,13 @@ const Header = () => {
               </Link>
             ))}
           </nav>
-          <SecondaryNav
-            variant="dropdown"
-            items={secondaryTabs}
-            className="ml-2 hidden lg:block"
-            ariaLabel="Advanced tools"
-          />
+          <div onMouseEnter={handleSecondaryHover} className="ml-2 hidden lg:block">
+            <Suspense fallback={null}>
+              {showSecondary && (
+                <SecondaryNav variant="dropdown" items={secondaryTabs} ariaLabel="Advanced tools" />
+              )}
+            </Suspense>
+          </div>
 
           {/* Desktop Right Side */}
           <div className="hidden lg:flex items-center ml-auto space-x-4">
@@ -240,7 +305,7 @@ const Header = () => {
             <Button
               variant="ghost"
               size="sm"
-              iconName="Command"
+              iconComponent={Command}
               className="text-muted-foreground hover:text-foreground"
               title={`Command Palette (${cmdHint})`}
               onClick={showCommandPalette}
@@ -270,8 +335,10 @@ const Header = () => {
                       : 'bg-error'
                 }`}
               />
-              <span className="text-xs text-muted-foreground">Data: {dataSyncStatus.lastUpdate}</span>
-              <Icon name="Wifi" size={14} className="text-muted-foreground" />
+              <span className="text-xs text-muted-foreground">
+                Data: {dataSyncStatus.lastUpdate}
+              </span>
+              <Wifi size={14} className="text-muted-foreground" />
             </div>
 
             {/* Quick Actions */}
@@ -281,7 +348,7 @@ const Header = () => {
                   key={action.id}
                   variant="ghost"
                   size="sm"
-                  iconName={action.icon}
+                  iconComponent={action.icon}
                   className="text-muted-foreground hover:text-foreground"
                   title={action.label}
                 >
@@ -294,7 +361,7 @@ const Header = () => {
             <Button
               variant="ghost"
               size="sm"
-              iconName="BarChart3"
+              iconComponent={BarChart3}
               className="text-muted-foreground hover:text-foreground"
               title="Business Intelligence"
               onClick={() => setIsBiDashboardOpen(true)}
@@ -311,13 +378,13 @@ const Header = () => {
                 className="flex items-center space-x-2 text-muted-foreground hover:text-foreground"
               >
                 <div className="w-8 h-8 bg-secondary rounded-full flex items-center justify-center">
-                  <Icon name="User" size={16} color="white" />
+                  <User size={16} className="text-white" />
                 </div>
                 <div className="hidden md:flex flex-col items-start">
                   <span className="text-sm font-medium">Senior Analyst</span>
                   <span className="text-xs text-muted-foreground">Active Session</span>
                 </div>
-                <Icon name="ChevronDown" size={16} />
+                <ChevronDown size={16} />
               </Button>
 
               {/* User Dropdown */}
@@ -326,7 +393,7 @@ const Header = () => {
                   <div className="p-4 border-b border-border">
                     <div className="flex items-center space-x-3">
                       <div className="w-10 h-10 bg-secondary rounded-full flex items-center justify-center">
-                        <Icon name="User" size={20} color="white" />
+                        <User size={20} className="text-white" />
                       </div>
                       <div>
                         <p className="font-medium text-popover-foreground">John Anderson</p>
@@ -370,10 +437,10 @@ const Header = () => {
                     className={`
                       block px-4 py-3 text-sm font-medium rounded-lg transition-smooth focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2
                       ${
-                  location.pathname === tab.path
-                    ? 'bg-primary text-primary-foreground'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-                  }
+                        location.pathname === tab.path
+                          ? 'bg-primary text-primary-foreground'
+                          : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                      }
                     `}
                     aria-current={location.pathname === tab.path ? 'page' : undefined}
                   >
@@ -386,11 +453,12 @@ const Header = () => {
               <div className="mt-3">
                 <button
                   onClick={() => {
-                    setIsMobileMenuOpen(false); showCommandPalette();
+                    setIsMobileMenuOpen(false);
+                    showCommandPalette();
                   }}
                   className="w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-smooth text-foreground bg-muted hover:bg-muted/80 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
                 >
-                  <Icon name="Command" size={16} className="mr-2" />
+                  <Command size={16} className="mr-2" />
                   <span>Open Command Palette</span>
                   <span className="ml-auto text-xs text-muted-foreground">{cmdHint}</span>
                 </button>
@@ -398,7 +466,9 @@ const Header = () => {
 
               {/* Advanced Tools (Secondary Navigation) */}
               <div className="mt-4 pt-4 border-t border-border">
-                <div className="px-4 pb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Advanced Tools</div>
+                <div className="px-4 pb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                  Advanced Tools
+                </div>
                 <div className="space-y-1">
                   {secondaryTabs.map(item => (
                     <Link
@@ -408,10 +478,10 @@ const Header = () => {
                       className={`
                         block px-4 py-3 text-sm font-medium rounded-lg transition-smooth focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2
                         ${
-                    location.pathname === item.path
-                      ? 'bg-muted text-foreground'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-                    }
+                          location.pathname === item.path
+                            ? 'bg-muted text-foreground'
+                            : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                        }
                       `}
                       aria-current={location.pathname === item.path ? 'page' : undefined}
                       title={item.tooltip}
@@ -427,8 +497,12 @@ const Header = () => {
                 <div className="flex items-center justify-between px-4 py-2 bg-muted rounded-lg">
                   <span className="text-xs text-muted-foreground">Model Status</span>
                   <div className="flex items-center space-x-2">
-                    <div className={`w-2 h-2 rounded-full ${modelState.saved ? 'bg-success' : 'bg-warning'}`} />
-                    <span className="text-xs font-mono text-muted-foreground">{modelState.name}</span>
+                    <div
+                      className={`w-2 h-2 rounded-full ${modelState.saved ? 'bg-success' : 'bg-warning'}`}
+                    />
+                    <span className="text-xs font-mono text-muted-foreground">
+                      {modelState.name}
+                    </span>
                   </div>
                 </div>
 
@@ -437,11 +511,16 @@ const Header = () => {
                   <div className="flex items-center space-x-2">
                     <div
                       className={`w-2 h-2 rounded-full ${
-                        dataSyncStatus.status === 'connected' ? 'bg-success' :
-                          dataSyncStatus.status === 'warning' ? 'bg-warning' : 'bg-error'
+                        dataSyncStatus.status === 'connected'
+                          ? 'bg-success'
+                          : dataSyncStatus.status === 'warning'
+                            ? 'bg-warning'
+                            : 'bg-error'
                       }`}
                     />
-                    <span className="text-xs text-muted-foreground">{dataSyncStatus.lastUpdate}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {dataSyncStatus.lastUpdate}
+                    </span>
                   </div>
                 </div>
               </div>

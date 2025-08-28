@@ -1,9 +1,18 @@
 // Natural Language Query System - Phase 1 Implementation
 export class NaturalLanguageQueryService {
   constructor() {
-    this.intentClassifier = new IntentClassifier();
-    this.entityExtractor = new EntityExtractor();
-    this.queryProcessor = new QueryProcessor();
+    this.intentClassifier = {
+      classify: (parsedQuery, entities) => ({
+        action: this.identifyIntent(parsedQuery, entities),
+        confidence: 0.8
+      })
+    };
+    this.entityExtractor = {
+      extract: (query, context) => this.extractEntities(query, context)
+    };
+    this.queryProcessor = {
+      process: (query, entities) => this.processQuery(query, entities)
+    };
     this.responseGenerator = new ResponseGenerator();
     this.cache = new Map();
   }
@@ -13,32 +22,31 @@ export class NaturalLanguageQueryService {
     try {
       // Step 1: Parse and understand the query
       const parsedQuery = await this.parseQuery(query);
-      
+
       // Step 2: Extract financial entities and parameters
       const entities = this.entityExtractor.extract(query, context);
-      
+
       // Step 3: Classify intent and determine action
       const intent = this.intentClassifier.classify(parsedQuery, entities);
-      
+
       // Step 4: Execute the query
       const result = await this.executeQuery(intent, entities, context);
-      
+
       // Step 5: Generate natural language response
       const response = await this.responseGenerator.generate(result, intent, entities);
-      
+
       return {
-        query: query,
-        intent: intent,
-        entities: entities,
-        result: result,
-        response: response,
+        query,
+        intent,
+        entities,
+        result,
+        response,
         confidence: intent.confidence,
         suggestions: this.generateSuggestions(intent, entities)
       };
-      
     } catch (error) {
       return {
-        query: query,
+        query,
         error: error.message,
         response: "I'm sorry, I couldn't understand that query. Could you rephrase it?",
         suggestions: this.getHelpSuggestions()
@@ -49,20 +57,20 @@ export class NaturalLanguageQueryService {
   async parseQuery(query) {
     // Normalize query
     const normalized = query.toLowerCase().trim();
-    
+
     // Extract key phrases and financial terms
     const financialTerms = this.extractFinancialTerms(normalized);
     const timeReferences = this.extractTimeReferences(normalized);
     const comparisons = this.extractComparisons(normalized);
     const metrics = this.extractMetrics(normalized);
-    
+
     return {
       original: query,
-      normalized: normalized,
-      financialTerms: financialTerms,
-      timeReferences: timeReferences,
-      comparisons: comparisons,
-      metrics: metrics,
+      normalized,
+      financialTerms,
+      timeReferences,
+      comparisons,
+      metrics,
       questionType: this.identifyQuestionType(normalized)
     };
   }
@@ -78,9 +86,9 @@ export class NaturalLanguageQueryService {
     // Company name patterns
     const companyPatterns = [
       /\b([A-Z]{1,5})\b/g, // Stock tickers
-      /\b(apple|microsoft|google|amazon|tesla|netflix)\b/gi, // Common company names
+      /\b(apple|microsoft|google|amazon|tesla|netflix)\b/gi // Common company names
     ];
-    
+
     companyPatterns.forEach(pattern => {
       const matches = query.match(pattern);
       if (matches) terms.companies.push(...matches);
@@ -125,7 +133,7 @@ export class NaturalLanguageQueryService {
 
   extractComparisons(query) {
     const comparisons = [];
-    
+
     const comparisonPatterns = [
       /\bcompare\s+(.+?)\s+(?:to|with|against)\s+(.+?)(?:\s|$)/gi,
       /\b(.+?)\s+(?:vs|versus)\s+(.+?)(?:\s|$)/gi,
@@ -149,16 +157,16 @@ export class NaturalLanguageQueryService {
 
   extractMetrics(query) {
     const metricMappings = {
-      'revenue': ['revenue', 'sales', 'top line', 'turnover'],
-      'profit': ['profit', 'earnings', 'net income', 'bottom line'],
-      'margin': ['margin', 'profitability', 'profit margin'],
-      'growth': ['growth', 'growth rate', 'increase', 'expansion'],
-      'valuation': ['valuation', 'multiple', 'p/e', 'price to earnings'],
-      'debt': ['debt', 'leverage', 'debt ratio', 'borrowing'],
-      'cash': ['cash', 'cash flow', 'liquidity', 'working capital'],
-      'roe': ['roe', 'return on equity'],
-      'roa': ['roa', 'return on assets'],
-      'ebitda': ['ebitda', 'operating earnings']
+      revenue: ['revenue', 'sales', 'top line', 'turnover'],
+      profit: ['profit', 'earnings', 'net income', 'bottom line'],
+      margin: ['margin', 'profitability', 'profit margin'],
+      growth: ['growth', 'growth rate', 'increase', 'expansion'],
+      valuation: ['valuation', 'multiple', 'p/e', 'price to earnings'],
+      debt: ['debt', 'leverage', 'debt ratio', 'borrowing'],
+      cash: ['cash', 'cash flow', 'liquidity', 'working capital'],
+      roe: ['roe', 'return on equity'],
+      roa: ['roa', 'return on assets'],
+      ebitda: ['ebitda', 'operating earnings']
     };
 
     const foundMetrics = [];
@@ -174,16 +182,16 @@ export class NaturalLanguageQueryService {
 
   identifyQuestionType(query) {
     const questionPatterns = {
-      'what': /^what\b/i,
-      'how': /^how\b/i,
-      'when': /^when\b/i,
-      'where': /^where\b/i,
-      'why': /^why\b/i,
-      'which': /^which\b/i,
-      'show': /^show\b/i,
-      'calculate': /^calculate\b/i,
-      'compare': /^compare\b/i,
-      'analyze': /^analy[sz]e\b/i
+      what: /^what\b/i,
+      how: /^how\b/i,
+      when: /^when\b/i,
+      where: /^where\b/i,
+      why: /^why\b/i,
+      which: /^which\b/i,
+      show: /^show\b/i,
+      calculate: /^calculate\b/i,
+      compare: /^compare\b/i,
+      analyze: /^analy[sz]e\b/i
     };
 
     for (const [type, pattern] of Object.entries(questionPatterns)) {
@@ -193,9 +201,56 @@ export class NaturalLanguageQueryService {
     return 'statement';
   }
 
+  identifyIntent(parsedQuery, entities) {
+    const { normalized } = parsedQuery;
+    const { metrics, comparisons } = entities;
+
+    if (comparisons && comparisons.length > 0) {
+      return 'compare_companies';
+    }
+
+    if (metrics && metrics.includes('growth')) {
+      return 'analyze_trends';
+    }
+
+    if (
+      normalized.includes('forecast') ||
+      normalized.includes('predict') ||
+      normalized.includes('future')
+    ) {
+      return 'forecast_values';
+    }
+
+    if (
+      normalized.includes('explain') ||
+      normalized.includes('what is') ||
+      normalized.includes('meaning')
+    ) {
+      return 'explain_concept';
+    }
+
+    return 'get_financial_data';
+  }
+
+  extractEntities(query, context) {
+    const financialTerms = this.extractFinancialTerms(query);
+    const timeReferences = this.extractTimeReferences(query);
+    const comparisons = this.extractComparisons(query);
+    const metrics = this.extractMetrics(query);
+
+    return {
+      company: financialTerms.companies[0] || context.company || null,
+      metrics,
+      timeframe: timeReferences.quarters ? timeReferences.quarters[0] : null,
+      comparisons,
+      financialTerms,
+      inputValues: context.inputValues || {}
+    };
+  }
+
   async executeQuery(intent, entities, context) {
-    const { action, confidence } = intent;
-    
+    const { action, confidence: _confidence } = intent;
+
     switch (action) {
       case 'get_financial_data':
         return await this.getFinancialData(entities, context);
@@ -214,9 +269,9 @@ export class NaturalLanguageQueryService {
     }
   }
 
-  async getFinancialData(entities, context) {
-    const { company, metrics, timeframe } = entities;
-    
+  async getFinancialData(entities, _context) {
+    const { company, metrics: _metrics2, timeframe } = entities;
+
     // Mock financial data retrieval
     const data = {
       company: company || 'AAPL',
@@ -233,242 +288,196 @@ export class NaturalLanguageQueryService {
 
     return {
       type: 'financial_data',
-      data: data,
+      data,
       source: 'premium_data_service'
     };
   }
 
-  async calculateMetrics(entities, context) {
-    const { metrics, inputValues } = entities;
+  async calculateMetrics(entities, _context) {
+    const { metrics, financialTerms: _financialTerms, inputValues } = entities;
     const calculations = {};
 
     if (metrics.includes('growth')) {
       const currentValue = inputValues?.current || 100;
       const previousValue = inputValues?.previous || 90;
-      calculations.growth = ((currentValue - previousValue) / previousValue * 100);
+      calculations.growth = ((currentValue - previousValue) / previousValue) * 100;
     }
 
     if (metrics.includes('margin')) {
       const revenue = inputValues?.revenue || 1000;
       const costs = inputValues?.costs || 700;
-      calculations.margin = ((revenue - costs) / revenue * 100);
+      calculations.margin = ((revenue - costs) / revenue) * 100;
     }
 
     return {
       type: 'calculations',
-      calculations: calculations,
-      formulas: this.getFormulas(metrics)
+      calculations,
+      formulas: this.getFormulas(metrics || [])
     };
   }
 
-  async compareCompanies(entities, context) {
-    const { companies, metrics } = entities;
-    
-    // Mock comparison data
-    const comparison = {
-      companies: companies || ['AAPL', 'MSFT'],
-      metrics: metrics || ['revenue', 'profit', 'margin'],
-      data: {
-        'AAPL': { revenue: 394.33, profit: 99.8, margin: 25.3 },
-        'MSFT': { revenue: 211.92, profit: 72.74, margin: 34.3 }
+  getFormulas(_metrics) {
+    // Mock formulas based on requested metrics
+    return {
+      growth: '((Current - Previous) / Previous) * 100',
+      margin: '((Revenue - Costs) / Revenue) * 100',
+      ratio: 'Value A / Value B'
+    };
+  }
+
+  async compareCompanies(entities, _context) {
+    const { comparisons } = entities;
+
+    if (!comparisons || comparisons.length === 0) {
+      return {
+        type: 'comparison',
+        comparison: {
+          error: 'No comparison entities found',
+          companies: [],
+          metrics: []
+        }
+      };
+    }
+
+    const comparison = comparisons[0];
+    const mockData = {
+      companies: [comparison.entity1, comparison.entity2],
+      metrics: {
+        [comparison.entity1]: {
+          revenue: 100,
+          profit: 15,
+          growth: 8.5
+        },
+        [comparison.entity2]: {
+          revenue: 90,
+          profit: 12,
+          growth: 6.2
+        }
       },
-      winner: 'MSFT',
-      reasoning: 'Higher profit margins despite lower revenue'
+      winner: comparison.entity1,
+      reasoning: `${comparison.entity1} shows stronger revenue and profit performance`
     };
 
     return {
       type: 'comparison',
-      comparison: comparison
+      comparison: mockData
     };
   }
 
-  async analyzeTrends(entities, context) {
-    const { company, metrics, timeframe } = entities;
-    
-    // Mock trend analysis
+  async analyzeTrends(entities, _context) {
+    const { company, metrics: _metrics, timeframe } = entities;
+
     const trends = {
       company: company || 'AAPL',
-      metric: metrics?.[0] || 'revenue',
       period: timeframe || '5 years',
-      trend: 'upward',
-      slope: 12.5, // % annual growth
-      confidence: 0.87,
-      data_points: [100, 115, 132, 148, 167],
-      analysis: 'Strong consistent growth with accelerating momentum'
+      trends: {}
     };
 
+    if (_metrics && _metrics.includes('revenue')) {
+      trends.trends.revenue = {
+        direction: 'increasing',
+        growth_rate: 12.5,
+        data_points: [85, 92, 98, 105, 118]
+      };
+    }
+
+    if (_metrics && _metrics.includes('profit')) {
+      trends.trends.profit = {
+        direction: 'increasing',
+        growth_rate: 15.2,
+        data_points: [8.5, 9.2, 10.1, 11.8, 13.2]
+      };
+    }
+
     return {
-      type: 'trend_analysis',
-      trends: trends
+      type: 'trends',
+      trends
     };
   }
 
-  async forecastValues(entities, context) {
-    const { company, metrics, horizon } = entities;
-    
-    // Mock forecast using predictive models
-    const forecast = {
+  async forecastValues(entities, _context) {
+    const { company, metrics: _metrics, timeframe } = entities;
+
+    const horizon = timeframe === 'Q1' ? 4 : 8; // quarters
+    const forecasts = {
       company: company || 'AAPL',
-      metric: metrics?.[0] || 'revenue',
-      horizon: horizon || 4, // quarters
-      predictions: [120, 125, 132, 139],
-      confidence_intervals: [
-        { lower: 115, upper: 125 },
-        { lower: 119, upper: 131 },
-        { lower: 124, upper: 140 },
-        { lower: 129, upper: 149 }
-      ],
+      horizon: `${horizon} quarters`,
+      predictions: [],
       model_confidence: 0.82
     };
 
+    // Generate mock forecast data
+    let baseValue = 120; // Starting revenue in billions
+    for (let i = 0; i < horizon; i++) {
+      const growth = 0.05 + Math.random() * 0.03; // 5-8% growth
+      baseValue *= 1 + growth;
+      forecasts.predictions.push(Math.round(baseValue * 100) / 100);
+    }
+
     return {
       type: 'forecast',
-      forecast: forecast
+      forecast: forecasts
     };
   }
 
-  async explainConcept(entities, context) {
-    const { concept } = entities;
-    
+  async explainConcept(entities, _context) {
     const explanations = {
-      'pe_ratio': {
-        definition: 'Price-to-Earnings ratio measures how much investors are willing to pay per dollar of earnings',
+      pe_ratio: {
+        definition:
+          "Price-to-Earnings Ratio: A valuation metric that compares a company's stock price to its earnings per share.",
         formula: 'Stock Price / Earnings Per Share',
-        interpretation: 'Higher P/E suggests growth expectations or overvaluation',
-        typical_range: '10-30 for most companies'
+        interpretation:
+          'Higher P/E ratios typically indicate higher growth expectations but also higher risk.',
+        typical_range: 'Generally 10-25 for most industries'
       },
-      'dcf': {
-        definition: 'Discounted Cash Flow values a company based on projected future cash flows',
-        formula: 'Sum of (Future Cash Flow / (1 + Discount Rate)^n)',
-        interpretation: 'Intrinsic value based on cash generation ability',
-        use_cases: 'Long-term investment decisions, M&A valuation'
+      ebitda: {
+        definition:
+          'Earnings Before Interest, Taxes, Depreciation, and Amortization: A measure of operational profitability.',
+        formula: 'Revenue - Operating Expenses (excluding D&A)',
+        interpretation: 'EBITDA shows the earnings power of the core business operations.',
+        typical_range: 'Varies by industry, often compared as a multiple'
+      },
+      debt_to_equity: {
+        definition:
+          'Debt-to-Equity Ratio: A leverage ratio that measures the proportion of debt financing relative to equity.',
+        formula: 'Total Debt / Total Equity',
+        interpretation:
+          'Lower ratios indicate less leverage and lower risk, higher ratios indicate more leverage.',
+        typical_range: 'Generally 0.5-2.0 depending on industry'
+      },
+      return_on_equity: {
+        definition:
+          'Return on Equity: A profitability ratio that measures how effectively a company uses equity to generate profits.',
+        formula: 'Net Income / Shareholder Equity',
+        interpretation:
+          'Higher ROE indicates better profitability and efficiency in using equity capital.',
+        typical_range: 'Typically 10-20% for mature companies'
       }
+    };
+
+    // Try to identify the concept from entities
+    const concept = entities.metrics ? entities.metrics[0] : null;
+    const explanation = explanations[concept] || {
+      definition:
+        "Financial metrics are quantitative measures used to evaluate a company's performance, financial health, and valuation.",
+      interpretation:
+        'Different metrics provide different insights into various aspects of a business.',
+      formula: 'Varies by metric',
+      typical_range: 'Varies by metric and industry'
     };
 
     return {
       type: 'explanation',
-      concept: concept,
-      explanation: explanations[concept] || 'Concept not found in knowledge base'
+      explanation
     };
-  }
-
-  getFormulas(metrics) {
-    const formulas = {
-      growth: '((Current Value - Previous Value) / Previous Value) × 100',
-      margin: '((Revenue - Costs) / Revenue) × 100',
-      roe: 'Net Income / Shareholders\' Equity',
-      roa: 'Net Income / Total Assets',
-      debt_ratio: 'Total Debt / Total Assets'
-    };
-
-    return metrics.reduce((acc, metric) => {
-      if (formulas[metric]) acc[metric] = formulas[metric];
-      return acc;
-    }, {});
-  }
-
-  generateSuggestions(intent, entities) {
-    const suggestions = [
-      'Show me Apple\'s revenue growth over the last 5 years',
-      'Compare Microsoft and Google\'s profit margins',
-      'Calculate the P/E ratio for Tesla',
-      'What is the DCF valuation method?',
-      'Forecast Amazon\'s revenue for next 4 quarters'
-    ];
-
-    return suggestions.slice(0, 3); // Return top 3 suggestions
-  }
-
-  getHelpSuggestions() {
-    return [
-      'Try asking about specific companies: "Show me AAPL revenue"',
-      'Request comparisons: "Compare MSFT vs GOOGL margins"',
-      'Ask for calculations: "Calculate growth rate for Tesla"',
-      'Get explanations: "What is the P/E ratio?"'
-    ];
-  }
-}
-
-// Intent Classification System
-class IntentClassifier {
-  classify(parsedQuery, entities) {
-    const { questionType, metrics, financialTerms, comparisons } = parsedQuery;
-    
-    // Rule-based intent classification
-    let action = 'get_financial_data';
-    let confidence = 0.7;
-
-    if (questionType === 'compare' || comparisons.length > 0) {
-      action = 'compare_companies';
-      confidence = 0.9;
-    } else if (questionType === 'calculate' || parsedQuery.normalized.includes('calculate')) {
-      action = 'calculate_metrics';
-      confidence = 0.85;
-    } else if (parsedQuery.normalized.includes('trend') || parsedQuery.normalized.includes('over time')) {
-      action = 'analyze_trends';
-      confidence = 0.8;
-    } else if (parsedQuery.normalized.includes('forecast') || parsedQuery.normalized.includes('predict')) {
-      action = 'forecast_values';
-      confidence = 0.8;
-    } else if (questionType === 'what' && parsedQuery.normalized.includes('is')) {
-      action = 'explain_concept';
-      confidence = 0.85;
-    }
-
-    return { action, confidence };
-  }
-}
-
-// Entity Extraction System
-class EntityExtractor {
-  extract(query, context) {
-    const entities = {
-      company: null,
-      metrics: [],
-      timeframe: null,
-      values: {}
-    };
-
-    // Extract company symbols/names
-    const companyMatch = query.match(/\b([A-Z]{2,5})\b/);
-    if (companyMatch) entities.company = companyMatch[1];
-
-    // Extract metrics
-    const metricKeywords = {
-      revenue: /\b(revenue|sales)\b/i,
-      profit: /\b(profit|earnings|income)\b/i,
-      margin: /\b(margin)\b/i,
-      growth: /\b(growth)\b/i
-    };
-
-    Object.keys(metricKeywords).forEach(metric => {
-      if (metricKeywords[metric].test(query)) {
-        entities.metrics.push(metric);
-      }
-    });
-
-    // Extract timeframes
-    const timeMatch = query.match(/\b(q[1-4]|\d{4}|last\s+\d+\s+years?)\b/i);
-    if (timeMatch) entities.timeframe = timeMatch[1];
-
-    return entities;
-  }
-}
-
-// Query Processing System
-class QueryProcessor {
-  async process(intent, entities, context) {
-    // This would integrate with various data services
-    // and perform the actual query execution
-    return { processed: true };
   }
 }
 
 // Response Generation System
 class ResponseGenerator {
-  async generate(result, intent, entities) {
+  async generate(result, _intent, _entities) {
     const { type } = result;
-    
+
     switch (type) {
       case 'financial_data':
         return this.generateDataResponse(result);
@@ -489,7 +498,7 @@ class ResponseGenerator {
     const { data } = result;
     return `For ${data.company} in ${data.period}:
 • Revenue: $${data.metrics.revenue}B
-• Net Income: $${data.metrics.netIncome}B  
+• Net Income: $${data.metrics.netIncome}B
 • Gross Margin: ${data.metrics.grossMargin}%
 • P/E Ratio: ${data.metrics.peRatio}`;
   }
@@ -514,14 +523,14 @@ Key metrics comparison shows distinct competitive advantages.`;
   generateForecastResponse(result) {
     const { forecast } = result;
     return `${forecast.company} ${forecast.metric} forecast (${forecast.horizon} quarters):
-${forecast.predictions.map((pred, i) => `Q${i+1}: $${pred}B`).join(', ')}
+${forecast.predictions.map((pred, i) => `Q${i + 1}: $${pred}B`).join(', ')}
 Model confidence: ${(forecast.model_confidence * 100).toFixed(0)}%`;
   }
 
   generateExplanationResponse(result) {
     const { explanation } = result;
     if (typeof explanation === 'string') return explanation;
-    
+
     return `${explanation.definition}
 
 Formula: ${explanation.formula}

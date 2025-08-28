@@ -77,7 +77,7 @@ export default [
       ...js.configs.recommended.rules,
       'no-console': 'off',
       'no-debugger': 'error',
-      'no-unused-vars': ['error', { 
+      'no-unused-vars': ['error', {
         argsIgnorePattern: '^_',
         varsIgnorePattern: '^(React|_)',
         caughtErrors: 'all',
@@ -90,7 +90,7 @@ export default [
       'object-shorthand': 'error',
       'template-curly-spacing': 'error',
       'no-template-curly-in-string': 'error',
-      
+
       // React rules
       ...react.configs.recommended.rules,
       'react/react-in-jsx-scope': 'off', // Not needed in React 17+
@@ -112,17 +112,18 @@ export default [
       'react/jsx-first-prop-new-line': ['error', 'multiline'],
       'react/jsx-indent': ['error', 2],
       'react/jsx-indent-props': ['error', 2],
-      'react/jsx-max-props-per-line': ['error', { maximum: 3 }],
+      // Allow Prettier to manage prop wrapping entirely
+      'react/jsx-max-props-per-line': 'off',
       'react/jsx-no-bind': 'off',
       'react/jsx-wrap-multilines': 'error',
-      
+
       // React Hooks rules
       ...reactHooks.configs.recommended.rules,
       'react-hooks/exhaustive-deps': 'off',
-      
+
       // React Refresh rules
       'react-refresh/only-export-components': 'off',
-      
+
       // Accessibility rules
       ...jsxA11y.configs.recommended.rules,
       'jsx-a11y/alt-text': 'error',
@@ -138,7 +139,7 @@ export default [
       'jsx-a11y/no-autofocus': 'off',
       'jsx-a11y/role-has-required-aria-props': 'error',
       'jsx-a11y/role-supports-aria-props': 'error',
-      
+
       // Import rules
       'import/no-unresolved': 'error',
       'import/named': 'error',
@@ -167,9 +168,19 @@ export default [
           }
         }
       ],
-      
+      // Enforce named forwardRef import usage
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: "MemberExpression[object.name='React'][property.name='forwardRef']",
+          message:
+            "Do not use React.forwardRef; import { forwardRef } from 'react' instead."
+        }
+      ],
+
       // Code style rules
-      'indent': ['error', 2, { SwitchCase: 1 }],
+      // Defer indentation concerns to Prettier formatting
+      indent: 'off',
       'quotes': ['error', 'single', { avoidEscape: true }],
       'semi': ['error', 'always'],
       'comma-dangle': ['error', 'never'],
@@ -178,7 +189,8 @@ export default [
       'key-spacing': 'error',
       'keyword-spacing': 'error',
       'space-before-blocks': 'error',
-      'space-before-function-paren': ['error', 'never'],
+      // Defer to Prettier for function paren spacing; avoid false-positives on async arrows
+      'space-before-function-paren': 'off',
       'space-in-parens': 'error',
       'space-infix-ops': 'error',
       'space-unary-ops': 'error',

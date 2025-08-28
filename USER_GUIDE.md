@@ -107,7 +107,7 @@ Access powerful commands instantly with our Command Palette:
 ### Keyboard Shortcuts
 
 - `Cmd+K` / `Ctrl+K`: Open Command Palette
-- `Cmd+S` / `Ctrl+S`: Save current work  
+- `Cmd+S` / `Ctrl+S`: Save current work
 - `Cmd+E` / `Ctrl+E`: Export data
 - `Cmd+R` / `Ctrl+R`: Refresh data
 - `Esc`: Close modals/panels

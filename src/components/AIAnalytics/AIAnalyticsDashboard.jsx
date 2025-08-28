@@ -5,9 +5,15 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Brain, Target, AlertTriangle,
-  Eye, BarChart3,
-  CheckCircle, XCircle, Lightbulb, Shield
+  Brain,
+  Target,
+  AlertTriangle,
+  Eye,
+  BarChart3,
+  CheckCircle,
+  XCircle,
+  Lightbulb,
+  Shield
 } from 'lucide-react';
 import PropTypes from 'prop-types';
 import { useState, useEffect, useMemo } from 'react';
@@ -63,28 +69,31 @@ const AIAnalyticsDashboard = ({
   const predictionSummary = useMemo(() => getPredictionSummary(), [getPredictionSummary]);
   const riskSummary = useMemo(() => getRiskSummary(), [getRiskSummary]);
 
-  const criticalInsights = useMemo(() =>
-    getFilteredInsights({ severity: 'high', minConfidence: 0.7 }),
-  [getFilteredInsights]
+  const criticalInsights = useMemo(
+    () => getFilteredInsights({ severity: 'high', minConfidence: 0.7 }),
+    [getFilteredInsights]
   );
 
-  const handleInsightClick = (insight) => {
+  const handleInsightClick = insight => {
     if (onInsightAction) {
       onInsightAction(insight);
     }
   };
 
-  const getConfidenceColor = (confidence) => {
+  const getConfidenceColor = confidence => {
     if (confidence >= 0.8) return 'text-green-600 bg-green-100';
     if (confidence >= 0.6) return 'text-yellow-600 bg-yellow-100';
     return 'text-red-600 bg-red-100';
   };
 
-  const getSeverityIcon = (severity) => {
+  const getSeverityIcon = severity => {
     switch (severity) {
-      case 'high': return <AlertTriangle className="text-red-500" size={16} />;
-      case 'medium': return <Eye className="text-yellow-500" size={16} />;
-      default: return <CheckCircle className="text-green-500" size={16} />;
+      case 'high':
+        return <AlertTriangle className="text-red-500" size={16} />;
+      case 'medium':
+        return <Eye className="text-yellow-500" size={16} />;
+      default:
+        return <CheckCircle className="text-green-500" size={16} />;
     }
   };
 
@@ -122,7 +131,7 @@ const AIAnalyticsDashboard = ({
               <div className="h-6 bg-gray-200 rounded w-48" />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {[1, 2, 3].map((i) => (
+              {[1, 2, 3].map(i => (
                 <div key={i} className="bg-gray-50 p-4 rounded-lg">
                   <div className="h-4 bg-gray-200 rounded w-24 mb-2" />
                   <div className="h-8 bg-gray-200 rounded w-16" />
@@ -162,9 +171,7 @@ const AIAnalyticsDashboard = ({
               {analysis && (
                 <div className="text-right">
                   <div className="text-sm text-blue-100">Confidence Score</div>
-                  <div className="text-xl font-bold">
-                    {(analysis.confidence * 100).toFixed(1)}%
-                  </div>
+                  <div className="text-xl font-bold">{(analysis.confidence * 100).toFixed(1)}%</div>
                 </div>
               )}
             </div>
@@ -238,7 +245,7 @@ const AIAnalyticsDashboard = ({
                           role="button"
                           tabIndex={0}
                           onClick={() => handleInsightClick(insight)}
-                          onKeyDown={(e) => {
+                          onKeyDown={e => {
                             if (e.key === 'Enter' || e.key === ' ') {
                               e.preventDefault();
                               handleInsightClick(insight);
@@ -254,7 +261,9 @@ const AIAnalyticsDashboard = ({
                             </div>
                           </div>
                           {insight.confidence && (
-                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${getConfidenceColor(insight.confidence)}`}>
+                            <span
+                              className={`px-2 py-1 rounded-full text-xs font-medium ${getConfidenceColor(insight.confidence)}`}
+                            >
                               {(insight.confidence * 100).toFixed(0)}%
                             </span>
                           )}
@@ -295,13 +304,17 @@ const AIAnalyticsDashboard = ({
                         {predictionSummary.shortTerm && (
                           <div className="flex justify-between">
                             <span>1W Target:</span>
-                            <span className="font-bold">${predictionSummary.shortTerm.price.toFixed(2)}</span>
+                            <span className="font-bold">
+                              ${predictionSummary.shortTerm.price.toFixed(2)}
+                            </span>
                           </div>
                         )}
                         {predictionSummary.mediumTerm && (
                           <div className="flex justify-between">
                             <span>1M Target:</span>
-                            <span className="font-bold">${predictionSummary.mediumTerm.price.toFixed(2)}</span>
+                            <span className="font-bold">
+                              ${predictionSummary.mediumTerm.price.toFixed(2)}
+                            </span>
                           </div>
                         )}
                       </div>
@@ -341,7 +354,10 @@ const AIAnalyticsDashboard = ({
               >
                 <div className="text-gray-500">
                   <Brain size={48} className="mx-auto mb-4 opacity-50" />
-                  <p>{activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} content will be displayed here</p>
+                  <p>
+                    {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} content will be
+                    displayed here
+                  </p>
                 </div>
               </motion.div>
             )}

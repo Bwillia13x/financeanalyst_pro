@@ -17,7 +17,7 @@ function HookWrapper({ onRender }) {
 
 describe('useOnboarding', () => {
   let hook;
-  const setHook = (v) => {
+  const setHook = v => {
     hook = v;
   };
 
@@ -36,7 +36,7 @@ describe('useOnboarding', () => {
     expect(hook.userPreferences).toEqual({
       showTooltips: true,
       autoStartTours: true,
-      tourSpeed: 'normal',
+      tourSpeed: 'normal'
     });
   });
 
@@ -45,7 +45,7 @@ describe('useOnboarding', () => {
       completedTours: ['privateAnalysis'],
       dismissedIntroductions: ['financialValidator'],
       currentTour: null,
-      userPreferences: { showTooltips: false, autoStartTours: true, tourSpeed: 'fast' },
+      userPreferences: { showTooltips: false, autoStartTours: true, tourSpeed: 'fast' }
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(persisted));
 
@@ -54,7 +54,11 @@ describe('useOnboarding', () => {
     expect(hook.completedTours).toContain('privateAnalysis');
     expect(hook.dismissedIntroductions).toContain('financialValidator');
     expect(hook.currentTour).toBeNull();
-    expect(hook.userPreferences).toEqual({ showTooltips: false, autoStartTours: true, tourSpeed: 'fast' });
+    expect(hook.userPreferences).toEqual({
+      showTooltips: false,
+      autoStartTours: true,
+      tourSpeed: 'fast'
+    });
   });
 
   it('falls back to defaults if localStorage has malformed JSON', () => {
@@ -152,7 +156,7 @@ describe('useOnboarding', () => {
     expect(hook.userPreferences).toEqual({
       showTooltips: true,
       tourSpeed: 'fast',
-      autoStartTours: false,
+      autoStartTours: false
     });
   });
 
@@ -174,7 +178,7 @@ describe('useOnboarding', () => {
     expect(hook.userPreferences).toEqual({
       showTooltips: true,
       autoStartTours: true,
-      tourSpeed: 'normal',
+      tourSpeed: 'normal'
     });
   });
 
@@ -187,7 +191,7 @@ describe('useOnboarding', () => {
 
     const tours = hook.getAvailableTours();
     const expectedId = ONBOARDING_TOURS['privateAnalysis'].id;
-    const privateAnalysis = tours.find((t) => t.id === expectedId || t.id === 'privateAnalysis');
+    const privateAnalysis = tours.find(t => t.id === expectedId || t.id === 'privateAnalysis');
     expect(privateAnalysis).toBeTruthy();
     expect(privateAnalysis.completed).toBe(true);
   });

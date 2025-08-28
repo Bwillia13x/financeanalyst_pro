@@ -35,7 +35,7 @@ const UserPreferences = ({ isOpen, onClose }) => {
     }
   }, [isOpen]);
 
-  const loadPreferences = async() => {
+  const loadPreferences = async () => {
     setIsLoading(true);
     try {
       const prefs = userPreferencesService.getPreferences();
@@ -59,48 +59,54 @@ const UserPreferences = ({ isOpen, onClose }) => {
     setHasChanges(true);
   };
 
-  const savePreferences = async() => {
+  const savePreferences = async () => {
     setIsSaving(true);
     try {
       await userPreferencesService.updatePreferences(preferences);
       setHasChanges(false);
 
       // Show success notification
-      window.dispatchEvent(new CustomEvent('showNotification', {
-        detail: {
-          type: 'success',
-          message: 'Preferences saved successfully',
-          duration: 3000
-        }
-      }));
+      window.dispatchEvent(
+        new CustomEvent('showNotification', {
+          detail: {
+            type: 'success',
+            message: 'Preferences saved successfully',
+            duration: 3000
+          }
+        })
+      );
     } catch (error) {
       console.error('Error saving preferences:', error);
-      window.dispatchEvent(new CustomEvent('showNotification', {
-        detail: {
-          type: 'error',
-          message: 'Failed to save preferences',
-          duration: 5000
-        }
-      }));
+      window.dispatchEvent(
+        new CustomEvent('showNotification', {
+          detail: {
+            type: 'error',
+            message: 'Failed to save preferences',
+            duration: 5000
+          }
+        })
+      );
     } finally {
       setIsSaving(false);
     }
   };
 
-  const resetPreferences = async() => {
+  const resetPreferences = async () => {
     if (window.confirm('Reset all preferences to default? This action cannot be undone.')) {
       try {
         const reset = await userPreferencesService.resetPreferences();
         setPreferences(reset);
         setHasChanges(false);
 
-        window.dispatchEvent(new CustomEvent('showNotification', {
-          detail: {
-            type: 'success',
-            message: 'Preferences reset to default',
-            duration: 3000
-          }
-        }));
+        window.dispatchEvent(
+          new CustomEvent('showNotification', {
+            detail: {
+              type: 'success',
+              message: 'Preferences reset to default',
+              duration: 3000
+            }
+          })
+        );
       } catch (error) {
         console.error('Error resetting preferences:', error);
       }
@@ -118,43 +124,47 @@ const UserPreferences = ({ isOpen, onClose }) => {
     URL.revokeObjectURL(url);
   };
 
-  const importSettings = (event) => {
+  const importSettings = event => {
     const file = event.target.files[0];
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = e => {
       try {
         const settings = JSON.parse(e.target.result);
         const success = userPreferencesService.importSettings(settings);
 
         if (success) {
           loadPreferences();
-          window.dispatchEvent(new CustomEvent('showNotification', {
-            detail: {
-              type: 'success',
-              message: 'Settings imported successfully',
-              duration: 3000
-            }
-          }));
+          window.dispatchEvent(
+            new CustomEvent('showNotification', {
+              detail: {
+                type: 'success',
+                message: 'Settings imported successfully',
+                duration: 3000
+              }
+            })
+          );
         } else {
           throw new Error('Invalid settings file');
         }
       } catch (error) {
         console.error('Error importing settings:', error);
-        window.dispatchEvent(new CustomEvent('showNotification', {
-          detail: {
-            type: 'error',
-            message: 'Failed to import settings',
-            duration: 5000
-          }
-        }));
+        window.dispatchEvent(
+          new CustomEvent('showNotification', {
+            detail: {
+              type: 'error',
+              message: 'Failed to import settings',
+              duration: 5000
+            }
+          })
+        );
       }
     };
     reader.readAsText(file);
   };
 
-  const getCategoryIcon = (categoryKey) => {
+  const getCategoryIcon = categoryKey => {
     const icons = {
       appearance: Palette,
       dashboard: Layout,
@@ -170,24 +180,27 @@ const UserPreferences = ({ isOpen, onClose }) => {
 
   const renderPreferenceInput = (key, value) => {
     const inputProps = {
-      className: 'w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent',
+      className:
+        'w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent',
       value: value || '',
-      onChange: (e) => updatePreference(key, e.target.value)
+      onChange: e => updatePreference(key, e.target.value)
     };
 
     switch (key) {
       case 'theme':
         return (
-          <select {...inputProps} onChange={(e) => updatePreference(key, e.target.value)}>
+          <select {...inputProps} onChange={e => updatePreference(key, e.target.value)}>
             {themes.map(theme => (
-              <option key={theme.id} value={theme.id}>{theme.name}</option>
+              <option key={theme.id} value={theme.id}>
+                {theme.name}
+              </option>
             ))}
           </select>
         );
 
       case 'fontSize':
         return (
-          <select {...inputProps} onChange={(e) => updatePreference(key, e.target.value)}>
+          <select {...inputProps} onChange={e => updatePreference(key, e.target.value)}>
             <option value="small">Small</option>
             <option value="medium">Medium</option>
             <option value="large">Large</option>
@@ -197,7 +210,7 @@ const UserPreferences = ({ isOpen, onClose }) => {
 
       case 'density':
         return (
-          <select {...inputProps} onChange={(e) => updatePreference(key, e.target.value)}>
+          <select {...inputProps} onChange={e => updatePreference(key, e.target.value)}>
             <option value="compact">Compact</option>
             <option value="comfortable">Comfortable</option>
             <option value="spacious">Spacious</option>
@@ -206,7 +219,7 @@ const UserPreferences = ({ isOpen, onClose }) => {
 
       case 'colorScheme':
         return (
-          <select {...inputProps} onChange={(e) => updatePreference(key, e.target.value)}>
+          <select {...inputProps} onChange={e => updatePreference(key, e.target.value)}>
             <option value="light">Light</option>
             <option value="dark">Dark</option>
             <option value="auto">Auto</option>
@@ -215,7 +228,7 @@ const UserPreferences = ({ isOpen, onClose }) => {
 
       case 'currency':
         return (
-          <select {...inputProps} onChange={(e) => updatePreference(key, e.target.value)}>
+          <select {...inputProps} onChange={e => updatePreference(key, e.target.value)}>
             <option value="USD">USD - US Dollar</option>
             <option value="EUR">EUR - Euro</option>
             <option value="GBP">GBP - British Pound</option>
@@ -226,7 +239,7 @@ const UserPreferences = ({ isOpen, onClose }) => {
 
       case 'dateFormat':
         return (
-          <select {...inputProps} onChange={(e) => updatePreference(key, e.target.value)}>
+          <select {...inputProps} onChange={e => updatePreference(key, e.target.value)}>
             <option value="MM/DD/YYYY">MM/DD/YYYY</option>
             <option value="DD/MM/YYYY">DD/MM/YYYY</option>
             <option value="YYYY-MM-DD">YYYY-MM-DD</option>
@@ -236,7 +249,7 @@ const UserPreferences = ({ isOpen, onClose }) => {
 
       case 'numberFormat':
         return (
-          <select {...inputProps} onChange={(e) => updatePreference(key, e.target.value)}>
+          <select {...inputProps} onChange={e => updatePreference(key, e.target.value)}>
             <option value="standard">1,234.56</option>
             <option value="european">1.234,56</option>
             <option value="indian">1,23,456.78</option>
@@ -246,7 +259,7 @@ const UserPreferences = ({ isOpen, onClose }) => {
 
       case 'defaultTimeHorizon':
         return (
-          <select {...inputProps} onChange={(e) => updatePreference(key, e.target.value)}>
+          <select {...inputProps} onChange={e => updatePreference(key, e.target.value)}>
             <option value="1Y">1 Year</option>
             <option value="3Y">3 Years</option>
             <option value="5Y">5 Years</option>
@@ -268,7 +281,7 @@ const UserPreferences = ({ isOpen, onClose }) => {
             step={key.includes('Rate') || key.includes('Level') ? '0.001' : '1'}
             min={key.includes('Interval') ? '1000' : '0'}
             max={key.includes('Level') ? '1' : undefined}
-            onChange={(e) => updatePreference(key, parseFloat(e.target.value) || 0)}
+            onChange={e => updatePreference(key, parseFloat(e.target.value) || 0)}
           />
         );
 
@@ -296,7 +309,7 @@ const UserPreferences = ({ isOpen, onClose }) => {
           <input
             type="checkbox"
             checked={value || false}
-            onChange={(e) => updatePreference(key, e.target.checked)}
+            onChange={e => updatePreference(key, e.target.checked)}
             className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
           />
         );
@@ -306,7 +319,7 @@ const UserPreferences = ({ isOpen, onClose }) => {
     }
   };
 
-  const getPreferenceLabel = (key) => {
+  const getPreferenceLabel = key => {
     const labels = {
       theme: 'Theme',
       fontSize: 'Font Size',
@@ -364,7 +377,7 @@ const UserPreferences = ({ isOpen, onClose }) => {
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.9, opacity: 0 }}
-          onClick={(e) => e.stopPropagation()}
+          onClick={e => e.stopPropagation()}
           className="bg-white rounded-xl shadow-2xl max-w-6xl max-h-[90vh] w-full mx-4 overflow-hidden"
         >
           {/* Header */}
@@ -385,11 +398,7 @@ const UserPreferences = ({ isOpen, onClose }) => {
                   disabled={isSaving}
                   className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
                 >
-                  {isSaving ? (
-                    <RefreshCw className="animate-spin" size={16} />
-                  ) : (
-                    <Save size={16} />
-                  )}
+                  {isSaving ? <RefreshCw className="animate-spin" size={16} /> : <Save size={16} />}
                   <span>Save Changes</span>
                 </motion.button>
               )}
@@ -438,12 +447,7 @@ const UserPreferences = ({ isOpen, onClose }) => {
                 <label className="w-full flex items-center space-x-2 px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg cursor-pointer">
                   <Upload size={16} />
                   <span>Import Settings</span>
-                  <input
-                    type="file"
-                    accept=".json"
-                    onChange={importSettings}
-                    className="hidden"
-                  />
+                  <input type="file" accept=".json" onChange={importSettings} className="hidden" />
                 </label>
                 <button
                   onClick={resetPreferences}
@@ -509,9 +513,7 @@ const UserPreferences = ({ isOpen, onClose }) => {
           {hasChanges && (
             <div className="border-t border-gray-200 bg-yellow-50 px-6 py-3">
               <div className="flex items-center justify-between">
-                <p className="text-sm text-yellow-700">
-                  You have unsaved changes
-                </p>
+                <p className="text-sm text-yellow-700">You have unsaved changes</p>
                 <div className="flex space-x-3">
                   <button
                     onClick={loadPreferences}

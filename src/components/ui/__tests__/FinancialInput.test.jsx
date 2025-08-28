@@ -21,30 +21,19 @@ describe('FinancialInput', () => {
     expect(screen.getByText('*')).toBeInTheDocument();
   });
 
-  it('formats currency values correctly', async() => {
+  it('formats currency values correctly', async () => {
     const mockOnChange = vi.fn();
     render(
-      <FinancialInput
-        value={1234.56}
-        onChange={mockOnChange}
-        type="currency"
-        currency="USD"
-      />
+      <FinancialInput value={1234.56} onChange={mockOnChange} type="currency" currency="USD" />
     );
 
     const input = screen.getByRole('textbox');
     expect(input.value).toBe('$1,234.56');
   });
 
-  it('handles focus and blur correctly', async() => {
+  it('handles focus and blur correctly', async () => {
     const mockOnChange = vi.fn();
-    render(
-      <FinancialInput
-        value={1000}
-        onChange={mockOnChange}
-        type="currency"
-      />
-    );
+    render(<FinancialInput value={1000} onChange={mockOnChange} type="currency" />);
 
     const input = screen.getByRole('textbox');
 
@@ -61,15 +50,9 @@ describe('FinancialInput', () => {
     });
   });
 
-  it('validates negative values when not allowed', async() => {
+  it('validates negative values when not allowed', async () => {
     const mockOnValidation = vi.fn();
-    render(
-      <FinancialInput
-        allowNegative={false}
-        onValidation={mockOnValidation}
-        value={-100}
-      />
-    );
+    render(<FinancialInput allowNegative={false} onValidation={mockOnValidation} value={-100} />);
 
     const input = screen.getByRole('textbox');
     fireEvent.focus(input);
@@ -82,12 +65,7 @@ describe('FinancialInput', () => {
   });
 
   it('handles percentage type correctly', () => {
-    render(
-      <FinancialInput
-        value={25}
-        type="percentage"
-      />
-    );
+    render(<FinancialInput value={25} type="percentage" />);
 
     const input = screen.getByRole('textbox');
     expect(input.value).toBe('25.00%');
@@ -104,14 +82,9 @@ describe('FinancialInput', () => {
     expect(input).toBeDisabled();
   });
 
-  it('calls onChange with parsed value', async() => {
+  it('calls onChange with parsed value', async () => {
     const mockOnChange = vi.fn();
-    render(
-      <FinancialInput
-        onChange={mockOnChange}
-        type="currency"
-      />
-    );
+    render(<FinancialInput onChange={mockOnChange} type="currency" />);
 
     const input = screen.getByRole('textbox');
     fireEvent.focus(input);
@@ -123,23 +96,19 @@ describe('FinancialInput', () => {
     });
   });
 
-  it('validates min and max values', async() => {
+  it('validates min and max values', async () => {
     const mockOnValidation = vi.fn();
-    render(
-      <FinancialInput
-        min={0}
-        max={1000}
-        value={1500}
-        onValidation={mockOnValidation}
-      />
-    );
+    render(<FinancialInput min={0} max={1000} value={1500} onValidation={mockOnValidation} />);
 
     const input = screen.getByRole('textbox');
     fireEvent.focus(input);
     fireEvent.blur(input);
 
     await waitFor(() => {
-      expect(mockOnValidation).toHaveBeenCalledWith(false, expect.stringContaining('must not exceed'));
+      expect(mockOnValidation).toHaveBeenCalledWith(
+        false,
+        expect.stringContaining('must not exceed')
+      );
     });
   });
 });

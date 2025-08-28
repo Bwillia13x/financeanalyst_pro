@@ -1,18 +1,24 @@
 import { Card } from 'src/components/ui/UIHelpers.jsx';
 
-import { wacc, terminalValue, project, valueEquity, growthVector } from '../../utils/valuationUtils';
+import {
+  wacc,
+  terminalValue,
+  project,
+  valueEquity,
+  growthVector
+} from '../../utils/valuationUtils';
 
 export function runTests(assumptions, rows, valuation) {
   const tests = [];
   const disc = wacc(assumptions);
 
   // Identity: EV ≈ PV(FCFF)+PV(TV)
-  const pvFCFF = rows.reduce((acc, r, i) => acc + r.fcff / ((1 + disc) ** (i + 1)), 0);
+  const pvFCFF = rows.reduce((acc, r, i) => acc + r.fcff / (1 + disc) ** (i + 1), 0);
   const tv = terminalValue(assumptions, rows, disc).tv;
-  const pvTV = tv / ((1 + disc) ** rows.length);
+  const pvTV = tv / (1 + disc) ** rows.length;
   tests.push({
     name: 'EV identity (PV_FCFF + PV_TV)',
-    pass: Math.abs((pvFCFF + pvTV) - valuation.ev) < 1e-6
+    pass: Math.abs(pvFCFF + pvTV - valuation.ev) < 1e-6
   });
 
   // Gordon constraint if used: WACC>g
@@ -26,8 +32,14 @@ export function runTests(assumptions, rows, valuation) {
   // WACC monotonicity (±50 bps)
   const aUp = { ...assumptions, rf: assumptions.rf + 0.005 };
   const aDn = { ...assumptions, rf: Math.max(0, assumptions.rf - 0.005) };
-  const vsUp = valueEquity(aUp, project(aUp, growthVector(0.05, aUp.years, aUp.growthYears))).perShare;
-  const vsDn = valueEquity(aDn, project(aDn, growthVector(0.05, aDn.years, aDn.growthYears))).perShare;
+  const vsUp = valueEquity(
+    aUp,
+    project(aUp, growthVector(0.05, aUp.years, aUp.growthYears))
+  ).perShare;
+  const vsDn = valueEquity(
+    aDn,
+    project(aDn, growthVector(0.05, aDn.years, aDn.growthYears))
+  ).perShare;
   tests.push({
     name: 'Per‑share ↓ when WACC ↑',
     pass: vsUp < valuation.perShare && vsDn > valuation.perShare
@@ -52,7 +64,10 @@ export function runTests(assumptions, rows, valuation) {
     cashAdjust: assumptions.cashAdjust * 10,
     price: assumptions.price * 10
   };
-  const scaledRows = project(scaledAssumptions, growthVector(0.05, scaledAssumptions.years, scaledAssumptions.growthYears));
+  const scaledRows = project(
+    scaledAssumptions,
+    growthVector(0.05, scaledAssumptions.years, scaledAssumptions.growthYears)
+  );
   const scaledValuation = valueEquity(scaledAssumptions, scaledRows);
   tests.push({
     name: 'Currency-scale invariance',
@@ -62,7 +77,10 @@ export function runTests(assumptions, rows, valuation) {
   // Net cash case (negative net debt raises equity)
   if (assumptions.netDebt < 0) {
     const zeroCashAssumptions = { ...assumptions, netDebt: 0 };
-    const zeroCashRows = project(zeroCashAssumptions, growthVector(0.05, zeroCashAssumptions.years, zeroCashAssumptions.growthYears));
+    const zeroCashRows = project(
+      zeroCashAssumptions,
+      growthVector(0.05, zeroCashAssumptions.years, zeroCashAssumptions.growthYears)
+    );
     const zeroCashValuation = valueEquity(zeroCashAssumptions, zeroCashRows);
     tests.push({
       name: 'Net cash increases equity',
@@ -84,7 +102,10 @@ export function runTests(assumptions, rows, valuation) {
       terminalMethod: 'exitMultiple',
       exitEVMultiple: impliedMultiple
     };
-    const multipleRows = project(multipleAssumptions, growthVector(0.05, multipleAssumptions.years, multipleAssumptions.growthYears));
+    const multipleRows = project(
+      multipleAssumptions,
+      growthVector(0.05, multipleAssumptions.years, multipleAssumptions.growthYears)
+    );
     const multipleValuation = valueEquity(multipleAssumptions, multipleRows);
     tests.push({
       name: 'Terminal method parity',

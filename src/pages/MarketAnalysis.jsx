@@ -56,7 +56,7 @@ const MarketAnalysis = () => {
               name={name}
               size="small"
               showChart={true}
-              onPriceUpdate={(data) => handleAssetClick(dataType, symbol, data)}
+              onPriceUpdate={data => handleAssetClick(dataType, symbol, data)}
               className="hover:shadow-lg transition-shadow cursor-pointer"
             />
           ))}

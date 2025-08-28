@@ -1,11 +1,4 @@
-import {
-  Plus,
-  TrendingUp,
-  TrendingDown,
-  PieChart,
-  DollarSign,
-  Target
-} from 'lucide-react';
+import { Plus, TrendingUp, TrendingDown, PieChart, DollarSign, Target } from 'lucide-react';
 import React, { useState, useEffect, useCallback } from 'react';
 
 import PortfolioAnalytics from '../components/PortfolioAnalytics/PortfolioAnalytics';
@@ -36,11 +29,51 @@ const PortfolioManagement = () => {
       totalValue: 100000,
       cash: 5000,
       holdings: [
-        { symbol: 'AAPL', name: 'Apple Inc.', shares: 100, currentPrice: 175.50, allocation: 35.0, value: 17550, costBasis: 160.00 },
-        { symbol: 'MSFT', name: 'Microsoft Corporation', shares: 80, currentPrice: 335.20, allocation: 30.0, value: 26816, costBasis: 300.00 },
-        { symbol: 'GOOGL', name: 'Alphabet Inc.', shares: 50, currentPrice: 128.45, allocation: 15.0, value: 6422.50, costBasis: 120.00 },
-        { symbol: 'TSLA', name: 'Tesla Inc.', shares: 30, currentPrice: 245.80, allocation: 10.0, value: 7374, costBasis: 200.00 },
-        { symbol: 'NVDA', name: 'NVIDIA Corporation', shares: 25, currentPrice: 425.30, allocation: 10.0, value: 10632.50, costBasis: 400.00 }
+        {
+          symbol: 'AAPL',
+          name: 'Apple Inc.',
+          shares: 100,
+          currentPrice: 175.5,
+          allocation: 35.0,
+          value: 17550,
+          costBasis: 160.0
+        },
+        {
+          symbol: 'MSFT',
+          name: 'Microsoft Corporation',
+          shares: 80,
+          currentPrice: 335.2,
+          allocation: 30.0,
+          value: 26816,
+          costBasis: 300.0
+        },
+        {
+          symbol: 'GOOGL',
+          name: 'Alphabet Inc.',
+          shares: 50,
+          currentPrice: 128.45,
+          allocation: 15.0,
+          value: 6422.5,
+          costBasis: 120.0
+        },
+        {
+          symbol: 'TSLA',
+          name: 'Tesla Inc.',
+          shares: 30,
+          currentPrice: 245.8,
+          allocation: 10.0,
+          value: 7374,
+          costBasis: 200.0
+        },
+        {
+          symbol: 'NVDA',
+          name: 'NVIDIA Corporation',
+          shares: 25,
+          currentPrice: 425.3,
+          allocation: 10.0,
+          value: 10632.5,
+          costBasis: 400.0
+        }
       ]
     };
 
@@ -48,7 +81,7 @@ const PortfolioManagement = () => {
   }, []);
 
   // Fetch real-time market data for portfolio holdings
-  const fetchMarketData = useCallback(async() => {
+  const fetchMarketData = useCallback(async () => {
     if (!activePortfolio || loading.market) return;
 
     setLoading(prev => ({ ...prev, market: true }));
@@ -149,7 +182,7 @@ const PortfolioManagement = () => {
                   { id: 'analytics', label: 'Analytics', icon: 'BarChart3' }
                 ]}
                 activeItem={viewMode}
-                onItemClick={(itemId) => setViewMode(itemId)}
+                onItemClick={itemId => setViewMode(itemId)}
                 className="bg-gray-100 rounded-lg"
               />
 
@@ -222,14 +255,20 @@ const PortfolioCard = ({ portfolio }) => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Total Gain/Loss</p>
-              <p className={`text-2xl font-bold ${portfolio.totalGainLoss >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+              <p
+                className={`text-2xl font-bold ${portfolio.totalGainLoss >= 0 ? 'text-green-600' : 'text-red-600'}`}
+              >
                 {formatCurrency(portfolio.totalGainLoss)}
               </p>
-              <p className={`text-sm ${portfolio.totalGainLossPercent >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+              <p
+                className={`text-sm ${portfolio.totalGainLossPercent >= 0 ? 'text-green-600' : 'text-red-600'}`}
+              >
                 {formatPercentage(portfolio.totalGainLossPercent)}
               </p>
             </div>
-            <div className={`p-3 rounded-lg ${portfolio.totalGainLoss >= 0 ? 'bg-green-100' : 'bg-red-100'}`}>
+            <div
+              className={`p-3 rounded-lg ${portfolio.totalGainLoss >= 0 ? 'bg-green-100' : 'bg-red-100'}`}
+            >
               {portfolio.totalGainLoss >= 0 ? (
                 <TrendingUp className="w-6 h-6 text-green-600" />
               ) : (
@@ -243,14 +282,20 @@ const PortfolioCard = ({ portfolio }) => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Day Change</p>
-              <p className={`text-2xl font-bold ${portfolio.dailyChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+              <p
+                className={`text-2xl font-bold ${portfolio.dailyChange >= 0 ? 'text-green-600' : 'text-red-600'}`}
+              >
                 {formatCurrency(portfolio.dailyChange)}
               </p>
-              <p className={`text-sm ${portfolio.dailyChangePercent >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+              <p
+                className={`text-sm ${portfolio.dailyChangePercent >= 0 ? 'text-green-600' : 'text-red-600'}`}
+              >
                 {formatPercentage(portfolio.dailyChangePercent)}
               </p>
             </div>
-            <div className={`p-3 rounded-lg ${portfolio.dailyChange >= 0 ? 'bg-green-100' : 'bg-red-100'}`}>
+            <div
+              className={`p-3 rounded-lg ${portfolio.dailyChange >= 0 ? 'bg-green-100' : 'bg-red-100'}`}
+            >
               {portfolio.dailyChange >= 0 ? (
                 <TrendingUp className="w-6 h-6 text-green-600" />
               ) : (
@@ -283,7 +328,12 @@ const PortfolioCard = ({ portfolio }) => {
             <h3 className="text-lg font-semibold text-gray-900">Holdings</h3>
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
-                <label htmlFor="portfolio-name" className="block text-sm font-medium text-gray-700 mb-1">Timeframe:</label>
+                <label
+                  htmlFor="portfolio-name"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Timeframe:
+                </label>
                 <input
                   id="portfolio-name"
                   type="text"
@@ -297,42 +347,64 @@ const PortfolioCard = ({ portfolio }) => {
         </div>
 
         <div className="overflow-x-auto">
-          <table
-            className="w-full"
-            role="table"
-            aria-label="Portfolio holdings table"
-          >
+          <table className="w-full" role="table" aria-label="Portfolio holdings table">
             <caption className="sr-only">
-              Portfolio holdings showing symbols, shares, prices, market values, allocations, and performance data
+              Portfolio holdings showing symbols, shares, prices, market values, allocations, and
+              performance data
             </caption>
             <thead className="bg-gray-50">
               <tr role="row">
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
                   Symbol / Name
                 </th>
-                <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
                   Shares
                 </th>
-                <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
                   Price
                 </th>
-                <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
                   Market Value
                 </th>
-                <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
                   Allocation
                 </th>
-                <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
                   Day Change
                 </th>
-                <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
                   Total Gain/Loss
                 </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {portfolio.holdings.map(holding => (
-                <tr key={holding.symbol} className="hover:bg-gray-50 focus-within:bg-gray-100" role="row">
+                <tr
+                  key={holding.symbol}
+                  className="hover:bg-gray-50 focus-within:bg-gray-100"
+                  role="row"
+                >
                   <th scope="row" className="px-6 py-4 whitespace-nowrap font-medium">
                     <div>
                       <div className="text-sm font-medium text-gray-900">{holding.symbol}</div>
@@ -394,8 +466,18 @@ const PortfolioCard = ({ portfolio }) => {
                       <div className="text-sm text-gray-500">Cash & Cash Equivalents</div>
                     </div>
                   </th>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900" aria-label="Shares: Not applicable">-</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900" aria-label="Price: Not applicable">-</td>
+                  <td
+                    className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900"
+                    aria-label="Shares: Not applicable"
+                  >
+                    -
+                  </td>
+                  <td
+                    className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900"
+                    aria-label="Price: Not applicable"
+                  >
+                    -
+                  </td>
                   <td
                     className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset"
                     tabIndex="0"
@@ -409,8 +491,18 @@ const PortfolioCard = ({ portfolio }) => {
                   >
                     {formatPercentage(0.1)}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-500" aria-label="Day Change: Not applicable">-</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-500" aria-label="Total Gain Loss: Not applicable">-</td>
+                  <td
+                    className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-500"
+                    aria-label="Day Change: Not applicable"
+                  >
+                    -
+                  </td>
+                  <td
+                    className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-500"
+                    aria-label="Total Gain Loss: Not applicable"
+                  >
+                    -
+                  </td>
                 </tr>
               )}
             </tbody>
@@ -420,6 +512,5 @@ const PortfolioCard = ({ portfolio }) => {
     </div>
   );
 };
-
 
 export default PortfolioManagement;

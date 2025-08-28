@@ -28,7 +28,11 @@ import _HeatmapChart from '../components/Charts/HeatmapChart';
 import _RealTimeChart from '../components/Charts/RealTimeChart';
 import SEOHead from '../components/SEO/SEOHead';
 import secureApiClient from '../services/secureApiClient';
-import { formatCurrency as _formatCurrency, formatPercentage as _formatPercentage, formatNumber as _formatNumber } from '../utils/formatters';
+import {
+  formatCurrency as _formatCurrency,
+  formatPercentage as _formatPercentage,
+  formatNumber as _formatNumber
+} from '../utils/formatters';
 
 const AdvancedCharting = () => {
   const [selectedTimeframe, setSelectedTimeframe] = useState('1D');
@@ -43,10 +47,25 @@ const AdvancedCharting = () => {
     export: false
   });
   const [activeCharts, setActiveCharts] = useState([
-    { id: 'price-chart', type: 'candlestick', symbol: 'AAPL', position: { x: 0, y: 0, w: 6, h: 4 } },
+    {
+      id: 'price-chart',
+      type: 'candlestick',
+      symbol: 'AAPL',
+      position: { x: 0, y: 0, w: 6, h: 4 }
+    },
     { id: 'volume-chart', type: 'bar', symbol: 'AAPL', position: { x: 6, y: 0, w: 6, h: 2 } },
-    { id: 'correlation-matrix', type: 'heatmap', symbols: selectedSymbols, position: { x: 6, y: 2, w: 6, h: 2 } },
-    { id: 'performance-comparison', type: 'line', symbols: selectedSymbols.slice(0, 3), position: { x: 0, y: 4, w: 12, h: 3 } }
+    {
+      id: 'correlation-matrix',
+      type: 'heatmap',
+      symbols: selectedSymbols,
+      position: { x: 6, y: 2, w: 6, h: 2 }
+    },
+    {
+      id: 'performance-comparison',
+      type: 'line',
+      symbols: selectedSymbols.slice(0, 3),
+      position: { x: 0, y: 4, w: 12, h: 3 }
+    }
   ]);
 
   const timeframeOptions = [
@@ -62,7 +81,12 @@ const AdvancedCharting = () => {
   ];
 
   const chartTypes = [
-    { id: 'candlestick', name: 'Candlestick', icon: CandlestickChart, description: 'OHLC price data' },
+    {
+      id: 'candlestick',
+      name: 'Candlestick',
+      icon: CandlestickChart,
+      description: 'OHLC price data'
+    },
     { id: 'line', name: 'Line Chart', icon: LineChart, description: 'Price trends over time' },
     { id: 'bar', name: 'Bar Chart', icon: BarChart, description: 'Volume and comparison data' },
     { id: 'area', name: 'Area Chart', icon: Activity, description: 'Filled area charts' },
@@ -94,17 +118,17 @@ const AdvancedCharting = () => {
     }
   }, [isRealTime]);
 
-  const loadChartData = async() => {
+  const loadChartData = async () => {
     setLoading(prev => ({ ...prev, data: true }));
 
     try {
       // Load market data for selected symbols
-      const dataPromises = selectedSymbols.map(async(symbol) => {
+      const dataPromises = selectedSymbols.map(async symbol => {
         try {
           const [quote, historical] = await Promise.all([
             secureApiClient.get(`/market-data/quote/${symbol}`),
             (() => {
-              const mapTimeframe = (tf) => {
+              const mapTimeframe = tf => {
                 switch (tf) {
                   case '1D':
                     return { range: '1d', interval: '5m' };
@@ -129,7 +153,9 @@ const AdvancedCharting = () => {
                 }
               };
               const { range, interval } = mapTimeframe(selectedTimeframe);
-              return secureApiClient.get(`/market-data/historical/${symbol}?range=${range}&interval=${interval}`);
+              return secureApiClient.get(
+                `/market-data/historical/${symbol}?range=${range}&interval=${interval}`
+              );
             })()
           ]);
 
@@ -166,7 +192,6 @@ const AdvancedCharting = () => {
       } catch {
         console.log('No portfolio data available');
       }
-
     } catch (error) {
       console.error('Failed to load chart data:', error);
     } finally {
@@ -177,10 +202,10 @@ const AdvancedCharting = () => {
   const startRealTimeUpdates = () => {
     stopRealTimeUpdates(); // Clear existing interval
 
-    realTimeUpdateRef.current = setInterval(async() => {
+    realTimeUpdateRef.current = setInterval(async () => {
       try {
         // Update quotes for selected symbols
-        const quotePromises = selectedSymbols.map(async(symbol) => {
+        const quotePromises = selectedSymbols.map(async symbol => {
           try {
             const response = await secureApiClient.get(`/market-data/quote/${symbol}`);
             return { symbol, quote: response.data };
@@ -200,7 +225,6 @@ const AdvancedCharting = () => {
           });
           return updated;
         });
-
       } catch (error) {
         console.error('Real-time update failed:', error);
       }
@@ -214,7 +238,7 @@ const AdvancedCharting = () => {
     }
   };
 
-  const generateMockQuote = (symbol) => {
+  const generateMockQuote = symbol => {
     const basePrice = { AAPL: 175, MSFT: 280, GOOGL: 2800, AMZN: 3200, TSLA: 250 }[symbol] || 100;
     const change = (Math.random() - 0.5) * 10;
     const price = basePrice + change;
@@ -230,12 +254,23 @@ const AdvancedCharting = () => {
     };
   };
 
-  const generateMockHistoricalData = (symbol) => {
+  const generateMockHistoricalData = symbol => {
     const data = [];
     const basePrice = { AAPL: 175, MSFT: 280, GOOGL: 2800, AMZN: 3200, TSLA: 250 }[symbol] || 100;
     let currentPrice = basePrice;
 
-    const intervals = { '1D': 390, '5D': 78, '1M': 22, '3M': 65, '6M': 130, '1Y': 252, '2Y': 104, '5Y': 260, 'MAX': 520 }[selectedTimeframe] || 100;
+    const intervals =
+      {
+        '1D': 390,
+        '5D': 78,
+        '1M': 22,
+        '3M': 65,
+        '6M': 130,
+        '1Y': 252,
+        '2Y': 104,
+        '5Y': 260,
+        MAX: 520
+      }[selectedTimeframe] || 100;
 
     for (let i = 0; i < intervals; i++) {
       const change = (Math.random() - 0.5) * 5;
@@ -267,11 +302,11 @@ const AdvancedCharting = () => {
     setActiveCharts(prev => [...prev, newChart]);
   };
 
-  const removeChart = (chartId) => {
+  const removeChart = chartId => {
     setActiveCharts(prev => prev.filter(chart => chart.id !== chartId));
   };
 
-  const exportChart = async(chartId, format = 'png') => {
+  const exportChart = async (chartId, format = 'png') => {
     setLoading(prev => ({ ...prev, export: true }));
 
     try {
@@ -292,7 +327,6 @@ const AdvancedCharting = () => {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-
     } catch (error) {
       console.error('Export failed:', error);
     } finally {
@@ -321,7 +355,9 @@ const AdvancedCharting = () => {
               </div>
 
               <div className="flex items-center space-x-2">
-                <div className={`w-2 h-2 rounded-full ${isRealTime ? 'bg-green-400 animate-pulse' : 'bg-gray-400'}`} />
+                <div
+                  className={`w-2 h-2 rounded-full ${isRealTime ? 'bg-green-400 animate-pulse' : 'bg-gray-400'}`}
+                />
                 <span className="text-xs text-gray-500">
                   {isRealTime ? 'Live Data' : 'Static Data'}
                 </span>
@@ -437,9 +473,7 @@ const AdvancedCharting = () => {
                 key={chart.id}
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className={`bg-white rounded-xl shadow-sm border overflow-hidden ${
-                  `col-span-${chart.position.w} row-span-${chart.position.h}`
-                }`}
+                className={`bg-white rounded-xl shadow-sm border overflow-hidden ${`col-span-${chart.position.w} row-span-${chart.position.h}`}`}
               >
                 {/* Chart Header */}
                 <div className="flex items-center justify-between p-4 border-b border-gray-200">

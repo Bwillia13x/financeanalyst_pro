@@ -1,21 +1,21 @@
 {
-  "timestamp": "2025-08-23T17:34:20.390Z",
+  "timestamp": "2025-08-24T21:09:38.366Z",
   "summary": {
-    "totalBundles": 46,
-    "totalSize": 4217.51,
+    "totalBundles": 77,
+    "totalSize": 4394.42,
     "totalGzipSize": 0,
     "violations": 0,
     "warnings": 1
   },
   "bundles": [
     {
-      "filename": "index-BavwsuMT.css",
+      "filename": "main-BavwsuMT.css",
       "rawSize": 0.12,
       "gzipSize": 0
     },
     {
-      "filename": "ai-vendor-DgNaS5_R.css",
-      "rawSize": 100.58,
+      "filename": "ai-vendor-CQf0eMVY.css",
+      "rawSize": 101.17,
       "gzipSize": 0
     },
     {
@@ -24,13 +24,43 @@
       "gzipSize": 0
     },
     {
-      "filename": "Progress-ClqRmyw5.js",
+      "filename": "Landing-DY9KY8fS.js",
+      "rawSize": 1.19,
+      "gzipSize": 0
+    },
+    {
+      "filename": "Progress-UB2Yqdgm.js",
       "rawSize": 1.2,
       "gzipSize": 0
     },
     {
-      "filename": "NotFound-nDUKCkn5.js",
+      "filename": "NotFound-BO3m2TbE.js",
       "rawSize": 1.41,
+      "gzipSize": 0
+    },
+    {
+      "filename": "dataTransformation-CeoIyxqZ.js",
+      "rawSize": 2.4,
+      "gzipSize": 0
+    },
+    {
+      "filename": "defaultFinancialData-CL3DkgK1.js",
+      "rawSize": 3.4,
+      "gzipSize": 0
+    },
+    {
+      "filename": "secureApiClient-B8gNdlWz.js",
+      "rawSize": 3.6,
+      "gzipSize": 0
+    },
+    {
+      "filename": "dcfCalculations-Y0XEnKnp.js",
+      "rawSize": 3.67,
+      "gzipSize": 0
+    },
+    {
+      "filename": "apiLogger-D987Un6Q.js",
+      "rawSize": 4.4,
       "gzipSize": 0
     },
     {
@@ -39,8 +69,23 @@
       "gzipSize": 0
     },
     {
-      "filename": "MonitoringDebugPanel-BP2eU3yu.js",
-      "rawSize": 5.6,
+      "filename": "SecondaryNav-OH4vRqpy.js",
+      "rawSize": 5.36,
+      "gzipSize": 0
+    },
+    {
+      "filename": "MonitoringDebugPanel-CRIIDdLe.js",
+      "rawSize": 5.42,
+      "gzipSize": 0
+    },
+    {
+      "filename": "useAccessibility-DvvFL2pv.js",
+      "rawSize": 6.34,
+      "gzipSize": 0
+    },
+    {
+      "filename": "monitoring-C1rizh9o.js",
+      "rawSize": 6.65,
       "gzipSize": 0
     },
     {
@@ -49,88 +94,193 @@
       "gzipSize": 0
     },
     {
-      "filename": "App-HQFW8g87.js",
-      "rawSize": 8.35,
+      "filename": "index-BAWOBDX4.js",
+      "rawSize": 7.01,
       "gzipSize": 0
     },
     {
-      "filename": "react-router-ClI8qmIy.js",
+      "filename": "VariableInputs-DUJMf7T7.js",
+      "rawSize": 7.49,
+      "gzipSize": 0
+    },
+    {
+      "filename": "react-core-DNrzdqUg.js",
+      "rawSize": 7.56,
+      "gzipSize": 0
+    },
+    {
+      "filename": "AIFinancialAssistant-C4cMKECZ.js",
+      "rawSize": 8.26,
+      "gzipSize": 0
+    },
+    {
+      "filename": "FormulaBuilder-Df9KG0Aa.js",
+      "rawSize": 8.62,
+      "gzipSize": 0
+    },
+    {
+      "filename": "react-router-BtMzuv8J.js",
       "rawSize": 8.69,
       "gzipSize": 0
     },
     {
-      "filename": "valuation-tool-demo-CSE7RLvp.js",
+      "filename": "valuation-tool-demo-oMDXe1JZ.js",
       "rawSize": 9.04,
       "gzipSize": 0
     },
     {
-      "filename": "state-vendor-daJpLsEM.js",
-      "rawSize": 9.23,
+      "filename": "Integrations-Bk7mzzab.js",
+      "rawSize": 9.79,
       "gzipSize": 0
     },
     {
-      "filename": "Integrations-KdYgK3lF.js",
-      "rawSize": 9.78,
+      "filename": "lboModelingEngine-BU3g5hW3.js",
+      "rawSize": 9.83,
       "gzipSize": 0
     },
     {
-      "filename": "Models-lEQOA3tN.js",
-      "rawSize": 11.9,
+      "filename": "ContextualInsightsSidebar-CJFjfhbN.js",
+      "rawSize": 10.44,
       "gzipSize": 0
     },
     {
-      "filename": "Data-Bkq4QCth.js",
-      "rawSize": 13.29,
+      "filename": "App-DulQJSfP.js",
+      "rawSize": 10.69,
       "gzipSize": 0
     },
     {
-      "filename": "ValuationToolDocs-C_dAA4Pi.js",
+      "filename": "index-BAZQR88H.js",
+      "rawSize": 10.78,
+      "gzipSize": 0
+    },
+    {
+      "filename": "ModelTemplates-C7z8lFmi.js",
+      "rawSize": 10.96,
+      "gzipSize": 0
+    },
+    {
+      "filename": "CalculationResults-DPuO9rI5.js",
+      "rawSize": 11.21,
+      "gzipSize": 0
+    },
+    {
+      "filename": "Models-Cz_MoPHx.js",
+      "rawSize": 11.92,
+      "gzipSize": 0
+    },
+    {
+      "filename": "monteCarloEngine-VpQcTKma.js",
+      "rawSize": 12,
+      "gzipSize": 0
+    },
+    {
+      "filename": "FinancialModelWorkspace-oC880y88.js",
+      "rawSize": 12.38,
+      "gzipSize": 0
+    },
+    {
+      "filename": "state-vendor-DCfAOVtq.js",
+      "rawSize": 12.85,
+      "gzipSize": 0
+    },
+    {
+      "filename": "AdvancedLBOTool-DhLjZP2A.js",
+      "rawSize": 12.93,
+      "gzipSize": 0
+    },
+    {
+      "filename": "EnhancedScenarioAnalysis-kRcFaCOQ.js",
+      "rawSize": 12.94,
+      "gzipSize": 0
+    },
+    {
+      "filename": "Data-CTSwKo_e.js",
+      "rawSize": 13.3,
+      "gzipSize": 0
+    },
+    {
+      "filename": "Header-9rhx0EeS.js",
+      "rawSize": 13.69,
+      "gzipSize": 0
+    },
+    {
+      "filename": "EnhancedMarketDataDashboard-oa01bmwd.js",
+      "rawSize": 13.95,
+      "gzipSize": 0
+    },
+    {
+      "filename": "ValuationToolDocs-UWd3lDRw.js",
       "rawSize": 14.34,
       "gzipSize": 0
     },
     {
-      "filename": "AIInsights-D4smGulW.js",
-      "rawSize": 14.41,
+      "filename": "AIInsights-CGGhBQLx.js",
+      "rawSize": 14.49,
       "gzipSize": 0
     },
     {
-      "filename": "AdvancedCharting-Dii68dxg.js",
-      "rawSize": 17.12,
+      "filename": "MonteCarloIntegrationHub-DqyvKTVW.js",
+      "rawSize": 16.39,
       "gzipSize": 0
     },
     {
-      "filename": "FinancialInputsDemo-CI8zc3k3.js",
-      "rawSize": 19.26,
+      "filename": "AdvancedCharting-C2cSpRLc.js",
+      "rawSize": 17.11,
       "gzipSize": 0
     },
     {
-      "filename": "MarketAnalysis-fYXEMC8A.js",
-      "rawSize": 19.57,
+      "filename": "PersistentCLI-D2MiYvIR.js",
+      "rawSize": 17.22,
       "gzipSize": 0
     },
     {
-      "filename": "Reports-Dgykjgx9.js",
-      "rawSize": 26.69,
+      "filename": "FinancialInputsDemo-BUkI0coh.js",
+      "rawSize": 19.32,
       "gzipSize": 0
     },
     {
-      "filename": "Analytics-PR2eYuvc.js",
-      "rawSize": 28.44,
+      "filename": "MarketAnalysis-C7PsQrKM.js",
+      "rawSize": 19.59,
       "gzipSize": 0
     },
     {
-      "filename": "portfolioCommands-CZ986kev.js",
-      "rawSize": 31.11,
+      "filename": "AnalysisResults-DcwF-ZHo.js",
+      "rawSize": 23.31,
       "gzipSize": 0
     },
     {
-      "filename": "ThesisCanvas-CkgfMdLR.js",
-      "rawSize": 32.53,
+      "filename": "FinancialSpreadsheet-D4i4P1U6.js",
+      "rawSize": 26.1,
       "gzipSize": 0
     },
     {
-      "filename": "index-Cp9qD1E5.js",
-      "rawSize": 34.41,
+      "filename": "DataExportImport-BkYB4JtG.js",
+      "rawSize": 27.18,
+      "gzipSize": 0
+    },
+    {
+      "filename": "Reports-9HmDM2mx.js",
+      "rawSize": 27.22,
+      "gzipSize": 0
+    },
+    {
+      "filename": "Analytics-Dp-3U4Zh.js",
+      "rawSize": 28.81,
+      "gzipSize": 0
+    },
+    {
+      "filename": "portfolioCommands-BX5PuU7P.js",
+      "rawSize": 31.21,
+      "gzipSize": 0
+    },
+    {
+      "filename": "ThesisCanvas-Citcx_UR.js",
+      "rawSize": 32.72,
+      "gzipSize": 0
+    },
+    {
+      "filename": "BusinessIntelligenceDashboard-B4B75YAY.js",
+      "rawSize": 34.7,
       "gzipSize": 0
     },
     {
@@ -139,103 +289,108 @@
       "gzipSize": 0
     },
     {
-      "filename": "ValuationWorkbench-CvQlRbTT.js",
-      "rawSize": 36.36,
+      "filename": "index-CkCuNwqs.js",
+      "rawSize": 35.56,
       "gzipSize": 0
     },
     {
-      "filename": "PortfolioManagement-Bsm9_jpk.js",
-      "rawSize": 39.75,
+      "filename": "ValuationWorkbench-D1_i8hWO.js",
+      "rawSize": 36.38,
       "gzipSize": 0
     },
     {
-      "filename": "index-Dgats-Vd.js",
-      "rawSize": 39.94,
+      "filename": "PrivateAnalysis-DrC1QQ2b.js",
+      "rawSize": 38.35,
       "gzipSize": 0
     },
     {
-      "filename": "ModelLab-l_F8Q5jo.js",
-      "rawSize": 41.29,
+      "filename": "PortfolioManagement-iFoW6drI.js",
+      "rawSize": 39.9,
       "gzipSize": 0
     },
     {
-      "filename": "Settings-Bl181bkE.js",
-      "rawSize": 45.7,
+      "filename": "index-Ce-H5ub7.js",
+      "rawSize": 39.96,
       "gzipSize": 0
     },
     {
-      "filename": "index-YwRNTxqX.js",
-      "rawSize": 49.69,
+      "filename": "ModelLab-DjskQG12.js",
+      "rawSize": 41.31,
       "gzipSize": 0
     },
     {
-      "filename": "advanced-analytics-DtoWBUPJ.js",
-      "rawSize": 50.39,
+      "filename": "Settings-CL234smy.js",
+      "rawSize": 45.72,
       "gzipSize": 0
     },
     {
-      "filename": "ai-vendor-ZNav9SO1.js",
-      "rawSize": 56.84,
+      "filename": "index-BfO3PIWd.js",
+      "rawSize": 49.75,
       "gzipSize": 0
     },
     {
-      "filename": "index-Djh2UQq2.js",
-      "rawSize": 56.93,
+      "filename": "advanced-analytics-BAIbhtan.js",
+      "rawSize": 50.51,
       "gzipSize": 0
     },
     {
-      "filename": "d3-vendor-DSfn1wqK.js",
+      "filename": "d3-vendor-D_yLQ9UB.js",
       "rawSize": 61.88,
       "gzipSize": 0
     },
     {
-      "filename": "security-vendor-Cyd7Cpw1.js",
+      "filename": "security-vendor-BTuMooNY.js",
       "rawSize": 65.99,
       "gzipSize": 0
     },
     {
-      "filename": "ValuationTool-CN-55xfU.js",
-      "rawSize": 75.9,
+      "filename": "ai-vendor-feKnHpSc.js",
+      "rawSize": 73.74,
       "gzipSize": 0
     },
     {
-      "filename": "ui-vendor-A7iyaEQD.js",
-      "rawSize": 101.34,
+      "filename": "ValuationTool-DzVjISAt.js",
+      "rawSize": 75.96,
       "gzipSize": 0
     },
     {
-      "filename": "react-dom-Duoe04_M.js",
+      "filename": "main-uyxHV212.js",
+      "rawSize": 82.45,
+      "gzipSize": 0
+    },
+    {
+      "filename": "ModelingTools-eDIVkzCP.js",
+      "rawSize": 112.64,
+      "gzipSize": 0
+    },
+    {
+      "filename": "react-dom-CeM5YI00.js",
       "rawSize": 128.73,
       "gzipSize": 0
     },
     {
-      "filename": "index-D7w56vOM.js",
-      "rawSize": 238.76,
+      "filename": "TerminalInterface-DthTM0Tk.js",
+      "rawSize": 198.82,
       "gzipSize": 0
     },
     {
-      "filename": "monitoring-vendor-IRWhQ566.js",
-      "rawSize": 346.33,
+      "filename": "recharts-vendor-BQQFhCvI.js",
+      "rawSize": 355.31,
       "gzipSize": 0
     },
     {
-      "filename": "recharts-vendor-yL6fentH.js",
-      "rawSize": 353.35,
+      "filename": "ui-vendor-B9wUrVTC.js",
+      "rawSize": 604.56,
       "gzipSize": 0
     },
     {
-      "filename": "private-analysis-9NhowjlC.js",
-      "rawSize": 440.37,
+      "filename": "monitoring-vendor-DKF8G9e7.js",
+      "rawSize": 708.68,
       "gzipSize": 0
     },
     {
-      "filename": "vendor-aZv1Du6x.js",
-      "rawSize": 721.42,
-      "gzipSize": 0
-    },
-    {
-      "filename": "react-core-BJVGfhQG.js",
-      "rawSize": 802.02,
+      "filename": "vendor-DUjEiIAG.js",
+      "rawSize": 758.39,
       "gzipSize": 0
     }
   ],
@@ -243,9 +398,9 @@
   "warnings": [
     {
       "bundle": "chunk-count",
-      "actual": 46,
+      "actual": 77,
       "budget": 35,
-      "overBy": 11,
+      "overBy": 42,
       "percentage": "N/A"
     }
   ]

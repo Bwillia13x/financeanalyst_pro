@@ -6,51 +6,87 @@ const INDUSTRY_BENCHMARKS = {
     name: 'Healthcare & Life Sciences',
     metrics: {
       revenueGrowth: {
-        p25: 8, median: 15, p75: 25, unit: '%',
+        p25: 8,
+        median: 15,
+        p75: 25,
+        unit: '%',
         description: 'Annual revenue growth rate'
       },
       ebitdaMargin: {
-        p25: 18, median: 28, p75: 40, unit: '%',
+        p25: 18,
+        median: 28,
+        p75: 40,
+        unit: '%',
         description: 'EBITDA as percentage of revenue'
       },
       grossMargin: {
-        p25: 65, median: 75, p75: 85, unit: '%',
+        p25: 65,
+        median: 75,
+        p75: 85,
+        unit: '%',
         description: 'Gross profit margin'
       },
       operatingMargin: {
-        p25: 12, median: 20, p75: 32, unit: '%',
+        p25: 12,
+        median: 20,
+        p75: 32,
+        unit: '%',
         description: 'Operating income as percentage of revenue'
       },
       netMargin: {
-        p25: 8, median: 15, p75: 25, unit: '%',
+        p25: 8,
+        median: 15,
+        p75: 25,
+        unit: '%',
         description: 'Net income margin'
       },
       roe: {
-        p25: 12, median: 18, p75: 25, unit: '%',
+        p25: 12,
+        median: 18,
+        p75: 25,
+        unit: '%',
         description: 'Return on equity'
       },
       roa: {
-        p25: 6, median: 10, p75: 15, unit: '%',
+        p25: 6,
+        median: 10,
+        p75: 15,
+        unit: '%',
         description: 'Return on assets'
       },
       debtToEquity: {
-        p25: 0.2, median: 0.4, p75: 0.8, unit: 'x',
+        p25: 0.2,
+        median: 0.4,
+        p75: 0.8,
+        unit: 'x',
         description: 'Total debt to equity ratio'
       },
       currentRatio: {
-        p25: 1.2, median: 1.8, p75: 2.5, unit: 'x',
+        p25: 1.2,
+        median: 1.8,
+        p75: 2.5,
+        unit: 'x',
         description: 'Current assets to current liabilities'
       },
       assetTurnover: {
-        p25: 0.6, median: 0.9, p75: 1.3, unit: 'x',
+        p25: 0.6,
+        median: 0.9,
+        p75: 1.3,
+        unit: 'x',
         description: 'Revenue to total assets ratio'
       },
       wacc: {
-        p25: 8, median: 10, p75: 12, unit: '%',
+        p25: 8,
+        median: 10,
+        p75: 12,
+        unit: '%',
         description: 'Weighted average cost of capital'
       },
       terminalGrowth: {
-        p25: 2, median: 2.5, p75: 3, unit: '%',
+        p25: 2,
+        median: 2.5,
+        p75: 3,
+        unit: '%',
         description: 'Long-term terminal growth rate'
       }
     }
@@ -59,51 +95,87 @@ const INDUSTRY_BENCHMARKS = {
     name: 'Technology & Software',
     metrics: {
       revenueGrowth: {
-        p25: 15, median: 25, p75: 50, unit: '%',
+        p25: 15,
+        median: 25,
+        p75: 50,
+        unit: '%',
         description: 'Annual revenue growth rate'
       },
       ebitdaMargin: {
-        p25: 20, median: 35, p75: 50, unit: '%',
+        p25: 20,
+        median: 35,
+        p75: 50,
+        unit: '%',
         description: 'EBITDA as percentage of revenue'
       },
       grossMargin: {
-        p25: 70, median: 80, p75: 90, unit: '%',
+        p25: 70,
+        median: 80,
+        p75: 90,
+        unit: '%',
         description: 'Gross profit margin'
       },
       operatingMargin: {
-        p25: 15, median: 25, p75: 40, unit: '%',
+        p25: 15,
+        median: 25,
+        p75: 40,
+        unit: '%',
         description: 'Operating income as percentage of revenue'
       },
       netMargin: {
-        p25: 10, median: 18, p75: 30, unit: '%',
+        p25: 10,
+        median: 18,
+        p75: 30,
+        unit: '%',
         description: 'Net income margin'
       },
       roe: {
-        p25: 15, median: 22, p75: 35, unit: '%',
+        p25: 15,
+        median: 22,
+        p75: 35,
+        unit: '%',
         description: 'Return on equity'
       },
       roa: {
-        p25: 8, median: 15, p75: 25, unit: '%',
+        p25: 8,
+        median: 15,
+        p75: 25,
+        unit: '%',
         description: 'Return on assets'
       },
       debtToEquity: {
-        p25: 0.1, median: 0.3, p75: 0.6, unit: 'x',
+        p25: 0.1,
+        median: 0.3,
+        p75: 0.6,
+        unit: 'x',
         description: 'Total debt to equity ratio'
       },
       currentRatio: {
-        p25: 1.5, median: 2.2, p75: 3.5, unit: 'x',
+        p25: 1.5,
+        median: 2.2,
+        p75: 3.5,
+        unit: 'x',
         description: 'Current assets to current liabilities'
       },
       assetTurnover: {
-        p25: 0.4, median: 0.7, p75: 1.1, unit: 'x',
+        p25: 0.4,
+        median: 0.7,
+        p75: 1.1,
+        unit: 'x',
         description: 'Revenue to total assets ratio'
       },
       wacc: {
-        p25: 9, median: 12, p75: 15, unit: '%',
+        p25: 9,
+        median: 12,
+        p75: 15,
+        unit: '%',
         description: 'Weighted average cost of capital'
       },
       terminalGrowth: {
-        p25: 2.5, median: 3, p75: 3.5, unit: '%',
+        p25: 2.5,
+        median: 3,
+        p75: 3.5,
+        unit: '%',
         description: 'Long-term terminal growth rate'
       }
     }
@@ -112,51 +184,87 @@ const INDUSTRY_BENCHMARKS = {
     name: 'Manufacturing & Industrial',
     metrics: {
       revenueGrowth: {
-        p25: 3, median: 8, p75: 15, unit: '%',
+        p25: 3,
+        median: 8,
+        p75: 15,
+        unit: '%',
         description: 'Annual revenue growth rate'
       },
       ebitdaMargin: {
-        p25: 10, median: 18, p75: 25, unit: '%',
+        p25: 10,
+        median: 18,
+        p75: 25,
+        unit: '%',
         description: 'EBITDA as percentage of revenue'
       },
       grossMargin: {
-        p25: 25, median: 35, p75: 45, unit: '%',
+        p25: 25,
+        median: 35,
+        p75: 45,
+        unit: '%',
         description: 'Gross profit margin'
       },
       operatingMargin: {
-        p25: 6, median: 12, p75: 20, unit: '%',
+        p25: 6,
+        median: 12,
+        p75: 20,
+        unit: '%',
         description: 'Operating income as percentage of revenue'
       },
       netMargin: {
-        p25: 4, median: 8, p75: 15, unit: '%',
+        p25: 4,
+        median: 8,
+        p75: 15,
+        unit: '%',
         description: 'Net income margin'
       },
       roe: {
-        p25: 8, median: 15, p75: 22, unit: '%',
+        p25: 8,
+        median: 15,
+        p75: 22,
+        unit: '%',
         description: 'Return on equity'
       },
       roa: {
-        p25: 4, median: 8, p75: 12, unit: '%',
+        p25: 4,
+        median: 8,
+        p75: 12,
+        unit: '%',
         description: 'Return on assets'
       },
       debtToEquity: {
-        p25: 0.3, median: 0.6, p75: 1.2, unit: 'x',
+        p25: 0.3,
+        median: 0.6,
+        p75: 1.2,
+        unit: 'x',
         description: 'Total debt to equity ratio'
       },
       currentRatio: {
-        p25: 1.1, median: 1.5, p75: 2.2, unit: 'x',
+        p25: 1.1,
+        median: 1.5,
+        p75: 2.2,
+        unit: 'x',
         description: 'Current assets to current liabilities'
       },
       assetTurnover: {
-        p25: 0.8, median: 1.2, p75: 1.8, unit: 'x',
+        p25: 0.8,
+        median: 1.2,
+        p75: 1.8,
+        unit: 'x',
         description: 'Revenue to total assets ratio'
       },
       wacc: {
-        p25: 7, median: 9, p75: 11, unit: '%',
+        p25: 7,
+        median: 9,
+        p75: 11,
+        unit: '%',
         description: 'Weighted average cost of capital'
       },
       terminalGrowth: {
-        p25: 1.5, median: 2, p75: 2.5, unit: '%',
+        p25: 1.5,
+        median: 2,
+        p75: 2.5,
+        unit: '%',
         description: 'Long-term terminal growth rate'
       }
     }
@@ -165,51 +273,87 @@ const INDUSTRY_BENCHMARKS = {
     name: 'Retail & Consumer',
     metrics: {
       revenueGrowth: {
-        p25: 2, median: 6, p75: 12, unit: '%',
+        p25: 2,
+        median: 6,
+        p75: 12,
+        unit: '%',
         description: 'Annual revenue growth rate'
       },
       ebitdaMargin: {
-        p25: 8, median: 15, p75: 22, unit: '%',
+        p25: 8,
+        median: 15,
+        p75: 22,
+        unit: '%',
         description: 'EBITDA as percentage of revenue'
       },
       grossMargin: {
-        p25: 30, median: 40, p75: 55, unit: '%',
+        p25: 30,
+        median: 40,
+        p75: 55,
+        unit: '%',
         description: 'Gross profit margin'
       },
       operatingMargin: {
-        p25: 3, median: 8, p75: 15, unit: '%',
+        p25: 3,
+        median: 8,
+        p75: 15,
+        unit: '%',
         description: 'Operating income as percentage of revenue'
       },
       netMargin: {
-        p25: 2, median: 5, p75: 10, unit: '%',
+        p25: 2,
+        median: 5,
+        p75: 10,
+        unit: '%',
         description: 'Net income margin'
       },
       roe: {
-        p25: 10, median: 16, p75: 25, unit: '%',
+        p25: 10,
+        median: 16,
+        p75: 25,
+        unit: '%',
         description: 'Return on equity'
       },
       roa: {
-        p25: 3, median: 6, p75: 10, unit: '%',
+        p25: 3,
+        median: 6,
+        p75: 10,
+        unit: '%',
         description: 'Return on assets'
       },
       debtToEquity: {
-        p25: 0.4, median: 0.7, p75: 1.3, unit: 'x',
+        p25: 0.4,
+        median: 0.7,
+        p75: 1.3,
+        unit: 'x',
         description: 'Total debt to equity ratio'
       },
       currentRatio: {
-        p25: 0.9, median: 1.3, p75: 1.8, unit: 'x',
+        p25: 0.9,
+        median: 1.3,
+        p75: 1.8,
+        unit: 'x',
         description: 'Current assets to current liabilities'
       },
       assetTurnover: {
-        p25: 1.2, median: 1.8, p75: 2.5, unit: 'x',
+        p25: 1.2,
+        median: 1.8,
+        p75: 2.5,
+        unit: 'x',
         description: 'Revenue to total assets ratio'
       },
       wacc: {
-        p25: 8, median: 10, p75: 12, unit: '%',
+        p25: 8,
+        median: 10,
+        p75: 12,
+        unit: '%',
         description: 'Weighted average cost of capital'
       },
       terminalGrowth: {
-        p25: 1.5, median: 2, p75: 2.5, unit: '%',
+        p25: 1.5,
+        median: 2,
+        p75: 2.5,
+        unit: '%',
         description: 'Long-term terminal growth rate'
       }
     }
@@ -219,15 +363,20 @@ const INDUSTRY_BENCHMARKS = {
 // Historical context data for assumptions
 const HISTORICAL_CONTEXT = {
   wacc: {
-    '2020': { avg: 9.2, volatility: 'high', note: 'COVID-19 impact' },
-    '2021': { avg: 8.8, volatility: 'medium', note: 'Recovery period' },
-    '2022': { avg: 10.5, volatility: 'high', note: 'Rising interest rates' },
-    '2023': { avg: 11.2, volatility: 'medium', note: 'Continued rate increases' },
-    '2024': { avg: 10.8, volatility: 'medium', note: 'Rate stabilization' }
+    2020: { avg: 9.2, volatility: 'high', note: 'COVID-19 impact' },
+    2021: { avg: 8.8, volatility: 'medium', note: 'Recovery period' },
+    2022: { avg: 10.5, volatility: 'high', note: 'Rising interest rates' },
+    2023: { avg: 11.2, volatility: 'medium', note: 'Continued rate increases' },
+    2024: { avg: 10.8, volatility: 'medium', note: 'Rate stabilization' }
   },
   terminalGrowth: {
     context: 'Should align with long-term GDP growth expectations (2-3% for developed markets)',
-    factors: ['Economic growth', 'Inflation expectations', 'Market maturity', 'Regulatory environment']
+    factors: [
+      'Economic growth',
+      'Inflation expectations',
+      'Market maturity',
+      'Regulatory environment'
+    ]
   }
 };
 
@@ -275,19 +424,19 @@ export const useAssumptionBenchmarking = (industry = 'healthcare', companyMetric
     if (value >= benchmark.p75) {
       // Estimate between 75th and 100th percentile
       const excess = Math.min((value - benchmark.p75) / (benchmark.p75 * 0.5), 1);
-      return 75 + (excess * 25);
+      return 75 + excess * 25;
     } else if (value >= benchmark.median) {
       // Between 50th and 75th percentile
       const position = (value - benchmark.median) / (benchmark.p75 - benchmark.median);
-      return 50 + (position * 25);
+      return 50 + position * 25;
     } else if (value >= benchmark.p25) {
       // Between 25th and 50th percentile
       const position = (value - benchmark.p25) / (benchmark.median - benchmark.p25);
-      return 25 + (position * 25);
+      return 25 + position * 25;
     } else {
       // Below 25th percentile
       const deficit = Math.max((benchmark.p25 - value) / (benchmark.p25 * 0.5), 0);
-      return Math.max(25 - (deficit * 25), 0);
+      return Math.max(25 - deficit * 25, 0);
     }
   };
 
@@ -324,14 +473,18 @@ export const useAssumptionBenchmarking = (industry = 'healthcare', companyMetric
     switch (assumptionType) {
       case 'wacc': {
         const currentYear = new Date().getFullYear().toString();
-        const historicalData = HISTORICAL_CONTEXT.wacc[currentYear] || HISTORICAL_CONTEXT.wacc['2024'];
+        const historicalData =
+          HISTORICAL_CONTEXT.wacc[currentYear] || HISTORICAL_CONTEXT.wacc['2024'];
         return {
           historical: historicalData,
           guidance: `Current market conditions suggest WACC in range of ${industryBenchmarks.metrics.wacc.p25}%-${industryBenchmarks.metrics.wacc.p75}%`,
           factors: ['Risk-free rate', 'Market risk premium', 'Beta', 'Cost of debt', 'Tax rate'],
-          recommendation: value < industryBenchmarks.metrics.wacc.p25 ? 'Consider if discount rate reflects company risk profile' :
-            value > industryBenchmarks.metrics.wacc.p75 ? 'High discount rate - validate risk assumptions' :
-              'Within reasonable industry range'
+          recommendation:
+            value < industryBenchmarks.metrics.wacc.p25
+              ? 'Consider if discount rate reflects company risk profile'
+              : value > industryBenchmarks.metrics.wacc.p75
+                ? 'High discount rate - validate risk assumptions'
+                : 'Within reasonable industry range'
         };
       }
 
@@ -340,9 +493,12 @@ export const useAssumptionBenchmarking = (industry = 'healthcare', companyMetric
           context: HISTORICAL_CONTEXT.terminalGrowth.context,
           factors: HISTORICAL_CONTEXT.terminalGrowth.factors,
           guidance: `Industry terminal growth typically ${industryBenchmarks.metrics.terminalGrowth.p25}%-${industryBenchmarks.metrics.terminalGrowth.p75}%`,
-          recommendation: value < 1 ? 'Very conservative - consider economic growth assumptions' :
-            value > 4 ? 'High terminal growth - ensure justification' :
-              'Reasonable terminal growth assumption'
+          recommendation:
+            value < 1
+              ? 'Very conservative - consider economic growth assumptions'
+              : value > 4
+                ? 'High terminal growth - ensure justification'
+                : 'Reasonable terminal growth assumption'
         };
 
       default:
@@ -351,7 +507,7 @@ export const useAssumptionBenchmarking = (industry = 'healthcare', companyMetric
   };
 
   // Fetch additional benchmark data (simulate API call)
-  const fetchBenchmarkData = async(forceRefresh = false) => {
+  const fetchBenchmarkData = async (forceRefresh = false) => {
     if (benchmarkData && !forceRefresh) return benchmarkData;
 
     setLoading(true);

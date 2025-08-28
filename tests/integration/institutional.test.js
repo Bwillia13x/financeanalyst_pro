@@ -6,7 +6,7 @@
 import { describe, test, expect, beforeAll } from 'vitest';
 
 describe('Institutional Features Tests', () => {
-  
+
   describe('1. Multi-Entity Management', () => {
     test('Should create and manage entity hierarchies', async () => {
       const parentEntity = {
@@ -36,7 +36,7 @@ describe('Institutional Features Tests', () => {
               children: []
             },
             {
-              id: 'child_789', 
+              id: 'child_789',
               name: 'European Fund',
               parentId: 'parent_123',
               children: []
@@ -55,7 +55,7 @@ describe('Institutional Features Tests', () => {
       expect(mockEntityHierarchy.success).toBe(true);
       expect(mockEntityHierarchy.data.children).toHaveLength(2);
       expect(mockEntityHierarchy.data.totalDescendants).toBe(3);
-      
+
       console.log('✅ Multi-entity hierarchy test passed');
     });
 
@@ -74,7 +74,7 @@ describe('Institutional Features Tests', () => {
           entityId: 'parent_123',
           consolidatedFinancials: {
             totalRevenue: 2450000000,
-            totalExpenses: 1890000000, 
+            totalExpenses: 1890000000,
             netIncome: 560000000,
             totalAssets: 45600000000,
             totalLiabilities: 8900000000,
@@ -102,7 +102,7 @@ describe('Institutional Features Tests', () => {
       expect(mockConsolidation.success).toBe(true);
       expect(mockConsolidation.data.consolidatedFinancials.totalRevenue).toBeGreaterThan(2000000000);
       expect(Object.keys(mockConsolidation.data.entityBreakdown)).toHaveLength(3);
-      
+
       console.log('✅ Financial consolidation test passed');
     });
   });
@@ -114,7 +114,7 @@ describe('Institutional Features Tests', () => {
         brandName: 'Precision Analytics Pro',
         colors: {
           primary: '#1a472a',
-          secondary: '#2563eb', 
+          secondary: '#2563eb',
           accent: '#059669',
           background: '#ffffff',
           text: '#1f2937'
@@ -158,7 +158,7 @@ describe('Institutional Features Tests', () => {
       expect(mockBrandingSetup.success).toBe(true);
       expect(mockBrandingSetup.data.brandName).toBe('Precision Analytics Pro');
       expect(mockBrandingSetup.data.cssVariables['--color-primary']).toBe('#1a472a');
-      
+
       console.log('✅ Custom branding configuration test passed');
     });
 
@@ -196,7 +196,7 @@ describe('Institutional Features Tests', () => {
       expect(mockBrandedExport.success).toBe(true);
       expect(mockBrandedExport.data.brandingApplied).toBe(true);
       expect(mockBrandedExport.data.template.header.brandName).toBe('Precision Analytics Pro');
-      
+
       console.log('✅ Branded export generation test passed');
     });
   });
@@ -242,7 +242,7 @@ describe('Institutional Features Tests', () => {
       expect(mockSOXWorkflow.data.type).toBe('sox_compliance');
       expect(mockSOXWorkflow.data.steps).toHaveLength(4);
       expect(mockSOXWorkflow.data.steps[0].status).toBe('in_progress');
-      
+
       console.log('✅ SOX compliance workflow test passed');
     });
 
@@ -260,14 +260,14 @@ describe('Institutional Features Tests', () => {
           workflowId: 'workflow_sox_001',
           progressPercentage: 0.50,
           completedSteps: [
-            { 
-              id: 'financial_data_review', 
+            {
+              id: 'financial_data_review',
               completedAt: '2024-01-15T10:30:00Z',
               completedBy: 'analyst_002',
               duration: '5 days'
             },
-            { 
-              id: 'internal_controls_assessment', 
+            {
+              id: 'internal_controls_assessment',
               completedAt: '2024-01-22T16:45:00Z',
               completedBy: 'manager_001',
               duration: '7 days'
@@ -290,7 +290,7 @@ describe('Institutional Features Tests', () => {
       expect(mockProgressTracking.data.progressPercentage).toBe(0.50);
       expect(mockProgressTracking.data.completedSteps).toHaveLength(2);
       expect(mockProgressTracking.data.overallStatus).toBe('on_track');
-      
+
       console.log('✅ Compliance workflow progress test passed');
     });
 
@@ -333,7 +333,7 @@ describe('Institutional Features Tests', () => {
       expect(mockApproval.data.decision).toBe('approved');
       expect(mockApproval.data.digitalSignature).toBeDefined();
       expect(mockApproval.data.workflowUpdate.nextStep).toBe('external_audit_review');
-      
+
       console.log('✅ Compliance workflow approval test passed');
     });
   });
@@ -362,7 +362,7 @@ describe('Institutional Features Tests', () => {
           })),
           eventsByType: {
             'entity_created': 1,
-            'branding_configured': 1, 
+            'branding_configured': 1,
             'compliance_workflow_initiated': 1,
             'permissions_updated': 1
           },
@@ -374,7 +374,7 @@ describe('Institutional Features Tests', () => {
       expect(mockAuditLog.success).toBe(true);
       expect(mockAuditLog.data.events).toHaveLength(4);
       expect(mockAuditLog.data.eventsByType['entity_created']).toBe(1);
-      
+
       console.log('✅ Comprehensive audit logging test passed');
     });
 
@@ -417,7 +417,7 @@ describe('Institutional Features Tests', () => {
       expect(mockAuditAnalytics.data.totalEvents).toBeGreaterThan(100);
       expect(mockAuditAnalytics.data.riskAnalysis.overallRiskScore).toBe('low');
       expect(mockAuditAnalytics.data.complianceMetrics.auditTrailCompleteness).toBe(1.0);
-      
+
       console.log('✅ Audit trail analytics test passed');
     });
   });
@@ -440,7 +440,7 @@ describe('Institutional Features Tests', () => {
           assignedRole: 'analyst',
           permissions: [
             'read_data',
-            'write_data', 
+            'write_data',
             'view_reports',
             'create_reports',
             'export_basic',
@@ -465,7 +465,7 @@ describe('Institutional Features Tests', () => {
       expect(mockPermissionAssignment.data.permissions).toContain('read_data');
       expect(mockPermissionAssignment.data.restrictions.dataTypes).toContain('public');
       expect(mockPermissionAssignment.data.effectivePermissions).toBe(8);
-      
+
       console.log('✅ Role-based permission management test passed');
     });
 
@@ -481,18 +481,18 @@ describe('Institutional Features Tests', () => {
         data: {
           userId: 'user_456',
           entityPermissions: {
-            'parent_123': { 
+            'parent_123': {
               directPermissions: ['read_data', 'view_reports'],
               inherited: false,
               source: 'direct_assignment'
             },
-            'child_456': { 
+            'child_456': {
               directPermissions: ['read_data', 'view_reports', 'write_data'],
               inherited: true,
               source: 'parent_inheritance',
               inheritedFrom: 'parent_123'
             },
-            'grandchild_789': { 
+            'grandchild_789': {
               directPermissions: ['read_data', 'view_reports', 'write_data'],
               inherited: true,
               source: 'ancestor_inheritance',
@@ -511,7 +511,7 @@ describe('Institutional Features Tests', () => {
       expect(mockInheritanceValidation.success).toBe(true);
       expect(Object.keys(mockInheritanceValidation.data.entityPermissions)).toHaveLength(3);
       expect(mockInheritanceValidation.data.conflictResolution.conflicts).toBe(0);
-      
+
       console.log('✅ Permission inheritance validation test passed');
     });
   });
@@ -559,7 +559,7 @@ describe('Institutional Features Tests', () => {
       expect(mockScalabilityTest.data.performanceMetrics.entityCreationTime).toBeLessThan(200);
       expect(mockScalabilityTest.data.resourceUtilization.cacheHitRatio).toBeGreaterThan(0.9);
       expect(mockScalabilityTest.data.bottlenecks).toHaveLength(0);
-      
+
       console.log('✅ Large-scale institutional operations test passed');
     });
   });

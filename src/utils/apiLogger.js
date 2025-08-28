@@ -128,11 +128,11 @@ class ApiLogger {
         duration,
         error: error
           ? {
-            message: error.message,
-            code: error.code,
-            status: error.response?.status,
-            statusText: error.response?.statusText
-          }
+              message: error.message,
+              code: error.code,
+              status: error.response?.status,
+              statusText: error.response?.statusText
+            }
           : null,
         success: false
       });

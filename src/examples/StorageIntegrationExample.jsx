@@ -7,7 +7,11 @@ import { Save, FolderOpen, _Download, _Upload, Database } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 
 import DataExportImport from '../components/DataExportImport.jsx';
-import { useDCFStorage, useUserPreferences, useStorageStats } from '../hooks/useFinancialStorage.js';
+import {
+  useDCFStorage,
+  useUserPreferences,
+  useStorageStats
+} from '../hooks/useFinancialStorage.js';
 
 const StorageIntegrationExample = () => {
   const [showDataManager, setShowDataManager] = useState(false);
@@ -26,7 +30,7 @@ const StorageIntegrationExample = () => {
     },
     valuation: {
       intrinsicValue: 150.25,
-      currentPrice: 140.50,
+      currentPrice: 140.5,
       upside: 0.069
     }
   });
@@ -47,7 +51,7 @@ const StorageIntegrationExample = () => {
     }
   }, [modelData, preferences?.autoSave]);
 
-  const handleSaveModel = async() => {
+  const handleSaveModel = async () => {
     const success = await saveModel(modelData.symbol, {
       ...modelData,
       metadata: {
@@ -63,7 +67,7 @@ const StorageIntegrationExample = () => {
     }
   };
 
-  const handleLoadModel = async(symbol) => {
+  const handleLoadModel = async symbol => {
     const model = await getModel(symbol);
     if (model) {
       setModelData(model);
@@ -71,7 +75,7 @@ const StorageIntegrationExample = () => {
     }
   };
 
-  const handleDeleteModel = async(symbol) => {
+  const handleDeleteModel = async symbol => {
     if (window.confirm(`Are you sure you want to delete the model for ${symbol}?`)) {
       const success = await deleteModel(symbol);
       if (success && selectedModel === symbol) {
@@ -114,7 +118,7 @@ const StorageIntegrationExample = () => {
                 <input
                   type="checkbox"
                   checked={preferences?.autoSave || false}
-                  onChange={(e) => updatePreference('autoSave', e.target.checked)}
+                  onChange={e => updatePreference('autoSave', e.target.checked)}
                   className="mr-2"
                 />
                 <span className="text-sm text-gray-700">Auto-save</span>
@@ -143,7 +147,7 @@ const StorageIntegrationExample = () => {
               <div className="text-sm text-red-600">Error: {error}</div>
             ) : (
               <div className="space-y-2">
-                {models.map((model) => (
+                {models.map(model => (
                   <div
                     key={model.id}
                     className={`p-3 rounded border cursor-pointer transition-colors ${
@@ -157,7 +161,7 @@ const StorageIntegrationExample = () => {
                         onClick={() => handleLoadModel(model.id)}
                         role="button"
                         tabIndex={0}
-                        onKeyDown={(e) => {
+                        onKeyDown={e => {
                           if (e.key === 'Enter' || e.key === ' ') {
                             e.preventDefault();
                             handleLoadModel(model.id);
@@ -173,7 +177,7 @@ const StorageIntegrationExample = () => {
                         </div>
                       </div>
                       <button
-                        onClick={(e) => {
+                        onClick={e => {
                           e.stopPropagation();
                           handleDeleteModel(model.id);
                         }}
@@ -185,9 +189,7 @@ const StorageIntegrationExample = () => {
                   </div>
                 ))}
                 {models.length === 0 && (
-                  <div className="text-sm text-gray-500 text-center py-4">
-                    No saved models
-                  </div>
+                  <div className="text-sm text-gray-500 text-center py-4">No saved models</div>
                 )}
               </div>
             )}
@@ -199,20 +201,28 @@ const StorageIntegrationExample = () => {
 
             <div className="space-y-4">
               <div>
-                <label htmlFor="symbolInput" className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="symbolInput"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   Symbol
                 </label>
                 <input
                   id="symbolInput"
                   type="text"
                   value={modelData.symbol}
-                  onChange={(e) => setModelData(prev => ({ ...prev, symbol: e.target.value.toUpperCase() }))}
+                  onChange={e =>
+                    setModelData(prev => ({ ...prev, symbol: e.target.value.toUpperCase() }))
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
                 />
               </div>
 
               <div>
-                <label htmlFor="revenueGrowthRate" className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="revenueGrowthRate"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   Revenue Growth Rate
                 </label>
                 <input
@@ -220,13 +230,18 @@ const StorageIntegrationExample = () => {
                   type="number"
                   step="0.01"
                   value={modelData.assumptions.revenueGrowthRate}
-                  onChange={(e) => handleInputChange('assumptions', 'revenueGrowthRate', e.target.value)}
+                  onChange={e =>
+                    handleInputChange('assumptions', 'revenueGrowthRate', e.target.value)
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
                 />
               </div>
 
               <div>
-                <label htmlFor="discountRate" className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="discountRate"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   Discount Rate
                 </label>
                 <input
@@ -234,13 +249,16 @@ const StorageIntegrationExample = () => {
                   type="number"
                   step="0.01"
                   value={modelData.assumptions.discountRate}
-                  onChange={(e) => handleInputChange('assumptions', 'discountRate', e.target.value)}
+                  onChange={e => handleInputChange('assumptions', 'discountRate', e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
                 />
               </div>
 
               <div>
-                <label htmlFor="terminalGrowthRate" className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="terminalGrowthRate"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   Terminal Growth Rate
                 </label>
                 <input
@@ -248,7 +266,9 @@ const StorageIntegrationExample = () => {
                   type="number"
                   step="0.01"
                   value={modelData.assumptions.terminalGrowthRate}
-                  onChange={(e) => handleInputChange('assumptions', 'terminalGrowthRate', e.target.value)}
+                  onChange={e =>
+                    handleInputChange('assumptions', 'terminalGrowthRate', e.target.value)
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
                 />
               </div>
@@ -336,9 +356,7 @@ const StorageIntegrationExample = () => {
       </div>
 
       {/* Data Export/Import Modal */}
-      {showDataManager && (
-        <DataExportImport onClose={() => setShowDataManager(false)} />
-      )}
+      {showDataManager && <DataExportImport onClose={() => setShowDataManager(false)} />}
     </div>
   );
 };

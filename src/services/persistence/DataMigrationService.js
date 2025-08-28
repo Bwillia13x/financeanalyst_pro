@@ -41,7 +41,6 @@ export class DataMigrationService {
 
       console.warn(`✅ Data migration complete - version ${this.currentVersion}`);
       return { success: true, version: this.currentVersion };
-
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       console.error('❌ Data migration failed:', message);
@@ -70,7 +69,6 @@ export class DataMigrationService {
       } else {
         console.warn('ℹ️ No legacy data found - clean installation');
       }
-
     } catch (error) {
       console.error('Failed to perform initial migration:', error);
       throw error;
@@ -102,7 +100,6 @@ export class DataMigrationService {
       }
 
       console.warn('✅ Version migration completed successfully');
-
     } catch (error) {
       console.error('Failed to perform version migration:', error);
 
@@ -145,11 +142,13 @@ export class DataMigrationService {
 
       // Check for any other financeanalyst_ prefixed items
       Object.keys(localStorage).forEach(key => {
-        if (key.startsWith('financeanalyst_') &&
-            !key.includes('migration') &&
-            !key.includes('session') &&
-            !key.includes('user') &&
-            !key.includes('crypto_key')) {
+        if (
+          key.startsWith('financeanalyst_') &&
+          !key.includes('migration') &&
+          !key.includes('session') &&
+          !key.includes('user') &&
+          !key.includes('crypto_key')
+        ) {
           try {
             legacyData[key] = JSON.parse(localStorage.getItem(key));
           } catch {
@@ -159,7 +158,6 @@ export class DataMigrationService {
       });
 
       return legacyData;
-
     } catch (error) {
       console.error('Failed to detect legacy data:', error);
       return {};
@@ -171,7 +169,7 @@ export class DataMigrationService {
    */
   async migrateToV1_0_0(legacyData = null) {
     try {
-      const dataToMigrate = legacyData || await this.detectLegacyData();
+      const dataToMigrate = legacyData || (await this.detectLegacyData());
 
       // Migrate watchlists to new format
       if (dataToMigrate.watchlists) {
@@ -201,7 +199,6 @@ export class DataMigrationService {
       await this.cleanupLegacyData(dataToMigrate);
 
       console.warn('✅ Migration to v1.0.0 completed');
-
     } catch (error) {
       console.error('Failed to migrate to v1.0.0:', error);
       throw error;
@@ -306,17 +303,18 @@ export class DataMigrationService {
 
       // Remove other legacy keys found in detection
       Object.keys(legacyData).forEach(key => {
-        if (key.startsWith('financeanalyst_') &&
-            !key.includes('migration') &&
-            !key.includes('session') &&
-            !key.includes('user') &&
-            !key.includes('crypto_key')) {
+        if (
+          key.startsWith('financeanalyst_') &&
+          !key.includes('migration') &&
+          !key.includes('session') &&
+          !key.includes('user') &&
+          !key.includes('crypto_key')
+        ) {
           localStorage.removeItem(key);
         }
       });
 
       console.warn('✅ Legacy data cleanup completed');
-
     } catch (error) {
       console.error('Failed to cleanup legacy data:', error);
       // Don't throw - cleanup failure shouldn't break migration
@@ -336,7 +334,6 @@ export class DataMigrationService {
 
       localStorage.setItem(this.backupKey, JSON.stringify(backup));
       console.warn(`✅ Migration backup created for version ${version}`);
-
     } catch (error) {
       console.error('Failed to create migration backup:', error);
       // Don't throw - backup failure shouldn't prevent migration
@@ -365,7 +362,6 @@ export class DataMigrationService {
 
       console.warn('✅ Data restored from migration backup');
       return true;
-
     } catch (error) {
       console.error('Failed to restore from backup:', error);
       return false;

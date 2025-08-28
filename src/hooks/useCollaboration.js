@@ -28,7 +28,7 @@ export function useCollaboration(userId, userProfile = {}) {
   useEffect(() => {
     if (!userId || initialized.current) return;
 
-    const initializeService = async() => {
+    const initializeService = async () => {
       try {
         setIsLoading(true);
         setError(null);
@@ -68,7 +68,7 @@ export function useCollaboration(userId, userProfile = {}) {
   useEffect(() => {
     if (!isInitialized) return;
 
-    const handleConnectionStatus = (status) => {
+    const handleConnectionStatus = status => {
       setConnectionStatus(status);
     };
 
@@ -116,36 +116,42 @@ export function useCollaboration(userId, userProfile = {}) {
   }, [isInitialized, currentWorkspace?.id]);
 
   // Join workspace
-  const joinWorkspace = useCallback(async(workspaceId, options = {}) => {
-    if (!isInitialized) {
-      throw new Error('Collaboration service not initialized');
-    }
+  const joinWorkspace = useCallback(
+    async (workspaceId, options = {}) => {
+      if (!isInitialized) {
+        throw new Error('Collaboration service not initialized');
+      }
 
-    try {
-      setIsLoading(true);
-      setError(null);
+      try {
+        setIsLoading(true);
+        setError(null);
 
-      const workspace = await collaborationService.joinWorkspace(workspaceId, options);
-      return workspace;
-    } catch (err) {
-      setError(err.message);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [isInitialized]);
+        const workspace = await collaborationService.joinWorkspace(workspaceId, options);
+        return workspace;
+      } catch (err) {
+        setError(err.message);
+        throw err;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [isInitialized]
+  );
 
   // Leave workspace
-  const leaveWorkspace = useCallback(async(workspaceId) => {
-    if (!isInitialized) return;
+  const leaveWorkspace = useCallback(
+    async workspaceId => {
+      if (!isInitialized) return;
 
-    try {
-      await collaborationService.leaveWorkspace(workspaceId);
-    } catch (err) {
-      setError(err.message);
-      console.error('Failed to leave workspace:', err);
-    }
-  }, [isInitialized]);
+      try {
+        await collaborationService.leaveWorkspace(workspaceId);
+      } catch (err) {
+        setError(err.message);
+        console.error('Failed to leave workspace:', err);
+      }
+    },
+    [isInitialized]
+  );
 
   return {
     isInitialized,
@@ -189,7 +195,7 @@ export function useModelSharing(workspaceId, modelId) {
 
     const handleModelUpdate = ({ workspaceId: wsId, modelId: mId, updates, version }) => {
       if (wsId === workspaceId && mId === modelId) {
-        setModel(prev => prev ? { ...prev, data: { ...prev.data, ...updates }, version } : null);
+        setModel(prev => (prev ? { ...prev, data: { ...prev.data, ...updates }, version } : null));
         setModelVersion(version);
       }
     };
@@ -225,54 +231,59 @@ export function useModelSharing(workspaceId, modelId) {
     };
   }, [workspaceId, modelId]);
 
-  const shareModel = useCallback(async(modelData, permissions = {}) => {
-    if (!workspaceId || !modelId) return;
+  const shareModel = useCallback(
+    async (modelData, permissions = {}) => {
+      if (!workspaceId || !modelId) return;
 
-    try {
-      const sharedModel = await collaborationService.shareModel(
-        workspaceId,
-        modelId,
-        modelData,
-        permissions
-      );
-      return sharedModel;
-    } catch (error) {
-      console.error('Failed to share model:', error);
-      throw error;
-    }
-  }, [workspaceId, modelId]);
+      try {
+        const sharedModel = await collaborationService.shareModel(
+          workspaceId,
+          modelId,
+          modelData,
+          permissions
+        );
+        return sharedModel;
+      } catch (error) {
+        console.error('Failed to share model:', error);
+        throw error;
+      }
+    },
+    [workspaceId, modelId]
+  );
 
-  const updateModel = useCallback(async(updates) => {
-    if (!workspaceId || !modelId) return;
+  const updateModel = useCallback(
+    async updates => {
+      if (!workspaceId || !modelId) return;
 
-    try {
-      const updatedModel = await collaborationService.updateModel(
-        workspaceId,
-        modelId,
-        updates
-      );
-      return updatedModel;
-    } catch (error) {
-      console.error('Failed to update model:', error);
-      throw error;
-    }
-  }, [workspaceId, modelId]);
+      try {
+        const updatedModel = await collaborationService.updateModel(workspaceId, modelId, updates);
+        return updatedModel;
+      } catch (error) {
+        console.error('Failed to update model:', error);
+        throw error;
+      }
+    },
+    [workspaceId, modelId]
+  );
 
-  const addAnnotation = useCallback(async(annotation) => {
-    if (!workspaceId || !modelId) return;
+  const addAnnotation = useCallback(
+    async annotation => {
+      if (!workspaceId || !modelId) return;
 
-    try {
-      const newAnnotation = await collaborationService.addAnnotation(
-        workspaceId,
-        modelId,
-        annotation
-      );
-      return newAnnotation;
-    } catch (error) {
-      console.error('Failed to add annotation:', error);
-      throw error;
-    }
-  }, [workspaceId, modelId]);
+      try {
+        const newAnnotation = await collaborationService.addAnnotation(
+          workspaceId,
+          modelId,
+          annotation
+        );
+        return newAnnotation;
+      } catch (error) {
+        console.error('Failed to add annotation:', error);
+        throw error;
+      }
+    },
+    [workspaceId, modelId]
+  );
 
   return {
     model,
@@ -347,17 +358,22 @@ export function usePresence(workspaceId) {
 
   // Convert cursors map to array for easier rendering
   useEffect(() => {
-    setActiveCursors(Array.from(cursors.entries()).map(([userId, data]) => ({
-      userId,
-      ...data
-    })));
+    setActiveCursors(
+      Array.from(cursors.entries()).map(([userId, data]) => ({
+        userId,
+        ...data
+      }))
+    );
   }, [cursors]);
 
-  const updateCursor = useCallback((position) => {
-    if (workspaceId) {
-      collaborationService.updateCursor(workspaceId, position);
-    }
-  }, [workspaceId]);
+  const updateCursor = useCallback(
+    position => {
+      if (workspaceId) {
+        collaborationService.updateCursor(workspaceId, position);
+      }
+    },
+    [workspaceId]
+  );
 
   return {
     cursors: activeCursors,
@@ -410,14 +426,17 @@ export function useWorkspace(workspaceId) {
           return [...prev, user];
         });
 
-        setActivity(prev => [{
-          id: `activity_${Date.now()}`,
-          type: 'user_joined',
-          userId: user.id,
-          userName: user.name,
-          timestamp: new Date().toISOString(),
-          data: { user }
-        }, ...prev.slice(0, 49)]); // Keep last 50 activities
+        setActivity(prev => [
+          {
+            id: `activity_${Date.now()}`,
+            type: 'user_joined',
+            userId: user.id,
+            userName: user.name,
+            timestamp: new Date().toISOString(),
+            data: { user }
+          },
+          ...prev.slice(0, 49)
+        ]); // Keep last 50 activities
       }
     };
 
@@ -425,13 +444,16 @@ export function useWorkspace(workspaceId) {
       if (wsId === workspaceId) {
         setMembers(prev => prev.filter(member => member.id !== userId));
 
-        setActivity(prev => [{
-          id: `activity_${Date.now()}`,
-          type: 'user_left',
-          userId,
-          timestamp: new Date().toISOString(),
-          data: { userId }
-        }, ...prev.slice(0, 49)]);
+        setActivity(prev => [
+          {
+            id: `activity_${Date.now()}`,
+            type: 'user_left',
+            userId,
+            timestamp: new Date().toISOString(),
+            data: { userId }
+          },
+          ...prev.slice(0, 49)
+        ]);
       }
     };
 
@@ -439,13 +461,16 @@ export function useWorkspace(workspaceId) {
       if (wsId === workspaceId) {
         setModels(prev => [...prev, sharedModel]);
 
-        setActivity(prev => [{
-          id: `activity_${Date.now()}`,
-          type: 'model_shared',
-          userId: sharedModel.sharedBy,
-          timestamp: sharedModel.sharedAt,
-          data: { modelId: sharedModel.id, modelName: sharedModel.name }
-        }, ...prev.slice(0, 49)]);
+        setActivity(prev => [
+          {
+            id: `activity_${Date.now()}`,
+            type: 'model_shared',
+            userId: sharedModel.sharedBy,
+            timestamp: sharedModel.sharedAt,
+            data: { modelId: sharedModel.id, modelName: sharedModel.name }
+          },
+          ...prev.slice(0, 49)
+        ]);
       }
     };
 

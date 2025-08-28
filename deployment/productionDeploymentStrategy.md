@@ -34,7 +34,7 @@ services:
       - NODE_ENV=staging
       - REACT_APP_API_URL=https://staging-api.financeanalyst.pro
       - REACT_APP_WS_URL=wss://staging-ws.financeanalyst.pro
-    
+
   backend:
     image: financeanalyst-api:latest
     environment:
@@ -42,7 +42,7 @@ services:
       - DATABASE_URL=${STAGING_DATABASE_URL}
       - REDIS_URL=${STAGING_REDIS_URL}
       - JWT_SECRET=${STAGING_JWT_SECRET}
-    
+
   websocket:
     image: financeanalyst-ws:latest
     environment:
@@ -63,7 +63,7 @@ CREATE TABLE IF NOT EXISTS migrations (
 );
 
 -- Phase 2 migrations
-INSERT INTO migrations (version, description) VALUES 
+INSERT INTO migrations (version, description) VALUES
 ('2024.08.001', 'Version control tables'),
 ('2024.08.002', 'Comment system tables'),
 ('2024.08.003', 'Dashboard and widget tables'),
@@ -161,16 +161,16 @@ app.get('/health', async (req, res) => {
       memory: await checkMemoryUsage()
     }
   };
-  
+
   const unhealthyChecks = Object.entries(health.checks)
     .filter(([_, status]) => status !== 'healthy');
-  
+
   if (unhealthyChecks.length > 0) {
     health.status = 'unhealthy';
     health.issues = unhealthyChecks.map(([check, status]) => ({ check, status }));
     return res.status(503).json(health);
   }
-  
+
   res.json(health);
 });
 ```
@@ -190,7 +190,7 @@ logging:
     - action
     - message
     - metadata
-  
+
   outputs:
     - type: file
       path: /var/log/app.log
@@ -209,16 +209,16 @@ logging:
 server {
     listen 443 ssl http2;
     server_name financeanalyst.pro;
-    
+
     ssl_certificate /etc/ssl/certs/financeanalyst.pro.crt;
     ssl_certificate_key /etc/ssl/private/financeanalyst.pro.key;
-    
+
     # Security headers
     add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
     add_header X-Frame-Options "DENY" always;
     add_header X-Content-Type-Options "nosniff" always;
     add_header Referrer-Policy "strict-origin-when-cross-origin" always;
-    
+
     # CSP header
     add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com" always;
 }
@@ -303,15 +303,15 @@ database:
   backup_retention: 30_days
   point_in_time_recovery: true
   cross_region_backups: true
-  
+
 redis:
   persistence: rdb
   backup_frequency: 6_hours
   retention: 7_days
-  
+
 files:
   s3_versioning: enabled
-  lifecycle_policies: 
+  lifecycle_policies:
     - transition_to_ia: 30_days
     - transition_to_glacier: 90_days
   cross_region_replication: true
@@ -406,13 +406,13 @@ const validationTests = [
         '/api/v1/visualization/charts',
         '/api/v1/export/pdf'
       ];
-      
+
       const results = await Promise.all(
-        features.map(endpoint => 
+        features.map(endpoint =>
           fetch(endpoint).then(r => r.status < 400)
         )
       );
-      
+
       return results.every(success => success);
     }
   }

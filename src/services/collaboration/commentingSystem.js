@@ -252,7 +252,7 @@ export class CommentingService {
     }
 
     comment.reactions[reaction].add(userId);
-    
+
     this.emit('reaction_added', { commentId, reaction, userId });
     return comment;
   }
@@ -265,7 +265,7 @@ export class CommentingService {
 
     if (comment.reactions[reaction]) {
       comment.reactions[reaction].delete(userId);
-      
+
       if (comment.reactions[reaction].size === 0) {
         delete comment.reactions[reaction];
       }
@@ -316,15 +316,11 @@ export class CommentingService {
 
   // Query and filtering
   getCommentsByCell(cellId, options = {}) {
-    const {
-      includeResolved = false,
-      userId = null,
-      since = null
-    } = options;
+    const { includeResolved = false, userId = null, since = null } = options;
 
     const threadId = `cell_${cellId}`;
     const thread = this.threads.get(threadId);
-    
+
     if (!thread) return [];
 
     let comments = thread.comments.map(id => this.comments.get(id)).filter(Boolean);
@@ -348,7 +344,7 @@ export class CommentingService {
   getCommentsByAssumption(assumptionId, options = {}) {
     const threadId = `assumption_${assumptionId}`;
     const thread = this.threads.get(threadId);
-    
+
     if (!thread) return [];
 
     let comments = thread.comments.map(id => this.comments.get(id)).filter(Boolean);
@@ -361,14 +357,14 @@ export class CommentingService {
   }
 
   getUnresolvedComments(userId = null) {
-    let comments = Array.from(this.comments.values()).filter(comment => 
-      !comment.isResolved && comment.type !== 'reply'
+    let comments = Array.from(this.comments.values()).filter(
+      comment => !comment.isResolved && comment.type !== 'reply'
     );
 
     if (userId) {
-      comments = comments.filter(comment => 
-        comment.userId === userId || 
-        comment.mentions.some(mention => mention.username === userId)
+      comments = comments.filter(
+        comment =>
+          comment.userId === userId || comment.mentions.some(mention => mention.username === userId)
       );
     }
 
@@ -383,19 +379,15 @@ export class CommentingService {
 
   // Search comments
   searchComments(query, options = {}) {
-    const {
-      userId = null,
-      type = null,
-      resolved = null,
-      since = null
-    } = options;
+    const { userId = null, type = null, resolved = null, since = null } = options;
 
     const queryLower = query.toLowerCase();
     let comments = Array.from(this.comments.values());
 
-    comments = comments.filter(comment => 
-      comment.content.toLowerCase().includes(queryLower) ||
-      comment.userName.toLowerCase().includes(queryLower)
+    comments = comments.filter(
+      comment =>
+        comment.content.toLowerCase().includes(queryLower) ||
+        comment.userName.toLowerCase().includes(queryLower)
     );
 
     if (userId) {
@@ -425,14 +417,14 @@ export class CommentingService {
     annotations = annotations.filter(annotation => {
       const annoStart = annotation.selection.start;
       const annoEnd = annotation.selection.end;
-      
+
       // Check for overlap
       return !(end < annoStart || start > annoEnd);
     });
 
     if (modelSection) {
-      annotations = annotations.filter(annotation => 
-        annotation.metadata.modelSection === modelSection
+      annotations = annotations.filter(
+        annotation => annotation.metadata.modelSection === modelSection
       );
     }
 
@@ -529,9 +521,9 @@ export class CommentingService {
   // Comment statistics
   getCommentStatistics(modelId, options = {}) {
     const { since = null, userId = null } = options;
-    
+
     let comments = Array.from(this.comments.values());
-    
+
     if (since) {
       const sinceDate = new Date(since);
       comments = comments.filter(comment => new Date(comment.timestamp) >= sinceDate);
@@ -560,20 +552,22 @@ export class CommentingService {
     // Calculate response times (simplified)
     const threads = Array.from(this.threads.values());
     const responseTimes = [];
-    
+
     threads.forEach(thread => {
       const threadComments = thread.comments.map(id => this.comments.get(id)).filter(Boolean);
       if (threadComments.length > 1) {
         threadComments.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
         for (let i = 1; i < threadComments.length; i++) {
-          const responseTime = new Date(threadComments[i].timestamp) - new Date(threadComments[i-1].timestamp);
+          const responseTime =
+            new Date(threadComments[i].timestamp) - new Date(threadComments[i - 1].timestamp);
           responseTimes.push(responseTime);
         }
       }
     });
 
     if (responseTimes.length > 0) {
-      stats.avgResponseTime = responseTimes.reduce((sum, time) => sum + time, 0) / responseTimes.length;
+      stats.avgResponseTime =
+        responseTimes.reduce((sum, time) => sum + time, 0) / responseTimes.length;
     }
 
     // Most active threads

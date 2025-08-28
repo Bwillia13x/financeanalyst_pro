@@ -5,9 +5,11 @@ A collection of professional, minimalist financial input components designed for
 ## Components Overview
 
 ### 1. FinancialInput
+
 A comprehensive input component with smart formatting, validation, and financial-specific features.
 
 **Features:**
+
 - Multi-format support (currency, percentage, number)
 - Real-time validation with custom messages
 - Smart number formatting with locale support
@@ -16,6 +18,7 @@ A comprehensive input component with smart formatting, validation, and financial
 - Auto-focus capability
 
 **Usage:**
+
 ```jsx
 import { FinancialInput } from './components/ui';
 
@@ -29,10 +32,11 @@ import { FinancialInput } from './components/ui';
   min={0}
   description="Enter the company's annual revenue"
   onValidation={(isValid, message) => console.log(isValid, message)}
-/>
+/>;
 ```
 
 **Props:**
+
 - `type`: 'currency' | 'percentage' | 'number'
 - `currency`: String (default: 'USD')
 - `locale`: String (default: 'en-US')
@@ -45,9 +49,11 @@ import { FinancialInput } from './components/ui';
 - `onValidation`: Function callback for validation
 
 ### 2. EditableCell
+
 Inline editing component perfect for spreadsheet-like interfaces with financial data.
 
 **Features:**
+
 - Click-to-edit functionality
 - Visual feedback with save/cancel buttons
 - Formula cell support with auto-calculation indicators
@@ -56,6 +62,7 @@ Inline editing component perfect for spreadsheet-like interfaces with financial 
 - Keyboard shortcuts (Enter/Tab to save, Escape to cancel)
 
 **Usage:**
+
 ```jsx
 import { EditableCell } from './components/ui';
 
@@ -66,10 +73,11 @@ import { EditableCell } from './components/ui';
   variant="adjusted"
   isFormula={false}
   showEditIcon={true}
-/>
+/>;
 ```
 
 **Props:**
+
 - `value`: Any - the current value
 - `onChange`: Function - callback when value changes
 - `type`: 'currency' | 'percentage' | 'number' | 'text'
@@ -80,9 +88,11 @@ import { EditableCell } from './components/ui';
 - `error`: String
 
 ### 3. CurrencyInput
+
 Advanced currency input with multi-currency support, trend indicators, and abbreviation display.
 
 **Features:**
+
 - Multi-currency support with proper formatting
 - Abbreviation display (1.2M instead of 1,200,000)
 - Trend indicators comparing to previous values
@@ -91,6 +101,7 @@ Advanced currency input with multi-currency support, trend indicators, and abbre
 - Visual variants (default, filled, minimal)
 
 **Usage:**
+
 ```jsx
 import { CurrencyInput } from './components/ui';
 
@@ -103,10 +114,11 @@ import { CurrencyInput } from './components/ui';
   previousValue={2100000}
   size="default"
   variant="default"
-/>
+/>;
 ```
 
 **Props:**
+
 - `currency`: String - currency code (USD, EUR, GBP, etc.)
 - `abbreviateDisplay`: Boolean - show abbreviated format for large numbers
 - `showTrend`: Boolean - show trend indicator
@@ -115,21 +127,24 @@ import { CurrencyInput } from './components/ui';
 - `variant`: 'default' | 'filled' | 'minimal'
 
 ### 4. LoadingState
+
 Flexible loading state components for various use cases in financial applications.
 
 **Features:**
+
 - Multiple types (calculation, financial, trend, inline)
 - Size variants
 - Different animation styles (default, subtle, pulsing)
 - Contextual icons and messages
 
 **Usage:**
+
 ```jsx
 import { LoadingState, LoadingSkeleton, LoadingDots } from './components/ui';
 
 // Full loading state
-<LoadingState 
-  type="calculation" 
+<LoadingState
+  type="calculation"
   message="Calculating DCF model..."
   size="default"
 />
@@ -145,9 +160,11 @@ import { LoadingState, LoadingSkeleton, LoadingDots } from './components/ui';
 ```
 
 ### 5. ValidationFeedback
+
 Comprehensive validation and feedback system for forms and inputs.
 
 **Features:**
+
 - Multiple feedback types (error, warning, success, info)
 - Field-level validation
 - Validation summaries with collapsible sections
@@ -155,12 +172,13 @@ Comprehensive validation and feedback system for forms and inputs.
 - Consistent styling and behavior
 
 **Usage:**
+
 ```jsx
-import { 
-  ValidationFeedback, 
-  FieldValidation, 
+import {
+  ValidationFeedback,
+  FieldValidation,
   ValidationSummary,
-  ValidationStatus 
+  ValidationStatus
 } from './components/ui';
 
 // Individual feedback
@@ -193,24 +211,28 @@ import {
 ## Design Principles
 
 ### 1. Minimalist Aesthetics
+
 - Clean, uncluttered interfaces
 - Subtle shadows and borders
 - Consistent spacing using Tailwind's scale
 - Professional color palette suited for financial applications
 
 ### 2. Functional Beauty
+
 - Every visual element serves a purpose
 - Smart defaults that work out of the box
 - Progressive disclosure of advanced features
 - Contextual feedback and guidance
 
 ### 3. Consistent Behavior
+
 - Standardized keyboard shortcuts across components
 - Uniform validation patterns
 - Consistent loading and error states
 - Predictable user interactions
 
 ### 4. Professional Focus
+
 - Financial data formatting standards
 - Industry-appropriate validation rules
 - Calculation-aware interfaces
@@ -238,6 +260,7 @@ All components follow accessibility best practices:
 ## Browser Support
 
 Components are tested and work with:
+
 - Chrome 90+
 - Firefox 88+
 - Safari 14+
@@ -267,11 +290,13 @@ When extending these components:
 ## Testing
 
 Run tests with:
+
 ```bash
 npm test
 ```
 
 Components include unit tests covering:
+
 - Rendering with various props
 - User interactions
 - Validation logic

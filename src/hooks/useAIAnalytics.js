@@ -32,10 +32,14 @@ export function useAIAnalytics(options = {}) {
   const intervalRef = useRef(null);
   const analysisCountRef = useRef(0);
 
+  // Environment guard
+  const IS_TEST_ENV =
+    typeof process !== 'undefined' && process.env && process.env.NODE_ENV === 'test';
+
   /**
    * Initialize AI Analytics Service
    */
-  const initialize = useCallback(async() => {
+  const initialize = useCallback(async () => {
     if (isInitialized) return;
 
     try {
@@ -46,7 +50,7 @@ export function useAIAnalytics(options = {}) {
 
       // Report initialization
       import('../utils/performanceMonitoring')
-        .then((mod) => {
+        .then(mod => {
           if (mod?.reportPerformanceMetric) {
             mod.reportPerformanceMetric('ai_analytics_init', {
               success: true,
@@ -58,7 +62,7 @@ export function useAIAnalytics(options = {}) {
     } catch (err) {
       setError(`Failed to initialize AI Analytics: ${err.message}`);
       import('../utils/performanceMonitoring')
-        .then((mod) => {
+        .then(mod => {
           if (mod?.reportPerformanceMetric) {
             mod.reportPerformanceMetric('ai_analytics_init', {
               success: false,
@@ -76,119 +80,133 @@ export function useAIAnalytics(options = {}) {
   /**
    * Analyze financial data with AI
    */
-  const analyzeData = useCallback(async(data, customOptions = {}) => {
-    if (!isInitialized) {
-      await initialize();
-    }
+  const analyzeData = useCallback(
+    async (data, customOptions = {}) => {
+      if (!isInitialized) {
+        await initialize();
+      }
 
-    if (!data || !data.prices || data.prices.length === 0) {
-      setError('Invalid or insufficient data for analysis');
-      return null;
-    }
+      if (!data || !data.prices || data.prices.length === 0) {
+        setError('Invalid or insufficient data for analysis');
+        return null;
+      }
 
-    try {
-      setIsLoading(true);
-      setError(null);
+      try {
+        setIsLoading(true);
+        setError(null);
 
-      const analysisOptions = {
-        analysisType,
-        riskTolerance,
-        includePatterns: true,
-        includePredictions: true,
-        includeRiskAnalysis: true,
-        ...customOptions
-      };
+        const analysisOptions = {
+          analysisType,
+          riskTolerance,
+          includePatterns: true,
+          includePredictions: true,
+          includeRiskAnalysis: true,
+          ...customOptions
+        };
 
-      const startTime = Date.now();
-      const result = await aiAnalyticsService.analyzeFinancialData(data, analysisOptions);
-      const analysisTime = Date.now() - startTime;
+        const startTime = Date.now();
+        const result = await aiAnalyticsService.analyzeFinancialData(data, analysisOptions);
+        const analysisTime = Date.now() - startTime;
 
-      // Update state with results
-      setAnalysis(result);
-      setInsights(result.insights || []);
-      setPatterns(result.patterns || []);
-      setPredictions(result.predictions || []);
-      setRiskMetrics(result.riskMetrics || {});
-      setRecommendations(result.recommendations || []);
+        // Update state with results
+        setAnalysis(result);
+        setInsights(result.insights || []);
+        setPatterns(result.patterns || []);
+        setPredictions(result.predictions || []);
+        setRiskMetrics(result.riskMetrics || {});
+        setRecommendations(result.recommendations || []);
 
-      // Track analysis performance
-      analysisCountRef.current += 1;
-      import('../utils/performanceMonitoring')
-        .then((mod) => {
-          if (mod?.reportPerformanceMetric) {
-            mod.reportPerformanceMetric('ai_analysis_completed', {
-              analysisTime,
-              dataPoints: data.prices.length,
-              insightsGenerated: result.insights.length,
-              patternsDetected: result.patterns.length,
-              predictionsGenerated: result.predictions.length,
-              confidence: result.confidence,
-              analysisCount: analysisCountRef.current,
-              timestamp: Date.now()
-            });
-          }
-        })
-        .catch(() => {});
+        // Track analysis performance
+        analysisCountRef.current += 1;
+        import('../utils/performanceMonitoring')
+          .then(mod => {
+            if (mod?.reportPerformanceMetric) {
+              mod.reportPerformanceMetric('ai_analysis_completed', {
+                analysisTime,
+                dataPoints: data.prices.length,
+                insightsGenerated: result.insights.length,
+                patternsDetected: result.patterns.length,
+                predictionsGenerated: result.predictions.length,
+                confidence: result.confidence,
+                analysisCount: analysisCountRef.current,
+                timestamp: Date.now()
+              });
+            }
+          })
+          .catch(() => {});
 
-      return result;
-    } catch (err) {
-      const errorMessage = `AI Analysis failed: ${err.message}`;
-      setError(errorMessage);
+        return result;
+      } catch (err) {
+        const errorMessage = `AI Analysis failed: ${err.message}`;
+        setError(errorMessage);
 
-      import('../utils/performanceMonitoring')
-        .then((mod) => {
-          if (mod?.reportPerformanceMetric) {
-            mod.reportPerformanceMetric('ai_analysis_error', {
-              error: err.message,
-              dataPoints: data.prices?.length || 0,
-              timestamp: Date.now()
-            });
-          }
-        })
-        .catch(() => {});
+        import('../utils/performanceMonitoring')
+          .then(mod => {
+            if (mod?.reportPerformanceMetric) {
+              mod.reportPerformanceMetric('ai_analysis_error', {
+                error: err.message,
+                dataPoints: data.prices?.length || 0,
+                timestamp: Date.now()
+              });
+            }
+          })
+          .catch(() => {});
 
-      return null;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [isInitialized, initialize, analysisType, riskTolerance]);
+        return null;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [isInitialized, initialize, analysisType, riskTolerance]
+  );
 
   /**
    * Get real-time insights for streaming data
    */
-  const getRealtimeInsights = useCallback(async(streamingData) => {
-    if (!isInitialized || isLoading) return [];
+  const getRealtimeInsights = useCallback(
+    async streamingData => {
+      if (!isInitialized || isLoading) return [];
 
-    try {
-      // Quick analysis for real-time insights
-      const quickAnalysis = await aiAnalyticsService.analyzeFinancialData(streamingData, {
-        analysisType: 'quick',
-        includePatterns: false,
-        includePredictions: false,
-        includeRiskAnalysis: true
-      });
+      try {
+        // Quick analysis for real-time insights
+        const quickAnalysis = await aiAnalyticsService.analyzeFinancialData(streamingData, {
+          analysisType: 'quick',
+          includePatterns: false,
+          includePredictions: false,
+          includeRiskAnalysis: true
+        });
 
-      return quickAnalysis.insights || [];
-    } catch (err) {
-      console.warn('Real-time insights failed:', err);
-      return [];
-    }
-  }, [isInitialized, isLoading]);
+        return quickAnalysis.insights || [];
+      } catch (err) {
+        console.warn('Real-time insights failed:', err);
+        return [];
+      }
+    },
+    [isInitialized, isLoading]
+  );
 
   /**
    * Start automatic analysis with interval
    */
-  const startAutoAnalysis = useCallback((data) => {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-    }
-
-    intervalRef.current = setInterval(() => {
-      if (data && data.prices && data.prices.length > 0) {
-        analyzeData(data, { analysisType: 'quick' });
+  const startAutoAnalysis = useCallback(
+    data => {
+      // Avoid starting intervals in test environments to prevent open handles
+      if (IS_TEST_ENV) {
+        return;
       }
-    }, analysisInterval);
-  }, [analyzeData, analysisInterval]);
+
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+
+      intervalRef.current = setInterval(() => {
+        if (data && data.prices && data.prices.length > 0) {
+          analyzeData(data, { analysisType: 'quick' });
+        }
+      }, analysisInterval);
+    },
+    [analyzeData, analysisInterval, IS_TEST_ENV]
+  );
 
   /**
    * Stop automatic analysis
@@ -203,16 +221,19 @@ export function useAIAnalytics(options = {}) {
   /**
    * Get filtered insights by type and severity
    */
-  const getFilteredInsights = useCallback((filters = {}) => {
-    const { type, severity, minConfidence = 0 } = filters;
+  const getFilteredInsights = useCallback(
+    (filters = {}) => {
+      const { type, severity, minConfidence = 0 } = filters;
 
-    return insights.filter(insight => {
-      if (type && insight.type !== type) return false;
-      if (severity && insight.severity !== severity) return false;
-      if (insight.confidence && insight.confidence < minConfidence) return false;
-      return true;
-    });
-  }, [insights]);
+      return insights.filter(insight => {
+        if (type && insight.type !== type) return false;
+        if (severity && insight.severity !== severity) return false;
+        if (insight.confidence && insight.confidence < minConfidence) return false;
+        return true;
+      });
+    },
+    [insights]
+  );
 
   /**
    * Get high-priority recommendations
@@ -234,9 +255,10 @@ export function useAIAnalytics(options = {}) {
       bearishPatterns: patterns.filter(p =>
         ['head_and_shoulders', 'double_top', 'descending_triangle'].includes(p.type)
       ).length,
-      averageConfidence: patterns.length > 0
-        ? patterns.reduce((sum, p) => sum + p.confidence, 0) / patterns.length
-        : 0
+      averageConfidence:
+        patterns.length > 0
+          ? patterns.reduce((sum, p) => sum + p.confidence, 0) / patterns.length
+          : 0
     };
 
     return summary;
@@ -253,21 +275,27 @@ export function useAIAnalytics(options = {}) {
     const longTerm = predictions.find(p => p.horizon === '3m');
 
     return {
-      shortTerm: shortTerm ? {
-        price: shortTerm.predictedPrice,
-        confidence: shortTerm.confidence,
-        horizon: shortTerm.horizon
-      } : null,
-      mediumTerm: mediumTerm ? {
-        price: mediumTerm.predictedPrice,
-        confidence: mediumTerm.confidence,
-        horizon: mediumTerm.horizon
-      } : null,
-      longTerm: longTerm ? {
-        price: longTerm.predictedPrice,
-        confidence: longTerm.confidence,
-        horizon: longTerm.horizon
-      } : null,
+      shortTerm: shortTerm
+        ? {
+            price: shortTerm.predictedPrice,
+            confidence: shortTerm.confidence,
+            horizon: shortTerm.horizon
+          }
+        : null,
+      mediumTerm: mediumTerm
+        ? {
+            price: mediumTerm.predictedPrice,
+            confidence: mediumTerm.confidence,
+            horizon: mediumTerm.horizon
+          }
+        : null,
+      longTerm: longTerm
+        ? {
+            price: longTerm.predictedPrice,
+            confidence: longTerm.confidence,
+            horizon: longTerm.horizon
+          }
+        : null,
       averageConfidence: predictions.reduce((sum, p) => sum + p.confidence, 0) / predictions.length
     };
   }, [predictions]);
@@ -285,11 +313,12 @@ export function useAIAnalytics(options = {}) {
       sharpeRatio: riskMetrics.sharpeRatio || 0,
       maxDrawdown: riskMetrics.maxDrawdown || 0,
       valueAtRisk: riskMetrics.valueAtRisk || 0,
-      recommendation: riskMetrics.riskScore > 7
-        ? 'High risk - implement strict controls'
-        : riskMetrics.riskScore > 4
-          ? 'Moderate risk - monitor closely'
-          : 'Low risk - stable investment'
+      recommendation:
+        riskMetrics.riskScore > 7
+          ? 'High risk - implement strict controls'
+          : riskMetrics.riskScore > 4
+            ? 'Moderate risk - monitor closely'
+            : 'Low risk - stable investment'
     };
   }, [riskMetrics]);
 
@@ -312,7 +341,14 @@ export function useAIAnalytics(options = {}) {
         recommendations: recommendations.length
       }
     };
-  }, [analysis, insights, recommendations, getPatternSummary, getPredictionSummary, getRiskSummary]);
+  }, [
+    analysis,
+    insights,
+    recommendations,
+    getPatternSummary,
+    getPredictionSummary,
+    getRiskSummary
+  ]);
 
   /**
    * Clear all analysis data
@@ -397,7 +433,7 @@ export function useAIAnalytics(options = {}) {
 export function usePatternAnalysis(data, options = {}) {
   const { analyzeData, patterns, isLoading } = useAIAnalytics(options);
 
-  const analyzePatterns = useCallback(async() => {
+  const analyzePatterns = useCallback(async () => {
     if (!data) return [];
 
     const result = await analyzeData(data, {
@@ -422,7 +458,7 @@ export function usePatternAnalysis(data, options = {}) {
 export function usePredictionAnalysis(data, options = {}) {
   const { analyzeData, predictions, isLoading } = useAIAnalytics(options);
 
-  const generatePredictions = useCallback(async() => {
+  const generatePredictions = useCallback(async () => {
     if (!data) return [];
 
     const result = await analyzeData(data, {
@@ -447,7 +483,7 @@ export function usePredictionAnalysis(data, options = {}) {
 export function useRiskAnalysis(data, riskTolerance = 'moderate') {
   const { analyzeData, riskMetrics, isLoading } = useAIAnalytics({ riskTolerance });
 
-  const analyzeRisk = useCallback(async() => {
+  const analyzeRisk = useCallback(async () => {
     if (!data) return {};
 
     const result = await analyzeData(data, {

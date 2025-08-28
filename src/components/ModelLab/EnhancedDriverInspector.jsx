@@ -6,7 +6,9 @@ const Card = ({ title, right, children, className = '' }) => (
   <section className={`rounded-2xl border border-slate-200 bg-white shadow-sm ${className}`}>
     {(title || right) && (
       <header className="flex items-center justify-between border-b border-slate-200 px-4 py-2.5">
-        {title && <h3 className="text-[13px] font-semibold tracking-wide text-slate-700">{title}</h3>}
+        {title && (
+          <h3 className="text-[13px] font-semibold tracking-wide text-slate-700">{title}</h3>
+        )}
         {right}
       </header>
     )}
@@ -23,20 +25,25 @@ const Pill = ({ children, tone = 'slate' }) => {
     red: 'bg-rose-50 text-rose-700 border-rose-200'
   };
   return (
-    <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] ${tones[tone]}`}>
+    <span
+      className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] ${tones[tone]}`}
+    >
       {children}
     </span>
   );
 };
 
 const _NudgeButton = ({ label, onChange, currentValue, delta, suffix = '' }) => {
-  const handleNudge = (direction) => {
-    const newValue = currentValue + (delta * direction);
+  const handleNudge = direction => {
+    const newValue = currentValue + delta * direction;
     onChange(newValue);
   };
 
-  const _calculateImpact = async(_direction) => {
-    const _testModel = async() => ({ kind: 'DCF', assumptions: { ...currentValue, [label.toLowerCase()]: currentValue + (delta * _direction) } });
+  const _calculateImpact = async _direction => {
+    const _testModel = async () => ({
+      kind: 'DCF',
+      assumptions: { ...currentValue, [label.toLowerCase()]: currentValue + delta * _direction }
+    });
     // This is a simplified impact calculation - would need full model context
     return delta * _direction;
   };
@@ -233,7 +240,7 @@ const EnhancedDriverInspector = ({ model, onModelUpdate, lastSavedModel }) => {
   const drivers = driverMapping[model.kind] || [];
 
   // Calculate impact of nudges
-  const calculateNudgeImpact = async(driverKey, delta) => {
+  const calculateNudgeImpact = async (driverKey, delta) => {
     const testAssumptions = {
       ...model.assumptions,
       [driverKey]: (model.assumptions[driverKey] || 0) + delta
@@ -282,7 +289,7 @@ const EnhancedDriverInspector = ({ model, onModelUpdate, lastSavedModel }) => {
     onModelUpdate(updatedAssumptions);
   };
 
-  const revertField = (driverKey) => {
+  const revertField = driverKey => {
     if (!lastSavedModel) return;
 
     const originalValue = lastSavedModel.assumptions[driverKey];
@@ -349,7 +356,8 @@ const EnhancedDriverInspector = ({ model, onModelUpdate, lastSavedModel }) => {
 
           return (
             <li
-              key={i} className={`rounded border p-2 transition-colors ${
+              key={i}
+              className={`rounded border p-2 transition-colors ${
                 isChanged ? 'border-amber-300 bg-amber-50' : 'border-slate-200 bg-slate-50'
               }`}
             >
@@ -372,9 +380,7 @@ const EnhancedDriverInspector = ({ model, onModelUpdate, lastSavedModel }) => {
                   <span className={`text-slate-700 ${isChanged ? 'font-semibold' : ''}`}>
                     {driver.label}
                   </span>
-                  {isChanged && (
-                    <span className="text-amber-600 text-[10px]">●</span>
-                  )}
+                  {isChanged && <span className="text-amber-600 text-[10px]">●</span>}
                 </div>
 
                 <div className="flex items-center gap-2">
@@ -433,14 +439,18 @@ const EnhancedDriverInspector = ({ model, onModelUpdate, lastSavedModel }) => {
                       </div>
                       <div className="grid grid-cols-2 gap-2 text-[10px]">
                         {['positive', 'negative'].map(direction => {
-                          const delta = direction === 'positive' ? driver.nudgeDelta : -driver.nudgeDelta;
+                          const delta =
+                            direction === 'positive' ? driver.nudgeDelta : -driver.nudgeDelta;
                           const _prediction = model.predict('up');
                           const impacts = calculateNudgeImpact(driver.key, delta);
 
                           return (
                             <div
-                              key={direction} className={`p-2 rounded border ${
-                                direction === 'positive' ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'
+                              key={direction}
+                              className={`p-2 rounded border ${
+                                direction === 'positive'
+                                  ? 'bg-green-50 border-green-200'
+                                  : 'bg-red-50 border-red-200'
                               }`}
                             >
                               <div
@@ -448,7 +458,8 @@ const EnhancedDriverInspector = ({ model, onModelUpdate, lastSavedModel }) => {
                                   direction === 'positive' ? 'text-green-700' : 'text-red-700'
                                 }`}
                               >
-                                {direction === 'positive' ? '+' : '−'}{formatValue(Math.abs(delta), driver.suffix)}
+                                {direction === 'positive' ? '+' : '−'}
+                                {formatValue(Math.abs(delta), driver.suffix)}
                               </div>
                               {impacts.ev !== undefined && (
                                 <div>EV: {formatImpact(impacts.ev, 'ev')}</div>
@@ -477,9 +488,7 @@ const EnhancedDriverInspector = ({ model, onModelUpdate, lastSavedModel }) => {
           <div className="font-medium text-amber-800">
             {changedFields.size} field(s) changed since last save
           </div>
-          <div className="text-amber-700">
-            Changes: {Array.from(changedFields).join(', ')}
-          </div>
+          <div className="text-amber-700">Changes: {Array.from(changedFields).join(', ')}</div>
         </div>
       )}
     </Card>

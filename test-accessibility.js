@@ -1,8 +1,7 @@
 // Simple test to verify accessibility implementation
-import { accessibilityTester } from './src/utils/accessibilityTesting.js';
 
 // Create a simple DOM structure for testing
-const testHTML = `
+const _testHTML = `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,10 +13,10 @@ const testHTML = `
     <form>
       <label for="amount">Amount:</label>
       <input type="number" id="amount" required>
-      
+
       <button type="submit">Calculate</button>
     </form>
-    
+
     <table>
       <thead>
         <tr>

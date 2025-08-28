@@ -18,7 +18,7 @@ const mockData = {
 describe('ModelingTools', () => {
   test('renders the component with the DCF model active by default', () => {
     render(<ModelingTools data={mockData} onDataChange={() => {}} />);
-    expect(screen.getByText('Financial Modeling Tools')).toBeInTheDocument();
+    expect(screen.getByText('Financial Modeling')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /DCF Valuation/ })).toHaveClass('border-blue-500');
   });
 
@@ -26,11 +26,15 @@ describe('ModelingTools', () => {
     render(<ModelingTools data={mockData} onDataChange={() => {}} />);
     fireEvent.click(screen.getByRole('button', { name: /Ratio Analysis/ }));
     expect(screen.getByRole('button', { name: /Ratio Analysis/ })).toHaveClass('border-blue-500');
-    expect(screen.getByRole('button', { name: /DCF Valuation/ })).not.toHaveClass('border-blue-500');
+    expect(screen.getByRole('button', { name: /DCF Valuation/ })).not.toHaveClass(
+      'border-blue-500'
+    );
   });
 
   test('updates model inputs', () => {
     render(<ModelingTools data={mockData} onDataChange={() => {}} />);
+    // Switch to assumptions tab to access inputs
+    fireEvent.click(screen.getByRole('button', { name: /Assumptions/ }));
     const discountRateInput = screen.getByDisplayValue('10');
     fireEvent.change(discountRateInput, { target: { value: '12' } });
     expect(discountRateInput.value).toBe('12');
@@ -39,7 +43,7 @@ describe('ModelingTools', () => {
   test('calculates DCF correctly', () => {
     render(<ModelingTools data={mockData} onDataChange={() => {}} />);
     // Note: This is a simplified test. A more robust test would check the actual calculated values.
-    const enterpriseValueElement = screen.getByText('Enterprise Value').parentElement;
+    const enterpriseValueElement = screen.getByText('ENTERPRISE VALUE').parentElement;
     expect(enterpriseValueElement).toHaveTextContent('$1,840,195');
   });
 });

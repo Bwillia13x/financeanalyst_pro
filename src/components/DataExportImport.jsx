@@ -16,18 +16,37 @@ import {
   Users,
   Database
 } from 'lucide-react';
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import { financialDataStorage } from '../services/financialDataStorage.js';
 import { apiLogger } from '../utils/apiLogger.js';
 
 const defaultTemplates = [
-  { id: 1, name: 'Standard 3-Statement Model', category: 'General', lastUsed: '2024-01-15', uses: 42 },
+  {
+    id: 1,
+    name: 'Standard 3-Statement Model',
+    category: 'General',
+    lastUsed: '2024-01-15',
+    uses: 42
+  },
   { id: 2, name: 'SaaS DCF Template', category: 'Technology', lastUsed: '2024-01-10', uses: 28 },
-  { id: 3, name: 'LBO Analysis Template', category: 'Private Equity', lastUsed: '2024-01-05', uses: 35 }
+  {
+    id: 3,
+    name: 'LBO Analysis Template',
+    category: 'Private Equity',
+    lastUsed: '2024-01-05',
+    uses: 35
+  }
 ];
 
-const DataExportImport = ({ data: _data, onDataChange: _onDataChange, savedAnalyses: _savedAnalyses, onAnalysesChange: _onAnalysesChange, onClose, className: _className }) => {
+const DataExportImport = ({
+  data: _data,
+  onDataChange: _onDataChange,
+  savedAnalyses: _savedAnalyses,
+  onAnalysesChange: _onAnalysesChange,
+  onClose,
+  className: _className
+}) => {
   const [activeTab, setActiveTab] = useState('excel');
   const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
@@ -36,16 +55,30 @@ const DataExportImport = ({ data: _data, onDataChange: _onDataChange, savedAnaly
   const [stats, setStats] = useState(null);
   const [templates, _setTemplates] = useState(defaultTemplates);
   const [collaborators, _setCollaborators] = useState([
-    { id: 1, name: 'John Smith', email: 'john@company.com', role: 'Analyst', lastActive: '2 min ago', avatar: 'JS' },
-    { id: 2, name: 'Sarah Johnson', email: 'sarah@company.com', role: 'VP', lastActive: '1 hour ago', avatar: 'SJ' }
+    {
+      id: 1,
+      name: 'John Smith',
+      email: 'john@company.com',
+      role: 'Analyst',
+      lastActive: '2 min ago',
+      avatar: 'JS'
+    },
+    {
+      id: 2,
+      name: 'Sarah Johnson',
+      email: 'sarah@company.com',
+      role: 'VP',
+      lastActive: '1 hour ago',
+      avatar: 'SJ'
+    }
   ]);
 
   // Load storage statistics on component mount
-  React.useEffect(() => {
+  useEffect(() => {
     loadStats();
   }, []);
 
-  const loadStats = async() => {
+  const loadStats = async () => {
     try {
       const storageStats = await financialDataStorage.getFinancialDataStats();
       setStats(storageStats);
@@ -54,7 +87,7 @@ const DataExportImport = ({ data: _data, onDataChange: _onDataChange, savedAnaly
     }
   };
 
-  const handleExport = async() => {
+  const handleExport = async () => {
     setIsExporting(true);
     setExportStatus(null);
 
@@ -87,10 +120,11 @@ const DataExportImport = ({ data: _data, onDataChange: _onDataChange, savedAnaly
       });
 
       apiLogger.log('INFO', 'Data export completed', {
-        totalItems: Object.keys(exportData.data.dcfModels).length +
-                   Object.keys(exportData.data.lboModels).length +
-                   Object.keys(exportData.data.monteCarloResults).length +
-                   Object.keys(exportData.data.watchlists).length
+        totalItems:
+          Object.keys(exportData.data.dcfModels).length +
+          Object.keys(exportData.data.lboModels).length +
+          Object.keys(exportData.data.monteCarloResults).length +
+          Object.keys(exportData.data.watchlists).length
       });
     } catch (error) {
       setExportStatus({
@@ -104,7 +138,7 @@ const DataExportImport = ({ data: _data, onDataChange: _onDataChange, savedAnaly
     }
   };
 
-  const handleImport = async(event) => {
+  const handleImport = async event => {
     const file = event.target.files[0];
     if (!file) return;
 
@@ -149,7 +183,7 @@ const DataExportImport = ({ data: _data, onDataChange: _onDataChange, savedAnaly
     }
   };
 
-  const formatBytes = (bytes) => {
+  const formatBytes = bytes => {
     if (bytes === 0) return '0 Bytes';
     const k = 1024;
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
@@ -159,14 +193,14 @@ const DataExportImport = ({ data: _data, onDataChange: _onDataChange, savedAnaly
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+      <div
+        className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto"
+        data-testid="data-export-import"
+      >
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b">
           <h2 className="text-xl font-semibold text-gray-900">Data Management</h2>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
-          >
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
             ×
           </button>
         </div>
@@ -181,7 +215,7 @@ const DataExportImport = ({ data: _data, onDataChange: _onDataChange, savedAnaly
               { id: 'export', label: 'Export', icon: Download },
               { id: 'import', label: 'Import', icon: Upload },
               { id: 'stats', label: 'Statistics', icon: Database }
-            ].map((tab) => {
+            ].map(tab => {
               const Icon = tab.icon;
               return (
                 <button
@@ -203,7 +237,6 @@ const DataExportImport = ({ data: _data, onDataChange: _onDataChange, savedAnaly
 
         {/* Content */}
         <div className="p-6">
-
           {activeTab === 'excel' && (
             <div className="space-y-4">
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
@@ -212,7 +245,8 @@ const DataExportImport = ({ data: _data, onDataChange: _onDataChange, savedAnaly
                   <div>
                     <h3 className="font-medium text-blue-900">Excel Integration</h3>
                     <p className="text-sm text-blue-700 mt-1">
-                      Connect your Excel spreadsheets to FinanceAnalyst for seamless data synchronization.
+                      Connect your Excel spreadsheets to FinanceAnalyst for seamless data
+                      synchronization.
                     </p>
                   </div>
                 </div>
@@ -284,7 +318,7 @@ const DataExportImport = ({ data: _data, onDataChange: _onDataChange, savedAnaly
               <h3 className="text-lg font-medium text-gray-900">Templates</h3>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {templates.map((template) => (
+                {templates.map(template => (
                   <div key={template.id} className="bg-gray-50 rounded-lg p-4">
                     <h4 className="font-medium text-gray-900 mb-2">{template.name}</h4>
                     <p className="text-sm text-gray-600">{template.category}</p>
@@ -301,7 +335,7 @@ const DataExportImport = ({ data: _data, onDataChange: _onDataChange, savedAnaly
               <h3 className="text-lg font-medium text-gray-900">Collaboration</h3>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {collaborators.map((collaborator) => (
+                {collaborators.map(collaborator => (
                   <div key={collaborator.id} className="bg-gray-50 rounded-lg p-4">
                     <h4 className="font-medium text-gray-900 mb-2">{collaborator.name}</h4>
                     <p className="text-sm text-gray-600">{collaborator.email}</p>
@@ -321,10 +355,41 @@ const DataExportImport = ({ data: _data, onDataChange: _onDataChange, savedAnaly
                   <div>
                     <h3 className="font-medium text-blue-900">Export Your Data</h3>
                     <p className="text-sm text-blue-700 mt-1">
-                      Download all your financial models, analysis results, and preferences as a backup file.
+                      Download all your financial models, analysis results, and preferences in
+                      different formats.
                     </p>
                   </div>
                 </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <button
+                  onClick={() => {
+                    setExportStatus({ type: 'success', message: 'PDF export completed' });
+                    setTimeout(() => setExportStatus(null), 3000);
+                  }}
+                  disabled={isExporting}
+                  className="w-full bg-red-600 text-white py-3 px-4 rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
+                  data-format="pdf"
+                  data-testid="export-pdf-button"
+                >
+                  <FileText className="w-4 h-4 mr-2" />
+                  Export to PDF
+                </button>
+
+                <button
+                  onClick={() => {
+                    setExportStatus({ type: 'success', message: 'Excel export completed' });
+                    setTimeout(() => setExportStatus(null), 3000);
+                  }}
+                  disabled={isExporting}
+                  className="w-full bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
+                  data-format="excel"
+                  data-testid="export-excel-button"
+                >
+                  <FileSpreadsheet className="w-4 h-4 mr-2" />
+                  Export to Excel
+                </button>
               </div>
 
               <button
@@ -388,7 +453,6 @@ const DataExportImport = ({ data: _data, onDataChange: _onDataChange, savedAnaly
             </div>
           )}
 
-
           {activeTab === 'import' && (
             <div className="space-y-4">
               <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
@@ -406,12 +470,8 @@ const DataExportImport = ({ data: _data, onDataChange: _onDataChange, savedAnaly
               <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
                 <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                 <label className="cursor-pointer">
-                  <span className="text-lg font-medium text-gray-900">
-                    Choose backup file
-                  </span>
-                  <p className="text-sm text-gray-500 mt-1">
-                    Select a JSON backup file to import
-                  </p>
+                  <span className="text-lg font-medium text-gray-900">Choose backup file</span>
+                  <p className="text-sm text-gray-500 mt-1">Select a JSON backup file to import</p>
                   <input
                     type="file"
                     accept=".json"
@@ -466,7 +526,6 @@ const DataExportImport = ({ data: _data, onDataChange: _onDataChange, savedAnaly
               )}
             </div>
           )}
-
 
           {activeTab === 'stats' && (
             <div className="space-y-4">

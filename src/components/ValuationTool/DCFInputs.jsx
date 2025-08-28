@@ -72,7 +72,7 @@ const DCFInputs = ({ inputs, setInputs }) => {
           id="currentRevenue"
           type="number"
           value={inputs.currentRevenue || 0}
-          onChange={(e) => handleChange('currentRevenue', e.target.value)}
+          onChange={e => handleChange('currentRevenue', e.target.value)}
           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         />
       </div>
@@ -86,7 +86,7 @@ const DCFInputs = ({ inputs, setInputs }) => {
           type="number"
           step="0.01"
           value={(inputs.revenueGrowthRate || 0) * 100}
-          onChange={(e) => handleChange('revenueGrowthRate', e.target.value / 100)}
+          onChange={e => handleChange('revenueGrowthRate', e.target.value / 100)}
           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         />
       </div>
@@ -100,7 +100,7 @@ const DCFInputs = ({ inputs, setInputs }) => {
           type="number"
           step="0.01"
           value={(inputs.ebitdaMargin || 0) * 100}
-          onChange={(e) => handleChange('ebitdaMargin', e.target.value / 100)}
+          onChange={e => handleChange('ebitdaMargin', e.target.value / 100)}
           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         />
       </div>
@@ -114,13 +114,16 @@ const DCFInputs = ({ inputs, setInputs }) => {
           type="number"
           step="0.01"
           value={(inputs.taxRate || 0) * 100}
-          onChange={(e) => handleChange('taxRate', e.target.value / 100)}
+          onChange={e => handleChange('taxRate', e.target.value / 100)}
           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         />
       </div>
 
       <div>
-        <label htmlFor="terminalGrowthRate" className="block text-sm font-medium text-gray-700 mb-1">
+        <label
+          htmlFor="terminalGrowthRate"
+          className="block text-sm font-medium text-gray-700 mb-1"
+        >
           Terminal Growth Rate (%)
         </label>
         <input
@@ -128,7 +131,7 @@ const DCFInputs = ({ inputs, setInputs }) => {
           type="number"
           step="0.01"
           value={(inputs.terminalGrowthRate || 0) * 100}
-          onChange={(e) => handleChange('terminalGrowthRate', e.target.value / 100)}
+          onChange={e => handleChange('terminalGrowthRate', e.target.value / 100)}
           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         />
       </div>
@@ -142,7 +145,7 @@ const DCFInputs = ({ inputs, setInputs }) => {
           type="number"
           step="0.01"
           value={(inputs.discountRate || 0) * 100}
-          onChange={(e) => handleChange('discountRate', e.target.value / 100)}
+          onChange={e => handleChange('discountRate', e.target.value / 100)}
           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         />
       </div>
@@ -157,7 +160,7 @@ const DCFInputs = ({ inputs, setInputs }) => {
           min="3"
           max="10"
           value={inputs.projectionYears || 5}
-          onChange={(e) => handleChange('projectionYears', e.target.value)}
+          onChange={e => handleChange('projectionYears', e.target.value)}
           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         />
       </div>
@@ -176,19 +179,25 @@ const DCFInputs = ({ inputs, setInputs }) => {
           <h4 className="text-md font-semibold text-gray-900 mb-3">Base Year (Current)</h4>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label htmlFor="currentRevenue" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="currentRevenue"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Current Revenue ($)
               </label>
               <input
                 id="currentRevenue"
                 type="number"
                 value={inputs.currentRevenue || 0}
-                onChange={(e) => handleChange('currentRevenue', e.target.value)}
+                onChange={e => handleChange('currentRevenue', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
             <div>
-              <label htmlFor="terminalGrowthRate" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="terminalGrowthRate"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Terminal Growth Rate (%)
               </label>
               <input
@@ -196,12 +205,15 @@ const DCFInputs = ({ inputs, setInputs }) => {
                 type="number"
                 step="0.01"
                 value={(inputs.terminalGrowthRate || 0) * 100}
-                onChange={(e) => handleChange('terminalGrowthRate', e.target.value / 100)}
+                onChange={e => handleChange('terminalGrowthRate', e.target.value / 100)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
             <div>
-              <label htmlFor="discountRate" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="discountRate"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Discount Rate (WACC) (%)
               </label>
               <input
@@ -209,7 +221,7 @@ const DCFInputs = ({ inputs, setInputs }) => {
                 type="number"
                 step="0.01"
                 value={(inputs.discountRate || 0) * 100}
-                onChange={(e) => handleChange('discountRate', e.target.value / 100)}
+                onChange={e => handleChange('discountRate', e.target.value / 100)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
@@ -229,7 +241,10 @@ const DCFInputs = ({ inputs, setInputs }) => {
                     Metric
                   </th>
                   {years.map(year => (
-                    <th key={year} className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th
+                      key={year}
+                      className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
                       Year {year}
                     </th>
                   ))}
@@ -237,14 +252,16 @@ const DCFInputs = ({ inputs, setInputs }) => {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 <tr>
-                  <td className="px-4 py-3 text-sm font-medium text-gray-900">Revenue Growth (%)</td>
+                  <td className="px-4 py-3 text-sm font-medium text-gray-900">
+                    Revenue Growth (%)
+                  </td>
                   {years.map(year => (
                     <td key={year} className="px-4 py-3">
                       <input
                         type="number"
                         step="0.1"
                         value={yearlyData[year]?.revenueGrowth || 0}
-                        onChange={(e) => handleYearlyChange(year, 'revenueGrowth', e.target.value)}
+                        onChange={e => handleYearlyChange(year, 'revenueGrowth', e.target.value)}
                         className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-transparent"
                       />
                     </td>
@@ -258,7 +275,7 @@ const DCFInputs = ({ inputs, setInputs }) => {
                         type="number"
                         step="0.1"
                         value={yearlyData[year]?.ebitdaMargin || 0}
-                        onChange={(e) => handleYearlyChange(year, 'ebitdaMargin', e.target.value)}
+                        onChange={e => handleYearlyChange(year, 'ebitdaMargin', e.target.value)}
                         className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-transparent"
                       />
                     </td>
@@ -272,49 +289,57 @@ const DCFInputs = ({ inputs, setInputs }) => {
                         type="number"
                         step="0.1"
                         value={yearlyData[year]?.taxRate || 0}
-                        onChange={(e) => handleYearlyChange(year, 'taxRate', e.target.value)}
+                        onChange={e => handleYearlyChange(year, 'taxRate', e.target.value)}
                         className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-transparent"
                       />
                     </td>
                   ))}
                 </tr>
                 <tr className="bg-gray-50">
-                  <td className="px-4 py-3 text-sm font-medium text-gray-900">CapEx (% of Revenue)</td>
+                  <td className="px-4 py-3 text-sm font-medium text-gray-900">
+                    CapEx (% of Revenue)
+                  </td>
                   {years.map(year => (
                     <td key={year} className="px-4 py-3">
                       <input
                         type="number"
                         step="0.1"
                         value={yearlyData[year]?.capexPercent || 0}
-                        onChange={(e) => handleYearlyChange(year, 'capexPercent', e.target.value)}
+                        onChange={e => handleYearlyChange(year, 'capexPercent', e.target.value)}
                         className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-transparent"
                       />
                     </td>
                   ))}
                 </tr>
                 <tr>
-                  <td className="px-4 py-3 text-sm font-medium text-gray-900">D&A (% of Revenue)</td>
+                  <td className="px-4 py-3 text-sm font-medium text-gray-900">
+                    D&A (% of Revenue)
+                  </td>
                   {years.map(year => (
                     <td key={year} className="px-4 py-3">
                       <input
                         type="number"
                         step="0.1"
                         value={yearlyData[year]?.daPercent || 0}
-                        onChange={(e) => handleYearlyChange(year, 'daPercent', e.target.value)}
+                        onChange={e => handleYearlyChange(year, 'daPercent', e.target.value)}
                         className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-transparent"
                       />
                     </td>
                   ))}
                 </tr>
                 <tr className="bg-gray-50">
-                  <td className="px-4 py-3 text-sm font-medium text-gray-900">Δ Working Capital (% of Rev)</td>
+                  <td className="px-4 py-3 text-sm font-medium text-gray-900">
+                    Δ Working Capital (% of Rev)
+                  </td>
                   {years.map(year => (
                     <td key={year} className="px-4 py-3">
                       <input
                         type="number"
                         step="0.1"
                         value={yearlyData[year]?.workingCapitalChange || 0}
-                        onChange={(e) => handleYearlyChange(year, 'workingCapitalChange', e.target.value)}
+                        onChange={e =>
+                          handleYearlyChange(year, 'workingCapitalChange', e.target.value)
+                        }
                         className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-transparent"
                       />
                     </td>
@@ -337,31 +362,37 @@ const DCFInputs = ({ inputs, setInputs }) => {
                 id="cash-input"
                 type="number"
                 value={balanceSheet.cash || 0}
-                onChange={(e) => handleBalanceSheetChange('cash', e.target.value)}
+                onChange={e => handleBalanceSheetChange('cash', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
             <div>
-              <label htmlFor="total-debt-input" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="total-debt-input"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Total Debt ($)
               </label>
               <input
                 id="total-debt-input"
                 type="number"
                 value={balanceSheet.totalDebt || 0}
-                onChange={(e) => handleBalanceSheetChange('totalDebt', e.target.value)}
+                onChange={e => handleBalanceSheetChange('totalDebt', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
             <div>
-              <label htmlFor="shares-outstanding-input" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="shares-outstanding-input"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Shares Outstanding
               </label>
               <input
                 id="shares-outstanding-input"
                 type="number"
                 value={balanceSheet.sharesOutstanding || 0}
-                onChange={(e) => handleBalanceSheetChange('sharesOutstanding', e.target.value)}
+                onChange={e => handleBalanceSheetChange('sharesOutstanding', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>

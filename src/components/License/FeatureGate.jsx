@@ -1,20 +1,21 @@
-import React from 'react';
 import { Lock, Crown, Users } from 'lucide-react';
+import { useEffect, useState } from 'react';
+
 import { useLicense } from '../../services/licensing';
 
-export const FeatureGate = ({ 
-  feature, 
-  permission, 
-  children, 
-  fallback, 
-  showUpgrade = true 
+export const FeatureGate = ({
+  feature,
+  permission,
+  children,
+  fallback,
+  showUpgrade = true
 }) => {
   const { license, hasFeature, hasPermission } = useLicense();
-  const [hasAccess, setHasAccess] = React.useState(false);
-  const [loading, setLoading] = React.useState(true);
+  const [hasAccess, setHasAccess] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  React.useEffect(() => {
-    const checkAccess = async () => {
+  useEffect(() => {
+    const checkAccess = async() => {
       try {
         let featureAccess = true;
         let permissionAccess = true;
@@ -41,7 +42,7 @@ export const FeatureGate = ({
 
   if (loading) {
     return (
-      <div className="animate-pulse bg-gray-200 rounded-md h-8 w-32"></div>
+      <div className="animate-pulse bg-gray-200 rounded-md h-8 w-32" />
     );
   }
 

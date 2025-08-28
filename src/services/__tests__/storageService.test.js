@@ -9,11 +9,11 @@ import { storageService } from '../storageService.js';
 // Mock localStorage
 const localStorageMock = {
   store: {},
-  getItem: vi.fn((key) => localStorageMock.store[key] || null),
+  getItem: vi.fn(key => localStorageMock.store[key] || null),
   setItem: vi.fn((key, value) => {
     localStorageMock.store[key] = value;
   }),
-  removeItem: vi.fn((key) => {
+  removeItem: vi.fn(key => {
     delete localStorageMock.store[key];
   }),
   clear: vi.fn(() => {
@@ -22,15 +22,17 @@ const localStorageMock = {
   get length() {
     return Object.keys(localStorageMock.store).length;
   },
-  key: vi.fn((index) => Object.keys(localStorageMock.store)[index] || null)
+  key: vi.fn(index => Object.keys(localStorageMock.store)[index] || null)
 };
 
 // Mock navigator.storage
 const navigatorStorageMock = {
-  estimate: vi.fn(() => Promise.resolve({
-    quota: 50 * 1024 * 1024, // 50MB
-    usage: 10 * 1024 * 1024   // 10MB
-  }))
+  estimate: vi.fn(() =>
+    Promise.resolve({
+      quota: 50 * 1024 * 1024, // 50MB
+      usage: 10 * 1024 * 1024 // 10MB
+    })
+  )
 };
 
 describe('StorageService', () => {
@@ -56,7 +58,7 @@ describe('StorageService', () => {
   });
 
   describe('Basic Storage Operations', () => {
-    it('should store and retrieve data', async() => {
+    it('should store and retrieve data', async () => {
       const testData = { test: 'value', number: 42 };
 
       await storageService.setItem('test', 'item1', testData);
@@ -65,12 +67,12 @@ describe('StorageService', () => {
       expect(retrieved).toEqual(testData);
     });
 
-    it('should return null for non-existent items', async() => {
+    it('should return null for non-existent items', async () => {
       const result = await storageService.getItem('test', 'nonexistent');
       expect(result).toBeNull();
     });
 
-    it('should remove items', async() => {
+    it('should remove items', async () => {
       const testData = { test: 'value' };
 
       await storageService.setItem('test', 'item1', testData);
@@ -80,12 +82,12 @@ describe('StorageService', () => {
       expect(await storageService.getItem('test', 'item1')).toBeNull();
     });
 
-    it('should list items of a specific type', async() => {
+    it('should list items of a specific type', async () => {
       await storageService.setItem('test', 'item1', { data: 1 });
       await storageService.setItem('test', 'item2', { data: 2 });
       await storageService.setItem('other', 'item3', { data: 3 });
 
-      const testItems = storageService.listItems('test');
+      const testItems = await storageService.listItems('test');
       expect(testItems).toHaveLength(2);
       expect(testItems).toContain('item1');
       expect(testItems).toContain('item2');
@@ -93,7 +95,7 @@ describe('StorageService', () => {
   });
 
   describe('Data Validation', () => {
-    it('should validate DCF model data', async() => {
+    it('should validate DCF model data', async () => {
       const validDCFData = {
         symbol: 'AAPL',
         assumptions: { growthRate: 0.05 },
@@ -102,22 +104,22 @@ describe('StorageService', () => {
         metadata: { createdAt: Date.now() }
       };
 
-      await expect(storageService.setItem('dcfModel', 'AAPL', validDCFData))
-        .resolves.toBe(true);
+      await expect(storageService.setItem('dcfModel', 'AAPL', validDCFData)).resolves.toBe(true);
     });
 
-    it('should reject invalid DCF model data', async() => {
+    it('should reject invalid DCF model data', async () => {
       const invalidDCFData = {
         symbol: 'AAPL',
         // Missing required fields: assumptions, projections, valuation
         metadata: { createdAt: Date.now() }
       };
 
-      await expect(storageService.setItem('dcfModel', 'AAPL', invalidDCFData))
-        .rejects.toThrow('Missing required field');
+      await expect(storageService.setItem('dcfModel', 'AAPL', invalidDCFData)).rejects.toThrow(
+        'Missing required field'
+      );
     });
 
-    it('should validate LBO model data', async() => {
+    it('should validate LBO model data', async () => {
       const validLBOData = {
         symbol: 'AAPL',
         transaction: { purchasePrice: 1000 },
@@ -126,11 +128,10 @@ describe('StorageService', () => {
         metadata: { createdAt: Date.now() }
       };
 
-      await expect(storageService.setItem('lboModel', 'AAPL', validLBOData))
-        .resolves.toBe(true);
+      await expect(storageService.setItem('lboModel', 'AAPL', validLBOData)).resolves.toBe(true);
     });
 
-    it('should validate Monte Carlo results data', async() => {
+    it('should validate Monte Carlo results data', async () => {
       const validMCData = {
         modelType: 'DCF',
         iterations: 10000,
@@ -139,13 +140,14 @@ describe('StorageService', () => {
         metadata: { createdAt: Date.now() }
       };
 
-      await expect(storageService.setItem('monteCarloResults', 'test1', validMCData))
-        .resolves.toBe(true);
+      await expect(storageService.setItem('monteCarloResults', 'test1', validMCData)).resolves.toBe(
+        true
+      );
     });
   });
 
   describe('Compression', () => {
-    it('should handle compression for large data', async() => {
+    it('should handle compression for large data', async () => {
       const largeData = {
         symbol: 'AAPL',
         assumptions: {},
@@ -162,7 +164,7 @@ describe('StorageService', () => {
       expect(retrieved).toEqual(largeData);
     });
 
-    it('should not compress small data', async() => {
+    it('should not compress small data', async () => {
       const smallData = { test: 'small' };
 
       await storageService.setItem('test', 'small', smallData);
@@ -174,7 +176,7 @@ describe('StorageService', () => {
   });
 
   describe('Storage Statistics', () => {
-    it('should provide storage statistics', async() => {
+    it('should provide storage statistics', async () => {
       await storageService.setItem('test', 'item1', { data: 'test1' });
       await storageService.setItem('test', 'item2', { data: 'test2' });
       await storageService.setItem('other', 'item3', { data: 'test3' });
@@ -189,7 +191,7 @@ describe('StorageService', () => {
       expect(stats.typeStats.other).toBe(1);
     });
 
-    it('should provide quota information', async() => {
+    it('should provide quota information', async () => {
       const quota = await storageService.getQuotaInfo();
 
       expect(quota).toHaveProperty('quota');
@@ -200,9 +202,9 @@ describe('StorageService', () => {
   });
 
   describe('Cleanup Operations', () => {
-    it('should clean up old data', async() => {
+    it('should clean up old data', async () => {
       // Create old data by mocking timestamp
-      const oldTimestamp = Date.now() - (35 * 24 * 60 * 60 * 1000); // 35 days ago
+      const oldTimestamp = Date.now() - 35 * 24 * 60 * 60 * 1000; // 35 days ago
 
       // Mock the stored data to appear old
       const oldData = {
@@ -246,21 +248,22 @@ describe('StorageService', () => {
   });
 
   describe('Error Handling', () => {
-    it('should handle storage unavailability', async() => {
+    it('should handle storage unavailability', async () => {
       // Mock localStorage to throw error for this test only
       const originalSetItem = localStorageMock.setItem;
       localStorageMock.setItem.mockImplementationOnce(() => {
         throw new Error('Storage quota exceeded');
       });
 
-      await expect(storageService.setItem('test', 'item', { data: 'test' }))
-        .rejects.toThrow('Storage quota exceeded');
+      await expect(storageService.setItem('test', 'item', { data: 'test' })).rejects.toThrow(
+        'Storage quota exceeded'
+      );
 
       // Restore original implementation
       localStorageMock.setItem = originalSetItem;
     });
 
-    it('should handle corrupted data gracefully', async() => {
+    it('should handle corrupted data gracefully', async () => {
       // Store corrupted data directly
       localStorageMock.store['financeanalyst_test_corrupted'] = 'invalid json';
 
@@ -268,14 +271,15 @@ describe('StorageService', () => {
       expect(result).toBeNull();
     });
 
-    it('should handle unknown schema types', async() => {
-      await expect(storageService.setItem('unknownType', 'item', { data: 'test' }))
-        .resolves.toBe(true); // Should succeed for unknown types
+    it('should handle unknown schema types', async () => {
+      await expect(storageService.setItem('unknownType', 'item', { data: 'test' })).resolves.toBe(
+        true
+      ); // Should succeed for unknown types
     });
   });
 
   describe('Version Management', () => {
-    it('should handle version mismatches', async() => {
+    it('should handle version mismatches', async () => {
       // Store data with old version directly in mock store
       const oldVersionData = {
         version: '0.9.0', // Old version

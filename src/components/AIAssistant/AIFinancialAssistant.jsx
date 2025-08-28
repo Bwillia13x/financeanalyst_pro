@@ -34,7 +34,8 @@ const AIFinancialAssistant = ({
     {
       id: '1',
       type: 'assistant',
-      content: "Hi! I'm your AI Financial Assistant. I can help you with portfolio analysis, market insights, risk assessment, and financial planning. What would you like to explore today?",
+      content:
+        "Hi! I'm your AI Financial Assistant. I can help you with portfolio analysis, market insights, risk assessment, and financial planning. What would you like to explore today?",
       timestamp: new Date(),
       suggestions: [
         'Analyze my portfolio performance',
@@ -58,7 +59,7 @@ const AIFinancialAssistant = ({
     scrollToBottom();
   }, [messages]);
 
-  const handleSendMessage = async(message = inputValue) => {
+  const handleSendMessage = async (message = inputValue) => {
     if (!message.trim()) return;
 
     const userMessage = {
@@ -102,7 +103,8 @@ const AIFinancialAssistant = ({
       const fallbackMessage = {
         id: (Date.now() + 1).toString(),
         type: 'assistant',
-        content: "I'm having trouble processing your request right now. This could be due to high demand or a temporary service issue. Please try again in a moment, or let me help you with basic portfolio analysis using the available data.",
+        content:
+          "I'm having trouble processing your request right now. This could be due to high demand or a temporary service issue. Please try again in a moment, or let me help you with basic portfolio analysis using the available data.",
         timestamp: new Date(),
         suggestions: [
           'Show portfolio overview',
@@ -118,11 +120,11 @@ const AIFinancialAssistant = ({
     }
   };
 
-  const handleSuggestionClick = (suggestion) => {
+  const handleSuggestionClick = suggestion => {
     handleSendMessage(suggestion);
   };
 
-  const handleKeyPress = (e) => {
+  const handleKeyPress = e => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
@@ -130,12 +132,32 @@ const AIFinancialAssistant = ({
   };
 
   const quickActions = [
-    { icon: PieChart, label: 'Portfolio Analysis', action: 'Analyze my current portfolio allocation and performance' },
-    { icon: TrendingUp, label: 'Market Insights', action: 'What are the current market trends and opportunities?' },
-    { icon: AlertTriangle, label: 'Risk Assessment', action: 'Assess the risk profile of my portfolio' },
-    { icon: Calculator, label: 'Financial Planning', action: 'Help me with financial planning and projections' },
+    {
+      icon: PieChart,
+      label: 'Portfolio Analysis',
+      action: 'Analyze my current portfolio allocation and performance'
+    },
+    {
+      icon: TrendingUp,
+      label: 'Market Insights',
+      action: 'What are the current market trends and opportunities?'
+    },
+    {
+      icon: AlertTriangle,
+      label: 'Risk Assessment',
+      action: 'Assess the risk profile of my portfolio'
+    },
+    {
+      icon: Calculator,
+      label: 'Financial Planning',
+      action: 'Help me with financial planning and projections'
+    },
     { icon: Target, label: 'Goal Planning', action: 'Help me set and track financial goals' },
-    { icon: BarChart3, label: 'Performance Review', action: 'Review my portfolio performance over time' }
+    {
+      icon: BarChart3,
+      label: 'Performance Review',
+      action: 'Review my portfolio performance over time'
+    }
   ];
 
   if (!isOpen) return null;
@@ -185,7 +207,7 @@ const AIFinancialAssistant = ({
             {/* Messages Area */}
             <div className="flex-1 overflow-y-auto p-6 space-y-4">
               <AnimatePresence>
-                {messages.map((message) => (
+                {messages.map(message => (
                   <motion.div
                     key={message.id}
                     initial={{ opacity: 0, y: 10 }}
@@ -193,7 +215,9 @@ const AIFinancialAssistant = ({
                     exit={{ opacity: 0, y: -10 }}
                     className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
                   >
-                    <div className={`max-w-3xl flex ${message.type === 'user' ? 'flex-row-reverse' : 'flex-row'} items-start space-x-3`}>
+                    <div
+                      className={`max-w-3xl flex ${message.type === 'user' ? 'flex-row-reverse' : 'flex-row'} items-start space-x-3`}
+                    >
                       <div
                         className={`p-2 rounded-lg ${
                           message.type === 'user'
@@ -201,7 +225,11 @@ const AIFinancialAssistant = ({
                             : 'bg-purple-100 text-purple-600'
                         }`}
                       >
-                        {message.type === 'user' ? <User className="w-5 h-5" /> : <Bot className="w-5 h-5" />}
+                        {message.type === 'user' ? (
+                          <User className="w-5 h-5" />
+                        ) : (
+                          <Bot className="w-5 h-5" />
+                        )}
                       </div>
                       <div
                         className={`px-4 py-3 rounded-2xl ${
@@ -262,8 +290,14 @@ const AIFinancialAssistant = ({
                     <div className="px-4 py-3 rounded-2xl bg-gray-100">
                       <div className="flex space-x-1">
                         <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
-                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
-                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
+                        <div
+                          className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                          style={{ animationDelay: '0.1s' }}
+                        />
+                        <div
+                          className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                          style={{ animationDelay: '0.2s' }}
+                        />
                       </div>
                     </div>
                   </div>
@@ -298,7 +332,7 @@ const AIFinancialAssistant = ({
                   <textarea
                     ref={inputRef}
                     value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
+                    onChange={e => setInputValue(e.target.value)}
                     onKeyPress={handleKeyPress}
                     placeholder="Ask me anything about your portfolio, market analysis, or financial planning..."
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"

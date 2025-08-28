@@ -12,16 +12,18 @@ export const useOnboarding = () => {
   const [onboardingState, setOnboardingState] = useState(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
-      return stored ? JSON.parse(stored) : {
-        completedTours: [],
-        dismissedIntroductions: [],
-        currentTour: null,
-        userPreferences: {
-          showTooltips: true,
-          autoStartTours: true,
-          tourSpeed: 'normal'
-        }
-      };
+      return stored
+        ? JSON.parse(stored)
+        : {
+            completedTours: [],
+            dismissedIntroductions: [],
+            currentTour: null,
+            userPreferences: {
+              showTooltips: true,
+              autoStartTours: true,
+              tourSpeed: 'normal'
+            }
+          };
     } catch {
       return {
         completedTours: [],
@@ -38,7 +40,8 @@ export const useOnboarding = () => {
 
   // Persist state changes to localStorage, but skip during tests to prevent crashes
   useEffect(() => {
-    const isAutomatedEnvironment = navigator.webdriver ||
+    const isAutomatedEnvironment =
+      navigator.webdriver ||
       window.location.search.includes('lhci') ||
       window.location.search.includes('ci') ||
       window.location.search.includes('audit');
@@ -53,14 +56,14 @@ export const useOnboarding = () => {
   }, [onboardingState]);
 
   // Ensure we always use the canonical tour key (e.g., 'privateAnalysis')
-  const normalizeTourId = (id) => {
+  const normalizeTourId = id => {
     if (!id) return id;
     if (ONBOARDING_TOURS[id]) return id;
     const match = Object.entries(ONBOARDING_TOURS).find(([, tour]) => tour.id === id);
     return match ? match[0] : id;
   };
 
-  const startTour = (tourId) => {
+  const startTour = tourId => {
     const normalizedId = normalizeTourId(tourId);
     const tour = ONBOARDING_TOURS[normalizedId];
     if (!tour) {
@@ -81,7 +84,7 @@ export const useOnboarding = () => {
     return true;
   };
 
-  const completeTour = (tourId) => {
+  const completeTour = tourId => {
     try {
       setOnboardingState(prev => {
         const fallbackId = prev.currentTour?.id;
@@ -112,14 +115,14 @@ export const useOnboarding = () => {
     }));
   };
 
-  const dismissIntroduction = (featureId) => {
+  const dismissIntroduction = featureId => {
     setOnboardingState(prev => ({
       ...prev,
       dismissedIntroductions: [...new Set([...prev.dismissedIntroductions, featureId])]
     }));
   };
 
-  const shouldShowFeatureIntroduction = (featureId) => {
+  const shouldShowFeatureIntroduction = featureId => {
     return shouldShowIntroduction(featureId, {
       dismissedIntroductions: onboardingState.dismissedIntroductions
     });
@@ -138,7 +141,7 @@ export const useOnboarding = () => {
     });
   };
 
-  const updatePreferences = (newPreferences) => {
+  const updatePreferences = newPreferences => {
     setOnboardingState(prev => ({
       ...prev,
       userPreferences: {
@@ -148,7 +151,7 @@ export const useOnboarding = () => {
     }));
   };
 
-  const hasTourBeenCompleted = (tourId) => {
+  const hasTourBeenCompleted = tourId => {
     const normalizedId = normalizeTourId(tourId);
     return onboardingState.completedTours.includes(normalizedId);
   };

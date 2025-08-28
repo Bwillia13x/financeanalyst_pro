@@ -1,5 +1,5 @@
 // User Acceptance Testing Framework - Financial Professional Workflows
-import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';
+import { describe, it, expect, beforeEach } from '@jest/globals';
 
 export class UserAcceptanceTestFramework {
   constructor() {
@@ -244,7 +244,7 @@ export class UserAcceptanceTestFramework {
   async runUserAcceptanceTest(scenarioId, userProfileId, testEnvironment = 'staging') {
     const scenario = this.testScenarios.get(scenarioId);
     const userProfile = this.userProfiles.get(userProfileId);
-    
+
     if (!scenario || !userProfile) {
       throw new Error('Invalid scenario or user profile');
     }
@@ -272,7 +272,7 @@ export class UserAcceptanceTestFramework {
       for (const stepName of scenario.steps) {
         const stepResult = await this.executeTestStep(stepName, userProfile, testEnvironment);
         testSession.steps.push(stepResult);
-        
+
         if (stepResult.success) {
           testSession.metrics.successfulSteps++;
         } else {
@@ -281,7 +281,7 @@ export class UserAcceptanceTestFramework {
       }
 
       testSession.metrics.completionTime = Date.now() - testSession.startTime;
-      
+
       // Collect user feedback
       testSession.metrics.userSatisfactionRating = await this.collectUserFeedback(
         scenario,
@@ -302,7 +302,7 @@ export class UserAcceptanceTestFramework {
       console.error('UAT execution failed:', error);
       testSession.error = error.message;
       testSession.metrics.completionTime = Date.now() - testSession.startTime;
-      
+
       this.testResults.set(testSession.id, testSession);
       return testSession;
     }
@@ -310,55 +310,55 @@ export class UserAcceptanceTestFramework {
 
   async executeTestStep(stepName, userProfile, environment) {
     const startTime = Date.now();
-    
+
     try {
       let result;
-      
+
       switch (stepName) {
         case 'login_and_setup':
           result = await this.simulateLogin(userProfile, environment);
           break;
-          
+
         case 'create_new_analysis':
           result = await this.simulateAnalysisCreation(userProfile);
           break;
-          
+
         case 'input_financial_data':
           result = await this.simulateDataInput(userProfile);
           break;
-          
+
         case 'build_dcf_model':
           result = await this.simulateDCFModeling(userProfile);
           break;
-          
+
         case 'perform_sensitivity_analysis':
           result = await this.simulateSensitivityAnalysis(userProfile);
           break;
-          
+
         case 'create_executive_summary':
           result = await this.simulateExecutiveSummary(userProfile);
           break;
-          
+
         case 'export_presentation':
           result = await this.simulatePresentationExport(userProfile);
           break;
-          
+
         case 'share_with_team':
           result = await this.simulateTeamSharing(userProfile);
           break;
-          
+
         case 'access_shared_model':
           result = await this.simulateSharedModelAccess(userProfile);
           break;
-          
+
         case 'add_comments_feedback':
           result = await this.simulateCommentAddition(userProfile);
           break;
-          
+
         case 'track_version_changes':
           result = await this.simulateVersionTracking(userProfile);
           break;
-          
+
         default:
           result = await this.simulateGenericStep(stepName, userProfile);
       }
@@ -386,7 +386,7 @@ export class UserAcceptanceTestFramework {
     // Simulate login process
     const loginDuration = userProfile.experience === 'beginner' ? 2000 : 1000;
     await this.delay(loginDuration);
-    
+
     return {
       authenticated: true,
       sessionId: 'test-session-123',
@@ -398,7 +398,7 @@ export class UserAcceptanceTestFramework {
   async simulateAnalysisCreation(userProfile) {
     const creationTime = userProfile.experience === 'beginner' ? 3000 : 1500;
     await this.delay(creationTime);
-    
+
     return {
       analysisId: 'analysis-' + Date.now(),
       template: 'dcf_model',
@@ -409,14 +409,14 @@ export class UserAcceptanceTestFramework {
   async simulateDataInput(userProfile) {
     const inputComplexity = userProfile.experience === 'beginner' ? 'guided' : 'direct';
     const inputDuration = inputComplexity === 'guided' ? 5000 : 3000;
-    
+
     await this.delay(inputDuration);
-    
+
     // Simulate potential errors based on user experience
     if (userProfile.experience === 'beginner' && Math.random() < 0.2) {
       throw new Error('Data validation error - guided help needed');
     }
-    
+
     return {
       dataRows: 120,
       validationErrors: userProfile.experience === 'beginner' ? 2 : 0,
@@ -428,14 +428,14 @@ export class UserAcceptanceTestFramework {
   async simulateDCFModeling(userProfile) {
     const modelingDuration = 4000;
     await this.delay(modelingDuration);
-    
+
     // Assess model quality based on user experience
     const modelQuality = {
       'beginner': 0.7,
       'intermediate': 0.85,
       'senior': 0.95
     };
-    
+
     return {
       modelCompleted: true,
       assumptions: 15,
@@ -448,7 +448,7 @@ export class UserAcceptanceTestFramework {
   async simulateSensitivityAnalysis(userProfile) {
     const analysisDuration = 2500;
     await this.delay(analysisDuration);
-    
+
     return {
       sensitivityRuns: userProfile.experience === 'senior' ? 5 : 3,
       variablesAnalyzed: ['revenue_growth', 'discount_rate', 'terminal_growth'],
@@ -460,7 +460,7 @@ export class UserAcceptanceTestFramework {
   async simulateExecutiveSummary(userProfile) {
     const summaryDuration = 3000;
     await this.delay(summaryDuration);
-    
+
     return {
       summaryGenerated: true,
       keyMetrics: 8,
@@ -469,10 +469,10 @@ export class UserAcceptanceTestFramework {
     };
   }
 
-  async simulatePresentationExport(userProfile) {
+  async simulatePresentationExport(_userProfile) {
     const exportDuration = 2000;
     await this.delay(exportDuration);
-    
+
     return {
       format: 'pptx',
       slides: 12,
@@ -482,10 +482,10 @@ export class UserAcceptanceTestFramework {
     };
   }
 
-  async simulateTeamSharing(userProfile) {
+  async simulateTeamSharing(_userProfile) {
     const sharingDuration = 1500;
     await this.delay(sharingDuration);
-    
+
     return {
       shareMethod: 'secure_link',
       permissions: 'view_comment',
@@ -494,10 +494,10 @@ export class UserAcceptanceTestFramework {
     };
   }
 
-  async simulateSharedModelAccess(userProfile) {
+  async simulateSharedModelAccess(_userProfile) {
     const accessDuration = 1000;
     await this.delay(accessDuration);
-    
+
     return {
       modelLoaded: true,
       loadTime: accessDuration,
@@ -509,7 +509,7 @@ export class UserAcceptanceTestFramework {
   async simulateCommentAddition(userProfile) {
     const commentDuration = 2000;
     await this.delay(commentDuration);
-    
+
     return {
       commentsAdded: userProfile.experience === 'senior' ? 3 : 1,
       threadCreated: true,
@@ -520,7 +520,7 @@ export class UserAcceptanceTestFramework {
   async simulateVersionTracking(userProfile) {
     const trackingDuration = 1500;
     await this.delay(trackingDuration);
-    
+
     return {
       versionsViewed: 4,
       changesIdentified: 7,
@@ -532,7 +532,7 @@ export class UserAcceptanceTestFramework {
   async simulateGenericStep(stepName, userProfile) {
     const genericDuration = 2000;
     await this.delay(genericDuration);
-    
+
     return {
       stepCompleted: true,
       duration: genericDuration,
@@ -544,51 +544,51 @@ export class UserAcceptanceTestFramework {
     // Assess user experience based on step complexity and user profile
     const complexSteps = ['build_dcf_model', 'perform_sensitivity_analysis', 'create_executive_summary'];
     const isComplex = complexSteps.includes(stepName);
-    
+
     if (isComplex && userProfile.experience === 'beginner') {
       return result.error ? 'poor' : 'challenging';
     }
-    
+
     if (result.error) {
       return 'poor';
     }
-    
+
     if (result.duration > 5000) {
       return userProfile.experience === 'beginner' ? 'acceptable' : 'slow';
     }
-    
+
     return 'good';
   }
 
   async collectUserFeedback(scenario, userProfile, testSession) {
     // Simulate user feedback collection
     await this.delay(1000);
-    
+
     // Base satisfaction on scenario success and user expectations
     const successRate = testSession.metrics.successfulSteps / scenario.steps.length;
     const expectedDuration = scenario.expectedDuration * 60 * 1000; // Convert to ms
     const actualDuration = testSession.metrics.completionTime;
-    
+
     let satisfactionScore = 3.0; // Base score
-    
+
     // Adjust based on success rate
     satisfactionScore += (successRate - 0.8) * 5; // +/- 1 point for success rate
-    
+
     // Adjust based on timing
     if (actualDuration <= expectedDuration) {
       satisfactionScore += 0.5;
     } else if (actualDuration > expectedDuration * 1.5) {
       satisfactionScore -= 0.5;
     }
-    
+
     // Adjust based on user profile expectations
     if (userProfile.expectations.speed === 'fast' && actualDuration > expectedDuration) {
       satisfactionScore -= 0.3;
     }
-    
+
     // Clamp to 1-5 range
     satisfactionScore = Math.max(1, Math.min(5, satisfactionScore));
-    
+
     return Math.round(satisfactionScore * 10) / 10; // Round to 1 decimal
   }
 
@@ -597,7 +597,7 @@ export class UserAcceptanceTestFramework {
     const successRate = metrics.successfulSteps / scenario.steps.length;
     const errorRate = metrics.errorCount / scenario.steps.length;
     const efficiencyScore = scenario.expectedDuration * 60 * 1000 / metrics.completionTime;
-    
+
     return {
       overallSuccess: successRate >= scenario.successCriteria.completion_rate,
       successRate,
@@ -612,7 +612,7 @@ export class UserAcceptanceTestFramework {
   generateRecommendations(testSession, scenario) {
     const recommendations = [];
     const metrics = testSession.metrics;
-    
+
     if (metrics.errorCount > 0) {
       recommendations.push({
         priority: 'high',
@@ -620,7 +620,7 @@ export class UserAcceptanceTestFramework {
         suggestion: 'Improve error handling and user guidance'
       });
     }
-    
+
     if (metrics.completionTime > scenario.expectedDuration * 60 * 1000 * 1.2) {
       recommendations.push({
         priority: 'medium',
@@ -628,7 +628,7 @@ export class UserAcceptanceTestFramework {
         suggestion: 'Optimize workflow efficiency and reduce task complexity'
       });
     }
-    
+
     if (metrics.userSatisfactionRating < 4.0) {
       recommendations.push({
         priority: 'high',
@@ -636,7 +636,7 @@ export class UserAcceptanceTestFramework {
         suggestion: 'Enhance user interface and provide better onboarding'
       });
     }
-    
+
     return recommendations;
   }
 
@@ -645,22 +645,22 @@ export class UserAcceptanceTestFramework {
     const metrics = testSession.metrics;
     const successRate = metrics.successfulSteps / scenario.steps.length;
     const errorRate = metrics.errorCount / scenario.steps.length;
-    
+
     return {
       completion_rate: successRate >= criteria.completion_rate,
       error_rate: errorRate <= criteria.error_rate,
       user_satisfaction: metrics.userSatisfactionRating >= criteria.user_satisfaction,
-      overall_pass: successRate >= criteria.completion_rate && 
-                   errorRate <= criteria.error_rate && 
+      overall_pass: successRate >= criteria.completion_rate &&
+                   errorRate <= criteria.error_rate &&
                    metrics.userSatisfactionRating >= criteria.user_satisfaction
     };
   }
 
   async runFullUATSuite() {
     const results = [];
-    
+
     console.log('Starting Full UAT Suite...');
-    
+
     // Run all scenarios for appropriate user types
     for (const [scenarioId, scenario] of this.testScenarios) {
       for (const userType of scenario.userTypes) {
@@ -674,11 +674,11 @@ export class UserAcceptanceTestFramework {
         }
       }
     }
-    
+
     // Generate comprehensive report
     const report = this.generateUATReport(results);
     console.log('UAT Suite completed. Report generated.');
-    
+
     return report;
   }
 
@@ -686,13 +686,13 @@ export class UserAcceptanceTestFramework {
     const totalTests = results.length;
     const passedTests = results.filter(r => r.analysis?.passedCriteria?.overall_pass).length;
     const failedTests = totalTests - passedTests;
-    
-    const avgSatisfaction = results.reduce((sum, r) => 
+
+    const avgSatisfaction = results.reduce((sum, r) =>
       sum + (r.metrics?.userSatisfactionRating || 0), 0) / totalTests;
-    
-    const avgDuration = results.reduce((sum, r) => 
+
+    const avgDuration = results.reduce((sum, r) =>
       sum + (r.metrics?.completionTime || 0), 0) / totalTests;
-    
+
     return {
       summary: {
         totalTests,
@@ -711,7 +711,7 @@ export class UserAcceptanceTestFramework {
 
   aggregateRecommendations(results) {
     const recommendations = new Map();
-    
+
     results.forEach(result => {
       if (result.analysis?.recommendations) {
         result.analysis.recommendations.forEach(rec => {
@@ -723,13 +723,13 @@ export class UserAcceptanceTestFramework {
         });
       }
     });
-    
+
     return Array.from(recommendations.values()).sort((a, b) => b.count - a.count);
   }
 
   generateNextSteps(results) {
     const passRate = results.filter(r => r.analysis?.passedCriteria?.overall_pass).length / results.length;
-    
+
     if (passRate >= 0.9) {
       return ['Ready for production deployment', 'Monitor user feedback post-launch'];
     } else if (passRate >= 0.7) {
@@ -760,67 +760,67 @@ describe('User Acceptance Tests - FinanceAnalyst Pro Phase 2', () => {
   });
 
   describe('Investment Banking Workflows', () => {
-    it('should complete DCF analysis workflow successfully', async () => {
+    it('should complete DCF analysis workflow successfully', async() => {
       const result = await framework.runUserAcceptanceTest('complete_dcf_analysis', 'investment_banker');
-      
+
       expect(result.analysis.overallSuccess).toBe(true);
       expect(result.metrics.userSatisfactionRating).toBeGreaterThanOrEqual(4.0);
       expect(result.metrics.errorCount).toBeLessThanOrEqual(2);
     }, 60000);
 
-    it('should handle collaborative model review', async () => {
+    it('should handle collaborative model review', async() => {
       const result = await framework.runUserAcceptanceTest('collaborative_model_review', 'investment_banker');
-      
+
       expect(result.analysis.successRate).toBeGreaterThanOrEqual(0.9);
       expect(result.analysis.satisfactionMet).toBe(true);
     }, 45000);
   });
 
   describe('Portfolio Management Workflows', () => {
-    it('should provide effective dashboard monitoring', async () => {
+    it('should provide effective dashboard monitoring', async() => {
       const result = await framework.runUserAcceptanceTest('real_time_dashboard_monitoring', 'portfolio_manager');
-      
+
       expect(result.analysis.overallSuccess).toBe(true);
       expect(result.analysis.efficiencyScore).toBeGreaterThanOrEqual(0.8);
     }, 30000);
   });
 
   describe('Credit Analysis Workflows', () => {
-    it('should complete comprehensive credit assessment', async () => {
+    it('should complete comprehensive credit assessment', async() => {
       const result = await framework.runUserAcceptanceTest('credit_risk_assessment', 'credit_analyst');
-      
+
       expect(result.analysis.passedCriteria.overall_pass).toBe(true);
       expect(result.metrics.successfulSteps).toBeGreaterThanOrEqual(6);
     }, 75000);
   });
 
   describe('User Onboarding', () => {
-    it('should provide effective onboarding for beginners', async () => {
+    it('should provide effective onboarding for beginners', async() => {
       const result = await framework.runUserAcceptanceTest('beginner_onboarding', 'financial_consultant');
-      
+
       expect(result.analysis.successRate).toBeGreaterThanOrEqual(0.85);
       expect(result.metrics.userSatisfactionRating).toBeGreaterThanOrEqual(3.8);
     }, 120000);
   });
 
   describe('Advanced Features', () => {
-    it('should support advanced visualization creation', async () => {
+    it('should support advanced visualization creation', async() => {
       const result = await framework.runUserAcceptanceTest('advanced_visualization_creation', 'equity_researcher');
-      
+
       expect(result.analysis.overallSuccess).toBe(true);
     }, 50000);
 
-    it('should work on mobile devices', async () => {
+    it('should work on mobile devices', async() => {
       const result = await framework.runUserAcceptanceTest('mobile_workflow_testing', 'portfolio_manager');
-      
+
       expect(result.analysis.successRate).toBeGreaterThanOrEqual(0.8);
     }, 20000);
   });
 
   describe('Full UAT Suite', () => {
-    it('should pass comprehensive UAT across all user types', async () => {
+    it('should pass comprehensive UAT across all user types', async() => {
       const report = await framework.runFullUATSuite();
-      
+
       expect(report.summary.passRate).toBeGreaterThanOrEqual(85);
       expect(report.summary.averageSatisfaction).toBeGreaterThanOrEqual(4.0);
       expect(report.recommendations).toBeDefined();

@@ -429,7 +429,7 @@ class APIService {
   async fetchMarketData(symbol) {
     // Rate limiting
     await this.rateLimiter.acquire();
-    
+
     // Circuit breaker pattern
     if (this.circuitBreaker.isOpen()) {
       return this.fallbackData(symbol);

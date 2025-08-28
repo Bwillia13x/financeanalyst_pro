@@ -40,7 +40,7 @@ class FinancialModelingCache {
     let hash = 0;
     for (let i = 0; i < str.length; i++) {
       const char = str.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
+      hash = (hash << 5) - hash + char;
       hash = hash & hash; // Convert to 32bit integer
     }
     return Math.abs(hash).toString(36);
@@ -109,7 +109,7 @@ class FinancialModelingCache {
     const result = await calculator(inputs);
     const endTime = performance.now();
 
-    this.performanceMetrics.computationTime += (endTime - startTime);
+    this.performanceMetrics.computationTime += endTime - startTime;
 
     // Cache result with longer TTL for complex calculations
     this.set(key, result, 600000); // 10 minutes for DCF
@@ -141,7 +141,7 @@ class FinancialModelingCache {
     const result = await calculator(inputs);
     const endTime = performance.now();
 
-    this.performanceMetrics.computationTime += (endTime - startTime);
+    this.performanceMetrics.computationTime += endTime - startTime;
 
     // Cache result with longer TTL for complex calculations
     this.set(key, result, 600000); // 10 minutes for LBO
@@ -183,7 +183,7 @@ class FinancialModelingCache {
     const result = await calculator(inputs, partialResults);
     const endTime = performance.now();
 
-    this.performanceMetrics.computationTime += (endTime - startTime);
+    this.performanceMetrics.computationTime += endTime - startTime;
 
     // Cache result with shorter TTL for stochastic calculations
     this.set(baseKey, result, 180000); // 3 minutes for Monte Carlo
@@ -219,7 +219,7 @@ class FinancialModelingCache {
     const result = await calculator(inputs);
     const endTime = performance.now();
 
-    this.performanceMetrics.computationTime += (endTime - startTime);
+    this.performanceMetrics.computationTime += endTime - startTime;
 
     // Cache ratios with moderate TTL
     this.set(key, result, 300000); // 5 minutes for ratios
@@ -251,12 +251,12 @@ class FinancialModelingCache {
 
     // Second pass: execute uncached operations in parallel
     if (uncachedOperations.length > 0) {
-      const computePromises = uncachedOperations.map(async(op) => {
+      const computePromises = uncachedOperations.map(async op => {
         const startTime = performance.now();
         const result = await op.calculator(op.inputs);
         const endTime = performance.now();
 
-        this.performanceMetrics.computationTime += (endTime - startTime);
+        this.performanceMetrics.computationTime += endTime - startTime;
         this.set(op.key, result);
 
         return { ...op, result, computationTime: endTime - startTime };
@@ -303,17 +303,20 @@ class FinancialModelingCache {
    * @returns {Object} Performance metrics
    */
   getPerformanceMetrics() {
-    const hitRate = this.performanceMetrics.hits + this.performanceMetrics.misses > 0
-      ? this.performanceMetrics.hits / (this.performanceMetrics.hits + this.performanceMetrics.misses)
-      : 0;
+    const hitRate =
+      this.performanceMetrics.hits + this.performanceMetrics.misses > 0
+        ? this.performanceMetrics.hits /
+          (this.performanceMetrics.hits + this.performanceMetrics.misses)
+        : 0;
 
     return {
       ...this.performanceMetrics,
       hitRate,
       cacheSize: this.cache.size,
-      avgComputationTime: this.performanceMetrics.cacheOperations > 0
-        ? this.performanceMetrics.computationTime / this.performanceMetrics.cacheOperations
-        : 0
+      avgComputationTime:
+        this.performanceMetrics.cacheOperations > 0
+          ? this.performanceMetrics.computationTime / this.performanceMetrics.cacheOperations
+          : 0
     };
   }
 
@@ -433,7 +436,7 @@ class FinancialModelingCache {
       scenarioCount: scenarios.length
     });
 
-    const precomputePromises = scenarios.map(async(scenario) => {
+    const precomputePromises = scenarios.map(async scenario => {
       const key = this.generateCacheKey(scenario.type, scenario.inputs);
 
       if (!this.get(key)) {
@@ -471,7 +474,7 @@ class FinancialModelingCache {
   setupCacheWarming(warmingConfig) {
     const { interval = 300000, scenarios = [] } = warmingConfig; // Default 5 minutes
 
-    setInterval(async() => {
+    setInterval(async () => {
       try {
         await this.precomputeCommonScenarios(scenarios);
       } catch (error) {

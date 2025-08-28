@@ -21,13 +21,42 @@ import WatchlistPanel from './components/WatchlistPanel';
 
 const RealTimeMarketDataCenter = () => {
   // Add accessibility and performance monitoring
-  const { elementRef: _elementRef, testFinancialFeatures: _testFinancialFeatures } = useFinancialAccessibility('market-data-center');
+  const { elementRef: _elementRef, testFinancialFeatures: _testFinancialFeatures } =
+    useFinancialAccessibility('market-data-center');
 
   const [dataSources, setDataSources] = useState([
-    { id: 'yahoo', name: 'Yahoo Finance', enabled: true, status: 'connected', latency: 12, requiresKey: false },
-    { id: 'alpha_vantage', name: 'Alpha Vantage', enabled: false, status: 'disconnected', latency: 25, requiresKey: true },
-    { id: 'fmp', name: 'Financial Modeling Prep', enabled: false, status: 'disconnected', latency: 18, requiresKey: true },
-    { id: 'sec_edgar', name: 'SEC EDGAR', enabled: true, status: 'connected', latency: 45, requiresKey: false }
+    {
+      id: 'yahoo',
+      name: 'Yahoo Finance',
+      enabled: true,
+      status: 'connected',
+      latency: 12,
+      requiresKey: false
+    },
+    {
+      id: 'alpha_vantage',
+      name: 'Alpha Vantage',
+      enabled: false,
+      status: 'disconnected',
+      latency: 25,
+      requiresKey: true
+    },
+    {
+      id: 'fmp',
+      name: 'Financial Modeling Prep',
+      enabled: false,
+      status: 'disconnected',
+      latency: 18,
+      requiresKey: true
+    },
+    {
+      id: 'sec_edgar',
+      name: 'SEC EDGAR',
+      enabled: true,
+      status: 'connected',
+      latency: 45,
+      requiresKey: false
+    }
   ]);
 
   const [connectionHealth, _setConnectionHealth] = useState({
@@ -144,7 +173,7 @@ const RealTimeMarketDataCenter = () => {
 
   // Initialize real data services and check API health
   useEffect(() => {
-    const initializeRealData = async() => {
+    const initializeRealData = async () => {
       try {
         // Ensure backend base URL is initialized from environment at runtime
         const base = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api';
@@ -162,7 +191,8 @@ const RealTimeMarketDataCenter = () => {
               return {
                 ...source,
                 enabled: health.hasValidApiKey || !health.requiresApiKey,
-                status: health.hasValidApiKey || !health.requiresApiKey ? 'connected' : 'disconnected'
+                status:
+                  health.hasValidApiKey || !health.requiresApiKey ? 'connected' : 'disconnected'
               };
             }
             return source;
@@ -174,7 +204,6 @@ const RealTimeMarketDataCenter = () => {
           health => health.hasValidApiKey || !health.requiresApiKey
         );
         setRealDataEnabled(hasWorkingApi);
-
       } catch (error) {
         console.error('Failed to initialize real data services:', error);
       }
@@ -187,11 +216,11 @@ const RealTimeMarketDataCenter = () => {
   useEffect(() => {
     if (!isAutoRefresh) return;
 
-    const interval = setInterval(async() => {
+    const interval = setInterval(async () => {
       if (realDataEnabled) {
         // Fetch real data for each widget
         const updatedWidgets = await Promise.all(
-          widgets.map(async(widget) => {
+          widgets.map(async widget => {
             try {
               const marketData = await enhancedApiService.fetchRealTimeMarketData(widget.symbol);
               const normalized = normalizeQuote(marketData, widget);
@@ -208,13 +237,13 @@ const RealTimeMarketDataCenter = () => {
                 lastUpdate: new Date(normalized.timestamp),
                 source: normalized.source,
                 dataQuality: validation.qualityScore,
-                sparklineData: [
-                  ...widget.sparklineData.slice(1),
-                  normalized.currentPrice
-                ]
+                sparklineData: [...widget.sparklineData.slice(1), normalized.currentPrice]
               };
             } catch (error) {
-              console.warn(`Failed to fetch real data for ${widget.symbol}, using simulation:`, error);
+              console.warn(
+                `Failed to fetch real data for ${widget.symbol}, using simulation:`,
+                error
+              );
               // Fallback to simulation
               return {
                 ...widget,
@@ -263,7 +292,7 @@ const RealTimeMarketDataCenter = () => {
     );
   };
 
-  const handleSymbolSelect = async(symbol) => {
+  const handleSymbolSelect = async symbol => {
     try {
       let marketData;
       let source = 'Simulation';
@@ -297,8 +326,9 @@ const RealTimeMarketDataCenter = () => {
         source,
         dataQuality,
         lastUpdate: new Date(),
-        sparklineData: Array.from({ length: 6 }, () =>
-          normalizedInitial.currentPrice || Math.random() * 1000 + 50
+        sparklineData: Array.from(
+          { length: 6 },
+          () => normalizedInitial.currentPrice || Math.random() * 1000 + 50
         )
       };
 
@@ -306,11 +336,18 @@ const RealTimeMarketDataCenter = () => {
 
       // Subscribe to real-time updates for this symbol
       if (realDataEnabled) {
-        realTimeDataService.subscribe('stock_price', symbol.symbol, (data) => {
+        realTimeDataService.subscribe('stock_price', symbol.symbol, data => {
           setWidgets(prevWidgets =>
             prevWidgets.map(widget => {
               if (widget.symbol !== symbol.symbol) return widget;
-              const normalized = normalizeQuote({ ...data, symbol: widget.symbol, source: data.source || widget.source || 'SIM_FEED' }, widget);
+              const normalized = normalizeQuote(
+                {
+                  ...data,
+                  symbol: widget.symbol,
+                  source: data.source || widget.source || 'SIM_FEED'
+                },
+                widget
+              );
               return {
                 ...widget,
                 currentValue: normalized.currentPrice ?? widget.currentValue,

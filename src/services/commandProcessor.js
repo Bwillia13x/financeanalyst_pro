@@ -62,7 +62,6 @@ export class CommandProcessor {
       if (settings && typeof settings === 'object') {
         this.settings = { ...this.settings, ...settings };
       }
-
     } catch (error) {
       console.error('Failed to load persisted data:', error);
     }
@@ -90,7 +89,6 @@ export class CommandProcessor {
       await persistenceManager.store('user_preferences', this.settings, {
         storage: 'localStorage'
       });
-
     } catch (error) {
       console.error('Failed to save data:', error);
     }
@@ -158,7 +156,6 @@ export class CommandProcessor {
       });
 
       return result;
-
     } catch (error) {
       return this.createErrorResponse(`Command execution failed: ${error.message}`, input);
     }
@@ -250,8 +247,10 @@ export class CommandProcessor {
    */
   parseParameterValue(value) {
     // Remove quotes
-    if ((value.startsWith('"') && value.endsWith('"')) ||
-        (value.startsWith("'") && value.endsWith("'"))) {
+    if (
+      (value.startsWith('"') && value.endsWith('"')) ||
+      (value.startsWith("'") && value.endsWith("'"))
+    ) {
       return value.slice(1, -1);
     }
 
@@ -334,8 +333,10 @@ export class CommandProcessor {
     const allCommands = commandRegistry.getAllCommands();
 
     return allCommands
-      .filter(cmd => cmd.includes(command.substring(0, 3)) ||
-                     cmd.toLowerCase().includes(command.toLowerCase()))
+      .filter(
+        cmd =>
+          cmd.includes(command.substring(0, 3)) || cmd.toLowerCase().includes(command.toLowerCase())
+      )
       .slice(0, 5);
   }
 

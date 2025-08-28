@@ -38,7 +38,8 @@ const SourceTransparency = ({ dataPoint, value, onClose }) => {
         lineItem: 'Total Revenue',
         page: 47,
         section: 'Consolidated Statements of Income',
-        secUrl: 'https://sec.gov/Archives/edgar/data/123456/000012345624000001/tech-10k_20231231.htm',
+        secUrl:
+          'https://sec.gov/Archives/edgar/data/123456/000012345624000001/tech-10k_20231231.htm',
         xpath: '/html/body/div[1]/table[2]/tbody/tr[3]/td[2]',
         extractedText: 'Total revenue for fiscal year 2023 was $2,891,245,000',
         verificationHash: 'sha256:a1b2c3d4e5f6...',
@@ -46,7 +47,10 @@ const SourceTransparency = ({ dataPoint, value, onClose }) => {
       },
       methodology: {
         extractionMethod: 'Automated XBRL parsing',
-        validationRules: ['Revenue recognition standards (ASC 606)', 'Cross-reference with quarterly filings'],
+        validationRules: [
+          'Revenue recognition standards (ASC 606)',
+          'Cross-reference with quarterly filings'
+        ],
         dataQuality: 95,
         confidence: 'High'
       },
@@ -100,7 +104,7 @@ const SourceTransparency = ({ dataPoint, value, onClose }) => {
 
   const currentSource = sourceData[dataPoint] || sourceData['Total Revenue'];
 
-  const getStatusIcon = (status) => {
+  const getStatusIcon = status => {
     switch (status) {
       case 'verified':
         return <CheckCircle className="w-5 h-5 text-green-600" />;
@@ -113,7 +117,7 @@ const SourceTransparency = ({ dataPoint, value, onClose }) => {
     }
   };
 
-  const getStatusColor = (status) => {
+  const getStatusColor = status => {
     switch (status) {
       case 'verified':
         return 'bg-green-50 border-green-200 text-green-800';
@@ -140,7 +144,7 @@ const SourceTransparency = ({ dataPoint, value, onClose }) => {
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.9, opacity: 0 }}
           className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden"
-          onClick={(e) => e.stopPropagation()}
+          onClick={e => e.stopPropagation()}
         >
           {/* Header */}
           <div className="border-b border-gray-200 p-6">
@@ -151,13 +155,12 @@ const SourceTransparency = ({ dataPoint, value, onClose }) => {
                 </div>
                 <div>
                   <h2 className="text-xl font-bold text-gray-900">{dataPoint}</h2>
-                  <p className="text-2xl font-bold text-blue-600 mt-1">{value || currentSource.value}</p>
+                  <p className="text-2xl font-bold text-blue-600 mt-1">
+                    {value || currentSource.value}
+                  </p>
                 </div>
               </div>
-              <button
-                onClick={onClose}
-                className="text-gray-400 hover:text-gray-600 text-2xl"
-              >
+              <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-2xl">
                 ×
               </button>
             </div>
@@ -174,7 +177,9 @@ const SourceTransparency = ({ dataPoint, value, onClose }) => {
               </div>
               <div className="flex items-center space-x-2">
                 <CheckCircle className="w-4 h-4 text-green-600" />
-                <span className="text-sm text-green-600 font-medium">Quality: {currentSource.methodology.dataQuality}%</span>
+                <span className="text-sm text-green-600 font-medium">
+                  Quality: {currentSource.methodology.dataQuality}%
+                </span>
               </div>
             </div>
           </div>
@@ -187,7 +192,7 @@ const SourceTransparency = ({ dataPoint, value, onClose }) => {
                 { id: 'lineage', label: 'Data Lineage', icon: TrendingUp },
                 { id: 'methodology', label: 'Methodology', icon: Search },
                 { id: 'audit', label: 'Audit Trail', icon: Clock }
-              ].map((tab) => (
+              ].map(tab => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
@@ -214,7 +219,9 @@ const SourceTransparency = ({ dataPoint, value, onClose }) => {
                     <div className="flex items-center space-x-3">
                       <FileText className="w-6 h-6 text-blue-600" />
                       <div>
-                        <h3 className="font-semibold text-blue-900">{currentSource.source.document}</h3>
+                        <h3 className="font-semibold text-blue-900">
+                          {currentSource.source.document}
+                        </h3>
                         <p className="text-sm text-blue-700">{currentSource.source.company}</p>
                       </div>
                     </div>
@@ -251,7 +258,9 @@ const SourceTransparency = ({ dataPoint, value, onClose }) => {
 
                   <div className="mt-4 p-3 bg-white rounded border">
                     <span className="text-xs text-gray-600 font-medium">EXTRACTED TEXT:</span>
-                    <p className="text-sm text-gray-900 mt-1 italic">&ldquo;{currentSource.source.extractedText}&rdquo;</p>
+                    <p className="text-sm text-gray-900 mt-1 italic">
+                      &ldquo;{currentSource.source.extractedText}&rdquo;
+                    </p>
                   </div>
                 </div>
 
@@ -260,7 +269,10 @@ const SourceTransparency = ({ dataPoint, value, onClose }) => {
                   <h4 className="font-semibold text-gray-900 mb-3">Related Data Points</h4>
                   <div className="space-y-2">
                     {currentSource.relatedData.map((item, index) => (
-                      <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded">
+                      <div
+                        key={index}
+                        className="flex items-center justify-between p-3 bg-gray-50 rounded"
+                      >
                         <span className="text-sm text-gray-700">{item.metric}</span>
                         <div className="flex items-center space-x-2">
                           <span className="font-medium text-gray-900">{item.value}</span>
@@ -288,7 +300,9 @@ const SourceTransparency = ({ dataPoint, value, onClose }) => {
                     </div>
                     <div className="flex-1">
                       <p className="font-medium text-gray-900">{step.process}</p>
-                      <p className="text-sm text-gray-500">{new Date(step.timestamp).toLocaleString()}</p>
+                      <p className="text-sm text-gray-500">
+                        {new Date(step.timestamp).toLocaleString()}
+                      </p>
                     </div>
                     <CheckCircle className="w-5 h-5 text-green-600" />
                   </div>
@@ -318,11 +332,15 @@ const SourceTransparency = ({ dataPoint, value, onClose }) => {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                     <h5 className="font-medium text-green-900">Data Quality</h5>
-                    <p className="text-2xl font-bold text-green-600 mt-1">{currentSource.methodology.dataQuality}%</p>
+                    <p className="text-2xl font-bold text-green-600 mt-1">
+                      {currentSource.methodology.dataQuality}%
+                    </p>
                   </div>
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                     <h5 className="font-medium text-blue-900">Confidence Level</h5>
-                    <p className="text-lg font-semibold text-blue-600 mt-1">{currentSource.methodology.confidence}</p>
+                    <p className="text-lg font-semibold text-blue-600 mt-1">
+                      {currentSource.methodology.confidence}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -362,7 +380,9 @@ const SourceTransparency = ({ dataPoint, value, onClose }) => {
                 </div>
                 <div className="flex items-center space-x-1">
                   <Clock className="w-3 h-3" />
-                  <span>Last verified: {new Date(currentSource.source.lastVerified).toLocaleString()}</span>
+                  <span>
+                    Last verified: {new Date(currentSource.source.lastVerified).toLocaleString()}
+                  </span>
                 </div>
               </div>
               <button

@@ -191,9 +191,11 @@ class StorageService {
   async compressData(data) {
     const jsonString = JSON.stringify(data);
 
-    if (!STORAGE_CONFIG.compression.enabled ||
-        jsonString.length < STORAGE_CONFIG.compression.threshold ||
-        !this.compressionAvailable) {
+    if (
+      !STORAGE_CONFIG.compression.enabled ||
+      jsonString.length < STORAGE_CONFIG.compression.threshold ||
+      !this.compressionAvailable
+    ) {
       return { data: jsonString, compressed: false };
     }
 
@@ -368,7 +370,7 @@ class StorageService {
   /**
    * List all items of a specific type
    */
-  listItems(type) {
+  async listItems(type) {
     if (!this.isAvailable) {
       return [];
     }
@@ -391,7 +393,7 @@ class StorageService {
    * Perform cleanup of old data
    */
   async performCleanup() {
-    const cutoffTime = Date.now() - (30 * 24 * 60 * 60 * 1000); // 30 days
+    const cutoffTime = Date.now() - 30 * 24 * 60 * 60 * 1000; // 30 days
     let cleanedCount = 0;
 
     for (let i = localStorage.length - 1; i >= 0; i--) {

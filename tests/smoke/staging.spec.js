@@ -11,7 +11,7 @@ test.describe('Staging Environment Smoke Tests', () => {
   test('should load homepage without errors', async ({ page }) => {
     // Check that page loads
     await expect(page).toHaveTitle(/FinanceAnalyst Pro/);
-    
+
     // Check for console errors
     const errors = [];
     page.on('console', msg => {
@@ -19,23 +19,23 @@ test.describe('Staging Environment Smoke Tests', () => {
         errors.push(msg.text());
       }
     });
-    
+
     await page.waitForLoadState('networkidle');
-    
+
     // Should not have critical errors
-    const criticalErrors = errors.filter(error => 
-      !error.includes('ResizeObserver') && 
+    const criticalErrors = errors.filter(error =>
+      !error.includes('ResizeObserver') &&
       !error.includes('favicon') &&
       !error.includes('404')
     );
-    
+
     expect(criticalErrors).toHaveLength(0);
   });
 
   test('should have functional navigation', async ({ page }) => {
     // Test main navigation links
     await expect(page.locator('nav')).toBeVisible();
-    
+
     // Test Company Analysis navigation
     const companyAnalysisLink = page.getByText('Company Analysis');
     if (await companyAnalysisLink.isVisible()) {
@@ -43,7 +43,7 @@ test.describe('Staging Environment Smoke Tests', () => {
       await page.waitForLoadState('networkidle');
       await expect(page).toHaveURL(/.*\/company-analysis/);
     }
-    
+
     // Test Private Analysis navigation
     await page.goto(STAGING_URL);
     const privateAnalysisLink = page.getByText('Private Analysis');
@@ -57,7 +57,7 @@ test.describe('Staging Environment Smoke Tests', () => {
   test('should load core JavaScript bundles', async ({ page }) => {
     const response = await page.goto(STAGING_URL);
     expect(response.status()).toBe(200);
-    
+
     // Check that critical JS files load
     const jsRequests = [];
     page.on('response', response => {
@@ -68,9 +68,9 @@ test.describe('Staging Environment Smoke Tests', () => {
         });
       }
     });
-    
+
     await page.waitForLoadState('networkidle');
-    
+
     // Should have loaded JS files successfully
     const failedJs = jsRequests.filter(req => req.status >= 400);
     expect(failedJs).toHaveLength(0);
@@ -79,16 +79,16 @@ test.describe('Staging Environment Smoke Tests', () => {
   test('should have functional command palette', async ({ page }) => {
     // Open command palette with keyboard shortcut
     await page.keyboard.press('Meta+k');
-    
+
     // Command palette should be visible
     await expect(page.locator('[data-testid="command-palette"]')).toBeVisible();
-    
+
     // Should be able to search
     await page.fill('[placeholder*="Search"]', 'analysis');
-    
+
     // Should show results
     await expect(page.locator('[data-testid="command-results"]')).toBeVisible();
-    
+
     // Close with Escape
     await page.keyboard.press('Escape');
     await expect(page.locator('[data-testid="command-palette"]')).not.toBeVisible();
@@ -96,7 +96,7 @@ test.describe('Staging Environment Smoke Tests', () => {
 
   test('should handle API connectivity', async ({ page }) => {
     await page.goto(`${STAGING_URL}/company-analysis`);
-    
+
     // Monitor network requests
     const apiRequests = [];
     page.on('response', response => {
@@ -107,13 +107,13 @@ test.describe('Staging Environment Smoke Tests', () => {
         });
       }
     });
-    
+
     // Try to load market data (should handle gracefully even if API is down)
     await page.fill('[placeholder*="ticker"]', 'AAPL');
     await page.keyboard.press('Enter');
-    
+
     await page.waitForTimeout(2000);
-    
+
     // Check that we don't have 5xx errors (4xx is acceptable for demo mode)
     const serverErrors = apiRequests.filter(req => req.status >= 500);
     expect(serverErrors).toHaveLength(0);
@@ -133,19 +133,19 @@ test.describe('Staging Environment Smoke Tests', () => {
     await page.setViewportSize({ width: 375, height: 667 });
     await page.reload();
     await page.waitForLoadState('networkidle');
-    
+
     // Navigation should be responsive
     const mobileMenu = page.locator('[data-testid="mobile-menu"]');
     if (await mobileMenu.isVisible()) {
       await mobileMenu.click();
       await expect(page.locator('nav')).toBeVisible();
     }
-    
+
     // Test tablet viewport
     await page.setViewportSize({ width: 768, height: 1024 });
     await page.reload();
     await page.waitForLoadState('networkidle');
-    
+
     // Should still be functional
     await expect(page.locator('main')).toBeVisible();
   });
@@ -153,10 +153,10 @@ test.describe('Staging Environment Smoke Tests', () => {
   test('should have proper error boundaries', async ({ page }) => {
     // Navigate to a non-existent route
     await page.goto(`${STAGING_URL}/non-existent-route`);
-    
+
     // Should show error page or redirect, not crash
     await page.waitForLoadState('networkidle');
-    
+
     // Should not show React error boundary
     const errorBoundary = page.locator('text=Something went wrong');
     await expect(errorBoundary).not.toBeVisible();
@@ -165,7 +165,7 @@ test.describe('Staging Environment Smoke Tests', () => {
   test('should track performance metrics', async ({ page }) => {
     // Start performance measurement
     await page.goto(STAGING_URL);
-    
+
     const performanceMetrics = await page.evaluate(() => {
       return new Promise((resolve) => {
         if ('performance' in window && 'getEntriesByType' in performance) {
@@ -180,7 +180,7 @@ test.describe('Staging Environment Smoke Tests', () => {
         }
       });
     });
-    
+
     // Reasonable performance thresholds for staging
     expect(performanceMetrics.loadTime).toBeLessThan(10000); // 10s max
     expect(performanceMetrics.domContentLoaded).toBeLessThan(5000); // 5s max
@@ -189,13 +189,13 @@ test.describe('Staging Environment Smoke Tests', () => {
   test('should handle authentication flow', async ({ page }) => {
     // Test auth-related functionality if present
     const loginButton = page.locator('text=Login').first();
-    
+
     if (await loginButton.isVisible()) {
       await loginButton.click();
-      
+
       // Should show login form or redirect to auth provider
       await page.waitForLoadState('networkidle');
-      
+
       // Should not crash or show errors
       const errors = await page.locator('.error, [role="alert"]').count();
       expect(errors).toBe(0);

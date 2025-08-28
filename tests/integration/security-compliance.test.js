@@ -6,7 +6,7 @@
 import { describe, test, expect, beforeAll } from 'vitest';
 
 describe('Security & Compliance Testing', () => {
-  
+
   describe('1. Authentication & Authorization', () => {
     test('Should enforce strong authentication mechanisms', async () => {
       const authenticationTests = [
@@ -54,7 +54,7 @@ describe('Security & Compliance Testing', () => {
       expect(mockAuthResults.data.jwtValidation.algorithm).toBe('RS256');
       expect(mockAuthResults.data.apiKeyValidation.keyLength).toBeGreaterThanOrEqual(32);
       expect(mockAuthResults.data.mfaImplementation.totpSupport).toBe(true);
-      
+
       console.log('✅ Strong authentication mechanisms test passed');
     });
 
@@ -99,7 +99,7 @@ describe('Security & Compliance Testing', () => {
       expect(mockAuthzResults.success).toBe(true);
       expect(mockAuthzResults.data.accessControl.principleOfLeastPrivilege).toBe(true);
       expect(mockAuthzResults.data.auditableAccess.allPermissionChecksLogged).toBe(true);
-      
+
       console.log('✅ Authorization controls test passed');
     });
   });
@@ -153,14 +153,14 @@ describe('Security & Compliance Testing', () => {
       expect(mockEncryptionResults.data.transportSecurity.tlsVersion).toBe('1.3');
       expect(mockEncryptionResults.data.dataAtRest.keySize).toBe(256);
       expect(mockEncryptionResults.data.keyManagement.hardwareSecurityModule).toBe(true);
-      
+
       console.log('✅ Comprehensive data encryption test passed');
     });
 
     test('Should protect against data breaches', async () => {
       const dataProtectionMeasures = [
         'input_validation',
-        'output_encoding', 
+        'output_encoding',
         'sql_injection_prevention',
         'xss_protection',
         'csrf_protection'
@@ -211,7 +211,7 @@ describe('Security & Compliance Testing', () => {
       expect(mockDataProtection.data.inputValidation.whitelistValidation).toBe(true);
       expect(mockDataProtection.data.sqlInjectionPrevention.parameterizedQueries).toBe(true);
       expect(mockDataProtection.data.intrusionDetection.realTimeMonitoring).toBe(true);
-      
+
       console.log('✅ Data breach protection test passed');
     });
   });
@@ -266,14 +266,14 @@ describe('Security & Compliance Testing', () => {
       expect(mockSOXCompliance.data.internalControls.deficiencies).toBe(0);
       expect(mockSOXCompliance.data.auditTrails.completeness).toBe(1.0);
       expect(mockSOXCompliance.data.changeManagement.segregationOfDuties).toBe(true);
-      
+
       console.log('✅ SOX compliance test passed');
     });
 
     test('Should comply with GDPR requirements', async () => {
       const gdprRequirements = [
         'lawful_basis_processing',
-        'consent_management', 
+        'consent_management',
         'data_subject_rights',
         'privacy_by_design',
         'breach_notification'
@@ -325,7 +325,7 @@ describe('Security & Compliance Testing', () => {
       expect(mockGDPRCompliance.data.dataSubjectRights.responseTimeLimit).toBeLessThanOrEqual(30);
       expect(mockGDPRCompliance.data.breachNotification.supervisoryAuthorityNotification).toBeLessThanOrEqual(72);
       expect(mockGDPRCompliance.data.privacyByDesign.privacyImpactAssessment).toBe(true);
-      
+
       console.log('✅ GDPR compliance test passed');
     });
 
@@ -378,7 +378,7 @@ describe('Security & Compliance Testing', () => {
               identify: 0.95,
               protect: 0.93,
               detect: 0.91,
-              respond: 0.89,  
+              respond: 0.89,
               recover: 0.87
             },
             overallMaturity: 0.91
@@ -390,7 +390,7 @@ describe('Security & Compliance Testing', () => {
       expect(mockFinancialCompliance.data.iso27001.complianceRate).toBe(1.0);
       expect(mockFinancialCompliance.data.soc2TypeII.exceptions).toBe(0);
       expect(mockFinancialCompliance.data.nistCybersecurity.overallMaturity).toBeGreaterThan(0.85);
-      
+
       console.log('✅ Financial industry compliance standards test passed');
     });
   });
@@ -457,7 +457,7 @@ describe('Security & Compliance Testing', () => {
       expect(mockVulnerabilityAssessment.data.staticCodeAnalysis.criticalIssues).toBe(0);
       expect(mockVulnerabilityAssessment.data.dependencyScanning.criticalVulnerabilities).toBe(0);
       expect(mockVulnerabilityAssessment.data.penetrationTest.overallRisk).toBe('low');
-      
+
       console.log('✅ Vulnerability assessment test passed');
     });
 
@@ -512,7 +512,7 @@ describe('Security & Compliance Testing', () => {
       expect(mockSecurityMonitoring.data.siemImplementation.falsePositiveRate).toBeLessThan(0.1);
       expect(mockSecurityMonitoring.data.securityMetrics.resolvedIncidents).toBe(mockSecurityMonitoring.data.securityMetrics.securityIncidents);
       expect(mockSecurityMonitoring.data.incidentResponse.automatedResponse).toBe(true);
-      
+
       console.log('✅ Security monitoring and incident response test passed');
     });
   });
@@ -528,7 +528,7 @@ describe('Security & Compliance Testing', () => {
       };
 
       const mockDataGovernance = {
-        success: true,  
+        success: true,
         data: {
           dataClassification: {
             classificationLevels: ['public', 'internal', 'confidential', 'restricted'],
@@ -566,7 +566,7 @@ describe('Security & Compliance Testing', () => {
       expect(mockDataGovernance.data.dataClassification.classificationAccuracy).toBeGreaterThan(0.95);
       expect(mockDataGovernance.data.retentionManagement.retentionCompliance).toBeGreaterThan(0.98);
       expect(mockDataGovernance.data.privacyGovernance.averageResponseTime).toBeLessThan(30);
-      
+
       console.log('✅ Data governance implementation test passed');
     });
   });
@@ -622,7 +622,7 @@ describe('Security & Compliance Testing', () => {
       expect(mockContinuityTest.data.disasterRecovery.rto).toBeLessThanOrEqual(8);
       expect(mockContinuityTest.data.backupSystems.encryption).toBe(true);
       expect(mockContinuityTest.data.disasterRecovery.failoverSuccess).toBe(true);
-      
+
       console.log('✅ Business continuity and disaster recovery test passed');
     });
   });
@@ -674,7 +674,7 @@ describe('Security & Compliance Testing', () => {
       expect(mockThirdPartyRisk.data.vendorAssessments.assessedVendors).toBe(mockThirdPartyRisk.data.vendorAssessments.totalVendors);
       expect(mockThirdPartyRisk.data.contractualSafeguards.dataProcessingAgreements).toBe(12);
       expect(mockThirdPartyRisk.data.monitoringAndReview.continuousMonitoring).toBe(true);
-      
+
       console.log('✅ Third-party risk management test passed');
     });
   });

@@ -3,14 +3,7 @@
  * Every chart, table, and visualization designed for presentation to managing directors and clients
  */
 
-import {
-  Download,
-  Copy,
-  Share2,
-  Presentation,
-  Settings,
-  Camera
-} from 'lucide-react';
+import { Download, Copy, Share2, Presentation, Settings, Camera } from 'lucide-react';
 import React, { useState, useRef } from 'react';
 import {
   LineChart,
@@ -120,7 +113,7 @@ const PresentationReadyOutput = ({ data, title, type: _type = 'chart', chartType
     { period: 'Q2 2024E', revenue: 358, ebitda: 104, margin: 29.1 }
   ];
 
-  const handleExport = (format) => {
+  const handleExport = format => {
     if (chartRef.current) {
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
@@ -146,8 +139,9 @@ const PresentationReadyOutput = ({ data, title, type: _type = 'chart', chartType
           <p className="font-semibold text-gray-900 mb-2">{_label}</p>
           {payload.map((entry, index) => (
             <p key={index} style={{ color: entry.color }} className="text-sm">
-              {`${entry.name}: ${typeof entry.value === 'number' ?
-                entry.value.toLocaleString() : entry.value}`}
+              {`${entry.name}: ${
+                typeof entry.value === 'number' ? entry.value.toLocaleString() : entry.value
+              }`}
             </p>
           ))}
         </div>
@@ -277,7 +271,7 @@ const PresentationReadyOutput = ({ data, title, type: _type = 'chart', chartType
           <div className="flex items-center space-x-2">
             <select
               value={colorTheme}
-              onChange={(e) => setColorTheme(e.target.value)}
+              onChange={e => setColorTheme(e.target.value)}
               className="text-sm border border-gray-300 rounded px-2 py-1"
             >
               <option value="professional">Professional</option>
@@ -288,7 +282,7 @@ const PresentationReadyOutput = ({ data, title, type: _type = 'chart', chartType
 
             <select
               value={exportFormat}
-              onChange={(e) => setExportFormat(e.target.value)}
+              onChange={e => setExportFormat(e.target.value)}
               className="text-sm border border-gray-300 rounded px-2 py-1"
             >
               <option value="png">PNG (High-Res)</option>

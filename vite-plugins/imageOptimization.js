@@ -3,7 +3,6 @@ import { createHash } from 'crypto';
 import { promises as fs } from 'fs';
 import path from 'path';
 
-const SUPPORTED_FORMATS = ['jpg', 'jpeg', 'png', 'webp', 'avif'];
 const DEFAULT_SIZES = [320, 640, 768, 1024, 1280, 1920];
 const DEFAULT_QUALITY = 80;
 
@@ -42,7 +41,7 @@ export function imageOptimization(options = {}) {
       const match = id.match(/\.(jpg|jpeg|png|webp|avif)\?optimize=(.+)$/);
       if (!match) return null;
 
-      const [, ext, paramsStr] = match;
+      const [, , paramsStr] = match;
       const imagePath = id.replace(/\?optimize=.+$/, '');
       const params = new URLSearchParams(paramsStr);
 
@@ -128,7 +127,7 @@ async function generateOptimizedImages(imagePath, options) {
   return results;
 }
 
-async function simulateImageOptimization(inputPath, outputPath, options) {
+async function simulateImageOptimization(inputPath, outputPath, _options) {
   // In production, replace this with actual image processing using sharp:
   /*
   const sharp = require('sharp');
@@ -180,7 +179,7 @@ function generateSrcSet(optimizedImages) {
   return srcSets;
 }
 
-async function generatePlaceholder(imagePath) {
+async function generatePlaceholder(_imagePath) {
   // Generate a tiny placeholder image (could be base64 encoded)
   // For now, return a simple color placeholder
   return {

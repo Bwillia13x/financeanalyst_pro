@@ -28,12 +28,7 @@ import {
 } from 'lucide-react';
 import React, { useState, useEffect, useCallback } from 'react';
 
-const PersonalizationEngine = ({
-  userId,
-  onPreferencesChange,
-  onLayoutChange,
-  children
-}) => {
+const PersonalizationEngine = ({ userId, onPreferencesChange, onLayoutChange, children }) => {
   const [_userProfile, _setUserProfile] = useState(null);
   const [preferences, setPreferences] = useState({});
   const [_usagePatterns, _setUsagePatterns] = useState({});
@@ -129,7 +124,8 @@ const PersonalizationEngine = ({
         const now = new Date();
         newMap.set(featureId, {
           count: current.count + 1,
-          successRate: (current.successRate * current.count + (success ? 1 : 0)) / (current.count + 1),
+          successRate:
+            (current.successRate * current.count + (success ? 1 : 0)) / (current.count + 1),
           lastUsed: Date.now(),
           timeOfDay: [...current.timeOfDay, now.getHours()].slice(-20),
           dayOfWeek: [...current.dayOfWeek, now.getDay()].slice(-20)
@@ -159,8 +155,9 @@ const PersonalizationEngine = ({
     }
 
     // Chart type recommendations
-    const chartUsage = Array.from(interactions.preferredCharts.entries())
-      .sort(([, a], [, b]) => b.count - a.count);
+    const chartUsage = Array.from(interactions.preferredCharts.entries()).sort(
+      ([, a], [, b]) => b.count - a.count
+    );
 
     if (chartUsage.length > 0) {
       recommendations.push({
@@ -196,15 +193,17 @@ const PersonalizationEngine = ({
 
     // Prioritize frequently viewed metrics
     const prioritizedMetrics = Array.from(interactions.viewedMetrics.entries())
-      .sort(([, a], [, b]) => (b.count * b.avgTime) - (a.count * a.avgTime))
+      .sort(([, a], [, b]) => b.count * b.avgTime - a.count * a.avgTime)
       .slice(0, 8)
       .map(([metricId]) => metricId);
 
     layout.metricPriority = prioritizedMetrics;
 
     // Adapt sidebar based on usage
-    const totalInteractions = Array.from(interactions.usedFeatures.values())
-      .reduce((sum, feature) => sum + feature.count, 0);
+    const totalInteractions = Array.from(interactions.usedFeatures.values()).reduce(
+      (sum, feature) => sum + feature.count,
+      0
+    );
 
     layout.sidebarCollapsed = totalInteractions > 50; // Collapse for power users
 
@@ -230,7 +229,7 @@ const PersonalizationEngine = ({
   }, [interactions]);
 
   // Preference management functions
-  const addToFavoriteMetrics = (metricId) => {
+  const addToFavoriteMetrics = metricId => {
     setPreferences(prev => ({
       ...prev,
       metrics: {
@@ -240,17 +239,20 @@ const PersonalizationEngine = ({
     }));
   };
 
-  const setDefaultChartType = (chartType) => {
+  const setDefaultChartType = chartType => {
     setPreferences(prev => ({
       ...prev,
       charts: {
         ...prev.charts,
-        preferredTypes: [chartType, ...(prev.charts?.preferredTypes || []).filter(t => t !== chartType)]
+        preferredTypes: [
+          chartType,
+          ...(prev.charts?.preferredTypes || []).filter(t => t !== chartType)
+        ]
       }
     }));
   };
 
-  const addToQuickAccess = (featureId) => {
+  const addToQuickAccess = featureId => {
     setPreferences(prev => ({
       ...prev,
       workflow: {
@@ -262,7 +264,7 @@ const PersonalizationEngine = ({
 
   // Load user profile and preferences
   useEffect(() => {
-    const loadUserData = async() => {
+    const loadUserData = async () => {
       try {
         // In production, this would load from your backend
         const savedPreferences = localStorage.getItem(`preferences_${userId}`);
@@ -357,7 +359,7 @@ const PersonalizationEngine = ({
           </div>
 
           <div className="mt-3 flex space-x-1">
-            {['insights', 'preferences', 'layout'].map((tab) => (
+            {['insights', 'preferences', 'layout'].map(tab => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -424,14 +426,18 @@ const PersonalizationEngine = ({
           {activeTab === 'preferences' && (
             <div className="p-4 space-y-4">
               <div>
-                <label htmlFor="interface-theme" className="text-sm font-medium text-gray-700">Interface Theme</label>
+                <label htmlFor="interface-theme" className="text-sm font-medium text-gray-700">
+                  Interface Theme
+                </label>
                 <select
                   id="interface-theme"
                   value={preferences.interface?.theme || 'professional'}
-                  onChange={(e) => setPreferences(prev => ({
-                    ...prev,
-                    interface: { ...prev.interface, theme: e.target.value }
-                  }))}
+                  onChange={e =>
+                    setPreferences(prev => ({
+                      ...prev,
+                      interface: { ...prev.interface, theme: e.target.value }
+                    }))
+                  }
                   className="mt-1 w-full text-sm border border-gray-300 rounded px-2 py-1"
                 >
                   <option value="professional">Professional</option>
@@ -442,14 +448,18 @@ const PersonalizationEngine = ({
               </div>
 
               <div>
-                <label htmlFor="interface-density" className="text-sm font-medium text-gray-700">Density</label>
+                <label htmlFor="interface-density" className="text-sm font-medium text-gray-700">
+                  Density
+                </label>
                 <select
                   id="interface-density"
                   value={preferences.interface?.density || 'comfortable'}
-                  onChange={(e) => setPreferences(prev => ({
-                    ...prev,
-                    interface: { ...prev.interface, density: e.target.value }
-                  }))}
+                  onChange={e =>
+                    setPreferences(prev => ({
+                      ...prev,
+                      interface: { ...prev.interface, density: e.target.value }
+                    }))
+                  }
                   className="mt-1 w-full text-sm border border-gray-300 rounded px-2 py-1"
                 >
                   <option value="compact">Compact</option>
@@ -459,11 +469,13 @@ const PersonalizationEngine = ({
               </div>
 
               <div>
-                <label htmlFor="default-chart-type" className="text-sm font-medium text-gray-700">Default Chart Type</label>
+                <label htmlFor="default-chart-type" className="text-sm font-medium text-gray-700">
+                  Default Chart Type
+                </label>
                 <select
                   id="default-chart-type"
                   value={preferences.charts?.preferredTypes?.[0] || 'line'}
-                  onChange={(e) => setDefaultChartType(e.target.value)}
+                  onChange={e => setDefaultChartType(e.target.value)}
                   className="mt-1 w-full text-sm border border-gray-300 rounded px-2 py-1"
                 >
                   <option value="line">Line Chart</option>
@@ -525,7 +537,7 @@ const PersonalizationEngine = ({
   };
 
   // Enhanced children with personalization context
-  const enhancedChildren = React.Children.map(children, (child) => {
+  const enhancedChildren = React.Children.map(children, child => {
     if (React.isValidElement(child)) {
       return React.cloneElement(child, {
         ...child.props,
@@ -555,9 +567,7 @@ const PersonalizationEngine = ({
       </motion.button>
 
       {/* Personalization Panel */}
-      <AnimatePresence>
-        {showPersonalizationPanel && <PersonalizationPanel />}
-      </AnimatePresence>
+      <AnimatePresence>{showPersonalizationPanel && <PersonalizationPanel />}</AnimatePresence>
     </div>
   );
 };

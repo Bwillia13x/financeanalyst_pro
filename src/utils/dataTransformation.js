@@ -8,7 +8,7 @@ export const formatCurrency = (value, currency = 'USD', compact = false) => {
     currency,
     notation: compact ? 'compact' : 'standard',
     minimumFractionDigits: 0,
-    maximumFractionDigits: 2
+    maximumFractionDigits: 0
   });
 
   return formatter.format(value);
@@ -19,13 +19,13 @@ export const formatPercentage = (value, decimals = 1) => {
   return `${(value * 100).toFixed(decimals)}%`;
 };
 
-export const formatNumber = (value, decimals = 2, compact = false) => {
+export const formatNumber = (value, decimals = 0, compact = false) => {
   if (value === null || value === undefined || isNaN(value)) return 'N/A';
 
   const formatter = new Intl.NumberFormat('en-US', {
     notation: compact ? 'compact' : 'standard',
     minimumFractionDigits: 0,
-    maximumFractionDigits: decimals
+    maximumFractionDigits: compact ? 0 : decimals
   });
 
   return formatter.format(value);
@@ -37,9 +37,13 @@ export const calculateCAGR = (beginningValue, endingValue, years) => {
 };
 
 export const calculateNPV = (cashFlows, discountRate) => {
-  return cashFlows.reduce((npv, cashFlow, index) => {
-    return npv + cashFlow / Math.pow(1 + discountRate, index + 1);
-  }, 0);
+  if (!Array.isArray(cashFlows) || cashFlows.length === 0) return 0;
+  // Exclude the initial cash flow (index 0) and discount subsequent flows by their period index
+  let npv = 0;
+  for (let i = 1; i < cashFlows.length; i++) {
+    npv += cashFlows[i] / Math.pow(1 + discountRate, i);
+  }
+  return npv;
 };
 
 export const calculateIRR = (cashFlows, guess = 0.1) => {
@@ -83,6 +87,9 @@ export const calculateWACC = (costOfEquity, costOfDebt, taxRate, debtRatio) => {
 };
 
 export const calculateTerminalValue = (finalCashFlow, terminalGrowthRate, discountRate) => {
+  if (discountRate === terminalGrowthRate) {
+    throw new Error('Discount rate must be greater than terminal growth rate');
+  }
   return (finalCashFlow * (1 + terminalGrowthRate)) / (discountRate - terminalGrowthRate);
 };
 
@@ -95,6 +102,8 @@ export const projectCashFlows = (baseCashFlow, growthRates, years = 5) => {
       ? growthRates[i] || growthRates[growthRates.length - 1]
       : growthRates;
     currentCashFlow *= 1 + growthRate;
+    // Normalize to avoid floating-point precision drift (e.g., 1517.9999999999998)
+    currentCashFlow = parseFloat(currentCashFlow.toFixed(12));
     cashFlows.push(currentCashFlow);
   }
 
@@ -249,8 +258,16 @@ export const calculatePercentile = (value, dataset) => {
     return null;
 
   validDataset.sort((a, b) => a - b);
+  const n = validDataset.length;
   const belowCount = validDataset.filter(v => v < value).length;
-  return belowCount / validDataset.length;
+  const exactIndex = validDataset.findIndex(v => v === value);
+  if (exactIndex !== -1) {
+    // Percentile rank for exact matches using Hazen's formula: (rank - 0.5) / n
+    const rank = exactIndex + 1; // 1-based
+    return (rank - 0.5) / n;
+  }
+  // For non-exact values, return proportion strictly below
+  return belowCount / n;
 };
 
 export const generateMonteCarloScenarios = (baseInputs, variableRanges, iterations = 1000) => {
@@ -282,10 +299,13 @@ export const calculateSensitivityAnalysis = (
 
   for (let i = 0; i < steps; i++) {
     const variableValue = range.min + stepSize * i;
-    const inputs = { ...baseInputs, [sensitivityVariable]: variableValue };
+    // If the base value is numeric, interpret range as a multiplier window (e.g., 0.8x to 1.2x)
+    const baseValue = baseInputs[sensitivityVariable];
+    const scaledValue = typeof baseValue === 'number' ? baseValue * variableValue : variableValue;
+    const inputs = { ...baseInputs, [sensitivityVariable]: scaledValue };
 
     results.push({
-      [sensitivityVariable]: variableValue,
+      [sensitivityVariable]: scaledValue,
       inputs
     });
   }

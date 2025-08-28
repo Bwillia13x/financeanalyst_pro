@@ -40,7 +40,7 @@ const FinancialInputsDemo = () => {
     }, 2000);
   };
 
-  const handleValueChange = (key) => (newValue) => {
+  const handleValueChange = key => newValue => {
     setValues(prev => ({ ...prev, [key]: newValue }));
   };
 
@@ -60,16 +60,18 @@ const FinancialInputsDemo = () => {
             <div className="p-3 bg-blue-100 rounded-xl">
               <Calculator className="w-8 h-8 text-blue-600" />
             </div>
-            <h1 className="text-3xl font-bold text-slate-900">Enhanced Financial Input Components</h1>
+            <h1 className="text-3xl font-bold text-slate-900">
+              Enhanced Financial Input Components
+            </h1>
           </div>
           <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-            Professional financial input components with smart formatting, validation, and seamless user experience
+            Professional financial input components with smart formatting, validation, and seamless
+            user experience
           </p>
         </div>
 
         {/* Main Demo Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-
           {/* Financial Input Component */}
           <Card className="p-6 space-y-6">
             <div className="flex items-center gap-3">
@@ -144,7 +146,7 @@ const FinancialInputsDemo = () => {
               <CurrencyInput
                 label="Investment Amount (EUR)"
                 value={850000}
-                onChange={(val) => console.log('EUR Value:', val)}
+                onChange={val => console.log('EUR Value:', val)}
                 currency="EUR"
                 locale="de-DE"
                 size="lg"
@@ -153,7 +155,7 @@ const FinancialInputsDemo = () => {
               <CurrencyInput
                 label="Small Investment"
                 value={25000}
-                onChange={(val) => console.log('Small Investment:', val)}
+                onChange={val => console.log('Small Investment:', val)}
                 currency="USD"
                 size="sm"
                 variant="filled"
@@ -162,7 +164,7 @@ const FinancialInputsDemo = () => {
               <CurrencyInput
                 label="Japanese Investment"
                 value={15000000}
-                onChange={(val) => console.log('JPY Value:', val)}
+                onChange={val => console.log('JPY Value:', val)}
                 currency="JPY"
                 locale="ja-JP"
                 abbreviateDisplay={true}
@@ -191,7 +193,7 @@ const FinancialInputsDemo = () => {
                 />
                 <EditableCell
                   value={values.editableValue * 1.15}
-                  onChange={(val) => console.log('Adjusted:', val)}
+                  onChange={val => console.log('Adjusted:', val)}
                   type="currency"
                   variant="adjusted"
                 />
@@ -199,12 +201,12 @@ const FinancialInputsDemo = () => {
                 <div className="text-sm text-slate-700">Growth Rate</div>
                 <EditableCell
                   value={15.5}
-                  onChange={(val) => console.log('Growth:', val)}
+                  onChange={val => console.log('Growth:', val)}
                   type="percentage"
                 />
                 <EditableCell
                   value={18.2}
-                  onChange={(val) => console.log('Adj Growth:', val)}
+                  onChange={val => console.log('Adj Growth:', val)}
                   type="percentage"
                   variant="adjusted"
                 />
@@ -230,11 +232,7 @@ const FinancialInputsDemo = () => {
 
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
-                <LoadingState
-                  type="calculation"
-                  message="Calculating DCF..."
-                  size="default"
-                />
+                <LoadingState type="calculation" message="Calculating DCF..." size="default" />
                 <LoadingState
                   type="financial"
                   message="Processing data..."
@@ -279,7 +277,9 @@ const FinancialInputsDemo = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-4">
-                <h4 className="text-sm font-medium text-slate-700">Individual Validation Messages</h4>
+                <h4 className="text-sm font-medium text-slate-700">
+                  Individual Validation Messages
+                </h4>
 
                 <ValidationFeedback
                   type="error"
@@ -310,12 +310,14 @@ const FinancialInputsDemo = () => {
                 <h4 className="text-sm font-medium text-slate-700">Field Validation</h4>
 
                 <div className="space-y-2">
-                  <label htmlFor="test-validation" className="text-sm font-medium text-slate-700">Test Validation</label>
+                  <label htmlFor="test-validation" className="text-sm font-medium text-slate-700">
+                    Test Validation
+                  </label>
                   <input
                     id="test-validation"
                     type="number"
                     value={-50}
-                    onChange={(e) => validateInput(parseFloat(e.target.value), 0, 1000)}
+                    onChange={e => validateInput(parseFloat(e.target.value), 0, 1000)}
                     className="w-full px-3 py-2 border border-input rounded-lg"
                   />
                   <FieldValidation
@@ -346,7 +348,8 @@ const FinancialInputsDemo = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
             <div className="p-4 bg-slate-50 rounded-lg">
               <h4 className="font-medium text-slate-700 mb-2">Basic Currency Input</h4>
-              <code className="text-xs text-slate-600 block whitespace-pre">{`<CurrencyInput
+              <code className="text-xs text-slate-600 block whitespace-pre">
+                {`<CurrencyInput
   value={1000000}
   onChange={setValue}
   currency="USD"
@@ -357,7 +360,8 @@ const FinancialInputsDemo = () => {
 
             <div className="p-4 bg-slate-50 rounded-lg">
               <h4 className="font-medium text-slate-700 mb-2">Editable Table Cell</h4>
-              <code className="text-xs text-slate-600 block whitespace-pre">{`<EditableCell
+              <code className="text-xs text-slate-600 block whitespace-pre">
+                {`<EditableCell
   value={value}
   onChange={onChange}
   type="currency"
@@ -368,7 +372,8 @@ const FinancialInputsDemo = () => {
 
             <div className="p-4 bg-slate-50 rounded-lg">
               <h4 className="font-medium text-slate-700 mb-2">Validation Feedback</h4>
-              <code className="text-xs text-slate-600 block whitespace-pre">{`<FieldValidation
+              <code className="text-xs text-slate-600 block whitespace-pre">
+                {`<FieldValidation
   error="Invalid input"
   warning="Check value"
   success="Valid input"

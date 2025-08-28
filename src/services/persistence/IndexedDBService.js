@@ -123,7 +123,7 @@ export class IndexedDBService {
         resolve(request.result);
       };
 
-      request.onupgradeneeded = (event) => {
+      request.onupgradeneeded = event => {
         const target = /** @type {IDBOpenDBRequest} */ (event.target);
         const db = target.result;
         this.createObjectStores(db);
@@ -168,11 +168,7 @@ export class IndexedDBService {
       throw new Error('IndexedDB is not available');
     }
 
-    const {
-      storeName = 'cached_data',
-      metadata = {},
-      compress = false
-    } = options;
+    const { storeName = 'cached_data', metadata = {}, compress = false } = options;
 
     try {
       // Prepare data object
@@ -195,7 +191,7 @@ export class IndexedDBService {
       }
 
       // Store in IndexedDB
-      const result = await this.performTransaction(storeName, 'readwrite', (store) => {
+      const result = await this.performTransaction(storeName, 'readwrite', store => {
         return store.put(dataObject);
       });
 
@@ -206,7 +202,6 @@ export class IndexedDBService {
         size: JSON.stringify(dataObject).length,
         metadata: dataObject.metadata
       };
-
     } catch (error) {
       console.error(`Failed to store data in IndexedDB for key "${key}":`, error);
       throw error;
@@ -224,7 +219,7 @@ export class IndexedDBService {
     const { storeName = 'cached_data' } = options;
 
     try {
-      const result = await this.performTransaction(storeName, 'readonly', (store) => {
+      const result = await this.performTransaction(storeName, 'readonly', store => {
         return store.get(key);
       });
 
@@ -249,7 +244,6 @@ export class IndexedDBService {
         metadata: result.metadata,
         timestamp: result.timestamp
       };
-
     } catch (error) {
       console.error(`Failed to retrieve data from IndexedDB for key "${key}":`, error);
       return null;
@@ -267,7 +261,7 @@ export class IndexedDBService {
     const { storeName = 'cached_data' } = options;
 
     try {
-      await this.performTransaction(storeName, 'readwrite', (store) => {
+      await this.performTransaction(storeName, 'readwrite', store => {
         return store.delete(key);
       });
 
@@ -289,13 +283,13 @@ export class IndexedDBService {
     try {
       if (storeName) {
         // Clear specific store
-        await this.performTransaction(storeName, 'readwrite', (store) => {
+        await this.performTransaction(storeName, 'readwrite', store => {
           return store.clear();
         });
       } else {
         // Clear all stores
         for (const store of Object.keys(this.stores)) {
-          await this.performTransaction(store, 'readwrite', (storeObj) => {
+          await this.performTransaction(store, 'readwrite', storeObj => {
             return storeObj.clear();
           });
         }
@@ -317,7 +311,7 @@ export class IndexedDBService {
     }
 
     try {
-      return await this.performTransaction(storeName, 'readonly', (store) => {
+      return await this.performTransaction(storeName, 'readonly', store => {
         return store.getAllKeys();
       });
     } catch (error) {
@@ -337,7 +331,7 @@ export class IndexedDBService {
     const { limit = null, filter = null } = options;
 
     try {
-      const results = await this.performTransaction(storeName, 'readonly', (store) => {
+      const results = await this.performTransaction(storeName, 'readonly', store => {
         return store.getAll();
       });
 
@@ -371,13 +365,16 @@ export class IndexedDBService {
     const { limit = null } = options;
 
     try {
-      return await this.performTransaction(storeName, 'readonly', (store) => {
+      return await this.performTransaction(storeName, 'readonly', store => {
         const index = store.index(indexName);
         const request = limit ? index.getAll(value, limit) : index.getAll(value);
         return request;
       });
     } catch (error) {
-      console.error(`Failed to query IndexedDB store "${storeName}" with index "${indexName}":`, error);
+      console.error(
+        `Failed to query IndexedDB store "${storeName}" with index "${indexName}":`,
+        error
+      );
       return [];
     }
   }
@@ -477,7 +474,7 @@ export class IndexedDBService {
               }
             }
 
-            await this.performTransaction(storeName, 'readwrite', (store) => {
+            await this.performTransaction(storeName, 'readwrite', store => {
               return store.put(record);
             });
 

@@ -77,7 +77,7 @@ router.get('/profile/:symbol',
 
           return res.json(response);
         }
-      } catch (fmpError) {
+      } catch (_fmpError) {
         console.log('FMP failed, trying Alpha Vantage...');
       }
 

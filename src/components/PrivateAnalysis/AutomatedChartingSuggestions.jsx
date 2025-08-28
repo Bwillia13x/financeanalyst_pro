@@ -89,7 +89,14 @@ const AutomatedChartingSuggestions = ({
     }
 
     // Revenue composition analysis
-    const revenueSegments = ['energyDevices', 'injectables', 'wellness', 'weightloss', 'retailSales', 'surgery'];
+    const revenueSegments = [
+      'energyDevices',
+      'injectables',
+      'wellness',
+      'weightloss',
+      'retailSales',
+      'surgery'
+    ];
     const latestPeriod = periods.length - 1;
     const segmentData = revenueSegments
       .map(segment => ({
@@ -116,11 +123,13 @@ const AutomatedChartingSuggestions = ({
 
     // Margin analysis over time
     if (income.totalRevenue && income.operatingIncome && periods.length >= 3) {
-      const margins = periods.map((_, idx) => {
-        const revenue = income.totalRevenue[idx];
-        const opIncome = income.operatingIncome[idx];
-        return revenue > 0 ? (opIncome / revenue) * 100 : 0;
-      }).filter(m => m !== 0);
+      const margins = periods
+        .map((_, idx) => {
+          const revenue = income.totalRevenue[idx];
+          const opIncome = income.operatingIncome[idx];
+          return revenue > 0 ? (opIncome / revenue) * 100 : 0;
+        })
+        .filter(m => m !== 0);
 
       if (margins.length >= 3) {
         patterns.push({
@@ -142,10 +151,17 @@ const AutomatedChartingSuggestions = ({
     }
 
     // Cost structure analysis
-    const costCategories = ['totalCostOfGoodsSold', 'totalSalariesBenefits', 'totalOperatingExpense'];
+    const costCategories = [
+      'totalCostOfGoodsSold',
+      'totalSalariesBenefits',
+      'totalOperatingExpense'
+    ];
     const costData = costCategories
       .map(category => ({
-        name: category.replace(/total|([A-Z])/g, ' $1').trim().replace(/^./, str => str.toUpperCase()),
+        name: category
+          .replace(/total|([A-Z])/g, ' $1')
+          .trim()
+          .replace(/^./, str => str.toUpperCase()),
         value: income[category]?.[latestPeriod] || 0
       }))
       .filter(cost => cost.value > 0);
@@ -236,34 +252,42 @@ const AutomatedChartingSuggestions = ({
     setSuggestions(activeSuggestions.slice(0, 4)); // Show max 4 suggestions
   }, [activeSuggestions]);
 
-  const handleDismiss = (suggestionId) => {
+  const handleDismiss = suggestionId => {
     setDismissedSuggestions(prev => new Set([...prev, suggestionId]));
     if (onDismiss) {
       onDismiss(suggestionId);
     }
   };
 
-  const handleCreateChart = (suggestion) => {
+  const handleCreateChart = suggestion => {
     if (onCreateChart) {
       onCreateChart(suggestion);
     }
   };
 
-  const getPriorityColor = (priority) => {
+  const getPriorityColor = priority => {
     switch (priority) {
-      case 'high': return 'border-red-200 bg-red-50';
-      case 'medium': return 'border-yellow-200 bg-yellow-50';
-      case 'low': return 'border-gray-200 bg-gray-50';
-      default: return 'border-gray-200 bg-gray-50';
+      case 'high':
+        return 'border-red-200 bg-red-50';
+      case 'medium':
+        return 'border-yellow-200 bg-yellow-50';
+      case 'low':
+        return 'border-gray-200 bg-gray-50';
+      default:
+        return 'border-gray-200 bg-gray-50';
     }
   };
 
-  const getPriorityIcon = (priority) => {
+  const getPriorityIcon = priority => {
     switch (priority) {
-      case 'high': return <Zap size={12} className="text-red-500" />;
-      case 'medium': return <Target size={12} className="text-yellow-500" />;
-      case 'low': return <Lightbulb size={12} className="text-gray-500" />;
-      default: return <Lightbulb size={12} className="text-gray-500" />;
+      case 'high':
+        return <Zap size={12} className="text-red-500" />;
+      case 'medium':
+        return <Target size={12} className="text-yellow-500" />;
+      case 'low':
+        return <Lightbulb size={12} className="text-gray-500" />;
+      default:
+        return <Lightbulb size={12} className="text-gray-500" />;
     }
   };
 
@@ -329,9 +353,7 @@ const AutomatedChartingSuggestions = ({
                     <h4 className="font-semibold text-slate-900 text-sm mb-1">
                       {suggestion.title}
                     </h4>
-                    <p className="text-xs text-slate-600 mb-2">
-                      {suggestion.description}
-                    </p>
+                    <p className="text-xs text-slate-600 mb-2">{suggestion.description}</p>
                     <div className="flex items-center gap-2 text-xs">
                       <span className="px-2 py-1 bg-slate-100 text-slate-700 rounded-md font-medium">
                         {chartConfig.name}
@@ -362,9 +384,7 @@ const AutomatedChartingSuggestions = ({
                         style={{ width: `${suggestion.relevance * 100}%` }}
                       />
                     </div>
-                    <span className="font-medium">
-                      {Math.round(suggestion.relevance * 100)}%
-                    </span>
+                    <span className="font-medium">{Math.round(suggestion.relevance * 100)}%</span>
                   </div>
                 </div>
               </motion.div>

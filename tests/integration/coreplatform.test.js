@@ -3,7 +3,7 @@
  * Tests the fundamental features of FinanceAnalyst Pro
  */
 
-import { describe, test, expect, beforeAll, afterAll, beforeEach } from '@jest/globals';
+import { describe, test, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import axios from 'axios';
 
 // Mock environment for testing
@@ -12,7 +12,7 @@ const TEST_API_KEY = 'test_api_key_12345';
 
 describe('Core Platform Functionality Tests', () => {
   let testServer;
-  let testData = {};
+  const testData = {};
 
   beforeAll(async () => {
     // Setup test server and initialize test data
@@ -30,7 +30,7 @@ describe('Core Platform Functionality Tests', () => {
   describe('1. Financial Data Retrieval', () => {
     test('Should retrieve company financial statements', async () => {
       const testCompany = 'AAPL';
-      
+
       // Simulate API call
       const mockResponse = {
         success: true,
@@ -60,18 +60,18 @@ describe('Core Platform Functionality Tests', () => {
       expect(mockResponse.data.financials).toHaveProperty('income_statement');
       expect(mockResponse.data.financials).toHaveProperty('balance_sheet');
       expect(mockResponse.data.financials).toHaveProperty('cash_flow');
-      
+
       // Validate financial data
       const income2023 = mockResponse.data.financials.income_statement['2023'];
       expect(income2023.revenue).toBeGreaterThan(0);
       expect(income2023.net_income).toBeGreaterThan(0);
-      
+
       console.log('✅ Financial data retrieval test passed');
     });
 
     test('Should handle multiple company batch requests', async () => {
       const companies = ['AAPL', 'MSFT', 'GOOGL'];
-      
+
       const mockBatchResponse = {
         success: true,
         data: companies.map(symbol => ({
@@ -90,7 +90,7 @@ describe('Core Platform Functionality Tests', () => {
         expect(company).toHaveProperty('market_data');
         expect(company.market_data.price).toBeGreaterThan(0);
       });
-      
+
       console.log('✅ Batch company data test passed');
     });
   });
@@ -138,7 +138,7 @@ describe('Core Platform Functionality Tests', () => {
       expect(mockDCFResult.data.equity_value).toBeGreaterThan(0);
       expect(mockDCFResult.data.per_share_value).toBeGreaterThan(0);
       expect(mockDCFResult.data).toHaveProperty('sensitivity_analysis');
-      
+
       console.log('✅ DCF calculation test passed');
     });
 
@@ -154,7 +154,7 @@ describe('Core Platform Functionality Tests', () => {
         expect(validation.isValid).toBe(false);
         expect(validation.errors).toBeDefined();
       });
-      
+
       console.log('✅ DCF input validation test passed');
     });
   });
@@ -188,7 +188,7 @@ describe('Core Platform Functionality Tests', () => {
       expect(loadResult.success).toBe(true);
       expect(loadResult.data.name).toBe(analysisData.name);
       expect(loadResult.data.company).toBe(analysisData.company);
-      
+
       console.log('✅ Private analysis save/load test passed');
     });
 
@@ -226,7 +226,7 @@ describe('Core Platform Functionality Tests', () => {
       expect(mockModelResult.success).toBe(true);
       expect(mockModelResult.data).toHaveProperty('projected_financials');
       expect(mockModelResult.data).toHaveProperty('key_metrics');
-      
+
       console.log('✅ Financial modeling workspace test passed');
     });
   });
@@ -234,7 +234,7 @@ describe('Core Platform Functionality Tests', () => {
   describe('4. Market Data Integration', () => {
     test('Should fetch real-time market data', async () => {
       const symbols = ['AAPL', 'MSFT', 'GOOGL'];
-      
+
       const mockMarketData = {
         success: true,
         data: symbols.map(symbol => ({
@@ -251,13 +251,13 @@ describe('Core Platform Functionality Tests', () => {
 
       expect(mockMarketData.success).toBe(true);
       expect(mockMarketData.data).toHaveLength(symbols.length);
-      
+
       mockMarketData.data.forEach(stock => {
         expect(stock.symbol).toBeDefined();
         expect(stock.price).toBeGreaterThan(0);
         expect(stock.timestamp).toBeDefined();
       });
-      
+
       console.log('✅ Real-time market data test passed');
     });
 
@@ -279,7 +279,7 @@ describe('Core Platform Functionality Tests', () => {
       expect(mockEconomicData.data).toHaveProperty('gdp_growth');
       expect(mockEconomicData.data).toHaveProperty('inflation_rate');
       expect(mockEconomicData.data).toHaveProperty('unemployment_rate');
-      
+
       console.log('✅ Economic indicators test passed');
     });
   });
@@ -299,7 +299,7 @@ describe('Core Platform Functionality Tests', () => {
         expect(mockNavigation.path).toBe(expectedPath);
         expect(mockNavigation.success).toBe(true);
       });
-      
+
       console.log('✅ UI navigation test passed');
     });
 
@@ -316,7 +316,7 @@ describe('Core Platform Functionality Tests', () => {
         expect(mockResponsive.breakpoint).toBe(name);
         expect(mockResponsive.width).toBe(width);
       });
-      
+
       console.log('✅ Responsive design test passed');
     });
   });
@@ -328,19 +328,19 @@ describe('Core Platform Functionality Tests', () => {
 
       for (const format of exportFormats) {
         const mockExport = await mockExportAnalysis(analysisId, format);
-        
+
         expect(mockExport.success).toBe(true);
         expect(mockExport.format).toBe(format);
         expect(mockExport.file_size).toBeGreaterThan(0);
         expect(mockExport.download_url).toBeDefined();
       }
-      
+
       console.log('✅ Multi-format export test passed');
     });
 
     test('Should generate shareable links', async () => {
       const analysisId = 'analysis_001';
-      
+
       const mockShareableLink = {
         success: true,
         data: {
@@ -354,7 +354,7 @@ describe('Core Platform Functionality Tests', () => {
       expect(mockShareableLink.success).toBe(true);
       expect(mockShareableLink.data.url).toContain('shared');
       expect(mockShareableLink.data.expires_at).toBeDefined();
-      
+
       console.log('✅ Shareable links test passed');
     });
   });
@@ -363,19 +363,19 @@ describe('Core Platform Functionality Tests', () => {
 // Helper functions for mocking
 function validateDCFInputs(inputs) {
   const errors = [];
-  
+
   if (inputs.revenue_base && inputs.revenue_base <= 0) {
     errors.push('Revenue base must be positive');
   }
-  
+
   if (inputs.discount_rate && inputs.discount_rate < 0) {
     errors.push('Discount rate cannot be negative');
   }
-  
+
   if (inputs.terminal_growth_rate && inputs.terminal_growth_rate > 0.10) {
     errors.push('Terminal growth rate seems unrealistic (>10%)');
   }
-  
+
   return {
     isValid: errors.length === 0,
     errors: errors.length > 0 ? errors : null
@@ -385,7 +385,7 @@ function validateDCFInputs(inputs) {
 async function mockSaveAnalysis(analysisData) {
   // Simulate async save operation
   await new Promise(resolve => setTimeout(resolve, 100));
-  
+
   return {
     success: true,
     analysis_id: 'saved_' + Date.now(),
@@ -396,7 +396,7 @@ async function mockSaveAnalysis(analysisData) {
 async function mockLoadAnalysis(analysisId) {
   // Simulate async load operation
   await new Promise(resolve => setTimeout(resolve, 100));
-  
+
   return {
     success: true,
     data: {
@@ -415,7 +415,7 @@ function mockNavigateToSection(section) {
     'private-analysis': '/private-analysis',
     'canvas': '/canvas'
   };
-  
+
   return {
     success: true,
     path: pathMapping[section] || '/',
@@ -425,17 +425,17 @@ function mockNavigateToSection(section) {
 
 function mockSetViewportWidth(width) {
   let breakpoint = 'mobile';
-  
+
   if (width >= 1600) breakpoint = 'large';
   else if (width >= 1200) breakpoint = 'desktop';
   else if (width >= 768) breakpoint = 'tablet';
-  
+
   return { breakpoint, width };
 }
 
 async function mockExportAnalysis(analysisId, format) {
   await new Promise(resolve => setTimeout(resolve, 200));
-  
+
   return {
     success: true,
     format,

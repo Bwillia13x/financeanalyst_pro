@@ -3,15 +3,15 @@
  * Tests Banking, Real Estate, Healthcare, Energy, and Technology analytics
  */
 
-import { describe, test, expect, beforeAll, afterAll } from '@jest/globals';
+import { describe, test, expect, beforeAll, afterAll } from 'vitest';
 
 describe('Industry-Specific Analytics Tests', () => {
-  
+
   describe('1. Banking & Financial Services Analytics', () => {
     test('Should perform credit portfolio risk assessment', async () => {
       const portfolioData = {
         loans: [
-          { 
+          {
             id: 'loan_001',
             principal: 1000000,
             interest_rate: 0.05,
@@ -22,7 +22,7 @@ describe('Industry-Specific Analytics Tests', () => {
             region: 'CA'
           },
           {
-            id: 'loan_002', 
+            id: 'loan_002',
             principal: 2500000,
             interest_rate: 0.045,
             term_months: 360,
@@ -72,7 +72,7 @@ describe('Industry-Specific Analytics Tests', () => {
       expect(mockCreditAnalysis.data.portfolio_metrics.expected_loss_rate).toBeGreaterThan(0);
       expect(mockCreditAnalysis.data.risk_segments).toHaveProperty('low_risk');
       expect(mockCreditAnalysis.data.stress_test_results).toHaveProperty('recession_scenario');
-      
+
       console.log('✅ Banking credit portfolio analysis test passed');
     });
 
@@ -122,7 +122,7 @@ describe('Industry-Specific Analytics Tests', () => {
       expect(mockBaselAnalysis.data.capital_ratios.cet1_ratio).toBeGreaterThan(0.045);
       expect(mockBaselAnalysis.data.liquidity_ratios.lcr).toBeGreaterThanOrEqual(1.0);
       expect(mockBaselAnalysis.data.compliance_status.overall_compliant).toBe(true);
-      
+
       console.log('✅ Basel III compliance analysis test passed');
     });
   });
@@ -187,7 +187,7 @@ describe('Industry-Specific Analytics Tests', () => {
       expect(mockPropertyValuation.data.dcf_analysis.present_value).toBeGreaterThan(0);
       expect(mockPropertyValuation.data.valuation_methods).toHaveProperty('dcf_value');
       expect(mockPropertyValuation.data.sensitivity_analysis).toHaveProperty('cap_rate_sensitivity');
-      
+
       console.log('✅ Real estate property valuation test passed');
     });
 
@@ -238,7 +238,7 @@ describe('Industry-Specific Analytics Tests', () => {
       expect(mockREITAnalysis.data.core_metrics.ffo_per_share).toBeGreaterThan(0);
       expect(mockREITAnalysis.data.operating_metrics.same_store_growth).toBeCloseTo(0.032, 3);
       expect(mockREITAnalysis.data.financial_metrics.debt_service_coverage).toBeGreaterThan(1.0);
-      
+
       console.log('✅ REIT portfolio analysis test passed');
     });
   });
@@ -316,7 +316,7 @@ describe('Industry-Specific Analytics Tests', () => {
       expect(mockPipelineValuation.data.pipeline_value.total_npv).toBeGreaterThan(0);
       expect(mockPipelineValuation.data.by_phase).toHaveProperty('Commercial');
       expect(mockPipelineValuation.data.clinical_metrics.overall_success_probability).toBeLessThanOrEqual(1.0);
-      
+
       console.log('✅ Drug development pipeline analysis test passed');
     });
 
@@ -370,7 +370,7 @@ describe('Industry-Specific Analytics Tests', () => {
       expect(mockTrialAnalysis.data.probability_analysis.current_phase_success).toBeGreaterThan(0);
       expect(mockTrialAnalysis.data.probability_analysis.current_phase_success).toBeLessThanOrEqual(1.0);
       expect(mockTrialAnalysis.data.indication_benchmarks).toHaveProperty('alzheimers_phase2_rate');
-      
+
       console.log('✅ Clinical trial probability analysis test passed');
     });
   });
@@ -416,7 +416,7 @@ describe('Industry-Specific Analytics Tests', () => {
             '1P_npv10': 1650000000,
             '2P_npv10': 2250000000,
             '3P_npv10': 2750000000,
-            contingent_resources_npv10': 450000000
+            'contingent_resources_npv10': 450000000
           },
           sensitivity_analysis: {
             oil_price_sensitivity: {
@@ -439,7 +439,7 @@ describe('Industry-Specific Analytics Tests', () => {
       expect(mockReservesValuation.data.valuation_summary.pv10_value).toBeGreaterThan(0);
       expect(mockReservesValuation.data.production_economics.irr_at_current_prices).toBeGreaterThan(0);
       expect(mockReservesValuation.data.reserves_breakdown).toHaveProperty('1P_npv10');
-      
+
       console.log('✅ Oil & gas reserves valuation test passed');
     });
 
@@ -498,7 +498,7 @@ describe('Industry-Specific Analytics Tests', () => {
       expect(mockRenewableAnalysis.data.project_economics.project_irr).toBeGreaterThan(0);
       expect(mockRenewableAnalysis.data.project_economics.levalized_coe).toBeGreaterThan(0);
       expect(mockRenewableAnalysis.data.financing_structure.dscr_average).toBeGreaterThan(1.0);
-      
+
       console.log('✅ Renewable energy project analysis test passed');
     });
   });
@@ -572,7 +572,7 @@ describe('Industry-Specific Analytics Tests', () => {
       expect(mockSaaSAnalysis.data.unit_economics.ltv_cac_ratio).toBeGreaterThan(3.0);
       expect(mockSaaSAnalysis.data.growth_analysis.rule_of_40_score).toBeGreaterThan(0.4);
       expect(mockSaaSAnalysis.data.cohort_analysis.month_1_retention).toBeGreaterThan(0.8);
-      
+
       console.log('✅ SaaS metrics analysis test passed');
     });
 
@@ -638,7 +638,7 @@ describe('Industry-Specific Analytics Tests', () => {
       expect(mockPlatformAnalysis.data.network_value.critical_mass_achieved).toBe(true);
       expect(mockPlatformAnalysis.data.growth_dynamics.viral_coefficient).toBeGreaterThan(1.0);
       expect(mockPlatformAnalysis.data.competitive_moats.overall_moat_strength).toBe('Very Strong');
-      
+
       console.log('✅ Platform business model analysis test passed');
     });
   });
@@ -647,7 +647,7 @@ describe('Industry-Specific Analytics Tests', () => {
     test('Should validate analytics consistency across industries', () => {
       const industryModules = [
         'bankingAnalytics',
-        'realEstateAnalytics', 
+        'realEstateAnalytics',
         'healthcareAnalytics',
         'energyAnalytics',
         'technologyAnalytics'
@@ -656,16 +656,16 @@ describe('Industry-Specific Analytics Tests', () => {
       industryModules.forEach(module => {
         // Mock module validation
         const moduleValidation = validateAnalyticsModule(module);
-        
+
         expect(moduleValidation.hasRequiredMethods).toBe(true);
         expect(moduleValidation.hasErrorHandling).toBe(true);
         expect(moduleValidation.hasValidation).toBe(true);
         expect(moduleValidation.performance).toBeGreaterThan(0.8);
       });
-      
+
       console.log('✅ Cross-industry analytics validation test passed');
     });
-    
+
     test('Should handle industry-specific data format conversions', () => {
       const testConversions = [
         { from: 'banking', to: 'standard', expectedFields: ['risk_metrics', 'capital_ratios'] },
@@ -677,14 +677,14 @@ describe('Industry-Specific Analytics Tests', () => {
 
       testConversions.forEach(({ from, to, expectedFields }) => {
         const conversion = mockDataFormatConversion(from, to);
-        
+
         expect(conversion.success).toBe(true);
         expect(conversion.format).toBe(to);
         expectedFields.forEach(field => {
           expect(conversion.data).toHaveProperty(field);
         });
       });
-      
+
       console.log('✅ Industry data format conversion test passed');
     });
   });
@@ -695,7 +695,7 @@ function validateAnalyticsModule(moduleName) {
   // Mock module validation logic
   return {
     hasRequiredMethods: true,
-    hasErrorHandling: true, 
+    hasErrorHandling: true,
     hasValidation: true,
     performance: Math.random() * 0.2 + 0.8, // 0.8 to 1.0
     moduleName

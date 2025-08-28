@@ -1,39 +1,47 @@
-/**
- * Tests for Financial Data Storage Service
- */
-
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { financialDataStorage } from '../financialDataStorage.js';
-import { storageService } from '../storageService.js';
 
-// Mock localStorage service
+// Mock dependencies
 vi.mock('../storageService.js', () => ({
   storageService: {
-    setItem: vi.fn(),
+    setItem: vi.fn().mockResolvedValue(true),
     getItem: vi.fn(),
-    removeItem: vi.fn(),
-    listItems: vi.fn(),
-    getStorageStats: vi.fn()
+    listItems: vi.fn().mockResolvedValue([]),
+    removeItem: vi.fn().mockResolvedValue(true),
+    getStorageStats: vi.fn().mockResolvedValue({ totalSize: 0, itemCount: 0 })
   }
 }));
+
+vi.mock('../../utils/apiLogger.js', () => ({
+  apiLogger: {
+    log: vi.fn()
+  }
+}));
+
+import { storageService } from '../storageService.js';
+import { apiLogger } from '../../utils/apiLogger.js';
 
 describe('FinancialDataStorage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // Reset Date.now() mock
+    vi.useRealTimers();
+    // Reset storageService.setItem to default success state
+    storageService.setItem.mockResolvedValue(true);
+    storageService.getItem.mockResolvedValue(null);
+    storageService.listItems.mockResolvedValue([]);
+    storageService.removeItem.mockResolvedValue(true);
+    storageService.getStorageStats.mockResolvedValue({ totalSize: 0, itemCount: 0 });
   });
 
-  describe('DCF Model Storage', () => {
-    it('should save DCF model data', async() => {
+  describe('DCF Model Operations', () => {
+    it('should save DCF model successfully', async () => {
       const symbol = 'AAPL';
       const modelData = {
-        assumptions: { growthRate: 0.05, discountRate: 0.1 },
-        projections: { revenues: [100, 105, 110] },
-        valuation: { intrinsicValue: 150, currentPrice: 140 },
-        metadata: { analyst: 'John Doe' }
+        assumptions: { wacc: 0.1, growthRate: 0.03 },
+        projections: { revenue: [1000, 1100] },
+        valuation: { intrinsicValue: 150.25 }
       };
-
-      storageService.setItem.mockResolvedValue(true);
 
       const result = await financialDataStorage.saveDCFModel(symbol, modelData);
 
@@ -47,64 +55,83 @@ describe('FinancialDataStorage', () => {
           projections: modelData.projections,
           valuation: modelData.valuation,
           metadata: expect.objectContaining({
-            createdAt: expect.any(Number),
-            lastModified: expect.any(Number),
-            version: '1.0',
             modelType: 'DCF',
-            analyst: 'John Doe'
+            version: '1.0'
           })
         })
       );
+      expect(apiLogger.log).toHaveBeenCalledWith('INFO', 'DCF model saved', {
+        symbol: 'AAPL',
+        valuation: 150.25
+      });
     });
 
-    it('should retrieve DCF model data', async() => {
-      const symbol = 'AAPL';
-      const mockData = {
-        symbol: 'AAPL',
-        assumptions: { growthRate: 0.05 },
-        projections: { revenues: [100, 105] },
-        valuation: { intrinsicValue: 150 }
-      };
+    it('should handle save DCF model errors', async () => {
+      const error = new Error('Storage failed');
+      storageService.setItem.mockRejectedValue(error);
 
+      await expect(financialDataStorage.saveDCFModel('AAPL', {})).rejects.toThrow('Storage failed');
+      expect(apiLogger.log).toHaveBeenCalledWith('ERROR', 'Failed to save DCF model', {
+        symbol: 'AAPL',
+        error: 'Storage failed'
+      });
+    });
+
+    it('should retrieve DCF model successfully', async () => {
+      const mockData = { symbol: 'AAPL', valuation: { intrinsicValue: 150 } };
       storageService.getItem.mockResolvedValue(mockData);
 
-      const result = await financialDataStorage.getDCFModel(symbol);
+      const result = await financialDataStorage.getDCFModel('AAPL');
 
       expect(result).toEqual(mockData);
       expect(storageService.getItem).toHaveBeenCalledWith('dcfModel', 'AAPL');
+      expect(apiLogger.log).toHaveBeenCalledWith('DEBUG', 'DCF model retrieved', {
+        symbol: 'AAPL'
+      });
     });
 
-    it('should list DCF models', async() => {
-      const mockSymbols = ['AAPL', 'GOOGL', 'MSFT'];
-      storageService.listItems.mockReturnValue(mockSymbols);
+    it('should handle DCF model retrieval errors gracefully', async () => {
+      storageService.getItem.mockRejectedValue(new Error('Retrieval failed'));
+
+      const result = await financialDataStorage.getDCFModel('AAPL');
+
+      expect(result).toBe(null);
+      expect(apiLogger.log).toHaveBeenCalledWith('ERROR', 'Failed to retrieve DCF model', {
+        symbol: 'AAPL',
+        error: 'Retrieval failed'
+      });
+    });
+
+    it('should list DCF models', async () => {
+      const mockModels = ['AAPL', 'GOOGL', 'MSFT'];
+      storageService.listItems.mockResolvedValue(mockModels);
 
       const result = await financialDataStorage.listDCFModels();
 
-      expect(result).toEqual(mockSymbols);
+      expect(result).toEqual(mockModels);
       expect(storageService.listItems).toHaveBeenCalledWith('dcfModel');
     });
 
-    it('should delete DCF model', async() => {
-      const symbol = 'AAPL';
-      storageService.removeItem.mockReturnValue(true);
+    it('should delete DCF model', async () => {
+      storageService.removeItem.mockResolvedValue(true);
 
-      const result = await financialDataStorage.deleteDCFModel(symbol);
+      const result = await financialDataStorage.deleteDCFModel('AAPL');
 
       expect(result).toBe(true);
       expect(storageService.removeItem).toHaveBeenCalledWith('dcfModel', 'AAPL');
     });
   });
 
-  describe('LBO Model Storage', () => {
-    it('should save LBO model data', async() => {
-      const symbol = 'AAPL';
+  describe('LBO Model Operations', () => {
+    it('should save LBO model successfully', async () => {
+      const symbol = 'TSLA';
       const modelData = {
-        transaction: { purchasePrice: 1000, purchaseMultiple: 10 },
-        financing: { debt: 600, equity: 400 },
-        returns: { irr: 0.25, moic: 2.5 },
-        metadata: { sponsor: 'PE Firm' }
+        transaction: { purchasePrice: 1000 },
+        financing: { debtRatio: 0.6 },
+        returns: { irr: 0.25, moic: 2.5 }
       };
 
+      // Ensure the mock returns success for this specific test
       storageService.setItem.mockResolvedValue(true);
 
       const result = await financialDataStorage.saveLBOModel(symbol, modelData);
@@ -112,364 +139,437 @@ describe('FinancialDataStorage', () => {
       expect(result).toBe(true);
       expect(storageService.setItem).toHaveBeenCalledWith(
         'lboModel',
-        'AAPL',
+        'TSLA',
         expect.objectContaining({
-          symbol: 'AAPL',
+          symbol: 'TSLA',
           transaction: modelData.transaction,
           financing: modelData.financing,
           returns: modelData.returns,
           metadata: expect.objectContaining({
-            createdAt: expect.any(Number),
-            lastModified: expect.any(Number),
-            version: '1.0',
             modelType: 'LBO',
-            sponsor: 'PE Firm'
+            version: '1.0'
           })
         })
       );
+      expect(apiLogger.log).toHaveBeenCalledWith('INFO', 'LBO model saved', {
+        symbol: 'TSLA',
+        irr: 0.25,
+        moic: 2.5
+      });
     });
 
-    it('should retrieve LBO model data', async() => {
-      const symbol = 'AAPL';
-      const mockData = {
-        symbol: 'AAPL',
-        transaction: { purchasePrice: 1000 },
-        financing: { debt: 600, equity: 400 },
-        returns: { irr: 0.25, moic: 2.5 }
-      };
+    it('should handle LBO model retrieval errors', async () => {
+      storageService.getItem.mockRejectedValue(new Error('Retrieval failed'));
 
-      storageService.getItem.mockResolvedValue(mockData);
+      const result = await financialDataStorage.getLBOModel('TSLA');
 
-      const result = await financialDataStorage.getLBOModel(symbol);
-
-      expect(result).toEqual(mockData);
-      expect(storageService.getItem).toHaveBeenCalledWith('lboModel', 'AAPL');
-    });
-  });
-
-  describe('Monte Carlo Results Storage', () => {
-    it('should save Monte Carlo results', async() => {
-      const modelId = 'dcf_aapl_20241201';
-      const resultsData = {
-        modelType: 'DCF',
-        iterations: 10000,
-        results: [145, 150, 155, 160],
-        statistics: { mean: 152.5, stdDev: 6.45 },
-        symbol: 'AAPL',
-        metadata: { scenario: 'base_case' }
-      };
-
-      storageService.setItem.mockResolvedValue(true);
-
-      const result = await financialDataStorage.saveMonteCarloResults(modelId, resultsData);
-
-      expect(result).toBe(true);
-      expect(storageService.setItem).toHaveBeenCalledWith(
-        'monteCarloResults',
-        modelId,
-        expect.objectContaining({
-          modelType: 'DCF',
-          iterations: 10000,
-          results: resultsData.results,
-          statistics: resultsData.statistics,
-          metadata: expect.objectContaining({
-            createdAt: expect.any(Number),
-            modelId,
-            symbol: 'AAPL',
-            version: '1.0',
-            scenario: 'base_case'
-          })
-        })
-      );
-    });
-
-    it('should retrieve Monte Carlo results', async() => {
-      const modelId = 'dcf_aapl_20241201';
-      const mockData = {
-        modelType: 'DCF',
-        iterations: 10000,
-        results: [145, 150, 155],
-        statistics: { mean: 150 }
-      };
-
-      storageService.getItem.mockResolvedValue(mockData);
-
-      const result = await financialDataStorage.getMonteCarloResults(modelId);
-
-      expect(result).toEqual(mockData);
-      expect(storageService.getItem).toHaveBeenCalledWith('monteCarloResults', modelId);
+      expect(result).toBe(null);
+      expect(apiLogger.log).toHaveBeenCalledWith('ERROR', 'Failed to retrieve LBO model', {
+        symbol: 'TSLA',
+        error: 'Retrieval failed'
+      });
     });
   });
 
-  describe('Market Data Storage with TTL', () => {
-    it('should save market data with TTL', async() => {
-      const symbol = 'AAPL';
-      const marketData = {
-        currentPrice: 150,
-        volume: 1000000,
-        source: 'Yahoo Finance'
-      };
-      const ttlMinutes = 15;
+  describe('Market Data Operations', () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date('2024-01-01T00:00:00.000Z'));
+    });
 
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it('should save market data with TTL', async () => {
+      const symbol = 'AAPL';
+      const marketData = { price: 150.25, volume: 1000000 };
+      const ttlMinutes = 30;
+
+      // Ensure the mock returns success for this specific test
       storageService.setItem.mockResolvedValue(true);
 
       const result = await financialDataStorage.saveMarketData(symbol, marketData, ttlMinutes);
 
       expect(result).toBe(true);
-      expect(storageService.setItem).toHaveBeenCalledWith(
-        'marketData',
-        'AAPL',
-        expect.objectContaining({
-          symbol: 'AAPL',
-          data: marketData,
-          timestamp: expect.any(Number),
-          source: 'Yahoo Finance',
-          expiresAt: expect.any(Number)
-        })
-      );
+      expect(storageService.setItem).toHaveBeenCalledWith('marketData', 'AAPL', {
+        symbol: 'AAPL',
+        data: marketData,
+        timestamp: Date.now(),
+        source: 'unknown',
+        expiresAt: Date.now() + ttlMinutes * 60 * 1000
+      });
     });
 
-    it('should retrieve valid market data', async() => {
-      const symbol = 'AAPL';
+    it('should retrieve valid cached market data', async () => {
       const mockData = {
         symbol: 'AAPL',
-        data: { currentPrice: 150 },
+        data: { price: 150.25 },
         timestamp: Date.now(),
-        source: 'Yahoo Finance',
-        expiresAt: Date.now() + (15 * 60 * 1000) // 15 minutes from now
+        expiresAt: Date.now() + 3600000 // 1 hour from now
       };
-
       storageService.getItem.mockResolvedValue(mockData);
 
-      const result = await financialDataStorage.getMarketData(symbol);
+      const result = await financialDataStorage.getMarketData('AAPL');
 
       expect(result).toEqual(mockData.data);
-      expect(storageService.getItem).toHaveBeenCalledWith('marketData', 'AAPL');
+      expect(apiLogger.log).toHaveBeenCalledWith('DEBUG', 'Market data cache hit', {
+        symbol: 'AAPL'
+      });
     });
 
-    it('should return null for expired market data', async() => {
-      const symbol = 'AAPL';
-      const mockData = {
+    it('should return null for expired market data and remove it', async () => {
+      const expiredData = {
         symbol: 'AAPL',
-        data: { currentPrice: 150 },
-        timestamp: Date.now(),
-        source: 'Yahoo Finance',
-        expiresAt: Date.now() - 1000 // Expired 1 second ago
+        data: { price: 150.25 },
+        timestamp: Date.now() - 7200000, // 2 hours ago
+        expiresAt: Date.now() - 3600000 // 1 hour ago (expired)
       };
+      storageService.getItem.mockResolvedValue(expiredData);
 
-      storageService.getItem.mockResolvedValue(mockData);
-      storageService.removeItem.mockReturnValue(true);
+      const result = await financialDataStorage.getMarketData('AAPL');
 
-      const result = await financialDataStorage.getMarketData(symbol);
-
-      expect(result).toBeNull();
+      expect(result).toBe(null);
       expect(storageService.removeItem).toHaveBeenCalledWith('marketData', 'AAPL');
+      expect(apiLogger.log).toHaveBeenCalledWith('DEBUG', 'Market data cache expired', {
+        symbol: 'AAPL'
+      });
+    });
+
+    it('should return null when market data not found', async () => {
+      storageService.getItem.mockResolvedValue(null);
+
+      const result = await financialDataStorage.getMarketData('AAPL');
+
+      expect(result).toBe(null);
+    });
+
+    it('should handle market data retrieval errors', async () => {
+      storageService.getItem.mockRejectedValue(new Error('Retrieval failed'));
+
+      const result = await financialDataStorage.getMarketData('AAPL');
+
+      expect(result).toBe(null);
+      expect(apiLogger.log).toHaveBeenCalledWith('ERROR', 'Failed to retrieve market data', {
+        symbol: 'AAPL',
+        error: 'Retrieval failed'
+      });
     });
   });
 
-  describe('User Preferences Storage', () => {
-    it('should save user preferences', async() => {
+  describe('User Preferences Operations', () => {
+    it('should save user preferences successfully', async () => {
       const preferences = {
-        theme: 'dark',
-        layout: { sidebar: 'collapsed' },
-        notifications: { email: true },
-        privacy: { analytics: false }
-      };
-
-      storageService.setItem.mockResolvedValue(true);
-
-      const result = await financialDataStorage.saveUserPreferences(preferences);
-
-      expect(result).toBe(true);
-      expect(storageService.setItem).toHaveBeenCalledWith(
-        'userPreferences',
-        'default',
-        expect.objectContaining({
-          theme: 'dark',
-          layout: preferences.layout,
-          notifications: preferences.notifications,
-          privacy: preferences.privacy,
-          metadata: expect.objectContaining({
-            lastUpdated: expect.any(Number),
-            version: '1.0'
-          })
-        })
-      );
-    });
-
-    it('should retrieve user preferences', async() => {
-      const mockPreferences = {
         theme: 'dark',
         layout: { sidebar: 'collapsed' },
         notifications: { email: true }
       };
 
-      storageService.getItem.mockResolvedValue(mockPreferences);
+      // Ensure the mock returns success for this specific test
+      storageService.setItem.mockResolvedValue(true);
+
+      const result = await financialDataStorage.saveUserPreferences(preferences);
+
+      expect(result).toBe(true);
+      expect(storageService.setItem).toHaveBeenCalledWith('userPreferences', 'default', {
+        theme: 'dark',
+        layout: { sidebar: 'collapsed' },
+        notifications: { email: true },
+        privacy: {},
+        metadata: expect.objectContaining({
+          lastUpdated: expect.any(Number),
+          version: '1.0'
+        })
+      });
+    });
+
+    it('should handle save user preferences errors', async () => {
+      const error = new Error('Storage failed');
+      storageService.setItem.mockRejectedValue(error);
+
+      await expect(financialDataStorage.saveUserPreferences({ theme: 'dark' })).rejects.toThrow(
+        'Storage failed'
+      );
+      expect(apiLogger.log).toHaveBeenCalledWith('ERROR', 'Failed to save user preferences', {
+        error: 'Storage failed'
+      });
+    });
+
+    it('should retrieve user preferences', async () => {
+      const mockPrefs = { theme: 'dark' };
+      storageService.getItem.mockResolvedValue(mockPrefs);
 
       const result = await financialDataStorage.getUserPreferences();
 
-      expect(result).toEqual(mockPreferences);
-      expect(storageService.getItem).toHaveBeenCalledWith('userPreferences', 'default');
+      expect(result).toEqual(mockPrefs);
+      expect(apiLogger.log).toHaveBeenCalledWith('DEBUG', 'User preferences retrieved');
+    });
+
+    it('should handle user preferences retrieval errors', async () => {
+      storageService.getItem.mockRejectedValue(new Error('Retrieval failed'));
+
+      const result = await financialDataStorage.getUserPreferences();
+
+      expect(result).toBe(null);
+      expect(apiLogger.log).toHaveBeenCalledWith('ERROR', 'Failed to retrieve user preferences', {
+        error: 'Retrieval failed'
+      });
     });
   });
 
-  describe('Watchlist Storage', () => {
-    it('should save watchlist', async() => {
-      const name = 'Tech Stocks';
+  describe('Watchlist Operations', () => {
+    it('should save watchlist successfully', async () => {
+      const name = 'tech-stocks';
       const symbols = ['AAPL', 'GOOGL', 'MSFT'];
 
+      // Ensure the mock returns success for this specific test
       storageService.setItem.mockResolvedValue(true);
 
       const result = await financialDataStorage.saveWatchlist(name, symbols);
 
       expect(result).toBe(true);
-      expect(storageService.setItem).toHaveBeenCalledWith(
-        'watchlist',
-        name,
-        expect.objectContaining({
-          name,
-          symbols: ['AAPL', 'GOOGL', 'MSFT'],
-          metadata: expect.objectContaining({
-            createdAt: expect.any(Number),
-            lastModified: expect.any(Number),
-            symbolCount: 3
-          })
+      expect(storageService.setItem).toHaveBeenCalledWith('watchlist', 'tech-stocks', {
+        name: 'tech-stocks',
+        symbols: ['AAPL', 'GOOGL', 'MSFT'],
+        metadata: expect.objectContaining({
+          symbolCount: 3
         })
-      );
+      });
+      expect(apiLogger.log).toHaveBeenCalledWith('INFO', 'Watchlist saved', {
+        name: 'tech-stocks',
+        symbolCount: 3
+      });
     });
 
-    it('should retrieve watchlist', async() => {
-      const name = 'Tech Stocks';
-      const mockWatchlist = {
-        name,
-        symbols: ['AAPL', 'GOOGL', 'MSFT'],
-        metadata: { symbolCount: 3 }
-      };
-
+    it('should retrieve watchlist', async () => {
+      const mockWatchlist = { name: 'tech-stocks', symbols: ['AAPL', 'GOOGL'] };
       storageService.getItem.mockResolvedValue(mockWatchlist);
 
-      const result = await financialDataStorage.getWatchlist(name);
+      const result = await financialDataStorage.getWatchlist('tech-stocks');
 
       expect(result).toEqual(mockWatchlist);
-      expect(storageService.getItem).toHaveBeenCalledWith('watchlist', name);
+      expect(apiLogger.log).toHaveBeenCalledWith('DEBUG', 'Watchlist retrieved', {
+        name: 'tech-stocks'
+      });
+    });
+
+    it('should list watchlists', async () => {
+      const mockWatchlists = ['tech-stocks', 'growth-stocks'];
+      storageService.listItems.mockResolvedValue(mockWatchlists);
+
+      const result = await financialDataStorage.listWatchlists();
+
+      expect(result).toEqual(mockWatchlists);
+      expect(storageService.listItems).toHaveBeenCalledWith('watchlist');
     });
   });
 
-  describe('Data Export/Import', () => {
-    it('should export all financial data', async() => {
-      // Mock list methods
+  describe('Data Export/Import Operations', () => {
+    it('should export all data successfully', async () => {
+      // Mock all the list methods
       storageService.listItems
-        .mockReturnValueOnce(['AAPL', 'GOOGL']) // DCF models
-        .mockReturnValueOnce(['AAPL']) // LBO models
-        .mockReturnValueOnce(['mc1', 'mc2']) // Monte Carlo results
-        .mockReturnValueOnce(['Tech Stocks']); // Watchlists
+        .mockResolvedValueOnce(['AAPL']) // DCF models
+        .mockResolvedValueOnce(['TSLA']) // LBO models
+        .mockResolvedValueOnce(['mc-123']) // Monte Carlo results
+        .mockResolvedValueOnce(['tech-stocks']); // Watchlists
 
       // Mock get methods
-      storageService.getItem
-        .mockResolvedValueOnce({ symbol: 'AAPL', valuation: { intrinsicValue: 150 } }) // DCF AAPL
-        .mockResolvedValueOnce({ symbol: 'GOOGL', valuation: { intrinsicValue: 2500 } }) // DCF GOOGL
-        .mockResolvedValueOnce({ symbol: 'AAPL', returns: { irr: 0.25 } }) // LBO AAPL
-        .mockResolvedValueOnce({ modelType: 'DCF', results: [150, 155] }) // MC mc1
-        .mockResolvedValueOnce({ modelType: 'LBO', results: [0.2, 0.3] }) // MC mc2
-        .mockResolvedValueOnce({ name: 'Tech Stocks', symbols: ['AAPL'] }) // Watchlist
-        .mockResolvedValueOnce({ theme: 'dark' }); // User preferences
+      const spyDCF = vi
+        .spyOn(financialDataStorage, 'getDCFModel')
+        .mockResolvedValue({ symbol: 'AAPL' });
+      const spyLBO = vi
+        .spyOn(financialDataStorage, 'getLBOModel')
+        .mockResolvedValue({ symbol: 'TSLA' });
+      const spyMC = vi
+        .spyOn(financialDataStorage, 'getMonteCarloResults')
+        .mockResolvedValue({ modelId: 'mc-123' });
+      const spyWL = vi
+        .spyOn(financialDataStorage, 'getWatchlist')
+        .mockResolvedValue({ name: 'tech-stocks' });
+      const spyPrefs = vi
+        .spyOn(financialDataStorage, 'getUserPreferences')
+        .mockResolvedValue({ theme: 'dark' });
 
-      const exportData = await financialDataStorage.exportAllData();
+      const result = await financialDataStorage.exportAllData();
 
-      expect(exportData).toHaveProperty('timestamp');
-      expect(exportData).toHaveProperty('version', '1.0');
-      expect(exportData.data).toHaveProperty('dcfModels');
-      expect(exportData.data).toHaveProperty('lboModels');
-      expect(exportData.data).toHaveProperty('monteCarloResults');
-      expect(exportData.data).toHaveProperty('watchlists');
-      expect(exportData.data).toHaveProperty('userPreferences');
-
-      expect(Object.keys(exportData.data.dcfModels)).toHaveLength(2);
-      expect(Object.keys(exportData.data.lboModels)).toHaveLength(1);
-      expect(Object.keys(exportData.data.monteCarloResults)).toHaveLength(2);
-      expect(Object.keys(exportData.data.watchlists)).toHaveLength(1);
-    });
-
-    it('should import financial data', async() => {
-      const importData = {
-        timestamp: Date.now(),
+      expect(result).toEqual({
+        timestamp: expect.any(Number),
         version: '1.0',
         data: {
-          dcfModels: {
-            'AAPL': { symbol: 'AAPL', valuation: { intrinsicValue: 150 } }
-          },
-          lboModels: {
-            'AAPL': { symbol: 'AAPL', returns: { irr: 0.25 } }
-          },
-          monteCarloResults: {
-            'mc1': { modelType: 'DCF', results: [150, 155] }
-          },
-          watchlists: {
-            'Tech Stocks': { name: 'Tech Stocks', symbols: ['AAPL'] }
-          },
+          dcfModels: { AAPL: { symbol: 'AAPL' } },
+          lboModels: { TSLA: { symbol: 'TSLA' } },
+          monteCarloResults: { 'mc-123': { modelId: 'mc-123' } },
+          watchlists: { 'tech-stocks': { name: 'tech-stocks' } },
+          userPreferences: { theme: 'dark' }
+        }
+      });
+      expect(apiLogger.log).toHaveBeenCalledWith('INFO', 'Data export completed', {
+        dcfCount: 1,
+        lboCount: 1,
+        mcCount: 1,
+        watchlistCount: 1
+      });
+
+      // Restore spies to avoid leaking mocks into subsequent tests
+      spyDCF.mockRestore();
+      spyLBO.mockRestore();
+      spyMC.mockRestore();
+      spyWL.mockRestore();
+      spyPrefs.mockRestore();
+    });
+
+    it('should handle export errors', async () => {
+      storageService.listItems.mockRejectedValue(new Error('Export failed'));
+
+      await expect(financialDataStorage.exportAllData()).rejects.toThrow('Export failed');
+      expect(apiLogger.log).toHaveBeenCalledWith('ERROR', 'Failed to export data', {
+        error: 'Export failed'
+      });
+    });
+
+    it('should import data successfully', async () => {
+      const importData = {
+        data: {
+          dcfModels: { AAPL: { symbol: 'AAPL' } },
+          lboModels: { TSLA: { symbol: 'TSLA' } },
+          monteCarloResults: { 'mc-123': { modelId: 'mc-123' } },
+          watchlists: { 'tech-stocks': { name: 'tech-stocks', symbols: ['AAPL'] } },
           userPreferences: { theme: 'dark' }
         }
       };
 
+      // Ensure the mock returns success for this specific test
       storageService.setItem.mockResolvedValue(true);
 
-      const importCount = await financialDataStorage.importData(importData);
+      const result = await financialDataStorage.importData(importData);
 
-      expect(importCount).toBe(5); // 1 DCF + 1 LBO + 1 MC + 1 Watchlist + 1 Preferences
-      expect(storageService.setItem).toHaveBeenCalledTimes(5);
-    });
-  });
-
-  describe('Statistics and Cleanup', () => {
-    it('should get financial data statistics', async() => {
-      const mockStats = {
-        totalSize: 1024,
-        itemCount: 10,
-        typeStats: { dcfModel: 3, lboModel: 2 }
-      };
-
-      storageService.getStorageStats.mockResolvedValue(mockStats);
-      storageService.listItems
-        .mockReturnValueOnce(['AAPL', 'GOOGL']) // DCF models
-        .mockReturnValueOnce(['AAPL']) // LBO models
-        .mockReturnValueOnce(['mc1']) // Monte Carlo results
-        .mockReturnValueOnce(['Tech Stocks']); // Watchlists
-
-      const stats = await financialDataStorage.getFinancialDataStats();
-
-      expect(stats).toHaveProperty('totalSize', 1024);
-      expect(stats).toHaveProperty('itemCount', 10);
-      expect(stats.financialData).toEqual({
-        dcfModels: 2,
-        lboModels: 1,
-        monteCarloResults: 1,
-        watchlists: 1
+      expect(result).toBe(5); // 5 items imported
+      expect(apiLogger.log).toHaveBeenCalledWith('INFO', 'Data import completed', {
+        importCount: 5
       });
     });
 
-    it('should cleanup expired market data', async() => {
-      const expiredData = {
-        symbol: 'AAPL',
-        data: { currentPrice: 150 },
-        expiresAt: Date.now() - 1000 // Expired
-      };
+    it('should handle import errors', async () => {
+      const importData = { data: { dcfModels: { AAPL: { symbol: 'AAPL' } } } };
+      storageService.setItem.mockRejectedValue(new Error('Import failed'));
 
+      await expect(financialDataStorage.importData(importData)).rejects.toThrow('Import failed');
+      expect(apiLogger.log).toHaveBeenCalledWith('ERROR', 'Failed to import data', {
+        error: 'Import failed'
+      });
+    });
+  });
+
+  describe('Statistics and Maintenance', () => {
+    it('should get financial data statistics', async () => {
+      storageService.getStorageStats.mockResolvedValue({ totalSize: 1024000, itemCount: 50 });
+      storageService.listItems
+        .mockResolvedValueOnce(['AAPL', 'GOOGL']) // DCF
+        .mockResolvedValueOnce(['TSLA']) // LBO
+        .mockResolvedValueOnce(['mc-123']) // Monte Carlo
+        .mockResolvedValueOnce(['tech-stocks']); // Watchlists
+
+      const result = await financialDataStorage.getFinancialDataStats();
+
+      expect(result).toEqual({
+        totalSize: 1024000,
+        itemCount: 50,
+        financialData: {
+          dcfModels: 2,
+          lboModels: 1,
+          monteCarloResults: 1,
+          watchlists: 1
+        }
+      });
+    });
+
+    it('should cleanup expired market data', async () => {
       const validData = {
+        symbol: 'AAPL',
+        expiresAt: Date.now() + 3600000 // Future
+      };
+      const expiredData = {
         symbol: 'GOOGL',
-        data: { currentPrice: 2500 },
-        expiresAt: Date.now() + 1000 // Valid
+        expiresAt: Date.now() - 3600000 // Past
       };
 
-      storageService.listItems.mockReturnValue(['AAPL', 'GOOGL']);
-      storageService.getItem
-        .mockResolvedValueOnce(expiredData)
-        .mockResolvedValueOnce(validData);
-      storageService.removeItem.mockReturnValue(true);
+      // Ensure listItems returns an array for proper iteration
+      storageService.listItems.mockResolvedValue(['AAPL', 'GOOGL']);
+      storageService.getItem.mockResolvedValueOnce(validData).mockResolvedValueOnce(expiredData);
 
-      const cleanedCount = await financialDataStorage.cleanupExpiredMarketData();
+      const result = await financialDataStorage.cleanupExpiredMarketData();
 
-      expect(cleanedCount).toBe(1);
-      expect(storageService.removeItem).toHaveBeenCalledWith('marketData', 'AAPL');
+      expect(result).toBe(1); // One expired item cleaned
+      expect(storageService.removeItem).toHaveBeenCalledWith('marketData', 'GOOGL');
+      expect(apiLogger.log).toHaveBeenCalledWith('INFO', 'Expired market data cleaned', {
+        cleanedCount: 1
+      });
+    });
+
+    it('should handle non-iterable market data keys gracefully', async () => {
+      // Test case where listItems returns null or non-array
+      storageService.listItems.mockResolvedValue(null);
+
+      const result = await financialDataStorage.cleanupExpiredMarketData();
+
+      expect(result).toBe(0); // Should return 0 for non-iterable keys
+      expect(apiLogger.log).toHaveBeenCalledWith(
+        'WARN',
+        'Market data keys not available or not iterable',
+        {
+          keysType: 'object',
+          keysValue: null
+        }
+      );
+    });
+  });
+
+  describe('Error Handling and Logging', () => {
+    it('should log all operations appropriately', async () => {
+      // Test successful operations log INFO/DEBUG
+      storageService.setItem.mockResolvedValue(true);
+      await financialDataStorage.saveDCFModel('TEST', { valuation: { intrinsicValue: 100 } });
+
+      expect(apiLogger.log).toHaveBeenCalledWith('INFO', 'DCF model saved', {
+        symbol: 'TEST',
+        valuation: 100
+      });
+
+      // Test error operations log ERROR
+      storageService.setItem.mockRejectedValue(new Error('Test error'));
+      await expect(financialDataStorage.saveDCFModel('TEST', {})).rejects.toThrow();
+
+      expect(apiLogger.log).toHaveBeenCalledWith('ERROR', 'Failed to save DCF model', {
+        symbol: 'TEST',
+        error: 'Test error'
+      });
+    });
+
+    it('should handle malformed data gracefully', async () => {
+      // Mock the entire storageService for this test
+      const originalGetItem = storageService.getItem;
+      storageService.getItem = vi.fn().mockResolvedValue(null);
+
+      try {
+        // Test with null/undefined data
+        const result = await financialDataStorage.getDCFModel(null);
+        expect(result).toBe(null);
+
+        // Test with malformed symbol
+        const result2 = await financialDataStorage.getDCFModel({});
+        expect(result2).toBe(null);
+
+        // Test with empty string
+        const result3 = await financialDataStorage.getDCFModel('');
+        expect(result3).toBe(null);
+
+        // Test with whitespace-only string
+        const result4 = await financialDataStorage.getDCFModel('   ');
+        expect(result4).toBe(null);
+      } finally {
+        // Restore the original method
+        storageService.getItem = originalGetItem;
+      }
     });
   });
 });

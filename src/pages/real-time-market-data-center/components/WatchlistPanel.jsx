@@ -75,14 +75,7 @@ const WatchlistPanel = ({ watchlist, onRemoveFromWatchlist, onSelectSymbol }) =>
             <button
               key={field}
               onClick={() => handleSort(field)}
-              className={`
-                flex items-center space-x-1 px-2 py-1 rounded transition-smooth
-                ${
-            sortBy === field
-              ? 'bg-primary text-primary-foreground'
-              : 'text-muted-foreground hover:text-foreground'
-            }
-              `}
+              className={`flex items-center space-x-1 px-2 py-1 rounded transition-smooth ${sortBy === field ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}`}
             >
               <span className="capitalize">{field}</span>
               {sortBy === field && (
@@ -107,18 +100,13 @@ const WatchlistPanel = ({ watchlist, onRemoveFromWatchlist, onSelectSymbol }) =>
           sortedWatchlist.map(item => (
             <div
               key={item.symbol}
-              className="flex items-center justify-between p-3 border-b border-border last:border-b-0 hover:bg-muted/50 cursor-pointer transition-smooth"
-              onClick={() => onSelectSymbol(item)}
-              role="button"
-              tabIndex={0}
-              onKeyDown={e => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  onSelectSymbol(item);
-                }
-              }}
+              className="flex items-center justify-between p-3 border-b border-border last:border-b-0 hover:bg-muted/50 transition-smooth"
             >
-              <div className="flex-1">
+              <button
+                className="flex-1 text-left cursor-pointer focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded"
+                onClick={() => onSelectSymbol(item)}
+                aria-label={`View details for ${item.symbol} - ${item.name}`}
+              >
                 <div className="flex items-center space-x-2">
                   <span className="font-semibold text-foreground">{item.symbol}</span>
                   <span className="text-xs px-2 py-1 bg-muted rounded text-muted-foreground">
@@ -126,9 +114,9 @@ const WatchlistPanel = ({ watchlist, onRemoveFromWatchlist, onSelectSymbol }) =>
                   </span>
                 </div>
                 <div className="text-sm text-muted-foreground truncate">{item.name}</div>
-              </div>
+              </button>
 
-              <div className="text-right mr-3">
+              <div className="text-right mr-3 pointer-events-none">
                 <div className="font-semibold text-foreground">
                   {formatValue(item.price || 150.25, 'currency')}
                 </div>
@@ -141,12 +129,10 @@ const WatchlistPanel = ({ watchlist, onRemoveFromWatchlist, onSelectSymbol }) =>
               </div>
 
               <button
-                onClick={e => {
-                  e.stopPropagation();
-                  onRemoveFromWatchlist(item.symbol);
-                }}
-                className="p-1 text-muted-foreground hover:text-error transition-smooth"
+                onClick={() => onRemoveFromWatchlist(item.symbol)}
+                className="p-1 text-muted-foreground hover:text-error transition-smooth focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded"
                 title="Remove from watchlist"
+                aria-label={`Remove ${item.symbol} from watchlist`}
               >
                 <Icon name="X" size={16} />
               </button>

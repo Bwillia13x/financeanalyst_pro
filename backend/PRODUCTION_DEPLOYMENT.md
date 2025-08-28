@@ -45,7 +45,7 @@
 ### 🔧 Backend Production URLs
 Once deployed, your backend will be available at:
 - **Render**: `https://[app-name].onrender.com`
-- **Railway**: `https://[app-name].up.railway.app`  
+- **Railway**: `https://[app-name].up.railway.app`
 - **Heroku**: `https://[app-name].herokuapp.com`
 
 ### 📱 Update Frontend Configuration

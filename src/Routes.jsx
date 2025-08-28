@@ -1,4 +1,3 @@
-/* eslint-disable indent, react/jsx-indent */
 import { Suspense, lazy, useEffect } from 'react';
 import { BrowserRouter, Routes as RouterRoutes, Route, useLocation } from 'react-router-dom';
 
@@ -9,6 +8,7 @@ import LoadingSpinner from './components/ui/LoadingSpinner';
 
 // Lazy load pages for code splitting and better performance
 const FinancialModelWorkspace = lazy(() => import('./pages/financial-model-workspace'));
+const Home = lazy(() => import('./pages/Landing'));
 const RealTimeMarketDataCenter = lazy(() => import('./pages/real-time-market-data-center'));
 const ScenarioAnalysisSensitivityTools = lazy(
   () => import('./pages/scenario-analysis-sensitivity-tools')
@@ -41,10 +41,7 @@ const isAutomatedEnv = (() => {
   try {
     const params = new URLSearchParams(window.location.search);
     return (
-      navigator.webdriver === true ||
-      params.has('lhci') ||
-      params.has('ci') ||
-      params.has('audit')
+      navigator.webdriver === true || params.has('lhci') || params.has('ci') || params.has('audit')
     );
   } catch {
     return navigator.webdriver === true;
@@ -60,7 +57,7 @@ const RouteChangeTracker = () => {
     if (isAutomatedEnv) return;
     // Dynamically import monitoring to avoid side effects during tests
     import('./utils/monitoring')
-      .then((mod) => {
+      .then(mod => {
         if (mod?.default?.trackPageView) {
           mod.default.trackPageView(path);
         }
@@ -82,39 +79,40 @@ const Routes = () => {
         <KeyboardShortcutsProvider>
           <Suspense fallback={<LoadingSpinner />}>
             <RouterRoutes>
-            {/* Define your routes here */}
-            <Route path="/" element={<FinancialModelWorkspace />} />
-            <Route path="/financial-model-workspace" element={<FinancialModelWorkspace />} />
-            <Route path="/real-time-market-data-center" element={<RealTimeMarketDataCenter />} />
-            <Route
-              path="/scenario-analysis-sensitivity-tools"
-              element={<ScenarioAnalysisSensitivityTools />}
-            />
-            <Route path="/valuation-tool" element={<ValuationTool />} />
-            <Route path="/valuation-tool/docs" element={<ValuationToolDocs />} />
-            <Route path="/valuation-tool/demo" element={<ValuationToolDemo />} />
-            <Route path="/valuation-workbench" element={<ValuationWorkbench />} />
-            <Route path="/model-lab" element={<ModelLab />} />
-            <Route path="/advanced-charts" element={<AdvancedCharting />} />
-            <Route path="/market-analysis" element={<MarketAnalysis />} />
-            <Route path="/reports" element={<Reports />} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="/ai-insights" element={<AIInsights />} />
-            <Route path="/analytics" element={<Analytics />} />
-            <Route path="/advanced-analytics" element={<AdvancedAnalytics />} />
-            <Route path="/portfolio-management" element={<PortfolioManagement />} />
-            <Route path="/portfolio" element={<PortfolioManagement />} />
-            <Route path="/models" element={<Models />} />
-            <Route path="/app" element={<App />} />
-            <Route path="/data" element={<Data />} />
-            <Route path="/integrations" element={<Integrations />} />
-            <Route path="/canvas" element={<ThesisCanvas />} />
-            <Route path="/private-analysis" element={<PrivateAnalysis />} />
-            <Route path="/financial-inputs-demo" element={<FinancialInputsDemo />} />
-            {(import.meta.env.VITE_ENABLE_DEBUG_MODE === 'true' || import.meta.env.VITE_APP_ENV !== 'production') && (
-              <Route path="/monitoring-debug" element={<MonitoringDebugPanel />} />
-            )}
-            <Route path="*" element={<NotFound />} />
+              {/* Define your routes here */}
+              <Route path="/" element={<Home />} />
+              <Route path="/financial-model-workspace" element={<FinancialModelWorkspace />} />
+              <Route path="/real-time-market-data-center" element={<RealTimeMarketDataCenter />} />
+              <Route
+                path="/scenario-analysis-sensitivity-tools"
+                element={<ScenarioAnalysisSensitivityTools />}
+              />
+              <Route path="/valuation-tool" element={<ValuationTool />} />
+              <Route path="/valuation-tool/docs" element={<ValuationToolDocs />} />
+              <Route path="/valuation-tool/demo" element={<ValuationToolDemo />} />
+              <Route path="/valuation-workbench" element={<ValuationWorkbench />} />
+              <Route path="/model-lab" element={<ModelLab />} />
+              <Route path="/advanced-charts" element={<AdvancedCharting />} />
+              <Route path="/market-analysis" element={<MarketAnalysis />} />
+              <Route path="/reports" element={<Reports />} />
+              <Route path="/settings" element={<Settings />} />
+              <Route path="/ai-insights" element={<AIInsights />} />
+              <Route path="/analytics" element={<Analytics />} />
+              <Route path="/advanced-analytics" element={<AdvancedAnalytics />} />
+              <Route path="/portfolio-management" element={<PortfolioManagement />} />
+              <Route path="/portfolio" element={<PortfolioManagement />} />
+              <Route path="/models" element={<Models />} />
+              <Route path="/app" element={<App />} />
+              <Route path="/data" element={<Data />} />
+              <Route path="/integrations" element={<Integrations />} />
+              <Route path="/canvas" element={<ThesisCanvas />} />
+              <Route path="/private-analysis" element={<PrivateAnalysis />} />
+              <Route path="/financial-inputs-demo" element={<FinancialInputsDemo />} />
+              {(import.meta.env.VITE_ENABLE_DEBUG_MODE === 'true' ||
+                import.meta.env.VITE_APP_ENV !== 'production') && (
+                <Route path="/monitoring-debug" element={<MonitoringDebugPanel />} />
+              )}
+              <Route path="*" element={<NotFound />} />
             </RouterRoutes>
           </Suspense>
         </KeyboardShortcutsProvider>

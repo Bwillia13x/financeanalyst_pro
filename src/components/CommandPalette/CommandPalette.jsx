@@ -21,7 +21,6 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 
 import { useCommandRegistry } from '../../hooks/useCommandRegistry';
- 
 
 const CommandPalette = ({
   isOpen,
@@ -71,7 +70,9 @@ const CommandPalette = ({
     if (!query.trim()) {
       // Show recent commands and contextual suggestions when no query
       const recent = recentCommands.slice(0, 3).map(cmd => ({ ...cmd, category: 'recent' }));
-      const contextual = getContextualCommands().slice(0, 4).map(cmd => ({ ...cmd, category: 'suggested' }));
+      const contextual = getContextualCommands()
+        .slice(0, 4)
+        .map(cmd => ({ ...cmd, category: 'suggested' }));
       const popular = [
         {
           id: 'new-dcf',
@@ -111,7 +112,7 @@ const CommandPalette = ({
       // Mark palette open time and emit telemetry
       openTimestampRef.current = performance.now();
       getMonitoring()
-        .then((mon) => {
+        .then(mon => {
           try {
             mon.trackEvent('command_palette_open', {
               page: currentContext?.page,
@@ -130,7 +131,7 @@ const CommandPalette = ({
   useEffect(() => {
     if (!isOpen) return;
 
-    const handleKeyDown = (e) => {
+    const handleKeyDown = e => {
       // Arrow/Enter/Escape behavior
       if (['ArrowDown', 'ArrowUp', 'Enter', 'Escape'].includes(e.key)) {
         switch (e.key) {
@@ -168,8 +169,9 @@ const CommandPalette = ({
           'select:not([disabled])',
           '[tabindex]:not([tabindex="-1"])'
         ].join(',');
-        const focusables = Array.from(dialogRef.current.querySelectorAll(focusableSelectors))
-          .filter(el => !el.hasAttribute('disabled') && !el.getAttribute('aria-hidden'));
+        const focusables = Array.from(
+          dialogRef.current.querySelectorAll(focusableSelectors)
+        ).filter(el => !el.hasAttribute('disabled') && !el.getAttribute('aria-hidden'));
         if (focusables.length === 0) return;
 
         const first = focusables[0];
@@ -191,7 +193,7 @@ const CommandPalette = ({
   }, [isOpen, selectedIndex, searchResults, onClose]);
 
   // Execute command
-  const handleExecuteCommand = async(command) => {
+  const handleExecuteCommand = async command => {
     try {
       // Add to command history
       setCommandHistory(prev => [command, ...prev.slice(0, 9)]);
@@ -231,7 +233,10 @@ const CommandPalette = ({
       console.error('Command execution failed:', error);
       try {
         const mon = await getMonitoring();
-        mon.trackError(error, 'command_execution', { commandId: command?.id, page: currentContext?.page });
+        mon.trackError(error, 'command_execution', {
+          commandId: command?.id,
+          page: currentContext?.page
+        });
       } catch (e) {
         console.warn('Monitoring: trackError failed', e);
       }
@@ -240,44 +245,74 @@ const CommandPalette = ({
   };
 
   // Get category icon
-  const getCategoryIcon = (category) => {
+  const getCategoryIcon = category => {
     switch (category) {
-      case 'recent': return Clock;
-      case 'suggested': return Star;
-      case 'popular': return TrendingUp;
-      case 'navigation': return ArrowRight;
-      case 'analysis': return Calculator;
-      case 'data': return FileText;
-      case 'export': return Download;
-      case 'import': return Upload;
-      case 'charts': return BarChart3;
-      case 'collaboration': return Users;
-      case 'automation': return Zap;
-      case 'external': return Globe;
-      case 'settings': return Settings;
-      case 'help': return HelpCircle;
-      default: return Command;
+      case 'recent':
+        return Clock;
+      case 'suggested':
+        return Star;
+      case 'popular':
+        return TrendingUp;
+      case 'navigation':
+        return ArrowRight;
+      case 'analysis':
+        return Calculator;
+      case 'data':
+        return FileText;
+      case 'export':
+        return Download;
+      case 'import':
+        return Upload;
+      case 'charts':
+        return BarChart3;
+      case 'collaboration':
+        return Users;
+      case 'automation':
+        return Zap;
+      case 'external':
+        return Globe;
+      case 'settings':
+        return Settings;
+      case 'help':
+        return HelpCircle;
+      default:
+        return Command;
     }
   };
 
   // Get category color
-  const getCategoryColor = (category) => {
+  const getCategoryColor = category => {
     switch (category) {
-      case 'recent': return 'text-blue-500';
-      case 'suggested': return 'text-amber-500';
-      case 'popular': return 'text-emerald-500';
-      case 'navigation': return 'text-slate-500';
-      case 'analysis': return 'text-purple-500';
-      case 'data': return 'text-indigo-500';
-      case 'export': return 'text-green-500';
-      case 'import': return 'text-orange-500';
-      case 'charts': return 'text-pink-500';
-      case 'collaboration': return 'text-cyan-500';
-      case 'automation': return 'text-red-500';
-      case 'external': return 'text-gray-500';
-      case 'settings': return 'text-slate-600';
-      case 'help': return 'text-blue-600';
-      default: return 'text-slate-500';
+      case 'recent':
+        return 'text-blue-500';
+      case 'suggested':
+        return 'text-amber-500';
+      case 'popular':
+        return 'text-emerald-500';
+      case 'navigation':
+        return 'text-slate-500';
+      case 'analysis':
+        return 'text-purple-500';
+      case 'data':
+        return 'text-indigo-500';
+      case 'export':
+        return 'text-green-500';
+      case 'import':
+        return 'text-orange-500';
+      case 'charts':
+        return 'text-pink-500';
+      case 'collaboration':
+        return 'text-cyan-500';
+      case 'automation':
+        return 'text-red-500';
+      case 'external':
+        return 'text-gray-500';
+      case 'settings':
+        return 'text-slate-600';
+      case 'help':
+        return 'text-blue-600';
+      default:
+        return 'text-slate-500';
     }
   };
 
@@ -293,7 +328,9 @@ const CommandPalette = ({
         <mark key={index} className="bg-yellow-200 text-yellow-900 px-0.5 rounded">
           {part}
         </mark>
-      ) : part
+      ) : (
+        part
+      )
     );
   };
 
@@ -312,13 +349,14 @@ const CommandPalette = ({
           initial={{ opacity: 0, scale: 0.95, y: -20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: -20 }}
+          data-testid="command-palette"
           transition={{ type: 'spring', duration: 0.3 }}
           className="bg-white rounded-xl shadow-2xl border border-slate-200 w-full max-w-2xl mx-4 overflow-hidden"
           role="dialog"
           aria-modal="true"
           aria-labelledby="command-palette-title"
           ref={dialogRef}
-          onClick={(e) => e.stopPropagation()}
+          onClick={e => e.stopPropagation()}
         >
           {/* Header */}
           <div className="flex items-center gap-3 p-4 border-b border-slate-100 bg-slate-50">
@@ -326,8 +364,12 @@ const CommandPalette = ({
               <Command size={18} className="text-white" />
             </div>
             <div className="flex-1">
-              <h3 id="command-palette-title" className="font-semibold text-slate-900">Command Palette</h3>
-              <p className="text-xs text-slate-500">Type to search commands, or use natural language</p>
+              <h3 id="command-palette-title" className="font-semibold text-slate-900">
+                Command Palette
+              </h3>
+              <p className="text-xs text-slate-500">
+                Type to search commands, or use natural language
+              </p>
             </div>
             <div className="flex items-center gap-1 text-xs text-slate-500">
               <kbd className="px-1.5 py-0.5 bg-white border border-slate-200 rounded">Esc</kbd>
@@ -338,12 +380,15 @@ const CommandPalette = ({
           {/* Search Input */}
           <div className="relative p-4 border-b border-slate-100">
             <div className="relative">
-              <Search size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" />
+              <Search
+                size={18}
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"
+              />
               <input
                 ref={inputRef}
                 type="text"
                 value={query}
-                onChange={(e) => setQuery(e.target.value)}
+                onChange={e => setQuery(e.target.value)}
                 placeholder="Type a command or just describe what you'd like to do..."
                 className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-slate-900 placeholder-slate-500"
               />
@@ -353,7 +398,12 @@ const CommandPalette = ({
             {!query && (
               <div className="mt-3 flex flex-wrap gap-2">
                 <span className="text-xs text-slate-500">Try:</span>
-                {['New DCF for AAPL', 'Run sensitivity on WACC', 'Export to PDF', 'Find revenue data'].map((tip) => (
+                {[
+                  'New DCF for AAPL',
+                  'Run sensitivity on WACC',
+                  'Export to PDF',
+                  'Find revenue data'
+                ].map(tip => (
                   <button
                     key={tip}
                     onClick={() => setQuery(tip)}
@@ -375,7 +425,8 @@ const CommandPalette = ({
                 </div>
                 <h4 className="font-medium text-slate-900 mb-2">No commands found</h4>
                 <p className="text-sm text-slate-500">
-                  Try a different search term or use natural language to describe what you want to do.
+                  Try a different search term or use natural language to describe what you want to
+                  do.
                 </p>
               </div>
             ) : (
@@ -392,21 +443,21 @@ const CommandPalette = ({
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.05 }}
                       className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-all duration-150 ${
-                        isSelected
-                          ? 'bg-blue-50 border-r-2 border-blue-500'
-                          : 'hover:bg-slate-50'
+                        isSelected ? 'bg-blue-50 border-r-2 border-blue-500' : 'hover:bg-slate-50'
                       }`}
                       role="option"
                       tabIndex={0}
                       aria-selected={isSelected}
                       onClick={() => handleExecuteCommand(command)}
                       onFocus={() => setSelectedIndex(index)}
-                      onKeyDown={(e) => {
+                      onKeyDown={e => {
                         if (e.key === 'Enter') {
                           e.preventDefault();
                           handleExecuteCommand(command);
                         }
                       }}
+                      data-testid="command-result"
+                      data-command-id={command.id}
                     >
                       {/* Category indicator */}
                       <div
@@ -425,9 +476,8 @@ const CommandPalette = ({
                           }`}
                         >
                           <CommandIcon
-                            size={16} className={
-                              isSelected ? 'text-blue-600' : 'text-slate-600'
-                            }
+                            size={16}
+                            className={isSelected ? 'text-blue-600' : 'text-slate-600'}
                           />
                         </div>
                       )}
@@ -445,7 +495,10 @@ const CommandPalette = ({
                           {command.shortcut && (
                             <div className="flex items-center gap-1">
                               {command.shortcut.split('+').map((key, idx) => (
-                                <kbd key={idx} className="px-1.5 py-0.5 bg-slate-200 text-slate-600 text-xs rounded">
+                                <kbd
+                                  key={idx}
+                                  className="px-1.5 py-0.5 bg-slate-200 text-slate-600 text-xs rounded"
+                                >
                                   {key}
                                 </kbd>
                               ))}
@@ -464,7 +517,9 @@ const CommandPalette = ({
                         <div className="flex items-center gap-3 mt-1">
                           <span
                             className={`text-xs px-2 py-0.5 rounded-full ${
-                              isSelected ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600'
+                              isSelected
+                                ? 'bg-blue-100 text-blue-700'
+                                : 'bg-slate-100 text-slate-600'
                             }`}
                           >
                             {command.category}

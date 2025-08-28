@@ -4,20 +4,21 @@
  */
 
 import express from 'express';
+
 const router = express.Router();
 
 // Real AI service integration
-const generateAIResponse = async (message, context) => {
+const generateAIResponse = async(message, context) => {
   const AI_API_KEY = process.env.AI_API_KEY || 'placeholder-api-key';
   const AI_API_ENDPOINT = process.env.AI_API_ENDPOINT || 'https://api.openai.com/v1/chat/completions';
-  
+
   try {
     // Call real AI service (OpenAI/GPT-4 as example)
     const response = await fetch(AI_API_ENDPOINT, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${AI_API_KEY}`,
+        'Authorization': `Bearer ${AI_API_KEY}`
       },
       body: JSON.stringify({
         model: 'gpt-4',
@@ -27,7 +28,7 @@ const generateAIResponse = async (message, context) => {
             content: `You are a professional financial analyst AI assistant. Provide expert financial advice, portfolio analysis, market insights, and investment recommendations. Use the provided context data: ${JSON.stringify(context)}`
           },
           {
-            role: 'user', 
+            role: 'user',
             content: message
           }
         ],
@@ -96,14 +97,14 @@ const extractActionRecommendations = (message) => {
 // Fallback response generation
 const generateFallbackResponse = (message, context) => {
   const lowerMessage = message.toLowerCase();
-  
+
   // Portfolio Analysis
   if (lowerMessage.includes('portfolio') && (lowerMessage.includes('analyze') || lowerMessage.includes('analysis'))) {
     return {
-      response: `I've analyzed your portfolio performance. ${context.portfolioData ? 
-        `Your current portfolio has ${context.portfolioData.holdings?.length || 0} holdings with a total value of approximately ${context.portfolioData.totalValue || 'N/A'}. ` : 
+      response: `I've analyzed your portfolio performance. ${context.portfolioData ?
+        `Your current portfolio has ${context.portfolioData.holdings?.length || 0} holdings with a total value of approximately ${context.portfolioData.totalValue || 'N/A'}. ` :
         'To provide detailed analysis, please ensure your portfolio data is loaded. '}
-        
+
 Here are key insights:
 
 📊 **Performance Overview:**
@@ -130,18 +131,18 @@ Here are key insights:
       actions: ['rebalance', 'risk_analysis']
     };
   }
-  
+
   // Market Trends
   if (lowerMessage.includes('market') && (lowerMessage.includes('trend') || lowerMessage.includes('insight'))) {
     return {
       response: `Based on current market data and analysis:
 
 📈 **Current Market Overview:**
-${context.marketData ? 
-  `- S&P 500: ${context.marketData.sp500?.price || 'N/A'} (${context.marketData.sp500?.change || 'N/A'})
+${context.marketData ?
+    `- S&P 500: ${context.marketData.sp500?.price || 'N/A'} (${context.marketData.sp500?.change || 'N/A'})
 - VIX (Fear Index): ${context.marketData.vix?.price || 'N/A'}
 - 10-Year Treasury: ${context.marketData.treasury10y?.yield || 'N/A'}%` :
-  '- Market data loading...'}
+    '- Market data loading...'}
 
 🔍 **Key Trends:**
 - Technology sector showing resilience with AI and cloud computing driving growth
@@ -164,7 +165,7 @@ ${context.marketData ?
       actions: ['market_screener', 'economic_calendar']
     };
   }
-  
+
   // Risk Assessment
   if (lowerMessage.includes('risk') && (lowerMessage.includes('assess') || lowerMessage.includes('calculation'))) {
     return {
@@ -201,7 +202,7 @@ ${context.marketData ?
       actions: ['monte_carlo', 'stress_test', 'optimize']
     };
   }
-  
+
   // Portfolio Rebalancing
   if (lowerMessage.includes('rebalanc') || (lowerMessage.includes('suggest') && lowerMessage.includes('portfolio'))) {
     return {
@@ -209,11 +210,11 @@ ${context.marketData ?
 
 ⚖️ **Current vs Target Allocation:**
 
-${context.portfolioData?.holdings ? 
-  context.portfolioData.holdings.map(holding => 
-    `- ${holding.symbol}: ${holding.currentWeight}% (Target: ${holding.targetWeight}%, Drift: ${(holding.currentWeight - holding.targetWeight).toFixed(1)}%)`
-  ).join('\n') :
-  `- AAPL: 22.5% (Target: 20%, Drift: +2.5%)
+${context.portfolioData?.holdings ?
+    context.portfolioData.holdings.map(holding =>
+      `- ${holding.symbol}: ${holding.currentWeight}% (Target: ${holding.targetWeight}%, Drift: ${(holding.currentWeight - holding.targetWeight).toFixed(1)}%)`
+    ).join('\n') :
+    `- AAPL: 22.5% (Target: 20%, Drift: +2.5%)
 - MSFT: 18.3% (Target: 15%, Drift: +3.3%)
 - GOOGL: 16.8% (Target: 15%, Drift: +1.8%)
 - AMZN: 14.2% (Target: 15%, Drift: -0.8%)
@@ -222,7 +223,7 @@ ${context.portfolioData?.holdings ?
 
 📊 **Recommended Trades:**
 - Reduce MSFT position by ~$15,000 (3.3% overweight)
-- Reduce AAPL position by ~$11,000 (2.5% overweight)  
+- Reduce AAPL position by ~$11,000 (2.5% overweight)
 - Reduce TSLA position by ~$9,000 (2.1% overweight)
 - Increase cash position by ~$35,000 for opportunities
 
@@ -241,7 +242,7 @@ ${context.portfolioData?.holdings ?
       actions: ['execute_rebalance', 'tax_analysis', 'schedule_rebalance']
     };
   }
-  
+
   // Financial Planning
   if (lowerMessage.includes('financial planning') || lowerMessage.includes('goal') || lowerMessage.includes('retirement')) {
     return {
@@ -277,7 +278,7 @@ ${context.portfolioData?.holdings ?
       actions: ['retirement_calculator', 'tax_optimizer', 'goal_tracker']
     };
   }
-  
+
   // Default response for general queries
   return {
     response: `I understand you're asking about "${message}". As your AI Financial Assistant, I can help you with:
@@ -296,7 +297,7 @@ ${context.portfolioData?.holdings ?
 
 💰 **Financial Planning:**
 - Retirement planning and projections
-- Goal-based investment strategies  
+- Goal-based investment strategies
 - Tax optimization strategies
 - Risk management and insurance
 
@@ -319,10 +320,10 @@ What specific area would you like to explore further?`,
 };
 
 // Chat endpoint
-router.post('/chat', async (req, res) => {
+router.post('/chat', async(req, res) => {
   try {
     const { message, context = {} } = req.body;
-    
+
     if (!message) {
       return res.status(400).json({
         error: 'Message is required'
@@ -331,10 +332,10 @@ router.post('/chat', async (req, res) => {
 
     // Generate AI response
     const aiResponse = await generateAIResponse(message, context);
-    
+
     // Log interaction for analytics (optional)
     console.log(`AI Assistant Query: ${message}`);
-    
+
     res.json({
       response: aiResponse.response,
       suggestions: aiResponse.suggestions || [],
@@ -353,7 +354,7 @@ router.post('/chat', async (req, res) => {
 });
 
 // Get conversation history (placeholder)
-router.get('/history', async (req, res) => {
+router.get('/history', async(req, res) => {
   try {
     // In a real implementation, this would fetch from database
     res.json({
@@ -374,7 +375,7 @@ router.get('/capabilities', (req, res) => {
     capabilities: [
       'Portfolio Analysis & Optimization',
       'Market Intelligence & Trends',
-      'Risk Assessment & Management', 
+      'Risk Assessment & Management',
       'Financial Planning & Projections',
       'Investment Research & Screening',
       'Performance Attribution Analysis',

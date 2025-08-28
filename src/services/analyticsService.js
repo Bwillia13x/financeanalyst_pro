@@ -121,7 +121,9 @@ class AnalyticsService {
       features: new Set(),
       errors: [],
       performance: {
-        loadTime: performance.timing ? (performance.timing.loadEventEnd - performance.timing.navigationStart) : 0,
+        loadTime: performance.timing
+          ? performance.timing.loadEventEnd - performance.timing.navigationStart
+          : 0,
         interactions: 0,
         scrollDepth: 0
       }
@@ -159,6 +161,7 @@ class AnalyticsService {
     const event = {
       id: `event_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       name: eventName,
+      eventType: eventName, // Add eventType for test compatibility
       timestamp: Date.now(),
       sessionId: this.currentSession?.id,
       properties: {
@@ -167,7 +170,8 @@ class AnalyticsService {
         userAgent: navigator.userAgent,
         screenSize: `${screen.width}x${screen.height}`,
         viewport: `${window.innerWidth}x${window.innerHeight}`
-      }
+      },
+      data: properties // Add data property for test compatibility
     };
 
     // Add to event queue
@@ -387,7 +391,10 @@ class AnalyticsService {
 
     // Analyze feature chains
     if (workflow.currentChain.length >= 2) {
-      const chainKey = workflow.currentChain.slice(-2).map(item => `${item.feature}_${item.action}`).join(' -> ');
+      const chainKey = workflow.currentChain
+        .slice(-2)
+        .map(item => `${item.feature}_${item.action}`)
+        .join(' -> ');
       const chainCount = workflow.featureChains.get(chainKey) || 0;
       workflow.featureChains.set(chainKey, chainCount + 1);
     }
@@ -461,9 +468,10 @@ class AnalyticsService {
     // Monitor long tasks
     if ('PerformanceObserver' in window) {
       try {
-        const observer = new PerformanceObserver((list) => {
-          list.getEntries().forEach((entry) => {
-            if (entry.duration > 50) { // Tasks longer than 50ms
+        const observer = new PerformanceObserver(list => {
+          list.getEntries().forEach(entry => {
+            if (entry.duration > 50) {
+              // Tasks longer than 50ms
               this.trackPerformance('long_task', entry.duration, {
                 startTime: entry.startTime,
                 name: entry.name
@@ -543,8 +551,10 @@ class AnalyticsService {
     const totalEvents = this.events.size;
     const totalSessions = this.userSessions.size;
     const activeFeaturesCount = this.featureUsage.size;
-    const errorCount = Array.from(this.userSessions.values())
-      .reduce((sum, session) => sum + session.errors.length, 0);
+    const errorCount = Array.from(this.userSessions.values()).reduce(
+      (sum, session) => sum + session.errors.length,
+      0
+    );
 
     return {
       totalEvents,
@@ -561,8 +571,7 @@ class AnalyticsService {
    * Get feature usage metrics
    */
   getFeatureUsageMetrics() {
-    const features = Array.from(this.featureUsage.values())
-      .sort((a, b) => b.count - a.count);
+    const features = Array.from(this.featureUsage.values()).sort((a, b) => b.count - a.count);
 
     return {
       topFeatures: features.slice(0, 10),
@@ -581,18 +590,22 @@ class AnalyticsService {
     const timePattern = this.userBehavior.get('time_pattern');
 
     return {
-      navigation: navigation ? {
-        topPages: Array.from(navigation.pageFrequency.entries())
-          .sort((a, b) => b[1] - a[1])
-          .slice(0, 10),
-        navigationSequences: navigation.sequences.slice(-10)
-      } : null,
-      workflow: workflow ? {
-        topWorkflows: Array.from(workflow.featureChains.entries())
-          .sort((a, b) => b[1] - a[1])
-          .slice(0, 10),
-        workflowSequences: workflow.sequences.slice(-5)
-      } : null,
+      navigation: navigation
+        ? {
+            topPages: Array.from(navigation.pageFrequency.entries())
+              .sort((a, b) => b[1] - a[1])
+              .slice(0, 10),
+            navigationSequences: navigation.sequences.slice(-10)
+          }
+        : null,
+      workflow: workflow
+        ? {
+            topWorkflows: Array.from(workflow.featureChains.entries())
+              .sort((a, b) => b[1] - a[1])
+              .slice(0, 10),
+            workflowSequences: workflow.sequences.slice(-5)
+          }
+        : null,
       timePattern: timePattern || null
     };
   }
@@ -641,6 +654,26 @@ class AnalyticsService {
     };
   }
 
+  /**
+   * Get comprehensive analytics data (used by integration tests)
+   */
+  getAnalytics() {
+    const allEvents = Array.from(this.events.values());
+    const sessionData = this.getSessionMetrics();
+    const featureData = this.getFeatureUsageMetrics();
+
+    return {
+      events: allEvents,
+      sessionData,
+      featureUsage: featureData, // Map featureData to featureUsage for test compatibility
+      performanceMetrics: this.getPerformanceMetrics(),
+      userBehavior: this.getUserBehaviorMetrics(),
+      summary: this.getSummaryMetrics(),
+      currentSession: this.currentSession,
+      timestamp: Date.now()
+    };
+  }
+
   // Helper methods for calculations
   getAverageSessionLength() {
     const sessions = Array.from(this.userSessions.values());
@@ -658,9 +691,7 @@ class AnalyticsService {
     const features = Array.from(this.featureUsage.values());
     if (features.length === 0) return null;
 
-    return features.reduce((max, feature) =>
-      feature.count > max.count ? feature : max
-    );
+    return features.reduce((max, feature) => (feature.count > max.count ? feature : max));
   }
 
   calculateFeatureAdoption() {

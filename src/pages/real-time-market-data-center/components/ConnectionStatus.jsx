@@ -1,4 +1,3 @@
-
 import Icon from '../../../components/AppIcon';
 
 const ConnectionStatus = ({ connectionHealth, lastUpdate }) => {

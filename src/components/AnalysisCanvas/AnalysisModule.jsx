@@ -11,7 +11,15 @@ import {
   Calendar
 } from 'lucide-react';
 import { useState, useMemo } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer
+} from 'recharts';
 
 const AnalysisModule = ({
   moduleId,
@@ -67,7 +75,8 @@ const AnalysisModule = ({
       <div className="flex justify-between items-center">
         <label className="text-sm font-medium text-gray-700">{label}</label>
         <span className="text-sm font-mono text-gray-900 bg-gray-100 px-2 py-1 rounded">
-          {value.toFixed(step < 1 ? 1 : 0)}{suffix}
+          {value.toFixed(step < 1 ? 1 : 0)}
+          {suffix}
         </span>
       </div>
       <div className="relative">
@@ -77,7 +86,7 @@ const AnalysisModule = ({
           max={max}
           step={step}
           value={value}
-          onChange={(e) => onChange(parseFloat(e.target.value))}
+          onChange={e => onChange(parseFloat(e.target.value))}
           className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
           style={{
             background: `linear-gradient(to right, rgb(59 130 246) 0%, rgb(59 130 246) ${((value - min) / (max - min)) * 100}%, rgb(229 231 235) ${((value - min) / (max - min)) * 100}%, rgb(229 231 235) 100%)`
@@ -114,7 +123,9 @@ const AnalysisModule = ({
           {/* Header */}
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className={`w-10 h-10 bg-${config.color}-100 rounded-lg flex items-center justify-center`}>
+              <div
+                className={`w-10 h-10 bg-${config.color}-100 rounded-lg flex items-center justify-center`}
+              >
                 <Icon className={`w-5 h-5 text-${config.color}-600`} />
               </div>
               <div>
@@ -147,7 +158,7 @@ const AnalysisModule = ({
               max={5}
               step={0.1}
               suffix="%"
-              onChange={(value) => handleInputChange('terminalGrowthRate', value / 100)}
+              onChange={value => handleInputChange('terminalGrowthRate', value / 100)}
             />
             <InteractiveSlider
               label="Discount Rate (WACC)"
@@ -156,7 +167,7 @@ const AnalysisModule = ({
               max={20}
               step={0.1}
               suffix="%"
-              onChange={(value) => handleInputChange('discountRate', value / 100)}
+              onChange={value => handleInputChange('discountRate', value / 100)}
             />
           </div>
 
@@ -193,7 +204,7 @@ const AnalysisModule = ({
                   <XAxis dataKey="year" tick={{ fontSize: 10 }} />
                   <YAxis tick={{ fontSize: 10 }} />
                   <Tooltip
-                    formatter={(value) => [`$${value.toFixed(0)}M`, 'FCF']}
+                    formatter={value => [`$${value.toFixed(0)}M`, 'FCF']}
                     labelStyle={{ color: '#374151' }}
                   />
                 </LineChart>
@@ -220,7 +231,7 @@ const AnalysisModule = ({
                 max={1e12}
                 step={1e6}
                 suffix=""
-                onChange={(value) => handleInputChange('currentRevenue', value)}
+                onChange={value => handleInputChange('currentRevenue', value)}
               />
               <InteractiveSlider
                 label="Terminal Growth Rate"
@@ -229,7 +240,7 @@ const AnalysisModule = ({
                 max={5}
                 step={0.1}
                 suffix="%"
-                onChange={(value) => handleInputChange('terminalGrowthRate', value / 100)}
+                onChange={value => handleInputChange('terminalGrowthRate', value / 100)}
               />
               <InteractiveSlider
                 label="Discount Rate (WACC)"
@@ -238,7 +249,7 @@ const AnalysisModule = ({
                 max={20}
                 step={0.1}
                 suffix="%"
-                onChange={(value) => handleInputChange('discountRate', value / 100)}
+                onChange={value => handleInputChange('discountRate', value / 100)}
               />
             </div>
 
@@ -250,7 +261,7 @@ const AnalysisModule = ({
                 max={10}
                 step={1}
                 suffix=" years"
-                onChange={(value) => handleInputChange('projectionYears', value)}
+                onChange={value => handleInputChange('projectionYears', value)}
               />
 
               {/* Year 1 Quick Adjustments */}
@@ -264,7 +275,7 @@ const AnalysisModule = ({
                     max={50}
                     step={0.5}
                     suffix="%"
-                    onChange={(value) => handleYearlyInputChange(1, 'revenueGrowth', value)}
+                    onChange={value => handleYearlyInputChange(1, 'revenueGrowth', value)}
                   />
                   <InteractiveSlider
                     label="EBITDA Margin"
@@ -273,7 +284,7 @@ const AnalysisModule = ({
                     max={50}
                     step={0.5}
                     suffix="%"
-                    onChange={(value) => handleYearlyInputChange(1, 'ebitdaMargin', value)}
+                    onChange={value => handleYearlyInputChange(1, 'ebitdaMargin', value)}
                   />
                 </div>
               </div>
@@ -347,7 +358,7 @@ const AnalysisModule = ({
                         axisLine={false}
                         tickLine={false}
                         tick={{ fontSize: 12, fill: '#64748b' }}
-                        tickFormatter={(value) => `$${value}M`}
+                        tickFormatter={value => `$${value}M`}
                       />
                       <Tooltip
                         formatter={(value, name) => [

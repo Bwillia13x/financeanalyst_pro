@@ -68,9 +68,7 @@ describe('Financial Modeling Engine', () => {
       );
 
       // Bear case should have lower valuation than base case
-      expect(dcfModel.scenarios.bear.pricePerShare).toBeLessThan(
-        dcfModel.baseCase.pricePerShare
-      );
+      expect(dcfModel.scenarios.bear.pricePerShare).toBeLessThan(dcfModel.baseCase.pricePerShare);
     });
 
     it('should perform sensitivity analysis', () => {
@@ -95,7 +93,14 @@ describe('Financial Modeling Engine', () => {
       expect(dcfModel.summary.recommendation).toHaveProperty('reasoning');
 
       // Rating should be one of the valid options
-      const validRatings = ['STRONG_BUY', 'BUY', 'HOLD', 'SELL', 'STRONG_SELL', 'INSUFFICIENT_DATA'];
+      const validRatings = [
+        'STRONG_BUY',
+        'BUY',
+        'HOLD',
+        'SELL',
+        'STRONG_SELL',
+        'INSUFFICIENT_DATA'
+      ];
       expect(validRatings).toContain(dcfModel.summary.recommendation.rating);
 
       // Confidence should be between 0 and 100
@@ -114,7 +119,8 @@ describe('Financial Modeling Engine', () => {
         discountRate
       );
 
-      const expectedTerminalValue = (finalFCF * (1 + terminalGrowthRate)) / (discountRate - terminalGrowthRate);
+      const expectedTerminalValue =
+        (finalFCF * (1 + terminalGrowthRate)) / (discountRate - terminalGrowthRate);
       expect(terminalValue).toBeCloseTo(expectedTerminalValue, 2);
     });
 
@@ -266,7 +272,9 @@ describe('Financial Modeling Engine', () => {
     });
 
     it('should generate triangular random variables', () => {
-      const min = 0, mode = 0.5, max = 1;
+      const min = 0,
+        mode = 0.5,
+        max = 1;
       const samples = [];
 
       for (let i = 0; i < 1000; i++) {

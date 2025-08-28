@@ -53,7 +53,8 @@ const DCFCalculator = {
     // Add warnings for edge cases
     if (ev < 0) warnings.push('Negative enterprise value - check assumptions');
     if (perShare < 0) warnings.push('Negative per-share value - high net debt relative to EV');
-    if (tv / ev > 0.8) warnings.push('Terminal value >80% of EV - consider longer projection period');
+    if (tv / ev > 0.8)
+      warnings.push('Terminal value >80% of EV - consider longer projection period');
 
     return { ev, perShare, warnings };
   },
@@ -63,18 +64,50 @@ const DCFCalculator = {
     const a = assumptions;
 
     // Required fields
-    if (!a.rev0 || a.rev0 <= 0) issues.push({ field: 'rev0', level: 'error', message: 'Revenue must be positive' });
-    if (!a.shares || a.shares <= 0) issues.push({ field: 'shares', level: 'error', message: 'Shares outstanding must be positive' });
+    if (!a.rev0 || a.rev0 <= 0)
+      issues.push({ field: 'rev0', level: 'error', message: 'Revenue must be positive' });
+    if (!a.shares || a.shares <= 0)
+      issues.push({
+        field: 'shares',
+        level: 'error',
+        message: 'Shares outstanding must be positive'
+      });
 
     // Range validations
-    if (a.margin < 0 || a.margin > 0.6) issues.push({ field: 'margin', level: 'warn', message: 'EBIT margin outside typical range (0-60%)' });
-    if (a.tax < 0 || a.tax > 0.6) issues.push({ field: 'tax', level: 'warn', message: 'Tax rate outside typical range (0-60%)' });
-    if (a.wacc < 0.02 || a.wacc > 0.25) issues.push({ field: 'wacc', level: 'warn', message: 'WACC outside typical range (2-25%)' });
-    if (a.g < -0.2 || a.g > 0.2) issues.push({ field: 'g', level: 'warn', message: 'Growth rate outside typical range (-20% to +20%)' });
-    if (a.tg < -0.02 || a.tg > 0.05) issues.push({ field: 'tg', level: 'warn', message: 'Terminal growth outside typical range (-2% to +5%)' });
+    if (a.margin < 0 || a.margin > 0.6)
+      issues.push({
+        field: 'margin',
+        level: 'warn',
+        message: 'EBIT margin outside typical range (0-60%)'
+      });
+    if (a.tax < 0 || a.tax > 0.6)
+      issues.push({
+        field: 'tax',
+        level: 'warn',
+        message: 'Tax rate outside typical range (0-60%)'
+      });
+    if (a.wacc < 0.02 || a.wacc > 0.25)
+      issues.push({ field: 'wacc', level: 'warn', message: 'WACC outside typical range (2-25%)' });
+    if (a.g < -0.2 || a.g > 0.2)
+      issues.push({
+        field: 'g',
+        level: 'warn',
+        message: 'Growth rate outside typical range (-20% to +20%)'
+      });
+    if (a.tg < -0.02 || a.tg > 0.05)
+      issues.push({
+        field: 'tg',
+        level: 'warn',
+        message: 'Terminal growth outside typical range (-2% to +5%)'
+      });
 
     // Domain rules
-    if (a.wacc <= a.tg) issues.push({ field: 'wacc', level: 'error', message: 'WACC must be greater than terminal growth rate' });
+    if (a.wacc <= a.tg)
+      issues.push({
+        field: 'wacc',
+        level: 'error',
+        message: 'WACC must be greater than terminal growth rate'
+      });
 
     return issues;
   }
@@ -114,11 +147,23 @@ const CompsCalculator = {
     const issues = [];
     const a = assumptions;
 
-    if (!a.metric || a.metric <= 0) issues.push({ field: 'metric', level: 'error', message: 'Metric must be positive' });
-    if (!a.multiple || a.multiple <= 0) issues.push({ field: 'multiple', level: 'error', message: 'Multiple must be positive' });
-    if (!a.shares || a.shares <= 0) issues.push({ field: 'shares', level: 'error', message: 'Shares outstanding must be positive' });
+    if (!a.metric || a.metric <= 0)
+      issues.push({ field: 'metric', level: 'error', message: 'Metric must be positive' });
+    if (!a.multiple || a.multiple <= 0)
+      issues.push({ field: 'multiple', level: 'error', message: 'Multiple must be positive' });
+    if (!a.shares || a.shares <= 0)
+      issues.push({
+        field: 'shares',
+        level: 'error',
+        message: 'Shares outstanding must be positive'
+      });
 
-    if (a.multiple < 2 || a.multiple > 40) issues.push({ field: 'multiple', level: 'warn', message: 'Multiple outside typical range (2x-40x)' });
+    if (a.multiple < 2 || a.multiple > 40)
+      issues.push({
+        field: 'multiple',
+        level: 'warn',
+        message: 'Multiple outside typical range (2x-40x)'
+      });
 
     return issues;
   }
@@ -160,11 +205,23 @@ const EPVCalculator = {
     const issues = [];
     const a = assumptions;
 
-    if (!a.ebit || a.ebit <= 0) issues.push({ field: 'ebit', level: 'error', message: 'EBIT must be positive' });
-    if (!a.shares || a.shares <= 0) issues.push({ field: 'shares', level: 'error', message: 'Shares outstanding must be positive' });
+    if (!a.ebit || a.ebit <= 0)
+      issues.push({ field: 'ebit', level: 'error', message: 'EBIT must be positive' });
+    if (!a.shares || a.shares <= 0)
+      issues.push({
+        field: 'shares',
+        level: 'error',
+        message: 'Shares outstanding must be positive'
+      });
 
-    if (a.tax < 0 || a.tax > 0.6) issues.push({ field: 'tax', level: 'warn', message: 'Tax rate outside typical range (0-60%)' });
-    if (a.wacc < 0.02 || a.wacc > 0.25) issues.push({ field: 'wacc', level: 'warn', message: 'WACC outside typical range (2-25%)' });
+    if (a.tax < 0 || a.tax > 0.6)
+      issues.push({
+        field: 'tax',
+        level: 'warn',
+        message: 'Tax rate outside typical range (0-60%)'
+      });
+    if (a.wacc < 0.02 || a.wacc > 0.25)
+      issues.push({ field: 'wacc', level: 'warn', message: 'WACC outside typical range (2-25%)' });
 
     return issues;
   }
@@ -212,7 +269,8 @@ const LBOCalculator = {
     // Warnings
     if (irr < 0.15) warnings.push('IRR below typical PE target (15%+)');
     if (debtPct > 0.7) warnings.push('High leverage ratio may increase risk');
-    if (entryX > exitX + 2) warnings.push('Entry multiple significantly higher than exit - check assumptions');
+    if (entryX > exitX + 2)
+      warnings.push('Entry multiple significantly higher than exit - check assumptions');
 
     return { irr, warnings };
   },
@@ -221,16 +279,40 @@ const LBOCalculator = {
     const issues = [];
     const a = assumptions;
 
-    if (!a.ebitda || a.ebitda <= 0) issues.push({ field: 'ebitda', level: 'error', message: 'EBITDA must be positive' });
-    if (!a.entryX || a.entryX <= 0) issues.push({ field: 'entryX', level: 'error', message: 'Entry multiple must be positive' });
-    if (!a.exitX || a.exitX <= 0) issues.push({ field: 'exitX', level: 'error', message: 'Exit multiple must be positive' });
+    if (!a.ebitda || a.ebitda <= 0)
+      issues.push({ field: 'ebitda', level: 'error', message: 'EBITDA must be positive' });
+    if (!a.entryX || a.entryX <= 0)
+      issues.push({ field: 'entryX', level: 'error', message: 'Entry multiple must be positive' });
+    if (!a.exitX || a.exitX <= 0)
+      issues.push({ field: 'exitX', level: 'error', message: 'Exit multiple must be positive' });
 
-    if (a.debtPct < 0 || a.debtPct > 0.9) issues.push({ field: 'debtPct', level: 'error', message: 'Debt percentage must be between 0-90%' });
-    if (a.years < 1 || a.years > 10) issues.push({ field: 'years', level: 'error', message: 'Hold period must be 1-10 years' });
+    if (a.debtPct < 0 || a.debtPct > 0.9)
+      issues.push({
+        field: 'debtPct',
+        level: 'error',
+        message: 'Debt percentage must be between 0-90%'
+      });
+    if (a.years < 1 || a.years > 10)
+      issues.push({ field: 'years', level: 'error', message: 'Hold period must be 1-10 years' });
 
-    if (a.entryX < 2 || a.entryX > 30) issues.push({ field: 'entryX', level: 'warn', message: 'Entry multiple outside typical range (2x-30x)' });
-    if (a.exitX < 2 || a.exitX > 30) issues.push({ field: 'exitX', level: 'warn', message: 'Exit multiple outside typical range (2x-30x)' });
-    if (a.ebitdaCAGR < -0.3 || a.ebitdaCAGR > 0.5) issues.push({ field: 'ebitdaCAGR', level: 'warn', message: 'EBITDA growth outside typical range (-30% to +50%)' });
+    if (a.entryX < 2 || a.entryX > 30)
+      issues.push({
+        field: 'entryX',
+        level: 'warn',
+        message: 'Entry multiple outside typical range (2x-30x)'
+      });
+    if (a.exitX < 2 || a.exitX > 30)
+      issues.push({
+        field: 'exitX',
+        level: 'warn',
+        message: 'Exit multiple outside typical range (2x-30x)'
+      });
+    if (a.ebitdaCAGR < -0.3 || a.ebitdaCAGR > 0.5)
+      issues.push({
+        field: 'ebitdaCAGR',
+        level: 'warn',
+        message: 'EBITDA growth outside typical range (-30% to +50%)'
+      });
 
     return issues;
   }

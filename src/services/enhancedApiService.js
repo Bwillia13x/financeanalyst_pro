@@ -13,7 +13,7 @@ class RateLimiter {
     const now = Date.now();
 
     this.requestTimestamps = this.requestTimestamps.filter(
-      (timestamp) => now - timestamp < this.interval
+      timestamp => now - timestamp < this.interval
     );
 
     if (this.requestTimestamps.length >= this.requestsPerInterval) {
@@ -42,6 +42,9 @@ class EnhancedApiService {
     this.initializeSecureClient();
     this.initializeSourceHealth();
     this.rateLimiters.set('default', new RateLimiter(5, 1000));
+
+    // Ensure baseUrl is properly initialized
+    this.baseUrl = this.baseUrl || 'http://localhost:3001/api';
   }
 
   /**
@@ -58,7 +61,15 @@ class EnhancedApiService {
    * Initialize health tracking for all data sources
    */
   initializeSourceHealth() {
-    const sources = ['BACKEND_PROXY', 'ALPHA_VANTAGE', 'FMP', 'YAHOO_FINANCE', 'SEC_EDGAR', 'QUANDL', 'FRED'];
+    const sources = [
+      'BACKEND_PROXY',
+      'ALPHA_VANTAGE',
+      'FMP',
+      'YAHOO_FINANCE',
+      'SEC_EDGAR',
+      'QUANDL',
+      'FRED'
+    ];
 
     sources.forEach(source => {
       this.sourceHealth.set(source, {
@@ -115,7 +126,10 @@ class EnhancedApiService {
       return data;
     } catch (error) {
       this.updateSourceHealth('BACKEND_PROXY', false, Date.now() - t0, error);
-      apiLogger.log('ERROR', 'Failed to fetch real-time market data', { symbol, error: error.message });
+      apiLogger.log('ERROR', 'Failed to fetch real-time market data', {
+        symbol,
+        error: error.message
+      });
       throw error;
     }
   }
@@ -133,7 +147,9 @@ class EnhancedApiService {
     // Try backend proxy first
     const t0 = Date.now();
     try {
-      const backendData = await this.request(`/market-data/historical/${symbol.toUpperCase()}?${qs}`);
+      const backendData = await this.request(
+        `/market-data/historical/${symbol.toUpperCase()}?${qs}`
+      );
       const result = {
         ...(typeof backendData === 'object' ? backendData : { data: backendData }),
         symbol: backendData?.symbol || symbol.toUpperCase(),
@@ -145,7 +161,9 @@ class EnhancedApiService {
       return result;
     } catch (backendError) {
       this.updateSourceHealth('BACKEND_PROXY', false, Date.now() - t0, backendError);
-      apiLogger.log('WARN', 'Backend historical data failed, falling back to direct sources', { error: backendError.message });
+      apiLogger.log('WARN', 'Backend historical data failed, falling back to direct sources', {
+        error: backendError.message
+      });
     }
     // Fallback to Yahoo Finance
     try {
@@ -170,7 +188,9 @@ class EnhancedApiService {
       };
     } catch (yahooError) {
       this.updateSourceHealth('YAHOO_FINANCE', false, Date.now(), yahooError);
-      apiLogger.log('WARN', 'Yahoo Finance historical fallback failed, trying Alpha Vantage', { error: yahooError.message });
+      apiLogger.log('WARN', 'Yahoo Finance historical fallback failed, trying Alpha Vantage', {
+        error: yahooError.message
+      });
     }
     // Fallback to Alpha Vantage (daily adjusted)
     try {
@@ -223,12 +243,17 @@ class EnhancedApiService {
       return result;
     } catch (backendError) {
       this.updateSourceHealth('BACKEND_PROXY', false, Date.now() - t0, backendError);
-      apiLogger.log('WARN', 'Backend intraday data failed, falling back to direct sources', { error: backendError.message });
+      apiLogger.log('WARN', 'Backend intraday data failed, falling back to direct sources', {
+        error: backendError.message
+      });
     }
     // Fallback to Yahoo Finance (use 1d range)
     try {
       const range = '1d';
-      const yf = await this.fetchFromYahooFinance(symbol, { range, interval: interval.replace('min', 'm') });
+      const yf = await this.fetchFromYahooFinance(symbol, {
+        range,
+        interval: interval.replace('min', 'm')
+      });
       const timestamps = yf.timestamp || [];
       const quote = yf.indicators?.quote?.[0] || {};
       const data = timestamps.map((t, i) => ({
@@ -249,11 +274,15 @@ class EnhancedApiService {
       };
     } catch (yahooError) {
       this.updateSourceHealth('YAHOO_FINANCE', false, Date.now(), yahooError);
-      apiLogger.log('WARN', 'Yahoo Finance intraday fallback failed, trying Alpha Vantage', { error: yahooError.message });
+      apiLogger.log('WARN', 'Yahoo Finance intraday fallback failed, trying Alpha Vantage', {
+        error: yahooError.message
+      });
     }
     // Fallback to Alpha Vantage intraday
     try {
-      const av = await this.fetchFromAlphaVantage(symbol, 'TIME_SERIES_INTRADAY', { params: { interval } });
+      const av = await this.fetchFromAlphaVantage(symbol, 'TIME_SERIES_INTRADAY', {
+        params: { interval }
+      });
       const seriesKey = Object.keys(av).find(k => k.startsWith('Time Series'));
       const series = av[seriesKey];
       if (!series) throw new Error('Alpha Vantage intraday series missing');
@@ -330,7 +359,9 @@ class EnhancedApiService {
       throw new Error('Alpha Vantage API key not available');
     }
 
-    const config = this.apiConfigs?.ALPHA_VANTAGE || { baseURL: 'https://www.alphavantage.co/query' };
+    const config = this.apiConfigs?.ALPHA_VANTAGE || {
+      baseURL: 'https://www.alphavantage.co/query'
+    };
 
     const params = {
       function: functionName,
@@ -381,7 +412,7 @@ class EnhancedApiService {
       { key: 'peers', method: 'getPeerCompanies' }
     ];
 
-    const promises = dataTypes.map(async({ key, method }) => {
+    const promises = dataTypes.map(async ({ key, method }) => {
       try {
         results[key] = await this.client[method](symbol);
       } catch (error) {
@@ -426,13 +457,15 @@ class EnhancedApiService {
   normalizeYahooData(data) {
     const meta = data.meta;
     const quote = data.indicators?.quote?.[0];
-    const latest = quote ? {
-      open: quote.open[quote.open.length - 1],
-      high: quote.high[quote.high.length - 1],
-      low: quote.low[quote.low.length - 1],
-      close: quote.close[quote.close.length - 1],
-      volume: quote.volume[quote.volume.length - 1]
-    } : {};
+    const latest = quote
+      ? {
+          open: quote.open[quote.open.length - 1],
+          high: quote.high[quote.high.length - 1],
+          low: quote.low[quote.low.length - 1],
+          close: quote.close[quote.close.length - 1],
+          volume: quote.volume[quote.volume.length - 1]
+        }
+      : {};
 
     return {
       symbol: meta.symbol,

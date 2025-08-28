@@ -1,8 +1,8 @@
-import React from 'react';
+import { Component } from 'react';
 
 import Icon from './AppIcon';
 
-class ErrorBoundary extends React.Component {
+class _ErrorBoundaryLegacy extends Component {
   constructor(props) {
     super(props);
     this.state = { hasError: false };
@@ -13,22 +13,24 @@ class ErrorBoundary extends React.Component {
   }
 
   componentDidCatch(error, errorInfo) {
+    // Ensure state reflects error synchronously to render fallback deterministically
+    this.setState({ hasError: true });
+
     error.__ErrorBoundary = true;
     window.__COMPONENT_ERROR__?.(error, errorInfo);
 
     // Report to monitoring/Sentry only if not in automated test environment
     try {
-      const isAutomatedEnv = (
+      const isAutomatedEnv =
         navigator.webdriver === true ||
         new URLSearchParams(window.location.search).has('lhci') ||
         new URLSearchParams(window.location.search).has('ci') ||
-        new URLSearchParams(window.location.search).has('audit')
-      );
+        new URLSearchParams(window.location.search).has('audit');
 
       if (!isAutomatedEnv) {
         // Dynamically import monitoring to avoid side effects during tests
         import('../utils/monitoring')
-          .then((mod) => {
+          .then(mod => {
             if (mod?.default?.trackError) {
               mod.default.trackError(error, 'react_error', {
                 componentStack: errorInfo?.componentStack
@@ -42,13 +44,20 @@ class ErrorBoundary extends React.Component {
     } catch (_) {
       // noop
     }
+    // Ensure fallback is displayed even if getDerivedStateFromError isn't triggered in some edge cases
+    this.setState({ hasError: true });
     // console.log("Error caught by ErrorBoundary:", error, errorInfo);
   }
 
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen flex items-center justify-center bg-neutral-50">
+        <div
+          className="min-h-screen flex items-center justify-center bg-neutral-50"
+          role="alert"
+          aria-live="assertive"
+          data-testid="app-error-fallback"
+        >
           <div className="text-center p-8 max-w-md">
             <div className="flex justify-center items-center mb-2">
               <svg
@@ -107,4 +116,4 @@ class ErrorBoundary extends React.Component {
   }
 }
 
-export default ErrorBoundary;
+export { default } from './ui/ErrorBoundary';

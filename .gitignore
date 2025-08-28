@@ -9,3 +9,22 @@ vite.config.*s.*
 
 # Local Netlify folder
 .netlify
+
+# Production artifacts
+dist/
+coverage/
+playwright-report/
+test-results/
+.npm-cache/
+
+# Logs and reports
+frontend_server.log
+backend_server.log
+eslint-full-output.txt
+bundle-report.json
+
+# Secrets (do not commit)
+.env
+.env.*
+backend/.env
+backend/.env.*

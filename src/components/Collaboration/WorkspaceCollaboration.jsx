@@ -21,12 +21,7 @@ import Button from '../ui/Button';
  * Supports live sharing, real-time cursors, annotations, and multi-user editing
  */
 
-const WorkspaceCollaboration = ({
-  workspaceId,
-  modelData,
-  onModelUpdate,
-  className = ''
-}) => {
+const WorkspaceCollaboration = ({ workspaceId, modelData, onModelUpdate, className = '' }) => {
   const [_workspace, setWorkspace] = useState(null);
   const [members, setMembers] = useState([]);
   const [annotations, setAnnotations] = useState([]);
@@ -45,7 +40,7 @@ const WorkspaceCollaboration = ({
 
   useEffect(() => {
     // Initialize collaboration service
-    const initializeCollaboration = async() => {
+    const initializeCollaboration = async () => {
       try {
         await collaborationService.initialize('current-user-id', {
           name: 'Current User',
@@ -62,14 +57,13 @@ const WorkspaceCollaboration = ({
         // Load initial data
         setMembers(collaborationService.getWorkspaceMembers(workspaceId));
         setAnnotations(collaborationService.getModelAnnotations(workspaceId, 'main-model'));
-
       } catch (error) {
         console.error('Failed to initialize collaboration:', error);
       }
     };
 
     // Event listeners
-    const handleConnectionStatus = (status) => setConnectionStatus(status);
+    const handleConnectionStatus = status => setConnectionStatus(status);
     const handleUserJoined = ({ user }) => {
       setMembers(prev => [...prev.filter(m => m.id !== user.id), user]);
     };
@@ -108,7 +102,7 @@ const WorkspaceCollaboration = ({
 
   // Track cursor movement
   useEffect(() => {
-    const handleMouseMove = (e) => {
+    const handleMouseMove = e => {
       const rect = cursorRef.current?.getBoundingClientRect();
       if (rect) {
         const position = {
@@ -127,21 +121,16 @@ const WorkspaceCollaboration = ({
     }
   }, [workspaceId]);
 
-  const handleShareModel = async() => {
+  const handleShareModel = async () => {
     try {
-      await collaborationService.shareModel(
-        workspaceId,
-        'main-model',
-        modelData,
-        sharePermissions
-      );
+      await collaborationService.shareModel(workspaceId, 'main-model', modelData, sharePermissions);
       setShowShareModal(false);
     } catch (error) {
       console.error('Failed to share model:', error);
     }
   };
 
-  const _handleAddAnnotation = async(position, content) => {
+  const _handleAddAnnotation = async (position, content) => {
     try {
       await collaborationService.addAnnotation(workspaceId, 'main-model', {
         content,
@@ -238,7 +227,7 @@ const WorkspaceCollaboration = ({
 
         {/* Annotations */}
         <AnimatePresence>
-          {annotations.map((annotation) => (
+          {annotations.map(annotation => (
             <motion.div
               key={annotation.id}
               initial={{ opacity: 0, scale: 0.8 }}
@@ -274,7 +263,7 @@ const WorkspaceCollaboration = ({
             Recent Activity
           </h4>
           <div className="space-y-2">
-            {members.slice(0, 3).map((member) => (
+            {members.slice(0, 3).map(member => (
               <div key={member.id} className="flex items-center space-x-3 text-sm">
                 <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
                   <span className="text-blue-600 dark:text-blue-400 font-medium">
@@ -309,7 +298,7 @@ const WorkspaceCollaboration = ({
               Workspace Members
             </h4>
             <div className="space-y-2">
-              {members.map((member) => (
+              {members.map(member => (
                 <div key={member.id} className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
                     <div className="w-8 h-8 bg-slate-100 dark:bg-slate-700 rounded-full flex items-center justify-center">
@@ -326,9 +315,7 @@ const WorkspaceCollaboration = ({
                       </div>
                     </div>
                   </div>
-                  {member.role === 'owner' && (
-                    <Crown className="w-4 h-4 text-yellow-500" />
-                  )}
+                  {member.role === 'owner' && <Crown className="w-4 h-4 text-yellow-500" />}
                 </div>
               ))}
             </div>
@@ -353,7 +340,10 @@ const WorkspaceCollaboration = ({
 
                 {/* Share Link */}
                 <div className="mb-4">
-                  <label htmlFor="share-link" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                  <label
+                    htmlFor="share-link"
+                    className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
+                  >
                     Share Link
                   </label>
                   <div className="flex items-center space-x-2">
@@ -377,7 +367,10 @@ const WorkspaceCollaboration = ({
 
                 {/* Permissions */}
                 <div className="mb-6">
-                  <label htmlFor="permissions" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                  <label
+                    htmlFor="permissions"
+                    className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
+                  >
                     Permissions
                   </label>
                   <div className="space-y-2">
@@ -385,7 +378,9 @@ const WorkspaceCollaboration = ({
                       <input
                         type="checkbox"
                         checked={sharePermissions.canView}
-                        onChange={(e) => setSharePermissions(prev => ({ ...prev, canView: e.target.checked }))}
+                        onChange={e =>
+                          setSharePermissions(prev => ({ ...prev, canView: e.target.checked }))
+                        }
                         className="mr-2"
                       />
                       <Eye className="w-4 h-4 mr-1" />
@@ -395,7 +390,9 @@ const WorkspaceCollaboration = ({
                       <input
                         type="checkbox"
                         checked={sharePermissions.canComment}
-                        onChange={(e) => setSharePermissions(prev => ({ ...prev, canComment: e.target.checked }))}
+                        onChange={e =>
+                          setSharePermissions(prev => ({ ...prev, canComment: e.target.checked }))
+                        }
                         className="mr-2"
                       />
                       <MessageCircle className="w-4 h-4 mr-1" />
@@ -405,7 +402,9 @@ const WorkspaceCollaboration = ({
                       <input
                         type="checkbox"
                         checked={sharePermissions.canEdit}
-                        onChange={(e) => setSharePermissions(prev => ({ ...prev, canEdit: e.target.checked }))}
+                        onChange={e =>
+                          setSharePermissions(prev => ({ ...prev, canEdit: e.target.checked }))
+                        }
                         className="mr-2"
                       />
                       <Edit3 className="w-4 h-4 mr-1" />
@@ -416,16 +415,10 @@ const WorkspaceCollaboration = ({
 
                 {/* Actions */}
                 <div className="flex justify-end space-x-2">
-                  <Button
-                    variant="outline"
-                    onClick={() => setShowShareModal(false)}
-                  >
+                  <Button variant="outline" onClick={() => setShowShareModal(false)}>
                     Cancel
                   </Button>
-                  <Button
-                    variant="primary"
-                    onClick={handleShareModel}
-                  >
+                  <Button variant="primary" onClick={handleShareModel}>
                     Share Model
                   </Button>
                 </div>

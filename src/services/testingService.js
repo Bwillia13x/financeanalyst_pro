@@ -145,18 +145,18 @@ class TestingService {
     this.mockData = new Map();
     this.mockData.set('financial_statements', {
       incomeStatement: {
-        '2023': { totalRevenue: 1000000, netIncome: 100000, operatingIncome: 150000 },
-        '2022': { totalRevenue: 900000, netIncome: 90000, operatingIncome: 135000 }
+        2023: { totalRevenue: 1000000, netIncome: 100000, operatingIncome: 150000 },
+        2022: { totalRevenue: 900000, netIncome: 90000, operatingIncome: 135000 }
       },
       balanceSheet: {
-        '2023': { totalAssets: 2000000, totalLiabilities: 800000, totalEquity: 1200000 },
-        '2022': { totalAssets: 1800000, totalLiabilities: 720000, totalEquity: 1080000 }
+        2023: { totalAssets: 2000000, totalLiabilities: 800000, totalEquity: 1200000 },
+        2022: { totalAssets: 1800000, totalLiabilities: 720000, totalEquity: 1080000 }
       }
     });
 
     this.mockData.set('user_inputs', {
       valid: {
-        assumptions: { revenueGrowth: 0.05, discountRate: 0.10 },
+        assumptions: { revenueGrowth: 0.05, discountRate: 0.1 },
         timeHorizon: 5,
         currency: 'USD'
       },
@@ -211,7 +211,6 @@ class TestingService {
 
       this.testResults.set(testRun.id, testRun);
       return testRun;
-
     } catch (error) {
       testRun.status = 'error';
       testRun.error = error.message;
@@ -244,7 +243,6 @@ class TestingService {
           result.status = 'warning';
         }
       }
-
     } catch (error) {
       result.status = 'failed';
       result.error = error.message;
@@ -285,7 +283,7 @@ class TestingService {
     const mockData = this.mockData.get('financial_statements');
     const startTime = performance.now();
 
-    const assumptions = { revenueGrowthRate: 0.05, discountRate: 0.10 };
+    const assumptions = { revenueGrowthRate: 0.05, discountRate: 0.1 };
     const result = this.simulateDCFCalculation(mockData, assumptions);
 
     if (result.enterpriseValue <= 0) {
@@ -378,10 +376,10 @@ class TestingService {
     const memoryBefore = this.getMemoryUsage();
 
     for (let i = 0; i < iterations; i++) {
-      this.simulateDCFCalculation(
-        this.mockData.get('financial_statements'),
-        { revenueGrowthRate: 0.05, discountRate: 0.10 }
-      );
+      this.simulateDCFCalculation(this.mockData.get('financial_statements'), {
+        revenueGrowthRate: 0.05,
+        discountRate: 0.1
+      });
     }
 
     const duration = performance.now() - startTime;
@@ -422,7 +420,7 @@ class TestingService {
   simulateDCFCalculation(financialData, assumptions) {
     const baseRevenue = financialData.incomeStatement['2023'].totalRevenue;
     const growthRate = assumptions.revenueGrowthRate || 0.05;
-    const discountRate = assumptions.discountRate || 0.10;
+    const discountRate = assumptions.discountRate || 0.1;
 
     let presentValue = 0;
     for (let year = 1; year <= 5; year++) {
@@ -439,10 +437,12 @@ class TestingService {
 
   simulateDataValidation(data) {
     try {
-      if (typeof data.assumptions?.revenueGrowth === 'number' &&
-          typeof data.assumptions?.discountRate === 'number' &&
-          data.assumptions.discountRate > 0 &&
-          typeof data.currency === 'string') {
+      if (
+        typeof data.assumptions?.revenueGrowth === 'number' &&
+        typeof data.assumptions?.discountRate === 'number' &&
+        data.assumptions.discountRate > 0 &&
+        typeof data.currency === 'string'
+      ) {
         return { isValid: true };
       }
       return { isValid: false };
@@ -491,7 +491,8 @@ class TestingService {
     const navigation = performance.getEntriesByType('navigation')[0];
     if (navigation) {
       return {
-        domContentLoaded: navigation.domContentLoadedEventEnd - navigation.domContentLoadedEventStart,
+        domContentLoaded:
+          navigation.domContentLoadedEventEnd - navigation.domContentLoadedEventStart,
         loadComplete: navigation.loadEventEnd - navigation.loadEventStart
       };
     }
@@ -499,7 +500,7 @@ class TestingService {
   }
 
   cleanupOldMetrics() {
-    const cutoff = Date.now() - (24 * 60 * 60 * 1000);
+    const cutoff = Date.now() - 24 * 60 * 60 * 1000;
     for (const [id, metrics] of this.performanceMetrics) {
       if (new Date(metrics.timestamp).getTime() < cutoff) {
         this.performanceMetrics.delete(id);
@@ -523,7 +524,9 @@ class TestingService {
   }
 
   calculateOverallSummary(results) {
-    let totalTests = 0, totalPassed = 0, totalFailed = 0;
+    let totalTests = 0,
+      totalPassed = 0,
+      totalFailed = 0;
 
     for (const result of results.values()) {
       if (result.summary) {

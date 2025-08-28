@@ -280,10 +280,7 @@ const ResultsVisualizationPanel = ({ simulationResults, isSimulating }) => {
               fill="var(--color-background)"
               fillOpacity={1}
             />
-            <Line
-              dataKey="mean" stroke="var(--color-primary)" strokeWidth={2}
-              dot={false}
-            />
+            <Line dataKey="mean" stroke="var(--color-primary)" strokeWidth={2} dot={false} />
           </AreaChart>
         </ResponsiveContainer>
       </div>

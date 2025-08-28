@@ -5,7 +5,7 @@ const gotoPrivateAnalysis = async (page) => {
   await page.addInitScript(() => {
     try {
       localStorage.clear();
-      
+
       // Set up comprehensive error logging
       window.addEventListener('error', (event) => {
         console.error('PAGE ERROR:', {
@@ -34,7 +34,9 @@ const gotoPrivateAnalysis = async (page) => {
       console.warn = (...args) => {
         originalWarn.apply(console, ['TEST_WARN:', ...args]);
       };
-    } catch {}
+    } catch {
+      // Ignore initialization errors for test setup
+    }
   });
 
   // Listen to console events
@@ -53,14 +55,14 @@ const gotoPrivateAnalysis = async (page) => {
   });
 
   await page.goto('/private-analysis');
-  
+
   // Wait a moment for any async errors to surface
   await page.waitForTimeout(1000);
-  
+
   // Check what's actually rendered instead of the expected heading
   const bodyContent = await page.textContent('body');
   console.log('PAGE BODY CONTENT:', bodyContent.substring(0, 500) + '...');
-  
+
   await expect(page.locator('#page-title')).toBeVisible();
 };
 
@@ -79,11 +81,11 @@ const expectTourStep = async (page, { title, contentIncludes }) => {
 
 const next = async (page) => {
   const tl = tooltip(page);
-  
+
   // Try Next button first
   const nextButton = tl.getByRole('button', { name: 'Next' });
   const finishButton = tl.getByRole('button', { name: 'Finish' });
-  
+
   try {
     if (await nextButton.isVisible({ timeout: 1000 })) {
       await nextButton.click();
@@ -119,7 +121,7 @@ test.describe('Private Analysis Onboarding Tour', () => {
 
     // Quick Start modal should appear
     await expect(page.getByRole('dialog', { name: 'Welcome to Private Analysis' })).toBeVisible();
-    
+
     // Wait for the Start Tour button to be ready and click it
     const startTourButton = page.getByRole('button', { name: 'Start Tour' });
     await expect(startTourButton).toBeVisible();

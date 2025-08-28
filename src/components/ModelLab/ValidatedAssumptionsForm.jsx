@@ -7,7 +7,9 @@ const Card = ({ title, right, children, className = '' }) => (
   <section className={`rounded-2xl border border-slate-200 bg-white shadow-sm ${className}`}>
     {(title || right) && (
       <header className="flex items-center justify-between border-b border-slate-200 px-4 py-2.5">
-        {title && <h3 className="text-[13px] font-semibold tracking-wide text-slate-700">{title}</h3>}
+        {title && (
+          <h3 className="text-[13px] font-semibold tracking-wide text-slate-700">{title}</h3>
+        )}
         {right}
       </header>
     )}
@@ -24,7 +26,9 @@ const Pill = ({ children, tone = 'slate' }) => {
     red: 'bg-rose-50 text-rose-700 border-rose-200'
   };
   return (
-    <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] ${tones[tone]}`}>
+    <span
+      className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] ${tones[tone]}`}
+    >
       {children}
     </span>
   );
@@ -57,7 +61,7 @@ function ValidatedNumberInput({
     setLocalValue(value);
   }, [value]);
 
-  const handleChange = (e) => {
+  const handleChange = e => {
     const newValue = parseFloat(e.target.value || '0');
     setLocalValue(newValue);
     const clampedValue = clamp(newValue, min ?? -Infinity, max ?? Infinity);
@@ -89,9 +93,13 @@ function ValidatedNumberInput({
             <input
               type="number"
               className={`w-32 rounded-md border px-2 py-1 text-right transition-colors
-                ${hasError ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-200' :
-      hasWarning ? 'border-amber-300 bg-amber-50 focus:border-amber-500 focus:ring-amber-200' :
-        'border-slate-300 bg-white focus:border-blue-500 focus:ring-blue-200'}
+                ${
+                  hasError
+                    ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-200'
+                    : hasWarning
+                      ? 'border-amber-300 bg-amber-50 focus:border-amber-500 focus:ring-amber-200'
+                      : 'border-slate-300 bg-white focus:border-blue-500 focus:ring-blue-200'
+                }
                 ${isFocused ? 'ring-2' : ''}
               `}
               value={Number((localValue ?? 0).toFixed(6))}
@@ -101,7 +109,7 @@ function ValidatedNumberInput({
               onChange={handleChange}
               onFocus={handleFocus}
               onBlur={handleBlur}
-              onKeyDown={(e) => {
+              onKeyDown={e => {
                 if (e.shiftKey && e.key === 'ArrowUp') {
                   e.preventDefault();
                   onChange(clamp((value || 0) + step * 10, min ?? -Infinity, max ?? Infinity));
@@ -133,7 +141,10 @@ function ValidatedNumberInput({
       {issues.length > 0 && isFocused && (
         <div className="absolute z-10 mt-1 p-2 bg-white border rounded-md shadow-lg text-[11px] min-w-48">
           {issues.map((issue, idx) => (
-            <div key={idx} className={`${issue.level === 'error' ? 'text-red-700' : 'text-amber-700'}`}>
+            <div
+              key={idx}
+              className={`${issue.level === 'error' ? 'text-red-700' : 'text-amber-700'}`}
+            >
               {issue.message}
             </div>
           ))}
@@ -181,10 +192,13 @@ const ValidatedAssumptionsForm = ({
     return () => clearTimeout(timeout);
   }, [model.assumptions, autoSave, dirtyFields.size]);
 
-  const set = useCallback((key) => (value) => {
-    setDirtyFields(prev => new Set(prev).add(key));
-    onChange({ ...model.assumptions, [key]: value });
-  }, [model.assumptions, onChange]);
+  const set = useCallback(
+    key => value => {
+      setDirtyFields(prev => new Set(prev).add(key));
+      onChange({ ...model.assumptions, [key]: value });
+    },
+    [model.assumptions, onChange]
+  );
 
   // Derived hints calculation
   const derivedHints = useMemo(() => {
@@ -207,7 +221,7 @@ const ValidatedAssumptionsForm = ({
     }
 
     if (model.outputs?.perShare && a.price) {
-      const mos = ((model.outputs.perShare - a.price) / a.price * 100);
+      const mos = ((model.outputs.perShare - a.price) / a.price) * 100;
       hints.push(`MOS: ${mos > 0 ? '+' : ''}${mos.toFixed(1)}%`);
     }
 
@@ -229,8 +243,12 @@ const ValidatedAssumptionsForm = ({
       right={
         <div className="flex items-center gap-2">
           <Pill tone="slate">Schema‑driven</Pill>
-          {validationSummary.errors > 0 && <Pill tone="red">{validationSummary.errors} errors</Pill>}
-          {validationSummary.warnings > 0 && <Pill tone="amber">{validationSummary.warnings} warnings</Pill>}
+          {validationSummary.errors > 0 && (
+            <Pill tone="red">{validationSummary.errors} errors</Pill>
+          )}
+          {validationSummary.warnings > 0 && (
+            <Pill tone="amber">{validationSummary.warnings} warnings</Pill>
+          )}
           {dirtyFields.size > 0 && <Pill tone="blue">Unsaved</Pill>}
         </div>
       }
@@ -241,9 +259,7 @@ const ValidatedAssumptionsForm = ({
           <div className="text-[13px] font-medium text-red-800 mb-1">
             {validationSummary.errors} validation error(s) found
           </div>
-          <div className="text-[12px] text-red-700">
-            Fix errors to enable calculations
-          </div>
+          <div className="text-[12px] text-red-700">Fix errors to enable calculations</div>
         </div>
       )}
 
@@ -283,10 +299,12 @@ const ValidatedAssumptionsForm = ({
                 <select
                   className="rounded-md border border-slate-300 bg-white px-2 py-1"
                   value={model.assumptions[f.key] || ''}
-                  onChange={(e) => set(f.key)(e.target.value)}
+                  onChange={e => set(f.key)(e.target.value)}
                 >
                   {(f.options || []).map(opt => (
-                    <option key={opt} value={opt}>{opt}</option>
+                    <option key={opt} value={opt}>
+                      {opt}
+                    </option>
                   ))}
                 </select>
               </label>
@@ -312,9 +330,11 @@ const ValidatedAssumptionsForm = ({
       {/* Auto-save status */}
       {autoSave && (
         <div className="mt-3 text-[11px] text-slate-500">
-          {dirtyFields.size > 0 ? 'Auto-saving...' :
-            lastSaved ? `Last saved: ${lastSaved.toLocaleTimeString()}` :
-              'All changes saved'}
+          {dirtyFields.size > 0
+            ? 'Auto-saving...'
+            : lastSaved
+              ? `Last saved: ${lastSaved.toLocaleTimeString()}`
+              : 'All changes saved'}
         </div>
       )}
     </Card>

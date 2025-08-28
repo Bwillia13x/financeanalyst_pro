@@ -5,7 +5,9 @@ const Card = ({ title, right, children, className = '' }) => (
   <section className={`rounded-2xl border border-slate-200 bg-white shadow-sm ${className}`}>
     {(title || right) && (
       <header className="flex items-center justify-between border-b border-slate-200 px-4 py-2.5">
-        {title && <h3 className="text-[13px] font-semibold tracking-wide text-slate-700">{title}</h3>}
+        {title && (
+          <h3 className="text-[13px] font-semibold tracking-wide text-slate-700">{title}</h3>
+        )}
         {right}
       </header>
     )}
@@ -23,7 +25,9 @@ const Pill = ({ children, tone = 'slate' }) => {
     purple: 'bg-purple-50 text-purple-700 border-purple-200'
   };
   return (
-    <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] ${tones[tone]}`}>
+    <span
+      className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] ${tones[tone]}`}
+    >
       {children}
     </span>
   );
@@ -51,11 +55,15 @@ const HandoffOption = ({
     <div className="flex items-start gap-3">
       <div
         className={`p-2 rounded-lg ${
-          tone === 'blue' ? 'bg-blue-100 text-blue-600' :
-            tone === 'green' ? 'bg-emerald-100 text-emerald-600' :
-              tone === 'purple' ? 'bg-purple-100 text-purple-600' :
-                tone === 'amber' ? 'bg-amber-100 text-amber-600' :
-                  'bg-slate-100 text-slate-600'
+          tone === 'blue'
+            ? 'bg-blue-100 text-blue-600'
+            : tone === 'green'
+              ? 'bg-emerald-100 text-emerald-600'
+              : tone === 'purple'
+                ? 'bg-purple-100 text-purple-600'
+                : tone === 'amber'
+                  ? 'bg-amber-100 text-amber-600'
+                  : 'bg-slate-100 text-slate-600'
         }`}
       >
         <Icon className="w-4 h-4" />
@@ -75,7 +83,9 @@ const HandoffOption = ({
 
         <div className="flex flex-wrap gap-1">
           {modelCompatibility.map(model => (
-            <Pill key={model} tone="slate" size="xs">{model}</Pill>
+            <Pill key={model} tone="slate" size="xs">
+              {model}
+            </Pill>
           ))}
         </div>
       </div>
@@ -163,11 +173,11 @@ const ValuationHandoff = ({ model, onHandoff }) => {
     }
   ];
 
-  const availableOptions = handoffOptions.filter(option =>
-    !option.disabled && option.modelCompatibility.includes(model?.kind)
+  const availableOptions = handoffOptions.filter(
+    option => !option.disabled && option.modelCompatibility.includes(model?.kind)
   );
 
-  const handleHandoff = (option) => {
+  const handleHandoff = option => {
     if (!model) return;
 
     const handoffData = {
@@ -205,9 +215,11 @@ const ValuationHandoff = ({ model, onHandoff }) => {
     if (!value || value === 0) return '—';
 
     if (type === 'currency') {
-      return value >= 1e9 ? `$${(value / 1e9).toFixed(1)}B` :
-        value >= 1e6 ? `$${(value / 1e6).toFixed(0)}M` :
-          `$${value.toLocaleString()}`;
+      return value >= 1e9
+        ? `$${(value / 1e9).toFixed(1)}B`
+        : value >= 1e6
+          ? `$${(value / 1e6).toFixed(0)}M`
+          : `$${value.toLocaleString()}`;
     }
     if (type === 'percentage') return `${(value * 100).toFixed(1)}%`;
     if (type === 'multiple') return `${value.toFixed(1)}x`;
@@ -275,10 +287,12 @@ const ValuationHandoff = ({ model, onHandoff }) => {
             <input
               type="checkbox"
               checked={handoffConfig.includeAssumptions}
-              onChange={(e) => setHandoffConfig(prev => ({
-                ...prev,
-                includeAssumptions: e.target.checked
-              }))}
+              onChange={e =>
+                setHandoffConfig(prev => ({
+                  ...prev,
+                  includeAssumptions: e.target.checked
+                }))
+              }
               className="w-3 h-3"
             />
             Include assumptions
@@ -287,10 +301,12 @@ const ValuationHandoff = ({ model, onHandoff }) => {
             <input
               type="checkbox"
               checked={handoffConfig.includeOutputs}
-              onChange={(e) => setHandoffConfig(prev => ({
-                ...prev,
-                includeOutputs: e.target.checked
-              }))}
+              onChange={e =>
+                setHandoffConfig(prev => ({
+                  ...prev,
+                  includeOutputs: e.target.checked
+                }))
+              }
               className="w-3 h-3"
             />
             Include calculated outputs
@@ -299,10 +315,12 @@ const ValuationHandoff = ({ model, onHandoff }) => {
             <input
               type="checkbox"
               checked={handoffConfig.includeHistory}
-              onChange={(e) => setHandoffConfig(prev => ({
-                ...prev,
-                includeHistory: e.target.checked
-              }))}
+              onChange={e =>
+                setHandoffConfig(prev => ({
+                  ...prev,
+                  includeHistory: e.target.checked
+                }))
+              }
               className="w-3 h-3"
             />
             Include version history
@@ -366,7 +384,9 @@ const ValuationHandoff = ({ model, onHandoff }) => {
 
       {/* Help text */}
       <div className="mt-3 p-2 bg-blue-50 rounded text-[10px] text-blue-700">
-        <strong>Tip:</strong> Handoff will transfer your model to the selected workspace while preserving all data and assumptions. You can return to Model Lab anytime to continue iterating.
+        <strong>Tip:</strong> Handoff will transfer your model to the selected workspace while
+        preserving all data and assumptions. You can return to Model Lab anytime to continue
+        iterating.
       </div>
     </Card>
   );

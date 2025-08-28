@@ -157,21 +157,21 @@ jobs:
               repo: context.repo.repo,
               ref: context.payload.pull_request.head.sha
             });
-            
+
             if (deployments.length > 0) {
               const deployment = deployments[0];
               const previewUrl = `https://deploy-preview-${context.issue.number}--financeanalyst-staging.netlify.app`;
-              
+
               await github.rest.issues.createComment({
                 issue_number: context.issue.number,
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 body: `🚀 **Preview deployment ready!**
-                
+
                 📱 **Preview URL:** ${previewUrl}
                 📊 **Lighthouse Report:** Available after deployment completes
                 🔍 **Tests:** All tests must pass before merge
-                
+
                 This preview will be updated automatically with new commits.`
               });
             }
@@ -212,10 +212,10 @@ jobs:
               repo: context.repo.repo,
               title: `🚨 Staging deployment smoke tests failed - ${new Date().toISOString()}`,
               body: `**Staging smoke tests failed for commit:** ${context.sha}
-              
+
               **Failed workflow:** ${context.workflow}
               **Run URL:** ${context.payload.repository.html_url}/actions/runs/${context.runId}
-              
+
               Please investigate and fix the staging environment.`,
               labels: ['bug', 'staging', 'critical']
             });

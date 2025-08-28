@@ -9,11 +9,11 @@ import { authService, USER_ROLES, PERMISSIONS } from '../authService.js';
 // Mock localStorage
 const localStorageMock = {
   store: {},
-  getItem: vi.fn((key) => localStorageMock.store[key] || null),
+  getItem: vi.fn(key => localStorageMock.store[key] || null),
   setItem: vi.fn((key, value) => {
     localStorageMock.store[key] = value;
   }),
-  removeItem: vi.fn((key) => {
+  removeItem: vi.fn(key => {
     delete localStorageMock.store[key];
   }),
   clear: vi.fn(() => {
@@ -45,7 +45,7 @@ describe('AuthService', () => {
   });
 
   describe('Authentication', () => {
-    it('should login with valid credentials', async() => {
+    it('should login with valid credentials', async () => {
       const result = await authService.login('admin@financeanalyst.pro', 'admin123');
 
       expect(result.success).toBe(true);
@@ -56,22 +56,25 @@ describe('AuthService', () => {
       expect(authService.isAuthenticated()).toBe(true);
     });
 
-    it('should reject invalid credentials', async() => {
-      await expect(authService.login('admin@financeanalyst.pro', 'wrongpassword'))
-        .rejects.toThrow('Invalid email or password');
+    it('should reject invalid credentials', async () => {
+      await expect(authService.login('admin@financeanalyst.pro', 'wrongpassword')).rejects.toThrow(
+        'Invalid email or password'
+      );
 
       expect(authService.isAuthenticated()).toBe(false);
     });
 
-    it('should require email and password', async() => {
-      await expect(authService.login('', 'password'))
-        .rejects.toThrow('Email and password are required');
+    it('should require email and password', async () => {
+      await expect(authService.login('', 'password')).rejects.toThrow(
+        'Email and password are required'
+      );
 
-      await expect(authService.login('email@test.com', ''))
-        .rejects.toThrow('Email and password are required');
+      await expect(authService.login('email@test.com', '')).rejects.toThrow(
+        'Email and password are required'
+      );
     });
 
-    it('should track failed login attempts', async() => {
+    it('should track failed login attempts', async () => {
       const email = 'admin@financeanalyst.pro';
 
       // Make multiple failed attempts
@@ -86,7 +89,7 @@ describe('AuthService', () => {
       expect(authService.loginAttempts.get(email).count).toBe(3);
     });
 
-    it('should lock account after max failed attempts', async() => {
+    it('should lock account after max failed attempts', async () => {
       const email = 'admin@financeanalyst.pro';
 
       // Make max failed attempts
@@ -99,11 +102,12 @@ describe('AuthService', () => {
       }
 
       // Next attempt should be locked
-      await expect(authService.login(email, 'wrongpassword'))
-        .rejects.toThrow('Account temporarily locked');
+      await expect(authService.login(email, 'wrongpassword')).rejects.toThrow(
+        'Account temporarily locked'
+      );
     });
 
-    it('should logout successfully', async() => {
+    it('should logout successfully', async () => {
       // Login first
       await authService.login('admin@financeanalyst.pro', 'admin123');
       expect(authService.isAuthenticated()).toBe(true);
@@ -114,7 +118,7 @@ describe('AuthService', () => {
       expect(authService.getCurrentUser()).toBeNull();
     });
 
-    it('should persist session with remember me', async() => {
+    it('should persist session with remember me', async () => {
       await authService.login('admin@financeanalyst.pro', 'admin123', true);
 
       expect(localStorageMock.setItem).toHaveBeenCalledWith(
@@ -133,7 +137,7 @@ describe('AuthService', () => {
   });
 
   describe('Token Management', () => {
-    it('should generate valid JWT tokens', async() => {
+    it('should generate valid JWT tokens', async () => {
       await authService.login('admin@financeanalyst.pro', 'admin123');
 
       const token = authService.authToken;
@@ -169,7 +173,7 @@ describe('AuthService', () => {
       expect(authService.isTokenValid(validToken)).toBe(true);
     });
 
-    it('should refresh tokens', async() => {
+    it('should refresh tokens', async () => {
       await authService.login('admin@financeanalyst.pro', 'admin123');
 
       const originalToken = authService.authToken;
@@ -187,7 +191,7 @@ describe('AuthService', () => {
   });
 
   describe('Role-Based Access Control', () => {
-    it('should check user roles correctly', async() => {
+    it('should check user roles correctly', async () => {
       await authService.login('admin@financeanalyst.pro', 'admin123');
 
       expect(authService.hasRole(USER_ROLES.ADMIN)).toBe(true);
@@ -195,7 +199,7 @@ describe('AuthService', () => {
       expect(authService.hasRole(USER_ROLES.ADMIN, USER_ROLES.ANALYST)).toBe(true);
     });
 
-    it('should check permissions correctly', async() => {
+    it('should check permissions correctly', async () => {
       await authService.login('analyst@financeanalyst.pro', 'analyst123');
 
       expect(authService.hasPermission(PERMISSIONS.READ_MODELS)).toBe(true);
@@ -203,7 +207,7 @@ describe('AuthService', () => {
       expect(authService.hasPermission(PERMISSIONS.MANAGE_USERS)).toBe(false);
     });
 
-    it('should return correct permissions for each role', async() => {
+    it('should return correct permissions for each role', async () => {
       // Test admin permissions
       await authService.login('admin@financeanalyst.pro', 'admin123');
       const adminPermissions = authService.getUserPermissions();
@@ -222,7 +226,7 @@ describe('AuthService', () => {
   });
 
   describe('Session Management', () => {
-    it('should load existing session', async() => {
+    it('should load existing session', async () => {
       // Simulate existing session in localStorage
       const user = {
         id: 'user_admin_001',
@@ -243,7 +247,7 @@ describe('AuthService', () => {
       expect(authService.getCurrentUser().email).toBe('admin@financeanalyst.pro');
     });
 
-    it('should handle corrupted session data', async() => {
+    it('should handle corrupted session data', async () => {
       localStorageMock.store['financeanalyst_auth_token'] = 'invalid_token';
       localStorageMock.store['financeanalyst_user_data'] = 'invalid_json';
 
@@ -253,7 +257,7 @@ describe('AuthService', () => {
       expect(authService.isAuthenticated()).toBe(false);
     });
 
-    it('should provide auth headers for API requests', async() => {
+    it('should provide auth headers for API requests', async () => {
       await authService.login('admin@financeanalyst.pro', 'admin123');
 
       const headers = authService.getAuthHeader();
@@ -264,21 +268,24 @@ describe('AuthService', () => {
   });
 
   describe('Event Listeners', () => {
-    it('should notify listeners on login', async() => {
+    it('should notify listeners on login', async () => {
       const listener = vi.fn();
       const unsubscribe = authService.addAuthListener(listener);
 
       await authService.login('admin@financeanalyst.pro', 'admin123');
 
-      expect(listener).toHaveBeenCalledWith('login', expect.objectContaining({
-        email: 'admin@financeanalyst.pro',
-        role: USER_ROLES.ADMIN
-      }));
+      expect(listener).toHaveBeenCalledWith(
+        'login',
+        expect.objectContaining({
+          email: 'admin@financeanalyst.pro',
+          role: USER_ROLES.ADMIN
+        })
+      );
 
       unsubscribe();
     });
 
-    it('should notify listeners on logout', async() => {
+    it('should notify listeners on logout', async () => {
       const listener = vi.fn();
       authService.addAuthListener(listener);
 
@@ -288,7 +295,7 @@ describe('AuthService', () => {
       expect(listener).toHaveBeenCalledWith('logout', null);
     });
 
-    it('should handle listener errors gracefully', async() => {
+    it('should handle listener errors gracefully', async () => {
       const errorListener = vi.fn(() => {
         throw new Error('Listener error');
       });
@@ -296,14 +303,14 @@ describe('AuthService', () => {
       authService.addAuthListener(errorListener);
 
       // Should not throw
-      expect(async() => {
+      expect(async () => {
         await authService.login('admin@financeanalyst.pro', 'admin123');
       }).not.toThrow();
     });
   });
 
   describe('Security Features', () => {
-    it('should clear sensitive data on logout', async() => {
+    it('should clear sensitive data on logout', async () => {
       await authService.login('admin@financeanalyst.pro', 'admin123');
 
       expect(authService.authToken).toBeDefined();
@@ -316,13 +323,13 @@ describe('AuthService', () => {
       expect(authService.refreshToken).toBeNull();
     });
 
-    it('should handle account lockout timing', async() => {
+    it('should handle account lockout timing', async () => {
       const email = 'admin@financeanalyst.pro';
 
       // Simulate failed attempts
       authService.loginAttempts.set(email, {
         count: 5,
-        lastAttempt: Date.now() - (20 * 60 * 1000) // 20 minutes ago
+        lastAttempt: Date.now() - 20 * 60 * 1000 // 20 minutes ago
       });
 
       // Should be unlocked after lockout period
@@ -331,7 +338,7 @@ describe('AuthService', () => {
       // Recent failed attempts should still be locked
       authService.loginAttempts.set(email, {
         count: 5,
-        lastAttempt: Date.now() - (5 * 60 * 1000) // 5 minutes ago
+        lastAttempt: Date.now() - 5 * 60 * 1000 // 5 minutes ago
       });
 
       expect(authService.isAccountLocked(email)).toBe(true);
@@ -339,7 +346,7 @@ describe('AuthService', () => {
   });
 
   describe('Demo Users', () => {
-    it('should authenticate all demo users', async() => {
+    it('should authenticate all demo users', async () => {
       const demoUsers = [
         { email: 'admin@financeanalyst.pro', password: 'admin123', role: USER_ROLES.ADMIN },
         { email: 'analyst@financeanalyst.pro', password: 'analyst123', role: USER_ROLES.ANALYST },

@@ -8,7 +8,7 @@ const RevenueBreakdown = ({
   data = [],
   className,
   title = 'Revenue Breakdown',
-  formatValue = (value) => `$${(value / 1000000).toFixed(1)}M`
+  formatValue = value => `$${(value / 1000000).toFixed(1)}M`
 }) => {
   const [activeIndex, setActiveIndex] = useState(null);
 
@@ -21,7 +21,7 @@ const RevenueBreakdown = ({
     'var(--color-warning)',
     '#64748b', // slate-500
     '#94a3b8', // slate-400
-    '#cbd5e1'  // slate-300
+    '#cbd5e1' // slate-300
   ];
 
   const total = data.reduce((sum, item) => sum + item.value, 0);
@@ -106,9 +106,7 @@ const RevenueBreakdown = ({
                   key={item.name}
                   className={cn(
                     'flex items-center justify-between p-3 rounded-md transition-colors duration-200 cursor-pointer',
-                    activeIndex === index
-                      ? 'bg-muted'
-                      : 'hover:bg-gray-50'
+                    activeIndex === index ? 'bg-muted' : 'hover:bg-gray-50'
                   )}
                   onMouseEnter={() => setActiveIndex(index)}
                   onMouseLeave={() => setActiveIndex(null)}
@@ -119,12 +117,8 @@ const RevenueBreakdown = ({
                       style={{ backgroundColor: item.color }}
                     />
                     <div className="min-w-0">
-                      <p className="font-medium text-sm text-foreground truncate">
-                        {item.name}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {item.percentage}% of total
-                      </p>
+                      <p className="font-medium text-sm text-foreground truncate">{item.name}</p>
+                      <p className="text-xs text-muted-foreground">{item.percentage}% of total</p>
                     </div>
                   </div>
                   <div className="text-right flex-shrink-0">

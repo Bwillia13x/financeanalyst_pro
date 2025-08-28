@@ -10,10 +10,7 @@ export const preloadCriticalResources = () => {
   document.head.appendChild(criticalStyles);
 
   // Preload essential fonts with proper CORS
-  const fontPreloads = [
-    '/assets/fonts/inter-var.woff2',
-    '/assets/fonts/fira-code.woff2'
-  ];
+  const fontPreloads = ['/assets/fonts/inter-var.woff2', '/assets/fonts/fira-code.woff2'];
 
   fontPreloads.forEach(fontUrl => {
     const link = document.createElement('link');
@@ -27,18 +24,21 @@ export const preloadCriticalResources = () => {
 };
 
 // Optimize image loading with intersection observer
-export const createImageObserver = (callback) => {
+export const createImageObserver = callback => {
   if ('IntersectionObserver' in window) {
-    return new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          callback(entry.target);
-        }
-      });
-    }, {
-      rootMargin: '50px 0px',
-      threshold: 0.01
-    });
+    return new IntersectionObserver(
+      entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            callback(entry.target);
+          }
+        });
+      },
+      {
+        rootMargin: '50px 0px',
+        threshold: 0.01
+      }
+    );
   }
   return null;
 };
@@ -46,11 +46,16 @@ export const createImageObserver = (callback) => {
 // Performance monitoring
 export const measurePerformance = (name, fn) => {
   if ('performance' in window && 'mark' in performance) {
-    performance.mark(`${name}-start`);
-    const result = fn();
-    performance.mark(`${name}-end`);
-    performance.measure(name, `${name}-start`, `${name}-end`);
-    return result;
+    try {
+      performance.mark(`${name}-start`);
+      const result = fn();
+      performance.mark(`${name}-end`);
+      performance.measure(name, `${name}-start`, `${name}-end`);
+      return result;
+    } catch (_error) {
+      // Fallback if performance API fails
+      return fn();
+    }
   }
   return fn();
 };
@@ -63,11 +68,7 @@ export const loadAnimationLibrary = () => import('framer-motion');
 // Resource hints for better loading
 export const addResourceHints = () => {
   // DNS prefetch for external domains
-  const domains = [
-    'fonts.googleapis.com',
-    'fonts.gstatic.com',
-    'cdn.jsdelivr.net'
-  ];
+  const domains = ['fonts.googleapis.com', 'fonts.gstatic.com', 'cdn.jsdelivr.net'];
 
   domains.forEach(domain => {
     const link = document.createElement('link');
@@ -77,10 +78,7 @@ export const addResourceHints = () => {
   });
 
   // Preconnect to critical third parties
-  const preconnectDomains = [
-    'https://fonts.googleapis.com',
-    'https://fonts.gstatic.com'
-  ];
+  const preconnectDomains = ['https://fonts.googleapis.com', 'https://fonts.gstatic.com'];
 
   preconnectDomains.forEach(domain => {
     const link = document.createElement('link');

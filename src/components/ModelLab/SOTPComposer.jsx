@@ -5,7 +5,9 @@ const Card = ({ title, right, children, className = '' }) => (
   <section className={`rounded-2xl border border-slate-200 bg-white shadow-sm ${className}`}>
     {(title || right) && (
       <header className="flex items-center justify-between border-b border-slate-200 px-4 py-2.5">
-        {title && <h3 className="text-[13px] font-semibold tracking-wide text-slate-700">{title}</h3>}
+        {title && (
+          <h3 className="text-[13px] font-semibold tracking-wide text-slate-700">{title}</h3>
+        )}
         {right}
       </header>
     )}
@@ -27,7 +29,9 @@ const Pill = ({ children, tone = 'slate', size = 'sm' }) => {
     xs: 'text-[10px] px-1.5 py-0.5'
   };
   return (
-    <span className={`inline-flex items-center gap-1 rounded-full border ${tones[tone]} ${sizes[size]}`}>
+    <span
+      className={`inline-flex items-center gap-1 rounded-full border ${tones[tone]} ${sizes[size]}`}
+    >
       {children}
     </span>
   );
@@ -43,28 +47,38 @@ const SOTPComponent = ({
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const formatCurrency = (value) => {
+  const formatCurrency = value => {
     if (!value) return '$0';
-    return value >= 1e9 ? `$${(value / 1e9).toFixed(1)}B` :
-      value >= 1e6 ? `$${(value / 1e6).toFixed(0)}M` :
-        `$${value.toLocaleString()}`;
+    return value >= 1e9
+      ? `$${(value / 1e9).toFixed(1)}B`
+      : value >= 1e6
+        ? `$${(value / 1e6).toFixed(0)}M`
+        : `$${value.toLocaleString()}`;
   };
 
-  const getComponentIcon = (type) => {
+  const getComponentIcon = type => {
     switch (type) {
-      case 'model': return <Calculator className="w-3 h-3" />;
-      case 'manual': return <Target className="w-3 h-3" />;
-      case 'adjustment': return <BarChart3 className="w-3 h-3" />;
-      default: return <PieChart className="w-3 h-3" />;
+      case 'model':
+        return <Calculator className="w-3 h-3" />;
+      case 'manual':
+        return <Target className="w-3 h-3" />;
+      case 'adjustment':
+        return <BarChart3 className="w-3 h-3" />;
+      default:
+        return <PieChart className="w-3 h-3" />;
     }
   };
 
-  const getComponentColor = (type) => {
+  const getComponentColor = type => {
     switch (type) {
-      case 'model': return 'blue';
-      case 'manual': return 'green';
-      case 'adjustment': return 'amber';
-      default: return 'slate';
+      case 'model':
+        return 'blue';
+      case 'manual':
+        return 'green';
+      case 'adjustment':
+        return 'amber';
+      default:
+        return 'slate';
     }
   };
 
@@ -93,9 +107,7 @@ const SOTPComponent = ({
             <span className="text-[12px] font-medium text-slate-700">
               {formatCurrency(component.value)}
             </span>
-            <span className="text-[10px] text-slate-500">
-              ({component.weight?.toFixed(1)}%)
-            </span>
+            <span className="text-[10px] text-slate-500">({component.weight?.toFixed(1)}%)</span>
 
             {isEditable && (
               <div className="flex items-center gap-1">
@@ -123,13 +135,16 @@ const SOTPComponent = ({
             {/* Component configuration */}
             {component.type === 'model' && (
               <div>
-                <label htmlFor={`model-${component.id}`} className="block text-[11px] font-medium text-slate-700 mb-1">
+                <label
+                  htmlFor={`model-${component.id}`}
+                  className="block text-[11px] font-medium text-slate-700 mb-1"
+                >
                   Source Model
                 </label>
                 <select
                   id={`model-${component.id}`}
                   value={component.modelId || ''}
-                  onChange={(e) => onUpdate(component.id, { modelId: e.target.value })}
+                  onChange={e => onUpdate(component.id, { modelId: e.target.value })}
                   className="w-full text-[11px] px-2 py-1 border border-slate-200 rounded"
                   disabled={!isEditable}
                 >
@@ -145,14 +160,19 @@ const SOTPComponent = ({
 
             {component.type === 'manual' && (
               <div>
-                <label htmlFor={`manual-${component.id}`} className="block text-[11px] font-medium text-slate-700 mb-1">
+                <label
+                  htmlFor={`manual-${component.id}`}
+                  className="block text-[11px] font-medium text-slate-700 mb-1"
+                >
                   Manual Value
                 </label>
                 <input
                   id={`manual-${component.id}`}
                   type="number"
                   value={component.manualValue || 0}
-                  onChange={(e) => onUpdate(component.id, { manualValue: parseFloat(e.target.value) || 0 })}
+                  onChange={e =>
+                    onUpdate(component.id, { manualValue: parseFloat(e.target.value) || 0 })
+                  }
                   className="w-full text-[11px] px-2 py-1 border border-slate-200 rounded"
                   disabled={!isEditable}
                   placeholder="Enter value..."
@@ -163,13 +183,16 @@ const SOTPComponent = ({
             {component.type === 'adjustment' && (
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label htmlFor={`adj-type-${component.id}`} className="block text-[11px] font-medium text-slate-700 mb-1">
+                  <label
+                    htmlFor={`adj-type-${component.id}`}
+                    className="block text-[11px] font-medium text-slate-700 mb-1"
+                  >
                     Adjustment Type
                   </label>
                   <select
                     id={`adj-type-${component.id}`}
                     value={component.adjustmentType || 'add'}
-                    onChange={(e) => onUpdate(component.id, { adjustmentType: e.target.value })}
+                    onChange={e => onUpdate(component.id, { adjustmentType: e.target.value })}
                     className="w-full text-[11px] px-2 py-1 border border-slate-200 rounded"
                     disabled={!isEditable}
                   >
@@ -180,14 +203,19 @@ const SOTPComponent = ({
                   </select>
                 </div>
                 <div>
-                  <label htmlFor={`adj-value-${component.id}`} className="block text-[11px] font-medium text-slate-700 mb-1">
+                  <label
+                    htmlFor={`adj-value-${component.id}`}
+                    className="block text-[11px] font-medium text-slate-700 mb-1"
+                  >
                     Value
                   </label>
                   <input
                     id={`adj-value-${component.id}`}
                     type="number"
                     value={component.adjustmentValue || 0}
-                    onChange={(e) => onUpdate(component.id, { adjustmentValue: parseFloat(e.target.value) || 0 })}
+                    onChange={e =>
+                      onUpdate(component.id, { adjustmentValue: parseFloat(e.target.value) || 0 })
+                    }
                     className="w-full text-[11px] px-2 py-1 border border-slate-200 rounded"
                     disabled={!isEditable}
                   />
@@ -196,13 +224,16 @@ const SOTPComponent = ({
             )}
 
             <div>
-              <label htmlFor={`desc-${component.id}`} className="block text-[11px] font-medium text-slate-700 mb-1">
+              <label
+                htmlFor={`desc-${component.id}`}
+                className="block text-[11px] font-medium text-slate-700 mb-1"
+              >
                 Description
               </label>
               <textarea
                 id={`desc-${component.id}`}
                 value={component.description || ''}
-                onChange={(e) => onUpdate(component.id, { description: e.target.value })}
+                onChange={e => onUpdate(component.id, { description: e.target.value })}
                 className="w-full text-[11px] px-2 py-1 border border-slate-200 rounded h-16 resize-none"
                 disabled={!isEditable}
                 placeholder="Component description..."
@@ -250,11 +281,20 @@ const SOTPComposer = ({ models = [], onSave }) => {
       } else if (component.type === 'adjustment') {
         const baseValue = sum; // Apply to running total
         switch (component.adjustmentType) {
-          case 'add': value = component.adjustmentValue || 0; break;
-          case 'subtract': value = -(component.adjustmentValue || 0); break;
-          case 'multiply': value = baseValue * ((component.adjustmentValue || 1) - 1); break;
-          case 'discount': value = -baseValue * ((component.adjustmentValue || 0) / 100); break;
-          default: value = 0;
+          case 'add':
+            value = component.adjustmentValue || 0;
+            break;
+          case 'subtract':
+            value = -(component.adjustmentValue || 0);
+            break;
+          case 'multiply':
+            value = baseValue * ((component.adjustmentValue || 1) - 1);
+            break;
+          case 'discount':
+            value = -baseValue * ((component.adjustmentValue || 0) / 100);
+            break;
+          default:
+            value = 0;
         }
       }
 
@@ -286,7 +326,7 @@ const SOTPComposer = ({ models = [], onSave }) => {
     });
   }, [composition.components, totalValue, models]);
 
-  const addComponent = useCallback((type) => {
+  const addComponent = useCallback(type => {
     const newComponent = {
       id: `comp_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
       type,
@@ -320,7 +360,7 @@ const SOTPComposer = ({ models = [], onSave }) => {
     }));
   }, []);
 
-  const removeComponent = useCallback((componentId) => {
+  const removeComponent = useCallback(componentId => {
     setComposition(prev => ({
       ...prev,
       components: prev.components.filter(comp => comp.id !== componentId),
@@ -328,7 +368,7 @@ const SOTPComposer = ({ models = [], onSave }) => {
     }));
   }, []);
 
-  const duplicateComponent = useCallback((component) => {
+  const duplicateComponent = useCallback(component => {
     const duplicated = {
       ...component,
       id: `comp_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
@@ -354,11 +394,13 @@ const SOTPComposer = ({ models = [], onSave }) => {
     }
   };
 
-  const formatCurrency = (value) => {
+  const formatCurrency = value => {
     if (!value) return '$0';
-    return value >= 1e9 ? `$${(value / 1e9).toFixed(1)}B` :
-      value >= 1e6 ? `$${(value / 1e6).toFixed(0)}M` :
-        `$${value.toLocaleString()}`;
+    return value >= 1e9
+      ? `$${(value / 1e9).toFixed(1)}B`
+      : value >= 1e6
+        ? `$${(value / 1e6).toFixed(0)}M`
+        : `$${value.toLocaleString()}`;
   };
 
   return (
@@ -384,13 +426,13 @@ const SOTPComposer = ({ models = [], onSave }) => {
         <input
           type="text"
           value={composition.name}
-          onChange={(e) => setComposition(prev => ({ ...prev, name: e.target.value }))}
+          onChange={e => setComposition(prev => ({ ...prev, name: e.target.value }))}
           className="w-full text-[13px] font-medium px-2 py-1 border border-slate-200 rounded"
           placeholder="SOTP Analysis Name"
         />
         <textarea
           value={composition.description}
-          onChange={(e) => setComposition(prev => ({ ...prev, description: e.target.value }))}
+          onChange={e => setComposition(prev => ({ ...prev, description: e.target.value }))}
           className="w-full text-[11px] px-2 py-1 border border-slate-200 rounded h-16 resize-none"
           placeholder="Analysis description..."
         />
@@ -469,11 +511,15 @@ const SOTPComposer = ({ models = [], onSave }) => {
           <div className="text-[11px] font-medium text-slate-700 mb-2">Composition Summary</div>
           <div className="grid grid-cols-3 gap-3 text-[10px]">
             <div className="text-center">
-              <div className="font-bold text-[14px] text-purple-600">{composition.components.length}</div>
+              <div className="font-bold text-[14px] text-purple-600">
+                {composition.components.length}
+              </div>
               <div className="text-slate-600">Components</div>
             </div>
             <div className="text-center">
-              <div className="font-bold text-[14px] text-green-600">{formatCurrency(totalValue)}</div>
+              <div className="font-bold text-[14px] text-green-600">
+                {formatCurrency(totalValue)}
+              </div>
               <div className="text-slate-600">Total Value</div>
             </div>
             <div className="text-center">

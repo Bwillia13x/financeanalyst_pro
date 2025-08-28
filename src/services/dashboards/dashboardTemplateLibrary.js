@@ -144,7 +144,7 @@ export class DashboardTemplateLibrary {
       template.rating = 0;
       template.ratingCount = 0;
       template.isActive = true;
-      
+
       this.templates.set(template.id, template);
     });
   }
@@ -156,7 +156,11 @@ export class DashboardTemplateLibrary {
         name: 'Essential Industry Pack',
         description: 'Core dashboard templates for major industries',
         type: 'curated',
-        templates: ['saas-metrics-dashboard', 'reit-analysis-dashboard', 'bank-performance-dashboard'],
+        templates: [
+          'saas-metrics-dashboard',
+          'reit-analysis-dashboard',
+          'bank-performance-dashboard'
+        ],
         author: 'FinanceAnalyst Pro',
         isOfficial: true,
         tags: ['essential', 'industry', 'starter'],
@@ -200,15 +204,15 @@ export class DashboardTemplateLibrary {
   }
 
   searchTemplates(query, filters = {}) {
-    let templates = Array.from(this.templates.values())
-      .filter(template => template.isActive);
+    let templates = Array.from(this.templates.values()).filter(template => template.isActive);
 
     if (query) {
       const queryLower = query.toLowerCase();
-      templates = templates.filter(template =>
-        template.name.toLowerCase().includes(queryLower) ||
-        template.description.toLowerCase().includes(queryLower) ||
-        template.tags.some(tag => tag.toLowerCase().includes(queryLower))
+      templates = templates.filter(
+        template =>
+          template.name.toLowerCase().includes(queryLower) ||
+          template.description.toLowerCase().includes(queryLower) ||
+          template.tags.some(tag => tag.toLowerCase().includes(queryLower))
       );
     }
 
@@ -288,7 +292,7 @@ export class DashboardTemplateLibrary {
     if (!this.ratings.has(templateId)) {
       this.ratings.set(templateId, []);
     }
-    
+
     this.ratings.get(templateId).push(ratingData);
     this.recalculateTemplateRating(templateId);
 
@@ -321,7 +325,7 @@ export class DashboardTemplateLibrary {
       id: this.generateDashboardId(),
       name: dashboardName,
       description: template.description,
-      templateId: templateId,
+      templateId,
       createdBy: userId,
       createdAt: new Date().toISOString(),
       layout: { ...template.layout, ...customizations.layout },
@@ -329,7 +333,7 @@ export class DashboardTemplateLibrary {
       widgets: template.widgets.map(widget => ({
         ...widget,
         id: this.generateWidgetId(),
-        ...customizations.widgets?.[widget.id] || {}
+        ...(customizations.widgets?.[widget.id] || {})
       })),
       dataSources: [...template.dataSources],
       isPublic: customizations.isPublic || false
@@ -357,7 +361,9 @@ export class DashboardTemplateLibrary {
       },
       usage: {
         total: usage.length,
-        last30Days: usage.filter(u => new Date(u.timestamp) >= new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)).length,
+        last30Days: usage.filter(
+          u => new Date(u.timestamp) >= new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+        ).length,
         uniqueUsers: new Set(usage.map(u => u.userId)).size
       },
       ratings: {
@@ -424,3 +430,4 @@ export class DashboardTemplateLibrary {
 }
 
 export const dashboardTemplateLibrary = new DashboardTemplateLibrary();
+export const dashboardTemplateService = dashboardTemplateLibrary;

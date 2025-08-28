@@ -15,35 +15,35 @@ export class NotificationService {
   initializeDefaultTemplates() {
     const templates = {
       // Collaboration notifications
-      'user_joined': {
+      user_joined: {
         title: '{{ userName }} joined the model',
         body: '{{ userName }} has joined {{ modelName }} and is now collaborating.',
         icon: 'user-plus',
         category: 'collaboration',
         priority: 'low'
       },
-      'user_left': {
+      user_left: {
         title: '{{ userName }} left the model',
         body: '{{ userName }} has left {{ modelName }}.',
-        icon: 'user-minus', 
+        icon: 'user-minus',
         category: 'collaboration',
         priority: 'low'
       },
-      'comment_added': {
+      comment_added: {
         title: 'New comment from {{ userName }}',
         body: '{{ userName }} commented: "{{ commentText }}" on {{ location }}',
         icon: 'message-square',
         category: 'collaboration',
         priority: 'medium'
       },
-      'comment_replied': {
+      comment_replied: {
         title: '{{ userName }} replied to your comment',
         body: 'Reply: "{{ replyText }}" on {{ location }}',
         icon: 'reply',
         category: 'collaboration',
         priority: 'high'
       },
-      'mentioned': {
+      mentioned: {
         title: 'You were mentioned by {{ userName }}',
         body: '{{ userName }} mentioned you in {{ location }}: "{{ content }}"',
         icon: 'at-sign',
@@ -52,21 +52,21 @@ export class NotificationService {
       },
 
       // Model updates
-      'model_updated': {
+      model_updated: {
         title: 'Model updated by {{ userName }}',
         body: '{{ userName }} made {{ changeCount }} changes to {{ modelName }}',
         icon: 'edit',
         category: 'model_updates',
         priority: 'medium'
       },
-      'version_created': {
+      version_created: {
         title: 'New version created',
         body: 'Version {{ version }} of {{ modelName }} has been created by {{ userName }}',
         icon: 'git-branch',
         category: 'model_updates',
         priority: 'medium'
       },
-      'model_shared': {
+      model_shared: {
         title: 'Model shared with you',
         body: '{{ userName }} shared {{ modelName }} with you as {{ role }}',
         icon: 'share',
@@ -75,14 +75,14 @@ export class NotificationService {
       },
 
       // Data updates
-      'data_refreshed': {
+      data_refreshed: {
         title: 'Data refreshed',
         body: 'Market data for {{ modelName }} has been updated with latest information',
         icon: 'refresh-cw',
         category: 'data_updates',
         priority: 'low'
       },
-      'data_fetch_error': {
+      data_fetch_error: {
         title: 'Data update failed',
         body: 'Failed to refresh data for {{ modelName }}: {{ error }}',
         icon: 'alert-triangle',
@@ -91,21 +91,21 @@ export class NotificationService {
       },
 
       // Analysis alerts
-      'covenant_breach': {
+      covenant_breach: {
         title: 'Covenant breach detected',
         body: '{{ covenantName }} is projected to breach in {{ modelName }} by {{ date }}',
         icon: 'alert-circle',
         category: 'analysis_alerts',
         priority: 'critical'
       },
-      'risk_threshold_exceeded': {
+      risk_threshold_exceeded: {
         title: 'Risk threshold exceeded',
         body: '{{ riskMetric }} has exceeded threshold in {{ modelName }}: {{ value }}',
         icon: 'trending-up',
         category: 'analysis_alerts',
         priority: 'high'
       },
-      'valuation_change': {
+      valuation_change: {
         title: 'Significant valuation change',
         body: 'Valuation for {{ modelName }} changed by {{ percentChange }} to {{ newValue }}',
         icon: 'dollar-sign',
@@ -114,14 +114,14 @@ export class NotificationService {
       },
 
       // System notifications
-      'export_completed': {
+      export_completed: {
         title: 'Export completed',
         body: 'Your {{ exportType }} export of {{ modelName }} is ready for download',
         icon: 'download',
         category: 'system',
         priority: 'medium'
       },
-      'presentation_generated': {
+      presentation_generated: {
         title: 'Presentation ready',
         body: 'Your {{ presentationType }} presentation has been generated and is ready to view',
         icon: 'presentation',
@@ -137,7 +137,7 @@ export class NotificationService {
 
   initializeChannels() {
     const channels = {
-      'in_app': {
+      in_app: {
         name: 'In-App Notifications',
         description: 'Show notifications within the application',
         enabled: true,
@@ -147,7 +147,7 @@ export class NotificationService {
           position: 'top-right'
         }
       },
-      'email': {
+      email: {
         name: 'Email Notifications',
         description: 'Send notifications via email',
         enabled: true,
@@ -157,7 +157,7 @@ export class NotificationService {
           immediateThreshold: 'high'
         }
       },
-      'push': {
+      push: {
         name: 'Push Notifications',
         description: 'Browser push notifications',
         enabled: false,
@@ -166,7 +166,7 @@ export class NotificationService {
           maxPerHour: 10
         }
       },
-      'slack': {
+      slack: {
         name: 'Slack Integration',
         description: 'Send notifications to Slack channels',
         enabled: false,
@@ -176,7 +176,7 @@ export class NotificationService {
           mentionUsers: false
         }
       },
-      'teams': {
+      teams: {
         name: 'Microsoft Teams',
         description: 'Send notifications to Teams channels',
         enabled: false,
@@ -270,7 +270,7 @@ export class NotificationService {
     for (const recipient of recipientList) {
       const notification = await this.createNotification(recipient, template, data, options);
       notifications.push(notification);
-      
+
       // Send through appropriate channels based on user preferences
       await this.deliverNotification(notification);
     }
@@ -288,7 +288,7 @@ export class NotificationService {
       icon: template.icon || 'bell',
       category: template.category || 'general',
       priority: options.priority || template.priority || 'medium',
-      data: data,
+      data,
       metadata: {
         modelId: data.modelId || null,
         sourceUserId: data.sourceUserId || null,
@@ -330,7 +330,7 @@ export class NotificationService {
 
     // Deliver through enabled channels
     const enabledChannels = Object.entries(userPreferences.channels)
-      .filter(([channel, config]) => config.enabled)
+      .filter(([_channel, config]) => config.enabled)
       .map(([channel]) => channel);
 
     for (const channelId of enabledChannels) {
@@ -385,15 +385,17 @@ export class NotificationService {
 
     // Would integrate with UI notification system
     if (typeof window !== 'undefined') {
-      window.dispatchEvent(new CustomEvent('app_notification', {
-        detail: notification
-      }));
+      window.dispatchEvent(
+        new CustomEvent('app_notification', {
+          detail: notification
+        })
+      );
     }
 
     return { success: true, channel: 'in_app' };
   }
 
-  async deliverEmail(notification, config) {
+  async deliverEmail(notification, _config) {
     // This would integrate with email service (SendGrid, AWS SES, etc.)
     const emailData = {
       to: await this.getUserEmail(notification.userId),
@@ -404,13 +406,17 @@ export class NotificationService {
 
     // Mock email delivery
     console.log(`Email notification sent to ${emailData.to}:`, notification.title);
-    
+
     return { success: true, channel: 'email', emailId: `email_${Date.now()}` };
   }
 
-  deliverPush(notification, config) {
+  deliverPush(notification, _config) {
     // Browser push notification
-    if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
+    if (
+      typeof window !== 'undefined' &&
+      'Notification' in window &&
+      Notification.permission === 'granted'
+    ) {
       const pushNotification = new Notification(notification.title, {
         body: notification.body,
         icon: `/icons/${notification.icon}.png`,
@@ -438,12 +444,14 @@ export class NotificationService {
 
     const slackPayload = {
       text: notification.title,
-      attachments: [{
-        color: this.getPriorityColor(notification.priority),
-        text: notification.body,
-        footer: 'FinanceAnalyst Pro',
-        ts: Math.floor(new Date(notification.createdAt).getTime() / 1000)
-      }]
+      attachments: [
+        {
+          color: this.getPriorityColor(notification.priority),
+          text: notification.body,
+          footer: 'FinanceAnalyst Pro',
+          ts: Math.floor(new Date(notification.createdAt).getTime() / 1000)
+        }
+      ]
     };
 
     // Mock Slack delivery
@@ -461,11 +469,13 @@ export class NotificationService {
       '@context': 'https://schema.org/extensions',
       summary: notification.title,
       themeColor: this.getPriorityColor(notification.priority),
-      sections: [{
-        activityTitle: notification.title,
-        activityText: notification.body,
-        activityImage: `https://app.financeanalyst.pro/icons/${notification.icon}.png`
-      }]
+      sections: [
+        {
+          activityTitle: notification.title,
+          activityText: notification.body,
+          activityImage: `https://app.financeanalyst.pro/icons/${notification.icon}.png`
+        }
+      ]
     };
 
     // Mock Teams delivery
@@ -496,7 +506,7 @@ export class NotificationService {
   async unsubscribe(userId, subscriptionId) {
     const userSubscriptions = this.subscriptions.get(userId) || [];
     const subscriptionIndex = userSubscriptions.findIndex(sub => sub.id === subscriptionId);
-    
+
     if (subscriptionIndex === -1) {
       throw new Error('Subscription not found');
     }
@@ -517,7 +527,7 @@ export class NotificationService {
   async handleEvent(eventType, eventData) {
     // Find all subscriptions matching this event
     const matchingSubscriptions = [];
-    
+
     for (const [userId, userSubs] of this.subscriptions.entries()) {
       for (const subscription of userSubs) {
         if (subscription.isActive && subscription.eventType === eventType) {
@@ -573,7 +583,7 @@ export class NotificationService {
 
   async markAllAsRead(userId, category = null) {
     let count = 0;
-    
+
     for (const notification of this.notifications.values()) {
       if (notification.userId === userId && !notification.readAt) {
         if (!category || notification.category === category) {
@@ -601,16 +611,11 @@ export class NotificationService {
 
   // Query methods
   getUserNotifications(userId, options = {}) {
-    const {
-      limit = 50,
-      offset = 0,
-      category = null,
-      unreadOnly = false,
-      since = null
-    } = options;
+    const { limit = 50, offset = 0, category = null, unreadOnly = false, since = null } = options;
 
-    let notifications = Array.from(this.notifications.values())
-      .filter(notification => notification.userId === userId);
+    let notifications = Array.from(this.notifications.values()).filter(
+      notification => notification.userId === userId
+    );
 
     if (category) {
       notifications = notifications.filter(n => n.category === category);
@@ -636,8 +641,7 @@ export class NotificationService {
   }
 
   getNotificationStats(userId, timeframe = '7d') {
-    const notifications = Array.from(this.notifications.values())
-      .filter(n => n.userId === userId);
+    const notifications = Array.from(this.notifications.values()).filter(n => n.userId === userId);
 
     const now = new Date();
     let startDate;
@@ -656,9 +660,7 @@ export class NotificationService {
         startDate = new Date(0);
     }
 
-    const recentNotifications = notifications.filter(n => 
-      new Date(n.createdAt) >= startDate
-    );
+    const recentNotifications = notifications.filter(n => new Date(n.createdAt) >= startDate);
 
     const stats = {
       total: recentNotifications.length,
@@ -671,16 +673,13 @@ export class NotificationService {
 
     recentNotifications.forEach(notification => {
       // By category
-      stats.byCategory[notification.category] = 
-        (stats.byCategory[notification.category] || 0) + 1;
+      stats.byCategory[notification.category] = (stats.byCategory[notification.category] || 0) + 1;
 
       // By priority
-      stats.byPriority[notification.priority] = 
-        (stats.byPriority[notification.priority] || 0) + 1;
+      stats.byPriority[notification.priority] = (stats.byPriority[notification.priority] || 0) + 1;
 
       // By status
-      stats.byStatus[notification.status] = 
-        (stats.byStatus[notification.status] || 0) + 1;
+      stats.byStatus[notification.status] = (stats.byStatus[notification.status] || 0) + 1;
     });
 
     // Calculate delivery rate
@@ -740,14 +739,15 @@ export class NotificationService {
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2 style="color: #1f2937;">${notification.title}</h2>
         <p style="color: #4b5563; line-height: 1.6;">${notification.body}</p>
-        ${notification.metadata.actionUrl ? 
-          `<a href="${notification.metadata.actionUrl}" style="background: #3b82f6; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; display: inline-block; margin-top: 15px;">View Details</a>` : 
-          ''
+        ${
+          notification.metadata.actionUrl
+            ? `<a href="${notification.metadata.actionUrl}" style="background: #3b82f6; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; display: inline-block; margin-top: 15px;">View Details</a>`
+            : ''
         }
         <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;">
         <p style="color: #6b7280; font-size: 12px;">
-          Sent by FinanceAnalyst Pro | 
-          <a href="#" style="color: #3b82f6;">Unsubscribe</a> | 
+          Sent by FinanceAnalyst Pro |
+          <a href="#" style="color: #3b82f6;">Unsubscribe</a> |
           <a href="#" style="color: #3b82f6;">Notification Preferences</a>
         </p>
       </div>

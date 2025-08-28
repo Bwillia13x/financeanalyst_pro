@@ -42,15 +42,15 @@ jobs:
         run: |
           HIGH_VULNS=$(npm audit --audit-level=high --json | jq '.metadata.vulnerabilities.high // 0')
           CRITICAL_VULNS=$(npm audit --audit-level=critical --json | jq '.metadata.vulnerabilities.critical // 0')
-          
+
           echo "High vulnerabilities: $HIGH_VULNS"
           echo "Critical vulnerabilities: $CRITICAL_VULNS"
-          
+
           if [ "$CRITICAL_VULNS" -gt 0 ]; then
             echo "❌ Critical vulnerabilities found!"
             exit 1
           fi
-          
+
           if [ "$HIGH_VULNS" -gt 5 ]; then
             echo "⚠️ Too many high severity vulnerabilities found!"
             exit 1
@@ -87,23 +87,23 @@ jobs:
         run: |
           npx serve -s dist -p 3000 &
           sleep 5
-        
+
       - name: Test security headers
         run: |
           echo "Testing security headers..."
-          
+
           # Test Content Security Policy
           CSP=$(curl -s -I http://localhost:3000 | grep -i "content-security-policy" || echo "Missing")
           echo "CSP: $CSP"
-          
+
           # Test X-Frame-Options
           XFO=$(curl -s -I http://localhost:3000 | grep -i "x-frame-options" || echo "Missing")
           echo "X-Frame-Options: $XFO"
-          
+
           # Test X-Content-Type-Options
           XCTO=$(curl -s -I http://localhost:3000 | grep -i "x-content-type-options" || echo "Missing")
           echo "X-Content-Type-Options: $XCTO"
-          
+
           # Test Strict-Transport-Security (HSTS)
           HSTS=$(curl -s -I http://localhost:3000 | grep -i "strict-transport-security" || echo "Missing")
           echo "HSTS: $HSTS"
@@ -136,17 +136,17 @@ jobs:
       - name: Scan for hardcoded secrets
         run: |
           echo "Scanning for potential secrets..."
-          
+
           # Check for API keys
           if grep -r "api[_-]key" src/ --include="*.js" --include="*.jsx" --include="*.ts" --include="*.tsx"; then
             echo "⚠️ Potential API key found in source code"
           fi
-          
+
           # Check for passwords
           if grep -r "password.*=" src/ --include="*.js" --include="*.jsx" --include="*.ts" --include="*.tsx"; then
             echo "⚠️ Potential password found in source code"
           fi
-          
+
           # Check for tokens
           if grep -r "token.*=" src/ --include="*.js" --include="*.jsx" --include="*.ts" --include="*.tsx"; then
             echo "⚠️ Potential token found in source code"
@@ -173,7 +173,7 @@ jobs:
             echo "Please create docs/PENETRATION_TEST_CHECKLIST.md"
             exit 1
           fi
-          
+
           echo "✅ Penetration test checklist found"
 
       - name: Check security documentation completeness
@@ -183,21 +183,21 @@ jobs:
             "docs/PENETRATION_TEST_CHECKLIST.md"
             "docs/INCIDENT_RESPONSE.md"
           )
-          
+
           MISSING_DOCS=()
-          
+
           for doc in "${REQUIRED_DOCS[@]}"; do
             if [ ! -f "$doc" ]; then
               MISSING_DOCS+=("$doc")
             fi
           done
-          
+
           if [ ${#MISSING_DOCS[@]} -gt 0 ]; then
             echo "❌ Missing security documentation:"
             printf '%s\n' "${MISSING_DOCS[@]}"
             exit 1
           fi
-          
+
           echo "✅ All required security documentation present"
 
   notify-security-issues:
@@ -213,29 +213,29 @@ jobs:
             const title = `🚨 Security audit failed - ${new Date().toISOString().split('T')[0]}`;
             const body = `
             **Security audit failure detected**
-            
+
             **Workflow:** ${context.workflow}
             **Run ID:** ${context.runId}
             **Commit:** ${context.sha}
             **Branch:** ${context.ref}
-            
+
             **Failed Jobs:**
             - Check the workflow run for detailed results
             - Review dependency vulnerabilities
             - Validate security headers
             - Check code security scan results
-            
+
             **Action Required:**
             1. Review and fix dependency vulnerabilities
             2. Update security configurations
             3. Address code security issues
             4. Re-run security audit
-            
+
             **Resources:**
             - [Security Documentation](./docs/SECURITY_ARCHITECTURE.md)
             - [Penetration Test Checklist](./docs/PENETRATION_TEST_CHECKLIST.md)
             `;
-            
+
             await github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,

@@ -43,7 +43,8 @@ export class SyncService {
     try {
       this.syncEndpoint = config.endpoint || null;
       this.syncInterval = config.interval || this.syncInterval;
-      this.conflictResolutionStrategy = config.conflictResolution || this.conflictResolutionStrategy;
+      this.conflictResolutionStrategy =
+        config.conflictResolution || this.conflictResolutionStrategy;
 
       // Load last sync time
       this.lastSyncTime = await persistenceManager.retrieve('last_sync_time');
@@ -61,7 +62,6 @@ export class SyncService {
 
       console.warn('✅ Sync service initialized');
       return { success: true, endpoint: this.syncEndpoint };
-
     } catch (error) {
       console.error('❌ Failed to initialize sync service:', error);
       const message = error instanceof Error ? error.message : String(error);
@@ -104,7 +104,6 @@ export class SyncService {
       }
 
       return syncOperation.id;
-
     } catch (error) {
       console.error('Failed to queue sync operation:', error);
       throw error;
@@ -134,7 +133,6 @@ export class SyncService {
           // Remove from queue on success
           this.syncQueue = this.syncQueue.filter(op => op.id !== operation.id);
           processed++;
-
         } catch (error) {
           console.error(`Failed to sync operation ${operation.id}:`, error);
 
@@ -164,7 +162,6 @@ export class SyncService {
       this.notifyListeners('syncCompleted', { processed, failed });
 
       return { processed, failed };
-
     } finally {
       this.syncInProgress = false;
     }
@@ -190,7 +187,9 @@ export class SyncService {
     // 3. Manage conflicts
     // 4. Return success/failure
 
-    console.warn(`Simulated sync operation: ${operation.type} ${operation.dataType}:${operation.key}`);
+    console.warn(
+      `Simulated sync operation: ${operation.type} ${operation.dataType}:${operation.key}`
+    );
 
     return { success: true, operation: operation.id };
   }
@@ -244,14 +243,12 @@ export class SyncService {
         timestamp: this.lastSyncTime,
         backup: backup.backupId
       };
-
     } catch (error) {
       console.error('Full sync failed:', error);
       const message = error instanceof Error ? error.message : String(error);
       // Notify listeners
       this.notifyListeners('syncFailed', { error: message });
       throw error;
-
     } finally {
       this.syncInProgress = false;
     }
@@ -264,12 +261,7 @@ export class SyncService {
     const data = {};
 
     // Get all syncable data types
-    const syncableTypes = [
-      'watchlists',
-      'alerts',
-      'user_preferences',
-      'user_variables'
-    ];
+    const syncableTypes = ['watchlists', 'alerts', 'user_preferences', 'user_variables'];
 
     for (const type of syncableTypes) {
       const typeData = await persistenceManager.retrieve(type);
@@ -301,10 +293,7 @@ export class SyncService {
     const merged = {};
 
     // Get all data types from both sources
-    const allTypes = new Set([
-      ...Object.keys(localData),
-      ...Object.keys(remoteData)
-    ]);
+    const allTypes = new Set([...Object.keys(localData), ...Object.keys(remoteData)]);
 
     for (const type of allTypes) {
       const local = localData[type];
@@ -375,8 +364,7 @@ export class SyncService {
 
     // Add local watchlists, keeping newer versions
     Object.entries(local).forEach(([name, watchlist]) => {
-      if (!merged[name] ||
-          new Date(watchlist.lastUpdated) > new Date(merged[name].lastUpdated)) {
+      if (!merged[name] || new Date(watchlist.lastUpdated) > new Date(merged[name].lastUpdated)) {
         merged[name] = watchlist;
       }
     });

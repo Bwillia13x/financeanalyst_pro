@@ -1,8 +1,5 @@
 import { motion } from 'framer-motion';
-import {
-  BarChart3, Plus, Trash2,
-  Play, AlertTriangle
-} from 'lucide-react';
+import { BarChart3, Plus, Trash2, Play, AlertTriangle } from 'lucide-react';
 import React, { useState, useMemo, useCallback } from 'react';
 import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 
@@ -51,7 +48,7 @@ const EnhancedScenarioAnalysis = ({ data, _onDataChange, calculateDCF, lboModeli
   const [results, setResults] = useState(null);
   const [isCalculating, setIsCalculating] = useState(false);
 
-  const formatCurrency = useCallback((value) => {
+  const formatCurrency = useCallback(value => {
     if (!value && value !== 0) return '$0';
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -61,11 +58,11 @@ const EnhancedScenarioAnalysis = ({ data, _onDataChange, calculateDCF, lboModeli
     }).format(value);
   }, []);
 
-  const formatPercent = useCallback((value) => {
+  const formatPercent = useCallback(value => {
     return `${(value || 0).toFixed(1)}%`;
   }, []);
 
-  const runScenarioAnalysis = useCallback(async() => {
+  const runScenarioAnalysis = useCallback(async () => {
     setIsCalculating(true);
 
     try {
@@ -117,7 +114,8 @@ const EnhancedScenarioAnalysis = ({ data, _onDataChange, calculateDCF, lboModeli
         scenarioResults.push({
           ...scenario,
           result,
-          enterpriseValue: result?.enterpriseValue || result?.baseCase?.exitAnalysis?.enterpriseValue || 0,
+          enterpriseValue:
+            result?.enterpriseValue || result?.baseCase?.exitAnalysis?.enterpriseValue || 0,
           equityValue: result?.equityValue || result?.baseCase?.exitAnalysis?.equityProceeds || 0,
           irr: result?.irr || result?.baseCase?.returnsAnalysis?.irr || 0,
           moic: result?.moic || result?.baseCase?.returnsAnalysis?.moic || 0
@@ -125,22 +123,24 @@ const EnhancedScenarioAnalysis = ({ data, _onDataChange, calculateDCF, lboModeli
       }
 
       // Calculate probability-weighted metrics
-      const weightedValue = scenarioResults.reduce((sum, s) =>
-        sum + (s.enterpriseValue * s.probability / 100), 0
+      const weightedValue = scenarioResults.reduce(
+        (sum, s) => sum + (s.enterpriseValue * s.probability) / 100,
+        0
       );
 
       const valueRange = {
         min: Math.min(...scenarioResults.map(s => s.enterpriseValue)),
         max: Math.max(...scenarioResults.map(s => s.enterpriseValue)),
-        range: Math.max(...scenarioResults.map(s => s.enterpriseValue)) -
-               Math.min(...scenarioResults.map(s => s.enterpriseValue))
+        range:
+          Math.max(...scenarioResults.map(s => s.enterpriseValue)) -
+          Math.min(...scenarioResults.map(s => s.enterpriseValue))
       };
 
       // Risk metrics
       const standardDeviation = Math.sqrt(
         scenarioResults.reduce((sum, s) => {
           const deviation = s.enterpriseValue - weightedValue;
-          return sum + (deviation * deviation * s.probability / 100);
+          return sum + (deviation * deviation * s.probability) / 100;
         }, 0)
       );
 
@@ -165,7 +165,6 @@ const EnhancedScenarioAnalysis = ({ data, _onDataChange, calculateDCF, lboModeli
           moic: s.moic
         }))
       });
-
     } catch (error) {
       console.error('Scenario analysis error:', error);
       alert(`Error running scenario analysis: ${error.message}`);
@@ -189,21 +188,24 @@ const EnhancedScenarioAnalysis = ({ data, _onDataChange, calculateDCF, lboModeli
   }, [scenarios]);
 
   const updateScenario = useCallback((id, field, value) => {
-    setScenarios(prev => prev.map(scenario =>
-      scenario.id === id ? { ...scenario, [field]: parseFloat(value) || value } : scenario
-    ));
+    setScenarios(prev =>
+      prev.map(scenario =>
+        scenario.id === id ? { ...scenario, [field]: parseFloat(value) || value } : scenario
+      )
+    );
   }, []);
 
-  const deleteScenario = useCallback((id) => {
+  const deleteScenario = useCallback(id => {
     setScenarios(prev => prev.filter(scenario => scenario.id !== id && !scenario.isBase));
   }, []);
 
-  const totalProbability = useMemo(() =>
-    scenarios.reduce((sum, s) => sum + s.probability, 0), [scenarios]
+  const totalProbability = useMemo(
+    () => scenarios.reduce((sum, s) => sum + s.probability, 0),
+    [scenarios]
   );
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6">
+    <div className="bg-white rounded-lg shadow-lg p-6" data-testid="scenario-analysis">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-3">
           <BarChart3 className="text-purple-600" size={28} />
@@ -234,11 +236,13 @@ const EnhancedScenarioAnalysis = ({ data, _onDataChange, calculateDCF, lboModeli
       <div className="mb-6 p-4 bg-gray-50 rounded-lg">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
-            <label htmlFor="modelType" className="block text-sm font-medium text-gray-700 mb-2">Model Type</label>
+            <label htmlFor="modelType" className="block text-sm font-medium text-gray-700 mb-2">
+              Model Type
+            </label>
             <select
               id="modelType"
               value={analysisSettings.modelType}
-              onChange={(e) => setAnalysisSettings(prev => ({ ...prev, modelType: e.target.value }))}
+              onChange={e => setAnalysisSettings(prev => ({ ...prev, modelType: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg"
             >
               <option value="dcf">DCF Valuation</option>
@@ -248,11 +252,15 @@ const EnhancedScenarioAnalysis = ({ data, _onDataChange, calculateDCF, lboModeli
           </div>
 
           <div>
-            <label htmlFor="outputMetric" className="block text-sm font-medium text-gray-700 mb-2">Output Metric</label>
+            <label htmlFor="outputMetric" className="block text-sm font-medium text-gray-700 mb-2">
+              Output Metric
+            </label>
             <select
               id="outputMetric"
               value={analysisSettings.outputMetric}
-              onChange={(e) => setAnalysisSettings(prev => ({ ...prev, outputMetric: e.target.value }))}
+              onChange={e =>
+                setAnalysisSettings(prev => ({ ...prev, outputMetric: e.target.value }))
+              }
               className="w-full px-3 py-2 border border-gray-300 rounded-lg"
             >
               <option value="enterpriseValue">Enterprise Value</option>
@@ -263,12 +271,19 @@ const EnhancedScenarioAnalysis = ({ data, _onDataChange, calculateDCF, lboModeli
           </div>
 
           <div>
-            <label htmlFor="simulations" className="block text-sm font-medium text-gray-700 mb-2">Simulations</label>
+            <label htmlFor="simulations" className="block text-sm font-medium text-gray-700 mb-2">
+              Simulations
+            </label>
             <input
               id="simulations"
               type="number"
               value={analysisSettings.numSimulations}
-              onChange={(e) => setAnalysisSettings(prev => ({ ...prev, numSimulations: parseInt(e.target.value) || 1000 }))}
+              onChange={e =>
+                setAnalysisSettings(prev => ({
+                  ...prev,
+                  numSimulations: parseInt(e.target.value) || 1000
+                }))
+              }
               className="w-full px-3 py-2 border border-gray-300 rounded-lg"
             />
           </div>
@@ -278,7 +293,9 @@ const EnhancedScenarioAnalysis = ({ data, _onDataChange, calculateDCF, lboModeli
               <input
                 type="checkbox"
                 checked={analysisSettings.includeCorrelations}
-                onChange={(e) => setAnalysisSettings(prev => ({ ...prev, includeCorrelations: e.target.checked }))}
+                onChange={e =>
+                  setAnalysisSettings(prev => ({ ...prev, includeCorrelations: e.target.checked }))
+                }
                 className="mr-2"
               />
               <span className="text-sm text-gray-700">Include Correlations</span>
@@ -311,7 +328,7 @@ const EnhancedScenarioAnalysis = ({ data, _onDataChange, calculateDCF, lboModeli
           </motion.button>
         </div>
 
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto" data-testid="scenario-summary-table">
           <table className="w-full">
             <thead>
               <tr className="border-b-2 border-gray-300">
@@ -325,13 +342,16 @@ const EnhancedScenarioAnalysis = ({ data, _onDataChange, calculateDCF, lboModeli
               </tr>
             </thead>
             <tbody>
-              {scenarios.map((scenario) => (
-                <tr key={scenario.id} className={`border-b border-gray-200 ${scenario.isBase ? 'bg-blue-50' : ''}`}>
+              {scenarios.map(scenario => (
+                <tr
+                  key={scenario.id}
+                  className={`border-b border-gray-200 ${scenario.isBase ? 'bg-blue-50' : ''}`}
+                >
                   <td className="py-3 px-4">
                     <input
                       type="text"
                       value={scenario.name}
-                      onChange={(e) => updateScenario(scenario.id, 'name', e.target.value)}
+                      onChange={e => updateScenario(scenario.id, 'name', e.target.value)}
                       disabled={scenario.isBase}
                       className={`border border-gray-300 rounded px-2 py-1 ${scenario.isBase ? 'bg-gray-100' : ''}`}
                     />
@@ -341,7 +361,7 @@ const EnhancedScenarioAnalysis = ({ data, _onDataChange, calculateDCF, lboModeli
                       type="number"
                       step="1"
                       value={scenario.probability}
-                      onChange={(e) => updateScenario(scenario.id, 'probability', e.target.value)}
+                      onChange={e => updateScenario(scenario.id, 'probability', e.target.value)}
                       className="w-20 text-right border border-gray-300 rounded px-2 py-1"
                     />
                   </td>
@@ -350,7 +370,7 @@ const EnhancedScenarioAnalysis = ({ data, _onDataChange, calculateDCF, lboModeli
                       type="number"
                       step="0.1"
                       value={scenario.revenueGrowth}
-                      onChange={(e) => updateScenario(scenario.id, 'revenueGrowth', e.target.value)}
+                      onChange={e => updateScenario(scenario.id, 'revenueGrowth', e.target.value)}
                       className="w-20 text-right border border-gray-300 rounded px-2 py-1"
                     />
                   </td>
@@ -359,7 +379,7 @@ const EnhancedScenarioAnalysis = ({ data, _onDataChange, calculateDCF, lboModeli
                       type="number"
                       step="0.1"
                       value={scenario.marginExpansion}
-                      onChange={(e) => updateScenario(scenario.id, 'marginExpansion', e.target.value)}
+                      onChange={e => updateScenario(scenario.id, 'marginExpansion', e.target.value)}
                       className="w-20 text-right border border-gray-300 rounded px-2 py-1"
                     />
                   </td>
@@ -368,7 +388,7 @@ const EnhancedScenarioAnalysis = ({ data, _onDataChange, calculateDCF, lboModeli
                       type="number"
                       step="0.1"
                       value={scenario.exitMultiple}
-                      onChange={(e) => updateScenario(scenario.id, 'exitMultiple', e.target.value)}
+                      onChange={e => updateScenario(scenario.id, 'exitMultiple', e.target.value)}
                       className="w-20 text-right border border-gray-300 rounded px-2 py-1"
                     />
                   </td>
@@ -377,7 +397,7 @@ const EnhancedScenarioAnalysis = ({ data, _onDataChange, calculateDCF, lboModeli
                       type="number"
                       step="0.1"
                       value={scenario.capexIntensity}
-                      onChange={(e) => updateScenario(scenario.id, 'capexIntensity', e.target.value)}
+                      onChange={e => updateScenario(scenario.id, 'capexIntensity', e.target.value)}
                       className="w-20 text-right border border-gray-300 rounded px-2 py-1"
                     />
                   </td>
@@ -434,15 +454,15 @@ const EnhancedScenarioAnalysis = ({ data, _onDataChange, calculateDCF, lboModeli
           </div>
 
           {/* Scenario Results Chart */}
-          <div className="bg-gray-50 rounded-lg p-6">
+          <div className="bg-gray-50 rounded-lg p-6" data-testid="scenario-comparison-chart">
             <h3 className="text-lg font-semibold mb-4">Scenario Results</h3>
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={results.chartData}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="name" />
-                  <YAxis tickFormatter={(value) => formatCurrency(value)} />
-                  <Tooltip formatter={(value) => [formatCurrency(value), 'Enterprise Value']} />
+                  <YAxis tickFormatter={value => formatCurrency(value)} />
+                  <Tooltip formatter={value => [formatCurrency(value), 'Enterprise Value']} />
                   <Bar dataKey="value" fill="#8884d8" />
                 </BarChart>
               </ResponsiveContainer>
@@ -456,19 +476,27 @@ const EnhancedScenarioAnalysis = ({ data, _onDataChange, calculateDCF, lboModeli
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span>Standard Deviation:</span>
-                  <span className="font-medium">{formatCurrency(results.summary.standardDeviation)}</span>
+                  <span className="font-medium">
+                    {formatCurrency(results.summary.standardDeviation)}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span>Coefficient of Variation:</span>
-                  <span className="font-medium">{(results.summary.coefficientOfVariation * 100).toFixed(1)}%</span>
+                  <span className="font-medium">
+                    {(results.summary.coefficientOfVariation * 100).toFixed(1)}%
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span>Value at Risk (5%):</span>
-                  <span className="font-medium">{formatCurrency(results.summary.valueRange.min)}</span>
+                  <span className="font-medium">
+                    {formatCurrency(results.summary.valueRange.min)}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span>Upside Potential:</span>
-                  <span className="font-medium">{formatCurrency(results.summary.valueRange.range)}</span>
+                  <span className="font-medium">
+                    {formatCurrency(results.summary.valueRange.range)}
+                  </span>
                 </div>
               </div>
             </div>
@@ -476,13 +504,15 @@ const EnhancedScenarioAnalysis = ({ data, _onDataChange, calculateDCF, lboModeli
             <div className="bg-gray-50 rounded-lg p-4">
               <h4 className="font-semibold mb-3">Scenario Returns</h4>
               <div className="space-y-2 text-sm">
-                {results.scenarios.map((scenario) => (
+                {results.scenarios.map(scenario => (
                   <div key={scenario.id} className="flex justify-between">
                     <span>{scenario.name}:</span>
                     <span className="font-medium">
-                      {analysisSettings.outputMetric === 'irr' ? formatPercent(scenario.irr) :
-                        analysisSettings.outputMetric === 'moic' ? `${scenario.moic.toFixed(1)}x` :
-                          formatCurrency(scenario[analysisSettings.outputMetric])}
+                      {analysisSettings.outputMetric === 'irr'
+                        ? formatPercent(scenario.irr)
+                        : analysisSettings.outputMetric === 'moic'
+                          ? `${scenario.moic.toFixed(1)}x`
+                          : formatCurrency(scenario[analysisSettings.outputMetric])}
                     </span>
                   </div>
                 ))}

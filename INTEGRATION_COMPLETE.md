@@ -58,7 +58,7 @@ import { useFinancialAccessibility } from './hooks/useAccessibility';
 
 const MyComponent = () => {
   const { elementRef, testFinancialFeatures } = useFinancialAccessibility('spreadsheet');
-  
+
   return <div ref={elementRef}>Financial content</div>;
 };
 ```
@@ -75,9 +75,9 @@ const MyComponent = () => {
 import { useMobileAccessibility } from './hooks/useMobileAccessibility';
 
 const MobileComponent = () => {
-  const { isMobile, announceToScreenReader, toggleHighContrast } = 
+  const { isMobile, announceToScreenReader, toggleHighContrast } =
     useMobileAccessibility();
-  
+
   if (isMobile) {
     announceToScreenReader('Financial data loaded');
   }

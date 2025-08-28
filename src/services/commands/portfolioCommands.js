@@ -8,13 +8,14 @@ import { dataFetchingService } from '../dataFetching';
 
 export const portfolioCommands = {
   PORTFOLIO: {
-    execute: async(parsedCommand, _context, _processor) => {
+    execute: async (parsedCommand, _context, _processor) => {
       const [tickers, weights] = parsedCommand.parameters;
 
       if (!tickers || !weights) {
         return {
           type: 'error',
-          content: 'PORTFOLIO command requires tickers and weights. Usage: PORTFOLIO([AAPL,MSFT,GOOGL], [0.4,0.3,0.3])'
+          content:
+            'PORTFOLIO command requires tickers and weights. Usage: PORTFOLIO([AAPL,MSFT,GOOGL], [0.4,0.3,0.3])'
         };
       }
 
@@ -39,7 +40,7 @@ export const portfolioCommands = {
 
         // Fetch data for all tickers
         const portfolioData = await Promise.all(
-          tickerArray.map(async(ticker, index) => {
+          tickerArray.map(async (ticker, index) => {
             const profile = await dataFetchingService.fetchCompanyProfile(ticker);
             return {
               ticker: ticker.toUpperCase(),
@@ -55,19 +56,33 @@ export const portfolioCommands = {
         );
 
         // Calculate portfolio metrics
-        const portfolioValue = portfolioData.reduce((sum, stock) => sum + (stock.marketCap * stock.weight), 0);
-        const weightedBeta = portfolioData.reduce((sum, stock) => sum + (stock.beta * stock.weight), 0);
-        const weightedPE = portfolioData.reduce((sum, stock) => sum + (stock.pe * stock.weight), 0);
-        const weightedDividendYield = portfolioData.reduce((sum, stock) => sum + (stock.dividendYield * stock.weight), 0);
+        const portfolioValue = portfolioData.reduce(
+          (sum, stock) => sum + stock.marketCap * stock.weight,
+          0
+        );
+        const weightedBeta = portfolioData.reduce(
+          (sum, stock) => sum + stock.beta * stock.weight,
+          0
+        );
+        const weightedPE = portfolioData.reduce((sum, stock) => sum + stock.pe * stock.weight, 0);
+        const weightedDividendYield = portfolioData.reduce(
+          (sum, stock) => sum + stock.dividendYield * stock.weight,
+          0
+        );
 
         // Calculate diversification metrics
         const maxWeight = Math.max(...weightArray);
         const minWeight = Math.min(...weightArray);
         const concentrationRatio = maxWeight / minWeight;
 
-        const content = `Portfolio Analysis\n\n📊 PORTFOLIO COMPOSITION:\n${portfolioData.map(stock =>
-          `• ${stock.ticker} (${stock.name}): ${formatPercentage(stock.weight)} - ${formatCurrency(stock.price)}`
-        ).join('\n')}\n\n📈 PORTFOLIO METRICS:\n• Total Portfolio Value: ${formatCurrency(portfolioValue, 'USD', true)}\n• Weighted Beta: ${formatNumber(weightedBeta, 2)}\n• Weighted P/E: ${formatNumber(weightedPE, 1)}x\n• Weighted Dividend Yield: ${formatPercentage(weightedDividendYield)}\n\n🎯 DIVERSIFICATION:\n• Number of Holdings: ${tickerArray.length}\n• Max Position: ${formatPercentage(maxWeight)}\n• Min Position: ${formatPercentage(minWeight)}\n• Concentration Ratio: ${formatNumber(concentrationRatio, 1)}\n\n⚖️ RISK PROFILE:\n• Portfolio Beta: ${weightedBeta > 1.2 ? 'High Risk' : weightedBeta > 0.8 ? 'Moderate Risk' : 'Low Risk'}\n• Diversification: ${tickerArray.length >= 10 ? 'Well Diversified' : tickerArray.length >= 5 ? 'Moderately Diversified' : 'Concentrated'}\n• Concentration Risk: ${maxWeight > 0.3 ? 'High' : maxWeight > 0.2 ? 'Moderate' : 'Low'}\n\n💡 RECOMMENDATIONS:\n${maxWeight > 0.4 ? '• Consider reducing concentration in largest position\n' : ''}${tickerArray.length < 5 ? '• Consider adding more holdings for diversification\n' : ''}${weightedBeta > 1.5 ? '• Portfolio has high market risk exposure\n' : ''}${weightedDividendYield < 0.02 ? '• Consider adding dividend-paying stocks for income\n' : ''}`;
+        const content = `Portfolio Analysis\n\n📊 PORTFOLIO COMPOSITION:\n${portfolioData
+          .map(
+            stock =>
+              `• ${stock.ticker} (${stock.name}): ${formatPercentage(stock.weight)} - ${formatCurrency(stock.price)}`
+          )
+          .join(
+            '\n'
+          )}\n\n📈 PORTFOLIO METRICS:\n• Total Portfolio Value: ${formatCurrency(portfolioValue, 'USD', true)}\n• Weighted Beta: ${formatNumber(weightedBeta, 2)}\n• Weighted P/E: ${formatNumber(weightedPE, 1)}x\n• Weighted Dividend Yield: ${formatPercentage(weightedDividendYield)}\n\n🎯 DIVERSIFICATION:\n• Number of Holdings: ${tickerArray.length}\n• Max Position: ${formatPercentage(maxWeight)}\n• Min Position: ${formatPercentage(minWeight)}\n• Concentration Ratio: ${formatNumber(concentrationRatio, 1)}\n\n⚖️ RISK PROFILE:\n• Portfolio Beta: ${weightedBeta > 1.2 ? 'High Risk' : weightedBeta > 0.8 ? 'Moderate Risk' : 'Low Risk'}\n• Diversification: ${tickerArray.length >= 10 ? 'Well Diversified' : tickerArray.length >= 5 ? 'Moderately Diversified' : 'Concentrated'}\n• Concentration Risk: ${maxWeight > 0.3 ? 'High' : maxWeight > 0.2 ? 'Moderate' : 'Low'}\n\n💡 RECOMMENDATIONS:\n${maxWeight > 0.4 ? '• Consider reducing concentration in largest position\n' : ''}${tickerArray.length < 5 ? '• Consider adding more holdings for diversification\n' : ''}${weightedBeta > 1.5 ? '• Portfolio has high market risk exposure\n' : ''}${weightedDividendYield < 0.02 ? '• Consider adding dividend-paying stocks for income\n' : ''}`;
 
         return {
           type: 'success',
@@ -84,7 +99,6 @@ export const portfolioCommands = {
             }
           }
         };
-
       } catch (error) {
         return {
           type: 'error',
@@ -99,7 +113,7 @@ export const portfolioCommands = {
   },
 
   RISK_METRICS: {
-    execute: async(parsedCommand, _context, _processor) => {
+    execute: async (parsedCommand, _context, _processor) => {
       const [ticker, period = 252] = parsedCommand.parameters;
 
       if (!ticker) {
@@ -141,7 +155,6 @@ export const portfolioCommands = {
             }
           }
         };
-
       } catch (error) {
         return {
           type: 'error',
@@ -156,13 +169,14 @@ export const portfolioCommands = {
   },
 
   CORRELATION_MATRIX: {
-    execute: async(parsedCommand, _context, _processor) => {
+    execute: async (parsedCommand, _context, _processor) => {
       const [tickers] = parsedCommand.parameters;
 
       if (!tickers || !Array.isArray(tickers)) {
         return {
           type: 'error',
-          content: 'CORRELATION_MATRIX command requires an array of tickers. Usage: CORRELATION_MATRIX([AAPL,MSFT,GOOGL])'
+          content:
+            'CORRELATION_MATRIX command requires an array of tickers. Usage: CORRELATION_MATRIX([AAPL,MSFT,GOOGL])'
         };
       }
 
@@ -176,7 +190,7 @@ export const portfolioCommands = {
 
         // Fetch data for all tickers
         const stockData = await Promise.all(
-          tickers.map(async(ticker) => {
+          tickers.map(async ticker => {
             const profile = await dataFetchingService.fetchCompanyProfile(ticker);
             return {
               ticker: ticker.toUpperCase(),
@@ -198,7 +212,10 @@ export const portfolioCommands = {
               // Mock correlation based on sector similarity and beta similarity
               const sectorCorr = stockData[i].sector === stockData[j].sector ? 0.3 : 0.1;
               const betaCorr = 1 - Math.abs(stockData[i].beta - stockData[j].beta) * 0.2;
-              const correlation = Math.min(0.95, Math.max(-0.5, sectorCorr + betaCorr * 0.4 + (Math.random() - 0.5) * 0.3));
+              const correlation = Math.min(
+                0.95,
+                Math.max(-0.5, sectorCorr + betaCorr * 0.4 + (Math.random() - 0.5) * 0.3)
+              );
               correlationMatrix[stockData[i].ticker][stockData[j].ticker] = correlation;
             }
           }
@@ -216,8 +233,10 @@ export const portfolioCommands = {
         const avgCorrelation = totalCorr / count;
 
         // Find highest and lowest correlations
-        let maxCorr = -1, minCorr = 1;
-        let maxPair = '', minPair = '';
+        let maxCorr = -1,
+          minCorr = 1;
+        let maxPair = '',
+          minPair = '';
         for (let i = 0; i < stockData.length; i++) {
           for (let j = i + 1; j < stockData.length; j++) {
             const corr = correlationMatrix[stockData[i].ticker][stockData[j].ticker];
@@ -232,11 +251,14 @@ export const portfolioCommands = {
           }
         }
 
-        const matrixDisplay = stockData.map(stock =>
-          `${stock.ticker.padEnd(6)} ${stockData.map(s =>
-            formatNumber(correlationMatrix[stock.ticker][s.ticker], 2).padStart(6)
-          ).join(' ')}`
-        ).join('\n');
+        const matrixDisplay = stockData
+          .map(
+            stock =>
+              `${stock.ticker.padEnd(6)} ${stockData
+                .map(s => formatNumber(correlationMatrix[stock.ticker][s.ticker], 2).padStart(6))
+                .join(' ')}`
+          )
+          .join('\n');
 
         const content = `Correlation Matrix Analysis\n\n📊 CORRELATION MATRIX:\n       ${stockData.map(s => s.ticker.padStart(6)).join(' ')}\n${matrixDisplay}\n\n📈 CORRELATION STATISTICS:\n• Average Correlation: ${formatNumber(avgCorrelation, 3)}\n• Highest Correlation: ${formatNumber(maxCorr, 3)} (${maxPair})\n• Lowest Correlation: ${formatNumber(minCorr, 3)} (${minPair})\n\n🎯 DIVERSIFICATION ANALYSIS:\n• Portfolio Diversification: ${avgCorrelation < 0.3 ? 'Excellent' : avgCorrelation < 0.5 ? 'Good' : avgCorrelation < 0.7 ? 'Moderate' : 'Poor'}\n• Risk Reduction Benefit: ${formatPercentage(1 - avgCorrelation)}\n• Concentration Risk: ${maxCorr > 0.8 ? 'High' : maxCorr > 0.6 ? 'Moderate' : 'Low'}\n\n🏢 SECTOR BREAKDOWN:\n${stockData.map(stock => `• ${stock.ticker}: ${stock.sector}`).join('\n')}\n\n💡 INSIGHTS:\n${avgCorrelation > 0.7 ? '• High correlations suggest limited diversification benefits\n' : ''}${minCorr < 0 ? '• Negative correlations provide excellent hedging opportunities\n' : ''}${maxCorr > 0.9 ? '• Some holdings are highly correlated - consider reducing overlap\n' : ''}`;
 
@@ -256,7 +278,6 @@ export const portfolioCommands = {
             }
           }
         };
-
       } catch (error) {
         return {
           type: 'error',
@@ -271,13 +292,14 @@ export const portfolioCommands = {
   },
 
   EFFICIENT_FRONTIER: {
-    execute: async(parsedCommand, _context, _processor) => {
+    execute: async (parsedCommand, _context, _processor) => {
       const [tickers] = parsedCommand.parameters;
 
       if (!tickers || !Array.isArray(tickers)) {
         return {
           type: 'error',
-          content: 'EFFICIENT_FRONTIER command requires an array of tickers. Usage: EFFICIENT_FRONTIER([AAPL,MSFT,GOOGL])'
+          content:
+            'EFFICIENT_FRONTIER command requires an array of tickers. Usage: EFFICIENT_FRONTIER([AAPL,MSFT,GOOGL])'
         };
       }
 
@@ -291,7 +313,7 @@ export const portfolioCommands = {
 
         // Fetch data for all tickers
         const stockData = await Promise.all(
-          tickers.map(async(ticker) => {
+          tickers.map(async ticker => {
             const profile = await dataFetchingService.fetchCompanyProfile(ticker);
             return {
               ticker: ticker.toUpperCase(),
@@ -305,7 +327,7 @@ export const portfolioCommands = {
 
         // Generate efficient frontier points (simplified calculation)
         const frontierPoints = [];
-        for (let targetReturn = 0.05; targetReturn <= 0.20; targetReturn += 0.01) {
+        for (let targetReturn = 0.05; targetReturn <= 0.2; targetReturn += 0.01) {
           // Simplified optimization - equal weights adjusted for target return
           const weights = stockData.map(stock => {
             const baseWeight = 1 / stockData.length;
@@ -318,10 +340,16 @@ export const portfolioCommands = {
           const normalizedWeights = weights.map(w => w / totalWeight);
 
           // Calculate portfolio metrics
-          const portfolioReturn = stockData.reduce((sum, stock, i) =>
-            sum + normalizedWeights[i] * stock.expectedReturn, 0);
-          const portfolioVolatility = Math.sqrt(stockData.reduce((sum, stock, i) =>
-            sum + Math.pow(normalizedWeights[i] * stock.volatility, 2), 0));
+          const portfolioReturn = stockData.reduce(
+            (sum, stock, i) => sum + normalizedWeights[i] * stock.expectedReturn,
+            0
+          );
+          const portfolioVolatility = Math.sqrt(
+            stockData.reduce(
+              (sum, stock, i) => sum + Math.pow(normalizedWeights[i] * stock.volatility, 2),
+              0
+            )
+          );
           const sharpeRatio = (portfolioReturn - 0.02) / portfolioVolatility;
 
           frontierPoints.push({
@@ -334,13 +362,21 @@ export const portfolioCommands = {
 
         // Find optimal portfolio (max Sharpe ratio)
         const optimalPortfolio = frontierPoints.reduce((best, current) =>
-          current.sharpeRatio > best.sharpeRatio ? current : best);
+          current.sharpeRatio > best.sharpeRatio ? current : best
+        );
 
-        const content = `Efficient Frontier Analysis\n\n📊 ASSET UNIVERSE:\n${stockData.map(stock =>
-          `• ${stock.ticker}: Expected Return ${formatPercentage(stock.expectedReturn)}, Volatility ${formatPercentage(stock.volatility)}`
-        ).join('\n')}\n\n🎯 OPTIMAL PORTFOLIO (Max Sharpe Ratio):\n• Expected Return: ${formatPercentage(optimalPortfolio.return)}\n• Volatility: ${formatPercentage(optimalPortfolio.volatility)}\n• Sharpe Ratio: ${formatNumber(optimalPortfolio.sharpeRatio, 2)}\n\n⚖️ OPTIMAL WEIGHTS:\n${stockData.map((stock, i) =>
-          `• ${stock.ticker}: ${formatPercentage(optimalPortfolio.weights[i])}`
-        ).join('\n')}\n\n📈 FRONTIER STATISTICS:\n• Minimum Volatility: ${formatPercentage(Math.min(...frontierPoints.map(p => p.volatility)))}\n• Maximum Return: ${formatPercentage(Math.max(...frontierPoints.map(p => p.return)))}\n• Best Sharpe Ratio: ${formatNumber(Math.max(...frontierPoints.map(p => p.sharpeRatio)), 2)}\n• Frontier Points: ${frontierPoints.length}\n\n💡 INSIGHTS:\n• Diversification reduces portfolio risk below individual asset volatilities\n• Optimal portfolio balances return and risk for maximum risk-adjusted return\n• Consider rebalancing periodically to maintain target allocation\n\n⚠️ Note: Analysis uses simplified assumptions. Real optimization requires historical correlation data.`;
+        const content = `Efficient Frontier Analysis\n\n📊 ASSET UNIVERSE:\n${stockData
+          .map(
+            stock =>
+              `• ${stock.ticker}: Expected Return ${formatPercentage(stock.expectedReturn)}, Volatility ${formatPercentage(stock.volatility)}`
+          )
+          .join(
+            '\n'
+          )}\n\n🎯 OPTIMAL PORTFOLIO (Max Sharpe Ratio):\n• Expected Return: ${formatPercentage(optimalPortfolio.return)}\n• Volatility: ${formatPercentage(optimalPortfolio.volatility)}\n• Sharpe Ratio: ${formatNumber(optimalPortfolio.sharpeRatio, 2)}\n\n⚖️ OPTIMAL WEIGHTS:\n${stockData
+          .map((stock, i) => `• ${stock.ticker}: ${formatPercentage(optimalPortfolio.weights[i])}`)
+          .join(
+            '\n'
+          )}\n\n📈 FRONTIER STATISTICS:\n• Minimum Volatility: ${formatPercentage(Math.min(...frontierPoints.map(p => p.volatility)))}\n• Maximum Return: ${formatPercentage(Math.max(...frontierPoints.map(p => p.return)))}\n• Best Sharpe Ratio: ${formatNumber(Math.max(...frontierPoints.map(p => p.sharpeRatio)), 2)}\n• Frontier Points: ${frontierPoints.length}\n\n💡 INSIGHTS:\n• Diversification reduces portfolio risk below individual asset volatilities\n• Optimal portfolio balances return and risk for maximum risk-adjusted return\n• Consider rebalancing periodically to maintain target allocation\n\n⚠️ Note: Analysis uses simplified assumptions. Real optimization requires historical correlation data.`;
 
         return {
           type: 'success',
@@ -352,7 +388,6 @@ export const portfolioCommands = {
             optimalPortfolio
           }
         };
-
       } catch (error) {
         return {
           type: 'error',
@@ -367,7 +402,7 @@ export const portfolioCommands = {
   },
 
   DRAWDOWN: {
-    execute: async(parsedCommand, _context, _processor) => {
+    execute: async (parsedCommand, _context, _processor) => {
       const [ticker, period = 252] = parsedCommand.parameters;
 
       if (!ticker) {
@@ -395,9 +430,14 @@ export const portfolioCommands = {
           { start: '2024-02-15', end: '2024-03-10', magnitude: maxDrawdown * 0.7, duration: 24 }
         ];
 
-        const content = `Drawdown Analysis for ${profile.companyName} (${ticker.toUpperCase()})\n\n📉 DRAWDOWN STATISTICS:\n• Maximum Drawdown: ${formatPercentage(maxDrawdown)}\n• Average Drawdown: ${formatPercentage(avgDrawdown)}\n• Drawdown Frequency: ${formatNumber(drawdownFrequency, 1)} per year\n• Average Recovery Time: ${formatNumber(recoveryTime, 0)} days\n\n📊 HISTORICAL DRAWDOWNS:\n${drawdownPeriods.map((dd, i) =>
-          `${i + 1}. ${dd.start} to ${dd.end}: ${formatPercentage(dd.magnitude)} (${dd.duration} days)`
-        ).join('\n')}\n\n⚠️ RISK ASSESSMENT:\n• Drawdown Risk: ${maxDrawdown > 0.3 ? 'High' : maxDrawdown > 0.2 ? 'Moderate' : 'Low'}\n• Recovery Speed: ${recoveryTime < 60 ? 'Fast' : recoveryTime < 120 ? 'Moderate' : 'Slow'}\n• Volatility Impact: ${volatility > 0.25 ? 'High volatility increases drawdown risk' : 'Moderate volatility profile'}\n\n📈 PERFORMANCE METRICS:\n• Calmar Ratio: ${formatNumber(0.08 / maxDrawdown, 2)} (Annual Return / Max Drawdown)\n• Pain Index: ${formatNumber(avgDrawdown * drawdownFrequency, 2)}\n• Ulcer Index: ${formatNumber(Math.sqrt(avgDrawdown), 3)}\n\n💡 INSIGHTS:\n• Drawdowns are normal part of investing - focus on recovery patterns\n• Diversification can help reduce maximum drawdown magnitude\n• Consider position sizing based on maximum acceptable drawdown\n\n⏱️ Analysis Period: ${period} trading days\n${dataFetchingService.demoMode ? '💡 Note: Using estimated drawdown metrics. Configure API keys for historical data.' : '✅ Based on historical price data'}`;
+        const content = `Drawdown Analysis for ${profile.companyName} (${ticker.toUpperCase()})\n\n📉 DRAWDOWN STATISTICS:\n• Maximum Drawdown: ${formatPercentage(maxDrawdown)}\n• Average Drawdown: ${formatPercentage(avgDrawdown)}\n• Drawdown Frequency: ${formatNumber(drawdownFrequency, 1)} per year\n• Average Recovery Time: ${formatNumber(recoveryTime, 0)} days\n\n📊 HISTORICAL DRAWDOWNS:\n${drawdownPeriods
+          .map(
+            (dd, i) =>
+              `${i + 1}. ${dd.start} to ${dd.end}: ${formatPercentage(dd.magnitude)} (${dd.duration} days)`
+          )
+          .join(
+            '\n'
+          )}\n\n⚠️ RISK ASSESSMENT:\n• Drawdown Risk: ${maxDrawdown > 0.3 ? 'High' : maxDrawdown > 0.2 ? 'Moderate' : 'Low'}\n• Recovery Speed: ${recoveryTime < 60 ? 'Fast' : recoveryTime < 120 ? 'Moderate' : 'Slow'}\n• Volatility Impact: ${volatility > 0.25 ? 'High volatility increases drawdown risk' : 'Moderate volatility profile'}\n\n📈 PERFORMANCE METRICS:\n• Calmar Ratio: ${formatNumber(0.08 / maxDrawdown, 2)} (Annual Return / Max Drawdown)\n• Pain Index: ${formatNumber(avgDrawdown * drawdownFrequency, 2)}\n• Ulcer Index: ${formatNumber(Math.sqrt(avgDrawdown), 3)}\n\n💡 INSIGHTS:\n• Drawdowns are normal part of investing - focus on recovery patterns\n• Diversification can help reduce maximum drawdown magnitude\n• Consider position sizing based on maximum acceptable drawdown\n\n⏱️ Analysis Period: ${period} trading days\n${dataFetchingService.demoMode ? '💡 Note: Using estimated drawdown metrics. Configure API keys for historical data.' : '✅ Based on historical price data'}`;
 
         return {
           type: 'success',
@@ -414,7 +454,6 @@ export const portfolioCommands = {
             }
           }
         };
-
       } catch (error) {
         return {
           type: 'error',

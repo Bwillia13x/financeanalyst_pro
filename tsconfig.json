@@ -20,13 +20,13 @@
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true,
-    
+
     /* Path mapping */
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     },
-    
+
     /* Additional options for React */
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,

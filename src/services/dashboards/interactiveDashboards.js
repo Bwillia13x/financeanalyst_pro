@@ -310,10 +310,14 @@ export class InteractiveDashboardService {
       dashboardId,
       name: layout.name || 'Custom Layout',
       config: layout.config,
-      widgets: layout.widgets || dashboard.widgets.map(widgetId => {
-        const widget = this.widgets.get(widgetId);
-        return widget ? { id: widgetId, position: widget.position } : null;
-      }).filter(Boolean),
+      widgets:
+        layout.widgets ||
+        dashboard.widgets
+          .map(widgetId => {
+            const widget = this.widgets.get(widgetId);
+            return widget ? { id: widgetId, position: widget.position } : null;
+          })
+          .filter(Boolean),
       createdAt: new Date().toISOString(),
       createdBy: userId
     };
@@ -366,7 +370,7 @@ export class InteractiveDashboardService {
     };
 
     this.dataConnections.set(connection.id, connection);
-    
+
     // Update widget with data source reference
     widget.dataSource = connection.id;
 
@@ -384,7 +388,7 @@ export class InteractiveDashboardService {
 
     try {
       let data;
-      
+
       switch (connection.type) {
         case 'api':
           data = await this.fetchFromAPI(connection.config);
@@ -410,7 +414,7 @@ export class InteractiveDashboardService {
         widget.data = data;
         widget.lastDataUpdate = new Date().toISOString();
         connection.lastRefresh = new Date().toISOString();
-        
+
         this.emit('widget_data_updated', { widgetId: widget.id, data });
       }
 
@@ -418,7 +422,6 @@ export class InteractiveDashboardService {
       if (connection.refreshInterval > 0) {
         setTimeout(() => this.startDataFetch(connectionId), connection.refreshInterval);
       }
-
     } catch (error) {
       console.error(`Error fetching data for connection ${connectionId}:`, error);
       this.emit('data_fetch_error', { connectionId, error });
@@ -428,13 +431,13 @@ export class InteractiveDashboardService {
   // Real-time Updates
   enableRealTimeUpdates(dashboardId, websocketUrl) {
     const ws = new WebSocket(websocketUrl);
-    
+
     ws.onopen = () => {
       ws.send(JSON.stringify({ type: 'subscribe', dashboardId }));
       this.emit('realtime_connected', { dashboardId });
     };
 
-    ws.onmessage = (event) => {
+    ws.onmessage = event => {
       try {
         const update = JSON.parse(event.data);
         this.handleRealTimeUpdate(dashboardId, update);
@@ -453,27 +456,29 @@ export class InteractiveDashboardService {
 
   handleRealTimeUpdate(dashboardId, update) {
     switch (update.type) {
-      case 'widget_updated':
+      case 'widget_updated': {
         const widget = this.widgets.get(update.widgetId);
         if (widget && widget.dashboardId === dashboardId) {
           Object.assign(widget, update.data);
           this.emit('widget_updated', { widget, realTime: true });
         }
         break;
-      
-      case 'widget_data':
+      }
+
+      case 'widget_data': {
         const dataWidget = this.widgets.get(update.widgetId);
         if (dataWidget && dataWidget.dashboardId === dashboardId) {
           dataWidget.data = update.data;
           dataWidget.lastDataUpdate = new Date().toISOString();
-          this.emit('widget_data_updated', { 
-            widgetId: update.widgetId, 
-            data: update.data, 
-            realTime: true 
+          this.emit('widget_data_updated', {
+            widgetId: update.widgetId,
+            data: update.data,
+            realTime: true
           });
         }
         break;
-      
+      }
+
       case 'layout_changed':
         this.emit('layout_changed', { dashboardId, layout: update.layout });
         break;
@@ -527,10 +532,13 @@ export class InteractiveDashboardService {
     }
 
     // Create dashboard from template
-    const dashboard = await this.createDashboard({
-      name: dashboardName,
-      ...template.dashboardConfig
-    }, userId);
+    const dashboard = await this.createDashboard(
+      {
+        name: dashboardName,
+        ...template.dashboardConfig
+      },
+      userId
+    );
 
     // Create widgets from template
     for (const templateWidget of template.widgets) {
@@ -549,7 +557,7 @@ export class InteractiveDashboardService {
 
     // Update template usage stats
     template.downloadCount++;
-    
+
     return dashboard;
   }
 
@@ -561,7 +569,7 @@ export class InteractiveDashboardService {
     }
 
     const widgets = dashboard.widgets.map(id => this.widgets.get(id)).filter(Boolean);
-    
+
     const exportData = {
       dashboard,
       widgets,
@@ -586,11 +594,12 @@ export class InteractiveDashboardService {
     let dashboards = Array.from(this.dashboards.values());
 
     // Filter by permissions
-    dashboards = dashboards.filter(dashboard => 
-      dashboard.permissions.owner === userId ||
-      dashboard.permissions.editors.includes(userId) ||
-      dashboard.permissions.viewers.includes(userId) ||
-      dashboard.permissions.isPublic
+    dashboards = dashboards.filter(
+      dashboard =>
+        dashboard.permissions.owner === userId ||
+        dashboard.permissions.editors.includes(userId) ||
+        dashboard.permissions.viewers.includes(userId) ||
+        dashboard.permissions.isPublic
     );
 
     // Apply additional filters
@@ -603,16 +612,15 @@ export class InteractiveDashboardService {
     }
 
     if (filters.tags && filters.tags.length > 0) {
-      dashboards = dashboards.filter(d => 
-        filters.tags.some(tag => d.metadata.tags.includes(tag))
-      );
+      dashboards = dashboards.filter(d => filters.tags.some(tag => d.metadata.tags.includes(tag)));
     }
 
     if (filters.search) {
       const searchLower = filters.search.toLowerCase();
-      dashboards = dashboards.filter(d =>
-        d.name.toLowerCase().includes(searchLower) ||
-        d.description.toLowerCase().includes(searchLower)
+      dashboards = dashboards.filter(
+        d =>
+          d.name.toLowerCase().includes(searchLower) ||
+          d.description.toLowerCase().includes(searchLower)
       );
     }
 
@@ -620,15 +628,17 @@ export class InteractiveDashboardService {
   }
 
   searchTemplates(query, filters = {}) {
-    let templates = Array.from(this.templates.values())
-      .filter(template => template.isPublic || filters.includePrivate);
+    let templates = Array.from(this.templates.values()).filter(
+      template => template.isPublic || filters.includePrivate
+    );
 
     if (query) {
       const queryLower = query.toLowerCase();
-      templates = templates.filter(template =>
-        template.name.toLowerCase().includes(queryLower) ||
-        template.description.toLowerCase().includes(queryLower) ||
-        template.tags.some(tag => tag.toLowerCase().includes(queryLower))
+      templates = templates.filter(
+        template =>
+          template.name.toLowerCase().includes(queryLower) ||
+          template.description.toLowerCase().includes(queryLower) ||
+          template.tags.some(tag => tag.toLowerCase().includes(queryLower))
       );
     }
 
@@ -712,7 +722,10 @@ class DragDropLayout {
 
     if (isResizeHandle) {
       this.startResize(widgetId, event);
-    } else if (event.target.classList.contains('drag-handle') || widgetElement.dataset.draggable === 'true') {
+    } else if (
+      event.target.classList.contains('drag-handle') ||
+      widgetElement.dataset.draggable === 'true'
+    ) {
       this.startDrag(widgetId, event);
     }
   }
@@ -746,12 +759,20 @@ class DragDropLayout {
       this.options.onDrag(this.currentWidget, this.getPosition(event));
     } else if (this.isResizing) {
       const newSize = {
-        w: Math.max(2, Math.round((this.resizeStart.width + event.clientX - this.resizeStart.x) / 100)),
-        h: Math.max(2, Math.round((this.resizeStart.height + event.clientY - this.resizeStart.y) / 100))
+        w: Math.max(
+          2,
+          Math.round((this.resizeStart.width + event.clientX - this.resizeStart.x) / 100)
+        ),
+        h: Math.max(
+          2,
+          Math.round((this.resizeStart.height + event.clientY - this.resizeStart.y) / 100)
+        )
       };
-      
+
       // Visual feedback during resize
-      const widgetElement = this.container.querySelector(`[data-widget-id="${this.currentWidget}"]`);
+      const widgetElement = this.container.querySelector(
+        `[data-widget-id="${this.currentWidget}"]`
+      );
       if (widgetElement) {
         widgetElement.style.width = `${newSize.w * 100}px`;
         widgetElement.style.height = `${newSize.h * 100}px`;
@@ -764,8 +785,14 @@ class DragDropLayout {
       this.options.onDragEnd(this.currentWidget, this.getPosition(event), 'current_user');
     } else if (this.isResizing && this.options.onResize) {
       const newSize = {
-        w: Math.max(2, Math.round((this.resizeStart.width + event.clientX - this.resizeStart.x) / 100)),
-        h: Math.max(2, Math.round((this.resizeStart.height + event.clientY - this.resizeStart.y) / 100))
+        w: Math.max(
+          2,
+          Math.round((this.resizeStart.width + event.clientX - this.resizeStart.x) / 100)
+        ),
+        h: Math.max(
+          2,
+          Math.round((this.resizeStart.height + event.clientY - this.resizeStart.y) / 100)
+        )
       };
       this.options.onResize(this.currentWidget, newSize, 'current_user');
     }

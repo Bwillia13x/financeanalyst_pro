@@ -1,5 +1,14 @@
 import { motion } from 'framer-motion';
-import { FileText, TrendingUp, Building, Activity, Calculator, RefreshCw, CheckCircle, AlertCircle } from 'lucide-react';
+import {
+  FileText,
+  TrendingUp,
+  Building,
+  Activity,
+  Calculator,
+  RefreshCw,
+  CheckCircle,
+  AlertCircle
+} from 'lucide-react';
 import React, { useState, useCallback } from 'react';
 
 const FinancialModelWorkspace = ({ _data, _onDataChange }) => {
@@ -46,7 +55,7 @@ const FinancialModelWorkspace = ({ _data, _onDataChange }) => {
 
   const [assumptions, setAssumptions] = useState({
     revenueGrowthRate: 0.05,
-    cogsPercentOfRevenue: 0.60,
+    cogsPercentOfRevenue: 0.6,
     opexGrowthRate: 0.05,
     taxRate: 0.21,
     depreciationRate: 0.06,
@@ -57,10 +66,13 @@ const FinancialModelWorkspace = ({ _data, _onDataChange }) => {
   const [validationErrors, setValidationErrors] = useState([]);
   const periods = ['Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5'];
 
-  const formatCurrency = useCallback((value) => {
+  const formatCurrency = useCallback(value => {
     if (!value && value !== 0) return '$0';
     return new Intl.NumberFormat('en-US', {
-      style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
     }).format(value * 1000); // Convert from thousands
   }, []);
 
@@ -73,7 +85,8 @@ const FinancialModelWorkspace = ({ _data, _onDataChange }) => {
       newData.revenue[i] = newData.revenue[i - 1] * (1 + assumptions.revenueGrowthRate);
       newData.costOfGoodsSold[i] = newData.revenue[i] * assumptions.cogsPercentOfRevenue;
       newData.grossProfit[i] = newData.revenue[i] - newData.costOfGoodsSold[i];
-      newData.operatingExpenses[i] = newData.operatingExpenses[i - 1] * (1 + assumptions.opexGrowthRate);
+      newData.operatingExpenses[i] =
+        newData.operatingExpenses[i - 1] * (1 + assumptions.opexGrowthRate);
       newData.ebitda[i] = newData.grossProfit[i] - newData.operatingExpenses[i];
       newData.depreciation[i] = newData.ppe[i - 1] * assumptions.depreciationRate;
       newData.ebit[i] = newData.ebitda[i] - newData.depreciation[i];
@@ -94,26 +107,31 @@ const FinancialModelWorkspace = ({ _data, _onDataChange }) => {
       newData.accountsPayable[i] = newData.costOfGoodsSold[i] * 0.05; // ~18 days
 
       // Cash Flow
-      const wcChange = (newData.accountsReceivable[i] - newData.accountsReceivable[i - 1]) +
-                      (newData.inventory[i] - newData.inventory[i - 1]) -
-                      (newData.accountsPayable[i] - newData.accountsPayable[i - 1]);
+      const wcChange =
+        newData.accountsReceivable[i] -
+        newData.accountsReceivable[i - 1] +
+        (newData.inventory[i] - newData.inventory[i - 1]) -
+        (newData.accountsPayable[i] - newData.accountsPayable[i - 1]);
 
       newData.operatingCashFlow[i] = newData.netIncome[i] + newData.depreciation[i] - wcChange;
       newData.capex[i] = -capex;
       newData.investingCashFlow[i] = newData.capex[i];
       newData.debtRepayment[i] = -assumptions.debtPaydown;
       newData.financingCashFlow[i] = newData.debtRepayment[i];
-      newData.netCashFlow[i] = newData.operatingCashFlow[i] + newData.investingCashFlow[i] + newData.financingCashFlow[i];
+      newData.netCashFlow[i] =
+        newData.operatingCashFlow[i] + newData.investingCashFlow[i] + newData.financingCashFlow[i];
       newData.endingCash[i] = newData.cash[i - 1] + newData.netCashFlow[i];
       newData.cash[i] = newData.endingCash[i];
 
       // Complete Balance Sheet
-      newData.totalCurrentAssets[i] = newData.cash[i] + newData.accountsReceivable[i] + newData.inventory[i];
+      newData.totalCurrentAssets[i] =
+        newData.cash[i] + newData.accountsReceivable[i] + newData.inventory[i];
       newData.totalAssets[i] = newData.totalCurrentAssets[i] + newData.ppe[i];
       newData.totalCurrentLiabilities[i] = newData.accountsPayable[i] + newData.shortTermDebt[i];
       newData.totalLiabilities[i] = newData.totalCurrentLiabilities[i] + newData.longTermDebt[i];
       newData.shareholderEquity[i] = newData.totalAssets[i] - newData.totalLiabilities[i];
-      newData.totalLiabilitiesEquity[i] = newData.totalLiabilities[i] + newData.shareholderEquity[i];
+      newData.totalLiabilitiesEquity[i] =
+        newData.totalLiabilities[i] + newData.shareholderEquity[i];
     }
 
     setModelData(newData);
@@ -127,7 +145,6 @@ const FinancialModelWorkspace = ({ _data, _onDataChange }) => {
       }
     }
     setValidationErrors(errors);
-
   }, [modelData, assumptions, periods]);
 
   const handleAssumptionChange = useCallback((field, value) => {
@@ -175,7 +192,9 @@ const FinancialModelWorkspace = ({ _data, _onDataChange }) => {
             <h3 className="font-semibold text-red-800">Validation Errors</h3>
           </div>
           <ul className="text-sm text-red-700">
-            {validationErrors.map((error, idx) => <li key={idx}>• {error}</li>)}
+            {validationErrors.map((error, idx) => (
+              <li key={idx}>• {error}</li>
+            ))}
           </ul>
         </div>
       )}
@@ -183,7 +202,7 @@ const FinancialModelWorkspace = ({ _data, _onDataChange }) => {
       {/* Tabs */}
       <div className="border-b border-gray-200 mb-6">
         <nav className="-mb-px flex space-x-8">
-          {statements.map((statement) => {
+          {statements.map(statement => {
             const Icon = statement.icon;
             return (
               <button
@@ -211,7 +230,11 @@ const FinancialModelWorkspace = ({ _data, _onDataChange }) => {
               <thead>
                 <tr className="border-b-2 border-gray-300">
                   <th className="text-left py-3 px-4 font-semibold">Income Statement ($000s)</th>
-                  {periods.map(period => <th key={period} className="text-right py-3 px-4 font-semibold">{period}</th>)}
+                  {periods.map(period => (
+                    <th key={period} className="text-right py-3 px-4 font-semibold">
+                      {period}
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
@@ -227,11 +250,13 @@ const FinancialModelWorkspace = ({ _data, _onDataChange }) => {
                   { label: 'EBT', key: 'ebt' },
                   { label: 'Taxes', key: 'taxes' },
                   { label: 'Net Income', key: 'netIncome' }
-                ].map((item) => (
+                ].map(item => (
                   <tr key={item.key} className="border-b border-gray-200">
                     <td className="py-2 px-4 font-medium">{item.label}</td>
                     {modelData[item.key]?.map((value, periodIdx) => (
-                      <td key={periodIdx} className="text-right py-2 px-4">{formatCurrency(value)}</td>
+                      <td key={periodIdx} className="text-right py-2 px-4">
+                        {formatCurrency(value)}
+                      </td>
                     ))}
                   </tr>
                 ))}
@@ -249,11 +274,19 @@ const FinancialModelWorkspace = ({ _data, _onDataChange }) => {
               <thead>
                 <tr className="border-b-2 border-gray-300">
                   <th className="text-left py-3 px-4 font-semibold">Balance Sheet ($000s)</th>
-                  {periods.map(period => <th key={period} className="text-right py-3 px-4 font-semibold">{period}</th>)}
+                  {periods.map(period => (
+                    <th key={period} className="text-right py-3 px-4 font-semibold">
+                      {period}
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
-                <tr className="bg-gray-100"><td colSpan={6} className="py-2 px-4 font-semibold">ASSETS</td></tr>
+                <tr className="bg-gray-100">
+                  <td colSpan={6} className="py-2 px-4 font-semibold">
+                    ASSETS
+                  </td>
+                </tr>
                 {[
                   { label: 'Cash', key: 'cash' },
                   { label: 'Accounts Receivable', key: 'accountsReceivable' },
@@ -261,16 +294,22 @@ const FinancialModelWorkspace = ({ _data, _onDataChange }) => {
                   { label: 'Total Current Assets', key: 'totalCurrentAssets' },
                   { label: 'PP&E', key: 'ppe' },
                   { label: 'Total Assets', key: 'totalAssets' }
-                ].map((item) => (
+                ].map(item => (
                   <tr key={item.key} className="border-b border-gray-200">
                     <td className="py-2 px-4">{item.label}</td>
                     {modelData[item.key]?.map((value, periodIdx) => (
-                      <td key={periodIdx} className="text-right py-2 px-4">{formatCurrency(value)}</td>
+                      <td key={periodIdx} className="text-right py-2 px-4">
+                        {formatCurrency(value)}
+                      </td>
                     ))}
                   </tr>
                 ))}
 
-                <tr className="bg-gray-100"><td colSpan={6} className="py-2 px-4 font-semibold">LIABILITIES & EQUITY</td></tr>
+                <tr className="bg-gray-100">
+                  <td colSpan={6} className="py-2 px-4 font-semibold">
+                    LIABILITIES & EQUITY
+                  </td>
+                </tr>
                 {[
                   { label: 'Accounts Payable', key: 'accountsPayable' },
                   { label: 'Short-term Debt', key: 'shortTermDebt' },
@@ -279,11 +318,13 @@ const FinancialModelWorkspace = ({ _data, _onDataChange }) => {
                   { label: 'Total Liabilities', key: 'totalLiabilities' },
                   { label: 'Shareholder Equity', key: 'shareholderEquity' },
                   { label: 'Total Liab. & Equity', key: 'totalLiabilitiesEquity' }
-                ].map((item) => (
+                ].map(item => (
                   <tr key={item.key} className="border-b border-gray-200">
                     <td className="py-2 px-4">{item.label}</td>
                     {modelData[item.key]?.map((value, periodIdx) => (
-                      <td key={periodIdx} className="text-right py-2 px-4">{formatCurrency(value)}</td>
+                      <td key={periodIdx} className="text-right py-2 px-4">
+                        {formatCurrency(value)}
+                      </td>
                     ))}
                   </tr>
                 ))}
@@ -301,7 +342,11 @@ const FinancialModelWorkspace = ({ _data, _onDataChange }) => {
               <thead>
                 <tr className="border-b-2 border-gray-300">
                   <th className="text-left py-3 px-4 font-semibold">Cash Flow Statement ($000s)</th>
-                  {periods.map(period => <th key={period} className="text-right py-3 px-4 font-semibold">{period}</th>)}
+                  {periods.map(period => (
+                    <th key={period} className="text-right py-3 px-4 font-semibold">
+                      {period}
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
@@ -313,11 +358,13 @@ const FinancialModelWorkspace = ({ _data, _onDataChange }) => {
                   { label: 'Financing Cash Flow', key: 'financingCashFlow' },
                   { label: 'Net Cash Flow', key: 'netCashFlow' },
                   { label: 'Ending Cash', key: 'endingCash' }
-                ].map((item) => (
+                ].map(item => (
                   <tr key={item.key} className="border-b border-gray-200">
                     <td className="py-2 px-4">{item.label}</td>
                     {modelData[item.key]?.map((value, periodIdx) => (
-                      <td key={periodIdx} className="text-right py-2 px-4">{formatCurrency(value)}</td>
+                      <td key={periodIdx} className="text-right py-2 px-4">
+                        {formatCurrency(value)}
+                      </td>
                     ))}
                   </tr>
                 ))}
@@ -349,11 +396,17 @@ const FinancialModelWorkspace = ({ _data, _onDataChange }) => {
                     <input
                       type="number"
                       step="0.01"
-                      value={assumption.isPercent ? assumptions[assumption.key] * 100 : assumptions[assumption.key]}
-                      onChange={(e) => handleAssumptionChange(
-                        assumption.key,
-                        assumption.isPercent ? (e.target.value || 0) / 100 : e.target.value
-                      )}
+                      value={
+                        assumption.isPercent
+                          ? assumptions[assumption.key] * 100
+                          : assumptions[assumption.key]
+                      }
+                      onChange={e =>
+                        handleAssumptionChange(
+                          assumption.key,
+                          assumption.isPercent ? (e.target.value || 0) / 100 : e.target.value
+                        )
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                     />
                   </div>
@@ -366,19 +419,35 @@ const FinancialModelWorkspace = ({ _data, _onDataChange }) => {
               <div className="space-y-3">
                 <div className="flex justify-between">
                   <span>5-Year Revenue CAGR:</span>
-                  <span className="font-medium">{((Math.pow(modelData.revenue[4] / modelData.revenue[0], 1 / 4) - 1) * 100).toFixed(1)}%</span>
+                  <span className="font-medium">
+                    {(
+                      (Math.pow(modelData.revenue[4] / modelData.revenue[0], 1 / 4) - 1) *
+                      100
+                    ).toFixed(1)}
+                    %
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span>5-Year EBITDA CAGR:</span>
-                  <span className="font-medium">{((Math.pow(modelData.ebitda[4] / modelData.ebitda[0], 1 / 4) - 1) * 100).toFixed(1)}%</span>
+                  <span className="font-medium">
+                    {(
+                      (Math.pow(modelData.ebitda[4] / modelData.ebitda[0], 1 / 4) - 1) *
+                      100
+                    ).toFixed(1)}
+                    %
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span>Exit EBITDA Margin:</span>
-                  <span className="font-medium">{((modelData.ebitda[4] / modelData.revenue[4]) * 100).toFixed(1)}%</span>
+                  <span className="font-medium">
+                    {((modelData.ebitda[4] / modelData.revenue[4]) * 100).toFixed(1)}%
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span>Exit Debt/EBITDA:</span>
-                  <span className="font-medium">{(modelData.longTermDebt[4] / modelData.ebitda[4]).toFixed(1)}x</span>
+                  <span className="font-medium">
+                    {(modelData.longTermDebt[4] / modelData.ebitda[4]).toFixed(1)}x
+                  </span>
                 </div>
               </div>
             </div>

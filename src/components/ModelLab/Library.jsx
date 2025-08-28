@@ -4,7 +4,9 @@ const Card = ({ title, right, children, className = '' }) => (
   <section className={`rounded-2xl border border-slate-200 bg-white shadow-sm ${className}`}>
     {(title || right) && (
       <header className="flex items-center justify-between border-b border-slate-200 px-4 py-2.5">
-        {title && <h3 className="text-[13px] font-semibold tracking-wide text-slate-700">{title}</h3>}
+        {title && (
+          <h3 className="text-[13px] font-semibold tracking-wide text-slate-700">{title}</h3>
+        )}
         {right}
       </header>
     )}
@@ -21,7 +23,9 @@ const Pill = ({ children, tone = 'slate' }) => {
     red: 'bg-rose-50 text-rose-700 border-rose-200'
   };
   return (
-    <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] ${tones[tone]}`}>
+    <span
+      className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] ${tones[tone]}`}
+    >
       {children}
     </span>
   );
@@ -32,21 +36,24 @@ const Library = ({ models, setModels, onSelect }) => {
   const tags = Array.from(new Set(models.flatMap(m => m.tags)));
   const [tag, setTag] = useState(undefined);
 
-  const filtered = models.filter(m =>
-    (!q || m.name.toLowerCase().includes(q.toLowerCase())) &&
-    (!tag || m.tags.includes(tag))
+  const filtered = models.filter(
+    m => (!q || m.name.toLowerCase().includes(q.toLowerCase())) && (!tag || m.tags.includes(tag))
   );
 
-  const toggleSel = (m) => {
-    setModels(models.map(x => x.id === m.id ? ({ ...x, selected: !x.selected }) : x));
+  const toggleSel = m => {
+    setModels(models.map(x => (x.id === m.id ? { ...x, selected: !x.selected } : x)));
   };
 
-  const del = (m) => setModels(models.filter(x => x.id !== m.id));
+  const del = m => setModels(models.filter(x => x.id !== m.id));
 
-  const bump = (m) => {
+  const bump = m => {
     const [v, patch] = m.version.split('v')[1].split('.');
     const newV = `v${v}.${Number(patch || 0) + 1}`;
-    setModels(models.map(x => x.id === m.id ? ({ ...x, version: newV, updated: new Date().toISOString() }) : x));
+    setModels(
+      models.map(x =>
+        x.id === m.id ? { ...x, version: newV, updated: new Date().toISOString() } : x
+      )
+    );
   };
 
   return (
@@ -59,7 +66,7 @@ const Library = ({ models, setModels, onSelect }) => {
           <span className="mb-1 block text-slate-600">Search</span>
           <input
             value={q}
-            onChange={(e) => setQ(e.target.value)}
+            onChange={e => setQ(e.target.value)}
             placeholder="Name or tag…"
             className="w-full rounded-md border border-slate-300 bg-white px-2 py-1"
           />
@@ -68,18 +75,25 @@ const Library = ({ models, setModels, onSelect }) => {
           <span className="mb-1 block text-slate-600">Filter tag</span>
           <select
             value={tag || ''}
-            onChange={(e) => setTag(e.target.value || undefined)}
+            onChange={e => setTag(e.target.value || undefined)}
             className="w-full rounded-md border border-slate-300 bg-white px-2 py-1"
           >
             <option value="">All</option>
-            {tags.map(t => <option key={t} value={t}>{t}</option>)}
+            {tags.map(t => (
+              <option key={t} value={t}>
+                {t}
+              </option>
+            ))}
           </select>
         </label>
       </div>
 
       <ul className="grid grid-cols-1 gap-2">
         {filtered.map(m => (
-          <li key={m.id} className="flex items-center justify-between rounded-xl border border-slate-200 p-3">
+          <li
+            key={m.id}
+            className="flex items-center justify-between rounded-xl border border-slate-200 p-3"
+          >
             <div className="flex flex-col">
               <div className="flex items-center gap-2">
                 <span className="text-[13px] font-semibold text-slate-800">{m.name}</span>
@@ -88,7 +102,12 @@ const Library = ({ models, setModels, onSelect }) => {
                 {m.selected && <Pill tone="green">Compare</Pill>}
               </div>
               <div className="text-[11px] text-slate-500">
-                Updated {new Date(m.updated).toLocaleString()} • {m.tags.map(t => <span key={t} className="mr-1">#{t}</span>)}
+                Updated {new Date(m.updated).toLocaleString()} •{' '}
+                {m.tags.map(t => (
+                  <span key={t} className="mr-1">
+                    #{t}
+                  </span>
+                ))}
               </div>
             </div>
             <div className="flex items-center gap-2">

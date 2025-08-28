@@ -18,7 +18,7 @@ module.exports = {
         'categories:accessibility': ['error', { minScore: 0.95 }],
         'categories:best-practices': ['error', { minScore: 0.90 }],
         'categories:seo': ['error', { minScore: 0.95 }],
-        
+
         // Core Web Vitals
         'metrics:largest-contentful-paint': ['error', { maxNumericValue: 2500 }],
         'metrics:first-input-delay': ['error', { maxNumericValue: 100 }],
@@ -26,13 +26,13 @@ module.exports = {
         'metrics:first-contentful-paint': ['error', { maxNumericValue: 1800 }],
         'metrics:interactive': ['error', { maxNumericValue: 3800 }],
         'metrics:speed-index': ['error', { maxNumericValue: 3400 }],
-        
+
         // Bundle size audits
         'resource-summary:script:size': ['error', { maxNumericValue: 1024000 }], // 1MB JS
         'resource-summary:stylesheet:size': ['error', { maxNumericValue: 102400 }], // 100KB CSS
         'resource-summary:image:size': ['error', { maxNumericValue: 512000 }], // 500KB images
         'resource-summary:total:size': ['error', { maxNumericValue: 2048000 }], // 2MB total
-        
+
         // Security and best practices
         'uses-https': 'error',
         'uses-http2': 'error',
@@ -41,7 +41,7 @@ module.exports = {
         'modern-image-formats': 'warn',
         'unused-css-rules': 'warn',
         'unused-javascript': 'warn',
-        
+
         // Accessibility requirements
         'color-contrast': 'error',
         'html-has-lang': 'error',
@@ -60,7 +60,7 @@ module.exports = {
         'heading-order': 'error',
         'landmark-one-main': 'error',
         'skip-link': 'error',
-        
+
         // SEO requirements
         'meta-description': 'error',
         'canonical': 'error',

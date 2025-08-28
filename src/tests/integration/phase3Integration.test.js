@@ -19,7 +19,7 @@ describe('Phase 3 Integration Tests', () => {
   let testUser;
   let mockFinancialData;
 
-  beforeAll(async() => {
+  beforeAll(async () => {
     // Initialize test user and data
     testUser = {
       id: 'test_user_123',
@@ -33,18 +33,18 @@ describe('Phase 3 Integration Tests', () => {
       financialData: {
         statements: {
           incomeStatement: {
-            '2023': { totalRevenue: 1000000, netIncome: 100000, operatingIncome: 150000 },
-            '2022': { totalRevenue: 900000, netIncome: 90000, operatingIncome: 135000 }
+            2023: { totalRevenue: 1000000, netIncome: 100000, operatingIncome: 150000 },
+            2022: { totalRevenue: 900000, netIncome: 90000, operatingIncome: 135000 }
           },
           balanceSheet: {
-            '2023': { totalAssets: 2000000, totalLiabilities: 800000, totalEquity: 1200000 },
-            '2022': { totalAssets: 1800000, totalLiabilities: 720000, totalEquity: 1080000 }
+            2023: { totalAssets: 2000000, totalLiabilities: 800000, totalEquity: 1200000 },
+            2022: { totalAssets: 1800000, totalLiabilities: 720000, totalEquity: 1080000 }
           }
         }
       },
       assumptions: {
         revenueGrowthRate: 0.05,
-        discountRate: 0.10,
+        discountRate: 0.1,
         terminalGrowthRate: 0.03
       }
     };
@@ -62,7 +62,7 @@ describe('Phase 3 Integration Tests', () => {
     ]);
   });
 
-  afterAll(async() => {
+  afterAll(async () => {
     // Cleanup test data
     if (collaborationService.disconnect) {
       await collaborationService.disconnect();
@@ -70,7 +70,7 @@ describe('Phase 3 Integration Tests', () => {
   });
 
   describe('Real-time Data & Collaboration Integration', () => {
-    it('should sync financial data updates across collaborative sessions', async() => {
+    it('should sync financial data updates across collaborative sessions', async () => {
       // Create a workspace
       const workspaceId = 'test_workspace_integration';
       await collaborationService.joinWorkspace(workspaceId, {
@@ -100,7 +100,7 @@ describe('Phase 3 Integration Tests', () => {
       expect(updatedModel.data.assumptions.revenueGrowthRate).toBe(0.07);
     });
 
-    it('should generate AI insights on collaborative data changes', async() => {
+    it('should generate AI insights on collaborative data changes', async () => {
       // Generate AI insights for the financial data
       const insights = await aiInsightsService.generateInsights(mockFinancialData);
 
@@ -113,7 +113,7 @@ describe('Phase 3 Integration Tests', () => {
   });
 
   describe('Analytics & User Tracking Integration', () => {
-    it('should track user interactions across all Phase 3 features', async() => {
+    it('should track user interactions across all Phase 3 features', async () => {
       // Simulate user interactions
       analyticsService.trackEvent('collaboration_join', { workspaceId: 'test_workspace' });
       analyticsService.trackEvent('ai_insights_generated', { insightCount: 5 });
@@ -129,7 +129,7 @@ describe('Phase 3 Integration Tests', () => {
       expect(analytics.events.length).toBeGreaterThan(0);
     });
 
-    it('should integrate user preferences with analytics tracking', async() => {
+    it('should integrate user preferences with analytics tracking', async () => {
       // Update user preferences
       const preferences = userPreferencesService.updatePreferences({
         theme: 'professional',
@@ -152,7 +152,7 @@ describe('Phase 3 Integration Tests', () => {
   });
 
   describe('API Integration & Security Integration', () => {
-    it('should securely authenticate API requests', async() => {
+    it('should securely authenticate API requests', async () => {
       // Test API authentication flow
       const credentials = {
         username: testUser.email,
@@ -161,12 +161,11 @@ describe('Phase 3 Integration Tests', () => {
       };
 
       // Mock authentication
-      const mockAuth = vi.spyOn(securityService, 'authenticateUser')
-        .mockResolvedValue({
-          sessionId: 'test_session_123',
-          user: testUser,
-          permissions: testUser.permissions
-        });
+      const mockAuth = vi.spyOn(securityService, 'authenticateUser').mockResolvedValue({
+        sessionId: 'test_session_123',
+        user: testUser,
+        permissions: testUser.permissions
+      });
 
       const session = await securityService.authenticateUser(credentials);
 
@@ -177,7 +176,7 @@ describe('Phase 3 Integration Tests', () => {
       mockAuth.mockRestore();
     });
 
-    it('should encrypt sensitive data in API integrations', async() => {
+    it('should encrypt sensitive data in API integrations', async () => {
       const sensitiveData = {
         apiKey: 'secret_api_key_123',
         userData: mockFinancialData
@@ -195,7 +194,7 @@ describe('Phase 3 Integration Tests', () => {
   });
 
   describe('Reporting Engine Integration', () => {
-    it('should generate reports using data from multiple Phase 3 services', async() => {
+    it('should generate reports using data from multiple Phase 3 services', async () => {
       // Prepare comprehensive report data
       const reportData = {
         ...mockFinancialData,
@@ -217,7 +216,7 @@ describe('Phase 3 Integration Tests', () => {
       expect(report.sections.length).toBeGreaterThan(0);
     });
 
-    it('should export reports with visualization data', async() => {
+    it('should export reports with visualization data', async () => {
       // Create a visualization
       const visualization = visualizationService.createVisualization({
         name: 'Revenue Trend',
@@ -243,7 +242,7 @@ describe('Phase 3 Integration Tests', () => {
   });
 
   describe('Dashboard & Visualization Integration', () => {
-    it('should create interactive dashboards with real-time data', async() => {
+    it('should create interactive dashboards with real-time data', async () => {
       // Create custom dashboard
       const dashboard = visualizationService.createDashboard({
         name: 'Integration Test Dashboard',
@@ -261,7 +260,10 @@ describe('Phase 3 Integration Tests', () => {
       const widget = visualizationService.addWidgetToDashboard(dashboard.id, {
         id: 'performance_chart',
         type: 'chart',
-        x: 0, y: 0, w: 8, h: 4,
+        x: 0,
+        y: 0,
+        w: 8,
+        h: 4,
         config: { chartType: 'line', template: 'revenue_trend' }
       });
 
@@ -271,7 +273,7 @@ describe('Phase 3 Integration Tests', () => {
       expect(updatedDashboard.layout.widgets.length).toBe(1);
     });
 
-    it('should integrate user preferences with dashboard themes', async() => {
+    it('should integrate user preferences with dashboard themes', async () => {
       // Update user preferences
       userPreferencesService.updatePreferences({
         theme: 'dark',
@@ -290,7 +292,7 @@ describe('Phase 3 Integration Tests', () => {
   });
 
   describe('Performance & Testing Integration', () => {
-    it('should run automated tests on integrated components', async() => {
+    it('should run automated tests on integrated components', async () => {
       // Run comprehensive test suite
       const testResults = await testingService.runAllTests({
         categories: ['unit', 'integration', 'performance']
@@ -301,7 +303,7 @@ describe('Phase 3 Integration Tests', () => {
       expect(testResults.summary.totalTests).toBeGreaterThan(0);
     });
 
-    it('should monitor performance across all Phase 3 features', async() => {
+    it('should monitor performance across all Phase 3 features', async () => {
       // Collect performance metrics
       testingService.collectPerformanceMetrics();
 
@@ -317,7 +319,7 @@ describe('Phase 3 Integration Tests', () => {
   });
 
   describe('Security & Compliance Integration', () => {
-    it('should maintain security across all integrated features', async() => {
+    it('should maintain security across all integrated features', async () => {
       // Run security compliance check
       const complianceReport = await securityService.runComplianceCheck();
 
@@ -325,7 +327,7 @@ describe('Phase 3 Integration Tests', () => {
       expect(complianceReport.summary).toBeDefined();
     });
 
-    it('should audit all Phase 3 feature interactions', async() => {
+    it('should audit all Phase 3 feature interactions', async () => {
       // Simulate various user actions that should be audited
       securityService.logSecurityEvent('data_access', {
         userId: testUser.id,
@@ -349,7 +351,7 @@ describe('Phase 3 Integration Tests', () => {
   });
 
   describe('End-to-End Workflow Integration', () => {
-    it('should complete full analysis workflow using all Phase 3 features', async() => {
+    it('should complete full analysis workflow using all Phase 3 features', async () => {
       const workflowResults = {};
 
       // 1. User authentication and preferences
@@ -435,8 +437,8 @@ export const IntegrationTestHelpers = {
       financialData: {
         statements: {
           incomeStatement: {
-            '2023': { totalRevenue: 1000000, netIncome: 100000 },
-            '2022': { totalRevenue: 900000, netIncome: 90000 }
+            2023: { totalRevenue: 1000000, netIncome: 100000 },
+            2022: { totalRevenue: 900000, netIncome: 90000 }
           }
         }
       },

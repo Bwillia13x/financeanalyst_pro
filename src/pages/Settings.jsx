@@ -38,7 +38,8 @@ const Settings = () => {
             </h1>
           </div>
           <p className="text-slate-600 dark:text-slate-400 max-w-3xl">
-            Configure your workspace, security settings, and preferences to optimize your financial analysis workflow.
+            Configure your workspace, security settings, and preferences to optimize your financial
+            analysis workflow.
           </p>
         </div>
 
@@ -47,7 +48,7 @@ const Settings = () => {
           <div className="lg:col-span-1">
             <Card className="p-0 overflow-hidden">
               <nav className="space-y-1">
-                {tabs.map((tab) => {
+                {tabs.map(tab => {
                   const Icon = tab.icon;
                   return (
                     <button

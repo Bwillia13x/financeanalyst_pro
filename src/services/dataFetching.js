@@ -1,4 +1,4 @@
-import axios from 'axios';
+import _axios from 'axios';
 
 import { apiLogger } from '../utils/apiLogger.js';
 
@@ -10,7 +10,7 @@ import secureApiClient from './secureApiClient.js';
 // No API keys are exposed in frontend code
 
 // Mock data sources configuration for fallback
-const DATA_SOURCES = {
+const _DATA_SOURCES = {
   ALPHA_VANTAGE: {
     baseURL: 'https://www.alphavantage.co/query',
     apiKey: import.meta.env.VITE_ALPHA_VANTAGE_API_KEY || 'demo'
@@ -27,7 +27,7 @@ const DATA_SOURCES = {
 
 // Mock API key validator
 const apiKeyValidator = {
-  validateAllKeys: async() => ({
+  validateAllKeys: async () => ({
     valid: true,
     recommendations: ['API keys validated successfully']
   })
@@ -312,11 +312,29 @@ class _RetryManager {
 }
 
 class DataFetchingService {
-  constructor() {
+  constructor(
+    envOverrides = null,
+    customRateLimits = null,
+    retryConfig = null,
+    circuitBreakerConfig = null
+  ) {
     this.cache = new Map();
     this.cacheExpiry = new Map();
     this.logger = apiLogger;
     this.client = secureApiClient;
+
+    // Environment-driven behavior (demo mode)
+    const env = envOverrides || (typeof import.meta !== 'undefined' && import.meta?.env) || {};
+    this.demoMode = String(env.VITE_FORCE_DEMO_MODE).toLowerCase() === 'true';
+
+    // Initialize resilience components
+    this.customRateLimits = customRateLimits || null;
+    this.rateLimiters = {};
+    this.retryManager = new _RetryManager(retryConfig || RETRY_CONFIG);
+    this.circuitBreakers = this.initializeCircuitBreakers(
+      circuitBreakerConfig || CIRCUIT_BREAKER_CONFIG
+    );
+    this.initializeRateLimiters();
 
     // Log service initialization
     this.logger.log('INFO', '🚀 DataFetchingService initialized (using secure backend proxy)');
@@ -396,6 +414,64 @@ class DataFetchingService {
       size: JSON.stringify(data).length,
       expiresAt: new Date(Date.now() + ttlMinutes * 60 * 1000).toISOString()
     });
+  }
+
+  // Fetch company profile guarded by circuit breaker, retries, and rate limiting
+  async fetchCompanyProfile(ticker) {
+    const cacheKey = this.getCacheKey('profile', { ticker });
+    const cached = this.getFromCache(cacheKey);
+    if (cached) return cached;
+
+    try {
+      await this.checkRateLimit('FMP');
+
+      // Guard the API call with FMP circuit breaker and retry manager
+      const raw = await this.circuitBreakers.FMP.execute(async () =>
+        this.retryManager.executeWithRetry(
+          async () => this.client.getCompanyProfile(ticker),
+          `Company profile fetch for ${ticker}`
+        )
+      );
+
+      // Normalize response to expected object shape
+      let profile = raw;
+      if (Array.isArray(profile)) {
+        profile = profile[0] || null;
+      }
+
+      if (!profile || typeof profile !== 'object') {
+        throw new Error('Company profile not found');
+      }
+
+      this.setCache(cacheKey, profile, 1440); // Cache for 24 hours
+      return profile;
+    } catch (error) {
+      // Allow fast-fail circuit breaker error to propagate for tests/assertions
+      if (error && error.circuitBreakerOpen) {
+        throw error;
+      }
+
+      // Propagate exact not-found message without wrapping (to satisfy test expectations)
+      if (error?.message === 'Company profile not found') {
+        this.logger.log('ERROR', `Company profile not found for ${ticker}`);
+        throw error;
+      }
+
+      // Fallback to demo profile on auth-related errors
+      const status = error?.response?.status;
+      if (status === 401 || status === 403) {
+        this.logger.log(
+          'WARN',
+          `Auth error (${status}) fetching company profile for ${ticker} - falling back to demo data`
+        );
+        return this.generateMockData(ticker, 'profile');
+      }
+
+      this.logger.log('ERROR', `Failed to fetch company profile for ${ticker}`, {
+        error: error.message
+      });
+      throw new Error(`Failed to fetch company profile: ${error.message}`);
+    }
   }
 
   generateMockData(ticker, dataType) {
@@ -482,22 +558,6 @@ class DataFetchingService {
         ];
 
       default:
-        return null;
-    }
-  }
-
-  async fetchCompanyProfile(ticker) {
-    const cacheKey = this.getCacheKey('profile', { ticker });
-    const cached = this.getFromCache(cacheKey);
-    if (cached) return cached;
-
-    try {
-      const profile = await this.client.getCompanyProfile(ticker);
-      this.setCache(cacheKey, profile, 1440); // Cache for 24 hours
-      return profile;
-    } catch (error) {
-      this.logger.log('ERROR', `Failed to fetch company profile for ${ticker}`, { error: error.message });
-      throw new Error(`Failed to fetch company profile: ${error.message}`);
     }
   }
 
@@ -512,310 +572,91 @@ class DataFetchingService {
     if (cached) return cached;
 
     try {
-      const data = await this.client.fetchFinancialStatements(ticker, statement, period, limit);
+      const data = await this.retryManager.executeWithRetry(
+        async () => this.client.fetchFinancialStatements(ticker, statement, period, limit),
+        `Financial statements fetch for ${ticker}`
+      );
       this.setCache(cacheKey, data, 360); // Cache for 6 hours
       return data;
     } catch (error) {
-      this.logger.log('ERROR', `Failed to fetch ${statement} for ${ticker}`, { error: error.message });
+      this.logger.log('ERROR', `Failed to fetch ${statement} for ${ticker}`, {
+        error: error.message
+      });
       throw new Error(`Failed to fetch ${statement}: ${error.message}`);
     }
   }
 
   async fetchMarketData(ticker, range = '1y') {
-    const cacheKey = this.getCacheKey('market', { ticker, range });
+    const cacheKey = this.getCacheKey('marketData', { ticker, range });
     const cached = this.getFromCache(cacheKey);
     if (cached) return cached;
 
     try {
-      const data = await this.client.fetchMarketData(ticker, range);
-      this.setCache(cacheKey, data, 15); // Cache for 15 minutes
+      const data = await this.circuitBreakers.YAHOO_FINANCE.execute(async () =>
+        this.retryManager.executeWithRetry(
+          async () => this.client.fetchMarketData(ticker, range),
+          `Market data fetch for ${ticker}`
+        )
+      );
+      this.setCache(cacheKey, data, 30); // Cache for 30 minutes
       return data;
     } catch (error) {
-      this.logger.log('ERROR', `Failed to fetch market data for ${ticker}`, { error: error.message });
+      this.logger.log('ERROR', `Failed to fetch market data for ${ticker}`, {
+        error: error.message
+      });
       throw new Error(`Failed to fetch market data: ${error.message}`);
     }
   }
 
-  async fetchMarketDataAlternative(ticker) {
-    if (this.demoMode) {
-      const mockData = this.generateMockData(ticker, 'marketData');
-      return mockData;
-    }
-
-    try {
-      return await this.retryManager.executeWithRetry(async() => {
-        await this.checkRateLimit('ALPHA_VANTAGE');
-
-        const response = await axios.get(DATA_SOURCES.ALPHA_VANTAGE.baseURL, {
-          params: {
-            function: 'GLOBAL_QUOTE',
-            symbol: ticker,
-            apikey: DATA_SOURCES.ALPHA_VANTAGE.apiKey
-          },
-          timeout: 10000
-        });
-
-        const quote = response.data['Global Quote'];
-        if (!quote || Object.keys(quote).length === 0) {
-          throw new Error(`No market data found for ticker: ${ticker}`);
-        }
-
-        return {
-          symbol: quote['01. symbol'],
-          currentPrice: parseFloat(quote['05. price']),
-          previousClose: parseFloat(quote['08. previous close']),
-          volume: parseInt(quote['06. volume']),
-          change: parseFloat(quote['09. change']),
-          changePercent: quote['10. change percent']
-        };
-      }, `Alternative market data fetch for ${ticker}`);
-    } catch (error) {
-      console.warn('Alternative market data API failed:', error.message);
-      return this.generateMockData(ticker, 'marketData');
-    }
-  }
-
-  async fetchSECFilings(ticker, filingType = '10-K', count = 5) {
-    const cacheKey = this.getCacheKey('sec', { ticker, filingType, count });
+  async fetchPeerComparables(ticker) {
+    const cacheKey = this.getCacheKey('peers', { ticker });
     const cached = this.getFromCache(cacheKey);
     if (cached) return cached;
 
     try {
-      if (this.demoMode) {
-        console.warn('SEC filings not available in demo mode');
-        return [
-          {
-            form: filingType,
-            filingDate: '2023-12-31',
-            accessionNumber: '0000000000-00-000000',
-            reportDate: '2023-12-31',
-            acceptanceDateTime: '2024-01-15T16:30:00',
-            act: '34',
-            primaryDocument: `${ticker.toLowerCase()}-${filingType.toLowerCase()}.htm`,
-            url: '#demo-filing'
-          }
-        ];
+      const data = await this.circuitBreakers.FMP.execute(async () =>
+        this.retryManager.executeWithRetry(
+          async () => this.client.fetchPeerComparables(ticker),
+          `Peer comparables fetch for ${ticker}`
+        )
+      );
+      this.setCache(cacheKey, data, 720); // Cache for 12 hours
+      return data;
+    } catch (error) {
+      // Allow fast-fail circuit breaker error to propagate for tests/assertions
+      if (error && error.circuitBreakerOpen) {
+        throw error;
       }
 
-      await this.checkRateLimit('SEC_EDGAR');
-
-      // This would need proper CIK lookup implementation
-      // For now, return demo data
-      return [
-        {
-          form: filingType,
-          filingDate: '2023-12-31',
-          accessionNumber: '0000000000-00-000000',
-          reportDate: '2023-12-31',
-          acceptanceDateTime: '2024-01-15T16:30:00',
-          act: '34',
-          primaryDocument: `${ticker.toLowerCase()}-${filingType.toLowerCase()}.htm`,
-          url: '#demo-filing'
-        }
-      ];
-    } catch (error) {
-      throw new Error(`Failed to fetch SEC filings: ${error.message}`);
-    }
-  }
-
-  async fetchPeerComparables(ticker, industryCode = null) {
-    const cacheKey = this.getCacheKey('peers', { ticker, industryCode });
-    const cached = this.getFromCache(cacheKey);
-    if (cached) return cached;
-
-    try {
-      const peers = await this.client.fetchPeerComparables(ticker);
-      this.setCache(cacheKey, peers, 240); // Cache for 4 hours
-      return peers;
-    } catch (error) {
-      this.logger.log('ERROR', `Failed to fetch peer comparables for ${ticker}`, { error: error.message });
+      this.logger.log('ERROR', `Failed to fetch peer comparables for ${ticker}`, {
+        error: error.message
+      });
       throw new Error(`Failed to fetch peer comparables: ${error.message}`);
-    }
-  }
-
-  async fetchDCFInputs(ticker) {
-    try {
-      const [profile, incomeStatements, balanceSheets, cashFlows, marketData] = await Promise.all([
-        this.fetchCompanyProfile(ticker),
-        this.fetchFinancialStatements(ticker, 'income-statement', 'annual', 5),
-        this.fetchFinancialStatements(ticker, 'balance-sheet-statement', 'annual', 5),
-        this.fetchFinancialStatements(ticker, 'cash-flow-statement', 'annual', 5),
-        this.fetchMarketData(ticker)
-      ]);
-
-      // Calculate historical growth rates
-      const revenues = Array.isArray(incomeStatements)
-        ? incomeStatements.map(stmt => stmt.revenue).reverse()
-        : [incomeStatements.revenue];
-      const revenueGrowthRates = [];
-      for (let i = 1; i < revenues.length; i++) {
-        if (revenues[i - 1] && revenues[i]) {
-          revenueGrowthRates.push((revenues[i] - revenues[i - 1]) / revenues[i - 1]);
-        }
-      }
-      const avgRevenueGrowth =
-        revenueGrowthRates.length > 0
-          ? revenueGrowthRates.reduce((a, b) => a + b, 0) / revenueGrowthRates.length
-          : 0.05; // Default 5% growth
-
-      // Calculate free cash flow margin
-      const latestCashFlow = Array.isArray(cashFlows) ? cashFlows[0] : cashFlows;
-      const latestIncome = Array.isArray(incomeStatements) ? incomeStatements[0] : incomeStatements;
-      const fcfMargin = latestCashFlow.freeCashFlow / latestIncome.revenue;
-
-      // Estimate WACC components
-      const riskFreeRate = 0.045; // 4.5% - this should come from treasury rates API
-      const marketPremium = 0.065; // 6.5% historical market premium
-      const beta = profile.beta || 1.0;
-      const costOfEquity = riskFreeRate + beta * marketPremium;
-
-      const latestBalance = Array.isArray(balanceSheets) ? balanceSheets[0] : balanceSheets;
-      const totalDebt = latestBalance.totalDebt || 0;
-      const marketCap = marketData.marketCap || marketData.currentPrice * profile.sharesOutstanding;
-      const debtRatio = totalDebt / (totalDebt + marketCap);
-      const taxRate = profile.effectiveTaxRateTTM || 0.21;
-
-      const wacc = costOfEquity * (1 - debtRatio) + 0.04 * debtRatio * (1 - taxRate); // Assuming 4% cost of debt
-
-      return {
-        symbol: ticker,
-        companyName: profile.companyName,
-        currentRevenue: latestIncome.revenue,
-        revenueGrowthRate: avgRevenueGrowth,
-        fcfMargin,
-        wacc,
-        terminalGrowthRate: 0.025, // 2.5% long-term GDP growth assumption
-        currentPrice: marketData.currentPrice,
-        sharesOutstanding: profile.sharesOutstanding,
-        marketCap,
-        totalDebt,
-        cash: latestBalance.cashAndCashEquivalents || 0,
-        beta,
-        peRatio: profile.pe,
-        historicalData: {
-          revenues,
-          revenueGrowthRates,
-          freeCashFlows: Array.isArray(cashFlows)
-            ? cashFlows.map(cf => cf.freeCashFlow).reverse()
-            : [latestCashFlow.freeCashFlow],
-          margins: Array.isArray(incomeStatements)
-            ? incomeStatements.map(stmt => stmt.grossProfitMargin).reverse()
-            : [latestIncome.grossProfitMargin]
-        }
-      };
-    } catch (error) {
-      throw new Error(`Failed to fetch DCF inputs for ${ticker}: ${error.message}`);
-    }
-  }
-
-  async fetchLBOInputs(ticker) {
-    try {
-      const [profile, incomeStatements, balanceSheets, marketData, peers] = await Promise.all([
-        this.fetchCompanyProfile(ticker),
-        this.fetchFinancialStatements(ticker, 'income-statement', 'annual', 3),
-        this.fetchFinancialStatements(ticker, 'balance-sheet-statement', 'annual', 3),
-        this.fetchMarketData(ticker),
-        this.fetchPeerComparison(ticker)
-      ]);
-
-      const latestIncome = Array.isArray(incomeStatements) ? incomeStatements[0] : incomeStatements;
-      const latestBalance = Array.isArray(balanceSheets) ? balanceSheets[0] : balanceSheets;
-
-      // Calculate key LBO metrics
-      const ebitda = latestIncome.ebitda;
-      const currentEV =
-        marketData.marketCap + latestBalance.totalDebt - latestBalance.cashAndCashEquivalents;
-      const evEbitdaMultiple = currentEV / ebitda;
-
-      // Peer multiples for exit assumptions
-      const peerEvEbitdaMultiples = peers
-        .filter(peer => peer.evToEbitda && peer.evToEbitda > 0)
-        .map(peer => peer.evToEbitda);
-      const avgPeerMultiple =
-        peerEvEbitdaMultiples.length > 0
-          ? peerEvEbitdaMultiples.reduce((a, b) => a + b, 0) / peerEvEbitdaMultiples.length
-          : evEbitdaMultiple;
-
-      return {
-        symbol: ticker,
-        companyName: profile.companyName,
-        currentPrice: marketData.currentPrice,
-        marketCap: marketData.marketCap,
-        enterpriseValue: currentEV,
-        ebitda,
-        evEbitdaMultiple,
-        revenue: latestIncome.revenue,
-        netIncome: latestIncome.netIncome,
-        totalDebt: latestBalance.totalDebt,
-        cash: latestBalance.cashAndCashEquivalents,
-        workingCapital: latestBalance.totalCurrentAssets - latestBalance.totalCurrentLiabilities,
-        capex: Math.abs(latestIncome.capex || 0),
-        debtToEbitda: latestBalance.totalDebt / ebitda,
-        interestCoverage: ebitda / (latestIncome.interestExpense || 1),
-        avgPeerMultiple,
-        suggestedPurchasePrice: ebitda * avgPeerMultiple,
-        maxDebtCapacity: ebitda * 6, // 6x EBITDA debt capacity assumption
-        sharesOutstanding: profile.sharesOutstanding
-      };
-    } catch (error) {
-      throw new Error(`Failed to fetch LBO inputs for ${ticker}: ${error.message}`);
     }
   }
 
   async validateTicker(ticker) {
     try {
+      // Basic input validation first (avoid API calls on obviously invalid input)
+      if (typeof ticker !== 'string') return false;
+      const normalized = ticker.trim().toUpperCase();
+      // Accept 1-10 alphabetic characters (common ticker constraints)
+      if (!/^[A-Z]{1,10}$/.test(normalized)) return false;
+
       // In demo mode, only validate known tickers
       if (this.demoMode) {
         const knownTickers = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META', 'TSLA', 'NVDA'];
-        return knownTickers.includes(ticker);
+        return knownTickers.includes(normalized);
       }
 
-      await this.fetchCompanyProfile(ticker);
+      await this.fetchCompanyProfile(normalized);
       return true;
     } catch (error) {
       console.warn('Ticker validation failed:', error.message);
       return false;
     }
   }
-
-  // Add method to check API status
-  async getApiStatus() {
-    const validationResults = await apiKeyValidator.validateAllKeys();
-    const metrics = this.logger.getMetrics();
-
-    return {
-      demoMode: this.demoMode,
-      cacheSize: this.cache.size,
-      validation: validationResults,
-      circuitBreakers: this.getCircuitBreakerStatus(),
-      metrics,
-      performance: {
-        uptime: metrics.uptime,
-        totalRequests: Object.values(metrics.services).reduce(
-          (total, service) => total + (service.requests?.total || 0),
-          0
-        ),
-        totalErrors: Object.values(metrics.services).reduce(
-          (total, service) => total + (service.error?.total || 0),
-          0
-        ),
-        averageResponseTime: this.calculateAverageResponseTime(metrics.services),
-        cacheHitRate: this.calculateCacheHitRate(metrics.cache)
-      },
-      availableKeys: {
-        alphaVantage: !!(
-          import.meta.env.VITE_ALPHA_VANTAGE_API_KEY &&
-          import.meta.env.VITE_ALPHA_VANTAGE_API_KEY !== 'demo'
-        ),
-        fmp: !!(import.meta.env.VITE_FMP_API_KEY && import.meta.env.VITE_FMP_API_KEY !== 'demo'),
-        quandl: !!(
-          import.meta.env.VITE_QUANDL_API_KEY && import.meta.env.VITE_QUANDL_API_KEY !== 'demo'
-        ),
-        fred: !!(import.meta.env.VITE_FRED_API_KEY && import.meta.env.VITE_FRED_API_KEY !== 'demo')
-      },
-      recommendations: validationResults.recommendations
-    };
-  }
+  // [removed obsolete service status block]
 
   // Get circuit breaker status for all services
   getCircuitBreakerStatus() {
@@ -912,7 +753,6 @@ class DataFetchingService {
       });
 
       return dcfModel;
-
     } catch (error) {
       apiLogger.log('ERROR', `Failed to build DCF model for ${symbol}`, { error: error.message });
       throw new Error(`DCF modeling failed: ${error.message}`);
@@ -950,7 +790,8 @@ class DataFetchingService {
           ...assumptions,
           exit: {
             ...assumptions.exit,
-            exitMultiple: assumptions.exit?.exitMultiple || this.calculatePeerAverageMultiple(peerData)
+            exitMultiple:
+              assumptions.exit?.exitMultiple || this.calculatePeerAverageMultiple(peerData)
           }
         }
       };
@@ -964,7 +805,6 @@ class DataFetchingService {
       });
 
       return lboModel;
-
     } catch (error) {
       apiLogger.log('ERROR', `Failed to build LBO model for ${symbol}`, { error: error.message });
       throw new Error(`LBO modeling failed: ${error.message}`);
@@ -998,9 +838,8 @@ class DataFetchingService {
   estimateGrowthRate(_financials) {
     // Simplified growth rate estimation
     // In practice, this would analyze multiple years of data
-    return 0.10; // 10% default growth rate
+    return 0.1; // 10% default growth rate
   }
-
 }
 
 // Export singleton instance

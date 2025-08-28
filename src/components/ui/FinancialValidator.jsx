@@ -1,4 +1,11 @@
-import { AlertTriangle, CheckCircle, Calculator, TrendingUp, TrendingDown, Info } from 'lucide-react';
+import {
+  AlertTriangle,
+  CheckCircle,
+  Calculator,
+  TrendingUp,
+  TrendingDown,
+  Info
+} from 'lucide-react';
 import React, { useState, useEffect, useMemo } from 'react';
 
 import { cn } from '../../utils/cn';
@@ -20,50 +27,59 @@ const FinancialValidator = ({
   const [calculationFeedback, setCalculationFeedback] = useState({});
 
   // Financial validation rules
-  const validationRules = useMemo(() => ({
-    revenue: {
-      min: 0,
-      max: 1e12, // $1 trillion max
-      required: true,
-      format: 'currency',
-      suggestions: ['Check if amount includes all revenue streams', 'Verify currency units (thousands, millions)']
-    },
-    expense: {
-      min: 0,
-      max: 1e12,
-      required: false,
-      format: 'currency',
-      suggestions: ['Ensure all related costs are included', 'Consider depreciation and amortization']
-    },
-    percentage: {
-      min: -100,
-      max: 1000, // Allow for high growth rates
-      required: false,
-      format: 'percentage',
-      suggestions: ['Typical ranges vary by industry', 'Consider seasonal fluctuations']
-    },
-    ratio: {
-      min: 0,
-      max: 100,
-      required: false,
-      format: 'decimal',
-      suggestions: ['Compare against industry benchmarks', 'Review calculation methodology']
-    },
-    shares: {
-      min: 1,
-      max: 1e12,
-      required: true,
-      format: 'integer',
-      suggestions: ['Verify share count is post-split adjusted', 'Check for treasury shares']
-    },
-    price: {
-      min: 0.01,
-      max: 10000,
-      required: true,
-      format: 'currency',
-      suggestions: ['Ensure price is per share', 'Check for currency conversion']
-    }
-  }), []);
+  const validationRules = useMemo(
+    () => ({
+      revenue: {
+        min: 0,
+        max: 1e12, // $1 trillion max
+        required: true,
+        format: 'currency',
+        suggestions: [
+          'Check if amount includes all revenue streams',
+          'Verify currency units (thousands, millions)'
+        ]
+      },
+      expense: {
+        min: 0,
+        max: 1e12,
+        required: false,
+        format: 'currency',
+        suggestions: [
+          'Ensure all related costs are included',
+          'Consider depreciation and amortization'
+        ]
+      },
+      percentage: {
+        min: -100,
+        max: 1000, // Allow for high growth rates
+        required: false,
+        format: 'percentage',
+        suggestions: ['Typical ranges vary by industry', 'Consider seasonal fluctuations']
+      },
+      ratio: {
+        min: 0,
+        max: 100,
+        required: false,
+        format: 'decimal',
+        suggestions: ['Compare against industry benchmarks', 'Review calculation methodology']
+      },
+      shares: {
+        min: 1,
+        max: 1e12,
+        required: true,
+        format: 'integer',
+        suggestions: ['Verify share count is post-split adjusted', 'Check for treasury shares']
+      },
+      price: {
+        min: 0.01,
+        max: 10000,
+        required: true,
+        format: 'currency',
+        suggestions: ['Ensure price is per share', 'Check for currency conversion']
+      }
+    }),
+    []
+  );
 
   // Perform validation
   useEffect(() => {
@@ -94,7 +110,9 @@ const FinancialValidator = ({
         if (fieldType === 'revenue' && context.previousYear) {
           const growth = ((numValue - context.previousYear) / context.previousYear) * 100;
           if (Math.abs(growth) > 50) {
-            warnings.push(`${growth > 0 ? 'Growth' : 'Decline'} of ${Math.abs(growth).toFixed(1)}% seems unusually high`);
+            warnings.push(
+              `${growth > 0 ? 'Growth' : 'Decline'} of ${Math.abs(growth).toFixed(1)}% seems unusually high`
+            );
             suggestions.push('Verify calculation and consider one-time events');
           }
         }
@@ -265,7 +283,10 @@ const FinancialValidator = ({
           {Object.entries(calculationFeedback).map(([key, feedback]) => {
             if (feedback.value !== undefined) {
               return (
-                <div key={key} className="flex items-center justify-between p-2 bg-blue-50 border border-blue-200 rounded-md">
+                <div
+                  key={key}
+                  className="flex items-center justify-between p-2 bg-blue-50 border border-blue-200 rounded-md"
+                >
                   <div className="flex items-center space-x-2">
                     <Calculator className="w-3 h-3 text-blue-600" />
                     <span className="text-sm text-blue-800">{feedback.label}:</span>
@@ -279,13 +300,24 @@ const FinancialValidator = ({
                 </div>
               );
             } else if (feedback.message) {
-              const Icon = feedback.type === 'success' ? CheckCircle :
-                feedback.type === 'warning' ? AlertTriangle : Info;
-              const colorClass = feedback.type === 'success' ? 'text-green-600' :
-                feedback.type === 'warning' ? 'text-yellow-600' : 'text-blue-600';
+              const Icon =
+                feedback.type === 'success'
+                  ? CheckCircle
+                  : feedback.type === 'warning'
+                    ? AlertTriangle
+                    : Info;
+              const colorClass =
+                feedback.type === 'success'
+                  ? 'text-green-600'
+                  : feedback.type === 'warning'
+                    ? 'text-yellow-600'
+                    : 'text-blue-600';
 
               return (
-                <div key={key} className="flex items-center space-x-2 p-2 bg-slate-50 border border-slate-200 rounded-md">
+                <div
+                  key={key}
+                  className="flex items-center space-x-2 p-2 bg-slate-50 border border-slate-200 rounded-md"
+                >
                   <Icon className={`w-3 h-3 ${colorClass}`} />
                   <span className="text-sm text-slate-700">{feedback.message}</span>
                 </div>
@@ -328,11 +360,18 @@ const FinancialValidator = ({
             ) : null}
             <span
               className={`text-xs font-medium ${
-                parseFloat(value) > context.previousValue ? 'text-green-600' :
-                  parseFloat(value) < context.previousValue ? 'text-red-600' : 'text-slate-600'
+                parseFloat(value) > context.previousValue
+                  ? 'text-green-600'
+                  : parseFloat(value) < context.previousValue
+                    ? 'text-red-600'
+                    : 'text-slate-600'
               }`}
             >
-              {((parseFloat(value) - context.previousValue) / context.previousValue * 100).toFixed(1)}%
+              {(
+                ((parseFloat(value) - context.previousValue) / context.previousValue) *
+                100
+              ).toFixed(1)}
+              %
             </span>
           </div>
         </div>

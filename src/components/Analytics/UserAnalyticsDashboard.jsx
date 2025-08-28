@@ -1,14 +1,5 @@
 import { motion } from 'framer-motion';
-import {
-  BarChart3,
-  Users,
-  Clock,
-  Activity,
-  Target,
-  Eye,
-  Zap,
-  Calendar
-} from 'lucide-react';
+import { BarChart3, Users, Clock, Activity, Target, Eye, Zap, Calendar } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import {
   BarChart,
@@ -55,19 +46,19 @@ const UserAnalyticsDashboard = ({ className = '' }) => {
     }, 500);
   };
 
-  const formatDuration = (ms) => {
+  const formatDuration = ms => {
     const minutes = Math.floor(ms / 60000);
     const seconds = Math.floor((ms % 60000) / 1000);
     return `${minutes}m ${seconds}s`;
   };
 
-  const formatNumber = (num) => {
+  const formatNumber = num => {
     if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
     if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
     return num.toString();
   };
 
-  const getGrowthColor = (value) => {
+  const getGrowthColor = value => {
     if (value > 0) return 'text-green-600 dark:text-green-400';
     if (value < 0) return 'text-red-600 dark:text-red-400';
     return 'text-slate-600 dark:text-slate-400';
@@ -124,9 +115,7 @@ const UserAnalyticsDashboard = ({ className = '' }) => {
       <div className={`bg-white dark:bg-slate-800 rounded-lg shadow-lg p-6 ${className}`}>
         <div className="text-center py-8">
           <BarChart3 className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
-          <p className="text-slate-500 dark:text-slate-400">
-            No analytics data available
-          </p>
+          <p className="text-slate-500 dark:text-slate-400">No analytics data available</p>
         </div>
       </div>
     );
@@ -154,7 +143,7 @@ const UserAnalyticsDashboard = ({ className = '' }) => {
           <div className="flex items-center space-x-2">
             <select
               value={selectedTimeframe}
-              onChange={(e) => setSelectedTimeframe(e.target.value)}
+              onChange={e => setSelectedTimeframe(e.target.value)}
               className="px-3 py-1 border border-slate-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
             >
               <option value="1d">Last 24 hours</option>

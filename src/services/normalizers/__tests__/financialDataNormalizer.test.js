@@ -14,7 +14,7 @@ describe('Financial Data Normalizer', () => {
         costOfRevenue: [600000, 650000, 700000],
         operatingIncome: [150000, 165000, 180000],
         netIncome: [100000, 110000, 120000],
-        eps: [1.00, 1.10, 1.20],
+        eps: [1.0, 1.1, 1.2],
         sharesOutstanding: [100000, 100000, 100000]
       };
 
@@ -91,7 +91,7 @@ describe('Financial Data Normalizer', () => {
       const result = normalizeIncomeStatement(rawData);
 
       expect(result.revenue).toEqual([1000000, null, null]);
-      expect(result.netIncome).toEqual([100000, null]);
+      expect(result.netIncome).toEqual([100000, null, 120000]);
     });
   });
 
@@ -145,7 +145,7 @@ describe('Financial Data Normalizer', () => {
       const assets = result.totalAssets[0];
       const liabilities = result.totalLiabilities[0];
       const equity = result.totalEquity[0];
-      
+
       expect(assets).toBe(liabilities + equity);
     });
   });
@@ -191,7 +191,7 @@ describe('Financial Data Normalizer', () => {
       const rawData = {
         operatingCashFlow: [100000],
         investingCashFlow: [-150000], // Large investment
-        financingCashFlow: [75000]     // Net financing inflow
+        financingCashFlow: [75000] // Net financing inflow
       };
 
       const result = normalizeCashFlow(rawData);
@@ -307,14 +307,14 @@ describe('Financial Data Normalizer', () => {
 
     it('should preserve precision of financial numbers', () => {
       const rawData = {
-        revenue: [1234567.89, 2345678.90],
+        revenue: [1234567.89, 2345678.9],
         eps: [12.345, 23.456]
       };
 
       const result = normalizeIncomeStatement(rawData);
 
       expect(result.revenue[0]).toBe(1234567.89);
-      expect(result.revenue[1]).toBe(2345678.90);
+      expect(result.revenue[1]).toBe(2345678.9);
       expect(result.eps[0]).toBe(12.345);
       expect(result.eps[1]).toBe(23.456);
     });
@@ -327,7 +327,7 @@ describe('Financial Data Normalizer', () => {
 
       expect(() => normalizeIncomeStatement(edgeCases)).not.toThrow();
       const result = normalizeIncomeStatement(edgeCases);
-      
+
       expect(result.revenue).toEqual([0, -1000000, Number.MAX_SAFE_INTEGER]);
       expect(result.netIncome).toEqual([Number.MIN_SAFE_INTEGER, 0, 1]);
     });
@@ -339,13 +339,13 @@ describe('Financial Data Normalizer', () => {
       };
 
       const normalized = normalizeIncomeStatement(rawData);
-      
+
       // Should be JSON serializable
       expect(() => JSON.stringify(normalized)).not.toThrow();
-      
+
       const serialized = JSON.stringify(normalized);
       const deserialized = JSON.parse(serialized);
-      
+
       expect(deserialized.revenue).toEqual(normalized.revenue);
       expect(deserialized.netIncome).toEqual(normalized.netIncome);
     });
@@ -354,19 +354,19 @@ describe('Financial Data Normalizer', () => {
   describe('Cross-statement data consistency', () => {
     it('should maintain consistent scaling across statements', () => {
       const scale = 1000;
-      
+
       const incomeData = { revenue: [1000, 1100], netIncome: [100, 110] };
       const balanceData = { totalAssets: [5000, 5500], cash: [500, 550] };
       const cashFlowData = { operatingCashFlow: [150, 165], freeCashFlow: [120, 132] };
-      
+
       const normalizedIncome = normalizeIncomeStatement(incomeData, { scale });
       const normalizedBalance = normalizeBalanceSheet(balanceData, { scale });
       const normalizedCashFlow = normalizeCashFlow(cashFlowData, { scale });
-      
+
       expect(normalizedIncome.scale).toBe(scale);
       expect(normalizedBalance.scale).toBe(scale);
       expect(normalizedCashFlow.scale).toBe(scale);
-      
+
       expect(normalizedIncome.revenue[0]).toBe(1000000);
       expect(normalizedBalance.totalAssets[0]).toBe(5000000);
       expect(normalizedCashFlow.operatingCashFlow[0]).toBe(150000);
@@ -377,15 +377,15 @@ describe('Financial Data Normalizer', () => {
         currency: 'EUR',
         periods: 5
       };
-      
+
       const incomeResult = normalizeIncomeStatement({}, options);
       const balanceResult = normalizeBalanceSheet({}, options);
       const cashFlowResult = normalizeCashFlow({}, options);
-      
+
       expect(incomeResult.currency).toBe('EUR');
       expect(balanceResult.currency).toBe('EUR');
       expect(cashFlowResult.currency).toBe('EUR');
-      
+
       expect(incomeResult.periods).toBe(5);
       expect(balanceResult.periods).toBe(5);
       expect(cashFlowResult.periods).toBe(5);

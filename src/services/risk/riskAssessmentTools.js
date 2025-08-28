@@ -13,22 +13,32 @@ export class RiskAssessmentService {
 
   initializeRiskFrameworks() {
     const frameworks = {
-      'basel_iii': {
+      basel_iii: {
         name: 'Basel III Framework',
         categories: ['credit_risk', 'market_risk', 'operational_risk', 'liquidity_risk'],
         weights: { credit_risk: 0.4, market_risk: 0.3, operational_risk: 0.2, liquidity_risk: 0.1 },
         thresholds: { low: 0.3, medium: 0.6, high: 0.8 }
       },
-      'coso': {
+      coso: {
         name: 'COSO Enterprise Risk Management',
         categories: ['strategic_risk', 'operational_risk', 'reporting_risk', 'compliance_risk'],
-        weights: { strategic_risk: 0.35, operational_risk: 0.25, reporting_risk: 0.2, compliance_risk: 0.2 },
+        weights: {
+          strategic_risk: 0.35,
+          operational_risk: 0.25,
+          reporting_risk: 0.2,
+          compliance_risk: 0.2
+        },
         thresholds: { low: 0.25, medium: 0.55, high: 0.75 }
       },
-      'iso_31000': {
+      iso_31000: {
         name: 'ISO 31000 Risk Management',
         categories: ['financial_risk', 'operational_risk', 'strategic_risk', 'hazard_risk'],
-        weights: { financial_risk: 0.3, operational_risk: 0.3, strategic_risk: 0.25, hazard_risk: 0.15 },
+        weights: {
+          financial_risk: 0.3,
+          operational_risk: 0.3,
+          strategic_risk: 0.25,
+          hazard_risk: 0.15
+        },
         thresholds: { low: 0.3, medium: 0.6, high: 0.8 }
       }
     };
@@ -40,7 +50,7 @@ export class RiskAssessmentService {
 
   initializeCovenantTemplates() {
     const templates = {
-      'senior_credit': {
+      senior_credit: {
         name: 'Senior Credit Facility',
         financial_covenants: [
           {
@@ -82,7 +92,7 @@ export class RiskAssessmentService {
           'maintain_corporate_existence'
         ]
       },
-      'high_yield_bond': {
+      high_yield_bond: {
         name: 'High Yield Bond',
         financial_covenants: [
           {
@@ -157,7 +167,7 @@ export class RiskAssessmentService {
 
     this.covenantAnalyses.set(analysis.id, analysis);
     this.emit('covenant_analysis_completed', analysis);
-    
+
     return analysis;
   }
 
@@ -189,7 +199,7 @@ export class RiskAssessmentService {
       if (!result.isCompliant) {
         const breach = Math.abs(result.cushion);
         const thresholdPercent = breach / Math.abs(covenant.threshold);
-        
+
         if (thresholdPercent > 0.2) result.severity = 'high';
         else if (thresholdPercent > 0.1) result.severity = 'medium';
         else result.severity = 'low';
@@ -202,7 +212,9 @@ export class RiskAssessmentService {
       tests: results,
       overallCompliance: results.every(r => r.isCompliant),
       breachedCovenants: results.filter(r => !r.isCompliant),
-      atRiskCovenants: results.filter(r => r.isCompliant && Math.abs(r.cushion) / Math.abs(r.threshold || 1) < 0.1)
+      atRiskCovenants: results.filter(
+        r => r.isCompliant && Math.abs(r.cushion) / Math.abs(r.threshold || 1) < 0.1
+      )
     };
   }
 
@@ -235,7 +247,10 @@ export class RiskAssessmentService {
       case 'tangible_net_worth':
         return totalAssets - totalDebt; // Simplified
       case 'debt_service_coverage':
-        return (netIncome + interestExpense) / (interestExpense + this.calculatePrincipalPayments(financials));
+        return (
+          (netIncome + interestExpense) /
+          (interestExpense + this.calculatePrincipalPayments(financials))
+        );
       default:
         return 0;
     }
@@ -245,8 +260,9 @@ export class RiskAssessmentService {
     const projectedResults = [];
 
     for (let period = 1; period <= periods; period++) {
-      const projectedFinancials = projections[`period_${period}`] || projections.quarterly?.[period - 1];
-      
+      const projectedFinancials =
+        projections[`period_${period}`] || projections.quarterly?.[period - 1];
+
       if (projectedFinancials) {
         const periodResult = {
           period,
@@ -268,11 +284,12 @@ export class RiskAssessmentService {
   calculateCovenantCushions(financials, covenants) {
     return covenants.map(covenant => {
       const actualValue = this.calculateCovenantMetric(financials, covenant.type);
-      const cushion = covenant.direction === 'max' ? 
-        covenant.threshold - actualValue : 
-        actualValue - covenant.threshold;
-      
-      const cushionPercent = Math.abs(cushion) / Math.abs(covenant.threshold || 1) * 100;
+      const cushion =
+        covenant.direction === 'max'
+          ? covenant.threshold - actualValue
+          : actualValue - covenant.threshold;
+
+      const cushionPercent = (Math.abs(cushion) / Math.abs(covenant.threshold || 1)) * 100;
 
       return {
         covenantName: covenant.name,
@@ -281,7 +298,10 @@ export class RiskAssessmentService {
         threshold: covenant.threshold,
         cushion,
         cushionPercent: Math.round(cushionPercent * 100) / 100,
-        riskLevel: this.assessCushionRisk(cushionPercent, covenant.direction === 'max' ? cushion >= 0 : cushion >= 0)
+        riskLevel: this.assessCushionRisk(
+          cushionPercent,
+          covenant.direction === 'max' ? cushion >= 0 : cushion >= 0
+        )
       };
     });
   }
@@ -311,8 +331,10 @@ export class RiskAssessmentService {
 
     return {
       scenarios: stressResults,
-      worstCase: stressResults.reduce((worst, current) => 
-        current.compliance.breachedCovenants.length > worst.compliance.breachedCovenants.length ? current : worst
+      worstCase: stressResults.reduce((worst, current) =>
+        current.compliance.breachedCovenants.length > worst.compliance.breachedCovenants.length
+          ? current
+          : worst
       ),
       summary: this.summarizeStressTestResults(stressResults)
     };
@@ -381,9 +403,9 @@ export class RiskAssessmentService {
     };
 
     const weights = { financial: 0.5, qualitative: 0.25, industry: 0.15, esg: 0.1 };
-    
+
     const totalScore = Object.entries(components).reduce((sum, [category, score]) => {
-      return sum + (score.score * weights[category]);
+      return sum + score.score * weights[category];
     }, 0);
 
     return {
@@ -408,7 +430,8 @@ export class RiskAssessmentService {
     scores.efficiency = this.scoreEfficiency(ratios.assetTurnover);
     scores.coverage = this.scoreCoverage(ratios.interestCoverage);
 
-    const avgScore = Object.values(scores).reduce((sum, score) => sum + score, 0) / Object.keys(scores).length;
+    const avgScore =
+      Object.values(scores).reduce((sum, score) => sum + score, 0) / Object.keys(scores).length;
 
     return {
       score: Math.round(avgScore),
@@ -510,7 +533,12 @@ export class RiskAssessmentService {
 
     const assessMethod = assessmentMethods[category];
     if (!assessMethod) {
-      return { score: 0.5, level: 'medium', factors: [], rationale: 'Assessment method not implemented' };
+      return {
+        score: 0.5,
+        level: 'medium',
+        factors: [],
+        rationale: 'Assessment method not implemented'
+      };
     }
 
     return assessMethod(companyData);
@@ -561,15 +589,15 @@ export class RiskAssessmentService {
     const cashConversionCycle = this.calculateCashConversionCycle(financials);
 
     let riskScore = 0;
-    
+
     // Liquidity ratio assessment
     if (liquidityRatio < 0.2) riskScore += 0.4;
     else if (liquidityRatio < 0.5) riskScore += 0.2;
-    
+
     // Quick ratio assessment
     if (quickRatio < 1) riskScore += 0.3;
     else if (quickRatio < 1.5) riskScore += 0.1;
-    
+
     // Operating cash flow assessment
     if (operatingCashFlow < 0) riskScore += 0.3;
 
@@ -589,7 +617,7 @@ export class RiskAssessmentService {
   // Utility Methods
   calculateProjectionDate(period) {
     const baseDate = new Date();
-    baseDate.setMonth(baseDate.getMonth() + (period * 3)); // Quarterly projections
+    baseDate.setMonth(baseDate.getMonth() + period * 3); // Quarterly projections
     return baseDate.toISOString().split('T')[0];
   }
 

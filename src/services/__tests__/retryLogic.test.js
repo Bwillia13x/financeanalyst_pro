@@ -3,12 +3,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 import DataFetchingService from '../dataFetching.js';
 
-// Mock axios
-vi.mock('axios', () => ({
-  default: {
-    get: vi.fn()
-  }
-}));
+// Use global axios mock from test setup (supports axios.create and interceptors)
 
 describe('Advanced Retry Logic', () => {
   let service;
@@ -92,7 +87,7 @@ describe('Advanced Retry Logic', () => {
       vi.useFakeTimers();
     });
 
-    it('should retry on retryable errors and eventually succeed', async() => {
+    it('should retry on retryable errors and eventually succeed', async () => {
       vi.useFakeTimers();
 
       // Force the service out of demo mode for this test
@@ -126,7 +121,7 @@ describe('Advanced Retry Logic', () => {
       vi.useRealTimers();
     });
 
-    it('should not retry on non-retryable errors', async() => {
+    it('should not retry on non-retryable errors', async () => {
       vi.useFakeTimers();
 
       // Force the service out of demo mode for this test
@@ -146,9 +141,7 @@ describe('Advanced Retry Logic', () => {
       // Fast-forward any timers
       await vi.runAllTimersAsync();
 
-      await expect(promise).rejects.toThrow(
-        'Failed to fetch company profile'
-      );
+      await expect(promise).rejects.toThrow('Failed to fetch company profile');
 
       // Should only be called once (no retries)
       expect(mockAxios.get).toHaveBeenCalledTimes(1);
@@ -159,7 +152,7 @@ describe('Advanced Retry Logic', () => {
       vi.useRealTimers();
     });
 
-    it('should exhaust all retries and fail', async() => {
+    it('should exhaust all retries and fail', async () => {
       vi.useFakeTimers();
 
       const retryableError = new Error('Server Error');
@@ -180,7 +173,7 @@ describe('Advanced Retry Logic', () => {
       vi.useRealTimers();
     });
 
-    it('should handle rate limiting during retries', async() => {
+    it('should handle rate limiting during retries', async () => {
       vi.useFakeTimers();
 
       const successData = [{ symbol: 'AAPL', companyName: 'Apple Inc.' }];
@@ -206,7 +199,7 @@ describe('Advanced Retry Logic', () => {
       vi.useRealTimers();
     });
 
-    it('should apply retry logic to financial statements fetch', async() => {
+    it('should apply retry logic to financial statements fetch', async () => {
       vi.useFakeTimers();
 
       const successData = [{ date: '2023-12-31', revenue: 1000000 }];
@@ -231,7 +224,7 @@ describe('Advanced Retry Logic', () => {
       vi.useRealTimers();
     });
 
-    it('should apply retry logic to market data fetch', async() => {
+    it('should apply retry logic to market data fetch', async () => {
       const successData = {
         chart: {
           result: [
@@ -307,7 +300,7 @@ describe('Advanced Retry Logic', () => {
       vi.spyOn(console, 'error').mockImplementation(() => {});
     });
 
-    it('should log successful retry attempts', async() => {
+    it('should log successful retry attempts', async () => {
       vi.useFakeTimers();
 
       const successData = [{ symbol: 'AAPL', companyName: 'Apple Inc.' }];
@@ -325,7 +318,7 @@ describe('Advanced Retry Logic', () => {
       );
     });
 
-    it('should log retry attempts with delay information', async() => {
+    it('should log retry attempts with delay information', async () => {
       vi.useFakeTimers();
 
       const retryableError = new Error('Server Error');
@@ -353,7 +346,7 @@ describe('Advanced Retry Logic', () => {
       );
     });
 
-    it('should log final failure after all retries exhausted', async() => {
+    it('should log final failure after all retries exhausted', async () => {
       vi.useFakeTimers();
 
       const retryableError = new Error('Server Error');

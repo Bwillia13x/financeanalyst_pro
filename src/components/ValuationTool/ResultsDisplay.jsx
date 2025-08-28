@@ -5,15 +5,21 @@ const ResultsDisplay = ({ results, formatCurrency, formatPercent }) => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-blue-50 p-4 rounded-lg">
             <h4 className="text-sm font-medium text-blue-600">Enterprise Value</h4>
-            <p className="text-2xl font-bold text-blue-900">{formatCurrency(results.enterpriseValue)}</p>
+            <p className="text-2xl font-bold text-blue-900">
+              {formatCurrency(results.enterpriseValue)}
+            </p>
           </div>
           <div className="bg-green-50 p-4 rounded-lg">
             <h4 className="text-sm font-medium text-green-600">Present Value FCF</h4>
-            <p className="text-xl font-bold text-green-900">{formatCurrency(results.presentValueFCF)}</p>
+            <p className="text-xl font-bold text-green-900">
+              {formatCurrency(results.presentValueFCF)}
+            </p>
           </div>
           <div className="bg-purple-50 p-4 rounded-lg">
             <h4 className="text-sm font-medium text-purple-600">Terminal Value</h4>
-            <p className="text-xl font-bold text-purple-900">{formatCurrency(results.presentValueTerminal)}</p>
+            <p className="text-xl font-bold text-purple-900">
+              {formatCurrency(results.presentValueTerminal)}
+            </p>
           </div>
         </div>
 
@@ -34,7 +40,9 @@ const ResultsDisplay = ({ results, formatCurrency, formatPercent }) => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div>
               <p className="text-sm text-gray-600">Revenue Growth</p>
-              <p className="font-semibold">{formatPercent(results.assumptions.revenueGrowthRate)}</p>
+              <p className="font-semibold">
+                {formatPercent(results.assumptions.revenueGrowthRate)}
+              </p>
             </div>
             <div>
               <p className="text-sm text-gray-600">EBITDA Margin</p>
@@ -46,7 +54,9 @@ const ResultsDisplay = ({ results, formatCurrency, formatPercent }) => {
             </div>
             <div>
               <p className="text-sm text-gray-600">Terminal Growth</p>
-              <p className="font-semibold">{formatPercent(results.assumptions.terminalGrowthRate)}</p>
+              <p className="font-semibold">
+                {formatPercent(results.assumptions.terminalGrowthRate)}
+              </p>
             </div>
           </div>
         </div>
@@ -66,7 +76,9 @@ const ResultsDisplay = ({ results, formatCurrency, formatPercent }) => {
           </div>
           <div className="bg-purple-50 p-4 rounded-lg">
             <h4 className="text-sm font-medium text-purple-600">Net Exit Value</h4>
-            <p className="text-xl font-bold text-purple-900">{formatCurrency(results.netExitValue)}</p>
+            <p className="text-xl font-bold text-purple-900">
+              {formatCurrency(results.netExitValue)}
+            </p>
           </div>
         </div>
 
@@ -98,11 +110,15 @@ const ResultsDisplay = ({ results, formatCurrency, formatPercent }) => {
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">EBITDA Growth:</span>
-                <span className="font-semibold">{formatPercent(results.assumptions.ebitdaGrowth)}</span>
+                <span className="font-semibold">
+                  {formatPercent(results.assumptions.ebitdaGrowth)}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Interest Rate:</span>
-                <span className="font-semibold">{formatPercent(results.assumptions.interestRate)}</span>
+                <span className="font-semibold">
+                  {formatPercent(results.assumptions.interestRate)}
+                </span>
               </div>
             </div>
           </div>

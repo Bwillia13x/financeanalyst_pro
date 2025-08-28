@@ -23,8 +23,12 @@ const SHORTCUT_CONFIG = {
   'ctrl+shift+m': { action: 'monte-carlo', description: 'Run Monte Carlo simulation' },
 
   // View shortcuts
+  'ctrl+shift+p': {
+    action: 'open-performance-dashboard',
+    description: 'Open Performance Dashboard'
+  },
   'ctrl+shift+i': { action: 'toggle-insights', description: 'Toggle insights sidebar' },
-  'f1': { action: 'help', description: 'Open help' },
+  f1: { action: 'help', description: 'Open help' },
 
   // Quick access
   'alt+1': { action: 'quick-company', company: 'AAPL', description: 'Quick Apple analysis' },
@@ -35,7 +39,7 @@ const SHORTCUT_CONFIG = {
 
 export const useKeyboardShortcuts = (handlers = {}) => {
   // Normalize key combination
-  const normalizeKey = useCallback((event) => {
+  const normalizeKey = useCallback(event => {
     const parts = [];
 
     if (event.metaKey || event.ctrlKey) {
@@ -59,38 +63,42 @@ export const useKeyboardShortcuts = (handlers = {}) => {
   }, []);
 
   // Check if element should receive shortcuts
-  const shouldHandleShortcut = useCallback((target) => {
+  const shouldHandleShortcut = useCallback(target => {
     // Don't handle shortcuts when typing in inputs, textareas, or contenteditable elements
-    const tagName = target.tagName.toLowerCase();
-    const isEditable = target.contentEditable === 'true';
+    const el = target ?? document.activeElement ?? document.body;
+    const tagName = (el?.tagName || '').toLowerCase();
+    const isEditable = el?.isContentEditable || el?.contentEditable === 'true';
     const isInput = ['input', 'textarea', 'select'].includes(tagName);
 
     return !isInput && !isEditable;
   }, []);
 
   // Handle keyboard events
-  const handleKeyDown = useCallback((event) => {
-    // Check if we should handle this shortcut
-    if (!shouldHandleShortcut(event.target)) {
-      return;
-    }
-
-    const keyCombo = normalizeKey(event);
-    const shortcut = SHORTCUT_CONFIG[keyCombo];
-
-    if (shortcut) {
-      event.preventDefault();
-      event.stopPropagation();
-
-      // Call the appropriate handler
-      const handler = handlers[shortcut.action];
-      if (handler) {
-        handler(shortcut);
-      } else {
-        console.warn(`No handler found for shortcut action: ${shortcut.action}`);
+  const handleKeyDown = useCallback(
+    event => {
+      // Check if we should handle this shortcut
+      if (!shouldHandleShortcut(event.target)) {
+        return;
       }
-    }
-  }, [normalizeKey, shouldHandleShortcut, handlers]);
+
+      const keyCombo = normalizeKey(event);
+      const shortcut = SHORTCUT_CONFIG[keyCombo];
+
+      if (shortcut) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        // Call the appropriate handler
+        const handler = handlers[shortcut.action];
+        if (handler) {
+          handler(shortcut);
+        } else {
+          console.warn(`No handler found for shortcut action: ${shortcut.action}`);
+        }
+      }
+    },
+    [normalizeKey, shouldHandleShortcut, handlers]
+  );
 
   // Register global keyboard event listener
   useEffect(() => {
@@ -125,9 +133,17 @@ export const useKeyboardShortcuts = (handlers = {}) => {
 
       if (config.action === 'navigate') {
         categories.navigation.push(shortcut);
-      } else if (config.action.includes('analysis') || config.action === 'create-dcf' || config.action === 'monte-carlo') {
+      } else if (
+        config.action.includes('analysis') ||
+        config.action === 'create-dcf' ||
+        config.action === 'monte-carlo'
+      ) {
         categories.analysis.push(shortcut);
-      } else if (config.action.includes('data') || config.action === 'import-data' || config.action === 'export-data') {
+      } else if (
+        config.action.includes('data') ||
+        config.action === 'import-data' ||
+        config.action === 'export-data'
+      ) {
         categories.data.push(shortcut);
       } else if (config.action.includes('toggle') || config.action === 'help') {
         categories.view.push(shortcut);
@@ -142,29 +158,40 @@ export const useKeyboardShortcuts = (handlers = {}) => {
   }, []);
 
   // Format key combination for display
-  const formatKeyCombo = useCallback((keyCombo) => {
+  const formatKeyCombo = useCallback(keyCombo => {
     return keyCombo
       .split('+')
       .map(key => {
         switch (key) {
-          case 'cmd': return '⌘';
-          case 'ctrl': return 'Ctrl';
-          case 'alt': return 'Alt';
-          case 'shift': return 'Shift';
-          case 'space': return 'Space';
-          case 'esc': return 'Esc';
-          case 'up': return '↑';
-          case 'down': return '↓';
-          case 'left': return '←';
-          case 'right': return '→';
-          default: return key.toUpperCase();
+          case 'cmd':
+            return '⌘';
+          case 'ctrl':
+            return 'Ctrl';
+          case 'alt':
+            return 'Alt';
+          case 'shift':
+            return 'Shift';
+          case 'space':
+            return 'Space';
+          case 'esc':
+            return 'Esc';
+          case 'up':
+            return '↑';
+          case 'down':
+            return '↓';
+          case 'left':
+            return '←';
+          case 'right':
+            return '→';
+          default:
+            return key.toUpperCase();
         }
       })
       .join(' + ');
   }, []);
 
   // Check if a key combination is available
-  const isShortcutAvailable = useCallback((keyCombo) => {
+  const isShortcutAvailable = useCallback(keyCombo => {
     return !SHORTCUT_CONFIG[keyCombo.toLowerCase()];
   }, []);
 

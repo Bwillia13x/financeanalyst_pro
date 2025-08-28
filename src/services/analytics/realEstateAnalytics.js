@@ -10,19 +10,19 @@ class RealEstateAnalyticsService extends EventEmitter {
     super();
     this.propertyTypes = {
       office: { typical_cap_rate: 0.06, vacancy_rate: 0.12, expense_ratio: 0.35 },
-      retail: { typical_cap_rate: 0.065, vacancy_rate: 0.08, expense_ratio: 0.30 },
+      retail: { typical_cap_rate: 0.065, vacancy_rate: 0.08, expense_ratio: 0.3 },
       industrial: { typical_cap_rate: 0.055, vacancy_rate: 0.05, expense_ratio: 0.25 },
-      multifamily: { typical_cap_rate: 0.05, vacancy_rate: 0.06, expense_ratio: 0.40 },
+      multifamily: { typical_cap_rate: 0.05, vacancy_rate: 0.06, expense_ratio: 0.4 },
       hotel: { typical_cap_rate: 0.08, vacancy_rate: 0.15, expense_ratio: 0.65 },
-      mixed_use: { typical_cap_rate: 0.06, vacancy_rate: 0.10, expense_ratio: 0.35 }
+      mixed_use: { typical_cap_rate: 0.06, vacancy_rate: 0.1, expense_ratio: 0.35 }
     };
 
     this.reitMetrics = {
       sector_averages: {
         residential: { dividend_yield: 0.035, payout_ratio: 0.75, debt_to_assets: 0.35 },
-        office: { dividend_yield: 0.045, payout_ratio: 0.80, debt_to_assets: 0.40 },
+        office: { dividend_yield: 0.045, payout_ratio: 0.8, debt_to_assets: 0.4 },
         retail: { dividend_yield: 0.055, payout_ratio: 0.85, debt_to_assets: 0.45 },
-        industrial: { dividend_yield: 0.03, payout_ratio: 0.70, debt_to_assets: 0.30 },
+        industrial: { dividend_yield: 0.03, payout_ratio: 0.7, debt_to_assets: 0.3 },
         healthcare: { dividend_yield: 0.04, payout_ratio: 0.78, debt_to_assets: 0.42 }
       }
     };
@@ -53,7 +53,7 @@ class RealEstateAnalyticsService extends EventEmitter {
   async performPropertyDCF(propertyData) {
     const projectionYears = propertyData.holding_period || 10;
     const cashFlows = [];
-    
+
     // Project NOI for each year
     for (let year = 1; year <= projectionYears; year++) {
       const noi = this.projectNOI(propertyData, year);
@@ -71,14 +71,16 @@ class RealEstateAnalyticsService extends EventEmitter {
 
     // Calculate terminal value
     const terminalNOI = cashFlows[cashFlows.length - 1].net_operating_income;
-    const terminalCapRate = propertyData.terminal_cap_rate || 
-      this.propertyTypes[propertyData.property_type]?.typical_cap_rate || 0.06;
+    const terminalCapRate =
+      propertyData.terminal_cap_rate ||
+      this.propertyTypes[propertyData.property_type]?.typical_cap_rate ||
+      0.06;
     const terminalValue = terminalNOI / terminalCapRate;
 
     // Discount cash flows
     const discountRate = propertyData.discount_rate || 0.08;
     let presentValue = 0;
-    
+
     cashFlows.forEach((cf, index) => {
       const year = index + 1;
       const discountFactor = 1 / Math.pow(1 + discountRate, year);
@@ -105,7 +107,7 @@ class RealEstateAnalyticsService extends EventEmitter {
     const currentNOI = propertyData.net_operating_income || 0;
     const propertyType = propertyData.property_type;
     const marketCapRates = this.getMarketCapRates(propertyData.market, propertyType);
-    
+
     return {
       current_noi: currentNOI,
       market_cap_rates: marketCapRates,
@@ -122,7 +124,7 @@ class RealEstateAnalyticsService extends EventEmitter {
   analyzeComparableSales(propertyData) {
     // This would typically integrate with external data sources
     const comparables = propertyData.comparables || [];
-    
+
     const metrics = comparables.map(comp => ({
       property_id: comp.id,
       sale_price: comp.sale_price,
@@ -167,7 +169,7 @@ class RealEstateAnalyticsService extends EventEmitter {
   calculateREITMetrics(reitData) {
     const financials = reitData.financials;
     const properties = reitData.property_portfolio;
-    
+
     return {
       funds_from_operations: this.calculateFFO(financials),
       adjusted_funds_from_operations: this.calculateAFFO(financials),
@@ -194,7 +196,8 @@ class RealEstateAnalyticsService extends EventEmitter {
       property_type: property.type,
       market_value: this.estimatePropertyValue(property),
       book_value: property.book_value,
-      premium_discount: (this.estimatePropertyValue(property) - property.book_value) / property.book_value
+      premium_discount:
+        (this.estimatePropertyValue(property) - property.book_value) / property.book_value
     }));
 
     const totalNAV = navByProperty.reduce((sum, prop) => sum + prop.market_value, 0);
@@ -213,8 +216,11 @@ class RealEstateAnalyticsService extends EventEmitter {
         cash_equivalents: reitData.financials.cash,
         other_assets: reitData.financials.other_assets,
         total_debt: -reitData.financials.total_debt,
-        net_nav: totalNAV + reitData.financials.cash + 
-                 reitData.financials.other_assets - reitData.financials.total_debt
+        net_nav:
+          totalNAV +
+          reitData.financials.cash +
+          reitData.financials.other_assets -
+          reitData.financials.total_debt
       }
     };
   }
@@ -223,7 +229,7 @@ class RealEstateAnalyticsService extends EventEmitter {
     const ffo = this.calculateFFO(reitData.financials);
     const affo = this.calculateAFFO(reitData.financials);
     const dividendsPaid = reitData.financials.dividends_paid;
-    
+
     return {
       ffo_payout_ratio: dividendsPaid / ffo,
       affo_payout_ratio: dividendsPaid / affo,
@@ -258,8 +264,16 @@ class RealEstateAnalyticsService extends EventEmitter {
     const phases = [
       { phase: 'predevelopment', duration_months: 6, costs_percentage: 0.05 },
       { phase: 'permits_approvals', duration_months: 12, costs_percentage: 0.03 },
-      { phase: 'construction', duration_months: projectData.construction_duration || 24, costs_percentage: 0.85 },
-      { phase: 'lease_up', duration_months: projectData.lease_up_duration || 12, costs_percentage: 0.02 },
+      {
+        phase: 'construction',
+        duration_months: projectData.construction_duration || 24,
+        costs_percentage: 0.85
+      },
+      {
+        phase: 'lease_up',
+        duration_months: projectData.lease_up_duration || 12,
+        costs_percentage: 0.02
+      },
       { phase: 'stabilization', duration_months: 6, costs_percentage: 0.05 }
     ];
 
@@ -267,7 +281,7 @@ class RealEstateAnalyticsService extends EventEmitter {
     const timeline = phases.map(phase => {
       const startMonth = cumulativeMonths;
       cumulativeMonths += phase.duration_months;
-      
+
       return {
         ...phase,
         start_month: startMonth,
@@ -287,19 +301,20 @@ class RealEstateAnalyticsService extends EventEmitter {
   projectNOI(propertyData, year) {
     const baseRent = propertyData.base_rent || 0;
     const rentGrowth = propertyData.rent_growth_rate || 0.03;
-    const propertyType = this.propertyTypes[propertyData.property_type] || this.propertyTypes.office;
-    
+    const propertyType =
+      this.propertyTypes[propertyData.property_type] || this.propertyTypes.office;
+
     const grossRent = baseRent * Math.pow(1 + rentGrowth, year - 1);
     const vacancyRate = propertyData.vacancy_rate || propertyType.vacancy_rate;
     const expenseRatio = propertyData.expense_ratio || propertyType.expense_ratio;
-    
+
     const grossRentalIncome = grossRent * propertyData.total_sf;
     const vacancyLoss = grossRentalIncome * vacancyRate;
     const effectiveGrossIncome = grossRentalIncome - vacancyLoss;
     const operatingExpenses = effectiveGrossIncome * expenseRatio;
     const netOperatingIncome = effectiveGrossIncome - operatingExpenses;
     const capex = netOperatingIncome * 0.05; // 5% capex reserve
-    
+
     return {
       gross_rental_income: grossRentalIncome,
       vacancy_loss: vacancyLoss,
@@ -314,7 +329,7 @@ class RealEstateAnalyticsService extends EventEmitter {
     // This would typically come from external market data
     const baseRates = this.propertyTypes[propertyType]?.typical_cap_rate || 0.06;
     const marketAdjustment = market?.cap_rate_adjustment || 0;
-    
+
     return {
       low: baseRates - 0.01 + marketAdjustment,
       median: baseRates + marketAdjustment,
@@ -327,14 +342,16 @@ class RealEstateAnalyticsService extends EventEmitter {
     return capRates.map(rate => ({
       cap_rate: rate,
       implied_value: noi / rate,
-      value_change: ((noi / rate) - (noi / 0.06)) / (noi / 0.06)
+      value_change: (noi / rate - noi / 0.06) / (noi / 0.06)
     }));
   }
 
   calculateFFO(financials) {
-    return financials.net_income + 
-           financials.depreciation_amortization - 
-           financials.gains_on_property_sales;
+    return (
+      financials.net_income +
+      financials.depreciation_amortization -
+      financials.gains_on_property_sales
+    );
   }
 
   calculateAFFO(financials) {
@@ -355,7 +372,7 @@ class RealEstateAnalyticsService extends EventEmitter {
       const marketAppreciation = 0.03; // 3% annual appreciation assumption
       return property.appraised_value * Math.pow(1 + marketAppreciation, monthsOld / 12);
     }
-    
+
     // Fall back to cap rate method
     const capRate = this.propertyTypes[property.type]?.typical_cap_rate || 0.06;
     return property.noi / capRate;
@@ -380,26 +397,66 @@ class RealEstateAnalyticsService extends EventEmitter {
   }
 
   // Additional methods would be implemented here...
-  performCostApproach() { /* Implementation */ }
-  performSensitivityAnalysis() { /* Implementation */ }
-  calculateInvestmentMetrics() { /* Implementation */ }
-  calculateComparabilityAdjustments() { /* Implementation */ }
-  calculateImpliedValueRange() { /* Implementation */ }
-  analyzeSalesTrends() { /* Implementation */ }
-  performPeerComparison() { /* Implementation */ }
-  analyzeInterestRateSensitivity() { /* Implementation */ }
-  performSectorAnalysis() { /* Implementation */ }
-  calculateAverageLeaseterm() { /* Implementation */ }
-  calculateRentGrowth() { /* Implementation */ }
-  assessDividendSustainability() { /* Implementation */ }
-  projectDividends() { /* Implementation */ }
-  analyzeDevelopmentCosts() { /* Implementation */ }
-  optimizeFinancingStructure() { /* Implementation */ }
-  assessDevelopmentRisks() { /* Implementation */ }
-  performDevelopmentSensitivity() { /* Implementation */ }
-  calculateDevelopmentReturns() { /* Implementation */ }
-  identifyCriticalMilestones() { /* Implementation */ }
-  analyzeYieldSpreads() { /* Implementation */ }
+  performCostApproach() {
+    /* Implementation */
+  }
+  performSensitivityAnalysis() {
+    /* Implementation */
+  }
+  calculateInvestmentMetrics() {
+    /* Implementation */
+  }
+  calculateComparabilityAdjustments() {
+    /* Implementation */
+  }
+  calculateImpliedValueRange() {
+    /* Implementation */
+  }
+  analyzeSalesTrends() {
+    /* Implementation */
+  }
+  performPeerComparison() {
+    /* Implementation */
+  }
+  analyzeInterestRateSensitivity() {
+    /* Implementation */
+  }
+  performSectorAnalysis() {
+    /* Implementation */
+  }
+  calculateAverageLeaseterm() {
+    /* Implementation */
+  }
+  calculateRentGrowth() {
+    /* Implementation */
+  }
+  assessDividendSustainability() {
+    /* Implementation */
+  }
+  projectDividends() {
+    /* Implementation */
+  }
+  analyzeDevelopmentCosts() {
+    /* Implementation */
+  }
+  optimizeFinancingStructure() {
+    /* Implementation */
+  }
+  assessDevelopmentRisks() {
+    /* Implementation */
+  }
+  performDevelopmentSensitivity() {
+    /* Implementation */
+  }
+  calculateDevelopmentReturns() {
+    /* Implementation */
+  }
+  identifyCriticalMilestones() {
+    /* Implementation */
+  }
+  analyzeYieldSpreads() {
+    /* Implementation */
+  }
 }
 
 export default new RealEstateAnalyticsService();

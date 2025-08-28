@@ -45,7 +45,7 @@ const CompanySelector = ({ onCompanySelect }) => {
       marketCap: 2100000000000,
       price: 142.56,
       change: 3.21,
-      changePercent: 2.30,
+      changePercent: 2.3,
       financials: {
         revenue: [161857000000, 182527000000, 257637000000, 282836000000, 307394000000],
         years: [2019, 2020, 2021, 2022, 2023]
@@ -88,9 +88,10 @@ const CompanySelector = ({ onCompanySelect }) => {
 
       // Simulate API delay
       const timer = setTimeout(() => {
-        const filtered = mockCompanies.filter(company =>
-          company.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          company.ticker.toLowerCase().includes(searchTerm.toLowerCase())
+        const filtered = mockCompanies.filter(
+          company =>
+            company.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            company.ticker.toLowerCase().includes(searchTerm.toLowerCase())
         );
         setSuggestions(filtered);
         setIsSearching(false);
@@ -103,14 +104,14 @@ const CompanySelector = ({ onCompanySelect }) => {
     }
   }, [searchTerm]);
 
-  const formatCurrency = (value) => {
+  const formatCurrency = value => {
     if (value >= 1e12) return `$${(value / 1e12).toFixed(1)}T`;
     if (value >= 1e9) return `$${(value / 1e9).toFixed(1)}B`;
     if (value >= 1e6) return `$${(value / 1e6).toFixed(1)}M`;
     return `$${value.toFixed(2)}`;
   };
 
-  const handleCompanySelect = (company) => {
+  const handleCompanySelect = company => {
     onCompanySelect(company);
     setSearchTerm('');
     setSuggestions([]);
@@ -126,7 +127,7 @@ const CompanySelector = ({ onCompanySelect }) => {
         <input
           type="text"
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={e => setSearchTerm(e.target.value)}
           className="block w-full pl-10 pr-3 py-4 border border-gray-200 rounded-2xl leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg"
           placeholder="Search companies (e.g., Apple, AAPL)"
         />
@@ -148,7 +149,7 @@ const CompanySelector = ({ onCompanySelect }) => {
               </div>
             ) : (
               <div className="max-h-80 overflow-y-auto">
-                {suggestions.map((company) => (
+                {suggestions.map(company => (
                   <motion.button
                     key={company.id}
                     onClick={() => handleCompanySelect(company)}
@@ -164,9 +165,7 @@ const CompanySelector = ({ onCompanySelect }) => {
                         </div>
                         <div>
                           <div className="flex items-center space-x-2">
-                            <h3 className="text-sm font-medium text-gray-900">
-                              {company.name}
-                            </h3>
+                            <h3 className="text-sm font-medium text-gray-900">{company.name}</h3>
                             <span className="text-xs font-mono text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
                               {company.ticker}
                             </span>
@@ -177,9 +176,7 @@ const CompanySelector = ({ onCompanySelect }) => {
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="text-sm font-medium text-gray-900">
-                          ${company.price}
-                        </div>
+                        <div className="text-sm font-medium text-gray-900">${company.price}</div>
                         <div
                           className={`text-xs flex items-center ${
                             company.changePercent >= 0 ? 'text-green-600' : 'text-red-600'
@@ -213,7 +210,7 @@ const CompanySelector = ({ onCompanySelect }) => {
         >
           <h3 className="text-sm font-medium text-gray-700 mb-3">Popular Companies</h3>
           <div className="grid grid-cols-2 gap-3">
-            {mockCompanies.slice(0, 4).map((company) => (
+            {mockCompanies.slice(0, 4).map(company => (
               <motion.button
                 key={company.id}
                 onClick={() => handleCompanySelect(company)}
@@ -226,12 +223,8 @@ const CompanySelector = ({ onCompanySelect }) => {
                     <Building2 className="w-4 h-4 text-white" />
                   </div>
                   <div>
-                    <div className="text-sm font-medium text-gray-900">
-                      {company.ticker}
-                    </div>
-                    <div className="text-xs text-gray-500 truncate">
-                      {company.name}
-                    </div>
+                    <div className="text-sm font-medium text-gray-900">{company.ticker}</div>
+                    <div className="text-xs text-gray-500 truncate">{company.name}</div>
                   </div>
                 </div>
               </motion.button>

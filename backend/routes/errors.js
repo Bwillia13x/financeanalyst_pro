@@ -11,7 +11,7 @@ router.post('/', (req, res) => {
       console.error('Client error report:', JSON.stringify(payload));
     }
     res.status(200).json({ ok: true });
-  } catch (e) {
+  } catch (_e) {
     res.status(200).json({ ok: true });
   }
 });

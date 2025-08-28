@@ -2,12 +2,12 @@ import { useState } from 'react';
 
 import { Card, NumberInput } from 'src/components/ui/UIHelpers.jsx';
 
-
 import { project, valueEquity, growthVector, wacc } from '../../utils/valuationUtils';
 
 // Solver functions for reverse DCF
 function solveForImpliedGrowth(assumptions, targetPrice, tolerance = 1e-6, maxIterations = 100) {
-  let low = -0.05, high = 0.20;
+  let low = -0.05,
+    high = 0.2;
   let iteration = 0;
 
   while (Math.abs(high - low) > tolerance && iteration < maxIterations) {
@@ -29,7 +29,8 @@ function solveForImpliedGrowth(assumptions, targetPrice, tolerance = 1e-6, maxIt
 }
 
 function solveForImpliedWACC(assumptions, targetPrice, tolerance = 1e-6, maxIterations = 100) {
-  let low = 0.01, high = 0.30;
+  let low = 0.01,
+    high = 0.3;
   let iteration = 0;
 
   while (Math.abs(high - low) > tolerance && iteration < maxIterations) {
@@ -51,7 +52,8 @@ function solveForImpliedWACC(assumptions, targetPrice, tolerance = 1e-6, maxIter
 }
 
 function solveForImpliedMargin(assumptions, targetPrice, tolerance = 1e-6, maxIterations = 100) {
-  let low = 0.01, high = 0.50;
+  let low = 0.01,
+    high = 0.5;
   let iteration = 0;
 
   while (Math.abs(high - low) > tolerance && iteration < maxIterations) {
@@ -176,8 +178,8 @@ const ReverseDCF = ({ _symbol, _onBack, _currentValuation }) => {
             onChange={setTargetMOS}
             suffix="ratio"
             step={0.01}
-            min={-0.50}
-            max={2.00}
+            min={-0.5}
+            max={2.0}
           />
         </div>
 
@@ -271,8 +273,8 @@ const ReverseDCF = ({ _symbol, _onBack, _currentValuation }) => {
         )}
 
         <div className="text-[11px] text-slate-500">
-          Solves for the implied value that makes DCF per-share equal target price,
-          or calculates target price for desired margin of safety.
+          Solves for the implied value that makes DCF per-share equal target price, or calculates
+          target price for desired margin of safety.
         </div>
       </div>
     </Card>

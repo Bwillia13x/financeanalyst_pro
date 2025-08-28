@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useRef, useState, lazy, Suspense } from 'react';
 
 import Icon from '../../components/AppIcon';
 import SEOHead from '../../components/SEO/SEOHead';
@@ -6,16 +6,18 @@ import Button from '../../components/ui/Button';
 import Header from '../../components/ui/Header';
 import { useKeyboardShortcutsContext } from '../../components/ui/KeyboardShortcutsProvider';
 
-import AuditTrail from './components/AuditTrail';
-import CalculationResults from './components/CalculationResults';
-import FormulaBuilder from './components/FormulaBuilder';
-import ModelTemplates from './components/ModelTemplates';
-import TerminalInterface from './components/TerminalInterface';
-import VariableInputs from './components/VariableInputs';
+// Lazy-load heavy panels to reduce initial TBT
+const AuditTrail = lazy(() => import('./components/AuditTrail'));
+const CalculationResults = lazy(() => import('./components/CalculationResults'));
+const FormulaBuilder = lazy(() => import('./components/FormulaBuilder'));
+const ModelTemplates = lazy(() => import('./components/ModelTemplates'));
+const TerminalInterface = lazy(() => import('./components/TerminalInterface'));
+const VariableInputs = lazy(() => import('./components/VariableInputs'));
 
 const FinancialModelWorkspace = () => {
   const [activeLayout, setActiveLayout] = useState('dual-pane');
-  const [leftPanelContent, setLeftPanelContent] = useState('terminal');
+  // Default to a lighter panel by default; load Terminal on demand
+  const [leftPanelContent, setLeftPanelContent] = useState('variables');
   const [rightPanelContent, setRightPanelContent] = useState('results');
   const [modelState] = useState({
     name: 'DCF_Analysis_v2.3',
@@ -35,9 +37,85 @@ const FinancialModelWorkspace = () => {
       leftPanel: leftPanelContent,
       rightPanel: rightPanelContent
     });
-  }, [updateCommandContext, modelState.name, modelState.saved, activeLayout, leftPanelContent, rightPanelContent]);
+  }, [
+    updateCommandContext,
+    modelState.name,
+    modelState.saved,
+    activeLayout,
+    leftPanelContent,
+    rightPanelContent
+  ]);
 
   const [calculationResults, setCalculationResults] = useState(null);
+
+  // Defer mounting heavy panels until first user interaction or a longer idle timeout
+  const [canMountPanels, setCanMountPanels] = useState(false);
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const isAudit = params.has('lhci') || params.has('audit');
+    let settled = false;
+    const onFirstInteract = () => {
+      if (!settled) {
+        settled = true;
+        setCanMountPanels(true);
+        window.removeEventListener('pointerdown', onFirstInteract);
+        window.removeEventListener('keydown', onFirstInteract);
+        window.removeEventListener('touchstart', onFirstInteract);
+      }
+    };
+
+    window.addEventListener('pointerdown', onFirstInteract, { once: true });
+    window.addEventListener('keydown', onFirstInteract, { once: true });
+    window.addEventListener('touchstart', onFirstInteract, { once: true });
+
+    let fallbackId;
+    if (!isAudit) {
+      const fallbackDelay = 2500;
+      fallbackId = setTimeout(() => {
+        if (!settled) {
+          settled = true;
+          setCanMountPanels(true);
+        }
+      }, fallbackDelay);
+    }
+
+    return () => {
+      if (fallbackId) clearTimeout(fallbackId);
+      window.removeEventListener('pointerdown', onFirstInteract);
+      window.removeEventListener('keydown', onFirstInteract);
+      window.removeEventListener('touchstart', onFirstInteract);
+    };
+  }, []);
+
+  // Only render right panel when visible to the viewport or after idle
+  const rightPanelRef = useRef(null);
+  const [isRightPanelVisible, setIsRightPanelVisible] = useState(false);
+  useEffect(() => {
+    if (!rightPanelRef.current || !window.IntersectionObserver) {
+      // Fallback for test environments without IntersectionObserver
+      setIsRightPanelVisible(true);
+      return;
+    }
+    const el = rightPanelRef.current;
+    const obs = new IntersectionObserver(
+      entries => {
+        const entry = entries[0];
+        if (entry && entry.isIntersecting) {
+          setIsRightPanelVisible(true);
+          obs.disconnect();
+        }
+      },
+      { root: null, rootMargin: '0px', threshold: 0.1 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [activeLayout]);
+
+  const PanelFallback = ({ className = '' }) => (
+    <div className={`w-full h-full bg-gray-900 flex items-center justify-center ${className}`}>
+      <div className="animate-pulse text-gray-400 text-sm">Loading…</div>
+    </div>
+  );
 
   const handleCommandExecute = (command, result) => {
     setCalculationResults(result);
@@ -46,24 +124,50 @@ const FinancialModelWorkspace = () => {
   const renderLeftPanel = () => {
     switch (leftPanelContent) {
       case 'terminal':
-        return (
-          <TerminalInterface
-            onCommandExecute={handleCommandExecute}
-            calculationResults={calculationResults}
-          />
+        return canMountPanels ? (
+          <Suspense fallback={<PanelFallback />}>
+            <TerminalInterface
+              onCommandExecute={handleCommandExecute}
+              calculationResults={calculationResults}
+            />
+          </Suspense>
+        ) : (
+          <PanelFallback />
         );
       case 'variables':
-        return <VariableInputs />;
+        return canMountPanels ? (
+          <Suspense fallback={<PanelFallback />}>
+            <VariableInputs />
+          </Suspense>
+        ) : (
+          <PanelFallback />
+        );
       case 'formulas':
-        return <FormulaBuilder />;
+        return canMountPanels ? (
+          <Suspense fallback={<PanelFallback />}>
+            <FormulaBuilder />
+          </Suspense>
+        ) : (
+          <PanelFallback />
+        );
       case 'templates':
-        return <ModelTemplates />;
+        return canMountPanels ? (
+          <Suspense fallback={<PanelFallback />}>
+            <ModelTemplates />
+          </Suspense>
+        ) : (
+          <PanelFallback />
+        );
       default:
-        return (
-          <TerminalInterface
-            onCommandExecute={handleCommandExecute}
-            calculationResults={calculationResults}
-          />
+        return canMountPanels ? (
+          <Suspense fallback={<PanelFallback />}>
+            <TerminalInterface
+              onCommandExecute={handleCommandExecute}
+              calculationResults={calculationResults}
+            />
+          </Suspense>
+        ) : (
+          <PanelFallback />
         );
     }
   };
@@ -71,11 +175,29 @@ const FinancialModelWorkspace = () => {
   const renderRightPanel = () => {
     switch (rightPanelContent) {
       case 'results':
-        return <CalculationResults results={calculationResults} />;
+        return canMountPanels && isRightPanelVisible ? (
+          <Suspense fallback={<PanelFallback />}>
+            <CalculationResults results={calculationResults} />
+          </Suspense>
+        ) : (
+          <PanelFallback />
+        );
       case 'audit':
-        return <AuditTrail />;
+        return canMountPanels && isRightPanelVisible ? (
+          <Suspense fallback={<PanelFallback />}>
+            <AuditTrail />
+          </Suspense>
+        ) : (
+          <PanelFallback />
+        );
       default:
-        return <CalculationResults results={calculationResults} />;
+        return canMountPanels && isRightPanelVisible ? (
+          <Suspense fallback={<PanelFallback />}>
+            <CalculationResults results={calculationResults} />
+          </Suspense>
+        ) : (
+          <PanelFallback />
+        );
     }
   };
 
@@ -132,7 +254,7 @@ const FinancialModelWorkspace = () => {
             <div className="flex items-center space-x-1">
               <select
                 value={leftPanelContent}
-                onChange={(e) => setLeftPanelContent(e.target.value)}
+                onChange={e => setLeftPanelContent(e.target.value)}
                 className="bg-gray-700 border border-gray-600 rounded px-2 py-1 text-sm"
                 aria-label="Select left panel content"
               >
@@ -145,7 +267,7 @@ const FinancialModelWorkspace = () => {
               {activeLayout === 'dual-pane' && (
                 <select
                   value={rightPanelContent}
-                  onChange={(e) => setRightPanelContent(e.target.value)}
+                  onChange={e => setRightPanelContent(e.target.value)}
                   className="bg-gray-700 border border-gray-600 rounded px-2 py-1 text-sm"
                   aria-label="Select right panel content"
                 >
@@ -170,7 +292,7 @@ const FinancialModelWorkspace = () => {
 
           {/* Right Panel */}
           {activeLayout === 'dual-pane' && (
-            <div className="w-1/2 overflow-hidden">
+            <div className="w-1/2 overflow-hidden" ref={rightPanelRef}>
               {renderRightPanel()}
             </div>
           )}

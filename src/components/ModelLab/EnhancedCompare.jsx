@@ -5,7 +5,9 @@ const Card = ({ title, right, children, className = '' }) => (
   <section className={`rounded-2xl border border-slate-200 bg-white shadow-sm ${className}`}>
     {(title || right) && (
       <header className="flex items-center justify-between border-b border-slate-200 px-4 py-2.5">
-        {title && <h3 className="text-[13px] font-semibold tracking-wide text-slate-700">{title}</h3>}
+        {title && (
+          <h3 className="text-[13px] font-semibold tracking-wide text-slate-700">{title}</h3>
+        )}
         {right}
       </header>
     )}
@@ -22,7 +24,9 @@ const Pill = ({ children, tone = 'slate' }) => {
     red: 'bg-rose-50 text-rose-700 border-rose-200'
   };
   return (
-    <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] ${tones[tone]}`}>
+    <span
+      className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] ${tones[tone]}`}
+    >
       {children}
     </span>
   );
@@ -38,7 +42,7 @@ const EnhancedCompare = ({ models = [] }) => {
     USD: { symbol: '$', rate: 1, label: 'US Dollar' },
     EUR: { symbol: '€', rate: 0.92, label: 'Euro' },
     GBP: { symbol: '£', rate: 0.81, label: 'British Pound' },
-    JPY: { symbol: '¥', rate: 149.50, label: 'Japanese Yen' },
+    JPY: { symbol: '¥', rate: 149.5, label: 'Japanese Yen' },
     CAD: { symbol: 'C$', rate: 1.35, label: 'Canadian Dollar' }
   };
 
@@ -67,12 +71,12 @@ const EnhancedCompare = ({ models = [] }) => {
     })}`;
   };
 
-  const formatPercentage = (value) => {
+  const formatPercentage = value => {
     if (!value) return '—';
     return `${(value * 100).toFixed(1)}%`;
   };
 
-  const formatMultiple = (value) => {
+  const formatMultiple = value => {
     if (!value) return '—';
     return `${value.toFixed(1)}x`;
   };
@@ -103,7 +107,7 @@ const EnhancedCompare = ({ models = [] }) => {
       moic: models.map(m => m.outputs?.moic || 0).filter(v => v !== 0)
     };
 
-    const calcStats = (arr) => {
+    const calcStats = arr => {
       if (!arr.length) return { min: 0, max: 0, avg: 0, median: 0 };
 
       const sorted = [...arr].sort((a, b) => a - b);
@@ -111,9 +115,10 @@ const EnhancedCompare = ({ models = [] }) => {
         min: sorted[0],
         max: sorted[sorted.length - 1],
         avg: sorted.reduce((sum, val) => sum + val, 0) / sorted.length,
-        median: sorted.length % 2 === 0
-          ? (sorted[sorted.length / 2 - 1] + sorted[sorted.length / 2]) / 2
-          : sorted[Math.floor(sorted.length / 2)]
+        median:
+          sorted.length % 2 === 0
+            ? (sorted[sorted.length / 2 - 1] + sorted[sorted.length / 2]) / 2
+            : sorted[Math.floor(sorted.length / 2)]
       };
     };
 
@@ -143,7 +148,9 @@ const EnhancedCompare = ({ models = [] }) => {
       model.name || 'Untitled',
       model.kind,
       model.outputs?.ev ? (model.outputs.ev * currencies[currency].rate).toFixed(0) : '—',
-      model.outputs?.perShare ? (model.outputs.perShare * currencies[currency].rate).toFixed(2) : '—',
+      model.outputs?.perShare
+        ? (model.outputs.perShare * currencies[currency].rate).toFixed(2)
+        : '—',
       model.outputs?.irr ? (model.outputs.irr * 100).toFixed(1) : '—',
       model.outputs?.moic ? model.outputs.moic.toFixed(1) : '—',
       model.version || '1.0.0',
@@ -172,7 +179,7 @@ const EnhancedCompare = ({ models = [] }) => {
     setSortOrder('desc');
   };
 
-  const handleSort = (metric) => {
+  const handleSort = metric => {
     if (sortBy === metric) {
       setSortOrder(sortOrder === 'desc' ? 'asc' : 'desc');
     } else {
@@ -196,14 +203,12 @@ const EnhancedCompare = ({ models = [] }) => {
       title="Cross-Model Compare"
       right={
         <div className="flex items-center gap-2">
-          {models.length > 0 && (
-            <Pill tone="blue">{models.length} models</Pill>
-          )}
+          {models.length > 0 && <Pill tone="blue">{models.length} models</Pill>}
 
           {/* Currency selector */}
           <select
             value={currency}
-            onChange={(e) => setCurrency(e.target.value)}
+            onChange={e => setCurrency(e.target.value)}
             className="text-[11px] px-2 py-1 rounded border border-slate-200 bg-white"
           >
             {Object.entries(currencies).map(([code, info]) => (
@@ -241,7 +246,7 @@ const EnhancedCompare = ({ models = [] }) => {
             <input
               type="checkbox"
               checked={showPercentages}
-              onChange={(e) => setShowPercentages(e.target.checked)}
+              onChange={e => setShowPercentages(e.target.checked)}
               className="w-3 h-3"
             />
             Show % differences
@@ -314,9 +319,13 @@ const EnhancedCompare = ({ models = [] }) => {
                     <span className="font-medium">{model.name || 'Untitled'}</span>
                     <Pill
                       tone={
-                        model.kind === 'DCF' ? 'blue' :
-                          model.kind === 'LBO' ? 'green' :
-                            model.kind === 'Comps' ? 'amber' : 'slate'
+                        model.kind === 'DCF'
+                          ? 'blue'
+                          : model.kind === 'LBO'
+                            ? 'green'
+                            : model.kind === 'Comps'
+                              ? 'amber'
+                              : 'slate'
                       }
                     >
                       {model.kind}
@@ -327,7 +336,7 @@ const EnhancedCompare = ({ models = [] }) => {
                   <div>{formatCurrency(model.outputs?.ev)}</div>
                   {showPercentages && stats.ev.avg && (
                     <div className="text-[10px] text-slate-500">
-                      {((model.outputs?.ev || 0) / stats.ev.avg * 100 - 100).toFixed(0)}% vs avg
+                      {(((model.outputs?.ev || 0) / stats.ev.avg) * 100 - 100).toFixed(0)}% vs avg
                     </div>
                   )}
                 </td>
@@ -335,7 +344,10 @@ const EnhancedCompare = ({ models = [] }) => {
                   <div>{formatCurrency(model.outputs?.perShare, false)}</div>
                   {showPercentages && stats.perShare.avg && (
                     <div className="text-[10px] text-slate-500">
-                      {((model.outputs?.perShare || 0) / stats.perShare.avg * 100 - 100).toFixed(0)}% vs avg
+                      {(((model.outputs?.perShare || 0) / stats.perShare.avg) * 100 - 100).toFixed(
+                        0
+                      )}
+                      % vs avg
                     </div>
                   )}
                 </td>
@@ -351,7 +363,8 @@ const EnhancedCompare = ({ models = [] }) => {
                   <div>{formatMultiple(model.outputs?.moic)}</div>
                   {showPercentages && stats.moic.avg && (
                     <div className="text-[10px] text-slate-500">
-                      {((model.outputs?.moic || 0) / stats.moic.avg * 100 - 100).toFixed(0)}% vs avg
+                      {(((model.outputs?.moic || 0) / stats.moic.avg) * 100 - 100).toFixed(0)}% vs
+                      avg
                     </div>
                   )}
                 </td>

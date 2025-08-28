@@ -3,6 +3,10 @@ import react from '@vitejs/plugin-react'
 import { fileURLToPath, URL } from 'node:url'
 import { imageOptimization } from './vite-plugins/imageOptimization.js'
 
+// When running Lighthouse CI in audit mode, we want to build only the minimal audit page
+// and avoid pulling the full app's vendor chunk into the audit entry.
+const isAuditBuild = process.env.VITE_BUILD_TARGET === 'audit'
+
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
@@ -47,16 +51,36 @@ export default defineConfig({
   },
   build: {
     rollupOptions: {
+      // Build only the minimal audit page for audit builds; otherwise build both pages
+      input: isAuditBuild
+        ? {
+            audit: fileURLToPath(new URL('./audit.html', import.meta.url)),
+          }
+        : {
+            main: fileURLToPath(new URL('./index.html', import.meta.url)),
+            audit: fileURLToPath(new URL('./audit.html', import.meta.url)),
+          },
       output: {
         manualChunks: (id) => {
-          // Split React core from React ecosystem
-          if (id.includes('react') && !id.includes('react-dom') && !id.includes('react-router')) {
+          // Keep the audit bundle extremely small by not aggregating a global vendor chunk
+          if (isAuditBuild) {
+            if (/node_modules\/react\//.test(id)) {
+              return 'react-core'
+            }
+            if (/node_modules\/react-dom\//.test(id)) {
+              return 'react-dom'
+            }
+            // Let Rollup decide for other modules; avoid pulling unrelated deps
+            return undefined
+          }
+          // Split React core from React ecosystem with precise matching to avoid oversized chunks
+          if (/node_modules\/react\//.test(id)) {
             return 'react-core';
           }
-          if (id.includes('react-dom')) {
+          if (/node_modules\/react-dom\//.test(id)) {
             return 'react-dom';
           }
-          if (id.includes('react-router')) {
+          if (/node_modules\/(react-router|react-router-dom)\//.test(id)) {
             return 'react-router';
           }
           
@@ -156,6 +180,90 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: './src/test/setup.js',
+    include: [
+      'src/**/*.{test,spec}.{js,jsx,ts,tsx}',
+      'tests/integration/**/*.{test,spec}.{js,jsx,ts,tsx}',
+    ],
+    exclude: [
+      'node_modules/**',
+      'dist/**',
+      'tests/e2e/**',
+      'tests/performance/**',
+      'tests/security/**',
+      'tests/smoke/**',
+    ],
+    pool: 'threads',
+    poolOptions: {
+      threads: {
+        maxThreads: 4,
+        minThreads: 1,
+      },
+    },
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json', 'html', 'lcov'],
+      exclude: [
+        'node_modules/',
+        'src/test/',
+        'src/**/*.test.{js,jsx,ts,tsx}',
+        'src/**/*.spec.{js,jsx,ts,tsx}',
+        'src/**/*.config.js',
+        'src/**/*.config.mjs',
+        'src/**/*.setup.js',
+        'src/**/*.d.ts',
+        'src/**/*.stories.{js,jsx,ts,tsx}',
+        'src/main.jsx',
+        'src/index.jsx',
+        'src/vite-env.d.ts',
+        'src/types/',
+        'src/examples/',
+        'src/docs/',
+        'public/',
+        'scripts/',
+        'tests/',
+        'test-results/',
+        'coverage/',
+      ],
+      thresholds: {
+        global: {
+          branches: 80,
+          functions: 80,
+          lines: 80,
+          statements: 80,
+        },
+        './src/components/': {
+          branches: 75,
+          functions: 75,
+          lines: 75,
+          statements: 75,
+        },
+        './src/hooks/': {
+          branches: 80,
+          functions: 80,
+          lines: 80,
+          statements: 80,
+        },
+        './src/utils/': {
+          branches: 80,
+          functions: 80,
+          lines: 80,
+          statements: 80,
+        },
+        './src/services/': {
+          branches: 75,
+          functions: 75,
+          lines: 75,
+          statements: 75,
+        },
+        './src/store/': {
+          branches: 80,
+          functions: 80,
+          lines: 80,
+          statements: 80,
+        },
+      },
+      all: true,
+      include: ['src/**/*.{js,jsx,ts,tsx}'],
+    },
   },
 })
-

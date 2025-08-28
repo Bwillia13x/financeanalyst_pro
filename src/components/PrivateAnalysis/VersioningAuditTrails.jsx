@@ -97,11 +97,11 @@ const VersioningAuditTrails = ({ _modelId, _modelData, _onDataChange }) => {
     ifrs: { compliant: true, standards: ['IFRS 9', 'IFRS 16'], lastUpdate: '2024-01-05' }
   });
 
-  const formatDate = (dateString) => {
+  const formatDate = dateString => {
     return new Date(dateString).toLocaleString();
   };
 
-  const getStatusIcon = (status) => {
+  const getStatusIcon = status => {
     switch (status) {
       case 'approved':
         return <CheckCircle className="w-4 h-4 text-green-600" />;
@@ -114,7 +114,7 @@ const VersioningAuditTrails = ({ _modelId, _modelData, _onDataChange }) => {
     }
   };
 
-  const getSeverityColor = (severity) => {
+  const getSeverityColor = severity => {
     switch (severity) {
       case 'info':
         return 'text-blue-600 bg-blue-50';
@@ -146,7 +146,7 @@ const VersioningAuditTrails = ({ _modelId, _modelData, _onDataChange }) => {
               { id: 'audit', label: 'Audit Logs', icon: FileText },
               { id: 'compliance', label: 'Compliance', icon: Lock },
               { id: 'compare', label: 'Compare Versions', icon: RotateCcw }
-            ].map((tab) => {
+            ].map(tab => {
               const Icon = tab.icon;
               return (
                 <button
@@ -186,7 +186,7 @@ const VersioningAuditTrails = ({ _modelId, _modelData, _onDataChange }) => {
               </div>
 
               <div className="space-y-4">
-                {versions.map((version) => (
+                {versions.map(version => (
                   <motion.div
                     key={version.id}
                     initial={{ opacity: 0, y: 20 }}
@@ -200,9 +200,11 @@ const VersioningAuditTrails = ({ _modelId, _modelData, _onDataChange }) => {
                           <h4 className="font-medium text-gray-900">{version.id}</h4>
                           <span
                             className={`px-2 py-1 text-xs font-medium rounded-full ${
-                              version.status === 'approved' ? 'bg-green-100 text-green-800' :
-                                version.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                                  'bg-gray-100 text-gray-800'
+                              version.status === 'approved'
+                                ? 'bg-green-100 text-green-800'
+                                : version.status === 'pending'
+                                  ? 'bg-yellow-100 text-yellow-800'
+                                  : 'bg-gray-100 text-gray-800'
                             }`}
                           >
                             {version.status}
@@ -301,7 +303,7 @@ const VersioningAuditTrails = ({ _modelId, _modelData, _onDataChange }) => {
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      {auditLogs.map((log) => (
+                      {auditLogs.map(log => (
                         <tr key={log.id} className="hover:bg-gray-50">
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                             {formatDate(log.timestamp)}
@@ -310,7 +312,9 @@ const VersioningAuditTrails = ({ _modelId, _modelData, _onDataChange }) => {
                             {log.user}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getSeverityColor(log.severity)}`}>
+                            <span
+                              className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getSeverityColor(log.severity)}`}
+                            >
                               {log.action.replace('_', ' ')}
                             </span>
                           </td>
@@ -342,7 +346,9 @@ const VersioningAuditTrails = ({ _modelId, _modelData, _onDataChange }) => {
                     <CheckCircle className="w-6 h-6 text-green-600" />
                   </div>
                   <div className="space-y-2 text-sm text-green-700">
-                    <div>Status: <span className="font-medium">Compliant</span></div>
+                    <div>
+                      Status: <span className="font-medium">Compliant</span>
+                    </div>
                     <div>Last Audit: {complianceStatus.sox.lastAudit}</div>
                     <div>Next Audit: {complianceStatus.sox.nextAudit}</div>
                   </div>
@@ -355,7 +361,9 @@ const VersioningAuditTrails = ({ _modelId, _modelData, _onDataChange }) => {
                     <CheckCircle className="w-6 h-6 text-blue-600" />
                   </div>
                   <div className="space-y-2 text-sm text-blue-700">
-                    <div>Status: <span className="font-medium">Compliant</span></div>
+                    <div>
+                      Status: <span className="font-medium">Compliant</span>
+                    </div>
                     <div>Last Review: {complianceStatus.gdpr.lastReview}</div>
                     <div>Data Retention: {complianceStatus.gdpr.dataRetention}</div>
                   </div>
@@ -368,7 +376,9 @@ const VersioningAuditTrails = ({ _modelId, _modelData, _onDataChange }) => {
                     <CheckCircle className="w-6 h-6 text-purple-600" />
                   </div>
                   <div className="space-y-2 text-sm text-purple-700">
-                    <div>Status: <span className="font-medium">Compliant</span></div>
+                    <div>
+                      Status: <span className="font-medium">Compliant</span>
+                    </div>
                     <div>Standards: {complianceStatus.ifrs.standards.join(', ')}</div>
                     <div>Last Update: {complianceStatus.ifrs.lastUpdate}</div>
                   </div>
@@ -383,7 +393,9 @@ const VersioningAuditTrails = ({ _modelId, _modelData, _onDataChange }) => {
                     <div className="flex items-center justify-between">
                       <div>
                         <div className="font-medium text-gray-900">Generate Compliance Report</div>
-                        <div className="text-sm text-gray-600">Create comprehensive audit report</div>
+                        <div className="text-sm text-gray-600">
+                          Create comprehensive audit report
+                        </div>
                       </div>
                       <FileText className="w-5 h-5 text-gray-400" />
                     </div>
@@ -409,20 +421,32 @@ const VersioningAuditTrails = ({ _modelId, _modelData, _onDataChange }) => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label htmlFor="baseVersion" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    htmlFor="baseVersion"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
                     Base Version
                   </label>
-                  <select id="baseVersion" className="w-full border border-gray-300 rounded-lg px-3 py-2">
+                  <select
+                    id="baseVersion"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                  >
                     <option>v1.0.3 (Current)</option>
                     <option>v1.0.2</option>
                     <option>v1.0.1</option>
                   </select>
                 </div>
                 <div>
-                  <label htmlFor="compareAgainst" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    htmlFor="compareAgainst"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
                     Compare Against
                   </label>
-                  <select id="compareAgainst" className="w-full border border-gray-300 rounded-lg px-3 py-2">
+                  <select
+                    id="compareAgainst"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                  >
                     <option>v1.0.2</option>
                     <option>v1.0.1</option>
                     <option>v1.0.0</option>
@@ -441,7 +465,8 @@ const VersioningAuditTrails = ({ _modelId, _modelData, _onDataChange }) => {
                   <div>
                     <h4 className="font-medium text-yellow-900">Version Comparison</h4>
                     <p className="text-sm text-yellow-700 mt-1">
-                      Select two versions to see detailed differences in assumptions, calculations, and results.
+                      Select two versions to see detailed differences in assumptions, calculations,
+                      and results.
                     </p>
                   </div>
                 </div>

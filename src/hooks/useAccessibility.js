@@ -2,15 +2,18 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 
 import { accessibilityTester } from '../utils/accessibilityTesting';
 
+// Minimize side effects during unit/integration tests
+const IS_TEST_MODE = import.meta.env && import.meta.env.MODE === 'test';
+
 // React hook for accessibility testing
 export function useAccessibility(options = {}) {
   // Disable accessibility testing during E2E tests to prevent interference
-  const isTestEnvironment = typeof window !== 'undefined' && (
-    window.navigator?.webdriver === true ||
-    window.location?.search?.includes('lhci') ||
-    window.location?.search?.includes('ci') ||
-    window.location?.search?.includes('audit')
-  );
+  const isTestEnvironment =
+    typeof window !== 'undefined' &&
+    (window.navigator?.webdriver === true ||
+      window.location?.search?.includes('lhci') ||
+      window.location?.search?.includes('ci') ||
+      window.location?.search?.includes('audit'));
 
   const {
     enabled = import.meta.env.DEV && !isTestEnvironment,
@@ -31,95 +34,101 @@ export function useAccessibility(options = {}) {
   const intervalRef = useRef(null);
 
   // Run accessibility tests
-  const runTests = useCallback(async(element = null, testOptions = {}) => {
-    if (!enabled) return null;
+  const runTests = useCallback(
+    async (element = null, testOptions = {}) => {
+      if (!enabled) return null;
 
-    const targetElement = element || elementRef.current || document;
-    setIsLoading(true);
+      const targetElement = element || elementRef.current || document;
+      setIsLoading(true);
 
-    try {
-      const testResults = await accessibilityTester.runTests(targetElement, testOptions);
+      try {
+        const testResults = await accessibilityTester.runTests(targetElement, testOptions);
 
-      setResults(testResults);
-      setViolations(testResults.violations || []);
-      setScore(accessibilityTester.calculateAccessibilityScore());
-      setLastTestTime(Date.now());
+        setResults(testResults);
+        setViolations(testResults.violations || []);
+        setScore(accessibilityTester.calculateAccessibilityScore());
+        setLastTestTime(Date.now());
 
-      // Report to performance monitoring
-      import('../utils/performanceMonitoring')
-        .then((mod) => {
-          if (mod?.reportPerformanceMetric) {
-            mod.reportPerformanceMetric('accessibility_test', {
-              violations: testResults.violations?.length || 0,
-              score: accessibilityTester.calculateAccessibilityScore(),
-              componentType,
-              timestamp: Date.now()
-            });
-          }
-        })
-        .catch(() => {});
+        // Report to performance monitoring
+        import('../utils/performanceMonitoring')
+          .then(mod => {
+            if (mod?.reportPerformanceMetric) {
+              mod.reportPerformanceMetric('accessibility_test', {
+                violations: testResults.violations?.length || 0,
+                score: accessibilityTester.calculateAccessibilityScore(),
+                componentType,
+                timestamp: Date.now()
+              });
+            }
+          })
+          .catch(() => {});
 
-      // Call callbacks
-      if (testResults.violations?.length > 0) {
-        onViolations?.(testResults.violations);
-      } else {
-        onSuccess?.(testResults);
+        // Call callbacks
+        if (testResults.violations?.length > 0) {
+          onViolations?.(testResults.violations);
+        } else {
+          onSuccess?.(testResults);
+        }
+
+        return testResults;
+      } catch (error) {
+        console.error('Accessibility test failed:', error);
+        return null;
+      } finally {
+        setIsLoading(false);
       }
-
-      return testResults;
-    } catch (error) {
-      console.error('Accessibility test failed:', error);
-      return null;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [enabled, componentType, onViolations, onSuccess]);
+    },
+    [enabled, componentType, onViolations, onSuccess]
+  );
 
   // Test specific financial component
-  const testFinancialComponent = useCallback(async(selector, type = componentType) => {
-    if (!enabled) return null;
+  const testFinancialComponent = useCallback(
+    async (selector, type = componentType) => {
+      if (!enabled) return null;
 
-    setIsLoading(true);
-    try {
-      const testResults = await accessibilityTester.testFinancialComponent(selector, type);
+      setIsLoading(true);
+      try {
+        const testResults = await accessibilityTester.testFinancialComponent(selector, type);
 
-      setResults(testResults);
-      setViolations(testResults.violations || []);
-      setScore(accessibilityTester.calculateAccessibilityScore());
-      setLastTestTime(Date.now());
+        setResults(testResults);
+        setViolations(testResults.violations || []);
+        setScore(accessibilityTester.calculateAccessibilityScore());
+        setLastTestTime(Date.now());
 
-      // Report specific component test
-      import('../utils/performanceMonitoring')
-        .then((mod) => {
-          if (mod?.reportPerformanceMetric) {
-            mod.reportPerformanceMetric('financial_component_accessibility', {
-              componentType: type,
-              violations: testResults.violations?.length || 0,
-              score: accessibilityTester.calculateAccessibilityScore(),
-              timestamp: Date.now()
-            });
-          }
-        })
-        .catch(() => {});
+        // Report specific component test
+        import('../utils/performanceMonitoring')
+          .then(mod => {
+            if (mod?.reportPerformanceMetric) {
+              mod.reportPerformanceMetric('financial_component_accessibility', {
+                componentType: type,
+                violations: testResults.violations?.length || 0,
+                score: accessibilityTester.calculateAccessibilityScore(),
+                timestamp: Date.now()
+              });
+            }
+          })
+          .catch(() => {});
 
-      return testResults;
-    } catch (error) {
-      console.error('Financial component accessibility test failed:', error);
-      return null;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [enabled, componentType]);
+        return testResults;
+      } catch (error) {
+        console.error('Financial component accessibility test failed:', error);
+        return null;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [enabled, componentType]
+  );
 
   // Test keyboard navigation
-  const testKeyboardNavigation = useCallback(async() => {
+  const testKeyboardNavigation = useCallback(async () => {
     if (!enabled) return null;
 
     try {
       const navResults = await accessibilityTester.testKeyboardNavigation();
 
       import('../utils/performanceMonitoring')
-        .then((mod) => {
+        .then(mod => {
           if (mod?.reportPerformanceMetric) {
             mod.reportPerformanceMetric('keyboard_navigation_test', {
               focusableElements: navResults.focusableElementsCount,
@@ -140,14 +149,14 @@ export function useAccessibility(options = {}) {
   }, [enabled]);
 
   // Test color contrast
-  const testColorContrast = useCallback(async() => {
+  const testColorContrast = useCallback(async () => {
     if (!enabled) return null;
 
     try {
       const contrastResults = await accessibilityTester.testColorContrast();
 
       import('../utils/performanceMonitoring')
-        .then((mod) => {
+        .then(mod => {
           if (mod?.reportPerformanceMetric) {
             mod.reportPerformanceMetric('color_contrast_test', {
               totalElements: contrastResults.totalElements,
@@ -167,14 +176,14 @@ export function useAccessibility(options = {}) {
   }, [enabled]);
 
   // Test form accessibility
-  const testFormAccessibility = useCallback(async() => {
+  const testFormAccessibility = useCallback(async () => {
     if (!enabled) return null;
 
     try {
       const formResults = await accessibilityTester.testFormAccessibility();
 
       import('../utils/performanceMonitoring')
-        .then((mod) => {
+        .then(mod => {
           if (mod?.reportPerformanceMetric) {
             mod.reportPerformanceMetric('form_accessibility_test', {
               totalForms: formResults.totalForms,
@@ -202,7 +211,7 @@ export function useAccessibility(options = {}) {
 
       // Store report data for performance monitoring
       import('../utils/performanceMonitoring')
-        .then((mod) => {
+        .then(mod => {
           if (mod?.reportPerformanceMetric) {
             mod.reportPerformanceMetric('accessibility_report_generated', {
               score: report.summary.score,
@@ -223,7 +232,7 @@ export function useAccessibility(options = {}) {
 
   // Set up automatic testing
   useEffect(() => {
-    if (!enabled || !autoTest) return;
+    if (!enabled || !autoTest || IS_TEST_MODE) return;
 
     const runAutoTest = () => {
       runTests();
@@ -280,7 +289,7 @@ export function useAppAccessibility() {
   const [recentViolations, setRecentViolations] = useState([]);
   const [testHistory, setTestHistory] = useState([]);
 
-  const runGlobalAccessibilityCheck = useCallback(async() => {
+  const runGlobalAccessibilityCheck = useCallback(async () => {
     try {
       // Run comprehensive tests on the entire document
       const results = await accessibilityTester.runTests(document);
@@ -301,7 +310,7 @@ export function useAppAccessibility() {
 
       // Report global metrics
       import('../utils/performanceMonitoring')
-        .then((mod) => {
+        .then(mod => {
           if (mod?.reportPerformanceMetric) {
             mod.reportPerformanceMetric('global_accessibility_check', {
               score,
@@ -322,6 +331,7 @@ export function useAppAccessibility() {
 
   // Check accessibility when route changes
   useEffect(() => {
+    if (IS_TEST_MODE) return;
     const checkOnRouteChange = () => {
       setTimeout(() => {
         runGlobalAccessibilityCheck();
@@ -353,14 +363,19 @@ export function useFinancialAccessibility(componentType) {
     componentType,
     autoTest: true,
     testInterval: 30000, // Test every 30 seconds in development
-    onViolations: (violations) => {
+    onViolations: violations => {
       // Log financial component specific violations
-      console.warn(`Financial component (${componentType}) accessibility violations:`, violations);
+      if (!IS_TEST_MODE) {
+        console.warn(
+          `Financial component (${componentType}) accessibility violations:`,
+          violations
+        );
+      }
     }
   });
 
   // Enhanced testing for financial components
-  const testFinancialFeatures = useCallback(async() => {
+  const testFinancialFeatures = useCallback(async () => {
     const results = {};
 
     try {
@@ -402,11 +417,11 @@ export function useAccessibilityMonitor(options = {}) {
   const intervalRef = useRef(null);
 
   const startMonitoring = useCallback(() => {
-    if (isMonitoring) return;
+    if (isMonitoring || IS_TEST_MODE) return;
 
     setIsMonitoring(true);
 
-    const monitor = async() => {
+    const monitor = async () => {
       try {
         const results = await accessibilityTester.runTests(document);
         const score = accessibilityTester.calculateAccessibilityScore();
@@ -446,7 +461,7 @@ export function useAccessibilityMonitor(options = {}) {
 
         // Report monitoring metrics
         import('../utils/performanceMonitoring')
-          .then((mod) => {
+          .then(mod => {
             if (mod?.reportPerformanceMetric) {
               mod.reportPerformanceMetric('accessibility_monitoring', {
                 score,
@@ -457,7 +472,6 @@ export function useAccessibilityMonitor(options = {}) {
             }
           })
           .catch(() => {});
-
       } catch (error) {
         console.error('Accessibility monitoring failed:', error);
       }

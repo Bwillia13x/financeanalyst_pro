@@ -31,7 +31,7 @@ describe('SyncService', () => {
   let syncService;
   let mockPersistenceManager;
 
-  beforeEach(async() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
 
     // Import mocked modules
@@ -42,7 +42,7 @@ describe('SyncService', () => {
   });
 
   describe('Initialization', () => {
-    it('should initialize with default configuration', async() => {
+    it('should initialize with default configuration', async () => {
       mockPersistenceManager.retrieve.mockResolvedValue(null);
 
       const result = await syncService.initialize();
@@ -56,7 +56,7 @@ describe('SyncService', () => {
       expect(syncService.conflictResolutionStrategy).toBe('client_wins');
     });
 
-    it('should initialize with custom configuration', async() => {
+    it('should initialize with custom configuration', async () => {
       mockPersistenceManager.retrieve.mockResolvedValue(null);
 
       const config = {
@@ -76,7 +76,7 @@ describe('SyncService', () => {
       expect(syncService.conflictResolutionStrategy).toBe(config.conflictResolution);
     });
 
-    it('should load previous sync data on initialization', async() => {
+    it('should load previous sync data on initialization', async () => {
       const lastSyncTime = Date.now();
       const syncQueue = [{ id: 1, operation: 'update' }];
 
@@ -90,7 +90,7 @@ describe('SyncService', () => {
       expect(syncService.syncQueue).toEqual(syncQueue);
     });
 
-    it('should handle initialization errors gracefully', async() => {
+    it('should handle initialization errors gracefully', async () => {
       mockPersistenceManager.retrieve.mockRejectedValue(new Error('Storage error'));
 
       const result = await syncService.initialize();
@@ -103,12 +103,12 @@ describe('SyncService', () => {
   });
 
   describe('Queue Operations', () => {
-    beforeEach(async() => {
+    beforeEach(async () => {
       mockPersistenceManager.retrieve.mockResolvedValue(null);
       await syncService.initialize();
     });
 
-    it('should queue sync operations', async() => {
+    it('should queue sync operations', async () => {
       const operation = {
         type: 'create',
         dataType: 'portfolios',
@@ -125,10 +125,14 @@ describe('SyncService', () => {
         dataType: 'portfolios',
         key: 'portfolio_1'
       });
-      expect(mockPersistenceManager.store).toHaveBeenCalledWith('sync_queue', syncService.syncQueue, { storage: 'localStorage' });
+      expect(mockPersistenceManager.store).toHaveBeenCalledWith(
+        'sync_queue',
+        syncService.syncQueue,
+        { storage: 'localStorage' }
+      );
     });
 
-    it('should maintain queue size limit', async() => {
+    it('should maintain queue size limit', async () => {
       syncService.maxQueueSize = 2;
 
       const operation1 = { type: 'create', dataType: 'test', key: '1' };
@@ -147,7 +151,7 @@ describe('SyncService', () => {
   });
 
   describe('Sync Status', () => {
-    beforeEach(async() => {
+    beforeEach(async () => {
       mockPersistenceManager.retrieve.mockResolvedValue(null);
       await syncService.initialize();
     });
@@ -175,7 +179,7 @@ describe('SyncService', () => {
   });
 
   describe('Event Management', () => {
-    beforeEach(async() => {
+    beforeEach(async () => {
       mockPersistenceManager.retrieve.mockResolvedValue(null);
       await syncService.initialize();
     });
@@ -205,7 +209,7 @@ describe('SyncService', () => {
   });
 
   describe('Utility Functions', () => {
-    beforeEach(async() => {
+    beforeEach(async () => {
       mockPersistenceManager.retrieve.mockResolvedValue(null);
       await syncService.initialize();
     });
@@ -228,7 +232,7 @@ describe('SyncService', () => {
       expect(['indexedDB', 'localStorage']).toContain(unknownType);
     });
 
-    it('should calculate data checksums', async() => {
+    it('should calculate data checksums', async () => {
       const data = { test: 'data', value: 123 };
       const checksum = await syncService.calculateChecksum(data);
 

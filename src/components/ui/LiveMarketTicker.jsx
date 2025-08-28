@@ -34,11 +34,7 @@ export const LiveMarketTicker = ({
     options: { autoReconnect: true }
   }));
 
-  const {
-    getData,
-    getConnectionState,
-    isAllConnected
-  } = useMultipleRealTimeData(subscriptions);
+  const { getData, getConnectionState, isAllConnected } = useMultipleRealTimeData(subscriptions);
 
   const speedClasses = {
     slow: 'animate-scroll-slow',
@@ -110,10 +106,7 @@ export const LiveMarketTicker = ({
 
   return (
     <div
-      className={cn(
-        'bg-slate-900 border-b border-slate-700 overflow-hidden relative',
-        className
-      )}
+      className={cn('bg-slate-900 border-b border-slate-700 overflow-hidden relative', className)}
     >
       {/* Connection Status */}
       {showConnectionStatus && (
@@ -141,10 +134,7 @@ export const LiveMarketTicker = ({
 
       {/* Scrolling Content */}
       <div
-        className={cn(
-          'flex whitespace-nowrap py-2',
-          speedClasses[speed] || speedClasses.normal
-        )}
+        className={cn('flex whitespace-nowrap py-2', speedClasses[speed] || speedClasses.normal)}
       >
         {symbols.map(({ dataType, symbol }, index) => {
           const data = getData(dataType, symbol);
@@ -159,19 +149,15 @@ export const LiveMarketTicker = ({
                 !isConnected && 'opacity-50'
               )}
               onClick={() => onTickerClick?.(dataType, symbol, data)}
-              onKeyDown={(e) => e.key === 'Enter' && onTickerClick?.(dataType, symbol, data)}
+              onKeyDown={e => e.key === 'Enter' && onTickerClick?.(dataType, symbol, data)}
               role="button"
               tabIndex={0}
             >
               {/* Symbol */}
-              <span className="text-white font-semibold text-sm">
-                {symbol}
-              </span>
+              <span className="text-white font-semibold text-sm">{symbol}</span>
 
               {/* Value */}
-              <span className="text-slate-300 text-sm">
-                {formatValue(dataType, data)}
-              </span>
+              <span className="text-slate-300 text-sm">{formatValue(dataType, data)}</span>
 
               {/* Change */}
               {change && (
@@ -189,16 +175,13 @@ export const LiveMarketTicker = ({
                   <span>
                     {dataType === 'stock_price'
                       ? `${change.percent.toFixed(2)}%`
-                      : `${change.value.toFixed(2)}%`
-                    }
+                      : `${change.value.toFixed(2)}%`}
                   </span>
                 </div>
               )}
 
               {/* Connection indicator */}
-              {!isConnected && (
-                <RefreshCw className="w-3 h-3 text-slate-500 animate-spin" />
-              )}
+              {!isConnected && <RefreshCw className="w-3 h-3 text-slate-500 animate-spin" />}
             </div>
           );
         })}
@@ -217,7 +200,7 @@ export const LiveMarketTicker = ({
                 !isConnected && 'opacity-50'
               )}
               onClick={() => onTickerClick?.(dataType, symbol, data)}
-              onKeyDown={(e) => e.key === 'Enter' && onTickerClick?.(dataType, symbol, data)}
+              onKeyDown={e => e.key === 'Enter' && onTickerClick?.(dataType, symbol, data)}
               role="button"
               tabIndex={0}
             >
@@ -238,14 +221,11 @@ export const LiveMarketTicker = ({
                   <span>
                     {dataType === 'stock_price'
                       ? `${change.percent.toFixed(2)}%`
-                      : `${change.value.toFixed(2)}%`
-                    }
+                      : `${change.value.toFixed(2)}%`}
                   </span>
                 </div>
               )}
-              {!isConnected && (
-                <RefreshCw className="w-3 h-3 text-slate-500 animate-spin" />
-              )}
+              {!isConnected && <RefreshCw className="w-3 h-3 text-slate-500 animate-spin" />}
             </div>
           );
         })}

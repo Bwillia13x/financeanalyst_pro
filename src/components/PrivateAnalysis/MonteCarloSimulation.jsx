@@ -1,7 +1,28 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { BarChart3, TrendingUp, AlertTriangle, Play, Square, Settings, Download, FileText, Zap } from 'lucide-react';
+import {
+  BarChart3,
+  TrendingUp,
+  AlertTriangle,
+  Play,
+  Square,
+  Settings,
+  Download,
+  FileText,
+  Zap
+} from 'lucide-react';
 import React, { useState, useMemo, useCallback } from 'react';
-import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ScatterChart, Scatter, Cell, AreaChart, Area } from 'recharts';
+import {
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  ScatterChart,
+  Scatter,
+  Cell,
+  AreaChart,
+  Area
+} from 'recharts';
 
 import { monteCarloEngine } from '../../services/monteCarloEngine.js';
 
@@ -59,7 +80,7 @@ const MonteCarloSimulation = ({ data, onDataChange: _onDataChange }) => {
     { value: 'beta', label: 'Beta', parameters: ['alpha', 'beta'] }
   ];
 
-  const runSimulation = useCallback(async() => {
+  const runSimulation = useCallback(async () => {
     try {
       // Validate data and settings before starting simulation
 
@@ -71,7 +92,9 @@ const MonteCarloSimulation = ({ data, onDataChange: _onDataChange }) => {
       );
 
       if (Object.keys(enabledDistributions).length === 0) {
-        throw new Error('No distributions are enabled. Please enable at least one variable distribution to run the simulation.');
+        throw new Error(
+          'No distributions are enabled. Please enable at least one variable distribution to run the simulation.'
+        );
       }
 
       const options = {
@@ -96,7 +119,9 @@ const MonteCarloSimulation = ({ data, onDataChange: _onDataChange }) => {
         ...Object.fromEntries(
           Object.entries(enabledDistributions).map(([key, dist]) => [
             key,
-            dist.parameters.mean || dist.parameters.mode || (dist.parameters.min + dist.parameters.max) / 2
+            dist.parameters.mean ||
+              dist.parameters.mode ||
+              (dist.parameters.min + dist.parameters.max) / 2
           ])
         )
       };
@@ -148,11 +173,13 @@ const MonteCarloSimulation = ({ data, onDataChange: _onDataChange }) => {
     const max = Math.max(...values);
     const binWidth = (max - min) / bins;
 
-    const histogram = Array(bins).fill(0).map((_, i) => ({
-      bin: min + i * binWidth,
-      count: 0,
-      frequency: 0
-    }));
+    const histogram = Array(bins)
+      .fill(0)
+      .map((_, i) => ({
+        bin: min + i * binWidth,
+        count: 0,
+        frequency: 0
+      }));
 
     values.forEach(value => {
       const binIndex = Math.min(Math.floor((value - min) / binWidth), bins - 1);
@@ -176,7 +203,7 @@ const MonteCarloSimulation = ({ data, onDataChange: _onDataChange }) => {
     }));
   }, [simulationResults]);
 
-  const formatCurrency = (value) => {
+  const formatCurrency = value => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
@@ -185,7 +212,7 @@ const MonteCarloSimulation = ({ data, onDataChange: _onDataChange }) => {
     }).format(value);
   };
 
-  const _formatPercent = (value) => {
+  const _formatPercent = value => {
     return `${(value * 100).toFixed(2)}%`;
   };
 
@@ -197,7 +224,10 @@ const MonteCarloSimulation = ({ data, onDataChange: _onDataChange }) => {
   ];
 
   return (
-    <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
+    <div
+      className="bg-gray-800 rounded-lg border border-gray-700 p-6"
+      data-testid="monte-carlo-simulation"
+    >
       <div className="mb-6">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <h2 className="text-2xl font-bold text-white mb-2 flex items-center">
@@ -205,14 +235,15 @@ const MonteCarloSimulation = ({ data, onDataChange: _onDataChange }) => {
             Monte Carlo Simulation
           </h2>
           <p className="text-gray-400 text-sm">
-            Advanced risk analysis using probabilistic modeling • Generate thousands of scenarios • Measure uncertainty
+            Advanced risk analysis using probabilistic modeling • Generate thousands of scenarios •
+            Measure uncertainty
           </p>
         </motion.div>
       </div>
 
       <div className="mb-6">
         <div className="flex space-x-2">
-          {tabs.map((tab) => {
+          {tabs.map(tab => {
             const Icon = tab.icon;
             return (
               <button
@@ -249,16 +280,23 @@ const MonteCarloSimulation = ({ data, onDataChange: _onDataChange }) => {
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <label htmlFor="iterations" className="block text-sm font-medium text-gray-200">Iterations</label>
+                      <label
+                        htmlFor="iterations"
+                        className="block text-sm font-medium text-gray-200"
+                      >
+                        Iterations
+                      </label>
                       <input
                         id="iterations"
                         type="number"
                         className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                         value={simulationSettings.iterations}
-                        onChange={(e) => setSimulationSettings(prev => ({
-                          ...prev,
-                          iterations: parseInt(e.target.value)
-                        }))}
+                        onChange={e =>
+                          setSimulationSettings(prev => ({
+                            ...prev,
+                            iterations: parseInt(e.target.value)
+                          }))
+                        }
                         min="1000"
                         max="100000"
                         step="1000"
@@ -266,32 +304,46 @@ const MonteCarloSimulation = ({ data, onDataChange: _onDataChange }) => {
                       <small className="text-gray-400">Leave empty for random</small>
                     </div>
                     <div className="space-y-2">
-                      <label htmlFor="confidenceLevel" className="block text-sm font-medium text-gray-200">Confidence Level</label>
+                      <label
+                        htmlFor="confidenceLevel"
+                        className="block text-sm font-medium text-gray-200"
+                      >
+                        Confidence Level
+                      </label>
                       <select
                         id="confidenceLevel"
                         className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                         value={simulationSettings.confidenceLevel}
-                        onChange={(e) => setSimulationSettings(prev => ({
-                          ...prev,
-                          confidenceLevel: parseFloat(e.target.value)
-                        }))}
+                        onChange={e =>
+                          setSimulationSettings(prev => ({
+                            ...prev,
+                            confidenceLevel: parseFloat(e.target.value)
+                          }))
+                        }
                       >
-                        <option value={0.90}>90%</option>
+                        <option value={0.9}>90%</option>
                         <option value={0.95}>95%</option>
                         <option value={0.99}>99%</option>
                       </select>
                     </div>
                     <div className="space-y-2">
-                      <label htmlFor="randomSeed" className="block text-sm font-medium text-gray-200">Random Seed (Optional)</label>
+                      <label
+                        htmlFor="randomSeed"
+                        className="block text-sm font-medium text-gray-200"
+                      >
+                        Random Seed (Optional)
+                      </label>
                       <input
                         id="randomSeed"
                         type="number"
                         className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                         value={simulationSettings.randomSeed || ''}
-                        onChange={(e) => setSimulationSettings(prev => ({
-                          ...prev,
-                          randomSeed: e.target.value ? parseInt(e.target.value) : null
-                        }))}
+                        onChange={e =>
+                          setSimulationSettings(prev => ({
+                            ...prev,
+                            randomSeed: e.target.value ? parseInt(e.target.value) : null
+                          }))
+                        }
                         placeholder="Leave empty for random"
                       />
                     </div>
@@ -301,10 +353,12 @@ const MonteCarloSimulation = ({ data, onDataChange: _onDataChange }) => {
                           type="checkbox"
                           className="w-4 h-4 text-blue-600 bg-gray-800 border-gray-600 rounded focus:ring-blue-500"
                           checked={simulationSettings.enableCorrelation}
-                          onChange={(e) => setSimulationSettings(prev => ({
-                            ...prev,
-                            enableCorrelation: e.target.checked
-                          }))}
+                          onChange={e =>
+                            setSimulationSettings(prev => ({
+                              ...prev,
+                              enableCorrelation: e.target.checked
+                            }))
+                          }
                         />
                         <span>Enable Variable Correlation</span>
                       </label>
@@ -318,13 +372,18 @@ const MonteCarloSimulation = ({ data, onDataChange: _onDataChange }) => {
                   </h3>
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     {Object.entries(distributions).map(([variable, dist]) => (
-                      <div key={variable} className="bg-gray-800 border border-gray-600 rounded-lg p-4">
+                      <div
+                        key={variable}
+                        className="bg-gray-800 border border-gray-600 rounded-lg p-4"
+                      >
                         <div className="flex items-center justify-between mb-3">
                           <label className="flex items-center space-x-2 text-gray-200">
                             <input
                               type="checkbox"
                               checked={dist.enabled}
-                              onChange={(e) => updateDistribution(variable, { enabled: e.target.checked })}
+                              onChange={e =>
+                                updateDistribution(variable, { enabled: e.target.checked })
+                              }
                             />
                             <span className="font-medium">{dist.name}</span>
                           </label>
@@ -333,14 +392,21 @@ const MonteCarloSimulation = ({ data, onDataChange: _onDataChange }) => {
                         {dist.enabled && (
                           <div className="space-y-3">
                             <div className="space-y-2">
-                              <label htmlFor="distributionType" className="block text-sm font-medium text-gray-200">Distribution Type</label>
+                              <label
+                                htmlFor="distributionType"
+                                className="block text-sm font-medium text-gray-200"
+                              >
+                                Distribution Type
+                              </label>
                               <select
                                 id="distributionType"
                                 className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 value={dist.type}
-                                onChange={(e) => {
+                                onChange={e => {
                                   const newType = e.target.value;
-                                  const _typeConfig = distributionTypes.find(t => t.value === newType);
+                                  const _typeConfig = distributionTypes.find(
+                                    t => t.value === newType
+                                  );
                                   const newParameters = {};
 
                                   // Set default parameters for new type
@@ -355,7 +421,10 @@ const MonteCarloSimulation = ({ data, onDataChange: _onDataChange }) => {
                                     newParameters.max = 0.15;
                                   }
 
-                                  updateDistribution(variable, { type: newType, parameters: newParameters });
+                                  updateDistribution(variable, {
+                                    type: newType,
+                                    parameters: newParameters
+                                  });
                                 }}
                               >
                                 {distributionTypes.map((type, _index) => (
@@ -371,17 +440,21 @@ const MonteCarloSimulation = ({ data, onDataChange: _onDataChange }) => {
                                 .find(t => t.value === dist.type)
                                 ?.parameters.map(param => (
                                   <div key={param} className="space-y-1">
-                                    <label className="block text-xs font-medium text-gray-300">{param.charAt(0).toUpperCase() + param.slice(1)}</label>
+                                    <label className="block text-xs font-medium text-gray-300">
+                                      {param.charAt(0).toUpperCase() + param.slice(1)}
+                                    </label>
                                     <input
                                       className="w-full px-2 py-1 bg-gray-700 border border-gray-600 rounded text-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
                                       type="number"
                                       value={dist.parameters[param] || ''}
-                                      onChange={(e) => updateDistribution(variable, {
-                                        parameters: {
-                                          ...dist.parameters,
-                                          [param]: parseFloat(e.target.value)
-                                        }
-                                      })}
+                                      onChange={e =>
+                                        updateDistribution(variable, {
+                                          parameters: {
+                                            ...dist.parameters,
+                                            [param]: parseFloat(e.target.value)
+                                          }
+                                        })
+                                      }
                                       step="0.001"
                                     />
                                   </div>
@@ -396,7 +469,9 @@ const MonteCarloSimulation = ({ data, onDataChange: _onDataChange }) => {
 
                 {simulationSettings.enableCorrelation && (
                   <div className="bg-gray-700 rounded-lg p-4">
-                    <h3 className="text-lg font-semibold text-white mb-4 flex items-center">🔗 Correlation Matrix</h3>
+                    <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
+                      🔗 Correlation Matrix
+                    </h3>
                     <div className="overflow-x-auto">
                       <table>
                         <thead>
@@ -420,7 +495,9 @@ const MonteCarloSimulation = ({ data, onDataChange: _onDataChange }) => {
                                   <input
                                     type="number"
                                     value={correlationMatrix[i][j]}
-                                    onChange={(e) => updateCorrelation(i, j, parseFloat(e.target.value))}
+                                    onChange={e =>
+                                      updateCorrelation(i, j, parseFloat(e.target.value))
+                                    }
                                     min="-1"
                                     max="1"
                                     step="0.1"
@@ -457,6 +534,7 @@ const MonteCarloSimulation = ({ data, onDataChange: _onDataChange }) => {
                         onClick={runSimulation}
                         className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium flex items-center space-x-2 transition-colors"
                         disabled={Object.values(distributions).every(d => !d.enabled)}
+                        data-action="run-simulation"
                       >
                         <Play size={16} />
                         <span>Run Simulation</span>
@@ -482,13 +560,17 @@ const MonteCarloSimulation = ({ data, onDataChange: _onDataChange }) => {
                       />
                     </div>
                     <div className="text-sm text-gray-400 text-center">
-                      {progress.toFixed(1)}% Complete ({Math.floor(progress * simulationSettings.iterations / 100)} / {simulationSettings.iterations} iterations)
+                      {progress.toFixed(1)}% Complete (
+                      {Math.floor((progress * simulationSettings.iterations) / 100)} /{' '}
+                      {simulationSettings.iterations} iterations)
                     </div>
                   </div>
                 )}
 
                 <div className="bg-gray-800 rounded-lg p-4 mt-4">
-                  <h4 className="text-lg font-semibold text-white mb-4 flex items-center">📋 Simulation Preview</h4>
+                  <h4 className="text-lg font-semibold text-white mb-4 flex items-center">
+                    📋 Simulation Preview
+                  </h4>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div className="bg-gray-700 rounded-lg p-3 text-center">
                       <div className="text-sm text-gray-400 mb-1">Iterations</div>
@@ -531,7 +613,9 @@ const MonteCarloSimulation = ({ data, onDataChange: _onDataChange }) => {
               {simulationResults ? (
                 <div className="space-y-6">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-xl font-semibold text-white flex items-center">📊 Simulation Results</h3>
+                    <h3 className="text-xl font-semibold text-white flex items-center">
+                      📊 Simulation Results
+                    </h3>
                     <div className="flex items-center space-x-2">
                       <button className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-medium flex items-center space-x-2 transition-colors">
                         <Download size={16} />
@@ -545,46 +629,69 @@ const MonteCarloSimulation = ({ data, onDataChange: _onDataChange }) => {
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {Object.entries(simulationResults.analysis.statistics).map(([metric, stats]) => (
-                      <div key={metric} className="bg-gray-700 rounded-lg p-4">
-                        <h4 className="text-lg font-semibold text-white mb-3">
-                          {metric === 'pricePerShare' ? '💰 Price per Share' :
-                            metric === 'enterpriseValue' ? '🏢 Enterprise Value' :
-                              '📈 Upside %'}
-                        </h4>
-                        <div className="text-2xl font-bold text-green-400 mb-2">
-                          {metric === 'upside'
-                            ? `${stats.mean.toFixed(1)}%`
-                            : formatCurrency(stats.mean)
-                          }
+                    {Object.entries(simulationResults.analysis.statistics).map(
+                      ([metric, stats]) => (
+                        <div key={metric} className="bg-gray-700 rounded-lg p-4">
+                          <h4 className="text-lg font-semibold text-white mb-3">
+                            {metric === 'pricePerShare'
+                              ? '💰 Price per Share'
+                              : metric === 'enterpriseValue'
+                                ? '🏢 Enterprise Value'
+                                : '📈 Upside %'}
+                          </h4>
+                          <div className="text-2xl font-bold text-green-400 mb-2">
+                            {metric === 'upside'
+                              ? `${stats.mean.toFixed(1)}%`
+                              : formatCurrency(stats.mean)}
+                          </div>
+                          <div className="space-y-1 text-sm text-gray-300">
+                            <div>
+                              Median:{' '}
+                              {metric === 'upside'
+                                ? `${stats.median.toFixed(1)}%`
+                                : formatCurrency(stats.median)}
+                            </div>
+                            <div>
+                              Std Dev:{' '}
+                              {metric === 'upside'
+                                ? `${stats.stdDev.toFixed(1)}%`
+                                : formatCurrency(stats.stdDev)}
+                            </div>
+                            <div>
+                              Min:{' '}
+                              {metric === 'upside'
+                                ? `${stats.min.toFixed(1)}%`
+                                : formatCurrency(stats.min)}
+                            </div>
+                            <div>
+                              Max:{' '}
+                              {metric === 'upside'
+                                ? `${stats.max.toFixed(1)}%`
+                                : formatCurrency(stats.max)}
+                            </div>
+                          </div>
                         </div>
-                        <div className="space-y-1 text-sm text-gray-300">
-                          <div>Median: {metric === 'upside' ? `${stats.median.toFixed(1)}%` : formatCurrency(stats.median)}</div>
-                          <div>Std Dev: {metric === 'upside' ? `${stats.stdDev.toFixed(1)}%` : formatCurrency(stats.stdDev)}</div>
-                          <div>Min: {metric === 'upside' ? `${stats.min.toFixed(1)}%` : formatCurrency(stats.min)}</div>
-                          <div>Max: {metric === 'upside' ? `${stats.max.toFixed(1)}%` : formatCurrency(stats.max)}</div>
-                        </div>
-                      </div>
-                    ))}
+                      )
+                    )}
                   </div>
 
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div className="bg-gray-700 rounded-lg p-4">
+                    <div
+                      className="bg-gray-700 rounded-lg p-4"
+                      data-testid="valuation-distribution-chart"
+                    >
                       <h4>📊 Price Distribution</h4>
                       <ResponsiveContainer width="100%" height={300}>
                         <AreaChart data={generateHistogramData}>
                           <CartesianGrid strokeDasharray="3 3" />
-                          <XAxis
-                            dataKey="bin"
-                            tickFormatter={formatCurrency}
-                          />
+                          <XAxis dataKey="bin" tickFormatter={formatCurrency} />
                           <YAxis />
                           <Tooltip
                             formatter={(value, _name) => [
                               `${(value * 100).toFixed(2)}%`,
                               'Frequency'
                             ]}
-                            labelFormatter={(value) => `Price: ${formatCurrency(value)}`}
+                            labelFormatter={value => `Price: ${formatCurrency(value)}`}
                           />
                           <Area
                             type="monotone"
@@ -605,7 +712,7 @@ const MonteCarloSimulation = ({ data, onDataChange: _onDataChange }) => {
                           <XAxis
                             dataKey="x"
                             name="Revenue Growth Rate"
-                            tickFormatter={(value) => `${value.toFixed(1)}%`}
+                            tickFormatter={value => `${value.toFixed(1)}%`}
                           />
                           <YAxis
                             dataKey="y"
@@ -614,7 +721,9 @@ const MonteCarloSimulation = ({ data, onDataChange: _onDataChange }) => {
                           />
                           <Tooltip
                             formatter={(value, name) => [
-                              name === 'Revenue Growth Rate' ? `${value.toFixed(2)}%` : formatCurrency(value),
+                              name === 'Revenue Growth Rate'
+                                ? `${value.toFixed(2)}%`
+                                : formatCurrency(value),
                               name
                             ]}
                           />
@@ -651,83 +760,159 @@ const MonteCarloSimulation = ({ data, onDataChange: _onDataChange }) => {
             >
               {simulationResults?.analysis ? (
                 <div className="space-y-6">
-                  <div className="bg-gray-700 rounded-lg p-4">
-                    <h3 className="text-lg font-semibold text-white mb-4 flex items-center">⚠️ Risk Metrics</h3>
+                  <div className="bg-gray-700 rounded-lg p-4" data-testid="risk-metrics">
+                    <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
+                      ⚠️ Risk Metrics
+                    </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                      {Object.entries(simulationResults.analysis.riskMetrics).map(([metric, value]) => (
-                        <div key={metric} className="bg-gray-800 rounded-lg p-4 border border-gray-600">
-                          <h4 className="text-sm font-medium text-gray-300 mb-2">{metric === 'var95' ? 'Value at Risk (95%)' :
-                            metric === 'cvar95' ? 'Conditional VaR (95%)' :
-                              metric === 'probabilityOfLoss' ? 'Probability of Loss' :
-                                'Sharpe Ratio'}
-                          </h4>
-                          <div className="text-xl font-bold text-red-400 mb-1">
-                            {metric === 'probabilityOfLoss' ? `${(value * 100).toFixed(1)}%` : formatCurrency(value)}
+                      {Object.entries(simulationResults.analysis.riskMetrics).map(
+                        ([metric, value]) => (
+                          <div
+                            key={metric}
+                            className="bg-gray-800 rounded-lg p-4 border border-gray-600"
+                          >
+                            <h4 className="text-sm font-medium text-gray-300 mb-2">
+                              {metric === 'var95'
+                                ? 'Value at Risk (95%)'
+                                : metric === 'cvar95'
+                                  ? 'Conditional VaR (95%)'
+                                  : metric === 'probabilityOfLoss'
+                                    ? 'Probability of Loss'
+                                    : 'Sharpe Ratio'}
+                            </h4>
+                            <div className="text-xl font-bold text-red-400 mb-1">
+                              {metric === 'probabilityOfLoss'
+                                ? `${(value * 100).toFixed(1)}%`
+                                : formatCurrency(value)}
+                            </div>
+                            <div className="text-xs text-gray-400">Risk measure</div>
                           </div>
-                          <div className="text-xs text-gray-400">
-                            Risk measure
-                          </div>
-                        </div>
-                      ))}
+                        )
+                      )}
                     </div>
                   </div>
 
-                  <div className="bg-gray-700 rounded-lg p-4">
-                    <h3 className="text-lg font-semibold text-white mb-4 flex items-center">📊 Confidence Intervals ({(simulationResults.analysis.confidenceIntervals.pricePerShare?.level * 100).toFixed(0)}%)</h3>
+                  <div className="bg-gray-700 rounded-lg p-4" data-testid="confidence-intervals">
+                    <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
+                      📊 Confidence Intervals (
+                      {(
+                        simulationResults.analysis.confidenceIntervals.pricePerShare?.level * 100
+                      ).toFixed(0)}
+                      %)
+                    </h3>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      {Object.entries(simulationResults.analysis.confidenceIntervals).map(([metric, interval]) => (
-                        <div key={metric} className="bg-gray-800 rounded-lg p-4 border border-gray-600">
-                          <h4 className="text-lg font-semibold text-white mb-3">{metric === 'pricePerShare' ? 'Price per Share' :
-                            metric === 'enterpriseValue' ? 'Enterprise Value' :
-                              'Upside %'}
-                          </h4>
-                          <div className="space-y-3">
-                            <div className="flex justify-between items-center">
-                              <span className="text-sm text-gray-400">Lower Bound:</span>
-                              <span className="font-medium text-white">{metric === 'upside' ? `${interval.lowerBound.toFixed(1)}%` : formatCurrency(interval.lowerBound)}</span>
-                            </div>
-                            <div className="flex justify-between items-center">
-                              <span className="text-sm text-gray-400">Upper Bound:</span>
-                              <span className="font-medium text-white">{metric === 'upside' ? `${interval.upperBound.toFixed(1)}%` : formatCurrency(interval.upperBound)}</span>
-                            </div>
-                            <div className="flex justify-between items-center">
-                              <span className="text-sm text-gray-400">Width:</span>
-                              <span className="font-medium text-blue-400">{metric === 'upside' ? `${interval.width.toFixed(1)}%` : formatCurrency(interval.width)}</span>
+                      {Object.entries(simulationResults.analysis.confidenceIntervals).map(
+                        ([metric, interval]) => (
+                          <div
+                            key={metric}
+                            className="bg-gray-800 rounded-lg p-4 border border-gray-600"
+                          >
+                            <h4 className="text-lg font-semibold text-white mb-3">
+                              {metric === 'pricePerShare'
+                                ? 'Price per Share'
+                                : metric === 'enterpriseValue'
+                                  ? 'Enterprise Value'
+                                  : 'Upside %'}
+                            </h4>
+                            <div className="space-y-3">
+                              <div className="flex justify-between items-center">
+                                <span className="text-sm text-gray-400">Lower Bound:</span>
+                                <span className="font-medium text-white">
+                                  {metric === 'upside'
+                                    ? `${interval.lowerBound.toFixed(1)}%`
+                                    : formatCurrency(interval.lowerBound)}
+                                </span>
+                              </div>
+                              <div className="flex justify-between items-center">
+                                <span className="text-sm text-gray-400">Upper Bound:</span>
+                                <span className="font-medium text-white">
+                                  {metric === 'upside'
+                                    ? `${interval.upperBound.toFixed(1)}%`
+                                    : formatCurrency(interval.upperBound)}
+                                </span>
+                              </div>
+                              <div className="flex justify-between items-center">
+                                <span className="text-sm text-gray-400">Width:</span>
+                                <span className="font-medium text-blue-400">
+                                  {metric === 'upside'
+                                    ? `${interval.width.toFixed(1)}%`
+                                    : formatCurrency(interval.width)}
+                                </span>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
+                        )
+                      )}
                     </div>
                   </div>
 
                   <div className="bg-gray-700 rounded-lg p-4">
-                    <h3 className="text-lg font-semibold text-white mb-4 flex items-center">📊 Percentile Analysis</h3>
+                    <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
+                      📊 Percentile Analysis
+                    </h3>
                     <div className="overflow-x-auto">
                       <table className="w-full">
                         <thead>
                           <tr className="border-b border-gray-600">
-                            <th className="text-left p-3 text-sm font-medium text-gray-300">Metric</th>
-                            <th className="text-right p-3 text-sm font-medium text-gray-300">5th %ile</th>
-                            <th className="text-right p-3 text-sm font-medium text-gray-300">25th %ile</th>
-                            <th className="text-right p-3 text-sm font-medium text-gray-300">50th %ile</th>
-                            <th className="text-right p-3 text-sm font-medium text-gray-300">75th %ile</th>
-                            <th className="text-right p-3 text-sm font-medium text-gray-300">95th %ile</th>
+                            <th className="text-left p-3 text-sm font-medium text-gray-300">
+                              Metric
+                            </th>
+                            <th className="text-right p-3 text-sm font-medium text-gray-300">
+                              5th %ile
+                            </th>
+                            <th className="text-right p-3 text-sm font-medium text-gray-300">
+                              25th %ile
+                            </th>
+                            <th className="text-right p-3 text-sm font-medium text-gray-300">
+                              50th %ile
+                            </th>
+                            <th className="text-right p-3 text-sm font-medium text-gray-300">
+                              75th %ile
+                            </th>
+                            <th className="text-right p-3 text-sm font-medium text-gray-300">
+                              95th %ile
+                            </th>
                           </tr>
                         </thead>
                         <tbody>
-                          {Object.entries(simulationResults.analysis.percentiles).map(([metric, percentiles]) => (
-                            <tr key={metric} className="border-b border-gray-600">
-                              <td className="p-3 text-sm text-white">{metric === 'pricePerShare' ? 'Price per Share' :
-                                metric === 'enterpriseValue' ? 'Enterprise Value' :
-                                  'Upside %'}
-                              </td>
-                              <td className="p-3 text-sm text-right text-gray-300">{metric === 'upside' ? `${percentiles.p5.toFixed(1)}%` : formatCurrency(percentiles.p5)}</td>
-                              <td className="p-3 text-sm text-right text-gray-300">{metric === 'upside' ? `${percentiles.p25.toFixed(1)}%` : formatCurrency(percentiles.p25)}</td>
-                              <td className="p-3 text-sm text-right text-blue-400 font-medium">{metric === 'upside' ? `${percentiles.p50.toFixed(1)}%` : formatCurrency(percentiles.p50)}</td>
-                              <td className="p-3 text-sm text-right text-gray-300">{metric === 'upside' ? `${percentiles.p75.toFixed(1)}%` : formatCurrency(percentiles.p75)}</td>
-                              <td className="p-3 text-sm text-right text-gray-300">{metric === 'upside' ? `${percentiles.p95.toFixed(1)}%` : formatCurrency(percentiles.p95)}</td>
-                            </tr>
-                          ))}
+                          {Object.entries(simulationResults.analysis.percentiles).map(
+                            ([metric, percentiles]) => (
+                              <tr key={metric} className="border-b border-gray-600">
+                                <td className="p-3 text-sm text-white">
+                                  {metric === 'pricePerShare'
+                                    ? 'Price per Share'
+                                    : metric === 'enterpriseValue'
+                                      ? 'Enterprise Value'
+                                      : 'Upside %'}
+                                </td>
+                                <td className="p-3 text-sm text-right text-gray-300">
+                                  {metric === 'upside'
+                                    ? `${percentiles.p5.toFixed(1)}%`
+                                    : formatCurrency(percentiles.p5)}
+                                </td>
+                                <td className="p-3 text-sm text-right text-gray-300">
+                                  {metric === 'upside'
+                                    ? `${percentiles.p25.toFixed(1)}%`
+                                    : formatCurrency(percentiles.p25)}
+                                </td>
+                                <td className="p-3 text-sm text-right text-blue-400 font-medium">
+                                  {metric === 'upside'
+                                    ? `${percentiles.p50.toFixed(1)}%`
+                                    : formatCurrency(percentiles.p50)}
+                                </td>
+                                <td className="p-3 text-sm text-right text-gray-300">
+                                  {metric === 'upside'
+                                    ? `${percentiles.p75.toFixed(1)}%`
+                                    : formatCurrency(percentiles.p75)}
+                                </td>
+                                <td className="p-3 text-sm text-right text-gray-300">
+                                  {metric === 'upside'
+                                    ? `${percentiles.p95.toFixed(1)}%`
+                                    : formatCurrency(percentiles.p95)}
+                                </td>
+                              </tr>
+                            )
+                          )}
                         </tbody>
                       </table>
                     </div>

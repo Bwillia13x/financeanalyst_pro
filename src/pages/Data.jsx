@@ -85,7 +85,7 @@ const Data = () => {
     errorRate: 0.02
   });
 
-  const getStatusIcon = (status) => {
+  const getStatusIcon = status => {
     switch (status) {
       case 'connected':
         return <CheckCircle className="w-5 h-5 text-green-500" />;
@@ -98,7 +98,7 @@ const Data = () => {
     }
   };
 
-  const getStatusColor = (status) => {
+  const getStatusColor = status => {
     switch (status) {
       case 'connected':
         return 'bg-green-100 text-green-800';
@@ -146,12 +146,8 @@ const Data = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-        {dataSources.map((source) => (
-          <motion.div
-            key={source.id}
-            whileHover={{ y: -2 }}
-            transition={{ duration: 0.2 }}
-          >
+        {dataSources.map(source => (
+          <motion.div key={source.id} whileHover={{ y: -2 }} transition={{ duration: 0.2 }}>
             <Card className="p-6">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center space-x-3">
@@ -169,7 +165,9 @@ const Data = () => {
               <div className="space-y-3">
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Status</span>
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(source.status)}`}>
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(source.status)}`}
+                  >
                     {source.status}
                   </span>
                 </div>
@@ -420,7 +418,7 @@ const Data = () => {
 
           <div className="mb-6">
             <nav className="flex space-x-8">
-              {tabs.map((tab) => (
+              {tabs.map(tab => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}

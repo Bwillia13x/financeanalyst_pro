@@ -116,7 +116,7 @@ export class UserPresenceService {
   updateCursor(userId, cursorData) {
     const cursor = this.cursors.get(userId);
     const session = this.activeUsers.get(userId);
-    
+
     if (!cursor || !session) return;
 
     // Update cursor position
@@ -135,15 +135,19 @@ export class UserPresenceService {
     this.updateUserActivity(userId, 'cursor_move');
 
     // Throttled broadcast to other users
-    this.throttledBroadcast(`cursor_${userId}`, () => {
-      this.broadcastPresenceUpdate('cursor_updated', {
-        userId,
-        userName: session.userInfo.name,
-        userColor: session.userInfo.color,
-        cursor: cursor,
-        modelId: session.modelId
-      });
-    }, this.presenceConfig.cursorUpdateThrottle);
+    this.throttledBroadcast(
+      `cursor_${userId}`,
+      () => {
+        this.broadcastPresenceUpdate('cursor_updated', {
+          userId,
+          userName: session.userInfo.name,
+          userColor: session.userInfo.color,
+          cursor,
+          modelId: session.modelId
+        });
+      },
+      this.presenceConfig.cursorUpdateThrottle
+    );
 
     this.emit('cursor_updated', { userId, cursor });
     return cursor;
@@ -168,7 +172,7 @@ export class UserPresenceService {
   updateSelection(userId, selectionData) {
     const selection = this.selections.get(userId);
     const session = this.activeUsers.get(userId);
-    
+
     if (!selection || !session) return;
 
     selection.selection = {
@@ -185,15 +189,19 @@ export class UserPresenceService {
     this.updateUserActivity(userId, 'selection_change');
 
     // Throttled broadcast
-    this.throttledBroadcast(`selection_${userId}`, () => {
-      this.broadcastPresenceUpdate('selection_updated', {
-        userId,
-        userName: session.userInfo.name,
-        userColor: session.userInfo.color,
-        selection: selection,
-        modelId: session.modelId
-      });
-    }, this.presenceConfig.selectionUpdateThrottle);
+    this.throttledBroadcast(
+      `selection_${userId}`,
+      () => {
+        this.broadcastPresenceUpdate('selection_updated', {
+          userId,
+          userName: session.userInfo.name,
+          userColor: session.userInfo.color,
+          selection,
+          modelId: session.modelId
+        });
+      },
+      this.presenceConfig.selectionUpdateThrottle
+    );
 
     this.emit('selection_updated', { userId, selection });
     return selection;
@@ -241,7 +249,7 @@ export class UserPresenceService {
       this.broadcastPresenceUpdate('viewport_updated', {
         userId,
         userName: session.userInfo.name,
-        viewport: viewport,
+        viewport,
         modelId: session.modelId
       });
     }
@@ -342,7 +350,7 @@ export class UserPresenceService {
   // Heartbeat and Health Monitoring
   startHeartbeatMonitoring(userId) {
     const heartbeatKey = `heartbeat_${userId}`;
-    
+
     // Clear existing heartbeat if any
     if (this.heartbeatTimers && this.heartbeatTimers[heartbeatKey]) {
       clearInterval(this.heartbeatTimers[heartbeatKey]);
@@ -360,7 +368,7 @@ export class UserPresenceService {
 
   stopHeartbeatMonitoring(userId) {
     const heartbeatKey = `heartbeat_${userId}`;
-    
+
     if (this.heartbeatTimers && this.heartbeatTimers[heartbeatKey]) {
       clearInterval(this.heartbeatTimers[heartbeatKey]);
       delete this.heartbeatTimers[heartbeatKey];
@@ -396,7 +404,7 @@ export class UserPresenceService {
     if (!session) return null;
 
     session.connection.lastHeartbeat = new Date().toISOString();
-    
+
     // If user was idle, mark as active
     if (session.presence.status === 'idle') {
       this.updateUserStatus(userId, 'active');
@@ -408,7 +416,7 @@ export class UserPresenceService {
   // Presence Queries
   getActiveUsers(modelId = null) {
     let users = Array.from(this.activeUsers.values());
-    
+
     if (modelId) {
       users = users.filter(session => session.modelId === modelId);
     }
@@ -441,7 +449,7 @@ export class UserPresenceService {
 
   getPresenceSummary(modelId) {
     const activeUsers = this.getActiveUsers(modelId);
-    
+
     const summary = {
       totalUsers: activeUsers.length,
       activeUsers: activeUsers.filter(u => u.presence.status === 'active').length,
@@ -449,8 +457,10 @@ export class UserPresenceService {
       editors: activeUsers.filter(u => u.capabilities.canEdit).length,
       viewers: activeUsers.filter(u => !u.capabilities.canEdit).length,
       locations: this.getLocationDistribution(activeUsers),
-      lastActivity: activeUsers.length > 0 ? 
-        Math.max(...activeUsers.map(u => new Date(u.presence.lastActivity))) : null
+      lastActivity:
+        activeUsers.length > 0
+          ? Math.max(...activeUsers.map(u => new Date(u.presence.lastActivity)))
+          : null
     };
 
     return summary;
@@ -462,20 +472,22 @@ export class UserPresenceService {
     if (!userSession) return [];
 
     const targetLocation = location || userSession.presence.currentLocation;
-    
-    return this.getActiveUsers(userSession.modelId)
-      .filter(user => user.userId !== userId && user.presence.currentLocation === targetLocation);
+
+    return this.getActiveUsers(userSession.modelId).filter(
+      user => user.userId !== userId && user.presence.currentLocation === targetLocation
+    );
   }
 
   getUsersEditingSameElement(elementId, elementType) {
     const usersWithElement = [];
 
     for (const [userId, selection] of this.selections.entries()) {
-      if (selection.selection && 
-          selection.selection.type === elementType &&
-          (selection.selection.data?.elementId === elementId || 
-           selection.selection.context?.elementId === elementId)) {
-        
+      if (
+        selection.selection &&
+        selection.selection.type === elementType &&
+        (selection.selection.data?.elementId === elementId ||
+          selection.selection.context?.elementId === elementId)
+      ) {
         const session = this.activeUsers.get(userId);
         if (session) {
           usersWithElement.push({
@@ -535,7 +547,8 @@ export class UserPresenceService {
   generateAvatar(userId) {
     // Generate a consistent avatar/initials based on userId
     const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FECA57', '#FF9FF3', '#54A0FF'];
-    const colorIndex = userId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length;
+    const colorIndex =
+      userId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length;
     return {
       type: 'initials',
       color: colors[colorIndex],
@@ -545,10 +558,19 @@ export class UserPresenceService {
 
   assignUserColor(userId) {
     const colors = [
-      '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FECA57', 
-      '#FF9FF3', '#54A0FF', '#5F27CD', '#00D2D3', '#FF9F43'
+      '#FF6B6B',
+      '#4ECDC4',
+      '#45B7D1',
+      '#96CEB4',
+      '#FECA57',
+      '#FF9FF3',
+      '#54A0FF',
+      '#5F27CD',
+      '#00D2D3',
+      '#FF9F43'
     ];
-    const colorIndex = userId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length;
+    const colorIndex =
+      userId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length;
     return colors[colorIndex];
   }
 
@@ -559,7 +581,7 @@ export class UserPresenceService {
     // Check if the viewport change is significant enough to broadcast
     const centerDelta = Math.sqrt(
       Math.pow(newViewport.center.x - lastViewport.center.x, 2) +
-      Math.pow(newViewport.center.y - lastViewport.center.y, 2)
+        Math.pow(newViewport.center.y - lastViewport.center.y, 2)
     );
 
     const zoomDelta = Math.abs(newViewport.zoom - lastViewport.zoom);

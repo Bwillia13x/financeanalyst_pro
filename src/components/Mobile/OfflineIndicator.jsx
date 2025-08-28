@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { WifiOff, Wifi, Cloud, CloudOff, Sync, AlertCircle } from 'lucide-react';
+import React, { useState } from 'react';
+
 import { useOfflineSync } from '../../hooks/useOfflineSync';
 
 const OfflineIndicator = () => {
@@ -60,7 +61,7 @@ const OfflineIndicator = () => {
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                     Connection Status
                   </h3>
-                  <div className={`w-3 h-3 rounded-full ${getStatusColor()}`}></div>
+                  <div className={`w-3 h-3 rounded-full ${getStatusColor()}`} />
                 </div>
 
                 <div className="space-y-3">
@@ -89,9 +90,11 @@ const OfflineIndicator = () => {
                         <Cloud className="w-4 h-4 text-green-500" />
                       )}
                       <span className="text-sm text-gray-700 dark:text-gray-300">
-                        {syncStatus === 'syncing' ? 'Syncing...' :
-                         syncStatus === 'error' ? 'Sync Error' :
-                         'Synced'}
+                        {syncStatus === 'syncing'
+                          ? 'Syncing...'
+                          : syncStatus === 'error'
+                            ? 'Sync Error'
+                            : 'Synced'}
                       </span>
                     </div>
                     {pendingChanges > 0 && (
@@ -128,7 +131,8 @@ const OfflineIndicator = () => {
                             Offline Mode Active
                           </p>
                           <p className="text-xs text-blue-600 dark:text-blue-300 mt-1">
-                            Your work is being saved locally and will sync when connection is restored.
+                            Your work is being saved locally and will sync when connection is
+                            restored.
                           </p>
                         </div>
                       </div>

@@ -15,7 +15,7 @@ import { dataFetchingService } from '../dataFetching';
 
 export const coreCommands = {
   DCF: {
-    execute: async(parsedCommand, _context, _processor) => {
+    execute: async (parsedCommand, _context, _processor) => {
       const [ticker] = parsedCommand.parameters;
 
       if (!ticker) {
@@ -45,7 +45,6 @@ export const coreCommands = {
             results: dcfResults
           }
         };
-
       } catch (error) {
         return {
           type: 'error',
@@ -60,7 +59,7 @@ export const coreCommands = {
   },
 
   LBO: {
-    execute: async(parsedCommand, _context, _processor) => {
+    execute: async (parsedCommand, _context, _processor) => {
       const [ticker] = parsedCommand.parameters;
 
       if (!ticker) {
@@ -104,7 +103,6 @@ export const coreCommands = {
             results: lboResults
           }
         };
-
       } catch (error) {
         return {
           type: 'error',
@@ -119,7 +117,7 @@ export const coreCommands = {
   },
 
   COMP: {
-    execute: async(parsedCommand, _context, _processor) => {
+    execute: async (parsedCommand, _context, _processor) => {
       const [ticker] = parsedCommand.parameters;
 
       if (!ticker) {
@@ -150,7 +148,12 @@ export const coreCommands = {
 
         const compAnalysis = calculateComparableMetrics(companyData, peers);
 
-        const content = `Comparable Company Analysis for ${profile.companyName} (${ticker.toUpperCase()})\n\n🏢 PEER GROUP (${peers.length} companies):\n${peers.slice(0, 5).map(peer => `• ${peer.symbol}: ${peer.name}`).join('\n')}\n\n📊 VALUATION MULTIPLES:\n• P/E Ratio: ${formatNumber(companyData.peRatio, 1)}x (Peer Median: ${formatNumber(compAnalysis.peerStatistics.peRatio.median, 1)}x)\n• EV/EBITDA: ${formatNumber(companyData.evToEbitda, 1)}x (Peer Median: ${formatNumber(compAnalysis.peerStatistics.evToEbitda.median, 1)}x)\n• P/B Ratio: ${formatNumber(companyData.priceToBook, 1)}x (Peer Median: ${formatNumber(compAnalysis.peerStatistics.priceToBook.median, 1)}x)\n\n📈 RELATIVE VALUATION:\n• P/E vs Peers: ${formatPercentage((compAnalysis.relativeValuation.peRatioRelative - 1))}\n• EV/EBITDA vs Peers: ${formatPercentage((compAnalysis.relativeValuation.evEbitdaRelative - 1))}\n• P/B vs Peers: ${formatPercentage((compAnalysis.relativeValuation.priceToBookRelative - 1))}\n\n💰 MARKET POSITION:\n• Market Cap Percentile: ${formatNumber(compAnalysis.relativeValuation.marketCapPercentile)}th\n• Size: ${companyData.marketCap > compAnalysis.peerStatistics.marketCap.median ? 'Above' : 'Below'} peer median\n\n🎯 PEER VALUATION RANGE:\n• Min P/E: ${formatNumber(compAnalysis.peerStatistics.peRatio.min, 1)}x\n• Max P/E: ${formatNumber(compAnalysis.peerStatistics.peRatio.max, 1)}x\n• Median P/E: ${formatNumber(compAnalysis.peerStatistics.peRatio.median, 1)}x\n\n${dataFetchingService.demoMode ? '💡 Note: Using demo data. Configure API keys for live analysis.' : '✅ Analysis based on live market data'}`;
+        const content = `Comparable Company Analysis for ${profile.companyName} (${ticker.toUpperCase()})\n\n🏢 PEER GROUP (${peers.length} companies):\n${peers
+          .slice(0, 5)
+          .map(peer => `• ${peer.symbol}: ${peer.name}`)
+          .join(
+            '\n'
+          )}\n\n📊 VALUATION MULTIPLES:\n• P/E Ratio: ${formatNumber(companyData.peRatio, 1)}x (Peer Median: ${formatNumber(compAnalysis.peerStatistics.peRatio.median, 1)}x)\n• EV/EBITDA: ${formatNumber(companyData.evToEbitda, 1)}x (Peer Median: ${formatNumber(compAnalysis.peerStatistics.evToEbitda.median, 1)}x)\n• P/B Ratio: ${formatNumber(companyData.priceToBook, 1)}x (Peer Median: ${formatNumber(compAnalysis.peerStatistics.priceToBook.median, 1)}x)\n\n📈 RELATIVE VALUATION:\n• P/E vs Peers: ${formatPercentage(compAnalysis.relativeValuation.peRatioRelative - 1)}\n• EV/EBITDA vs Peers: ${formatPercentage(compAnalysis.relativeValuation.evEbitdaRelative - 1)}\n• P/B vs Peers: ${formatPercentage(compAnalysis.relativeValuation.priceToBookRelative - 1)}\n\n💰 MARKET POSITION:\n• Market Cap Percentile: ${formatNumber(compAnalysis.relativeValuation.marketCapPercentile)}th\n• Size: ${companyData.marketCap > compAnalysis.peerStatistics.marketCap.median ? 'Above' : 'Below'} peer median\n\n🎯 PEER VALUATION RANGE:\n• Min P/E: ${formatNumber(compAnalysis.peerStatistics.peRatio.min, 1)}x\n• Max P/E: ${formatNumber(compAnalysis.peerStatistics.peRatio.max, 1)}x\n• Median P/E: ${formatNumber(compAnalysis.peerStatistics.peRatio.median, 1)}x\n\n${dataFetchingService.demoMode ? '💡 Note: Using demo data. Configure API keys for live analysis.' : '✅ Analysis based on live market data'}`;
 
         return {
           type: 'success',
@@ -161,7 +164,6 @@ export const coreCommands = {
             results: compAnalysis
           }
         };
-
       } catch (error) {
         return {
           type: 'error',
@@ -176,7 +178,7 @@ export const coreCommands = {
   },
 
   FETCH: {
-    execute: async(parsedCommand, _context, _processor) => {
+    execute: async (parsedCommand, _context, _processor) => {
       const [ticker] = parsedCommand.parameters;
 
       if (!ticker) {
@@ -200,7 +202,6 @@ export const coreCommands = {
             results: profile
           }
         };
-
       } catch (error) {
         return {
           type: 'error',

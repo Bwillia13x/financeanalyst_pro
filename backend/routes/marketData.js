@@ -63,7 +63,7 @@ router.get('/quote/:symbol',
 
           return res.json(response);
         }
-      } catch (yahooError) {
+      } catch (_yahooError) {
         console.log('Yahoo Finance failed, trying Alpha Vantage...');
       }
 

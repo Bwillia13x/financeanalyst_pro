@@ -8,7 +8,7 @@ import { dataFetchingService } from '../dataFetching';
 
 export const technicalCommands = {
   TECHNICALS: {
-    execute: async(parsedCommand, _context, _processor) => {
+    execute: async (parsedCommand, _context, _processor) => {
       const [ticker] = parsedCommand.parameters;
 
       if (!ticker) {
@@ -33,7 +33,7 @@ export const technicalCommands = {
         const ema26 = price * (1 + (Math.random() - 0.5) * 0.12);
 
         const rsi = 30 + Math.random() * 40; // RSI between 30-70
-        const macd = (ema12 - ema26);
+        const macd = ema12 - ema26;
         const macdSignal = macd * (0.9 + Math.random() * 0.2);
         const macdHistogram = macd - macdSignal;
 
@@ -43,9 +43,9 @@ export const technicalCommands = {
 
         // Support and resistance levels
         const support1 = price * 0.95;
-        const support2 = price * 0.90;
+        const support2 = price * 0.9;
         const resistance1 = price * 1.05;
-        const resistance2 = price * 1.10;
+        const resistance2 = price * 1.1;
 
         // Generate signals
         const signals = [];
@@ -83,7 +83,6 @@ export const technicalCommands = {
             signals
           }
         };
-
       } catch (error) {
         return {
           type: 'error',
@@ -98,13 +97,14 @@ export const technicalCommands = {
   },
 
   SUPPORT_RESISTANCE: {
-    execute: async(parsedCommand, _context, _processor) => {
+    execute: async (parsedCommand, _context, _processor) => {
       const [ticker] = parsedCommand.parameters;
 
       if (!ticker) {
         return {
           type: 'error',
-          content: 'SUPPORT_RESISTANCE command requires a ticker symbol. Usage: SUPPORT_RESISTANCE(AAPL)'
+          content:
+            'SUPPORT_RESISTANCE command requires a ticker symbol. Usage: SUPPORT_RESISTANCE(AAPL)'
         };
       }
 
@@ -130,12 +130,16 @@ export const technicalCommands = {
         const supportDistance = ((price - nearestSupport.level) / price) * 100;
         const resistanceDistance = ((nearestResistance.level - price) / price) * 100;
 
-        const content = `Support & Resistance Analysis for ${profile.companyName} (${ticker.toUpperCase()})\n\n🎯 KEY LEVELS:\n${levels.map(level => {
-          const distance = ((level.level - price) / price) * 100;
-          const arrow = level.type === 'Current' ? '👉' :
-            level.type === 'Resistance' ? '🔴' : '🟢';
-          return `${arrow} ${level.type}: ${formatCurrency(level.level)} (${level.strength}) ${level.touches > 0 ? `[${level.touches} touches]` : ''} ${level.type !== 'Current' ? `(${formatPercentage(Math.abs(distance) / 100)} away)` : ''}`;
-        }).join('\n')}\n\n📊 LEVEL ANALYSIS:\n• Nearest Support: ${formatCurrency(nearestSupport.level)} (${formatPercentage(supportDistance / 100)} below)\n• Nearest Resistance: ${formatCurrency(nearestResistance.level)} (${formatPercentage(resistanceDistance / 100)} above)\n• Support Strength: ${nearestSupport.strength}\n• Resistance Strength: ${nearestResistance.strength}\n\n📈 TRADING RANGES:\n• Current Range: ${formatCurrency(nearestSupport.level)} - ${formatCurrency(nearestResistance.level)}\n• Range Width: ${formatPercentage((nearestResistance.level - nearestSupport.level) / price)}\n• Position in Range: ${formatPercentage((price - nearestSupport.level) / (nearestResistance.level - nearestSupport.level))}\n\n🎯 BREAKOUT TARGETS:\n• Upside Target: ${formatCurrency(nearestResistance.level * 1.05)}\n• Downside Target: ${formatCurrency(nearestSupport.level * 0.95)}\n• Risk/Reward Ratio: ${formatNumber(resistanceDistance / supportDistance, 2)}:1\n\n💡 TRADING INSIGHTS:\n• ${supportDistance < 3 ? '⚠️ Close to support - watch for bounce or breakdown' : ''}\n• ${resistanceDistance < 3 ? '⚠️ Close to resistance - watch for breakout or rejection' : ''}\n• ${nearestSupport.strength === 'Strong' ? '🛡️ Strong support should provide good downside protection' : ''}\n• ${nearestResistance.strength === 'Strong' ? '🚧 Strong resistance may limit upside potential' : ''}\n• Volume confirmation needed for breakouts\n\n🔍 LEVEL QUALITY:\n• Support levels tested ${nearestSupport.touches} times\n• Resistance levels tested ${nearestResistance.touches} times\n• More touches = stronger level\n\n${dataFetchingService.demoMode ? '💡 Note: Using estimated levels. Configure API keys for historical price data.' : '✅ Based on historical price action'}`;
+        const content = `Support & Resistance Analysis for ${profile.companyName} (${ticker.toUpperCase()})\n\n🎯 KEY LEVELS:\n${levels
+          .map(level => {
+            const distance = ((level.level - price) / price) * 100;
+            const arrow =
+              level.type === 'Current' ? '👉' : level.type === 'Resistance' ? '🔴' : '🟢';
+            return `${arrow} ${level.type}: ${formatCurrency(level.level)} (${level.strength}) ${level.touches > 0 ? `[${level.touches} touches]` : ''} ${level.type !== 'Current' ? `(${formatPercentage(Math.abs(distance) / 100)} away)` : ''}`;
+          })
+          .join(
+            '\n'
+          )}\n\n📊 LEVEL ANALYSIS:\n• Nearest Support: ${formatCurrency(nearestSupport.level)} (${formatPercentage(supportDistance / 100)} below)\n• Nearest Resistance: ${formatCurrency(nearestResistance.level)} (${formatPercentage(resistanceDistance / 100)} above)\n• Support Strength: ${nearestSupport.strength}\n• Resistance Strength: ${nearestResistance.strength}\n\n📈 TRADING RANGES:\n• Current Range: ${formatCurrency(nearestSupport.level)} - ${formatCurrency(nearestResistance.level)}\n• Range Width: ${formatPercentage((nearestResistance.level - nearestSupport.level) / price)}\n• Position in Range: ${formatPercentage((price - nearestSupport.level) / (nearestResistance.level - nearestSupport.level))}\n\n🎯 BREAKOUT TARGETS:\n• Upside Target: ${formatCurrency(nearestResistance.level * 1.05)}\n• Downside Target: ${formatCurrency(nearestSupport.level * 0.95)}\n• Risk/Reward Ratio: ${formatNumber(resistanceDistance / supportDistance, 2)}:1\n\n💡 TRADING INSIGHTS:\n• ${supportDistance < 3 ? '⚠️ Close to support - watch for bounce or breakdown' : ''}\n• ${resistanceDistance < 3 ? '⚠️ Close to resistance - watch for breakout or rejection' : ''}\n• ${nearestSupport.strength === 'Strong' ? '🛡️ Strong support should provide good downside protection' : ''}\n• ${nearestResistance.strength === 'Strong' ? '🚧 Strong resistance may limit upside potential' : ''}\n• Volume confirmation needed for breakouts\n\n🔍 LEVEL QUALITY:\n• Support levels tested ${nearestSupport.touches} times\n• Resistance levels tested ${nearestResistance.touches} times\n• More touches = stronger level\n\n${dataFetchingService.demoMode ? '💡 Note: Using estimated levels. Configure API keys for historical price data.' : '✅ Based on historical price action'}`;
 
         return {
           type: 'success',
@@ -150,7 +154,6 @@ export const technicalCommands = {
             resistanceDistance
           }
         };
-
       } catch (error) {
         return {
           type: 'error',

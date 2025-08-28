@@ -9,7 +9,6 @@ import { Card } from '../ui/Card';
 import EnhancedDCFTool from './EnhancedDCFTool';
 import LivingModelDCF from './LivingModelDCF';
 
-
 const ValuationTool = () => {
   const [activeView, setActiveView] = useState('overview'); // 'overview', 'dcf', 'living-dcf', 'lbo', 'comp', 'canvas'
 
@@ -36,9 +35,7 @@ const ValuationTool = () => {
       <div className="max-w-6xl mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Valuation Tool</h1>
-          <p className="text-gray-400">
-            Professional valuation models and analysis tools
-          </p>
+          <p className="text-gray-400">Professional valuation models and analysis tools</p>
         </div>
 
         {/* Featured Living Model */}
@@ -55,7 +52,9 @@ const ValuationTool = () => {
                     </div>
                   </div>
                   <p className="text-emerald-100 mb-6 text-lg leading-relaxed">
-                    Experience financial modeling transformed. Real-time data integration, instantaneous calculations, and fluid time period adjustments create a living, breathing analysis that evolves with every input change.
+                    Experience financial modeling transformed. Real-time data integration,
+                    instantaneous calculations, and fluid time period adjustments create a living,
+                    breathing analysis that evolves with every input change.
                   </p>
                   <div className="flex flex-wrap gap-3 mb-6">
                     <span className="px-3 py-1 bg-emerald-800/50 text-emerald-200 rounded-full text-sm">
@@ -100,7 +99,9 @@ const ValuationTool = () => {
                     <h2 className="text-2xl font-bold text-white">Analysis Canvas</h2>
                   </div>
                   <p className="text-blue-100 mb-6 text-lg leading-relaxed">
-                    A unified workspace that reimagines financial analysis. Start with any company and seamlessly flow between DCF modeling, comparable analysis, and scenario planning—all in one integrated environment.
+                    A unified workspace that reimagines financial analysis. Start with any company
+                    and seamlessly flow between DCF modeling, comparable analysis, and scenario
+                    planning—all in one integrated environment.
                   </p>
                   <div className="flex flex-wrap gap-3 mb-6">
                     <span className="px-3 py-1 bg-blue-800/50 text-blue-200 rounded-full text-sm">
@@ -145,7 +146,8 @@ const ValuationTool = () => {
                 </div>
               </div>
               <p className="text-gray-400 mb-4">
-                Real-time, reactive DCF modeling with live data feeds and instantaneous calculations. No more &quot;run&quot; buttons—watch your model come alive.
+                Real-time, reactive DCF modeling with live data feeds and instantaneous
+                calculations. No more &quot;run&quot; buttons—watch your model come alive.
               </p>
               <Button
                 className="w-full bg-emerald-600 hover:bg-emerald-700"
@@ -163,12 +165,10 @@ const ValuationTool = () => {
                 <h3 className="text-xl font-semibold">Enhanced DCF Analysis</h3>
               </div>
               <p className="text-gray-400 mb-4">
-                Professional DCF modeling with year-by-year projections, sensitivity analysis, and detailed financial statements
+                Professional DCF modeling with year-by-year projections, sensitivity analysis, and
+                detailed financial statements
               </p>
-              <Button
-                className="w-full"
-                onClick={() => setActiveView('dcf')}
-              >
+              <Button className="w-full" onClick={() => setActiveView('dcf')}>
                 Launch Enhanced DCF Tool
               </Button>
             </div>
@@ -180,9 +180,7 @@ const ValuationTool = () => {
                 <Icon name="BarChart3" className="w-8 h-8 text-green-400 mr-3" />
                 <h3 className="text-xl font-semibold">Comparable Analysis</h3>
               </div>
-              <p className="text-gray-400 mb-4">
-                Peer comparison and relative valuation metrics
-              </p>
+              <p className="text-gray-400 mb-4">Peer comparison and relative valuation metrics</p>
               <Button className="w-full" disabled>
                 Coming Soon
               </Button>
@@ -195,9 +193,7 @@ const ValuationTool = () => {
                 <Icon name="Calculator" className="w-8 h-8 text-purple-400 mr-3" />
                 <h3 className="text-xl font-semibold">LBO Analysis</h3>
               </div>
-              <p className="text-gray-400 mb-4">
-                Leveraged buyout modeling and returns analysis
-              </p>
+              <p className="text-gray-400 mb-4">Leveraged buyout modeling and returns analysis</p>
               <Button className="w-full" disabled>
                 Coming Soon
               </Button>
@@ -269,9 +265,7 @@ const ValuationTool = () => {
                 <div className="text-green-400">$ HELP(&quot;VALUATION&quot;)</div>
               </div>
               <div className="mt-4">
-                <Button disabled>
-                  Terminal Interface - Coming Soon
-                </Button>
+                <Button disabled>Terminal Interface - Coming Soon</Button>
               </div>
             </div>
           </Card>

@@ -74,12 +74,7 @@ export class LocalStorageService {
       throw new Error('localStorage is not available');
     }
 
-    const {
-      encrypt = false,
-      compress = false,
-      ttl = null,
-      validate = true
-    } = options;
+    const { encrypt = false, compress = false, ttl = null, validate = true } = options;
 
     try {
       // Validate data if requested
@@ -115,7 +110,9 @@ export class LocalStorageService {
 
       // Check size limits
       if (serializedData.length > this.maxSize) {
-        throw new Error(`Data too large: ${serializedData.length} bytes exceeds ${this.maxSize} bytes`);
+        throw new Error(
+          `Data too large: ${serializedData.length} bytes exceeds ${this.maxSize} bytes`
+        );
       }
 
       // Store in localStorage
@@ -128,7 +125,6 @@ export class LocalStorageService {
         size: serializedData.length,
         metadata: storageObject.metadata
       };
-
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       console.error(`Failed to store data in localStorage for key "${key}":`, message);
@@ -188,7 +184,6 @@ export class LocalStorageService {
         data: storageObject.data,
         metadata: storageObject.metadata
       };
-
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       console.error(`Failed to retrieve data from localStorage for key "${key}":`, message);
@@ -291,10 +286,11 @@ export class LocalStorageService {
         maxSize: this.maxSize,
         usagePercentage: (totalSize / this.maxSize) * 100,
         itemSizes,
-        largestItem: Object.entries(itemSizes).reduce((max, [key, size]) =>
-          size > max.size ? { key, size } : max, { key: null, size: 0 })
+        largestItem: Object.entries(itemSizes).reduce(
+          (max, [key, size]) => (size > max.size ? { key, size } : max),
+          { key: null, size: 0 }
+        )
       };
-
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       console.error('Failed to get localStorage stats:', message);
@@ -388,7 +384,7 @@ export class LocalStorageService {
 
     try {
       const stats = await this.getStats();
-      return (stats.used + dataSize) <= this.maxSize;
+      return stats.used + dataSize <= this.maxSize;
     } catch {
       return false;
     }
@@ -431,7 +427,7 @@ export class LocalStorageService {
 
       // Check for circular references
       const seen = new WeakSet();
-      const checkCircular = (obj) => {
+      const checkCircular = obj => {
         if (obj !== null && typeof obj === 'object') {
           if (seen.has(obj)) {
             return false;
@@ -496,7 +492,6 @@ export class LocalStorageService {
         totalTime: writeTime + readTime,
         iterations
       };
-
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       console.error('Performance test failed:', message);

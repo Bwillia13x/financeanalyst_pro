@@ -7,7 +7,8 @@ export const Histogram = ({ data }) => {
   const bins = 24;
   if (data.length === 0) return null;
 
-  const lo = data[0], hi = data[data.length - 1];
+  const lo = data[0],
+    hi = data[data.length - 1];
   const step = (hi - lo) / (bins || 1);
   const counts = new Array(bins).fill(0);
 
@@ -21,18 +22,9 @@ export const Histogram = ({ data }) => {
   return (
     <svg width={360} height={160} className="text-slate-600">
       {counts.map((c, i) => {
-        const x = 10 + (i * (340 / bins));
-        const h = (140) * (c / maxC);
-        return (
-          <rect
-            key={i}
-            x={x}
-            y={150 - h}
-            width={340 / bins - 2}
-            height={h}
-            fill="#60a5fa"
-          />
-        );
+        const x = 10 + i * (340 / bins);
+        const h = 140 * (c / maxC);
+        return <rect key={i} x={x} y={150 - h} width={340 / bins - 2} height={h} fill="#60a5fa" />;
       })}
     </svg>
   );
@@ -79,12 +71,12 @@ export function runMonteCarlo(assumptions, priors, n = 1000) {
   }
 
   vals.sort((x, y) => x - y);
-  const p = (q) => vals[Math.max(0, Math.min(vals.length - 1, Math.floor(q * (vals.length - 1))))];
+  const p = q => vals[Math.max(0, Math.min(vals.length - 1, Math.floor(q * (vals.length - 1))))];
 
   return {
     vals,
     p5: p(0.05),
-    p50: p(0.50),
+    p50: p(0.5),
     p95: p(0.95)
   };
 }
@@ -100,8 +92,9 @@ export function generatePriors(assumptions) {
     },
     waccShifter: { min: -0.01, mid: 0, max: 0.01 },
     stc: { min: 1.5, mid: assumptions.salesToCapital, max: 3.5 },
-    tgOrExit: assumptions.terminalMethod === 'gordon'
-      ? { min: 0.00, mid: assumptions.tg, max: 0.04 }
-      : { min: 6, mid: assumptions.exitEVMultiple, max: 12 }
+    tgOrExit:
+      assumptions.terminalMethod === 'gordon'
+        ? { min: 0.0, mid: assumptions.tg, max: 0.04 }
+        : { min: 6, mid: assumptions.exitEVMultiple, max: 12 }
   };
 }

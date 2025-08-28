@@ -1,27 +1,80 @@
 import { motion } from 'framer-motion';
 import {
-  TrendingUp, TrendingDown, Activity, Globe, Bell,
-  Plus, Minus, RefreshCw, Settings,
-  BarChart3, LineChart, AlertCircle, CheckCircle
+  TrendingUp,
+  TrendingDown,
+  Activity,
+  Globe,
+  Bell,
+  Plus,
+  Minus,
+  RefreshCw,
+  Settings,
+  BarChart3,
+  LineChart,
+  AlertCircle,
+  CheckCircle
 } from 'lucide-react';
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { LineChart as RechartsLineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import {
+  LineChart as RechartsLineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer
+} from 'recharts';
 
 const EnhancedMarketDataDashboard = ({ data: _data, onDataChange: _onDataChange }) => {
   const [activeView, setActiveView] = useState('overview');
   const [watchlist, setWatchlist] = useState([
-    { symbol: 'SPY', name: 'SPDR S&P 500 ETF', price: 445.67, change: 2.34, changePercent: 0.53, category: 'index' },
-    { symbol: 'QQQ', name: 'Invesco QQQ Trust', price: 378.91, change: -1.45, changePercent: -0.38, category: 'index' },
-    { symbol: 'VIX', name: 'CBOE Volatility Index', price: 18.45, change: 0.87, changePercent: 4.95, category: 'volatility' },
-    { symbol: 'DXY', name: 'US Dollar Index', price: 102.45, change: -0.23, changePercent: -0.22, category: 'currency' },
-    { symbol: '^TNX', name: '10-Year Treasury Yield', price: 4.25, change: 0.05, changePercent: 1.19, category: 'rates' }
+    {
+      symbol: 'SPY',
+      name: 'SPDR S&P 500 ETF',
+      price: 445.67,
+      change: 2.34,
+      changePercent: 0.53,
+      category: 'index'
+    },
+    {
+      symbol: 'QQQ',
+      name: 'Invesco QQQ Trust',
+      price: 378.91,
+      change: -1.45,
+      changePercent: -0.38,
+      category: 'index'
+    },
+    {
+      symbol: 'VIX',
+      name: 'CBOE Volatility Index',
+      price: 18.45,
+      change: 0.87,
+      changePercent: 4.95,
+      category: 'volatility'
+    },
+    {
+      symbol: 'DXY',
+      name: 'US Dollar Index',
+      price: 102.45,
+      change: -0.23,
+      changePercent: -0.22,
+      category: 'currency'
+    },
+    {
+      symbol: '^TNX',
+      name: '10-Year Treasury Yield',
+      price: 4.25,
+      change: 0.05,
+      changePercent: 1.19,
+      category: 'rates'
+    }
   ]);
 
   const [marketData] = useState({
     indices: {
       'S&P 500': { value: 4456.78, change: 23.45, changePercent: 0.53 },
-      'NASDAQ': { value: 13789.45, change: -45.67, changePercent: -0.33 },
-      'DOW': { value: 34567.89, change: 156.78, changePercent: 0.46 },
+      NASDAQ: { value: 13789.45, change: -45.67, changePercent: -0.33 },
+      DOW: { value: 34567.89, change: 156.78, changePercent: 0.46 },
       'Russell 2000': { value: 1987.65, change: 12.34, changePercent: 0.63 }
     },
     sectors: [
@@ -36,7 +89,7 @@ const EnhancedMarketDataDashboard = ({ data: _data, onDataChange: _onDataChange 
       'Fed Funds Rate': { value: 5.25, change: 0.0, unit: '%' },
       '10Y Treasury': { value: 4.25, change: 0.05, unit: '%' },
       'Inflation (CPI)': { value: 3.1, change: -0.2, unit: '%' },
-      'Unemployment': { value: 3.8, change: 0.1, unit: '%' },
+      Unemployment: { value: 3.8, change: 0.1, unit: '%' },
       'GDP Growth': { value: 2.4, change: 0.1, unit: '%' }
     }
   });
@@ -49,7 +102,7 @@ const EnhancedMarketDataDashboard = ({ data: _data, onDataChange: _onDataChange 
   const [newSymbol, setNewSymbol] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const formatCurrency = useCallback((value) => {
+  const formatCurrency = useCallback(value => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
@@ -58,18 +111,18 @@ const EnhancedMarketDataDashboard = ({ data: _data, onDataChange: _onDataChange 
     }).format(value);
   }, []);
 
-  const formatPercent = useCallback((value) => {
+  const formatPercent = useCallback(value => {
     const sign = value >= 0 ? '+' : '';
     return `${sign}${value.toFixed(2)}%`;
   }, []);
 
-  const getChangeColor = useCallback((change) => {
+  const getChangeColor = useCallback(change => {
     if (change > 0) return 'text-green-600';
     if (change < 0) return 'text-red-600';
     return 'text-gray-600';
   }, []);
 
-  const getChangeIcon = useCallback((change) => {
+  const getChangeIcon = useCallback(change => {
     if (change > 0) return TrendingUp;
     if (change < 0) return TrendingDown;
     return Minus;
@@ -78,18 +131,20 @@ const EnhancedMarketDataDashboard = ({ data: _data, onDataChange: _onDataChange 
   // Simulate real-time data updates
   useEffect(() => {
     const interval = setInterval(() => {
-      setWatchlist(prev => prev.map(item => ({
-        ...item,
-        price: item.price + (Math.random() - 0.5) * 2,
-        change: item.change + (Math.random() - 0.5) * 0.5,
-        changePercent: item.changePercent + (Math.random() - 0.5) * 0.1
-      })));
+      setWatchlist(prev =>
+        prev.map(item => ({
+          ...item,
+          price: item.price + (Math.random() - 0.5) * 2,
+          change: item.change + (Math.random() - 0.5) * 0.5,
+          changePercent: item.changePercent + (Math.random() - 0.5) * 0.1
+        }))
+      );
     }, 5000); // Update every 5 seconds
 
     return () => clearInterval(interval);
   }, []);
 
-  const addToWatchlist = useCallback(async() => {
+  const addToWatchlist = useCallback(async () => {
     if (!newSymbol.trim()) return;
 
     setIsLoading(true);
@@ -115,7 +170,7 @@ const EnhancedMarketDataDashboard = ({ data: _data, onDataChange: _onDataChange 
     }
   }, [newSymbol]);
 
-  const removeFromWatchlist = useCallback((symbol) => {
+  const removeFromWatchlist = useCallback(symbol => {
     setWatchlist(prev => prev.filter(item => item.symbol !== symbol));
   }, []);
 
@@ -178,7 +233,7 @@ const EnhancedMarketDataDashboard = ({ data: _data, onDataChange: _onDataChange 
             { id: 'watchlist', label: 'Watchlist', icon: BarChart3 },
             { id: 'charts', label: 'Charts & Analysis', icon: LineChart },
             { id: 'alerts', label: 'Alerts', icon: Bell }
-          ].map((tab) => {
+          ].map(tab => {
             const Icon = tab.icon;
             return (
               <button
@@ -200,7 +255,11 @@ const EnhancedMarketDataDashboard = ({ data: _data, onDataChange: _onDataChange 
 
       {/* Market Overview */}
       {activeView === 'overview' && (
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="space-y-6"
+        >
           {/* Major Indices */}
           <div>
             <h3 className="text-lg font-semibold mb-4">Major Indices</h3>
@@ -213,9 +272,14 @@ const EnhancedMarketDataDashboard = ({ data: _data, onDataChange: _onDataChange 
                     <div className="text-xl font-bold text-gray-800">
                       {data.value.toLocaleString()}
                     </div>
-                    <div className={`flex items-center space-x-1 text-sm ${getChangeColor(data.change)}`}>
+                    <div
+                      className={`flex items-center space-x-1 text-sm ${getChangeColor(data.change)}`}
+                    >
                       <ChangeIcon size={14} />
-                      <span>{data.change > 0 ? '+' : ''}{data.change.toFixed(2)}</span>
+                      <span>
+                        {data.change > 0 ? '+' : ''}
+                        {data.change.toFixed(2)}
+                      </span>
                       <span>({formatPercent(data.changePercent)})</span>
                     </div>
                   </div>
@@ -229,7 +293,7 @@ const EnhancedMarketDataDashboard = ({ data: _data, onDataChange: _onDataChange 
             <h3 className="text-lg font-semibold mb-4">Sector Performance</h3>
             <div className="bg-gray-50 rounded-lg p-4">
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {marketData.sectors.map((sector) => (
+                {marketData.sectors.map(sector => (
                   <div key={sector.name} className="flex justify-between items-center">
                     <div>
                       <div className="font-medium text-gray-800">{sector.name}</div>
@@ -252,10 +316,13 @@ const EnhancedMarketDataDashboard = ({ data: _data, onDataChange: _onDataChange 
                 <div key={name} className="bg-blue-50 p-4 rounded-lg text-center">
                   <div className="text-sm text-gray-600 mb-1">{name}</div>
                   <div className="text-lg font-bold text-gray-800">
-                    {data.value}{data.unit}
+                    {data.value}
+                    {data.unit}
                   </div>
                   <div className={`text-sm ${getChangeColor(data.change)}`}>
-                    {data.change > 0 ? '+' : ''}{data.change}{data.unit}
+                    {data.change > 0 ? '+' : ''}
+                    {data.change}
+                    {data.unit}
                   </div>
                 </div>
               ))}
@@ -266,7 +333,11 @@ const EnhancedMarketDataDashboard = ({ data: _data, onDataChange: _onDataChange 
 
       {/* Watchlist */}
       {activeView === 'watchlist' && (
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="space-y-6"
+        >
           {/* Add Symbol */}
           <div className="flex space-x-3">
             <div className="flex-1">
@@ -274,8 +345,8 @@ const EnhancedMarketDataDashboard = ({ data: _data, onDataChange: _onDataChange 
                 type="text"
                 placeholder="Enter symbol (e.g., AAPL, MSFT)"
                 value={newSymbol}
-                onChange={(e) => setNewSymbol(e.target.value.toUpperCase())}
-                onKeyPress={(e) => e.key === 'Enter' && addToWatchlist()}
+                onChange={e => setNewSymbol(e.target.value.toUpperCase())}
+                onKeyPress={e => e.key === 'Enter' && addToWatchlist()}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
@@ -309,29 +380,39 @@ const EnhancedMarketDataDashboard = ({ data: _data, onDataChange: _onDataChange 
                 </tr>
               </thead>
               <tbody>
-                {watchlist.map((item) => {
+                {watchlist.map(item => {
                   const ChangeIcon = getChangeIcon(item.change);
                   return (
                     <tr key={item.symbol} className="border-b border-gray-200 hover:bg-gray-50">
                       <td className="py-3 px-4 font-medium text-gray-800">{item.symbol}</td>
                       <td className="py-3 px-4 text-gray-600">{item.name}</td>
-                      <td className="text-right py-3 px-4 font-medium">{formatCurrency(item.price)}</td>
+                      <td className="text-right py-3 px-4 font-medium">
+                        {formatCurrency(item.price)}
+                      </td>
                       <td className={`text-right py-3 px-4 ${getChangeColor(item.change)}`}>
                         <div className="flex items-center justify-end space-x-1">
                           <ChangeIcon size={14} />
-                          <span>{item.change > 0 ? '+' : ''}{item.change.toFixed(2)}</span>
+                          <span>
+                            {item.change > 0 ? '+' : ''}
+                            {item.change.toFixed(2)}
+                          </span>
                         </div>
                       </td>
-                      <td className={`text-right py-3 px-4 font-medium ${getChangeColor(item.changePercent)}`}>
+                      <td
+                        className={`text-right py-3 px-4 font-medium ${getChangeColor(item.changePercent)}`}
+                      >
                         {formatPercent(item.changePercent)}
                       </td>
                       <td className="text-center py-3 px-4">
                         <span
                           className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            item.category === 'index' ? 'bg-blue-100 text-blue-800' :
-                              item.category === 'stock' ? 'bg-green-100 text-green-800' :
-                                item.category === 'volatility' ? 'bg-red-100 text-red-800' :
-                                  'bg-gray-100 text-gray-800'
+                            item.category === 'index'
+                              ? 'bg-blue-100 text-blue-800'
+                              : item.category === 'stock'
+                                ? 'bg-green-100 text-green-800'
+                                : item.category === 'volatility'
+                                  ? 'bg-red-100 text-red-800'
+                                  : 'bg-gray-100 text-gray-800'
                           }`}
                         >
                           {item.category}
@@ -356,7 +437,11 @@ const EnhancedMarketDataDashboard = ({ data: _data, onDataChange: _onDataChange 
 
       {/* Charts & Analysis */}
       {activeView === 'charts' && (
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="space-y-6"
+        >
           {/* Price Chart */}
           <div className="bg-gray-50 rounded-lg p-6">
             <h3 className="text-lg font-semibold mb-4">30-Day Price Performance</h3>
@@ -368,17 +453,20 @@ const EnhancedMarketDataDashboard = ({ data: _data, onDataChange: _onDataChange 
                   <YAxis />
                   <Tooltip />
                   <Line
-                    type="monotone" dataKey="SPY" stroke="#3B82F6"
-                    strokeWidth={2} name="S&P 500"
+                    type="monotone"
+                    dataKey="SPY"
+                    stroke="#3B82F6"
+                    strokeWidth={2}
+                    name="S&P 500"
                   />
                   <Line
-                    type="monotone" dataKey="QQQ" stroke="#10B981"
-                    strokeWidth={2} name="NASDAQ"
+                    type="monotone"
+                    dataKey="QQQ"
+                    stroke="#10B981"
+                    strokeWidth={2}
+                    name="NASDAQ"
                   />
-                  <Line
-                    type="monotone" dataKey="VIX" stroke="#EF4444"
-                    strokeWidth={2} name="VIX"
-                  />
+                  <Line type="monotone" dataKey="VIX" stroke="#EF4444" strokeWidth={2} name="VIX" />
                 </RechartsLineChart>
               </ResponsiveContainer>
             </div>
@@ -389,7 +477,10 @@ const EnhancedMarketDataDashboard = ({ data: _data, onDataChange: _onDataChange 
             <h3 className="text-lg font-semibold mb-4">Correlation Analysis</h3>
             <div className="space-y-3">
               {correlationMatrix.map((corr, idx) => (
-                <div key={idx} className="flex items-center justify-between p-3 bg-white rounded-lg">
+                <div
+                  key={idx}
+                  className="flex items-center justify-between p-3 bg-white rounded-lg"
+                >
                   <div>
                     <div className="font-medium text-gray-800">{corr.pair}</div>
                     <div className="text-sm text-gray-600">{corr.strength}</div>
@@ -397,9 +488,11 @@ const EnhancedMarketDataDashboard = ({ data: _data, onDataChange: _onDataChange 
                   <div className="flex items-center space-x-3">
                     <div
                       className={`text-lg font-bold ${
-                        Math.abs(corr.correlation) > 0.7 ? 'text-red-600' :
-                          Math.abs(corr.correlation) > 0.4 ? 'text-yellow-600' :
-                            'text-green-600'
+                        Math.abs(corr.correlation) > 0.7
+                          ? 'text-red-600'
+                          : Math.abs(corr.correlation) > 0.4
+                            ? 'text-yellow-600'
+                            : 'text-green-600'
                       }`}
                     >
                       {corr.correlation.toFixed(2)}
@@ -407,9 +500,11 @@ const EnhancedMarketDataDashboard = ({ data: _data, onDataChange: _onDataChange 
                     <div className="w-24 bg-gray-200 rounded-full h-2">
                       <div
                         className={`h-2 rounded-full ${
-                          Math.abs(corr.correlation) > 0.7 ? 'bg-red-600' :
-                            Math.abs(corr.correlation) > 0.4 ? 'bg-yellow-600' :
-                              'bg-green-600'
+                          Math.abs(corr.correlation) > 0.7
+                            ? 'bg-red-600'
+                            : Math.abs(corr.correlation) > 0.4
+                              ? 'bg-yellow-600'
+                              : 'bg-green-600'
                         }`}
                         style={{ width: `${Math.abs(corr.correlation) * 100}%` }}
                       />
@@ -424,13 +519,20 @@ const EnhancedMarketDataDashboard = ({ data: _data, onDataChange: _onDataChange 
 
       {/* Alerts */}
       {activeView === 'alerts' && (
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="space-y-6"
+        >
           {/* Active Alerts */}
           <div>
             <h3 className="text-lg font-semibold mb-4">Active Alerts</h3>
             <div className="space-y-3">
-              {alerts.map((alert) => (
-                <div key={alert.id} className="flex items-center justify-between p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+              {alerts.map(alert => (
+                <div
+                  key={alert.id}
+                  className="flex items-center justify-between p-4 bg-yellow-50 border border-yellow-200 rounded-lg"
+                >
                   <div className="flex items-center space-x-3">
                     <Bell className="text-yellow-600" size={20} />
                     <div>

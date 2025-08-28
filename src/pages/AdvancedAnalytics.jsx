@@ -13,7 +13,7 @@ const AdvancedAnalytics = () => {
 
   // Listen for tab selection events from keyboard shortcuts
   useEffect(() => {
-    const handleTabSelection = (event) => {
+    const handleTabSelection = event => {
       setActiveTab(event.detail.tab);
     };
 
@@ -43,7 +43,7 @@ const AdvancedAnalytics = () => {
         <Card className="mb-6">
           <div className="border-b border-gray-200">
             <nav className="flex space-x-8" aria-label="Tabs">
-              {tabs.map((tab) => (
+              {tabs.map(tab => (
                 <Button
                   key={tab.id}
                   variant={activeTab === tab.id ? 'primary' : 'ghost'}

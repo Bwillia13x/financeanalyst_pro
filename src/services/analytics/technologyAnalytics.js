@@ -10,14 +10,18 @@ class TechnologyAnalyticsService extends EventEmitter {
     super();
     this.saasMetrics = {
       benchmarks: {
-        monthly_churn: { excellent: 0.02, good: 0.05, poor: 0.10 },
+        monthly_churn: { excellent: 0.02, good: 0.05, poor: 0.1 },
         nps_score: { excellent: 70, good: 50, poor: 30 },
         cac_payback: { excellent: 12, good: 18, poor: 36 },
         ltv_cac_ratio: { excellent: 5, good: 3, poor: 1.5 },
-        gross_margin: { excellent: 0.85, good: 0.75, poor: 0.60 }
+        gross_margin: { excellent: 0.85, good: 0.75, poor: 0.6 }
       },
       cohortRetention: {
-        month1: 0.95, month3: 0.85, month6: 0.75, month12: 0.65, month24: 0.55
+        month1: 0.95,
+        month3: 0.85,
+        month6: 0.75,
+        month12: 0.65,
+        month24: 0.55
       }
     };
 
@@ -69,7 +73,10 @@ class TechnologyAnalyticsService extends EventEmitter {
   calculateRevenueMetrics(saasData) {
     const financials = saasData.financials;
     const subscriptions = saasData.subscriptions || [];
-    
+
+    // Use financials data if available for enhanced analysis
+    const financialMetrics = financials ? this.extractFinancialMetrics(financials) : {};
+
     const mrr = this.calculateMRR(subscriptions);
     const arr = mrr * 12;
     const previousMRR = saasData.previous_period?.mrr || mrr * 0.9;
@@ -79,6 +86,7 @@ class TechnologyAnalyticsService extends EventEmitter {
       monthly_recurring_revenue: mrr,
       annual_recurring_revenue: arr,
       net_mrr_growth_rate: netMRRGrowth,
+      financial_metrics: financialMetrics,
       mrr_composition: this.analyzeMRRComposition(subscriptions),
       revenue_concentration: this.analyzeRevenueConcentration(subscriptions),
       pricing_analysis: this.analyzePricingTiers(saasData.pricing_tiers),
@@ -93,7 +101,8 @@ class TechnologyAnalyticsService extends EventEmitter {
   calculateCustomerMetrics(saasData) {
     const customers = saasData.customers || [];
     const totalCustomers = customers.length;
-    const previousPeriodCustomers = saasData.previous_period?.customer_count || totalCustomers * 0.95;
+    const previousPeriodCustomers =
+      saasData.previous_period?.customer_count || totalCustomers * 0.95;
 
     return {
       total_customers: totalCustomers,
@@ -107,7 +116,7 @@ class TechnologyAnalyticsService extends EventEmitter {
       },
       customer_retention: {
         gross_retention_rate: this.calculateGrossRetention(customers),
-        net_revenue_retention: this.calculateNetRevenue Retention(customers),
+        net_revenue_retention: this.calculateNetRevenueRetention(customers),
         logo_retention_rate: this.calculateLogoRetention(customers)
       }
     };
@@ -179,7 +188,7 @@ class TechnologyAnalyticsService extends EventEmitter {
     const users = platformData.users || [];
     const interactions = platformData.interactions || [];
     const networkType = platformData.network_type || 'direct';
-    
+
     const networkMetrics = this.platformMetrics.networkEffects[networkType];
     const networkDensity = interactions.length / (users.length * (users.length - 1));
     const networkValue = this.calculateMetcalfesValue(users.length, networkDensity);
@@ -235,7 +244,7 @@ class TechnologyAnalyticsService extends EventEmitter {
   analyzeAPIUsage(usage) {
     const totalCalls = usage.reduce((sum, u) => sum + u.calls, 0);
     const averageLatency = usage.reduce((sum, u) => sum + u.latency * u.calls, 0) / totalCalls;
-    
+
     return {
       total_api_calls: totalCalls,
       calls_per_customer: totalCalls / usage.length,
@@ -264,8 +273,7 @@ class TechnologyAnalyticsService extends EventEmitter {
   // Helper Methods
   calculateMRR(subscriptions) {
     return subscriptions.reduce((total, sub) => {
-      const monthlyValue = sub.billing_frequency === 'annual' ? 
-        sub.value / 12 : sub.value;
+      const monthlyValue = sub.billing_frequency === 'annual' ? sub.value / 12 : sub.value;
       return total + monthlyValue;
     }, 0);
   }
@@ -280,7 +288,7 @@ class TechnologyAnalyticsService extends EventEmitter {
     const averageMonthlyRevenue = saasData.average_revenue_per_user || 0;
     const grossMargin = saasData.gross_margin || 0.8;
     const monthlyChurnRate = saasData.monthly_churn_rate || 0.05;
-    
+
     return (averageMonthlyRevenue * grossMargin) / monthlyChurnRate;
   }
 
@@ -288,7 +296,7 @@ class TechnologyAnalyticsService extends EventEmitter {
     const cac = this.calculateCAC(saasData);
     const monthlyRevenuePerCustomer = saasData.average_revenue_per_user || 0;
     const grossMargin = saasData.gross_margin || 0.8;
-    
+
     return cac / (monthlyRevenuePerCustomer * grossMargin);
   }
 
@@ -300,7 +308,10 @@ class TechnologyAnalyticsService extends EventEmitter {
 
   calculateNetRevenueRetention(customers) {
     const currentRevenue = customers.reduce((sum, c) => sum + c.current_revenue, 0);
-    const previousRevenue = customers.reduce((sum, c) => sum + (c.previous_revenue || c.current_revenue * 0.9), 0);
+    const previousRevenue = customers.reduce(
+      (sum, c) => sum + (c.previous_revenue || c.current_revenue * 0.9),
+      0
+    );
     return currentRevenue / previousRevenue;
   }
 
@@ -318,7 +329,7 @@ class TechnologyAnalyticsService extends EventEmitter {
     const users = platformData.users?.length || 0;
     const interactions = platformData.interactions?.length || 0;
     const avgInteractionsPerUser = interactions / users;
-    
+
     // Network strength increases with user engagement
     return Math.log(1 + avgInteractionsPerUser) * Math.sqrt(users);
   }
@@ -327,17 +338,17 @@ class TechnologyAnalyticsService extends EventEmitter {
     const invites = platformData.invites_sent || 0;
     const signups = platformData.signups_from_invites || 0;
     const invitingUsers = platformData.users_who_invited || 1;
-    
+
     const invitesPerUser = invites / invitingUsers;
     const conversionRate = signups / invites;
-    
+
     return invitesPerUser * conversionRate;
   }
 
   analyzeSupplyDemandBalance(supply, demand) {
     const supplyCapacity = supply.reduce((sum, s) => sum + s.capacity, 0);
     const demandVolume = demand.reduce((sum, d) => sum + d.volume, 0);
-    
+
     return {
       supply_demand_ratio: supplyCapacity / demandVolume,
       utilization_rate: Math.min(demandVolume / supplyCapacity, 1),
@@ -361,7 +372,7 @@ class TechnologyAnalyticsService extends EventEmitter {
     const transactions = platformData.transactions || [];
     const totalGMV = transactions.reduce((sum, t) => sum + t.value, 0);
     const platformRevenue = transactions.reduce((sum, t) => sum + t.platform_fee, 0);
-    
+
     return {
       overall_take_rate: platformRevenue / totalGMV,
       take_rate_by_category: this.calculateTakeRateByCategory(transactions),
@@ -371,57 +382,159 @@ class TechnologyAnalyticsService extends EventEmitter {
   }
 
   // Additional helper methods would be implemented here...
-  analyzeMRRComposition() { /* Implementation */ }
-  analyzeRevenueConcentration() { /* Implementation */ }
-  analyzePricingTiers() { /* Implementation */ }
-  calculateACV() { /* Implementation */ }
-  calculateAnnualACV() { /* Implementation */ }
-  analyzeContractLengths() { /* Implementation */ }
-  segmentCustomers() { /* Implementation */ }
-  calculateCACByChannel() { /* Implementation */ }
-  calculateGrossMarginPerCustomer() { /* Implementation */ }
-  calculateContributionMargin() { /* Implementation */ }
-  performBreakEvenAnalysis() { /* Implementation */ }
-  modelUnitEconomicsScenarios() { /* Implementation */ }
-  buildRetentionCurve() { /* Implementation */ }
-  buildRevenueCurve() { /* Implementation */ }
-  calculateLTVProgression() { /* Implementation */ }
-  analyzeCohortChurn() { /* Implementation */ }
-  analyzeCohortTrends() { /* Implementation */ }
-  predictFutureCohorts() { /* Implementation */ }
-  optimizeCohortPerformance() { /* Implementation */ }
-  analyzeChurn() { /* Implementation */ }
-  analyzeGrowthMetrics() { /* Implementation */ }
-  benchmarkAgainstIndustry() { /* Implementation */ }
-  analyzePlatformMonetization() { /* Implementation */ }
-  assessEcosystemHealth() { /* Implementation */ }
-  analyzeCompetitiveMoats() { /* Implementation */ }
-  analyzeScalingDynamics() { /* Implementation */ }
-  assessNetworkDefensibility() { /* Implementation */ }
-  analyzeSaturationPoint() { /* Implementation */ }
-  assessChickenEggProblem() { /* Implementation */ }
-  analyzeMarketConcentration() { /* Implementation */ }
-  assessPlatformQuality() { /* Implementation */ }
-  analyzeAPIPricing() { /* Implementation */ }
-  segmentAPICustomers() { /* Implementation */ }
-  optimizeAPIMonetization() { /* Implementation */ }
-  analyzeDeveloperEcosystem() { /* Implementation */ }
-  calculateAPIProductMetrics() { /* Implementation */ }
-  identifyUsagePatterns() { /* Implementation */ }
-  analyzePeakUsage() { /* Implementation */ }
-  analyzeErrorRates() { /* Implementation */ }
-  analyzeRateLimiting() { /* Implementation */ }
-  valuateDataAssets() { /* Implementation */ }
-  identifyMonetizationStrategies() { /* Implementation */ }
-  analyzeDataProducts() { /* Implementation */ }
-  assessPrivacyCompliance() { /* Implementation */ }
-  analyzeDataCompetition() { /* Implementation */ }
-  projectDataMonetizationROI() { /* Implementation */ }
-  assessBalanceHealth() { /* Implementation */ }
-  calculateRepeatRate() { /* Implementation */ }
-  calculateTakeRateByCategory() { /* Implementation */ }
-  analyzeTakeRateTrends() { /* Implementation */ }
-  identifyTakeRateOptimizations() { /* Implementation */ }
+  analyzeMRRComposition() {
+    /* Implementation */
+  }
+  analyzeRevenueConcentration() {
+    /* Implementation */
+  }
+  analyzePricingTiers() {
+    /* Implementation */
+  }
+  calculateACV() {
+    /* Implementation */
+  }
+  calculateAnnualACV() {
+    /* Implementation */
+  }
+  analyzeContractLengths() {
+    /* Implementation */
+  }
+  segmentCustomers() {
+    /* Implementation */
+  }
+  calculateCACByChannel() {
+    /* Implementation */
+  }
+  calculateGrossMarginPerCustomer() {
+    /* Implementation */
+  }
+  calculateContributionMargin() {
+    /* Implementation */
+  }
+  performBreakEvenAnalysis() {
+    /* Implementation */
+  }
+  modelUnitEconomicsScenarios() {
+    /* Implementation */
+  }
+  buildRetentionCurve() {
+    /* Implementation */
+  }
+  buildRevenueCurve() {
+    /* Implementation */
+  }
+  calculateLTVProgression() {
+    /* Implementation */
+  }
+  analyzeCohortChurn() {
+    /* Implementation */
+  }
+  analyzeCohortTrends() {
+    /* Implementation */
+  }
+  predictFutureCohorts() {
+    /* Implementation */
+  }
+  optimizeCohortPerformance() {
+    /* Implementation */
+  }
+  analyzeChurn() {
+    /* Implementation */
+  }
+  analyzeGrowthMetrics() {
+    /* Implementation */
+  }
+  benchmarkAgainstIndustry() {
+    /* Implementation */
+  }
+  analyzePlatformMonetization() {
+    /* Implementation */
+  }
+  assessEcosystemHealth() {
+    /* Implementation */
+  }
+  analyzeCompetitiveMoats() {
+    /* Implementation */
+  }
+  analyzeScalingDynamics() {
+    /* Implementation */
+  }
+  assessNetworkDefensibility() {
+    /* Implementation */
+  }
+  analyzeSaturationPoint() {
+    /* Implementation */
+  }
+  assessChickenEggProblem() {
+    /* Implementation */
+  }
+  analyzeMarketConcentration() {
+    /* Implementation */
+  }
+  assessPlatformQuality() {
+    /* Implementation */
+  }
+  analyzeAPIPricing() {
+    /* Implementation */
+  }
+  segmentAPICustomers() {
+    /* Implementation */
+  }
+  optimizeAPIMonetization() {
+    /* Implementation */
+  }
+  analyzeDeveloperEcosystem() {
+    /* Implementation */
+  }
+  calculateAPIProductMetrics() {
+    /* Implementation */
+  }
+  identifyUsagePatterns() {
+    /* Implementation */
+  }
+  analyzePeakUsage() {
+    /* Implementation */
+  }
+  analyzeErrorRates() {
+    /* Implementation */
+  }
+  analyzeRateLimiting() {
+    /* Implementation */
+  }
+  valuateDataAssets() {
+    /* Implementation */
+  }
+  identifyMonetizationStrategies() {
+    /* Implementation */
+  }
+  analyzeDataProducts() {
+    /* Implementation */
+  }
+  assessPrivacyCompliance() {
+    /* Implementation */
+  }
+  analyzeDataCompetition() {
+    /* Implementation */
+  }
+  projectDataMonetizationROI() {
+    /* Implementation */
+  }
+  assessBalanceHealth() {
+    /* Implementation */
+  }
+  calculateRepeatRate() {
+    /* Implementation */
+  }
+  calculateTakeRateByCategory() {
+    /* Implementation */
+  }
+  analyzeTakeRateTrends() {
+    /* Implementation */
+  }
+  identifyTakeRateOptimizations() {
+    /* Implementation */
+  }
 }
 
 export default new TechnologyAnalyticsService();

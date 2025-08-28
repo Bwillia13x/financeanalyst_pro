@@ -1,14 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  MessageCircle,
-  Send,
-  Reply,
-  Edit3,
-  Trash2,
-  CheckCircle,
-  User,
-  Clock
-} from 'lucide-react';
+import { MessageCircle, Send, Reply, Edit3, Trash2, CheckCircle, User, Clock } from 'lucide-react';
 import React, { useState, useEffect, useRef } from 'react';
 
 import collaborationService from '../../services/collaborationService';
@@ -53,9 +44,9 @@ const LiveCommentSystem = ({
 
     const handleAnnotationUpdated = ({ workspaceId: wsId, annotationId, updates }) => {
       if (wsId === workspaceId) {
-        setComments(prev => prev.map(comment =>
-          comment.id === annotationId ? { ...comment, ...updates } : comment
-        ));
+        setComments(prev =>
+          prev.map(comment => (comment.id === annotationId ? { ...comment, ...updates } : comment))
+        );
       }
     };
 
@@ -88,7 +79,7 @@ const LiveCommentSystem = ({
     }, 100);
   };
 
-  const handleSubmitComment = async(e) => {
+  const handleSubmitComment = async e => {
     e.preventDefault();
     if (!newComment.trim() || isLoading) return;
 
@@ -117,7 +108,7 @@ const LiveCommentSystem = ({
     }
   };
 
-  const handleEditComment = async(commentId, newContent) => {
+  const handleEditComment = async (commentId, newContent) => {
     try {
       await collaborationService.updateAnnotation(workspaceId, commentId, {
         content: newContent,
@@ -129,7 +120,7 @@ const LiveCommentSystem = ({
     }
   };
 
-  const handleDeleteComment = async(commentId) => {
+  const handleDeleteComment = async commentId => {
     try {
       await collaborationService.deleteAnnotation(workspaceId, commentId);
     } catch (error) {
@@ -137,7 +128,7 @@ const LiveCommentSystem = ({
     }
   };
 
-  const handleResolveComment = async(commentId) => {
+  const handleResolveComment = async commentId => {
     try {
       await collaborationService.updateAnnotation(workspaceId, commentId, {
         resolved: true,
@@ -149,7 +140,7 @@ const LiveCommentSystem = ({
     }
   };
 
-  const formatTime = (timestamp) => {
+  const formatTime = timestamp => {
     const date = new Date(timestamp);
     const now = new Date();
     const diffMs = now - date;
@@ -191,7 +182,7 @@ const LiveCommentSystem = ({
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -10 }}
-      className={`p-3 rounded-lg ${isReply ? 'ml-6 bg-slate-50 dark:bg-slate-700' : 'bg-white dark:bg-slate-800'} 
+      className={`p-3 rounded-lg ${isReply ? 'ml-6 bg-slate-50 dark:bg-slate-700' : 'bg-white dark:bg-slate-800'}
         ${comment.resolved ? 'opacity-75' : ''} border border-slate-200 dark:border-slate-600`}
     >
       <div className="flex items-start space-x-3">
@@ -225,13 +216,11 @@ const LiveCommentSystem = ({
           {editingComment === comment.id ? (
             <EditCommentForm
               comment={comment}
-              onSave={(content) => handleEditComment(comment.id, content)}
+              onSave={content => handleEditComment(comment.id, content)}
               onCancel={() => setEditingComment(null)}
             />
           ) : (
-            <p className="text-sm text-slate-700 dark:text-slate-300 mb-2">
-              {comment.content}
-            </p>
+            <p className="text-sm text-slate-700 dark:text-slate-300 mb-2">{comment.content}</p>
           )}
 
           <div className="flex items-center space-x-2">
@@ -282,7 +271,7 @@ const LiveCommentSystem = ({
       {comment.replies?.length > 0 && (
         <div className="mt-3 space-y-2">
           <AnimatePresence>
-            {comment.replies.map((reply) => (
+            {comment.replies.map(reply => (
               <CommentItem key={reply.id} comment={reply} isReply />
             ))}
           </AnimatePresence>
@@ -296,19 +285,20 @@ const LiveCommentSystem = ({
 
     return (
       <form
-        onSubmit={(e) => {
-          e.preventDefault(); onSave(editContent);
+        onSubmit={e => {
+          e.preventDefault();
+          onSave(editContent);
         }}
       >
         <textarea
           value={editContent}
-          onChange={(e) => setEditContent(e.target.value)}
+          onChange={e => setEditContent(e.target.value)}
           className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg resize-none text-sm"
           rows={2}
           autoFocus
         />
         <div className="flex justify-end space-x-2 mt-2">
-          <Button variant="outline" size="sm" onClick={onCancel}>
+          <Button variant="outline" size="sm" type="button" onClick={onCancel}>
             Cancel
           </Button>
           <Button variant="primary" size="sm" type="submit">
@@ -320,17 +310,15 @@ const LiveCommentSystem = ({
   };
 
   return (
-    <div className={`bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 ${className}`}>
+    <div
+      className={`bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 ${className}`}
+    >
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-700">
         <div className="flex items-center space-x-2">
           <MessageCircle className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-          <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
-            Comments
-          </h3>
-          <span className="text-sm text-slate-500 dark:text-slate-400">
-            ({comments.length})
-          </span>
+          <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Comments</h3>
+          <span className="text-sm text-slate-500 dark:text-slate-400">({comments.length})</span>
         </div>
         {onClose && (
           <button
@@ -362,10 +350,9 @@ const LiveCommentSystem = ({
             </p>
           </div>
         )}
-
         <div className="space-y-3">
           <AnimatePresence>
-            {getThreadedComments().map((comment) => (
+            {getThreadedComments().map(comment => (
               <CommentItem key={comment.id} comment={comment} />
             ))}
           </AnimatePresence>
@@ -396,7 +383,7 @@ const LiveCommentSystem = ({
               <textarea
                 ref={commentInputRef}
                 value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
+                onChange={e => setNewComment(e.target.value)}
                 placeholder={replyTo ? `Reply to ${replyTo.createdBy}...` : 'Add a comment...'}
                 className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                 rows={3}

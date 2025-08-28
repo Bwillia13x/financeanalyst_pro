@@ -1,5 +1,7 @@
 import axios from 'axios';
 
+import { API_CONFIG } from './apiConfig.js';
+
 /**
  * Secure API Client for FinanceAnalyst Pro
  * This client communicates with our secure backend instead of making direct API calls
@@ -7,7 +9,10 @@ import axios from 'axios';
  */
 class SecureApiClient {
   constructor() {
-    this.baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api';
+    this.baseURL =
+      API_CONFIG?.BACKEND_PROXY?.baseURL ||
+      import.meta.env.VITE_API_BASE_URL ||
+      'http://localhost:3001/api';
     this.client = axios.create({
       baseURL: this.baseURL,
       timeout: 15000,
@@ -18,8 +23,8 @@ class SecureApiClient {
 
     // Response interceptor for error handling
     this.client.interceptors.response.use(
-      (response) => response,
-      (error) => {
+      response => response,
+      error => {
         console.error('API Error:', error.response?.data || error.message);
         return Promise.reject(error);
       }
@@ -125,9 +130,12 @@ class SecureApiClient {
    * @returns {Promise<Object>} Balance sheet data
    */
   async getBalanceSheet(symbol, period = 'annual', limit = 5) {
-    const response = await this.client.get(`/financial-statements/balance/${symbol.toUpperCase()}`, {
-      params: { period, limit }
-    });
+    const response = await this.client.get(
+      `/financial-statements/balance/${symbol.toUpperCase()}`,
+      {
+        params: { period, limit }
+      }
+    );
     return response.data;
   }
 
@@ -139,9 +147,12 @@ class SecureApiClient {
    * @returns {Promise<Object>} Cash flow data
    */
   async getCashFlowStatement(symbol, period = 'annual', limit = 5) {
-    const response = await this.client.get(`/financial-statements/cash-flow/${symbol.toUpperCase()}`, {
-      params: { period, limit }
-    });
+    const response = await this.client.get(
+      `/financial-statements/cash-flow/${symbol.toUpperCase()}`,
+      {
+        params: { period, limit }
+      }
+    );
     return response.data;
   }
 
@@ -293,23 +304,43 @@ class SecureApiClient {
    */
   async fetchMarketData(ticker, range = '1y') {
     try {
-      const data = await this.getHistoricalData(ticker, range);
+      const raw = await this.getHistoricalData(ticker, range);
 
-      // Transform to match expected format from old API service
+      // If the backend/test returns Yahoo-style 'chart' payload, normalize minimal fields
+      if (raw?.chart?.result?.[0]) {
+        const node = raw.chart.result[0];
+        const meta = node?.meta || {};
+        return {
+          symbol: meta.symbol || ticker.toUpperCase(),
+          currentPrice: meta.regularMarketPrice,
+          previousClose: meta.previousClose,
+          marketCap: meta.marketCap,
+          volume: meta.regularMarketVolume,
+          currency: meta.currency,
+          source: 'YAHOO_FINANCE'
+        };
+      }
+
+      // Transform to match expected format from old API service (defensive against missing arrays)
+      const rows = Array.isArray(raw?.data) ? raw.data : [];
+      const lastClose = rows.length ? rows[rows.length - 1]?.close : undefined;
       return {
-        symbol: data.symbol,
-        range: data.range,
-        data: data.data,
-        meta: data.meta,
-        timestamps: data.data.map(d => d.timestamp),
+        symbol: raw?.symbol || ticker.toUpperCase(),
+        range: raw?.range || range,
+        data: rows,
+        meta: raw?.meta,
+        timestamps: rows.map(d => d.timestamp),
         prices: {
-          close: data.data.map(d => d.close),
-          high: data.data.map(d => d.high),
-          low: data.data.map(d => d.low),
-          open: data.data.map(d => d.open)
+          close: rows.map(d => d.close),
+          high: rows.map(d => d.high),
+          low: rows.map(d => d.low),
+          open: rows.map(d => d.open)
         },
-        volume: data.data.map(d => d.volume),
-        source: data.source
+        volume: rows.map(d => d.volume),
+        source: raw?.source,
+        // Convenience fields consumed by some tests/widgets
+        currentPrice: raw?.meta?.regularMarketPrice ?? lastClose,
+        previousClose: raw?.meta?.previousClose
       };
     } catch (error) {
       console.error('Failed to fetch market data:', error);
@@ -325,7 +356,12 @@ class SecureApiClient {
    * @param {number} limit - Number of periods
    * @returns {Promise<Object>} Financial statement data
    */
-  async fetchFinancialStatements(ticker, statement = 'income-statement', period = 'annual', limit = 5) {
+  async fetchFinancialStatements(
+    ticker,
+    statement = 'income-statement',
+    period = 'annual',
+    limit = 5
+  ) {
     try {
       let data;
 
@@ -343,7 +379,8 @@ class SecureApiClient {
           throw new Error(`Unsupported statement type: ${statement}`);
       }
 
-      return data.data; // Return just the data array for compatibility
+      // Support both { data: [...] } and raw array shapes
+      return data?.data ?? data; // Return just the data array for compatibility
     } catch (error) {
       console.error('Failed to fetch financial statements:', error);
       throw error;

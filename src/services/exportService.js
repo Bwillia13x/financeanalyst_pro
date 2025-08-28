@@ -84,7 +84,9 @@ class ExportService {
       });
 
       this.downloadFile(
-        new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }),
+        new Blob([excelBuffer], {
+          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        }),
         `${filename}.xlsx`
       );
 
@@ -166,7 +168,11 @@ class ExportService {
         csvContent = this.arrayToCSV(data, { delimiter, includeHeaders });
       } else if (data.financialData) {
         // Financial data export
-        csvContent = this.financialDataToCSV(data.financialData, { delimiter, includeHeaders, flattenData });
+        csvContent = this.financialDataToCSV(data.financialData, {
+          delimiter,
+          includeHeaders,
+          flattenData
+        });
       } else {
         // Generic object export
         csvContent = this.objectToCSV(data, { delimiter, includeHeaders });
@@ -303,12 +309,7 @@ class ExportService {
       ['Analysis Results', ''],
       ['', ''],
       ['Metric', 'Current', 'Target', 'Variance'],
-      ...analysisData.map(item => [
-        item.metric,
-        item.current,
-        item.target,
-        item.variance
-      ])
+      ...analysisData.map(item => [item.metric, item.current, item.target, item.variance])
     ];
 
     return XLSX.utils.aoa_to_sheet(data);
@@ -354,10 +355,13 @@ class ExportService {
         headStyles: this.defaultStyles.pdf.headerStyle,
         columnStyles: {
           0: { cellWidth: 80 },
-          ...periods.reduce((acc, _, index) => ({
-            ...acc,
-            [index + 1]: { cellWidth: 30, halign: 'right' }
-          }), {})
+          ...periods.reduce(
+            (acc, _, index) => ({
+              ...acc,
+              [index + 1]: { cellWidth: 30, halign: 'right' }
+            }),
+            {}
+          )
         }
       });
 

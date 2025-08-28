@@ -14,7 +14,7 @@ export function usePerformanceOptimizer() {
 
   useEffect(() => {
     // Initialize performance optimizer
-    const init = async() => {
+    const init = async () => {
       if (performanceOptimizer.isInitialized) {
         setIsInitialized(true);
       } else {
@@ -40,37 +40,55 @@ export function usePerformanceOptimizer() {
     };
   }, []);
 
-  const getCached = useCallback(async(cacheId, key, fallbackFn) => {
-    if (!isInitialized) return fallbackFn ? await fallbackFn() : null;
-    return performanceOptimizer.get(cacheId, key, fallbackFn);
-  }, [isInitialized]);
+  const getCached = useCallback(
+    async (cacheId, key, fallbackFn) => {
+      if (!isInitialized) return fallbackFn ? await fallbackFn() : null;
+      return performanceOptimizer.get(cacheId, key, fallbackFn);
+    },
+    [isInitialized]
+  );
 
-  const setCached = useCallback(async(cacheId, key, value, options) => {
-    if (!isInitialized) return false;
-    return performanceOptimizer.set(cacheId, key, value, options);
-  }, [isInitialized]);
+  const setCached = useCallback(
+    async (cacheId, key, value, options) => {
+      if (!isInitialized) return false;
+      return performanceOptimizer.set(cacheId, key, value, options);
+    },
+    [isInitialized]
+  );
 
-  const lazyLoad = useCallback(async(componentId, loader, options) => {
-    if (!isInitialized) return loader();
-    return performanceOptimizer.lazyLoad(componentId, loader, options);
-  }, [isInitialized]);
+  const lazyLoad = useCallback(
+    async (componentId, loader, options) => {
+      if (!isInitialized) return loader();
+      return performanceOptimizer.lazyLoad(componentId, loader, options);
+    },
+    [isInitialized]
+  );
 
-  const batchLoad = useCallback(async(requests, options) => {
-    if (!isInitialized) {
-      return Promise.allSettled(requests.map(req => req.loader()));
-    }
-    return performanceOptimizer.batchLoad(requests, options);
-  }, [isInitialized]);
+  const batchLoad = useCallback(
+    async (requests, options) => {
+      if (!isInitialized) {
+        return Promise.allSettled(requests.map(req => req.loader()));
+      }
+      return performanceOptimizer.batchLoad(requests, options);
+    },
+    [isInitialized]
+  );
 
-  const getCacheStats = useCallback((cacheId) => {
-    if (!isInitialized) return null;
-    return performanceOptimizer.getCacheStats(cacheId);
-  }, [isInitialized]);
+  const getCacheStats = useCallback(
+    cacheId => {
+      if (!isInitialized) return null;
+      return performanceOptimizer.getCacheStats(cacheId);
+    },
+    [isInitialized]
+  );
 
-  const clearCache = useCallback((cacheId) => {
-    if (!isInitialized) return false;
-    return performanceOptimizer.clearCache(cacheId);
-  }, [isInitialized]);
+  const clearCache = useCallback(
+    cacheId => {
+      if (!isInitialized) return false;
+      return performanceOptimizer.clearCache(cacheId);
+    },
+    [isInitialized]
+  );
 
   return {
     isInitialized,
@@ -93,12 +111,12 @@ export function useCachedData(cacheId, key, loader, _options = {}) {
   useEffect(() => {
     let isMounted = true;
 
-    const fetchData = async() => {
+    const fetchData = async () => {
       try {
         setLoading(true);
         setError(null);
 
-        const cachedData = await getCached(cacheId, key, async() => {
+        const cachedData = await getCached(cacheId, key, async () => {
           return await loader();
         });
 
@@ -133,7 +151,7 @@ export function useLazyComponent(componentId, loader, options = {}) {
   const { lazyLoad } = usePerformanceOptimizer();
   const elementRef = useRef(null);
 
-  const loadComponent = useCallback(async() => {
+  const loadComponent = useCallback(async () => {
     if (Component) return Component;
 
     try {
@@ -190,7 +208,7 @@ export function usePerformanceMonitor() {
 
   useEffect(() => {
     // Monitor Web Vitals
-    const observer = new PerformanceObserver((list) => {
+    const observer = new PerformanceObserver(list => {
       for (const entry of list.getEntries()) {
         switch (entry.entryType) {
           case 'largest-contentful-paint':
@@ -219,7 +237,9 @@ export function usePerformanceMonitor() {
 
     if ('PerformanceObserver' in window) {
       try {
-        observer.observe({ entryTypes: ['largest-contentful-paint', 'first-input', 'layout-shift'] });
+        observer.observe({
+          entryTypes: ['largest-contentful-paint', 'first-input', 'layout-shift']
+        });
       } catch (error) {
         console.warn('Performance observer not supported:', error);
       }

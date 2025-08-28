@@ -50,11 +50,11 @@ export const AccessibilityWrapper = ({ children, onError: _onError, error: _erro
       }));
 
       // Listen for changes
-      const handleReducedMotionChange = (e) => {
+      const handleReducedMotionChange = e => {
         updateSetting('reducedMotion', e.matches);
       };
 
-      const handleHighContrastChange = (e) => {
+      const handleHighContrastChange = e => {
         updateSetting('highContrast', e.matches);
       };
 
@@ -145,11 +145,7 @@ export const AccessibilityWrapper = ({ children, onError: _onError, error: _erro
         {children}
 
         {/* Screen reader announcements */}
-        <div
-          aria-live="polite"
-          aria-atomic="true"
-          className="sr-only"
-        >
+        <div aria-live="polite" aria-atomic="true" className="sr-only">
           {announcement}
         </div>
       </div>
@@ -223,7 +219,7 @@ export const AccessibilityControls = ({ className = '' }) => {
                 <input
                   type="checkbox"
                   checked={settings[key]}
-                  onChange={(e) => updateSetting(key, e.target.checked)}
+                  onChange={e => updateSetting(key, e.target.checked)}
                   className="mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                 />
                 <div className="flex-1 min-w-0">
@@ -261,7 +257,7 @@ export const AccessibleButton = ({
 }) => {
   const { announce } = useAccessibility();
 
-  const handleClick = (e) => {
+  const handleClick = e => {
     if (loading || disabled) return;
 
     if (onClick) {
@@ -342,7 +338,7 @@ export const useKeyboardNavigation = (items = [], onSelect) => {
   const { announce } = useAccessibility();
 
   useEffect(() => {
-    const handleKeyDown = (e) => {
+    const handleKeyDown = e => {
       if (!items.length) return;
 
       switch (e.key) {
@@ -389,7 +385,7 @@ export const useKeyboardNavigation = (items = [], onSelect) => {
 
 // Focus Management Hook
 export const useFocusManagement = () => {
-  const trapFocus = (element) => {
+  const trapFocus = element => {
     const focusableElements = element.querySelectorAll(
       'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
     );
@@ -397,7 +393,7 @@ export const useFocusManagement = () => {
     const firstElement = focusableElements[0];
     const lastElement = focusableElements[focusableElements.length - 1];
 
-    const handleKeyDown = (e) => {
+    const handleKeyDown = e => {
       if (e.key === 'Tab') {
         if (e.shiftKey) {
           if (document.activeElement === firstElement) {
@@ -421,7 +417,7 @@ export const useFocusManagement = () => {
     };
   };
 
-  const restoreFocus = (previousElement) => {
+  const restoreFocus = previousElement => {
     if (previousElement && typeof previousElement.focus === 'function') {
       previousElement.focus();
     }

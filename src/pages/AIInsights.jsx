@@ -31,7 +31,7 @@ const AIInsights = () => {
     });
   }, [updateCommandContext, selectedAsset, financialData.sector, financialData.industry]);
 
-  const handleInsightClick = (insight) => {
+  const handleInsightClick = insight => {
     console.log('Insight clicked:', insight);
     // Handle insight interaction
   };
@@ -57,8 +57,8 @@ const AIInsights = () => {
             </h1>
           </div>
           <p className="text-slate-600 dark:text-slate-400 max-w-3xl">
-            Harness the power of artificial intelligence for advanced financial analysis,
-            automated pattern recognition, and intelligent investment recommendations.
+            Harness the power of artificial intelligence for advanced financial analysis, automated
+            pattern recognition, and intelligent investment recommendations.
           </p>
         </div>
 
@@ -124,7 +124,12 @@ const AIInsights = () => {
                 <div className="flex justify-between">
                   <span className="text-slate-600 dark:text-slate-400">ROE</span>
                   <span className="font-semibold text-green-600">
-                    {((financialData.netIncome / (financialData.totalAssets - financialData.totalDebt)) * 100).toFixed(1)}%
+                    {(
+                      (financialData.netIncome /
+                        (financialData.totalAssets - financialData.totalDebt)) *
+                      100
+                    ).toFixed(1)}
+                    %
                   </span>
                 </div>
               </div>

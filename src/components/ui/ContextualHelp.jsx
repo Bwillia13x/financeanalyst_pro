@@ -1,4 +1,13 @@
-import { HelpCircle, X, BookOpen, Calculator, TrendingUp, AlertCircle, ChevronRight, ExternalLink } from 'lucide-react';
+import {
+  HelpCircle,
+  X,
+  BookOpen,
+  Calculator,
+  TrendingUp,
+  AlertCircle,
+  ChevronRight,
+  ExternalLink
+} from 'lucide-react';
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 
@@ -13,7 +22,8 @@ import { cn } from '../../utils/cn';
 const helpContent = {
   dcf: {
     title: 'Discounted Cash Flow (DCF) Analysis',
-    description: 'Estimates company value by projecting future cash flows and discounting them to present value.',
+    description:
+      'Estimates company value by projecting future cash flows and discounting them to present value.',
     keyPoints: [
       'Projects free cash flows for 5-10 years',
       'Calculates terminal value for perpetual growth',
@@ -178,9 +188,10 @@ export const FinancialTooltip = ({
     }
   }, [isVisible, position]);
 
-  const triggerProps = trigger === 'hover'
-    ? { onMouseEnter: showTooltip, onMouseLeave: hideTooltip }
-    : { onClick: () => setIsVisible(!isVisible) };
+  const triggerProps =
+    trigger === 'hover'
+      ? { onMouseEnter: showTooltip, onMouseLeave: hideTooltip }
+      : { onClick: () => setIsVisible(!isVisible) };
 
   return (
     <>
@@ -188,30 +199,31 @@ export const FinancialTooltip = ({
         {children}
       </span>
 
-      {isVisible && createPortal(
-        <div
-          ref={tooltipRef}
-          className="fixed z-50 max-w-sm p-3 bg-slate-900 text-white text-sm rounded-lg shadow-lg pointer-events-none"
-          style={{ top: tooltipPosition.top, left: tooltipPosition.left }}
-        >
-          <div className="relative">
-            {typeof content === 'string' ? (
-              <p>{content}</p>
-            ) : (
-              <div className="space-y-2">
-                {content.title && <div className="font-semibold">{content.title}</div>}
-                {content.description && <p className="text-slate-300">{content.description}</p>}
-                {content.formula && (
-                  <div className="bg-slate-800 px-2 py-1 rounded text-xs font-mono">
-                    {content.formula}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        </div>,
-        document.body
-      )}
+      {isVisible &&
+        createPortal(
+          <div
+            ref={tooltipRef}
+            className="fixed z-50 max-w-sm p-3 bg-slate-900 text-white text-sm rounded-lg shadow-lg pointer-events-none"
+            style={{ top: tooltipPosition.top, left: tooltipPosition.left }}
+          >
+            <div className="relative">
+              {typeof content === 'string' ? (
+                <p>{content}</p>
+              ) : (
+                <div className="space-y-2">
+                  {content.title && <div className="font-semibold">{content.title}</div>}
+                  {content.description && <p className="text-slate-300">{content.description}</p>}
+                  {content.formula && (
+                    <div className="bg-slate-800 px-2 py-1 rounded text-xs font-mono">
+                      {content.formula}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>,
+          document.body
+        )}
     </>
   );
 };
@@ -441,10 +453,7 @@ export const OnboardingTour = ({ steps, isActive, onComplete, onSkip }) => {
         <div className="p-4">
           <div className="flex items-start justify-between mb-3">
             <h3 className="font-semibold text-slate-900">{step.title}</h3>
-            <button
-              onClick={onSkip}
-              className="text-slate-400 hover:text-slate-600"
-            >
+            <button onClick={onSkip} className="text-slate-400 hover:text-slate-600">
               <X className="w-4 h-4" />
             </button>
           </div>

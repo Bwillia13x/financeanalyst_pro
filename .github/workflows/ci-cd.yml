@@ -7,62 +7,161 @@ on:
     branches: [ main ]
 
 env:
-  NODE_VERSION: '18'
-  CACHE_KEY: node-modules-${{ hashFiles('**/package-lock.json') }}
+  NODE_VERSION: '20.19.0'
 
 jobs:
   # Quality Assurance Job
   quality-assurance:
     name: Quality Assurance
     runs-on: ubuntu-latest
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-      
+
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: ${{ env.NODE_VERSION }}
         cache: 'npm'
-        
+        cache-dependency-path: |
+          package-lock.json
+          backend/package-lock.json
+
     - name: Install dependencies
       run: npm ci
-      
-    - name: Run ESLint
-      run: npm run lint
-      
+
+    - name: Install backend dependencies
+      run: npm ci
+      working-directory: backend
+
+    - name: Run ESLint - Frontend (strict)
+      run: |
+        echo "🔍 Running ESLint for frontend with strict quality gates..."
+        npm run lint
+        if [ $? -ne 0 ]; then
+          echo "❌ Frontend ESLint failed! Deployment blocked."
+          echo "Please fix all frontend linting errors before merging."
+          exit 1
+        fi
+        echo "✅ Frontend ESLint passed!"
+
+    - name: Run ESLint - Backend (strict)
+      run: |
+        echo "🔍 Running ESLint for backend with strict quality gates..."
+        npm run lint
+        if [ $? -ne 0 ]; then
+          echo "❌ Backend ESLint failed! Deployment blocked."
+          echo "Please fix all backend linting errors before merging."
+          exit 1
+        fi
+        echo "✅ Backend ESLint passed!"
+      working-directory: backend
+
     - name: Run Prettier check
-      run: npm run format:check
-      
-    - name: Type checking (if applicable)
-      run: npm run type-check || echo "No type checking configured"
-      continue-on-error: true
+      run: |
+        echo "🎨 Checking code formatting..."
+        npm run format:check
+        if [ $? -ne 0 ]; then
+          echo "❌ Code formatting check failed!"
+          echo "Please run 'npm run format' to fix formatting issues."
+          echo "📋 Running 'npm run format' locally will auto-fix most issues."
+          exit 1
+        fi
+        echo "✅ Code formatting check passed!"
+
+    - name: Check for TypeScript errors (if applicable)
+      run: |
+        echo "🔍 Checking for TypeScript compilation errors..."
+        npm run type-check || echo "ℹ️  No TypeScript configuration found - skipping type check"
+
+    - name: Validate package.json integrity
+      run: |
+        echo "📦 Validating package.json integrity..."
+        npm ls --depth=0 --silent
+        if [ $? -ne 0 ]; then
+          echo "❌ Package.json validation failed!"
+          echo "Please check for dependency issues."
+          exit 1
+        fi
+        echo "✅ Package.json validation passed!"
 
   # Testing Job
   testing:
     name: Run Tests
     runs-on: ubuntu-latest
     needs: quality-assurance
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-      
+
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: ${{ env.NODE_VERSION }}
         cache: 'npm'
-        
+
     - name: Install dependencies
       run: npm ci
-      
-    - name: Run tests
-      run: npm test -- --run --coverage
+
+    - name: Install backend dependencies
+      run: npm ci
+      working-directory: backend
+
+    - name: Run tests (strict)
+      run: |
+        echo "Running tests with strict quality gates..."
+        npm test -- --run --coverage
+        if [ $? -ne 0 ]; then
+          echo "❌ Tests failed! Deployment blocked."
+          echo "Please ensure all tests pass before merging."
+          exit 1
+        fi
+        echo "✅ All tests passed!"
       env:
         CI: true
-        
+
+    - name: Run backend tests (strict)
+      run: |
+        echo "Running backend tests with strict quality gates..."
+        npm test -- --coverage
+        if [ $? -ne 0 ]; then
+          echo "❌ Backend tests failed! Deployment blocked."
+          echo "Please ensure all backend tests pass before merging."
+          exit 1
+        fi
+        echo "✅ All backend tests passed!"
+      env:
+        CI: true
+      working-directory: backend
+
+    - name: Install Playwright browsers
+      run: npx playwright install --with-deps
+
+    - name: Run Playwright E2E tests
+      run: npx playwright test
+      env:
+        CI: true
+
+    - name: Upload Playwright HTML report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: playwright-report
+        path: playwright-report/
+        retention-days: 14
+
+    - name: Upload Playwright traces and artifacts (on failure)
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: playwright-artifacts
+        path: |
+          test-results/
+          playwright-report/data/
+        retention-days: 14
+
     - name: Upload coverage reports
       uses: codecov/codecov-action@v3
       with:
@@ -71,54 +170,102 @@ jobs:
         name: codecov-umbrella
         fail_ci_if_error: false
 
+    - name: Upload backend coverage reports
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./backend/coverage/coverage-final.json
+        flags: backend
+        name: codecov-backend
+        fail_ci_if_error: false
+
   # Security Audit Job
   security-audit:
     name: Security Audit
     runs-on: ubuntu-latest
     needs: quality-assurance
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-      
+
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: ${{ env.NODE_VERSION }}
         cache: 'npm'
-        
+
     - name: Install dependencies
       run: npm ci
-      
-    - name: Run security audit
-      run: npm audit --audit-level=moderate
-      
-    - name: Run dependency check
-      run: npx audit-ci --moderate
+
+    - name: Run security audit (non-main branches)
+      if: github.ref != 'refs/heads/main'
+      run: |
+        echo "Running security audit (moderate) on non-main branches..."
+        npm audit --audit-level=moderate
+        if [ $? -ne 0 ]; then
+          echo "❌ Security audit failed! Moderate+ vulnerabilities found."
+          echo "Please resolve security vulnerabilities before deployment."
+          exit 1
+        fi
+        echo "✅ Security audit passed (moderate)."
+
+    - name: Run security audit (main branch - high)
+      if: github.ref == 'refs/heads/main'
+      run: |
+        echo "Running security audit (high) on main branch..."
+        npm audit --audit-level=high
+        if [ $? -ne 0 ]; then
+          echo "❌ Security audit failed! High+ vulnerabilities found."
+          echo "Please resolve security vulnerabilities before deployment."
+          exit 1
+        fi
+        echo "✅ Security audit passed (high)."
+
+    - name: Run dependency vulnerability check (non-main branches)
+      if: github.ref != 'refs/heads/main'
+      run: |
+        npx audit-ci --moderate
+        if [ $? -ne 0 ]; then
+          echo "❌ Dependency vulnerability check failed!"
+          echo "Please update vulnerable dependencies."
+          exit 1
+        fi
+        echo "✅ Dependency check passed (moderate)!"
+
+    - name: Run dependency vulnerability check (main branch - high)
+      if: github.ref == 'refs/heads/main'
+      run: |
+        npx audit-ci --high
+        if [ $? -ne 0 ]; then
+          echo "❌ Dependency vulnerability check failed (high)!"
+          echo "Please update vulnerable dependencies."
+          exit 1
+        fi
+        echo "✅ Dependency check passed (high)!"
 
   # Build Job
   build:
     name: Build Application
     runs-on: ubuntu-latest
     needs: [testing, security-audit]
-    
+
     strategy:
       matrix:
         environment: [staging, production]
-        
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-      
+
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: ${{ env.NODE_VERSION }}
         cache: 'npm'
-        
+
     - name: Install dependencies
       run: npm ci
-      
+
     - name: Build for ${{ matrix.environment }}
       run: |
         if [ "${{ matrix.environment }}" = "production" ]; then
@@ -129,12 +276,12 @@ jobs:
         npm run build
       env:
         NODE_ENV: production
-        
+
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
         name: build-${{ matrix.environment }}
-        path: build/
+        path: dist/
         retention-days: 30
 
   # Performance Testing Job
@@ -143,29 +290,35 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     if: github.ref == 'refs/heads/main'
-    
+    env:
+      LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-      
+
     - name: Download build artifacts
       uses: actions/download-artifact@v4
       with:
-        name: build-staging
-        path: build/
-        
+        name: build-production
+        path: dist/
+
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: ${{ env.NODE_VERSION }}
-        
+
+    - name: Install dependencies
+      run: npm ci
+
     - name: Install Lighthouse CI
       run: npm install -g @lhci/cli@0.12.x
-      
+
     - name: Run Lighthouse CI
+      if: ${{ env.LHCI_GITHUB_APP_TOKEN != '' }}
       run: lhci autorun
       env:
-        LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+        LHCI_GITHUB_APP_TOKEN: ${{ env.LHCI_GITHUB_APP_TOKEN }}
 
   # Deploy to Staging
   deploy-staging:
@@ -173,21 +326,20 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main'
-    environment: staging
-    
+
     steps:
     - name: Download build artifacts
       uses: actions/download-artifact@v4
       with:
         name: build-staging
-        path: build/
-        
+        path: dist/
+
     - name: Deploy to staging
       run: |
         echo "Deploying to staging environment..."
         # Add your staging deployment commands here
         # Example: rsync, AWS S3, Netlify, Vercel, etc.
-        
+
     - name: Run smoke tests
       run: |
         echo "Running smoke tests on staging..."
@@ -199,25 +351,24 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build, performance-testing, deploy-staging]
     if: github.ref == 'refs/heads/main'
-    environment: production
-    
+
     steps:
     - name: Download build artifacts
       uses: actions/download-artifact@v4
       with:
         name: build-production
-        path: build/
-        
+        path: dist/
+
     - name: Deploy to production
       run: |
         echo "Deploying to production environment..."
         # Add your production deployment commands here
-        
+
     - name: Run post-deployment tests
       run: |
         echo "Running post-deployment verification..."
         # Add verification commands here
-        
+
     - name: Notify team
       run: |
         echo "Production deployment completed successfully!"

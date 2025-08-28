@@ -6,7 +6,6 @@ import Button from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import Header from '../components/ui/Header';
 
-
 const Models = () => {
   const [activeModel, setActiveModel] = useState(null);
 
@@ -33,7 +32,12 @@ const Models = () => {
       description: 'Trading and transaction multiples comparison',
       icon: BarChart3,
       color: 'bg-purple-500',
-      features: ['Trading multiples', 'Transaction multiples', 'Peer selection', 'Statistical analysis']
+      features: [
+        'Trading multiples',
+        'Transaction multiples',
+        'Peer selection',
+        'Statistical analysis'
+      ]
     },
     {
       id: 'epv',
@@ -41,11 +45,16 @@ const Models = () => {
       description: 'Earnings Power Value for conservative valuation',
       icon: Target,
       color: 'bg-orange-500',
-      features: ['Normalized earnings', 'Conservative approach', 'Asset adjustment', 'Margin of safety']
+      features: [
+        'Normalized earnings',
+        'Conservative approach',
+        'Asset adjustment',
+        'Margin of safety'
+      ]
     }
   ];
 
-  const handleModelSelect = useCallback((modelId) => {
+  const handleModelSelect = useCallback(modelId => {
     setActiveModel(modelId);
   }, []);
 
@@ -89,7 +98,10 @@ const Models = () => {
                   <>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label htmlFor="dcf-fcf" className="block text-sm font-medium text-gray-700 mb-1">
+                        <label
+                          htmlFor="dcf-fcf"
+                          className="block text-sm font-medium text-gray-700 mb-1"
+                        >
                           Free Cash Flow (Year 1)
                         </label>
                         <input
@@ -100,7 +112,10 @@ const Models = () => {
                         />
                       </div>
                       <div>
-                        <label htmlFor="dcf-growth" className="block text-sm font-medium text-gray-700 mb-1">
+                        <label
+                          htmlFor="dcf-growth"
+                          className="block text-sm font-medium text-gray-700 mb-1"
+                        >
                           Growth Rate (%)
                         </label>
                         <input
@@ -113,7 +128,10 @@ const Models = () => {
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label htmlFor="dcf-wacc" className="block text-sm font-medium text-gray-700 mb-1">
+                        <label
+                          htmlFor="dcf-wacc"
+                          className="block text-sm font-medium text-gray-700 mb-1"
+                        >
                           WACC (%)
                         </label>
                         <input
@@ -124,7 +142,10 @@ const Models = () => {
                         />
                       </div>
                       <div>
-                        <label htmlFor="dcf-terminal-growth" className="block text-sm font-medium text-gray-700 mb-1">
+                        <label
+                          htmlFor="dcf-terminal-growth"
+                          className="block text-sm font-medium text-gray-700 mb-1"
+                        >
                           Terminal Growth (%)
                         </label>
                         <input
@@ -142,7 +163,10 @@ const Models = () => {
                   <>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label htmlFor="lbo-ev" className="block text-sm font-medium text-gray-700 mb-1">
+                        <label
+                          htmlFor="lbo-ev"
+                          className="block text-sm font-medium text-gray-700 mb-1"
+                        >
                           Enterprise Value
                         </label>
                         <input
@@ -153,7 +177,10 @@ const Models = () => {
                         />
                       </div>
                       <div>
-                        <label htmlFor="lbo-debt-equity" className="block text-sm font-medium text-gray-700 mb-1">
+                        <label
+                          htmlFor="lbo-debt-equity"
+                          className="block text-sm font-medium text-gray-700 mb-1"
+                        >
                           Debt/Equity Ratio
                         </label>
                         <input
@@ -166,7 +193,10 @@ const Models = () => {
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label htmlFor="lbo-exit-multiple" className="block text-sm font-medium text-gray-700 mb-1">
+                        <label
+                          htmlFor="lbo-exit-multiple"
+                          className="block text-sm font-medium text-gray-700 mb-1"
+                        >
                           Exit Multiple
                         </label>
                         <input
@@ -177,7 +207,10 @@ const Models = () => {
                         />
                       </div>
                       <div>
-                        <label htmlFor="lbo-hold-period" className="block text-sm font-medium text-gray-700 mb-1">
+                        <label
+                          htmlFor="lbo-hold-period"
+                          className="block text-sm font-medium text-gray-700 mb-1"
+                        >
                           Hold Period (Years)
                         </label>
                         <input
@@ -195,7 +228,10 @@ const Models = () => {
                   <>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label htmlFor="comps-revenue" className="block text-sm font-medium text-gray-700 mb-1">
+                        <label
+                          htmlFor="comps-revenue"
+                          className="block text-sm font-medium text-gray-700 mb-1"
+                        >
                           Revenue
                         </label>
                         <input
@@ -206,7 +242,10 @@ const Models = () => {
                         />
                       </div>
                       <div>
-                        <label htmlFor="comps-ebitda" className="block text-sm font-medium text-gray-700 mb-1">
+                        <label
+                          htmlFor="comps-ebitda"
+                          className="block text-sm font-medium text-gray-700 mb-1"
+                        >
                           EBITDA
                         </label>
                         <input
@@ -219,7 +258,10 @@ const Models = () => {
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label htmlFor="comps-net-income" className="block text-sm font-medium text-gray-700 mb-1">
+                        <label
+                          htmlFor="comps-net-income"
+                          className="block text-sm font-medium text-gray-700 mb-1"
+                        >
                           Net Income
                         </label>
                         <input
@@ -230,7 +272,10 @@ const Models = () => {
                         />
                       </div>
                       <div>
-                        <label htmlFor="comps-book-value" className="block text-sm font-medium text-gray-700 mb-1">
+                        <label
+                          htmlFor="comps-book-value"
+                          className="block text-sm font-medium text-gray-700 mb-1"
+                        >
                           Book Value
                         </label>
                         <input
@@ -248,7 +293,10 @@ const Models = () => {
                   <>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label htmlFor="epv-normalized-earnings" className="block text-sm font-medium text-gray-700 mb-1">
+                        <label
+                          htmlFor="epv-normalized-earnings"
+                          className="block text-sm font-medium text-gray-700 mb-1"
+                        >
                           Normalized Earnings
                         </label>
                         <input
@@ -259,7 +307,10 @@ const Models = () => {
                         />
                       </div>
                       <div>
-                        <label htmlFor="epv-cost-of-capital" className="block text-sm font-medium text-gray-700 mb-1">
+                        <label
+                          htmlFor="epv-cost-of-capital"
+                          className="block text-sm font-medium text-gray-700 mb-1"
+                        >
                           Cost of Capital (%)
                         </label>
                         <input
@@ -272,7 +323,10 @@ const Models = () => {
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label htmlFor="epv-asset-adjustment" className="block text-sm font-medium text-gray-700 mb-1">
+                        <label
+                          htmlFor="epv-asset-adjustment"
+                          className="block text-sm font-medium text-gray-700 mb-1"
+                        >
                           Asset Adjustment
                         </label>
                         <input
@@ -283,7 +337,10 @@ const Models = () => {
                         />
                       </div>
                       <div>
-                        <label htmlFor="epv-shares-outstanding" className="block text-sm font-medium text-gray-700 mb-1">
+                        <label
+                          htmlFor="epv-shares-outstanding"
+                          className="block text-sm font-medium text-gray-700 mb-1"
+                        >
                           Shares Outstanding
                         </label>
                         <input
@@ -299,9 +356,7 @@ const Models = () => {
               </div>
 
               <div className="mt-6">
-                <Button className="w-full">
-                  Calculate Valuation
-                </Button>
+                <Button className="w-full">Calculate Valuation</Button>
               </div>
             </Card>
           </div>
@@ -360,17 +415,11 @@ const Models = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            {models.map((model) => (
-              <motion.div
-                key={model.id}
-                whileHover={{ y: -4 }}
-                whileTap={{ scale: 0.98 }}
-              >
+            {models.map(model => (
+              <motion.div key={model.id} whileHover={{ y: -4 }} whileTap={{ scale: 0.98 }}>
                 <Card
                   className={`p-6 cursor-pointer transition-all duration-200 ${
-                    activeModel === model.id
-                      ? 'ring-2 ring-blue-500 shadow-lg'
-                      : 'hover:shadow-md'
+                    activeModel === model.id ? 'ring-2 ring-blue-500 shadow-lg' : 'hover:shadow-md'
                   }`}
                   onClick={() => handleModelSelect(model.id)}
                 >
@@ -396,9 +445,7 @@ const Models = () => {
             ))}
           </div>
 
-          <Card className="p-8">
-            {renderModelInterface()}
-          </Card>
+          <Card className="p-8">{renderModelInterface()}</Card>
         </motion.div>
       </div>
     </div>
