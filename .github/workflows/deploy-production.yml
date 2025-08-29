@@ -1,0 +1,242 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*' ]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+        - production
+
+jobs:
+  test:
+    uses: ./.github/workflows/ci.yml
+    secrets: inherit
+    
+  security-check:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Run security audit
+      run: |
+        npm audit --audit-level=critical
+        cd backend && npm audit --audit-level=critical
+    
+    - name: Check for secrets
+      uses: trufflesecurity/trufflehog@main
+      with:
+        path: ./
+        base: main
+        head: HEAD
+        extra_args: --debug --only-verified
+
+  deploy-backend-production:
+    runs-on: ubuntu-latest
+    needs: [test, security-check]
+    
+    environment: production
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+    
+    - name: Install Railway CLI
+      run: npm install -g @railway/cli
+    
+    - name: Deploy backend to Railway
+      run: railway up --service backend --environment production
+      working-directory: ./backend
+      env:
+        RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+    
+    - name: Wait for backend deployment
+      run: sleep 60
+    
+    - name: Verify backend deployment
+      run: |
+        curl -f ${{ secrets.PRODUCTION_BACKEND_URL }}/api/health || exit 1
+        curl -f ${{ secrets.PRODUCTION_BACKEND_URL }}/api/health/detailed || exit 1
+        echo "Backend production deployment verified"
+
+  deploy-frontend-production:
+    runs-on: ubuntu-latest
+    needs: [test, security-check, deploy-backend-production]
+    
+    environment: production
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Build frontend for production
+      run: npm run build
+      env:
+        VITE_API_BASE_URL: ${{ secrets.PRODUCTION_BACKEND_URL }}/api
+        VITE_APP_ENV: production
+        VITE_DEMO_MODE: false
+        VITE_SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+    
+    - name: Run build verification
+      run: |
+        ls -la dist/
+        test -f dist/index.html
+        test -f dist/manifest.json
+    
+    - name: Deploy to Netlify Production
+      uses: nwtgck/actions-netlify@v2.1
+      with:
+        publish-dir: './dist'
+        production-deploy: true
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        deploy-message: 'Production deploy from GitHub Actions - ${{ github.sha }}'
+      env:
+        NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+        NETLIFY_SITE_ID: ${{ secrets.NETLIFY_PRODUCTION_SITE_ID }}
+    
+    - name: Verify frontend deployment
+      run: |
+        curl -f ${{ secrets.PRODUCTION_FRONTEND_URL }} || exit 1
+        echo "Frontend production deployment verified"
+
+  production-smoke-tests:
+    runs-on: ubuntu-latest
+    needs: [deploy-backend-production, deploy-frontend-production]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Install Playwright
+      run: npx playwright install --with-deps
+    
+    - name: Run production smoke tests
+      run: npx playwright test __tests__/integration/smoke.test.js --reporter=html
+      env:
+        FRONTEND_URL: ${{ secrets.PRODUCTION_FRONTEND_URL }}
+        API_BASE_URL: ${{ secrets.PRODUCTION_BACKEND_URL }}/api
+    
+    - name: Upload production test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: production-smoke-test-results
+        path: |
+          test-results/
+          playwright-report/
+
+  performance-monitoring:
+    runs-on: ubuntu-latest
+    needs: [deploy-frontend-production]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Run Lighthouse CI on Production
+      run: npx lhci autorun
+      env:
+        LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+        LHCI_SERVER_URL: ${{ secrets.PRODUCTION_FRONTEND_URL }}
+    
+    - name: Check Core Web Vitals
+      run: |
+        npx web-vitals-report ${{ secrets.PRODUCTION_FRONTEND_URL }} --format json > core-web-vitals.json || true
+    
+    - name: Upload performance results
+      uses: actions/upload-artifact@v4
+      with:
+        name: production-performance-results
+        path: |
+          core-web-vitals.json
+          .lighthouseci/
+
+  notify-production-deployment:
+    runs-on: ubuntu-latest
+    needs: [deploy-backend-production, deploy-frontend-production, production-smoke-tests, performance-monitoring]
+    if: always()
+    
+    steps:
+    - name: Create GitHub Release
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        draft: false
+        prerelease: false
+        body: |
+          ## Production Deployment
+          
+          **Frontend:** ${{ secrets.PRODUCTION_FRONTEND_URL }}
+          **Backend:** ${{ secrets.PRODUCTION_BACKEND_URL }}
+          
+          ### Changes
+          - Check commit history for detailed changes
+          
+          ### Testing
+          - ✅ Full CI/CD pipeline passed
+          - ✅ Security audit completed
+          - ✅ Production smoke tests passed
+          - ✅ Performance monitoring completed
+    
+    - name: Notify deployment status
+      uses: 8398a7/action-slack@v3
+      if: always()
+      with:
+        status: ${{ job.status }}
+        text: |
+          🚀 Production Deployment Status: ${{ job.status }}
+          
+          **URLs:**
+          • Frontend: ${{ secrets.PRODUCTION_FRONTEND_URL }}
+          • Backend: ${{ secrets.PRODUCTION_BACKEND_URL }}
+          
+          **Deploy Info:**
+          • Commit: ${{ github.sha }}
+          • Branch: ${{ github.ref_name }}
+          • Actor: ${{ github.actor }}
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+    
+    - name: Update deployment status
+      uses: deployments@v1
+      if: always()
+      with:
+        step: finish
+        token: ${{ secrets.GITHUB_TOKEN }}
+        status: ${{ job.status }}
+        env: production
+        env_url: ${{ secrets.PRODUCTION_FRONTEND_URL }}

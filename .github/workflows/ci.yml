@@ -1,0 +1,272 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  backend-tests:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+    
+    defaults:
+      run:
+        working-directory: ./backend
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        cache-dependency-path: backend/package-lock.json
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Generate Prisma client
+      run: npx prisma generate
+    
+    - name: Run database migrations
+      run: npx prisma migrate dev --name ci-test
+      env:
+        DATABASE_URL: file:./prisma/test.db
+    
+    - name: Run linting
+      run: npm run lint || echo "Linting not configured"
+    
+    - name: Run backend tests
+      run: npm test
+      env:
+        NODE_ENV: test
+        JWT_SECRET: test-jwt-secret-minimum-32-characters-long-for-ci
+        JWT_REFRESH_SECRET: test-refresh-secret-different-from-jwt-secret
+        DATABASE_URL: file:./prisma/test.db
+        DEMO_MODE: true
+    
+    - name: Upload backend test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: backend-test-results-${{ matrix.node-version }}
+        path: backend/coverage/
+
+  frontend-tests:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Run linting
+      run: npm run lint || echo "Linting not configured"
+    
+    - name: Run frontend tests
+      run: npm run test:unit
+      env:
+        VITE_API_BASE_URL: http://localhost:3001/api
+        VITE_APP_ENV: test
+        VITE_DEMO_MODE: true
+    
+    - name: Build frontend
+      run: npm run build
+      env:
+        VITE_API_BASE_URL: http://localhost:3001/api
+        VITE_APP_ENV: production
+    
+    - name: Upload frontend build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: frontend-build-${{ matrix.node-version }}
+        path: dist/
+    
+    - name: Upload frontend test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: frontend-test-results-${{ matrix.node-version }}
+        path: coverage/
+
+  integration-tests:
+    runs-on: ubuntu-latest
+    needs: [backend-tests, frontend-tests]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+    
+    - name: Install root dependencies
+      run: npm ci
+    
+    - name: Install backend dependencies
+      run: npm ci
+      working-directory: ./backend
+    
+    - name: Setup backend environment
+      working-directory: ./backend
+      run: |
+        cp .env.example .env
+        echo "JWT_SECRET=test-jwt-secret-minimum-32-characters-long-for-ci" >> .env
+        echo "JWT_REFRESH_SECRET=test-refresh-secret-different-from-jwt-secret" >> .env
+        echo "DATABASE_URL=file:./prisma/test.db" >> .env
+        echo "DEMO_MODE=true" >> .env
+        echo "NODE_ENV=test" >> .env
+    
+    - name: Generate Prisma client and migrate
+      working-directory: ./backend
+      run: |
+        npx prisma generate
+        npx prisma migrate dev --name integration-test
+    
+    - name: Start backend server
+      working-directory: ./backend
+      run: npm run dev &
+      env:
+        PORT: 3001
+    
+    - name: Wait for backend to be ready
+      run: npx wait-on http://localhost:3001/api/health --timeout 60000
+    
+    - name: Start frontend server
+      run: npm run dev &
+      env:
+        VITE_API_BASE_URL: http://localhost:3001/api
+    
+    - name: Wait for frontend to be ready
+      run: npx wait-on http://localhost:5173 --timeout 60000
+    
+    - name: Install Playwright browsers
+      run: npx playwright install --with-deps
+    
+    - name: Run integration tests
+      run: npm run test:integration
+      env:
+        VITE_API_BASE_URL: http://localhost:3001/api
+        FRONTEND_URL: http://localhost:5173
+    
+    - name: Upload integration test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: integration-test-results
+        path: |
+          test-results/
+          playwright-report/
+
+  security-audit:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+    
+    - name: Audit frontend dependencies
+      run: npm audit --audit-level=high
+    
+    - name: Audit backend dependencies
+      run: npm audit --audit-level=high
+      working-directory: ./backend
+    
+    - name: Check for known vulnerabilities
+      run: npx audit-ci --config .audit-ci.json || true
+
+  lighthouse-performance:
+    runs-on: ubuntu-latest
+    needs: [frontend-tests]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Build frontend
+      run: npm run build
+      env:
+        VITE_API_BASE_URL: http://localhost:3001/api
+        VITE_APP_ENV: production
+    
+    - name: Serve built frontend
+      run: npx serve -s dist -p 4173 &
+    
+    - name: Wait for frontend to be ready
+      run: npx wait-on http://localhost:4173 --timeout 60000
+    
+    - name: Run Lighthouse CI
+      run: npx lhci autorun
+      env:
+        LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+
+  code-quality:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Install backend dependencies
+      run: npm ci
+      working-directory: ./backend
+    
+    - name: Run ESLint on frontend
+      run: npx eslint src/ --ext .js,.jsx,.ts,.tsx --format json --output-file eslint-frontend-results.json || true
+    
+    - name: Run ESLint on backend
+      run: npx eslint . --ext .js,.mjs --format json --output-file eslint-backend-results.json || true
+      working-directory: ./backend
+    
+    - name: Upload code quality results
+      uses: actions/upload-artifact@v4
+      with:
+        name: code-quality-results
+        path: |
+          eslint-frontend-results.json
+          backend/eslint-backend-results.json

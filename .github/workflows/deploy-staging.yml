@@ -1,0 +1,147 @@
+name: Deploy to Staging
+
+on:
+  push:
+    branches: [ develop ]
+  workflow_dispatch:
+    inputs:
+      force_deploy:
+        description: 'Force deployment even if tests fail'
+        required: false
+        default: 'false'
+
+jobs:
+  test:
+    uses: ./.github/workflows/ci.yml
+    secrets: inherit
+    
+  deploy-backend-staging:
+    runs-on: ubuntu-latest
+    needs: test
+    if: success() || github.event.inputs.force_deploy == 'true'
+    
+    environment: staging
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+    
+    - name: Install Railway CLI
+      run: npm install -g @railway/cli
+    
+    - name: Deploy backend to Railway
+      run: railway up --service backend --environment staging
+      working-directory: ./backend
+      env:
+        RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+    
+    - name: Wait for backend deployment
+      run: sleep 30
+    
+    - name: Test backend deployment
+      run: |
+        curl -f ${{ secrets.STAGING_BACKEND_URL }}/api/health || exit 1
+        echo "Backend staging deployment successful"
+
+  deploy-frontend-staging:
+    runs-on: ubuntu-latest
+    needs: [test, deploy-backend-staging]
+    if: success() || github.event.inputs.force_deploy == 'true'
+    
+    environment: staging
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Build frontend for staging
+      run: npm run build
+      env:
+        VITE_API_BASE_URL: ${{ secrets.STAGING_BACKEND_URL }}/api
+        VITE_APP_ENV: staging
+        VITE_DEMO_MODE: false
+    
+    - name: Deploy to Netlify
+      uses: nwtgck/actions-netlify@v2.1
+      with:
+        publish-dir: './dist'
+        production-branch: main
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        deploy-message: 'Deploy from GitHub Actions - ${{ github.sha }}'
+        alias: finance-analyst-pro-staging
+      env:
+        NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+        NETLIFY_SITE_ID: ${{ secrets.NETLIFY_STAGING_SITE_ID }}
+    
+    - name: Test frontend deployment
+      run: |
+        curl -f https://finance-analyst-pro-staging--${{ github.sha }}.netlify.app || exit 1
+        echo "Frontend staging deployment successful"
+
+  staging-smoke-tests:
+    runs-on: ubuntu-latest
+    needs: [deploy-backend-staging, deploy-frontend-staging]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Install Playwright
+      run: npx playwright install --with-deps
+    
+    - name: Run staging smoke tests
+      run: npx playwright test __tests__/integration/smoke.test.js
+      env:
+        FRONTEND_URL: https://finance-analyst-pro-staging--${{ github.sha }}.netlify.app
+        API_BASE_URL: ${{ secrets.STAGING_BACKEND_URL }}/api
+    
+    - name: Upload staging test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: staging-smoke-test-results
+        path: |
+          test-results/
+          playwright-report/
+
+  notify-staging-deployment:
+    runs-on: ubuntu-latest
+    needs: [deploy-backend-staging, deploy-frontend-staging, staging-smoke-tests]
+    if: always()
+    
+    steps:
+    - name: Notify deployment status
+      uses: 8398a7/action-slack@v3
+      if: always()
+      with:
+        status: ${{ job.status }}
+        text: |
+          Staging Deployment Status: ${{ job.status }}
+          Frontend: https://finance-analyst-pro-staging--${{ github.sha }}.netlify.app
+          Backend: ${{ secrets.STAGING_BACKEND_URL }}
+          Commit: ${{ github.sha }}
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
