@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+
 import secureApiClient from '../services/secureApiClient';
 
 const AuthContext = createContext();
@@ -30,7 +31,7 @@ export const AuthProvider = ({ children }) => {
         const userData = JSON.parse(storedUser);
         setUser(userData);
         setIsAuthenticated(true);
-        
+
         // Set up axios interceptor for authentication
         setupAxiosInterceptors();
       }
@@ -61,7 +62,7 @@ export const AuthProvider = ({ children }) => {
       async (error) => {
         if (error.response?.status === 401 && !error.config._retry) {
           error.config._retry = true;
-          
+
           try {
             const refreshToken = localStorage.getItem('refreshToken');
             if (refreshToken) {
@@ -81,7 +82,7 @@ export const AuthProvider = ({ children }) => {
             return Promise.reject(refreshError);
           }
         }
-        
+
         return Promise.reject(error);
       }
     );
@@ -90,18 +91,18 @@ export const AuthProvider = ({ children }) => {
   const login = async (credentials) => {
     try {
       const response = await secureApiClient.post('/auth/login', credentials);
-      
+
       if (response.data.success) {
         const { user: userData, accessToken, refreshToken } = response.data;
-        
+
         localStorage.setItem('accessToken', accessToken);
         localStorage.setItem('refreshToken', refreshToken);
         localStorage.setItem('user', JSON.stringify(userData));
-        
+
         setUser(userData);
         setIsAuthenticated(true);
         setupAxiosInterceptors();
-        
+
         return { success: true, user: userData };
       }
     } catch (error) {
@@ -115,18 +116,18 @@ export const AuthProvider = ({ children }) => {
   const register = async (userData) => {
     try {
       const response = await secureApiClient.post('/auth/register', userData);
-      
+
       if (response.data.success) {
         const { user: newUser, accessToken, refreshToken } = response.data;
-        
+
         localStorage.setItem('accessToken', accessToken);
         localStorage.setItem('refreshToken', refreshToken);
         localStorage.setItem('user', JSON.stringify(newUser));
-        
+
         setUser(newUser);
         setIsAuthenticated(true);
         setupAxiosInterceptors();
-        
+
         return { success: true, user: newUser };
       }
     } catch (error) {
@@ -152,10 +153,10 @@ export const AuthProvider = ({ children }) => {
       localStorage.removeItem('refreshToken');
       localStorage.removeItem('user');
       localStorage.removeItem('rememberMe');
-      
+
       setUser(null);
       setIsAuthenticated(false);
-      
+
       // Clear axios interceptors
       secureApiClient.interceptors.request.clear();
       secureApiClient.interceptors.response.clear();

@@ -1,124 +1,68 @@
-import { Suspense, lazy, useEffect } from 'react';
-import { BrowserRouter, Routes as RouterRoutes, Route, useLocation } from 'react-router-dom';
-
-import ErrorBoundary from './components/ErrorBoundary';
-import ScrollToTop from './components/ScrollToTop';
-import { KeyboardShortcutsProvider } from './components/ui/KeyboardShortcutsProvider';
+import React, { Suspense, lazy } from 'react';
+import { Routes, Route } from 'react-router-dom';
 import LoadingSpinner from './components/ui/LoadingSpinner';
+import MainLayout from './components/ui/MainLayout';
+import NotFound from './pages/NotFound';
 
-// Lazy load pages for code splitting and better performance
-const FinancialModelWorkspace = lazy(() => import('./pages/financial-model-workspace'));
-const Home = lazy(() => import('./pages/Landing'));
-const RealTimeMarketDataCenter = lazy(() => import('./pages/real-time-market-data-center'));
-const ScenarioAnalysisSensitivityTools = lazy(
-  () => import('./pages/scenario-analysis-sensitivity-tools')
-);
-const ValuationTool = lazy(() => import('./components/ValuationTool/ValuationTool'));
-const ValuationToolDocs = lazy(() => import('./components/ValuationTool/ValuationToolDocs'));
-const ValuationToolDemo = lazy(() => import('./pages/valuation-tool-demo'));
+// Lazy load components for better performance
+const Landing = lazy(() => import('./pages/Landing'));
 const PrivateAnalysis = lazy(() => import('./pages/PrivateAnalysis'));
-const ValuationWorkbench = lazy(() => import('./pages/ValuationWorkbench'));
+const Analytics = lazy(() => import('./pages/Analytics'));
 const ModelLab = lazy(() => import('./pages/ModelLab'));
+const ValuationWorkbench = lazy(() => import('./pages/ValuationWorkbench'));
 const PortfolioManagement = lazy(() => import('./pages/PortfolioManagement'));
-const ThesisCanvas = lazy(() => import('./pages/ThesisCanvas'));
-const AdvancedCharting = lazy(() => import('./pages/AdvancedCharting'));
-const MarketAnalysis = lazy(() => import('./pages/MarketAnalysis'));
 const Reports = lazy(() => import('./pages/Reports'));
 const Settings = lazy(() => import('./pages/Settings'));
-const AIInsights = lazy(() => import('./pages/AIInsights'));
-const Analytics = lazy(() => import('./pages/Analytics'));
+const LoginPage = lazy(() => import('./pages/LoginPage'));
+const RegisterPage = lazy(() => import('./pages/RegisterPage'));
 const AdvancedAnalytics = lazy(() => import('./pages/AdvancedAnalytics'));
-const FinancialInputsDemo = lazy(() => import('./components/FinancialInputsDemo'));
-const Models = lazy(() => import('./pages/Models'));
-const App = lazy(() => import('./pages/App'));
-const Data = lazy(() => import('./pages/Data'));
-const Integrations = lazy(() => import('./pages/Integrations'));
-const NotFound = lazy(() => import('./pages/NotFound'));
-const MonitoringDebugPanel = lazy(() => import('./components/MonitoringDebugPanel'));
+const RealtimeDashboard = lazy(() => import('./pages/RealtimeDashboard'));
+const MarketAnalysis = lazy(() => import('./pages/MarketAnalysis'));
+const Security = lazy(() => import('./pages/Security'));
+const Performance = lazy(() => import('./pages/Performance'));
+const Mobile = lazy(() => import('./pages/Mobile'));
 
-// Detect automated/CI environments (Playwright, LHCI, etc.)
-const isAutomatedEnv = (() => {
-  try {
-    const params = new URLSearchParams(window.location.search);
-    return (
-      navigator.webdriver === true || params.has('lhci') || params.has('ci') || params.has('audit')
-    );
-  } catch {
-    return navigator.webdriver === true;
-  }
-})();
+// Demo pages
+const AdvancedAnalyticsDemo = lazy(() => import('./pages/AdvancedAnalyticsDemo'));
+const DataVisualizationDemo = lazy(() => import('./pages/DataVisualizationDemo'));
+const EnhancedChartsDemo = lazy(() => import('./pages/EnhancedChartsDemo'));
 
-// Track route changes for analytics (disabled in automated envs)
-const RouteChangeTracker = () => {
-  const location = useLocation();
-
-  useEffect(() => {
-    const path = location.pathname + (location.search || '');
-    if (isAutomatedEnv) return;
-    // Dynamically import monitoring to avoid side effects during tests
-    import('./utils/monitoring')
-      .then(mod => {
-        if (mod?.default?.trackPageView) {
-          mod.default.trackPageView(path);
-        }
-      })
-      .catch(() => {
-        // Optional analytics; ignore errors in non-critical paths
-      });
-  }, [location.pathname, location.search]);
-
-  return null;
-};
-
-const Routes = () => {
+const AppRoutes = () => {
   return (
-    <BrowserRouter>
-      <ErrorBoundary>
-        <ScrollToTop />
-        <RouteChangeTracker />
-        <KeyboardShortcutsProvider>
-          <Suspense fallback={<LoadingSpinner />}>
-            <RouterRoutes>
-              {/* Define your routes here */}
-              <Route path="/" element={<Home />} />
-              <Route path="/financial-model-workspace" element={<FinancialModelWorkspace />} />
-              <Route path="/real-time-market-data-center" element={<RealTimeMarketDataCenter />} />
-              <Route
-                path="/scenario-analysis-sensitivity-tools"
-                element={<ScenarioAnalysisSensitivityTools />}
-              />
-              <Route path="/valuation-tool" element={<ValuationTool />} />
-              <Route path="/valuation-tool/docs" element={<ValuationToolDocs />} />
-              <Route path="/valuation-tool/demo" element={<ValuationToolDemo />} />
-              <Route path="/valuation-workbench" element={<ValuationWorkbench />} />
-              <Route path="/model-lab" element={<ModelLab />} />
-              <Route path="/advanced-charts" element={<AdvancedCharting />} />
-              <Route path="/market-analysis" element={<MarketAnalysis />} />
-              <Route path="/reports" element={<Reports />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="/ai-insights" element={<AIInsights />} />
-              <Route path="/analytics" element={<Analytics />} />
-              <Route path="/advanced-analytics" element={<AdvancedAnalytics />} />
-              <Route path="/portfolio-management" element={<PortfolioManagement />} />
-              <Route path="/portfolio" element={<PortfolioManagement />} />
-              <Route path="/models" element={<Models />} />
-              <Route path="/app" element={<App />} />
-              <Route path="/data" element={<Data />} />
-              <Route path="/integrations" element={<Integrations />} />
-              <Route path="/canvas" element={<ThesisCanvas />} />
-              <Route path="/private-analysis" element={<PrivateAnalysis />} />
-              <Route path="/financial-inputs-demo" element={<FinancialInputsDemo />} />
-              {(import.meta.env.VITE_ENABLE_DEBUG_MODE === 'true' ||
-                import.meta.env.VITE_APP_ENV !== 'production') && (
-                <Route path="/monitoring-debug" element={<MonitoringDebugPanel />} />
-              )}
-              <Route path="*" element={<NotFound />} />
-            </RouterRoutes>
-          </Suspense>
-        </KeyboardShortcutsProvider>
-      </ErrorBoundary>
-    </BrowserRouter>
+    <Suspense fallback={<LoadingSpinner />}>
+      <Routes>
+        {/* Public routes without layout */}
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+
+        {/* Main layout with AI assistant */}
+        <Route path="/" element={<MainLayout />}>
+          <Route index element={<Landing />} />
+          <Route path="private-analysis" element={<PrivateAnalysis />} />
+          <Route path="analytics" element={<Analytics />} />
+          <Route path="model-lab" element={<ModelLab />} />
+          <Route path="valuation-workbench" element={<ValuationWorkbench />} />
+          <Route path="portfolio" element={<PortfolioManagement />} />
+          <Route path="reports" element={<Reports />} />
+          <Route path="settings" element={<Settings />} />
+          <Route path="advanced-analytics" element={<AdvancedAnalytics />} />
+          <Route path="realtime-dashboard" element={<RealtimeDashboard />} />
+          <Route path="market-analysis" element={<MarketAnalysis />} />
+          <Route path="security" element={<Security />} />
+          <Route path="performance" element={<Performance />} />
+          <Route path="mobile" element={<Mobile />} />
+
+          {/* Demo routes */}
+          <Route path="demos/advanced-analytics" element={<AdvancedAnalyticsDemo />} />
+          <Route path="demos/data-visualization" element={<DataVisualizationDemo />} />
+          <Route path="demos/enhanced-charts" element={<EnhancedChartsDemo />} />
+        </Route>
+
+        {/* Catch-all route for 404 */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </Suspense>
   );
 };
 
-export default Routes;
+export default AppRoutes;

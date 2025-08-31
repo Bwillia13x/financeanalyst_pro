@@ -73,7 +73,12 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
   // Early return if data is not available yet - AFTER all hooks are called
   if (!data || !data.periods || !data.statements) {
     return (
-      <section aria-busy="true" aria-label="Financial Spreadsheet" data-testid="financial-spreadsheet">
+      <section
+        role="main"
+        aria-busy="true"
+        aria-label="Financial Spreadsheet"
+        data-testid="financial-spreadsheet"
+      >
         <div className="bg-slate-900 rounded-lg shadow-lg p-8">
           <div className="text-center text-gray-400">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-4" />
@@ -817,12 +822,13 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
     );
   };
 
-return (
-  <section
-    aria-labelledby="financial-spreadsheet-title"
-    className="bg-slate-900 rounded-lg shadow-lg"
-    data-testid="financial-spreadsheet"
-  >
+  return (
+    <section
+      role="main"
+      aria-labelledby="financial-spreadsheet-title"
+      className="bg-slate-900 rounded-lg shadow-lg"
+      data-testid="financial-spreadsheet"
+    >
       {/* Header */}
       <div className="p-4 sm:p-6 border-b border-slate-700">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -1045,8 +1051,8 @@ return (
           </div>
         </div>
       </div>
-  </section>
-);
+    </section>
+  );
 };
 
 export default FinancialSpreadsheet;

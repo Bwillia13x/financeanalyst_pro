@@ -9,7 +9,9 @@ class MonitoringService {
     this.enableAnalytics = import.meta.env.VITE_ENABLE_ANALYTICS === 'true';
     this.enableErrorReporting = import.meta.env.VITE_ENABLE_ERROR_REPORTING === 'true';
     this.enablePerformanceMonitoring = import.meta.env.VITE_PERFORMANCE_MONITORING === 'true';
-    this.gaTrackingId = null;
+    this.gaTrackingId = import.meta.env.VITE_GA_TRACKING_ID;
+    this.hotjarId = import.meta.env.VITE_HOTJAR_ID;
+    this.sentryDsn = import.meta.env.VITE_SENTRY_DSN;
     this.hotjarLoaded = false;
     this.isInitialized = false;
     // Detect test mode (Vitest/Jest) to avoid initializing monitoring in tests
@@ -28,6 +30,7 @@ class MonitoringService {
       typeof document !== 'undefined'
     ) {
       this.initializeMonitoring();
+      this.initializeProductionMonitoring();
     }
   }
 
@@ -460,6 +463,316 @@ class MonitoringService {
       element,
       ...additionalData
     });
+  }
+
+  /**
+   * ===== ADVANCED PRODUCTION MONITORING FEATURES =====
+   */
+
+  /**
+   * Initialize Sentry error tracking for production
+   */
+  initializeSentry() {
+    if (this.isProduction && this.enableErrorReporting && this.sentryDsn && !this.isTestMode) {
+      try {
+        // Dynamic import to avoid bundling Sentry in development
+        import('@sentry/react')
+          .then(({ init, BrowserTracing, Replay }) => {
+            init({
+              dsn: this.sentryDsn,
+              environment: import.meta.env.MODE,
+              release: import.meta.env.VITE_APP_VERSION || '1.0.0',
+              integrations: [
+                new BrowserTracing({
+                  tracePropagationTargets: ['localhost', /^https:\/\/.*\.financeanalyst\.pro/]
+                }),
+                new Replay({
+                  maskAllText: true,
+                  blockAllMedia: true
+                })
+              ],
+              tracesSampleRate: 0.1,
+              replaysSessionSampleRate: 0.1,
+              replaysOnErrorSampleRate: 1.0,
+              beforeSend: event => {
+                // Sanitize sensitive data
+                if (event.exception) {
+                  event.exception.values = event.exception.values?.map(value => {
+                    if (value.stacktrace) {
+                      value.stacktrace.frames = value.stacktrace.frames?.map(frame => {
+                        // Remove sensitive file paths
+                        if (frame.filename?.includes('api') || frame.filename?.includes('auth')) {
+                          frame.filename = '[REDACTED]';
+                        }
+                        return frame;
+                      });
+                    }
+                    return value;
+                  });
+                }
+                return event;
+              }
+            });
+
+            console.log('Sentry error tracking initialized');
+          })
+          .catch(error => {
+            console.warn('Failed to initialize Sentry:', error);
+          });
+      } catch (error) {
+        console.warn('Sentry initialization failed:', error);
+      }
+    }
+  }
+
+  /**
+   * Track Core Web Vitals
+   */
+  trackCoreWebVitals() {
+    if (this.isProduction && this.enablePerformanceMonitoring && !this.isTestMode) {
+      try {
+        // Dynamic import for web-vitals
+        import('web-vitals')
+          .then(({ getCLS, getFID, getFCP, getLCP, getTTFB }) => {
+            getCLS(metric => {
+              this.trackPerformanceMetric('CLS', metric.value, 'score');
+            });
+
+            getFID(metric => {
+              this.trackPerformanceMetric('FID', metric.value, 'ms');
+            });
+
+            getFCP(metric => {
+              this.trackPerformanceMetric('FCP', metric.value, 'ms');
+            });
+
+            getLCP(metric => {
+              this.trackPerformanceMetric('LCP', metric.value, 'ms');
+            });
+
+            getTTFB(metric => {
+              this.trackPerformanceMetric('TTFB', metric.value, 'ms');
+            });
+
+            console.log('Core Web Vitals tracking initialized');
+          })
+          .catch(error => {
+            console.warn('Failed to initialize Core Web Vitals:', error);
+          });
+      } catch (error) {
+        console.warn('Core Web Vitals initialization failed:', error);
+      }
+    }
+  }
+
+  /**
+   * Monitor long tasks and performance issues
+   */
+  monitorPerformanceIssues() {
+    if (this.isProduction && this.enablePerformanceMonitoring && !this.isTestMode) {
+      try {
+        const observer = new PerformanceObserver(list => {
+          for (const entry of list.getEntries()) {
+            // Track long tasks (>50ms)
+            if (entry.entryType === 'longtask') {
+              this.trackEvent('performance_issue', {
+                type: 'long_task',
+                duration: Math.round(entry.duration),
+                start_time: entry.startTime,
+                name: entry.name
+              });
+
+              console.warn('Long task detected:', entry);
+            }
+
+            // Track navigation timing
+            if (entry.entryType === 'navigation') {
+              const navTiming = entry;
+              this.trackPerformanceMetric(
+                'navigation_timing',
+                {
+                  dom_content_loaded:
+                    navTiming.domContentLoadedEventEnd - navTiming.domContentLoadedEventStart,
+                  load_complete: navTiming.loadEventEnd - navTiming.loadEventStart,
+                  total_time: navTiming.loadEventEnd - navTiming.fetchStart
+                },
+                'ms'
+              );
+            }
+
+            // Track resource loading issues
+            if (entry.entryType === 'resource' && entry.duration > 5000) {
+              this.trackEvent('performance_issue', {
+                type: 'slow_resource',
+                name: entry.name,
+                duration: Math.round(entry.duration),
+                size: entry.transferSize
+              });
+            }
+          }
+        });
+
+        observer.observe({
+          entryTypes: ['longtask', 'navigation', 'resource', 'measure']
+        });
+
+        console.log('Performance monitoring initialized');
+      } catch (error) {
+        console.warn('Performance monitoring initialization failed:', error);
+      }
+    }
+  }
+
+  /**
+   * Track feature usage and adoption
+   */
+  trackFeatureUsage(featureName, action = 'used', metadata = {}) {
+    if (this.enableAnalytics && !this.isTestMode) {
+      this.trackEvent('feature_usage', {
+        feature_name: featureName,
+        action: action,
+        session_id: this.getSessionId(),
+        timestamp: new Date().toISOString(),
+        ...metadata
+      });
+    }
+  }
+
+  /**
+   * Track user journey and funnel analytics
+   */
+  trackUserJourney(step, funnel = 'main', metadata = {}) {
+    if (this.enableAnalytics && !this.isTestMode) {
+      this.trackEvent('user_journey', {
+        step: step,
+        funnel: funnel,
+        session_id: this.getSessionId(),
+        timestamp: new Date().toISOString(),
+        ...metadata
+      });
+    }
+  }
+
+  /**
+   * Monitor application health
+   */
+  performHealthCheck() {
+    const healthStatus = {
+      timestamp: new Date().toISOString(),
+      user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : 'unknown',
+      url: typeof window !== 'undefined' ? window.location.href : 'unknown',
+      viewport:
+        typeof window !== 'undefined' ? `${window.innerWidth}x${window.innerHeight}` : 'unknown',
+      memory_usage:
+        typeof performance !== 'undefined' && performance.memory
+          ? {
+              used: performance.memory.usedJSHeapSize,
+              total: performance.memory.totalJSHeapSize,
+              limit: performance.memory.jsHeapSizeLimit
+            }
+          : null,
+      connection:
+        typeof navigator !== 'undefined' && navigator.connection
+          ? {
+              effective_type: navigator.connection.effectiveType,
+              downlink: navigator.connection.downlink,
+              rtt: navigator.connection.rtt
+            }
+          : null
+    };
+
+    this.trackEvent('health_check', healthStatus);
+
+    // Log to console in development
+    if (!this.isProduction) {
+      console.log('Health Check:', healthStatus);
+    }
+
+    return healthStatus;
+  }
+
+  /**
+   * Track business metrics
+   */
+  trackBusinessMetric(metricName, value, unit = 'count', metadata = {}) {
+    if (this.enableAnalytics && !this.isTestMode) {
+      this.trackEvent('business_metric', {
+        metric_name: metricName,
+        value: value,
+        unit: unit,
+        session_id: this.getSessionId(),
+        timestamp: new Date().toISOString(),
+        ...metadata
+      });
+    }
+  }
+
+  /**
+   * Enhanced error tracking with context
+   */
+  trackError(error, context = {}) {
+    const errorData = {
+      message: error.message,
+      stack: error.stack,
+      name: error.name,
+      timestamp: new Date().toISOString(),
+      url: typeof window !== 'undefined' ? window.location.href : 'unknown',
+      user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : 'unknown',
+      ...context
+    };
+
+    this.trackEvent('error', errorData);
+
+    // Send to Sentry if available
+    if (this.isProduction && window.Sentry) {
+      window.Sentry.captureException(error, {
+        contexts: {
+          custom_context: context,
+          error_data: errorData
+        }
+      });
+    }
+
+    console.error('Error tracked:', errorData);
+  }
+
+  /**
+   * Get or create session ID
+   */
+  getSessionId() {
+    if (typeof window === 'undefined') return null;
+
+    let sessionId = sessionStorage.getItem('fa_session_id');
+    if (!sessionId) {
+      sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      sessionStorage.setItem('fa_session_id', sessionId);
+    }
+    return sessionId;
+  }
+
+  /**
+   * Enhanced initialization with all production features
+   */
+  initializeProductionMonitoring() {
+    if (!this.isInitialized && !this.isTestMode) {
+      // Initialize all production monitoring features
+      this.initializeSentry();
+      this.trackCoreWebVitals();
+      this.monitorPerformanceIssues();
+
+      // Perform initial health check
+      this.performHealthCheck();
+
+      // Set up periodic health checks
+      if (this.isProduction) {
+        setInterval(() => {
+          this.performHealthCheck();
+        }, 300000); // Every 5 minutes
+      }
+
+      this.isInitialized = true;
+      console.log('Production monitoring fully initialized');
+    }
   }
 }
 

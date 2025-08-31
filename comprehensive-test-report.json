@@ -1,0 +1,523 @@
+{
+  "timestamp": "2025-08-30T17:27:32.170Z",
+  "environment": "development",
+  "platform": {
+    "nodeVersion": "v20.19.4",
+    "npmVersion": "10.8.2",
+    "os": "darwin",
+    "arch": "arm64"
+  },
+  "summary": {
+    "totalTests": 1,
+    "passedTests": 0,
+    "failedTests": 0,
+    "skippedTests": 0,
+    "errorTests": 0,
+    "coverage": {
+      "statements": 0,
+      "branches": 0,
+      "functions": 0,
+      "lines": 0
+    },
+    "performance": {
+      "bundleSize": 0,
+      "lighthouseScore": 0,
+      "loadTime": 0
+    },
+    "security": {
+      "vulnerabilities": 0,
+      "severity": "low"
+    }
+  },
+  "sections": [
+    {
+      "title": "Test Execution Summary",
+      "content": {
+        "unitTests": {
+          "frontend": null,
+          "backend": null
+        },
+        "integrationTests": [],
+        "e2eTests": {
+          "playwright": {
+            "reportPath": "/Users/benjaminwilliams/financeanalyst_pro/playwright-report/index.html",
+            "status": "generated"
+          },
+          "custom": []
+        }
+      }
+    },
+    {
+      "title": "Code Coverage Analysis",
+      "content": {
+        "statements": {
+          "total": 0,
+          "covered": 0,
+          "pct": 0
+        },
+        "branches": {
+          "total": 0,
+          "covered": 0,
+          "pct": 0
+        },
+        "functions": {
+          "total": 0,
+          "covered": 0,
+          "pct": 0
+        },
+        "lines": {
+          "total": 0,
+          "covered": 0,
+          "pct": 0
+        }
+      }
+    },
+    {
+      "title": "Performance Metrics",
+      "content": {
+        "loadTesting": {
+          "timestamp": "2025-08-30T14:44:09.226Z",
+          "environment": "development",
+          "tests": [
+            {
+              "name": "API Health Check",
+              "type": "api",
+              "metrics": {
+                "requestsPerSecond": 0,
+                "latency": 0,
+                "errors": 55257
+              },
+              "status": "FAIL"
+            },
+            {
+              "name": "Bundle Size Analysis",
+              "type": "frontend",
+              "metrics": {
+                "totalSize": 6745339,
+                "totalSizeMB": "6.43"
+              },
+              "status": "PASS"
+            },
+            {
+              "name": "Memory Usage Analysis",
+              "type": "system",
+              "metrics": {
+                "rssMB": "111.47",
+                "heapUsedMB": "34.32"
+              },
+              "status": "PASS"
+            }
+          ]
+        },
+        "crossBrowser": {
+          "timestamp": "2025-08-30T14:46:53.967Z",
+          "tests": [
+            {
+              "name": "Home Page - Mobile",
+              "viewport": {
+                "name": "Mobile",
+                "width": 375,
+                "height": 667,
+                "deviceScaleFactor": 2
+              },
+              "url": "http://localhost:3000",
+              "status": "ERROR",
+              "error": "net::ERR_CONNECTION_REFUSED at http://localhost:3000",
+              "timestamp": "2025-08-30T14:47:02.214Z"
+            },
+            {
+              "name": "Private Analysis - Mobile",
+              "viewport": {
+                "name": "Mobile",
+                "width": 375,
+                "height": 667,
+                "deviceScaleFactor": 2
+              },
+              "url": "http://localhost:3000/private-analysis",
+              "status": "ERROR",
+              "error": "net::ERR_CONNECTION_REFUSED at http://localhost:3000/private-analysis",
+              "timestamp": "2025-08-30T14:47:02.924Z"
+            },
+            {
+              "name": "Real-time Dashboard - Mobile",
+              "viewport": {
+                "name": "Mobile",
+                "width": 375,
+                "height": 667,
+                "deviceScaleFactor": 2
+              },
+              "url": "http://localhost:3000/realtime-dashboard",
+              "status": "ERROR",
+              "error": "net::ERR_CONNECTION_REFUSED at http://localhost:3000/realtime-dashboard",
+              "timestamp": "2025-08-30T14:47:03.340Z"
+            },
+            {
+              "name": "Home Page - Tablet",
+              "viewport": {
+                "name": "Tablet",
+                "width": 768,
+                "height": 1024,
+                "deviceScaleFactor": 1
+              },
+              "url": "http://localhost:3000",
+              "status": "ERROR",
+              "error": "net::ERR_CONNECTION_REFUSED at http://localhost:3000",
+              "timestamp": "2025-08-30T14:47:03.614Z"
+            },
+            {
+              "name": "Private Analysis - Tablet",
+              "viewport": {
+                "name": "Tablet",
+                "width": 768,
+                "height": 1024,
+                "deviceScaleFactor": 1
+              },
+              "url": "http://localhost:3000/private-analysis",
+              "status": "ERROR",
+              "error": "net::ERR_CONNECTION_REFUSED at http://localhost:3000/private-analysis",
+              "timestamp": "2025-08-30T14:47:03.873Z"
+            },
+            {
+              "name": "Real-time Dashboard - Tablet",
+              "viewport": {
+                "name": "Tablet",
+                "width": 768,
+                "height": 1024,
+                "deviceScaleFactor": 1
+              },
+              "url": "http://localhost:3000/realtime-dashboard",
+              "status": "ERROR",
+              "error": "net::ERR_CONNECTION_REFUSED at http://localhost:3000/realtime-dashboard",
+              "timestamp": "2025-08-30T14:47:04.026Z"
+            },
+            {
+              "name": "Home Page - Desktop",
+              "viewport": {
+                "name": "Desktop",
+                "width": 1920,
+                "height": 1080,
+                "deviceScaleFactor": 1
+              },
+              "url": "http://localhost:3000",
+              "status": "ERROR",
+              "error": "net::ERR_CONNECTION_REFUSED at http://localhost:3000",
+              "timestamp": "2025-08-30T14:47:04.189Z"
+            },
+            {
+              "name": "Private Analysis - Desktop",
+              "viewport": {
+                "name": "Desktop",
+                "width": 1920,
+                "height": 1080,
+                "deviceScaleFactor": 1
+              },
+              "url": "http://localhost:3000/private-analysis",
+              "status": "ERROR",
+              "error": "net::ERR_CONNECTION_REFUSED at http://localhost:3000/private-analysis",
+              "timestamp": "2025-08-30T14:47:04.351Z"
+            },
+            {
+              "name": "Real-time Dashboard - Desktop",
+              "viewport": {
+                "name": "Desktop",
+                "width": 1920,
+                "height": 1080,
+                "deviceScaleFactor": 1
+              },
+              "url": "http://localhost:3000/realtime-dashboard",
+              "status": "ERROR",
+              "error": "net::ERR_CONNECTION_REFUSED at http://localhost:3000/realtime-dashboard",
+              "timestamp": "2025-08-30T14:47:04.531Z"
+            },
+            {
+              "name": "Home Page - Large Desktop",
+              "viewport": {
+                "name": "Large Desktop",
+                "width": 2560,
+                "height": 1440,
+                "deviceScaleFactor": 1
+              },
+              "url": "http://localhost:3000",
+              "status": "ERROR",
+              "error": "net::ERR_CONNECTION_REFUSED at http://localhost:3000",
+              "timestamp": "2025-08-30T14:47:04.715Z"
+            },
+            {
+              "name": "Private Analysis - Large Desktop",
+              "viewport": {
+                "name": "Large Desktop",
+                "width": 2560,
+                "height": 1440,
+                "deviceScaleFactor": 1
+              },
+              "url": "http://localhost:3000/private-analysis",
+              "status": "ERROR",
+              "error": "net::ERR_CONNECTION_REFUSED at http://localhost:3000/private-analysis",
+              "timestamp": "2025-08-30T14:47:04.892Z"
+            },
+            {
+              "name": "Real-time Dashboard - Large Desktop",
+              "viewport": {
+                "name": "Large Desktop",
+                "width": 2560,
+                "height": 1440,
+                "deviceScaleFactor": 1
+              },
+              "url": "http://localhost:3000/realtime-dashboard",
+              "status": "ERROR",
+              "error": "net::ERR_CONNECTION_REFUSED at http://localhost:3000/realtime-dashboard",
+              "timestamp": "2025-08-30T14:47:05.122Z"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "title": "Security Assessment",
+      "content": {
+        "error": "Command failed: npm audit --json",
+        "status": "failed"
+      }
+    },
+    {
+      "title": "Accessibility Compliance",
+      "content": []
+    }
+  ],
+  "unitTests": {
+    "frontend": null,
+    "backend": null
+  },
+  "integrationTests": [],
+  "e2eTests": {
+    "playwright": {
+      "reportPath": "/Users/benjaminwilliams/financeanalyst_pro/playwright-report/index.html",
+      "status": "generated"
+    },
+    "custom": []
+  },
+  "performance": {
+    "loadTesting": {
+      "timestamp": "2025-08-30T14:44:09.226Z",
+      "environment": "development",
+      "tests": [
+        {
+          "name": "API Health Check",
+          "type": "api",
+          "metrics": {
+            "requestsPerSecond": 0,
+            "latency": 0,
+            "errors": 55257
+          },
+          "status": "FAIL"
+        },
+        {
+          "name": "Bundle Size Analysis",
+          "type": "frontend",
+          "metrics": {
+            "totalSize": 6745339,
+            "totalSizeMB": "6.43"
+          },
+          "status": "PASS"
+        },
+        {
+          "name": "Memory Usage Analysis",
+          "type": "system",
+          "metrics": {
+            "rssMB": "111.47",
+            "heapUsedMB": "34.32"
+          },
+          "status": "PASS"
+        }
+      ]
+    },
+    "crossBrowser": {
+      "timestamp": "2025-08-30T14:46:53.967Z",
+      "tests": [
+        {
+          "name": "Home Page - Mobile",
+          "viewport": {
+            "name": "Mobile",
+            "width": 375,
+            "height": 667,
+            "deviceScaleFactor": 2
+          },
+          "url": "http://localhost:3000",
+          "status": "ERROR",
+          "error": "net::ERR_CONNECTION_REFUSED at http://localhost:3000",
+          "timestamp": "2025-08-30T14:47:02.214Z"
+        },
+        {
+          "name": "Private Analysis - Mobile",
+          "viewport": {
+            "name": "Mobile",
+            "width": 375,
+            "height": 667,
+            "deviceScaleFactor": 2
+          },
+          "url": "http://localhost:3000/private-analysis",
+          "status": "ERROR",
+          "error": "net::ERR_CONNECTION_REFUSED at http://localhost:3000/private-analysis",
+          "timestamp": "2025-08-30T14:47:02.924Z"
+        },
+        {
+          "name": "Real-time Dashboard - Mobile",
+          "viewport": {
+            "name": "Mobile",
+            "width": 375,
+            "height": 667,
+            "deviceScaleFactor": 2
+          },
+          "url": "http://localhost:3000/realtime-dashboard",
+          "status": "ERROR",
+          "error": "net::ERR_CONNECTION_REFUSED at http://localhost:3000/realtime-dashboard",
+          "timestamp": "2025-08-30T14:47:03.340Z"
+        },
+        {
+          "name": "Home Page - Tablet",
+          "viewport": {
+            "name": "Tablet",
+            "width": 768,
+            "height": 1024,
+            "deviceScaleFactor": 1
+          },
+          "url": "http://localhost:3000",
+          "status": "ERROR",
+          "error": "net::ERR_CONNECTION_REFUSED at http://localhost:3000",
+          "timestamp": "2025-08-30T14:47:03.614Z"
+        },
+        {
+          "name": "Private Analysis - Tablet",
+          "viewport": {
+            "name": "Tablet",
+            "width": 768,
+            "height": 1024,
+            "deviceScaleFactor": 1
+          },
+          "url": "http://localhost:3000/private-analysis",
+          "status": "ERROR",
+          "error": "net::ERR_CONNECTION_REFUSED at http://localhost:3000/private-analysis",
+          "timestamp": "2025-08-30T14:47:03.873Z"
+        },
+        {
+          "name": "Real-time Dashboard - Tablet",
+          "viewport": {
+            "name": "Tablet",
+            "width": 768,
+            "height": 1024,
+            "deviceScaleFactor": 1
+          },
+          "url": "http://localhost:3000/realtime-dashboard",
+          "status": "ERROR",
+          "error": "net::ERR_CONNECTION_REFUSED at http://localhost:3000/realtime-dashboard",
+          "timestamp": "2025-08-30T14:47:04.026Z"
+        },
+        {
+          "name": "Home Page - Desktop",
+          "viewport": {
+            "name": "Desktop",
+            "width": 1920,
+            "height": 1080,
+            "deviceScaleFactor": 1
+          },
+          "url": "http://localhost:3000",
+          "status": "ERROR",
+          "error": "net::ERR_CONNECTION_REFUSED at http://localhost:3000",
+          "timestamp": "2025-08-30T14:47:04.189Z"
+        },
+        {
+          "name": "Private Analysis - Desktop",
+          "viewport": {
+            "name": "Desktop",
+            "width": 1920,
+            "height": 1080,
+            "deviceScaleFactor": 1
+          },
+          "url": "http://localhost:3000/private-analysis",
+          "status": "ERROR",
+          "error": "net::ERR_CONNECTION_REFUSED at http://localhost:3000/private-analysis",
+          "timestamp": "2025-08-30T14:47:04.351Z"
+        },
+        {
+          "name": "Real-time Dashboard - Desktop",
+          "viewport": {
+            "name": "Desktop",
+            "width": 1920,
+            "height": 1080,
+            "deviceScaleFactor": 1
+          },
+          "url": "http://localhost:3000/realtime-dashboard",
+          "status": "ERROR",
+          "error": "net::ERR_CONNECTION_REFUSED at http://localhost:3000/realtime-dashboard",
+          "timestamp": "2025-08-30T14:47:04.531Z"
+        },
+        {
+          "name": "Home Page - Large Desktop",
+          "viewport": {
+            "name": "Large Desktop",
+            "width": 2560,
+            "height": 1440,
+            "deviceScaleFactor": 1
+          },
+          "url": "http://localhost:3000",
+          "status": "ERROR",
+          "error": "net::ERR_CONNECTION_REFUSED at http://localhost:3000",
+          "timestamp": "2025-08-30T14:47:04.715Z"
+        },
+        {
+          "name": "Private Analysis - Large Desktop",
+          "viewport": {
+            "name": "Large Desktop",
+            "width": 2560,
+            "height": 1440,
+            "deviceScaleFactor": 1
+          },
+          "url": "http://localhost:3000/private-analysis",
+          "status": "ERROR",
+          "error": "net::ERR_CONNECTION_REFUSED at http://localhost:3000/private-analysis",
+          "timestamp": "2025-08-30T14:47:04.892Z"
+        },
+        {
+          "name": "Real-time Dashboard - Large Desktop",
+          "viewport": {
+            "name": "Large Desktop",
+            "width": 2560,
+            "height": 1440,
+            "deviceScaleFactor": 1
+          },
+          "url": "http://localhost:3000/realtime-dashboard",
+          "status": "ERROR",
+          "error": "net::ERR_CONNECTION_REFUSED at http://localhost:3000/realtime-dashboard",
+          "timestamp": "2025-08-30T14:47:05.122Z"
+        }
+      ]
+    }
+  },
+  "security": {
+    "error": "Command failed: npm audit --json",
+    "status": "failed"
+  },
+  "coverage": {
+    "statements": {
+      "total": 0,
+      "covered": 0,
+      "pct": 0
+    },
+    "branches": {
+      "total": 0,
+      "covered": 0,
+      "pct": 0
+    },
+    "functions": {
+      "total": 0,
+      "covered": 0,
+      "pct": 0
+    },
+    "lines": {
+      "total": 0,
+      "covered": 0,
+      "pct": 0
+    }
+  },
+  "accessibility": []
+}

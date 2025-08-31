@@ -3,11 +3,8 @@
  * Specialized tools for SaaS metrics, platform businesses, and technology company analysis
  */
 
-import { EventEmitter } from 'events';
-
-class TechnologyAnalyticsService extends EventEmitter {
+class TechnologyAnalyticsService {
   constructor() {
-    super();
     this.saasMetrics = {
       benchmarks: {
         monthly_churn: { excellent: 0.02, good: 0.05, poor: 0.1 },
@@ -62,10 +59,10 @@ class TechnologyAnalyticsService extends EventEmitter {
         benchmarking: this.benchmarkAgainstIndustry(saasData)
       };
 
-      this.emit('analysis:completed', { type: 'saas_metrics', analysis });
+      console.log('SaaS metrics analysis completed:', { type: 'saas_metrics', analysis });
       return analysis;
     } catch (error) {
-      this.emit('analysis:error', { type: 'saas_metrics', error });
+      console.error('SaaS metrics analysis failed:', error);
       throw error;
     }
   }
@@ -176,10 +173,10 @@ class TechnologyAnalyticsService extends EventEmitter {
         scaling_analysis: this.analyzeScalingDynamics(platformData)
       };
 
-      this.emit('analysis:completed', { type: 'platform_business', analysis });
+      console.log('Platform business analysis completed:', { type: 'platform_business', analysis });
       return analysis;
     } catch (error) {
-      this.emit('analysis:error', { type: 'platform_business', error });
+      console.error('Platform business analysis failed:', error);
       throw error;
     }
   }

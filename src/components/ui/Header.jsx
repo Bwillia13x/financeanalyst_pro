@@ -16,7 +16,8 @@ import { Link, useLocation } from 'react-router-dom';
 
 import Button from './Button';
 import { useKeyboardShortcutsContext } from './KeyboardShortcutsProvider';
-import SkipLink from './SkipLink';
+import SkipLink, { SkipLinks } from './SkipLink';
+import { ThemeToggle } from './ThemeProvider';
 
 // Using direct lucide-react icons to reduce indirection and runtime work
 const BusinessIntelligenceDashboard = lazy(
@@ -226,7 +227,15 @@ const Header = () => {
 
   return (
     <>
-      <SkipLink />
+      {/* Enhanced Skip Links for WCAG AA Compliance */}
+      <SkipLinks
+        links={[
+          { href: '#main-content', label: 'Skip to main content' },
+          { href: '#navigation', label: 'Skip to navigation' },
+          { href: '#search', label: 'Skip to search' }
+        ]}
+      />
+
       <Suspense fallback={null}>
         {isBiDashboardOpen && (
           <BusinessIntelligenceDashboard
@@ -301,6 +310,9 @@ const Header = () => {
 
           {/* Desktop Right Side */}
           <div className="hidden lg:flex items-center ml-auto space-x-4">
+            {/* Theme Toggle */}
+            <ThemeToggle size="default" variant="ghost" />
+
             {/* Command Palette Trigger */}
             <Button
               variant="ghost"
@@ -489,6 +501,14 @@ const Header = () => {
                       {item.label}
                     </Link>
                   ))}
+                </div>
+              </div>
+
+              {/* Mobile Theme Toggle */}
+              <div className="mt-3">
+                <div className="flex items-center justify-between px-4 py-3 bg-muted rounded-lg">
+                  <span className="text-sm font-medium text-foreground">Theme</span>
+                  <ThemeToggle size="sm" variant="ghost" />
                 </div>
               </div>
 

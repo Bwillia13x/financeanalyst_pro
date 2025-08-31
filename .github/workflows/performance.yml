@@ -1,0 +1,165 @@
+name: Performance Monitoring
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    # Run weekly performance tests
+    - cron: '0 2 * * 1'
+
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Build application
+      run: npm run build
+
+    - name: Start application
+      run: npm run dev &
+      env:
+        CI: true
+
+    - name: Wait for app to be ready
+      run: npx wait-on http://localhost:3000
+
+    - name: Run Lighthouse
+      uses: treosh/lighthouse-ci-action@v10
+      with:
+        urls: |
+          http://localhost:3000
+          http://localhost:3000/private-analysis
+          http://localhost:3000/realtime-dashboard
+        configPath: ./lighthouse.config.js
+        uploadArtifacts: true
+        temporaryPublicStorage: true
+
+    - name: Comment PR with Lighthouse results
+      uses: dorny/test-reporter@v1
+      if: success() && github.event_name == 'pull_request'
+      with:
+        name: Lighthouse Results
+        path: '.lighthouseci/*'
+        reporter: java-junit
+
+  bundle-analysis:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Build application
+      run: npm run build
+
+    - name: Analyze bundle size
+      run: npm run analyze:bundle
+
+    - name: Check bundle budget
+      run: npm run budget:check
+
+    - name: Upload bundle analysis
+      uses: actions/upload-artifact@v4
+      with:
+        name: bundle-analysis
+        path: |
+          dist/
+          bundle-report.json
+          performance-budgets.json
+
+  load-testing:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Build application
+      run: npm run build
+
+    - name: Start application
+      run: npm run dev &
+      env:
+        CI: true
+
+    - name: Wait for app to be ready
+      run: npx wait-on http://localhost:3000
+
+    - name: Run load testing
+      run: node scripts/performance-test.js
+
+    - name: Upload performance results
+      uses: actions/upload-artifact@v4
+      with:
+        name: performance-results
+        path: |
+          performance-report.json
+          cross-browser-report.json
+
+  api-performance:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Start backend server
+      run: cd backend && npm run dev &
+      env:
+        CI: true
+
+    - name: Wait for backend to be ready
+      run: npx wait-on http://localhost:3001/api/health
+
+    - name: Run API load testing
+      run: |
+        npm install --save-dev autocannon
+        npx autocannon -c 10 -d 20 -R 1000 http://localhost:3001/api/health > api-performance.txt
+
+    - name: Upload API performance results
+      uses: actions/upload-artifact@v4
+      with:
+        name: api-performance-results
+        path: api-performance.txt
+

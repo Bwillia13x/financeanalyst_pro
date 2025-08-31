@@ -3,7 +3,68 @@
  * Handles multi-user financial modeling workspaces, live sharing, and real-time sync
  */
 
-import { EventEmitter } from 'events';
+// Browser-compatible EventEmitter implementation
+class EventEmitter {
+  constructor() {
+    this.events = {};
+  }
+
+  on(event, listener) {
+    if (!this.events[event]) {
+      this.events[event] = [];
+    }
+    this.events[event].push(listener);
+    return this;
+  }
+
+  off(event, listener) {
+    if (!this.events[event]) return this;
+
+    const index = this.events[event].indexOf(listener);
+    if (index > -1) {
+      this.events[event].splice(index, 1);
+    }
+    return this;
+  }
+
+  emit(event, ...args) {
+    if (!this.events[event]) return false;
+
+    this.events[event].forEach(listener => {
+      try {
+        listener.apply(this, args);
+      } catch (error) {
+        console.error('Error in event listener:', error);
+      }
+    });
+    return true;
+  }
+
+  once(event, listener) {
+    const onceListener = (...args) => {
+      this.off(event, onceListener);
+      listener.apply(this, args);
+    };
+    return this.on(event, onceListener);
+  }
+
+  removeAllListeners(event) {
+    if (event) {
+      delete this.events[event];
+    } else {
+      this.events = {};
+    }
+    return this;
+  }
+
+  listeners(event) {
+    return this.events[event] || [];
+  }
+
+  listenerCount(event) {
+    return this.listeners(event).length;
+  }
+}
 
 // import { performanceMonitoring } from '../utils/performanceMonitoring'; // Missing module
 

@@ -2,10 +2,12 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { fileURLToPath, URL } from 'node:url'
 import { imageOptimization } from './vite-plugins/imageOptimization.js'
+import { performanceConfig } from './src/config/vite.config.performance.js'
 
 // When running Lighthouse CI in audit mode, we want to build only the minimal audit page
 // and avoid pulling the full app's vendor chunk into the audit entry.
 const isAuditBuild = process.env.VITE_BUILD_TARGET === 'audit'
+const isPerformanceBuild = process.env.VITE_BUILD_MODE === 'performance'
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -40,6 +42,7 @@ export default defineConfig({
         '/Users/benjaminwilliams/local_financepro/financeanalyst_pro',
         '/Users/benjaminwilliams/financeanalyst_pro-1',
         '/Users/benjaminwilliams/valor-ivx-pro(08.17.2025)/financeanalyst_pro',
+        '/Users/benjaminwilliams/financeanalyst_pro',
       ],
     },
     proxy: {
@@ -49,7 +52,24 @@ export default defineConfig({
       },
     },
   },
-  build: {
+  build: isPerformanceBuild ? {
+    // ===== INSTITUTIONAL PERFORMANCE BUILD =====
+    ...performanceConfig.build,
+
+    // Override with existing audit handling
+    rollupOptions: {
+      ...performanceConfig.build.rollupOptions,
+      input: isAuditBuild
+        ? {
+            audit: fileURLToPath(new URL('./audit.html', import.meta.url)),
+          }
+        : {
+            main: fileURLToPath(new URL('./index.html', import.meta.url)),
+            audit: fileURLToPath(new URL('./audit.html', import.meta.url)),
+          }
+    }
+  } : {
+    // ===== STANDARD BUILD =====
     rollupOptions: {
       // Build only the minimal audit page for audit builds; otherwise build both pages
       input: isAuditBuild
@@ -83,7 +103,7 @@ export default defineConfig({
           if (/node_modules\/(react-router|react-router-dom)\//.test(id)) {
             return 'react-router';
           }
-          
+
           // Split chart libraries more granularly
           if (id.includes('recharts')) {
             return 'recharts-vendor';
@@ -91,59 +111,59 @@ export default defineConfig({
           if (id.includes('d3')) {
             return 'd3-vendor';
           }
-          
+
           // Advanced Analytics - separate chunk for new features
           if (id.includes('AdvancedAnalytics') || id.includes('advancedAnalyticsService')) {
             return 'advanced-analytics';
           }
-          
+
           // Let React.lazy drive code-splitting for Private Analysis; no forced manual chunk
-          
+
           // Export libraries - heavy dependencies
           if (id.includes('xlsx') || id.includes('jspdf') || id.includes('jspdf-autotable')) {
             return 'export-vendor';
           }
-          
+
           // Crypto and security libraries
           if (id.includes('crypto-js') || id.includes('bcrypt')) {
             return 'security-vendor';
           }
-          
+
           // OpenAI and AI libraries
           if (id.includes('openai') || id.includes('ai')) {
             return 'ai-vendor';
           }
-          
+
           // Virtualization libraries
           if (id.includes('react-window') || id.includes('react-virtualized')) {
             return 'virtualization-vendor';
           }
-          
+
           // Animation and UI libraries
           if (id.includes('framer-motion') || id.includes('lucide-react')) {
             return 'ui-vendor';
           }
-          
+
           // Data processing libraries
           if (id.includes('axios') || id.includes('date-fns') || id.includes('papaparse')) {
             return 'data-vendor';
           }
-          
+
           // Utility libraries
           if (id.includes('clsx') || id.includes('tailwind-merge') || id.includes('class-variance-authority')) {
             return 'utils-vendor';
           }
-          
+
           // Redux and state management
           if (id.includes('redux') || id.includes('@reduxjs')) {
             return 'state-vendor';
           }
-          
+
           // Monitoring and error tracking
           if (id.includes('sentry') || id.includes('@sentry')) {
             return 'monitoring-vendor';
           }
-          
+
           // Node modules that aren't specifically chunked
           if (id.includes('node_modules')) {
             return 'vendor';

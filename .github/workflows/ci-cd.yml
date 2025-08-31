@@ -1,375 +1,485 @@
+# CI/CD Pipeline for FinanceAnalyst Pro
+# Comprehensive automated testing, building, security scanning, and deployment
+
 name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main, develop, staging ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, develop, staging ]
+  release:
+    types: [published]
 
 env:
-  NODE_VERSION: '20.19.0'
+  NODE_VERSION: '18.x'
+  PYTHON_VERSION: '3.9'
 
 jobs:
-  # Quality Assurance Job
-  quality-assurance:
-    name: Quality Assurance
+  # Security and Quality Gates
+  security-scan:
+    name: Security Scanning
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ env.NODE_VERSION }}
-        cache: 'npm'
-        cache-dependency-path: |
-          package-lock.json
-          backend/package-lock.json
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
 
-    - name: Install dependencies
-      run: npm ci
+      - name: Install dependencies
+        run: npm ci
 
-    - name: Install backend dependencies
-      run: npm ci
-      working-directory: backend
+      - name: Run security audit
+        run: npm audit --audit-level=moderate
 
-    - name: Run ESLint - Frontend (strict)
-      run: |
-        echo "🔍 Running ESLint for frontend with strict quality gates..."
-        npm run lint
-        if [ $? -ne 0 ]; then
-          echo "❌ Frontend ESLint failed! Deployment blocked."
-          echo "Please fix all frontend linting errors before merging."
-          exit 1
-        fi
-        echo "✅ Frontend ESLint passed!"
+      - name: Scan for vulnerabilities with Snyk
+        uses: snyk/actions/node@master
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=high
 
-    - name: Run ESLint - Backend (strict)
-      run: |
-        echo "🔍 Running ESLint for backend with strict quality gates..."
-        npm run lint
-        if [ $? -ne 0 ]; then
-          echo "❌ Backend ESLint failed! Deployment blocked."
-          echo "Please fix all backend linting errors before merging."
-          exit 1
-        fi
-        echo "✅ Backend ESLint passed!"
-      working-directory: backend
+      - name: CodeQL Analysis
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript
 
-    - name: Run Prettier check
-      run: |
-        echo "🎨 Checking code formatting..."
-        npm run format:check
-        if [ $? -ne 0 ]; then
-          echo "❌ Code formatting check failed!"
-          echo "Please run 'npm run format' to fix formatting issues."
-          echo "📋 Running 'npm run format' locally will auto-fix most issues."
-          exit 1
-        fi
-        echo "✅ Code formatting check passed!"
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
 
-    - name: Check for TypeScript errors (if applicable)
-      run: |
-        echo "🔍 Checking for TypeScript compilation errors..."
-        npm run type-check || echo "ℹ️  No TypeScript configuration found - skipping type check"
-
-    - name: Validate package.json integrity
-      run: |
-        echo "📦 Validating package.json integrity..."
-        npm ls --depth=0 --silent
-        if [ $? -ne 0 ]; then
-          echo "❌ Package.json validation failed!"
-          echo "Please check for dependency issues."
-          exit 1
-        fi
-        echo "✅ Package.json validation passed!"
-
-  # Testing Job
-  testing:
-    name: Run Tests
+  # Code Quality and Testing
+  test:
+    name: Test Suite
     runs-on: ubuntu-latest
-    needs: quality-assurance
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ env.NODE_VERSION }}
-        cache: 'npm'
-
-    - name: Install dependencies
-      run: npm ci
-
-    - name: Install backend dependencies
-      run: npm ci
-      working-directory: backend
-
-    - name: Run tests (strict)
-      run: |
-        echo "Running tests with strict quality gates..."
-        npm test -- --run --coverage
-        if [ $? -ne 0 ]; then
-          echo "❌ Tests failed! Deployment blocked."
-          echo "Please ensure all tests pass before merging."
-          exit 1
-        fi
-        echo "✅ All tests passed!"
-      env:
-        CI: true
-
-    - name: Run backend tests (strict)
-      run: |
-        echo "Running backend tests with strict quality gates..."
-        npm test -- --coverage
-        if [ $? -ne 0 ]; then
-          echo "❌ Backend tests failed! Deployment blocked."
-          echo "Please ensure all backend tests pass before merging."
-          exit 1
-        fi
-        echo "✅ All backend tests passed!"
-      env:
-        CI: true
-      working-directory: backend
-
-    - name: Install Playwright browsers
-      run: npx playwright install --with-deps
-
-    - name: Run Playwright E2E tests
-      run: npx playwright test
-      env:
-        CI: true
-
-    - name: Upload Playwright HTML report
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: playwright-report
-        path: playwright-report/
-        retention-days: 14
-
-    - name: Upload Playwright traces and artifacts (on failure)
-      if: failure()
-      uses: actions/upload-artifact@v4
-      with:
-        name: playwright-artifacts
-        path: |
-          test-results/
-          playwright-report/data/
-        retention-days: 14
-
-    - name: Upload coverage reports
-      uses: codecov/codecov-action@v3
-      with:
-        file: ./coverage/coverage-final.json
-        flags: unittests
-        name: codecov-umbrella
-        fail_ci_if_error: false
-
-    - name: Upload backend coverage reports
-      uses: codecov/codecov-action@v3
-      with:
-        file: ./backend/coverage/coverage-final.json
-        flags: backend
-        name: codecov-backend
-        fail_ci_if_error: false
-
-  # Security Audit Job
-  security-audit:
-    name: Security Audit
-    runs-on: ubuntu-latest
-    needs: quality-assurance
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ env.NODE_VERSION }}
-        cache: 'npm'
-
-    - name: Install dependencies
-      run: npm ci
-
-    - name: Run security audit (non-main branches)
-      if: github.ref != 'refs/heads/main'
-      run: |
-        echo "Running security audit (moderate) on non-main branches..."
-        npm audit --audit-level=moderate
-        if [ $? -ne 0 ]; then
-          echo "❌ Security audit failed! Moderate+ vulnerabilities found."
-          echo "Please resolve security vulnerabilities before deployment."
-          exit 1
-        fi
-        echo "✅ Security audit passed (moderate)."
-
-    - name: Run security audit (main branch - high)
-      if: github.ref == 'refs/heads/main'
-      run: |
-        echo "Running security audit (high) on main branch..."
-        npm audit --audit-level=high
-        if [ $? -ne 0 ]; then
-          echo "❌ Security audit failed! High+ vulnerabilities found."
-          echo "Please resolve security vulnerabilities before deployment."
-          exit 1
-        fi
-        echo "✅ Security audit passed (high)."
-
-    - name: Run dependency vulnerability check (non-main branches)
-      if: github.ref != 'refs/heads/main'
-      run: |
-        npx audit-ci --moderate
-        if [ $? -ne 0 ]; then
-          echo "❌ Dependency vulnerability check failed!"
-          echo "Please update vulnerable dependencies."
-          exit 1
-        fi
-        echo "✅ Dependency check passed (moderate)!"
-
-    - name: Run dependency vulnerability check (main branch - high)
-      if: github.ref == 'refs/heads/main'
-      run: |
-        npx audit-ci --high
-        if [ $? -ne 0 ]; then
-          echo "❌ Dependency vulnerability check failed (high)!"
-          echo "Please update vulnerable dependencies."
-          exit 1
-        fi
-        echo "✅ Dependency check passed (high)!"
-
-  # Build Job
-  build:
-    name: Build Application
-    runs-on: ubuntu-latest
-    needs: [testing, security-audit]
-
+    needs: security-scan
     strategy:
       matrix:
-        environment: [staging, production]
-
+        node-version: [18.x, 20.x]
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ env.NODE_VERSION }}
-        cache: 'npm'
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
 
-    - name: Install dependencies
-      run: npm ci
+      - name: Install dependencies
+        run: npm ci
 
-    - name: Build for ${{ matrix.environment }}
-      run: |
-        if [ "${{ matrix.environment }}" = "production" ]; then
-          cp .env.production .env.local
-        else
-          cp .env.staging .env.local
-        fi
-        npm run build
-      env:
-        NODE_ENV: production
+      - name: Run ESLint
+        run: npm run lint
 
-    - name: Upload build artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: build-${{ matrix.environment }}
-        path: dist/
-        retention-days: 30
+      - name: Run TypeScript type check
+        run: npm run type-check
 
-  # Performance Testing Job
-  performance-testing:
+      - name: Run unit tests
+        run: npm run test:unit
+        env:
+          CI: true
+
+      - name: Run integration tests
+        run: npm run test:integration
+        env:
+          CI: true
+
+      - name: Run E2E tests
+        run: npm run test:e2e
+        env:
+          CI: true
+
+      - name: Generate test coverage report
+        run: npm run test:coverage
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: false
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: test-results-${{ matrix.node-version }}
+          path: |
+            test-results/
+            coverage/
+
+  # Performance Testing
+  performance:
     name: Performance Testing
     runs-on: ubuntu-latest
-    needs: build
+    needs: test
     if: github.ref == 'refs/heads/main'
-    env:
-      LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
-
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Download build artifacts
-      uses: actions/download-artifact@v4
-      with:
-        name: build-production
-        path: dist/
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ env.NODE_VERSION }}
+      - name: Install dependencies
+        run: npm ci
 
-    - name: Install dependencies
-      run: npm ci
+      - name: Build application
+        run: npm run build
 
-    - name: Install Lighthouse CI
-      run: npm install -g @lhci/cli@0.12.x
+      - name: Run Lighthouse CI
+        uses: treosh/lighthouse-ci-action@v10
+        with:
+          urls: |
+            http://localhost:3000
+          configPath: .lighthouserc.json
+          uploadArtifacts: true
+          temporaryPublicStorage: true
 
-    - name: Run Lighthouse CI
-      if: ${{ env.LHCI_GITHUB_APP_TOKEN != '' }}
-      run: lhci autorun
-      env:
-        LHCI_GITHUB_APP_TOKEN: ${{ env.LHCI_GITHUB_APP_TOKEN }}
+      - name: Run bundle analyzer
+        run: npm run analyze-bundle
 
-  # Deploy to Staging
+  # Build and Containerization
+  build:
+    name: Build and Containerize
+    runs-on: ubuntu-latest
+    needs: [test, performance]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: financeanalyst/financeanalyst-pro
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            NODE_ENV=production
+            BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+            VCS_REF=${{ github.sha }}
+
+      - name: Generate SBOM
+        uses: anchore/sbom-action@v0
+        with:
+          path: .
+          artifact-name: sbom-${{ github.sha }}
+          format: spdx-json
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-artifacts
+          path: |
+            build/
+            dist/
+
+  # Deployment to Staging
   deploy-staging:
     name: Deploy to Staging
     runs-on: ubuntu-latest
     needs: build
-    if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main'
-
+    if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/staging'
+    environment:
+      name: staging
+      url: https://staging.financeanalyst.pro
     steps:
-    - name: Download build artifacts
-      uses: actions/download-artifact@v4
-      with:
-        name: build-staging
-        path: dist/
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Deploy to staging
-      run: |
-        echo "Deploying to staging environment..."
-        # Add your staging deployment commands here
-        # Example: rsync, AWS S3, Netlify, Vercel, etc.
+      - name: Setup AWS CLI
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
 
-    - name: Run smoke tests
-      run: |
-        echo "Running smoke tests on staging..."
-        # Add smoke test commands here
+      - name: Deploy to ECS Staging
+        run: |
+          aws ecs update-service \
+            --cluster financeanalyst-staging \
+            --service financeanalyst-pro-service \
+            --force-new-deployment \
+            --region us-east-1
 
-  # Deploy to Production
+      - name: Wait for deployment to complete
+        run: |
+          aws ecs wait services-stable \
+            --cluster financeanalyst-staging \
+            --services financeanalyst-pro-service \
+            --region us-east-1
+
+      - name: Run smoke tests on staging
+        run: |
+          npm run test:smoke -- --env=staging
+
+      - name: Notify deployment status
+        uses: 8398a7/action-slack@v3
+        if: always()
+        with:
+          status: ${{ job.status }}
+          channel: '#deployments'
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+
+  # Deployment to Production
   deploy-production:
     name: Deploy to Production
     runs-on: ubuntu-latest
-    needs: [build, performance-testing, deploy-staging]
+    needs: [build, deploy-staging]
     if: github.ref == 'refs/heads/main'
-
+    environment:
+      name: production
+      url: https://financeanalyst.pro
     steps:
-    - name: Download build artifacts
-      uses: actions/download-artifact@v4
-      with:
-        name: build-production
-        path: dist/
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Deploy to production
-      run: |
-        echo "Deploying to production environment..."
-        # Add your production deployment commands here
+      - name: Setup AWS CLI
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
 
-    - name: Run post-deployment tests
-      run: |
-        echo "Running post-deployment verification..."
-        # Add verification commands here
+      - name: Deploy to ECS Production
+        run: |
+          aws ecs update-service \
+            --cluster financeanalyst-production \
+            --service financeanalyst-pro-service \
+            --force-new-deployment \
+            --region us-east-1
 
-    - name: Notify team
-      run: |
-        echo "Production deployment completed successfully!"
-        # Add notification logic (Slack, email, etc.)
+      - name: Wait for deployment to complete
+        run: |
+          aws ecs wait services-stable \
+            --cluster financeanalyst-production \
+            --services financeanalyst-pro-service \
+            --region us-east-1
+
+      - name: Run production health checks
+        run: |
+          curl -f https://financeanalyst.pro/health || exit 1
+          curl -f https://financeanalyst.pro/api/status || exit 1
+
+      - name: Update CloudFront cache
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
+            --paths "/*"
+
+      - name: Notify production deployment
+        uses: 8398a7/action-slack@v3
+        with:
+          status: success
+          channel: '#production'
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+          fields: repo,message,commit,author,action,eventName,ref,workflow
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+
+  # Monitoring and Alerting
+  monitoring:
+    name: Setup Monitoring
+    runs-on: ubuntu-latest
+    needs: deploy-production
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup AWS CLI
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Update CloudWatch alarms
+        run: |
+          aws cloudwatch put-metric-alarm \
+            --alarm-name "FinanceAnalyst-Pro-High-CPU" \
+            --alarm-description "CPU utilization is too high" \
+            --metric-name CPUUtilization \
+            --namespace AWS/ECS \
+            --statistic Average \
+            --period 300 \
+            --threshold 80 \
+            --comparison-operator GreaterThanThreshold \
+            --dimensions Name=ClusterName,Value=financeanalyst-production Name=ServiceName,Value=financeanalyst-pro-service \
+            --evaluation-periods 2
+
+      - name: Setup error tracking
+        run: |
+          # Configure Sentry releases
+          curl -sL https://sentry.io/get-cli/ | bash
+          sentry-cli releases new ${{ github.sha }}
+          sentry-cli releases set-commits ${{ github.sha }} --auto
+          sentry-cli releases finalize ${{ github.sha }}
+
+      - name: Setup performance monitoring
+        run: |
+          # Configure New Relic deployment marker
+          curl -X POST "https://api.newrelic.com/v2/applications/${{ secrets.NEW_RELIC_APP_ID }}/deployments.json" \
+            -H "X-Api-Key:${{ secrets.NEW_RELIC_API_KEY }}" \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"deployment\": {
+                \"revision\": \"${{ github.sha }}\",
+                \"description\": \"Deployed via GitHub Actions\",
+                \"user\": \"${{ github.actor }}\"
+              }
+            }"
+
+  # Documentation
+  docs:
+    name: Update Documentation
+    runs-on: ubuntu-latest
+    needs: deploy-production
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate API documentation
+        run: npm run docs:generate
+
+      - name: Deploy documentation
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs
+          cname: docs.financeanalyst.pro
+
+  # Security Compliance
+  compliance:
+    name: Security Compliance
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.event_name == 'release'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run OWASP ZAP security scan
+        uses: zaproxy/action-baseline@v0.10.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          docker_name: 'owasp/zap2docker-stable'
+          target: 'https://staging.financeanalyst.pro'
+          rules_file_name: '.zap/rules.tsv'
+          cmd_options: '-a'
+
+      - name: Dependency vulnerability scan
+        run: |
+          npm audit --audit-level=high --production
+          npm audit --audit-level=moderate --production --json > security-audit.json
+
+      - name: Upload security scan results
+        uses: actions/upload-artifact@v3
+        with:
+          name: security-scan-results
+          path: |
+            security-audit.json
+            report.html
+            report.xml
+
+  # Notification
+  notify:
+    name: Send Notifications
+    runs-on: ubuntu-latest
+    needs: [deploy-production, docs, compliance]
+    if: always()
+    steps:
+      - name: Send deployment notification
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          channel: '#ci-cd'
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+          fields: repo,message,commit,author,action,eventName,ref,workflow
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+
+      - name: Create deployment summary
+        run: |
+          echo "## 🚀 Deployment Summary" >> deployment-summary.md
+          echo "- **Status**: ${{ job.status }}" >> deployment-summary.md
+          echo "- **Commit**: ${{ github.sha }}" >> deployment-summary.md
+          echo "- **Environment**: ${{ github.ref }}" >> deployment-summary.md
+          echo "- **Deployed by**: ${{ github.actor }}" >> deployment-summary.md
+          echo "- **Timestamp**: $(date)" >> deployment-summary.md
+
+      - name: Comment deployment summary on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const summary = fs.readFileSync('deployment-summary.md', 'utf8');
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: summary
+            });

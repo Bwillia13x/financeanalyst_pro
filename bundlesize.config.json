@@ -1,0 +1,24 @@
+{
+  "files": [
+    {
+      "path": "./dist/assets/*.js",
+      "maxSize": "6MB"
+    },
+    {
+      "path": "./dist/assets/vendor*.js",
+      "maxSize": "3MB"
+    },
+    {
+      "path": "./dist/assets/*.css",
+      "maxSize": "200KB"
+    }
+  ],
+  "ci": {
+    "trackBranches": [
+      "main",
+      "master"
+    ],
+    "repoBranchBase": "main",
+    "repoCurrentBranch": "HEAD"
+  }
+}

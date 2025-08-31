@@ -5,6 +5,7 @@ import SEOHead from '../../components/SEO/SEOHead';
 import Button from '../../components/ui/Button';
 import Header from '../../components/ui/Header';
 import { useKeyboardShortcutsContext } from '../../components/ui/KeyboardShortcutsProvider';
+import CollaborativeEditor from '../../components/Collaboration/CollaborativeEditor';
 
 // Lazy-load heavy panels to reduce initial TBT
 const AuditTrail = lazy(() => import('./components/AuditTrail'));
@@ -19,6 +20,9 @@ const FinancialModelWorkspace = () => {
   // Default to a lighter panel by default; load Terminal on demand
   const [leftPanelContent, setLeftPanelContent] = useState('variables');
   const [rightPanelContent, setRightPanelContent] = useState('results');
+  const [isCollaborationEnabled, setIsCollaborationEnabled] = useState(false);
+  const [currentUserId] = useState(`user_${Date.now()}`);
+  const [documentId] = useState(`model_${Date.now()}`);
   const [modelState] = useState({
     name: 'DCF_Analysis_v2.3',
     saved: true,
@@ -230,6 +234,18 @@ const FinancialModelWorkspace = () => {
           </div>
 
           <div className="flex items-center space-x-2">
+            {/* Collaboration Toggle */}
+            <Button
+              variant={isCollaborationEnabled ? 'primary' : 'ghost'}
+              size="sm"
+              onClick={() => setIsCollaborationEnabled(!isCollaborationEnabled)}
+              aria-label="Toggle collaboration mode"
+              title="Enable/disable real-time collaboration"
+            >
+              <Icon name="Users" className="w-4 h-4 mr-2" />
+              {isCollaborationEnabled ? 'Collaborating' : 'Collaborate'}
+            </Button>
+
             {/* Layout Controls */}
             <div className="flex items-center space-x-1 bg-gray-700 rounded-lg p-1">
               <Button
@@ -297,6 +313,40 @@ const FinancialModelWorkspace = () => {
             </div>
           )}
         </div>
+
+        {/* Collaborative Editor Overlay */}
+        {isCollaborationEnabled && (
+          <div className="absolute top-20 right-4 w-80 h-96 z-50">
+            <div className="bg-gray-800 border border-gray-600 rounded-lg shadow-xl h-full">
+              <div className="flex items-center justify-between p-3 border-b border-gray-600">
+                <div className="flex items-center space-x-2">
+                  <Icon name="Users" className="w-4 h-4 text-blue-400" />
+                  <span className="text-sm font-medium">Live Collaboration</span>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setIsCollaborationEnabled(false)}
+                  className="p-1"
+                >
+                  <Icon name="X" className="w-4 h-4" />
+                </Button>
+              </div>
+              <div className="p-3 h-full overflow-hidden">
+                <CollaborativeEditor
+                  documentId={documentId}
+                  userId={currentUserId}
+                  initialContent={{
+                    variables: {},
+                    formulas: {},
+                    results: {},
+                    lastModified: new Date()
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );

@@ -1,9 +1,10 @@
 [build]
   publish = "dist"
-  command = "npm run build"
+  command = "npm run build:prod"
 
 [build.environment]
   NODE_VERSION = "20.19.0"
+  NPM_FLAGS = "--prefer-offline"
 
 [[redirects]]
   from = "/*"

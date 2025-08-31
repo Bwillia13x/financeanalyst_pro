@@ -1,6 +1,6 @@
 // Export & Sharing Features - Phase 2 Implementation
 import jsPDF from 'jspdf';
-import * as XLSX from 'xlsx';
+import XLSX from '../utils/exceljs-compat.js';
 
 export class ExportSharingService {
   constructor() {

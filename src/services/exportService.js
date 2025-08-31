@@ -4,7 +4,7 @@
  */
 
 import jsPDF from 'jspdf';
-import * as XLSX from 'xlsx';
+import XLSX from '../utils/exceljs-compat.js';
 import 'jspdf-autotable';
 
 class ExportService {

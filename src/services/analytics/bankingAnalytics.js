@@ -3,11 +3,8 @@
  * Specialized tools for credit portfolio analysis, investment banking, and regulatory compliance
  */
 
-import { EventEmitter } from 'events';
-
-class BankingAnalyticsService extends EventEmitter {
+class BankingAnalyticsService {
   constructor() {
-    super();
     this.regulatoryFrameworks = {
       basel3: {
         riskWeights: {
@@ -45,10 +42,10 @@ class BankingAnalyticsService extends EventEmitter {
         stress_test_results: await this.runStressTests(portfolioData)
       };
 
-      this.emit('analysis:completed', { type: 'credit_portfolio', analysis });
+      console.log('Credit portfolio analysis completed:', { type: 'credit_portfolio', analysis });
       return analysis;
     } catch (error) {
-      this.emit('analysis:error', { type: 'credit_portfolio', error });
+      console.error('Credit portfolio analysis failed:', error);
       throw error;
     }
   }
@@ -188,7 +185,7 @@ class BankingAnalyticsService extends EventEmitter {
       risk_assessment: this.assessTransactionRisks(transactionData)
     };
 
-    this.emit('analysis:completed', { type: 'ma_transaction', analysis });
+    console.log('M&A transaction analysis completed:', { type: 'ma_transaction', analysis });
     return analysis;
   }
 
@@ -214,7 +211,7 @@ class BankingAnalyticsService extends EventEmitter {
       mid: valuations.reduce((sum, v) => sum + v, 0) / valuations.length
     };
 
-    this.emit('analysis:completed', { type: 'ipo_valuation', valuation });
+    console.log('IPO valuation analysis completed:', { type: 'ipo_valuation', valuation });
     return valuation;
   }
 

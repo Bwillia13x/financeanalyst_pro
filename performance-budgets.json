@@ -1,113 +1,332 @@
 {
-  "budgets": [
-    {
-      "path": "/*",
-      "timings": [
+  "name": "FinanceAnalyst Pro - Institutional Performance Budgets",
+  "version": "1.0.0",
+  "description": "Institutional-grade performance budgets for FinanceAnalyst Pro platform",
+  "budgets": {
+    "bundle": {
+      "description": "JavaScript bundle size budgets",
+      "budgets": [
         {
-          "metric": "first-contentful-paint",
-          "budget": 1800
+          "name": "main-bundle",
+          "resourceType": "bundle",
+          "budget": {
+            "size": "32kb",
+            "compression": "gzip"
+          },
+          "severity": "error",
+          "description": "Main application bundle must stay under 32kb gzipped"
         },
         {
-          "metric": "largest-contentful-paint",
-          "budget": 2500
+          "name": "vendor-bundle",
+          "resourceType": "bundle",
+          "budget": {
+            "size": "100kb",
+            "compression": "gzip"
+          },
+          "severity": "warning",
+          "description": "Vendor bundle should stay under 100kb gzipped"
         },
         {
-          "metric": "speed-index",
-          "budget": 3400
-        },
-        {
-          "metric": "interactive",
-          "budget": 3800
-        },
-        {
-          "metric": "first-meaningful-paint",
-          "budget": 2000
-        }
-      ],
-      "resourceSizes": [
-        {
-          "resourceType": "script",
-          "budget": 1024
-        },
-        {
-          "resourceType": "stylesheet",
-          "budget": 100
-        },
-        {
-          "resourceType": "image",
-          "budget": 500
-        },
-        {
-          "resourceType": "media",
-          "budget": 200
-        },
-        {
-          "resourceType": "font",
-          "budget": 150
-        },
-        {
-          "resourceType": "document",
-          "budget": 50
-        },
-        {
-          "resourceType": "other",
-          "budget": 200
-        },
-        {
-          "resourceType": "total",
-          "budget": 2048
-        }
-      ],
-      "resourceCounts": [
-        {
-          "resourceType": "script",
-          "budget": 30
-        },
-        {
-          "resourceType": "stylesheet",
-          "budget": 10
-        },
-        {
-          "resourceType": "image",
-          "budget": 25
-        },
-        {
-          "resourceType": "font",
-          "budget": 8
-        },
-        {
-          "resourceType": "total",
-          "budget": 100
+          "name": "total-js",
+          "resourceType": "bundle",
+          "budget": {
+            "size": "200kb",
+            "compression": "gzip"
+          },
+          "severity": "error",
+          "description": "Total JavaScript should not exceed 200kb gzipped"
         }
       ]
     },
-    {
-      "path": "/private-analysis",
-      "comment": "Private analysis page has heavier charts, allow more JS",
-      "resourceSizes": [
+    "css": {
+      "description": "CSS bundle size budgets",
+      "budgets": [
         {
-          "resourceType": "script",
-          "budget": 1536
+          "name": "main-css",
+          "resourceType": "stylesheet",
+          "budget": {
+            "size": "15kb",
+            "compression": "gzip"
+          },
+          "severity": "error",
+          "description": "Main CSS bundle must stay under 15kb gzipped"
         },
         {
-          "resourceType": "total",
-          "budget": 2560
+          "name": "tailwind-css",
+          "resourceType": "stylesheet",
+          "budget": {
+            "size": "50kb",
+            "compression": "gzip"
+          },
+          "severity": "warning",
+          "description": "Tailwind CSS should stay under 50kb gzipped"
         }
       ]
     },
-    {
-      "path": "/valuation-tool",
-      "comment": "Valuation tool needs financial libraries",
-      "resourceSizes": [
+    "assets": {
+      "description": "Asset size budgets",
+      "budgets": [
         {
-          "resourceType": "script",
-          "budget": 1280
+          "name": "images",
+          "resourceType": "image",
+          "budget": {
+            "size": "100kb",
+            "count": 10
+          },
+          "severity": "warning",
+          "description": "Total images should not exceed 100kb with max 10 files"
         },
         {
-          "resourceType": "total",
-          "budget": 2304
+          "name": "fonts",
+          "resourceType": "font",
+          "budget": {
+            "size": "50kb",
+            "count": 2
+          },
+          "severity": "error",
+          "description": "Fonts should not exceed 50kb with max 2 files"
+        }
+      ]
+    },
+    "performance": {
+      "description": "Core Web Vitals and performance budgets",
+      "budgets": [
+        {
+          "name": "first-contentful-paint",
+          "metric": "FCP",
+          "budget": {
+            "value": 1800,
+            "unit": "ms"
+          },
+          "severity": "error",
+          "description": "First Contentful Paint must be under 1.8 seconds"
+        },
+        {
+          "name": "largest-contentful-paint",
+          "metric": "LCP",
+          "budget": {
+            "value": 2500,
+            "unit": "ms"
+          },
+          "severity": "error",
+          "description": "Largest Contentful Paint must be under 2.5 seconds"
+        },
+        {
+          "name": "first-input-delay",
+          "metric": "FID",
+          "budget": {
+            "value": 100,
+            "unit": "ms"
+          },
+          "severity": "error",
+          "description": "First Input Delay must be under 100ms"
+        },
+        {
+          "name": "cumulative-layout-shift",
+          "metric": "CLS",
+          "budget": {
+            "value": 0.1,
+            "unit": "score"
+          },
+          "severity": "warning",
+          "description": "Cumulative Layout Shift should be under 0.1"
+        },
+        {
+          "name": "interaction-to-next-paint",
+          "metric": "INP",
+          "budget": {
+            "value": 200,
+            "unit": "ms"
+          },
+          "severity": "warning",
+          "description": "Interaction to Next Paint should be under 200ms"
+        },
+        {
+          "name": "time-to-first-byte",
+          "metric": "TTFB",
+          "budget": {
+            "value": 800,
+            "unit": "ms"
+          },
+          "severity": "warning",
+          "description": "Time to First Byte should be under 800ms"
+        }
+      ]
+    },
+    "accessibility": {
+      "description": "Accessibility performance budgets",
+      "budgets": [
+        {
+          "name": "contrast-ratio",
+          "metric": "contrast",
+          "budget": {
+            "value": 4.5,
+            "unit": "ratio"
+          },
+          "severity": "error",
+          "description": "Color contrast ratio must be at least 4.5:1 for normal text"
+        },
+        {
+          "name": "large-text-contrast",
+          "metric": "contrast-large",
+          "budget": {
+            "value": 3.0,
+            "unit": "ratio"
+          },
+          "severity": "error",
+          "description": "Color contrast ratio must be at least 3:1 for large text"
+        },
+        {
+          "name": "keyboard-navigation",
+          "metric": "keyboard",
+          "budget": {
+            "value": 100,
+            "unit": "percent"
+          },
+          "severity": "error",
+          "description": "100% of interactive elements must be keyboard accessible"
+        }
+      ]
+    },
+    "loading": {
+      "description": "Loading performance budgets",
+      "budgets": [
+        {
+          "name": "bundle-loading",
+          "metric": "bundle-load",
+          "budget": {
+            "value": 3000,
+            "unit": "ms"
+          },
+          "severity": "warning",
+          "description": "Initial bundle should load within 3 seconds"
+        },
+        {
+          "name": "component-loading",
+          "metric": "component-load",
+          "budget": {
+            "value": 1000,
+            "unit": "ms"
+          },
+          "severity": "warning",
+          "description": "Lazy-loaded components should load within 1 second"
+        },
+        {
+          "name": "critical-path",
+          "metric": "critical-path",
+          "budget": {
+            "value": 2000,
+            "unit": "ms"
+          },
+          "severity": "error",
+          "description": "Critical rendering path should complete within 2 seconds"
         }
       ]
     }
-  ]
+  },
+  "environments": {
+    "development": {
+      "description": "Development environment budgets (more lenient)",
+      "multipliers": {
+        "bundle": 1.5,
+        "performance": 2.0,
+        "loading": 1.5
+      }
+    },
+    "staging": {
+      "description": "Staging environment budgets (production-like)",
+      "multipliers": {
+        "bundle": 1.1,
+        "performance": 1.2,
+        "loading": 1.1
+      }
+    },
+    "production": {
+      "description": "Production environment budgets (strict)",
+      "multipliers": {
+        "bundle": 1.0,
+        "performance": 1.0,
+        "loading": 1.0
+      }
+    }
+  },
+  "monitoring": {
+    "enabled": true,
+    "metrics": [
+      "bundle-size",
+      "load-time",
+      "core-web-vitals",
+      "accessibility-score",
+      "error-rate",
+      "user-satisfaction"
+    ],
+    "alerts": {
+      "bundle-size-increase": {
+        "threshold": "10%",
+        "severity": "warning"
+      },
+      "performance-regression": {
+        "threshold": "100ms",
+        "severity": "error"
+      },
+      "accessibility-decline": {
+        "threshold": "5%",
+        "severity": "error"
+      }
+    },
+    "reporting": {
+      "frequency": "daily",
+      "destinations": ["console", "analytics", "monitoring-dashboard"],
+      "retention": "90d"
+    }
+  },
+  "optimization": {
+    "strategies": {
+      "code-splitting": {
+        "enabled": true,
+        "threshold": "50kb",
+        "strategy": "dynamic-import"
+      },
+      "tree-shaking": {
+        "enabled": true,
+        "aggressive": true
+      },
+      "compression": {
+        "enabled": true,
+        "algorithms": ["gzip", "brotli"]
+      },
+      "caching": {
+        "enabled": true,
+        "strategy": "content-hash",
+        "max-age": "1y"
+      },
+      "preload": {
+        "enabled": true,
+        "priority": "high",
+        "resources": ["critical-css", "main-bundle", "key-components"]
+      }
+    },
+    "targets": {
+      "mobile": {
+        "bundle-size": "150kb",
+        "lighthouse-score": 90
+      },
+      "desktop": {
+        "bundle-size": "200kb",
+        "lighthouse-score": 95
+      },
+      "slow-3g": {
+        "load-time": "5000ms",
+        "lighthouse-score": 70
+      }
+    }
+  },
+  "metadata": {
+    "created": "2024-01-01T00:00:00Z",
+    "updated": "2024-01-01T00:00:00Z",
+    "author": "FinanceAnalyst Pro Performance Team",
+    "version": "1.0.0",
+    "standards": ["WCAG 2.1 AA", "Core Web Vitals", "Lighthouse Best Practices"],
+    "review-cycle": "monthly"
+  }
 }

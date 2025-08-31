@@ -1,3 +1,11 @@
+@import './dark-mode.css';
+@import './spacing-system.css';
+@import './animation-system.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 body {
   margin: 0;
   padding: 0;

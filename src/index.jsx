@@ -1,23 +1,34 @@
+import React from 'react';
 import { createRoot } from 'react-dom/client';
-import { Provider } from 'react-redux';
-
+import { BrowserRouter } from 'react-router-dom';
 import App from './App';
-import ProductionErrorBoundary from './components/ErrorBoundary/ProductionErrorBoundary';
-import { store } from './store/store';
+import { initializePerformanceMonitoring } from './utils/performanceMonitoring';
 import { initializeSecurity } from './utils/securityHeaders';
-import { initializePWA, unregisterSW } from './utils/serviceWorker';
-import './styles/tailwind.css';
-import './styles/index.css';
+import PWAService from './utils/pwaService';
+import { unregisterSW } from './utils/serviceWorker';
+import analytics, { trackFeatureAccess, trackUserJourney } from './utils/analytics';
 
 const container = document.getElementById('root');
 const root = createRoot(container);
 
+// Initialize performance monitoring
+initializePerformanceMonitoring();
+
+// Initialize analytics
+analytics.initializeAnalytics();
+
+// Track app initialization
+trackUserJourney('app_initialized', {
+  userAgent: navigator.userAgent,
+  timestamp: new Date().toISOString(),
+  url: window.location.href
+});
+
+// Render the application with routing
 root.render(
-  <ProductionErrorBoundary level="app">
-    <Provider store={store}>
-      <App />
-    </Provider>
-  </ProductionErrorBoundary>
+  <BrowserRouter>
+    <App />
+  </BrowserRouter>
 );
 
 // Detect automated/CI environments (e.g., Playwright, LHCI)
@@ -36,8 +47,9 @@ const isAutomatedEnv = (() => {
 const securityNonce = initializeSecurity();
 
 // Initialize PWA features only outside development to avoid HMR/cache interference
+const pwaService = new PWAService();
 if (!import.meta.env.DEV) {
-  initializePWA();
+  pwaService.init();
 } else {
   // Ensure any previously registered service workers are removed during dev
   try {

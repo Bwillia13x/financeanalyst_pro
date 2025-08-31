@@ -3,11 +3,8 @@
  * Specialized tools for property valuation, REIT analysis, and real estate investment modeling
  */
 
-import { EventEmitter } from 'events';
-
-class RealEstateAnalyticsService extends EventEmitter {
+class RealEstateAnalyticsService {
   constructor() {
-    super();
     this.propertyTypes = {
       office: { typical_cap_rate: 0.06, vacancy_rate: 0.12, expense_ratio: 0.35 },
       retail: { typical_cap_rate: 0.065, vacancy_rate: 0.08, expense_ratio: 0.3 },
@@ -42,10 +39,13 @@ class RealEstateAnalyticsService extends EventEmitter {
         investment_metrics: this.calculateInvestmentMetrics(propertyData)
       };
 
-      this.emit('analysis:completed', { type: 'property_valuation', analysis });
+      console.log('Property valuation analysis completed:', {
+        type: 'property_valuation',
+        analysis
+      });
       return analysis;
     } catch (error) {
-      this.emit('analysis:error', { type: 'property_valuation', error });
+      console.error('Property valuation analysis failed:', error);
       throw error;
     }
   }
@@ -158,10 +158,10 @@ class RealEstateAnalyticsService extends EventEmitter {
         sector_analysis: this.performSectorAnalysis(reitData)
       };
 
-      this.emit('analysis:completed', { type: 'reit_analysis', analysis });
+      console.log('REIT analysis completed:', { type: 'reit_analysis', analysis });
       return analysis;
     } catch (error) {
-      this.emit('analysis:error', { type: 'reit_analysis', error });
+      console.error('REIT analysis failed:', error);
       throw error;
     }
   }
@@ -256,7 +256,10 @@ class RealEstateAnalyticsService extends EventEmitter {
       return_metrics: this.calculateDevelopmentReturns(projectData)
     };
 
-    this.emit('analysis:completed', { type: 'development_project', development });
+    console.log('Development project analysis completed:', {
+      type: 'development_project',
+      development
+    });
     return development;
   }
 

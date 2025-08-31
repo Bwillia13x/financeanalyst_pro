@@ -507,10 +507,4 @@ export const OnboardingTour = ({ steps, isActive, onComplete, onSkip }) => {
   );
 };
 
-export default {
-  FinancialTooltip,
-  HelpIcon,
-  HelpPanel,
-  OnboardingTour,
-  helpContent
-};
+export default HelpPanel;

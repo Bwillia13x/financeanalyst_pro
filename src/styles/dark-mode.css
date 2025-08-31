@@ -1,0 +1,261 @@
+/**
+ * Dark Mode Design System
+ * Comprehensive dark theme implementation with proper contrast ratios
+ */
+
+@layer base {
+  /* ===== DARK MODE THEME VARIABLES ===== */
+  .dark {
+    /* ===== BRAND COLORS ===== */
+    --color-primary: 59 130 246; /* blue-500 */
+    --color-primary-foreground: 255 255 255; /* white */
+    --color-secondary: 20 184 166; /* teal-500 */
+    --color-secondary-foreground: 255 255 255; /* white */
+    --color-accent: 245 158 11; /* amber-500 */
+    --color-accent-foreground: 255 255 255; /* white */
+
+    /* ===== SEMANTIC COLORS ===== */
+    --color-background: 15 23 42; /* slate-900 */
+    --color-background-secondary: 30 41 59; /* slate-700 */
+    --color-background-tertiary: 51 65 85; /* slate-600 */
+    --color-foreground: 248 250 252; /* slate-50 */
+    --color-foreground-secondary: 148 163 184; /* slate-400 */
+    --color-foreground-tertiary: 100 116 139; /* slate-500 */
+    --color-foreground-muted: 71 85 105; /* slate-600 */
+
+    /* ===== INTERACTIVE STATES ===== */
+    --color-interactive-hover: 30 41 59; /* slate-700 */
+    --color-interactive-active: 51 65 85; /* slate-600 */
+    --color-interactive-focus: 59 130 246; /* blue-500 */
+    --color-interactive-selected: 59 130 246; /* blue-500 */
+
+    /* ===== BORDER SYSTEM ===== */
+    --color-border: 51 65 85; /* slate-600 */
+    --color-border-secondary: 71 85 105; /* slate-500 */
+    --color-border-tertiary: 100 116 139; /* slate-400 */
+    --color-border-focus: 59 130 246; /* blue-500 */
+    --color-border-error: 239 68 68; /* red-500 */
+
+    /* ===== STATUS COLORS ===== */
+    --color-success: 34 197 94; /* green-500 */
+    --color-success-foreground: 255 255 255; /* white */
+    --color-warning: 245 158 11; /* amber-500 */
+    --color-warning-foreground: 255 255 255; /* white */
+    --color-error: 239 68 68; /* red-500 */
+    --color-error-foreground: 255 255 255; /* white */
+    --color-info: 59 130 246; /* blue-500 */
+    --color-info-foreground: 255 255 255; /* white */
+
+    /* ===== FINANCIAL DOMAIN COLORS ===== */
+    --color-financial-revenue: 34 197 94; /* green-500 */
+    --color-financial-revenue-light: 34 197 94; /* green-500 */
+    --color-financial-revenue-medium: 22 163 74; /* green-600 */
+    --color-financial-revenue-dark: 20 83 45; /* green-700 */
+    --color-financial-expense: 239 68 68; /* red-500 */
+    --color-financial-expense-light: 239 68 68; /* red-500 */
+    --color-financial-expense-medium: 220 38 38; /* red-600 */
+    --color-financial-expense-dark: 185 28 28; /* red-700 */
+    --color-financial-asset: 59 130 246; /* blue-500 */
+    --color-financial-asset-light: 59 130 246; /* blue-500 */
+    --color-financial-asset-medium: 37 99 235; /* blue-600 */
+    --color-financial-asset-dark: 29 78 216; /* blue-700 */
+    --color-financial-liability: 245 158 11; /* amber-500 */
+    --color-financial-liability-light: 245 158 11; /* amber-500 */
+    --color-financial-liability-medium: 217 119 6; /* amber-600 */
+    --color-financial-liability-dark: 180 83 9; /* amber-700 */
+    --color-financial-equity: 139 92 246; /* violet-500 */
+    --color-financial-equity-light: 139 92 246; /* violet-500 */
+    --color-financial-equity-medium: 124 58 237; /* violet-600 */
+    --color-financial-equity-dark: 109 40 217; /* violet-700 */
+
+    /* ===== CHART COLORS ===== */
+    --color-chart-1: 59 130 246; /* blue-500 */
+    --color-chart-2: 34 197 94; /* green-500 */
+    --color-chart-3: 245 158 11; /* amber-500 */
+    --color-chart-4: 239 68 68; /* red-500 */
+    --color-chart-5: 139 92 246; /* violet-500 */
+    --color-chart-6: 6 182 212; /* cyan-500 */
+    --color-chart-7: 236 72 153; /* rose-500 */
+    --color-chart-8: 34 197 94; /* lime-500 */
+    --color-chart-9: 251 146 60; /* orange-500 */
+    --color-chart-10: 147 51 234; /* purple-600 */
+
+    /* ===== SHADOW SYSTEM ===== */
+    --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.5);
+    --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.5), 0 1px 2px -1px rgb(0 0 0 / 0.5);
+    --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.5), 0 2px 4px -2px rgb(0 0 0 / 0.5);
+    --shadow-md: 0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.5);
+    --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.5), 0 8px 10px -6px rgb(0 0 0 / 0.5);
+    --shadow-xl: 0 25px 50px -12px rgb(0 0 0 / 0.5);
+    --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.75);
+
+    /* ===== MUTED COLORS ===== */
+    --muted: 30 41 59; /* slate-700 */
+    --muted-foreground: 148 163 184; /* slate-400 */
+
+    /* ===== POPOVER/CARD COLORS ===== */
+    --color-popover: 30 41 59; /* slate-700 */
+    --color-popover-foreground: 248 250 252; /* slate-50 */
+    --color-card: 30 41 59; /* slate-700 */
+    --color-card-foreground: 248 250 252; /* slate-50 */
+
+    /* ===== INPUT COLORS ===== */
+    --color-input: 30 41 59; /* slate-700 */
+    --color-ring: 59 130 246; /* blue-500 */
+
+    /* ===== DESTRUCTIVE COLORS ===== */
+    --color-destructive: 239 68 68; /* red-500 */
+    --color-destructive-foreground: 255 255 255; /* white */
+  }
+
+  /* ===== THEME TRANSITIONS ===== */
+  * {
+    transition-property: background-color, border-color, color, fill, stroke;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: var(--theme-transition-duration, 150ms);
+  }
+
+  /* ===== DARK MODE SPECIFIC ADJUSTMENTS ===== */
+  .dark body {
+    background-color: hsl(var(--color-background));
+    color: hsl(var(--color-foreground));
+  }
+
+  .dark .bg-background {
+    background-color: hsl(var(--color-background));
+  }
+
+  .dark .bg-background-secondary {
+    background-color: hsl(var(--color-background-secondary));
+  }
+
+  .dark .bg-background-tertiary {
+    background-color: hsl(var(--color-background-tertiary));
+  }
+
+  .dark .text-foreground {
+    color: hsl(var(--color-foreground));
+  }
+
+  .dark .text-foreground-secondary {
+    color: hsl(var(--color-foreground-secondary));
+  }
+
+  .dark .text-foreground-tertiary {
+    color: hsl(var(--color-foreground-tertiary));
+  }
+
+  .dark .text-foreground-muted {
+    color: hsl(var(--color-foreground-muted));
+  }
+
+  .dark .border-border {
+    border-color: hsl(var(--color-border));
+  }
+
+  .dark .border-border-secondary {
+    border-color: hsl(var(--color-border-secondary));
+  }
+
+  /* ===== DARK MODE FOCUS STYLES ===== */
+  .dark .focus-visible {
+    outline: 2px solid hsl(var(--color-interactive-focus));
+    outline-offset: 2px;
+  }
+
+  /* ===== DARK MODE SCROLLBAR ===== */
+  .dark ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .dark ::-webkit-scrollbar-track {
+    background: hsl(var(--color-background-secondary));
+  }
+
+  .dark ::-webkit-scrollbar-thumb {
+    background: hsl(var(--color-foreground-tertiary));
+    border-radius: 4px;
+  }
+
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--color-foreground-secondary));
+  }
+
+  /* ===== DARK MODE SELECTION ===== */
+  .dark ::selection {
+    background-color: hsl(var(--color-primary) / 0.3);
+    color: hsl(var(--color-primary-foreground));
+  }
+
+  .dark ::-moz-selection {
+    background-color: hsl(var(--color-primary) / 0.3);
+    color: hsl(var(--color-primary-foreground));
+  }
+
+  /* ===== DARK MODE PLACEHOLDER TEXT ===== */
+  .dark ::placeholder {
+    color: hsl(var(--color-foreground-muted));
+  }
+
+  /* ===== DARK MODE CODE BLOCKS ===== */
+  .dark code {
+    background-color: hsl(var(--color-background-secondary));
+    color: hsl(var(--color-foreground));
+    border: 1px solid hsl(var(--color-border));
+  }
+
+  .dark pre {
+    background-color: hsl(var(--color-background-secondary));
+    border: 1px solid hsl(var(--color-border));
+  }
+
+  .dark pre code {
+    background-color: transparent;
+    border: none;
+  }
+}
+
+/* ===== HIGH CONTRAST MODE ===== */
+.high-contrast {
+  /* Override colors for maximum contrast */
+  --color-background: 0 0 0; /* pure black */
+  --color-background-secondary: 0 0 0; /* pure black */
+  --color-background-tertiary: 32 32 32; /* dark gray */
+  --color-foreground: 255 255 255; /* pure white */
+  --color-foreground-secondary: 255 255 255; /* pure white */
+  --color-foreground-tertiary: 200 200 200; /* light gray */
+  --color-foreground-muted: 150 150 150; /* medium gray */
+  --color-border: 255 255 255; /* pure white */
+  --color-border-secondary: 200 200 200; /* light gray */
+  --color-primary: 255 255 0; /* bright yellow for high contrast */
+  --color-primary-foreground: 0 0 0; /* black text on yellow */
+}
+
+/* ===== REDUCED MOTION SUPPORT ===== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .dark * {
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ===== PRINT STYLES ===== */
+@media print {
+  .dark {
+    color-scheme: light;
+  }
+
+  .dark * {
+    color: black !important;
+    background: white !important;
+    border-color: black !important;
+  }
+}

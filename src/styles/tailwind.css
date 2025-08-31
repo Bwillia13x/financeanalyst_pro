@@ -6,77 +6,158 @@
 
 @layer base {
   :root {
-    /* Core Colors */
-    --color-background: #fafbfc; /* gray-50 */
-    --color-foreground: #2c3e50; /* slate-700 */
-    --color-border: #e1e8ed; /* gray-200 */
-    --color-input: #ffffff; /* white */
-    --color-ring: #4a90a4; /* teal-600 */
+    /* ===== INSTITUTIONAL DESIGN TOKENS ===== */
 
-    /* Card Colors */
-    --color-card: #ffffff; /* white */
-    --color-card-foreground: #2c3e50; /* slate-700 */
+    /* Core Brand Colors - Institutional Navy/Teal Palette */
+    --color-brand-primary: #1e3a5f;      /* Navy 800 - Primary brand */
+    --color-brand-secondary: #2c5aa0;    /* Blue 700 - Secondary brand */
+    --color-brand-accent: #4a90a4;       /* Teal 600 - Accent */
+    --color-brand-success: #059669;      /* Emerald 600 - Success */
+    --color-brand-warning: #d97706;      /* Amber 600 - Warning */
+    --color-brand-error: #dc2626;        /* Red 600 - Error */
+    --color-brand-info: #2563eb;         /* Blue 600 - Information */
 
-    /* Popover Colors */
-    --color-popover: #ffffff; /* white */
-    --color-popover-foreground: #2c3e50; /* slate-700 */
+    /* ===== SEMANTIC COLOR SYSTEM ===== */
 
-    /* Muted Colors - WCAG AA compliant */
-    --color-muted: #f8f9fa; /* gray-100 */
-    --color-muted-foreground: #5a6c7d; /* darker gray for 4.5:1 contrast */
+    /* Light Theme (Default) */
+    --color-background: #ffffff;         /* Pure white background */
+    --color-background-secondary: #f8fafc; /* Subtle gray background */
+    --color-background-tertiary: #f1f5f9;  /* Light gray for cards */
+    --color-background-overlay: #00000080; /* Semi-transparent overlay */
 
-    /* Primary Colors */
-    --color-primary: #1e3a5f; /* navy-800 */
-    --color-primary-foreground: #ffffff; /* white */
+    --color-foreground: #0f172a;         /* Slate 900 - Primary text */
+    --color-foreground-secondary: #475569; /* Slate 600 - Secondary text */
+    --color-foreground-tertiary: #64748b;  /* Slate 500 - Tertiary text */
+    --color-foreground-muted: #94a3b8;    /* Slate 400 - Muted text */
+    --color-foreground-inverse: #ffffff;  /* White text on dark */
 
-    /* Secondary Colors */
-    --color-secondary: #4a90a4; /* teal-600 */
-    --color-secondary-foreground: #ffffff; /* white */
+    /* Interactive States */
+    --color-interactive-hover: #f1f5f9;   /* Subtle hover state */
+    --color-interactive-active: #e2e8f0;  /* Active state */
+    --color-interactive-focus: #dbeafe;   /* Focus state */
+    --color-interactive-selected: #eff6ff; /* Selected state */
 
-    /* Destructive Colors */
-    --color-destructive: #e74c3c; /* red-600 */
-    --color-destructive-foreground: #ffffff; /* white */
+    /* Border System */
+    --color-border: #e2e8f0;             /* Slate 200 - Default border */
+    --color-border-secondary: #cbd5e1;   /* Slate 300 - Secondary border */
+    --color-border-tertiary: #94a3b8;    /* Slate 400 - Tertiary border */
+    --color-border-focus: #3b82f6;       /* Blue 500 - Focus border */
+    --color-border-error: #ef4444;       /* Red 500 - Error border */
 
-    /* Accent Colors */
-    --color-accent: #e67e22; /* orange-600 */
-    --color-accent-foreground: #ffffff; /* white */
+    /* Shadow System */
+    --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
 
-    /* Success Colors - WCAG AA compliant */
-    --color-success: #1e8449; /* darker green for better contrast */
-    --color-success-foreground: #ffffff; /* white */
+    /* ===== FINANCIAL DOMAIN COLORS ===== */
 
-    /* Warning Colors */
-    --color-warning: #f39c12; /* amber-500 */
-    --color-warning-foreground: #ffffff; /* white */
+    /* Revenue & Income - Professional Green Palette */
+    --color-financial-revenue: #059669;     /* Emerald 600 */
+    --color-financial-revenue-light: #d1fae5; /* Emerald 100 */
+    --color-financial-revenue-medium: #34d399; /* Emerald 400 */
+    --color-financial-revenue-dark: #047857; /* Emerald 700 */
 
-    /* Error Colors */
-    --color-error: #e74c3c; /* red-600 */
-    --color-error-foreground: #ffffff; /* white */
+    /* Expenses & Costs - Professional Red Palette */
+    --color-financial-expense: #dc2626;     /* Red 600 */
+    --color-financial-expense-light: #fee2e2; /* Red 100 */
+    --color-financial-expense-medium: #f87171; /* Red 400 */
+    --color-financial-expense-dark: #b91c1c; /* Red 700 */
 
-    /* Financial Data Colors */
-    --color-revenue: #059669; /* emerald-600 */
-    --color-revenue-light: #d1fae5; /* emerald-50 */
-    --color-revenue-dark: #047857; /* emerald-700 */
+    /* Assets - Professional Blue Palette */
+    --color-financial-asset: #2563eb;       /* Blue 600 */
+    --color-financial-asset-light: #dbeafe; /* Blue 100 */
+    --color-financial-asset-medium: #60a5fa; /* Blue 400 */
+    --color-financial-asset-dark: #1d4ed8;  /* Blue 700 */
 
-    --color-expense: #dc2626; /* red-600 */
-    --color-expense-light: #fef2f2; /* red-50 */
-    --color-expense-dark: #b91c1c; /* red-700 */
+    /* Liabilities - Professional Orange Palette */
+    --color-financial-liability: #ea580c;   /* Orange 600 */
+    --color-financial-liability-light: #fed7aa; /* Orange 200 */
+    --color-financial-liability-medium: #fb923c; /* Orange 400 */
+    --color-financial-liability-dark: #c2410c; /* Orange 700 */
 
-    --color-asset: #2563eb; /* blue-600 */
-    --color-asset-light: #dbeafe; /* blue-50 */
-    --color-asset-dark: #1d4ed8; /* blue-700 */
+    /* Equity - Professional Purple Palette */
+    --color-financial-equity: #7c3aed;     /* Violet 600 */
+    --color-financial-equity-light: #ddd6fe; /* Violet 200 */
+    --color-financial-equity-medium: #a78bfa; /* Violet 400 */
+    --color-financial-equity-dark: #6d28d9;  /* Violet 700 */
 
-    --color-liability: #ea580c; /* orange-600 */
-    --color-liability-light: #fff7ed; /* orange-50 */
-    --color-liability-dark: #c2410c; /* orange-700 */
+    /* ===== CHART & VISUALIZATION COLORS ===== */
 
-    /* Chart & Visualization Colors */
-    --color-chart-1: #3b82f6; /* blue-500 */
-    --color-chart-2: #10b981; /* emerald-500 */
-    --color-chart-3: #f59e0b; /* amber-500 */
-    --color-chart-4: #ef4444; /* red-500 */
-    --color-chart-5: #8b5cf6; /* violet-500 */
-    --color-chart-6: #06b6d4; /* cyan-500 */
+    /* Professional Chart Color Palette */
+    --color-chart-1: #2563eb;  /* Blue 600 */
+    --color-chart-2: #059669;  /* Emerald 600 */
+    --color-chart-3: #d97706;  /* Amber 600 */
+    --color-chart-4: #dc2626;  /* Red 600 */
+    --color-chart-5: #7c3aed;  /* Violet 600 */
+    --color-chart-6: #0891b2;  /* Cyan 600 */
+    --color-chart-7: #be123c;  /* Rose 600 */
+    --color-chart-8: #4d7c0f;  /* Lime 700 */
+    --color-chart-9: #c2410c;  /* Orange 700 */
+    --color-chart-10: #5b21b6; /* Purple 800 */
+
+    /* ===== LEGACY COMPATIBILITY ===== */
+
+    /* Maintain backward compatibility */
+    --color-primary: var(--color-brand-primary);
+    --color-primary-foreground: var(--color-foreground-inverse);
+    --color-secondary: var(--color-brand-accent);
+    --color-secondary-foreground: var(--color-foreground-inverse);
+    --color-destructive: var(--color-brand-error);
+    --color-destructive-foreground: var(--color-foreground-inverse);
+    --color-accent: var(--color-brand-secondary);
+    --color-accent-foreground: var(--color-foreground-inverse);
+    --color-success: var(--color-brand-success);
+    --color-success-foreground: var(--color-foreground-inverse);
+    --color-warning: var(--color-brand-warning);
+    --color-warning-foreground: var(--color-foreground-inverse);
+    --color-error: var(--color-brand-error);
+    --color-error-foreground: var(--color-foreground-inverse);
+    --color-info: var(--color-brand-info);
+    --color-info-foreground: var(--color-foreground-inverse);
+
+    /* Surface colors */
+    --color-card: var(--color-background);
+    --color-card-foreground: var(--color-foreground);
+    --color-popover: var(--color-background);
+    --color-popover-foreground: var(--color-foreground);
+    --color-muted: var(--color-background-secondary);
+    --color-muted-foreground: var(--color-foreground-secondary);
+    --color-input: var(--color-background);
+    --color-ring: var(--color-brand-accent);
+  }
+
+  /* ===== DARK THEME SUPPORT ===== */
+  .dark {
+    /* Dark theme brand colors */
+    --color-brand-primary: #60a5fa;        /* Blue 400 - lighter for dark */
+    --color-brand-secondary: #93c5fd;      /* Blue 300 */
+    --color-brand-accent: #5eead4;         /* Teal 300 */
+
+    /* Dark theme semantic colors */
+    --color-background: #0f172a;           /* Slate 900 */
+    --color-background-secondary: #1e293b; /* Slate 800 */
+    --color-background-tertiary: #334155;  /* Slate 700 */
+    --color-background-overlay: #000000cc; /* Darker overlay */
+
+    --color-foreground: #f8fafc;           /* Slate 50 */
+    --color-foreground-secondary: #cbd5e1; /* Slate 300 */
+    --color-foreground-tertiary: #94a3b8;  /* Slate 400 */
+    --color-foreground-muted: #64748b;     /* Slate 500 */
+    --color-foreground-inverse: #0f172a;   /* Slate 900 */
+
+    /* Dark theme interactive states */
+    --color-interactive-hover: #1e293b;    /* Slate 800 */
+    --color-interactive-active: #334155;  /* Slate 700 */
+    --color-interactive-focus: #1e40af;    /* Blue 800 */
+    --color-interactive-selected: #1e3a8a; /* Blue 900 */
+
+    /* Dark theme borders */
+    --color-border: #334155;               /* Slate 700 */
+    --color-border-secondary: #475569;     /* Slate 600 */
+    --color-border-tertiary: #64748b;      /* Slate 500 */
   }
 }
 
@@ -87,26 +168,178 @@
 
   body {
     @apply bg-background text-foreground;
-    font-feature-settings:
-      'rlig' 1,
-      'calt' 1;
+    font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-feature-settings: 'rlig' 1, 'calt' 1;
+    font-variation-settings: 'wght' 400;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
 
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
+  /* ===== INSTITUTIONAL TYPOGRAPHY SYSTEM ===== */
+
+  /* Headings - Professional Hierarchy */
+  h1 {
+    @apply text-4xl font-bold leading-tight tracking-tight text-foreground;
     font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    line-height: 1.1;
   }
 
+  h2 {
+    @apply text-3xl font-semibold leading-tight tracking-tight text-foreground;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+
+  h3 {
+    @apply text-2xl font-semibold leading-snug tracking-tight text-foreground;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    line-height: 1.25;
+  }
+
+  h4 {
+    @apply text-xl font-semibold leading-snug text-foreground;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.3;
+  }
+
+  h5 {
+    @apply text-lg font-semibold leading-normal text-foreground;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    letter-spacing: -0.005em;
+    line-height: 1.4;
+  }
+
+  h6 {
+    @apply text-base font-semibold leading-normal text-foreground;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  /* Body Text - Financial Document Standards */
+  p {
+    @apply text-base leading-relaxed text-foreground-secondary;
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    line-height: 1.6;
+  }
+
+  /* Professional Text Styles */
+  .text-display {
+    @apply text-6xl font-bold leading-none tracking-tight text-foreground;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+
+  .text-heading-1 { @apply text-5xl font-bold leading-tight tracking-tight text-foreground; }
+  .text-heading-2 { @apply text-4xl font-semibold leading-tight tracking-tight text-foreground; }
+  .text-heading-3 { @apply text-3xl font-semibold leading-snug tracking-tight text-foreground; }
+  .text-heading-4 { @apply text-2xl font-semibold leading-snug text-foreground; }
+  .text-heading-5 { @apply text-xl font-semibold leading-normal text-foreground; }
+  .text-heading-6 { @apply text-lg font-semibold leading-normal text-foreground; }
+
+  .text-body-large { @apply text-lg leading-relaxed text-foreground; }
+  .text-body { @apply text-base leading-relaxed text-foreground; }
+  .text-body-small { @apply text-sm leading-normal text-foreground-secondary; }
+  .text-caption { @apply text-xs leading-normal text-foreground-tertiary; }
+
+  .text-label { @apply text-sm font-medium leading-normal text-foreground; }
+  .text-button { @apply text-sm font-medium leading-normal; }
+
+  /* Financial Data Typography */
+  .financial-number {
+    font-family: 'JetBrains Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, monospace;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+  }
+
+  .financial-currency {
+    font-family: 'JetBrains Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, monospace;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .financial-percentage {
+    font-family: 'JetBrains Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, monospace;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Monospace for all code and data */
   .font-mono {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, monospace;
+    font-variant-numeric: tabular-nums;
+    font-variant-ligatures: none;
+  }
+
+  /* ===== INSTITUTIONAL FOCUS SYSTEM ===== */
+  .focus-visible {
+    @apply outline-none ring-2 ring-brand-accent ring-offset-2 ring-offset-background;
+  }
+
+  /* Enhanced focus for keyboard navigation */
+  *:focus-visible {
+    @apply focus-visible;
+  }
+
+  /* Skip link for accessibility */
+  .skip-link {
+    @apply absolute -top-full left-6 bg-brand-primary text-white px-4 py-2 rounded-md text-sm font-medium z-[9999] transition-all duration-200;
+    transform: translateY(-100%);
+  }
+
+  .skip-link:focus {
+    @apply top-6;
+    transform: translateY(0);
+  }
+
+  /* ===== INSTITUTIONAL SCROLLBAR STYLING ===== */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-background-secondary;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-border-secondary rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-border-tertiary;
+  }
+
+  /* ===== INSTITUTIONAL SELECTION STYLING ===== */
+  ::selection {
+    background-color: rgba(74, 144, 164, 0.2); /* --color-brand-accent with 20% opacity */
+    color: var(--color-foreground);
+  }
+
+  ::-moz-selection {
+    background-color: rgba(74, 144, 164, 0.2); /* --color-brand-accent with 20% opacity */
+    color: var(--color-foreground);
   }
 }
 
 @layer utilities {
+  /* ===== INSTITUTIONAL UTILITY CLASSES ===== */
+
+  /* Elevation System */
   .shadow-elevation-1 {
     box-shadow: 0 2px 8px rgba(30, 58, 95, 0.08);
   }
@@ -115,12 +348,411 @@
     box-shadow: 0 8px 24px rgba(30, 58, 95, 0.12);
   }
 
+  /* Transition System */
   .transition-smooth {
     transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
   }
 
+  .transition-fast {
+    transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .transition-slow {
+    transition: all 400ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Transform Utilities */
   .hover-scale {
     transform: scale(1.02);
+  }
+
+  .hover-scale-sm {
+    transform: scale(1.01);
+  }
+
+  /* Text Utilities - Using Design Tokens */
+  .text-foreground {
+    color: var(--color-foreground);
+  }
+
+  .text-foreground-secondary {
+    color: var(--color-foreground-secondary);
+  }
+
+  .text-foreground-tertiary {
+    color: var(--color-foreground-tertiary);
+  }
+
+  .text-foreground-muted {
+    color: var(--color-foreground-muted);
+  }
+
+  .text-foreground-inverse {
+    color: var(--color-foreground-inverse);
+  }
+
+  /* Background Utilities */
+  .bg-background {
+    background-color: var(--color-background);
+  }
+
+  .bg-background-secondary {
+    background-color: var(--color-background-secondary);
+  }
+
+  .bg-background-tertiary {
+    background-color: var(--color-background-tertiary);
+  }
+
+  .bg-interactive-hover {
+    background-color: var(--color-interactive-hover);
+  }
+
+  .bg-interactive-active {
+    background-color: var(--color-interactive-active);
+  }
+
+  .bg-interactive-focus {
+    background-color: var(--color-interactive-focus);
+  }
+
+  .bg-interactive-selected {
+    background-color: var(--color-interactive-selected);
+  }
+
+  /* Border Utilities */
+  .border-border {
+    border-color: var(--color-border);
+  }
+
+  .border-border-secondary {
+    border-color: var(--color-border-secondary);
+  }
+
+  .border-border-tertiary {
+    border-color: var(--color-border-tertiary);
+  }
+
+  .border-border-focus {
+    border-color: var(--color-border-focus);
+  }
+
+  .border-border-error {
+    border-color: var(--color-border-error);
+  }
+
+  /* Background Border Utilities */
+  .bg-border {
+    background-color: var(--color-border);
+  }
+
+  .bg-border-secondary {
+    background-color: var(--color-border-secondary);
+  }
+
+  .bg-border-tertiary {
+    background-color: var(--color-border-tertiary);
+  }
+
+  .border-brand-primary {
+    border-color: var(--color-brand-primary);
+  }
+
+  .border-brand-secondary {
+    border-color: var(--color-brand-secondary);
+  }
+
+  .border-brand-accent {
+    border-color: var(--color-brand-accent);
+  }
+
+  .border-brand-error {
+    border-color: var(--color-brand-error);
+  }
+
+  .border-brand-success {
+    border-color: var(--color-brand-success);
+  }
+
+  .border-brand-warning {
+    border-color: var(--color-brand-warning);
+  }
+
+  .border-brand-info {
+    border-color: var(--color-brand-info);
+  }
+
+  /* Background Brand Utilities */
+  .bg-brand-primary {
+    background-color: var(--color-brand-primary);
+  }
+
+  .bg-brand-secondary {
+    background-color: var(--color-brand-secondary);
+  }
+
+  .bg-brand-accent {
+    background-color: var(--color-brand-accent);
+  }
+
+  .bg-brand-error {
+    background-color: var(--color-brand-error);
+  }
+
+  .bg-brand-success {
+    background-color: var(--color-brand-success);
+  }
+
+  .bg-brand-warning {
+    background-color: var(--color-brand-warning);
+  }
+
+  .bg-brand-info {
+    background-color: var(--color-brand-info);
+  }
+
+  /* Text Brand Utilities */
+  .text-brand-primary {
+    color: var(--color-brand-primary);
+  }
+
+  .text-brand-secondary {
+    color: var(--color-brand-secondary);
+  }
+
+  .text-brand-accent {
+    color: var(--color-brand-accent);
+  }
+
+  .text-brand-error {
+    color: var(--color-brand-error);
+  }
+
+  .text-brand-success {
+    color: var(--color-brand-success);
+  }
+
+  .text-brand-warning {
+    color: var(--color-brand-warning);
+  }
+
+  .text-brand-info {
+    color: var(--color-brand-info);
+  }
+
+  /* Ring/Focus Utilities */
+  .ring-brand-accent {
+    --tw-ring-color: var(--color-brand-accent);
+  }
+
+  .ring-brand-primary {
+    --tw-ring-color: var(--color-brand-primary);
+  }
+
+  .ring-brand-error {
+    --tw-ring-color: var(--color-brand-error);
+  }
+
+  /* Financial Domain Utilities */
+  .text-financial-revenue {
+    color: var(--color-financial-revenue);
+  }
+
+  .text-financial-expense {
+    color: var(--color-financial-expense);
+  }
+
+  .text-financial-asset {
+    color: var(--color-financial-asset);
+  }
+
+  .text-financial-liability {
+    color: var(--color-financial-liability);
+  }
+
+  .text-financial-equity {
+    color: var(--color-financial-equity);
+  }
+
+  .bg-financial-revenue {
+    background-color: var(--color-financial-revenue);
+  }
+
+  .bg-financial-revenue-light {
+    background-color: var(--color-financial-revenue-light);
+  }
+
+  .bg-financial-expense {
+    background-color: var(--color-financial-expense);
+  }
+
+  .bg-financial-expense-light {
+    background-color: var(--color-financial-expense-light);
+  }
+
+  .bg-financial-asset {
+    background-color: var(--color-financial-asset);
+  }
+
+  .bg-financial-asset-light {
+    background-color: var(--color-financial-asset-light);
+  }
+
+  .bg-financial-liability {
+    background-color: var(--color-financial-liability);
+  }
+
+  .bg-financial-liability-light {
+    background-color: var(--color-financial-liability-light);
+  }
+
+  .bg-financial-equity {
+    background-color: var(--color-financial-equity);
+  }
+
+  .bg-financial-equity-light {
+    background-color: var(--color-financial-equity-light);
+  }
+
+  /* Typography Utilities */
+  .text-display {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 3.75rem; /* 60px */
+    line-height: 1;
+    letter-spacing: -0.03em;
+  }
+
+  .text-heading-1 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 3rem; /* 48px */
+    line-height: 1.1;
+    letter-spacing: -0.025em;
+  }
+
+  .text-heading-2 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 2.25rem; /* 36px */
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+
+  .text-heading-3 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 1.875rem; /* 30px */
+    line-height: 1.25;
+    letter-spacing: -0.015em;
+  }
+
+  .text-heading-4 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 1.5rem; /* 24px */
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+  }
+
+  .text-heading-5 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 1.25rem; /* 20px */
+    line-height: 1.4;
+    letter-spacing: -0.005em;
+  }
+
+  .text-heading-6 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 1rem; /* 16px */
+    line-height: 1.4;
+  }
+
+  .text-body-large {
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 1.125rem; /* 18px */
+    line-height: 1.6;
+  }
+
+  .text-body {
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 1rem; /* 16px */
+    line-height: 1.6;
+  }
+
+  .text-body-small {
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 0.875rem; /* 14px */
+    line-height: 1.5;
+  }
+
+  .text-caption {
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 0.75rem; /* 12px */
+    line-height: 1.4;
+  }
+
+  .text-label {
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 0.875rem; /* 14px */
+    line-height: 1.4;
+  }
+
+  .text-button {
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 0.875rem; /* 14px */
+    line-height: 1.4;
+  }
+
+  /* Financial Data Typography */
+  .financial-number {
+    font-family: 'JetBrains Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, monospace;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+  }
+
+  .financial-currency {
+    font-family: 'JetBrains Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, monospace;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .financial-percentage {
+    font-family: 'JetBrains Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, monospace;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Focus System */
+  .focus-visible {
+    outline: 2px solid var(--color-brand-accent);
+    outline-offset: 2px;
+  }
+
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-brand-accent focus:ring-offset-2;
+  }
+
+  /* Screen Reader Only */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
   }
 
   /* Financial Data Styling Utilities */

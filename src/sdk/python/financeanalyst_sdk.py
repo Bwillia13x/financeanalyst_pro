@@ -1,672 +1,699 @@
 """
 FinanceAnalyst Pro Python SDK
-Official Python client library for FinanceAnalyst Pro API v1
+
+A comprehensive Python SDK for the FinanceAnalyst Pro platform,
+providing easy access to financial data, analytics, and AI capabilities.
+
+Usage:
+    from financeanalyst_sdk import FinanceAnalystAPI
+
+    api = FinanceAnalystAPI(api_key='your_api_key')
+    quote = api.get_stock_quote('AAPL')
+    analysis = api.analyze_portfolio(portfolio_data)
 """
 
 import requests
 import json
 import time
-from typing import Dict, List, Optional, Any, Union
+from typing import Dict, List, Optional, Union, Any
+from dataclasses import dataclass
 from datetime import datetime, timedelta
 import pandas as pd
-from dataclasses import dataclass
-from enum import Enum
-
-__version__ = "1.0.0"
-__author__ = "FinanceAnalyst Pro Team"
-
-
-class APIError(Exception):
-    """Base exception for API errors"""
-    def __init__(self, message: str, status_code: int = None, response: Dict = None):
-        self.message = message
-        self.status_code = status_code
-        self.response = response
-        super().__init__(self.message)
-
-
-class RateLimitError(APIError):
-    """Exception raised when rate limit is exceeded"""
-    pass
-
-
-class AuthenticationError(APIError):
-    """Exception raised for authentication failures"""
-    pass
-
-
-class ValidationError(APIError):
-    """Exception raised for request validation failures"""
-    pass
+import numpy as np
 
 
 @dataclass
-class APIResponse:
-    """Standardized API response wrapper"""
-    success: bool
-    data: Dict
-    metadata: Dict = None
-    error: Dict = None
-    request_id: str = None
+class APIConfig:
+    """Configuration for API connections"""
+    base_url: str = "https://api.financeanalystpro.com/v1"
+    api_key: Optional[str] = None
+    client_id: Optional[str] = None
+    client_secret: Optional[str] = None
+    timeout: int = 30
+    max_retries: int = 3
+    rate_limit_buffer: float = 0.1
 
 
-class AnalysisType(Enum):
-    """Supported analysis types"""
-    BANKING_CREDIT_PORTFOLIO = "banking/credit-portfolio"
-    REAL_ESTATE_VALUATION = "real-estate/property-valuation"
-    HEALTHCARE_PIPELINE = "healthcare/drug-pipeline"
-    ENERGY_RESERVES = "energy/reserves-valuation"
-    SAAS_METRICS = "technology/saas-metrics"
+@dataclass
+class TokenResponse:
+    """OAuth2 token response"""
+    access_token: str
+    refresh_token: str
+    expires_in: int
+    token_type: str = "Bearer"
 
 
-class ExportFormat(Enum):
-    """Supported export formats"""
-    PDF = "pdf"
-    EXCEL = "excel"
-    CSV = "csv"
+class FinanceAnalystAPI:
+    """
+    Main API client for FinanceAnalyst Pro
 
+    Provides access to all platform capabilities including:
+    - Real-time market data
+    - Financial analytics
+    - Portfolio management
+    - Risk analysis
+    - AI/ML insights
+    - Options pricing
+    - Derivatives analysis
+    """
 
-class ChartType(Enum):
-    """Supported chart types"""
-    LINE = "line"
-    BAR = "bar"
-    PIE = "pie"
-    SCATTER = "scatter"
-    CANDLESTICK = "candlestick"
-    HEATMAP = "heatmap"
-
-
-class FinanceAnalystClient:
-    """Main client class for FinanceAnalyst Pro API"""
-    
-    def __init__(self, api_key: str = None, base_url: str = None, timeout: int = 30):
+    def __init__(self, api_key: Optional[str] = None, config: Optional[APIConfig] = None):
         """
-        Initialize the FinanceAnalyst Pro client
-        
+        Initialize the API client
+
         Args:
-            api_key: Your API key
-            base_url: API base URL (defaults to production)
-            timeout: Request timeout in seconds
+            api_key: Your API key for authentication
+            config: Optional APIConfig object for advanced configuration
         """
-        self.api_key = api_key
-        self.base_url = base_url or "https://api.financeanalyst.pro/v1"
-        self.timeout = timeout
+        self.config = config or APIConfig()
+        if api_key:
+            self.config.api_key = api_key
+
         self.session = requests.Session()
-        
+        self._tokens: Optional[TokenResponse] = None
+        self._last_request_time = 0
+        self._request_count = 0
+
         # Set default headers
         self.session.headers.update({
-            'X-API-Key': self.api_key,
-            'Content-Type': 'application/json',
-            'User-Agent': f'financeanalyst-python-sdk/{__version__}'
+            'User-Agent': 'FinanceAnalystPro-Python-SDK/1.0',
+            'Content-Type': 'application/json'
         })
-    
-    def _make_request(self, method: str, endpoint: str, **kwargs) -> APIResponse:
-        """Make HTTP request to API"""
-        url = f"{self.base_url}/{endpoint.lstrip('/')}"
-        
-        try:
-            response = self.session.request(
-                method=method,
-                url=url,
-                timeout=self.timeout,
-                **kwargs
-            )
-            
-            # Handle rate limiting
-            if response.status_code == 429:
-                raise RateLimitError("Rate limit exceeded", response.status_code, response.json())
-            
-            # Handle authentication errors
-            if response.status_code == 401:
-                raise AuthenticationError("Authentication failed", response.status_code, response.json())
-            
-            # Handle validation errors
-            if response.status_code == 400:
-                raise ValidationError("Request validation failed", response.status_code, response.json())
-            
-            # Raise for other HTTP errors
-            response.raise_for_status()
-            
-            data = response.json()
-            return APIResponse(
-                success=data.get('success', True),
-                data=data.get('data', {}),
-                metadata=data.get('metadata', {}),
-                error=data.get('error'),
-                request_id=response.headers.get('X-Request-ID')
-            )
-            
-        except requests.exceptions.RequestException as e:
-            raise APIError(f"Request failed: {str(e)}")
-    
-    def get(self, endpoint: str, params: Dict = None) -> APIResponse:
-        """Make GET request"""
-        return self._make_request('GET', endpoint, params=params)
-    
-    def post(self, endpoint: str, data: Dict = None) -> APIResponse:
-        """Make POST request"""
-        return self._make_request('POST', endpoint, json=data)
-    
-    def put(self, endpoint: str, data: Dict = None) -> APIResponse:
-        """Make PUT request"""
-        return self._make_request('PUT', endpoint, json=data)
-    
-    def delete(self, endpoint: str) -> APIResponse:
-        """Make DELETE request"""
-        return self._make_request('DELETE', endpoint)
 
+        if self.config.api_key:
+            self.session.headers['X-API-Key'] = self.config.api_key
 
-class CompanyData:
-    """Company data management"""
-    
-    def __init__(self, client: FinanceAnalystClient):
-        self.client = client
-    
-    def get_financials(self, company_id: str, period: str = 'annual', years: int = 5) -> pd.DataFrame:
+    def authenticate(self, username: str, password: str) -> TokenResponse:
         """
-        Get company financial data
-        
-        Args:
-            company_id: Company identifier
-            period: 'annual' or 'quarterly'
-            years: Number of years of data
-            
-        Returns:
-            DataFrame with financial data
-        """
-        response = self.client.get(
-            f'companies/{company_id}/financials',
-            params={'period': period, 'years': years}
-        )
-        
-        if response.success:
-            return pd.DataFrame(response.data['financials'])
-        else:
-            raise APIError(f"Failed to get financials: {response.error}")
-    
-    def get_market_data(self, symbols: List[str], period: str = '1y') -> Dict:
-        """
-        Get market data for symbols
-        
-        Args:
-            symbols: List of symbols
-            period: Time period
-            
-        Returns:
-            Market data dictionary
-        """
-        response = self.client.get(
-            'markets/indices',
-            params={'symbols': ','.join(symbols), 'period': period}
-        )
-        
-        if response.success:
-            return response.data['market_data']
-        else:
-            raise APIError(f"Failed to get market data: {response.error}")
+        Authenticate using username/password and get OAuth2 tokens
 
+        Args:
+            username: Your username
+            password: Your password
 
-class SpecializedAnalytics:
-    """Specialized analytics for different industries"""
-    
-    def __init__(self, client: FinanceAnalystClient):
-        self.client = client
-    
-    def analyze_banking_portfolio(self, portfolio_data: Dict, analysis_type: str = 'risk_assessment') -> Dict:
-        """
-        Analyze banking credit portfolio
-        
-        Args:
-            portfolio_data: Portfolio data dictionary
-            analysis_type: Type of analysis to perform
-            
         Returns:
-            Analysis results
+            TokenResponse object with access tokens
         """
-        response = self.client.post(
-            'analytics/specialized/banking/credit-portfolio',
-            data={
-                'portfolio_data': portfolio_data,
-                'analysis_type': analysis_type
-            }
-        )
-        
-        if response.success:
-            return response.data
-        else:
-            raise APIError(f"Banking analysis failed: {response.error}")
-    
-    def analyze_real_estate(self, property_data: Dict, methods: List[str] = None) -> Dict:
-        """
-        Analyze real estate property
-        
-        Args:
-            property_data: Property data dictionary
-            methods: Valuation methods to use
-            
-        Returns:
-            Valuation results
-        """
-        methods = methods or ['dcf', 'cap_rate', 'comparable_sales']
-        
-        response = self.client.post(
-            'analytics/specialized/real-estate/property-valuation',
-            data={
-                'property_data': property_data,
-                'valuation_methods': methods
-            }
-        )
-        
-        if response.success:
-            return response.data
-        else:
-            raise APIError(f"Real estate analysis failed: {response.error}")
-    
-    def analyze_drug_pipeline(self, pipeline_data: Dict, scope: List[str] = None) -> Dict:
-        """
-        Analyze healthcare drug pipeline
-        
-        Args:
-            pipeline_data: Pipeline data dictionary
-            scope: Analysis scope
-            
-        Returns:
-            Pipeline analysis results
-        """
-        scope = scope or ['valuation', 'clinical_trials', 'regulatory_risk']
-        
-        response = self.client.post(
-            'analytics/specialized/healthcare/drug-pipeline',
-            data={
-                'pipeline_data': pipeline_data,
-                'analysis_scope': scope
-            }
-        )
-        
-        if response.success:
-            return response.data
-        else:
-            raise APIError(f"Healthcare analysis failed: {response.error}")
-    
-    def analyze_energy_reserves(self, asset_data: Dict, methods: List[str] = None) -> Dict:
-        """
-        Analyze energy reserves
-        
-        Args:
-            asset_data: Asset data dictionary
-            methods: Valuation methods
-            
-        Returns:
-            Reserves valuation results
-        """
-        methods = methods or ['pv10', 'pv15', 'risked_value']
-        
-        response = self.client.post(
-            'analytics/specialized/energy/reserves-valuation',
-            data={
-                'asset_data': asset_data,
-                'valuation_methods': methods
-            }
-        )
-        
-        if response.success:
-            return response.data
-        else:
-            raise APIError(f"Energy analysis failed: {response.error}")
-    
-    def analyze_saas_metrics(self, saas_data: Dict, categories: List[str] = None) -> Dict:
-        """
-        Analyze SaaS metrics
-        
-        Args:
-            saas_data: SaaS data dictionary
-            categories: Metric categories to analyze
-            
-        Returns:
-            SaaS metrics analysis
-        """
-        categories = categories or ['revenue', 'customer', 'unit_economics', 'cohort']
-        
-        response = self.client.post(
-            'analytics/specialized/technology/saas-metrics',
-            data={
-                'saas_data': saas_data,
-                'metric_categories': categories
-            }
-        )
-        
-        if response.success:
-            return response.data
-        else:
-            raise APIError(f"SaaS analysis failed: {response.error}")
-
-
-class AIAnalytics:
-    """AI/ML powered analytics"""
-    
-    def __init__(self, client: FinanceAnalystClient):
-        self.client = client
-    
-    def forecast_revenue(self, company_data: Dict, horizon: int = 12, models: List[str] = None) -> Dict:
-        """
-        Forecast company revenue using AI models
-        
-        Args:
-            company_data: Company historical data
-            horizon: Forecast horizon in months
-            models: Preferred models to use
-            
-        Returns:
-            Revenue forecast results
-        """
-        response = self.client.post(
-            'ai/predictions/revenue',
-            data={
-                'company_data': company_data,
-                'forecast_horizon': horizon,
-                'model_preferences': models
-            }
-        )
-        
-        if response.success:
-            return response.data
-        else:
-            raise APIError(f"Revenue forecasting failed: {response.error}")
-    
-    def analyze_document(self, document: Dict, analysis_types: List[str] = None) -> Dict:
-        """
-        Analyze document using NLP
-        
-        Args:
-            document: Document data
-            analysis_types: Types of analysis to perform
-            
-        Returns:
-            Document analysis results
-        """
-        analysis_types = analysis_types or ['sentiment', 'entities', 'metrics', 'summary']
-        
-        response = self.client.post(
-            'ai/nlp/analyze-document',
-            data={
-                'document': document,
-                'analysis_types': analysis_types
-            }
-        )
-        
-        if response.success:
-            return response.data
-        else:
-            raise APIError(f"Document analysis failed: {response.error}")
-    
-    def recognize_chart(self, image_data: Dict, extract_data: bool = True) -> Dict:
-        """
-        Recognize and extract data from chart images
-        
-        Args:
-            image_data: Image data dictionary
-            extract_data: Whether to extract underlying data
-            
-        Returns:
-            Chart recognition results
-        """
-        response = self.client.post(
-            'ai/computer-vision/recognize-chart',
-            data={
-                'image_data': image_data,
-                'extract_data': extract_data
-            }
-        )
-        
-        if response.success:
-            return response.data
-        else:
-            raise APIError(f"Chart recognition failed: {response.error}")
-
-
-class Collaboration:
-    """Collaboration and workspace management"""
-    
-    def __init__(self, client: FinanceAnalystClient):
-        self.client = client
-    
-    def get_workspace_users(self, workspace_id: str) -> List[Dict]:
-        """Get users in workspace"""
-        response = self.client.get(f'workspaces/{workspace_id}/users')
-        
-        if response.success:
-            return response.data['users']
-        else:
-            raise APIError(f"Failed to get workspace users: {response.error}")
-    
-    def create_comment(self, analysis_id: str, content: str, parent_id: str = None) -> Dict:
-        """Create a comment on analysis"""
-        response = self.client.post(
-            'comments',
-            data={
-                'analysis_id': analysis_id,
-                'content': content,
-                'parent_id': parent_id
-            }
-        )
-        
-        if response.success:
-            return response.data
-        else:
-            raise APIError(f"Failed to create comment: {response.error}")
-    
-    def get_version_history(self, analysis_id: str, limit: int = 20) -> List[Dict]:
-        """Get version history for analysis"""
-        response = self.client.get(
-            f'versions/{analysis_id}/history',
-            params={'limit': limit}
-        )
-        
-        if response.success:
-            return response.data['versions']
-        else:
-            raise APIError(f"Failed to get version history: {response.error}")
-
-
-class Visualization:
-    """Data visualization and export"""
-    
-    def __init__(self, client: FinanceAnalystClient):
-        self.client = client
-    
-    def create_chart(self, data: Dict, chart_type: str, config: Dict = None) -> Dict:
-        """
-        Create visualization
-        
-        Args:
-            data: Chart data
-            chart_type: Type of chart
-            config: Chart configuration
-            
-        Returns:
-            Visualization result
-        """
-        response = self.client.post(
-            'visualizations/create',
-            data={
-                'data': data,
-                'chart_type': chart_type,
-                'configuration': config or {}
-            }
-        )
-        
-        if response.success:
-            return response.data
-        else:
-            raise APIError(f"Failed to create visualization: {response.error}")
-    
-    def export_analysis(self, analysis_id: str, format: str, template: str = None) -> Dict:
-        """
-        Export analysis
-        
-        Args:
-            analysis_id: Analysis ID
-            format: Export format (pdf, excel, csv)
-            template: Template to use
-            
-        Returns:
-            Export result with download URL
-        """
-        response = self.client.post(
-            'export',
-            data={
-                'analysis_id': analysis_id,
-                'format': format,
-                'template': template
-            }
-        )
-        
-        if response.success:
-            return response.data
-        else:
-            raise APIError(f"Failed to export analysis: {response.error}")
-
-
-class WebhookManager:
-    """Webhook management"""
-    
-    def __init__(self, client: FinanceAnalystClient):
-        self.client = client
-        self.base_endpoint = 'webhooks'
-    
-    def register_webhook(self, url: str, events: List[str], secret: str = None, **metadata) -> Dict:
-        """Register a new webhook"""
-        data = {
-            'url': url,
-            'events': events,
-            'secret': secret,
-            **metadata
+        auth_data = {
+            'grant_type': 'password',
+            'username': username,
+            'password': password,
+            'client_id': self.config.client_id,
+            'client_secret': self.config.client_secret
         }
-        
-        response = self.client.post(self.base_endpoint, data=data)
-        
-        if response.success:
-            return response.data
-        else:
-            raise APIError(f"Failed to register webhook: {response.error}")
-    
-    def list_webhooks(self, active_only: bool = True) -> List[Dict]:
-        """List registered webhooks"""
-        params = {'active': active_only} if active_only else {}
-        response = self.client.get(self.base_endpoint, params=params)
-        
-        if response.success:
-            return response.data['webhooks']
-        else:
-            raise APIError(f"Failed to list webhooks: {response.error}")
-    
-    def delete_webhook(self, webhook_id: str) -> bool:
-        """Delete a webhook"""
-        response = self.client.delete(f'{self.base_endpoint}/{webhook_id}')
-        return response.success
 
+        response = self._request('POST', '/auth/token', data=auth_data)
+        token_data = response.json()
 
-class FinanceAnalyst:
-    """Main SDK class providing access to all functionality"""
-    
-    def __init__(self, api_key: str = None, base_url: str = None, timeout: int = 30):
+        self._tokens = TokenResponse(**token_data)
+        self.session.headers['Authorization'] = f"Bearer {self._tokens.access_token}"
+
+        return self._tokens
+
+    def refresh_token(self) -> TokenResponse:
         """
-        Initialize FinanceAnalyst SDK
-        
+        Refresh the access token using the refresh token
+
+        Returns:
+            New TokenResponse object
+        """
+        if not self._tokens or not self._tokens.refresh_token:
+            raise ValueError("No refresh token available")
+
+        refresh_data = {
+            'grant_type': 'refresh_token',
+            'refresh_token': self._tokens.refresh_token,
+            'client_id': self.config.client_id,
+            'client_secret': self.config.client_secret
+        }
+
+        response = self._request('POST', '/auth/token', data=refresh_data)
+        token_data = response.json()
+
+        self._tokens = TokenResponse(**token_data)
+        self.session.headers['Authorization'] = f"Bearer {self._tokens.access_token}"
+
+        return self._tokens
+
+    def _request(self, method: str, endpoint: str,
+                 params: Optional[Dict] = None,
+                 data: Optional[Dict] = None,
+                 json_data: Optional[Dict] = None) -> requests.Response:
+        """
+        Make an authenticated API request with rate limiting and error handling
+        """
+        url = f"{self.config.base_url}{endpoint}"
+
+        # Rate limiting
+        self._handle_rate_limiting()
+
+        # Prepare request data
+        kwargs = {
+            'method': method,
+            'url': url,
+            'timeout': self.config.timeout
+        }
+
+        if params:
+            kwargs['params'] = params
+
+        if data:
+            kwargs['data'] = json.dumps(data)
+
+        if json_data:
+            kwargs['json'] = json_data
+
+        # Make request with retries
+        for attempt in range(self.config.max_retries):
+            try:
+                response = self.session.request(**kwargs)
+
+                # Handle rate limiting
+                if response.status_code == 429:
+                    retry_after = int(response.headers.get('Retry-After', 60))
+                    time.sleep(retry_after)
+                    continue
+
+                # Handle authentication errors
+                if response.status_code == 401 and self._tokens:
+                    try:
+                        self.refresh_token()
+                        # Retry with new token
+                        if 'Authorization' in self.session.headers:
+                            kwargs['headers'] = self.session.headers.copy()
+                        response = self.session.request(**kwargs)
+                    except Exception:
+                        pass
+
+                response.raise_for_status()
+                return response
+
+            except requests.exceptions.RequestException as e:
+                if attempt == self.config.max_retries - 1:
+                    raise e
+                time.sleep(2 ** attempt)  # Exponential backoff
+
+        raise RuntimeError("Request failed after all retries")
+
+    def _handle_rate_limiting(self):
+        """Handle rate limiting to avoid API limits"""
+        current_time = time.time()
+
+        # Simple rate limiting - max 10 requests per second
+        if current_time - self._last_request_time < 0.1:
+            time.sleep(0.1)
+
+        self._last_request_time = current_time
+        self._request_count += 1
+
+    # Market Data Methods
+
+    def get_stock_quote(self, symbol: str) -> Dict:
+        """
+        Get real-time stock quote
+
         Args:
-            api_key: Your API key
-            base_url: API base URL
-            timeout: Request timeout
+            symbol: Stock symbol (e.g., 'AAPL')
+
+        Returns:
+            Dictionary with quote data
         """
-        self.client = FinanceAnalystClient(api_key, base_url, timeout)
-        
-        # Initialize service modules
-        self.companies = CompanyData(self.client)
-        self.analytics = SpecializedAnalytics(self.client)
-        self.ai = AIAnalytics(self.client)
-        self.collaboration = Collaboration(self.client)
-        self.visualization = Visualization(self.client)
-        self.webhooks = WebhookManager(self.client)
-    
-    def get_analysis(self, analysis_id: str) -> Dict:
-        """Get analysis results by ID"""
-        response = self.client.get(f'analysis/{analysis_id}/results')
-        
-        if response.success:
-            return response.data
-        else:
-            raise APIError(f"Failed to get analysis: {response.error}")
-    
-    def calculate_dcf(self, company_id: str, assumptions: Dict, scenarios: List[str] = None) -> Dict:
-        """Calculate DCF valuation"""
-        scenarios = scenarios or ['base']
-        
-        response = self.client.post(
-            'models/dcf/calculate',
-            data={
-                'company_id': company_id,
-                'assumptions': assumptions,
-                'scenarios': scenarios
+        response = self._request('GET', f'/market/quote/{symbol}')
+        return response.json()
+
+    def get_historical_data(self, symbol: str,
+                           period: str = '1y',
+                           interval: str = '1d') -> pd.DataFrame:
+        """
+        Get historical stock data
+
+        Args:
+            symbol: Stock symbol
+            period: Time period ('1d', '5d', '1mo', '3mo', '6mo', '1y', '2y', '5y', '10y', 'ytd', 'max')
+            interval: Data interval ('1m', '2m', '5m', '15m', '30m', '60m', '90m', '1h', '1d', '5d', '1wk', '1mo', '3mo')
+
+        Returns:
+            Pandas DataFrame with historical data
+        """
+        response = self._request('GET', f'/market/history/{symbol}',
+                               params={'period': period, 'interval': interval})
+        data = response.json()
+
+        # Convert to DataFrame
+        df = pd.DataFrame(data['data'])
+        df['timestamp'] = pd.to_datetime(df['timestamp'], unit='s')
+        df.set_index('timestamp', inplace=True)
+
+        return df
+
+    def get_company_info(self, symbol: str) -> Dict:
+        """
+        Get company information and profile
+
+        Args:
+            symbol: Stock symbol
+
+        Returns:
+            Dictionary with company information
+        """
+        response = self._request('GET', f'/company/{symbol}/info')
+        return response.json()
+
+    def get_company_financials(self, symbol: str,
+                              statement_type: str = 'income',
+                              period: str = 'annual') -> pd.DataFrame:
+        """
+        Get company financial statements
+
+        Args:
+            symbol: Stock symbol
+            statement_type: 'income', 'balance', 'cashflow'
+            period: 'annual' or 'quarterly'
+
+        Returns:
+            Pandas DataFrame with financial data
+        """
+        response = self._request('GET', f'/company/{symbol}/financials',
+                               params={'type': statement_type, 'period': period})
+        data = response.json()
+
+        return pd.DataFrame(data['data'])
+
+    def get_market_indices(self) -> Dict:
+        """
+        Get major market indices data
+
+        Returns:
+            Dictionary with indices data
+        """
+        response = self._request('GET', '/market/indices')
+        return response.json()
+
+    # Analytics Methods
+
+    def analyze_portfolio(self, portfolio: Dict) -> Dict:
+        """
+        Analyze a portfolio with comprehensive metrics
+
+        Args:
+            portfolio: Portfolio data with assets and weights
+
+        Returns:
+            Dictionary with portfolio analysis results
+        """
+        response = self._request('POST', '/analytics/portfolio', json_data=portfolio)
+        return response.json()
+
+    def calculate_risk(self, portfolio: Dict,
+                      method: str = 'parametric',
+                      confidence_level: float = 0.95) -> Dict:
+        """
+        Calculate portfolio risk metrics including VaR
+
+        Args:
+            portfolio: Portfolio data
+            method: Risk calculation method ('parametric', 'historical', 'monte_carlo')
+            confidence_level: Confidence level for VaR (0.95, 0.99, etc.)
+
+        Returns:
+            Dictionary with risk analysis results
+        """
+        data = {
+            'portfolio': portfolio,
+            'method': method,
+            'confidence_level': confidence_level
+        }
+
+        response = self._request('POST', '/analytics/risk', json_data=data)
+        return response.json()
+
+    def price_options(self, option_params: Dict) -> Dict:
+        """
+        Price options using Black-Scholes and other models
+
+        Args:
+            option_params: Option parameters including type, strike, expiry, etc.
+
+        Returns:
+            Dictionary with option pricing results and Greeks
+        """
+        response = self._request('POST', '/analytics/options', json_data=option_params)
+        return response.json()
+
+    def analyze_derivatives(self, derivatives: List[Dict]) -> Dict:
+        """
+        Analyze derivatives portfolio
+
+        Args:
+            derivatives: List of derivative instruments
+
+        Returns:
+            Dictionary with derivatives analysis
+        """
+        response = self._request('POST', '/analytics/derivatives', json_data=derivatives)
+        return response.json()
+
+    def stress_test_portfolio(self, portfolio: Dict, scenarios: List[Dict]) -> Dict:
+        """
+        Perform stress testing on portfolio
+
+        Args:
+            portfolio: Portfolio data
+            scenarios: List of stress scenarios
+
+        Returns:
+            Dictionary with stress test results
+        """
+        data = {
+            'portfolio': portfolio,
+            'scenarios': scenarios
+        }
+
+        response = self._request('POST', '/analytics/stress-test', json_data=data)
+        return response.json()
+
+    # AI/ML Methods
+
+    def generate_insights(self, data: Dict, context: Optional[Dict] = None) -> Dict:
+        """
+        Generate AI-powered financial insights
+
+        Args:
+            data: Financial data for analysis
+            context: Optional context information
+
+        Returns:
+            Dictionary with AI-generated insights
+        """
+        payload = {'data': data}
+        if context:
+            payload['context'] = context
+
+        response = self._request('POST', '/ai/insights', json_data=payload)
+        return response.json()
+
+    def predict_metrics(self, data: Dict,
+                       horizon: int = 12,
+                       model: str = 'auto') -> Dict:
+        """
+        Predict financial metrics using machine learning
+
+        Args:
+            data: Historical financial data
+            horizon: Prediction horizon in periods
+            model: ML model to use ('auto', 'linear', 'rf', 'nn')
+
+        Returns:
+            Dictionary with predictions and confidence intervals
+        """
+        payload = {
+            'data': data,
+            'horizon': horizon,
+            'model': model
+        }
+
+        response = self._request('POST', '/ai/predict', json_data=payload)
+        return response.json()
+
+    def analyze_sentiment(self, text: str, source: str = 'news') -> Dict:
+        """
+        Analyze sentiment of financial text
+
+        Args:
+            text: Text to analyze
+            source: Source of text ('news', 'social', 'earnings')
+
+        Returns:
+            Dictionary with sentiment analysis results
+        """
+        payload = {
+            'text': text,
+            'source': source
+        }
+
+        response = self._request('POST', '/ai/sentiment', json_data=payload)
+        return response.json()
+
+    # Webhook Management
+
+    def register_webhook(self, endpoint: str, events: List[str],
+                        secret: Optional[str] = None) -> str:
+        """
+        Register a webhook for real-time notifications
+
+        Args:
+            endpoint: Your webhook endpoint URL
+            events: List of events to subscribe to
+            secret: Optional secret for webhook signature verification
+
+        Returns:
+            Webhook ID
+        """
+        payload = {
+            'endpoint': endpoint,
+            'events': events
+        }
+
+        if secret:
+            payload['secret'] = secret
+
+        response = self._request('POST', '/webhooks/register', json_data=payload)
+        result = response.json()
+
+        return result['webhook_id']
+
+    def unregister_webhook(self, webhook_id: str) -> bool:
+        """
+        Unregister a webhook
+
+        Args:
+            webhook_id: ID of webhook to remove
+
+        Returns:
+            Success status
+        """
+        response = self._request('DELETE', f'/webhooks/{webhook_id}')
+        return response.status_code == 200
+
+    def list_webhooks(self) -> List[Dict]:
+        """
+        List all registered webhooks
+
+        Returns:
+            List of webhook configurations
+        """
+        response = self._request('GET', '/webhooks')
+        return response.json()['webhooks']
+
+    # Integration Methods
+
+    def connect_integration(self, provider: str, credentials: Dict) -> Dict:
+        """
+        Connect to third-party financial data provider
+
+        Args:
+            provider: Provider name ('bloomberg', 'refinitiv', 'morningstar', etc.)
+            credentials: Authentication credentials for the provider
+
+        Returns:
+            Connection status and details
+        """
+        response = self._request('POST', f'/integrations/{provider}/connect',
+                               json_data=credentials)
+        return response.json()
+
+    def disconnect_integration(self, provider: str) -> bool:
+        """
+        Disconnect from third-party provider
+
+        Args:
+            provider: Provider name
+
+        Returns:
+            Success status
+        """
+        response = self._request('POST', f'/integrations/{provider}/disconnect')
+        return response.status_code == 200
+
+    def get_integrated_data(self, provider: str, endpoint: str,
+                           params: Optional[Dict] = None) -> Union[Dict, pd.DataFrame]:
+        """
+        Get data from connected third-party provider
+
+        Args:
+            provider: Provider name
+            endpoint: API endpoint on the provider
+            params: Optional query parameters
+
+        Returns:
+            Provider data (dict or DataFrame)
+        """
+        response = self._request('GET', f'/integrations/{provider}/{endpoint}',
+                               params=params or {})
+        return response.json()
+
+    # Utility Methods
+
+    def get_api_status(self) -> Dict:
+        """
+        Get API status and health information
+
+        Returns:
+            Dictionary with API health status
+        """
+        try:
+            response = self._request('GET', '/health')
+            return response.json()
+        except Exception as e:
+            return {
+                'status': 'error',
+                'message': str(e),
+                'timestamp': datetime.now().isoformat()
             }
-        )
-        
-        if response.success:
-            return response.data
-        else:
-            raise APIError(f"DCF calculation failed: {response.error}")
-    
-    def get_benchmarks(self, sector: str, metrics: List[str] = None) -> Dict:
-        """Get industry benchmarks"""
-        params = {}
-        if metrics:
-            params['metrics'] = ','.join(metrics)
-        
-        response = self.client.get(f'benchmarks/industry/{sector}', params=params)
-        
-        if response.success:
-            return response.data
-        else:
-            raise APIError(f"Failed to get benchmarks: {response.error}")
+
+    def get_usage_stats(self) -> Dict:
+        """
+        Get API usage statistics
+
+        Returns:
+            Dictionary with usage statistics
+        """
+        response = self._request('GET', '/usage/stats')
+        return response.json()
+
+    def create_portfolio_from_csv(self, csv_path: str,
+                                 symbol_col: str = 'symbol',
+                                 weight_col: str = 'weight') -> Dict:
+        """
+        Create portfolio from CSV file
+
+        Args:
+            csv_path: Path to CSV file
+            symbol_col: Column name for symbols
+            weight_col: Column name for weights
+
+        Returns:
+            Portfolio dictionary
+        """
+        df = pd.read_csv(csv_path)
+        assets = []
+
+        for _, row in df.iterrows():
+            assets.append({
+                'symbol': row[symbol_col],
+                'weight': row[weight_col],
+                'quantity': row.get('quantity', 100)  # Default quantity
+            })
+
+        return {
+            'assets': assets,
+            'created_from': 'csv',
+            'timestamp': datetime.now().isoformat()
+        }
+
+    def export_to_excel(self, data: Dict, filename: str):
+        """
+        Export analysis results to Excel file
+
+        Args:
+            data: Analysis results dictionary
+            filename: Output filename
+        """
+        with pd.ExcelWriter(filename, engine='openpyxl') as writer:
+            for sheet_name, sheet_data in data.items():
+                if isinstance(sheet_data, list):
+                    pd.DataFrame(sheet_data).to_excel(writer, sheet_name=sheet_name, index=False)
+                elif isinstance(sheet_data, dict):
+                    pd.DataFrame([sheet_data]).to_excel(writer, sheet_name=sheet_name, index=False)
 
 
-# Utility functions
-def create_client(api_key: str = None, **kwargs) -> FinanceAnalyst:
-    """Create a new FinanceAnalyst client"""
-    return FinanceAnalyst(api_key=api_key, **kwargs)
+# Convenience functions for common use cases
+
+def quick_portfolio_analysis(symbols: List[str],
+                           weights: Optional[List[float]] = None) -> Dict:
+    """
+    Quick portfolio analysis for a list of symbols
+
+    Args:
+        symbols: List of stock symbols
+        weights: Optional list of weights (equal weight if not provided)
+
+    Returns:
+        Portfolio analysis results
+    """
+    if not weights:
+        weights = [1.0 / len(symbols)] * len(symbols)
+
+    portfolio = {
+        'assets': [
+            {'symbol': symbol, 'weight': weight}
+            for symbol, weight in zip(symbols, weights)
+        ]
+    }
+
+    api = FinanceAnalystAPI()
+    return api.analyze_portfolio(portfolio)
 
 
-def load_config(config_file: str = None) -> Dict:
-    """Load configuration from file"""
-    import os
-    import configparser
-    
-    config_file = config_file or os.path.expanduser('~/.financeanalyst/config')
-    
-    if os.path.exists(config_file):
-        config = configparser.ConfigParser()
-        config.read(config_file)
-        return dict(config['default']) if 'default' in config else {}
-    
-    return {}
+def bulk_quote_request(symbols: List[str]) -> Dict:
+    """
+    Get quotes for multiple symbols efficiently
+
+    Args:
+        symbols: List of stock symbols
+
+    Returns:
+        Dictionary with quotes for all symbols
+    """
+    api = FinanceAnalystAPI()
+
+    # Note: This would typically use a bulk endpoint
+    # For now, we'll make individual requests
+    quotes = {}
+    for symbol in symbols:
+        try:
+            quotes[symbol] = api.get_stock_quote(symbol)
+        except Exception as e:
+            quotes[symbol] = {'error': str(e)}
+
+    return quotes
 
 
-# Export main classes and functions
-__all__ = [
-    'FinanceAnalyst',
-    'FinanceAnalystClient', 
-    'CompanyData',
-    'SpecializedAnalytics',
-    'AIAnalytics',
-    'Collaboration',
-    'Visualization',
-    'WebhookManager',
-    'APIError',
-    'RateLimitError',
-    'AuthenticationError',
-    'ValidationError',
-    'AnalysisType',
-    'ExportFormat',
-    'ChartType',
-    'create_client',
-    'load_config'
-]
+# Example usage and demo functions
+
+def demo_basic_usage():
+    """Demonstrate basic API usage"""
+    print("FinanceAnalyst Pro Python SDK Demo")
+    print("=" * 40)
+
+    # Initialize API (replace with your actual API key)
+    api = FinanceAnalystAPI(api_key='your_api_key_here')
+
+    # Get API status
+    print("API Status:", api.get_api_status())
+
+    # Example: Get stock quote
+    try:
+        quote = api.get_stock_quote('AAPL')
+        print(f"AAPL Quote: ${quote.get('price', 'N/A')}")
+    except Exception as e:
+        print(f"Quote request failed: {e}")
+
+    # Example: Simple portfolio analysis
+    try:
+        portfolio = {
+            'assets': [
+                {'symbol': 'AAPL', 'weight': 0.4},
+                {'symbol': 'MSFT', 'weight': 0.3},
+                {'symbol': 'GOOGL', 'weight': 0.3}
+            ]
+        }
+
+        analysis = api.analyze_portfolio(portfolio)
+        print(f"Portfolio Analysis: {analysis.get('status', 'Completed')}")
+    except Exception as e:
+        print(f"Portfolio analysis failed: {e}")
+
+
+if __name__ == "__main__":
+    demo_basic_usage()

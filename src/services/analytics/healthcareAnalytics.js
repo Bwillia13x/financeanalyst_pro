@@ -3,11 +3,8 @@
  * Specialized tools for drug development modeling, clinical trials, and healthcare economics
  */
 
-import { EventEmitter } from 'events';
-
-class HealthcareAnalyticsService extends EventEmitter {
+class HealthcareAnalyticsService {
   constructor() {
-    super();
     this.clinicalTrialProbabilities = {
       phase1: { success_rate: 0.63, duration_months: 18, cost_per_patient: 50000 },
       phase2: { success_rate: 0.31, duration_months: 24, cost_per_patient: 75000 },
@@ -46,10 +43,10 @@ class HealthcareAnalyticsService extends EventEmitter {
         commercial_potential: this.assessCommercialPotential(pipelineData)
       };
 
-      this.emit('analysis:completed', { type: 'drug_pipeline', analysis });
+      console.log('Drug pipeline analysis completed:', { type: 'drug_pipeline', analysis });
       return analysis;
     } catch (error) {
-      this.emit('analysis:error', { type: 'drug_pipeline', error });
+      console.error('Drug pipeline analysis failed:', error);
       throw error;
     }
   }
@@ -148,10 +145,13 @@ class HealthcareAnalyticsService extends EventEmitter {
         technology_impact: this.assessTechnologyImpact(organizationData)
       };
 
-      this.emit('analysis:completed', { type: 'healthcare_economics', analysis });
+      console.log('Healthcare economics analysis completed:', {
+        type: 'healthcare_economics',
+        analysis
+      });
       return analysis;
     } catch (error) {
-      this.emit('analysis:error', { type: 'healthcare_economics', error });
+      console.error('Healthcare economics analysis failed:', error);
       throw error;
     }
   }

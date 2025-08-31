@@ -22,6 +22,8 @@ import {
 import React, { useState, useRef, useEffect } from 'react';
 
 import secureApiClient from '../../services/secureApiClient';
+import { NaturalLanguageQueryService } from '../../services/ai/naturalLanguageQuery';
+import { AdvancedAIService } from '../../services/ai/advancedAIService';
 
 const AIFinancialAssistant = ({
   isOpen = false,
@@ -48,6 +50,10 @@ const AIFinancialAssistant = ({
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
+
+  // Initialize AI services
+  const [nlqService] = useState(() => new NaturalLanguageQueryService());
+  const [aiService] = useState(() => new AdvancedAIService());
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
 
@@ -74,16 +80,38 @@ const AIFinancialAssistant = ({
     setIsLoading(true);
 
     try {
-      // Send message to AI assistant backend
-      const response = await secureApiClient.post('/ai-assistant/chat', {
-        message,
-        context: {
+      // Try backend API first, fallback to local AI services
+      let response;
+
+      try {
+        response = await secureApiClient.post('/ai-assistant/chat', {
+          message,
+          context: {
+            ...currentContext,
+            portfolioData,
+            marketData,
+            previousMessages: messages.slice(-5) // Send last 5 messages for context
+          }
+        });
+      } catch (apiError) {
+        console.log('Backend API not available, using local AI services:', apiError);
+
+        // Use local AI services as fallback
+        const aiResponse = await nlqService.processQuery(message, {
           ...currentContext,
           portfolioData,
-          marketData,
-          previousMessages: messages.slice(-5) // Send last 5 messages for context
-        }
-      });
+          marketData
+        });
+
+        response = {
+          data: {
+            response: aiResponse.response,
+            suggestions: aiResponse.suggestions || [],
+            charts: [],
+            actions: []
+          }
+        };
+      }
 
       const assistantMessage = {
         id: (Date.now() + 1).toString(),

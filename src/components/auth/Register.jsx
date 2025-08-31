@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { trackComponentRender } from '../../utils/performanceMonitoring';
+
 import { useAuth } from '../../contexts/AuthContext';
+import { trackComponentRender } from '../../utils/performanceMonitoring';
 
 const Register = ({
   onRegister,

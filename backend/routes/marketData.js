@@ -5,6 +5,25 @@ import apiService from '../services/apiService.js';
 
 const router = express.Router();
 
+// Standardized response helpers
+const sendSuccess = (res, data, message = null, status = 200) => {
+  const response = {
+    success: true,
+    data: data,
+    ...(message && { message })
+  };
+  return res.status(status).json(response);
+};
+
+const sendError = (res, message, status = 500, details = null) => {
+  const response = {
+    success: false,
+    message: message,
+    ...(details && { details })
+  };
+  return res.status(status).json(response);
+};
+
 // Validation middleware
 const validateRequest = (req, res, next) => {
   const errors = validationResult(req);
@@ -21,10 +40,11 @@ const validateRequest = (req, res, next) => {
  * GET /api/market-data/quote/:symbol
  * Get real-time quote for a symbol
  */
-router.get('/quote/:symbol',
+router.get(
+  '/quote/:symbol',
   param('symbol').isAlpha().isLength({ min: 1, max: 5 }).toUpperCase(),
   validateRequest,
-  async(req, res) => {
+  async (req, res) => {
     try {
       const { symbol } = req.params;
 
@@ -52,7 +72,10 @@ router.get('/quote/:symbol',
             price: latest || meta.regularMarketPrice,
             previousClose: meta.previousClose,
             change: meta.regularMarketPrice - meta.previousClose,
-            changePercent: ((meta.regularMarketPrice - meta.previousClose) / meta.previousClose * 100).toFixed(2),
+            changePercent: (
+              ((meta.regularMarketPrice - meta.previousClose) / meta.previousClose) *
+              100
+            ).toFixed(2),
             volume: meta.regularMarketVolume,
             marketCap: meta.marketCap,
             currency: meta.currency,
@@ -61,7 +84,7 @@ router.get('/quote/:symbol',
             source: 'yahoo_finance'
           };
 
-          return res.json(response);
+          return sendSuccess(res, response, 'Quote retrieved successfully');
         }
       } catch (_yahooError) {
         console.log('Yahoo Finance failed, trying Alpha Vantage...');
@@ -89,18 +112,16 @@ router.get('/quote/:symbol',
           source: 'alpha_vantage'
         };
 
-        return res.json(response);
+        return sendSuccess(res, response, 'Quote retrieved successfully');
       }
 
       // If all else fails, return demo data
       throw new Error('No data available from any source');
-
     } catch (error) {
       console.error(`Market data error for ${req.params.symbol}:`, error);
-      res.status(500).json({
-        error: 'Failed to fetch market data',
-        message: error.message,
-        symbol: req.params.symbol
+      return sendError(res, 'Failed to fetch market data', 500, {
+        symbol: req.params.symbol,
+        error: error.message
       });
     }
   }
@@ -110,12 +131,15 @@ router.get('/quote/:symbol',
  * GET /api/market-data/historical/:symbol
  * Get historical price data for a symbol
  */
-router.get('/historical/:symbol',
+router.get(
+  '/historical/:symbol',
   param('symbol').isAlpha().isLength({ min: 1, max: 5 }).toUpperCase(),
   query('range').optional().isIn(['1d', '5d', '1mo', '3mo', '6mo', '1y', '2y', '5y']),
-  query('interval').optional().isIn(['1m', '2m', '5m', '15m', '30m', '60m', '90m', '1h', '1d', '5d', '1wk', '1mo', '3mo']),
+  query('interval')
+    .optional()
+    .isIn(['1m', '2m', '5m', '15m', '30m', '60m', '90m', '1h', '1d', '5d', '1wk', '1mo', '3mo']),
   validateRequest,
-  async(req, res) => {
+  async (req, res) => {
     try {
       const { symbol } = req.params;
       const { range = '1mo', interval = '1d' } = req.query;
@@ -134,14 +158,16 @@ router.get('/historical/:symbol',
         const timestamps = result.timestamp;
         const quotes = result.indicators.quote[0];
 
-        const historicalData = timestamps.map((timestamp, index) => ({
-          timestamp: new Date(timestamp * 1000).toISOString(),
-          open: quotes.open[index],
-          high: quotes.high[index],
-          low: quotes.low[index],
-          close: quotes.close[index],
-          volume: quotes.volume[index]
-        })).filter(data => data.close !== null);
+        const historicalData = timestamps
+          .map((timestamp, index) => ({
+            timestamp: new Date(timestamp * 1000).toISOString(),
+            open: quotes.open[index],
+            high: quotes.high[index],
+            low: quotes.low[index],
+            close: quotes.close[index],
+            volume: quotes.volume[index]
+          }))
+          .filter(data => data.close !== null);
 
         const response = {
           symbol: result.meta.symbol,
@@ -157,11 +183,10 @@ router.get('/historical/:symbol',
           source: 'yahoo_finance'
         };
 
-        return res.json(response);
+        return sendSuccess(res, response, 'Quote retrieved successfully');
       }
 
       throw new Error('No historical data available');
-
     } catch (error) {
       console.error(`Historical data error for ${req.params.symbol}:`, error);
       res.status(500).json({
@@ -177,11 +202,12 @@ router.get('/historical/:symbol',
  * GET /api/market-data/intraday/:symbol
  * Get intraday price data with technical indicators
  */
-router.get('/intraday/:symbol',
+router.get(
+  '/intraday/:symbol',
   param('symbol').isAlpha().isLength({ min: 1, max: 5 }).toUpperCase(),
   query('interval').optional().isIn(['1min', '5min', '15min', '30min', '60min']),
   validateRequest,
-  async(req, res) => {
+  async (req, res) => {
     try {
       const { symbol } = req.params;
       const { interval = '5min' } = req.query;
@@ -201,14 +227,16 @@ router.get('/intraday/:symbol',
       const timeSeriesKey = `Time Series (${interval})`;
       if (alphaData[timeSeriesKey]) {
         const timeSeries = alphaData[timeSeriesKey];
-        const data = Object.entries(timeSeries).map(([timestamp, values]) => ({
-          timestamp,
-          open: parseFloat(values['1. open']),
-          high: parseFloat(values['2. high']),
-          low: parseFloat(values['3. low']),
-          close: parseFloat(values['4. close']),
-          volume: parseInt(values['5. volume'])
-        })).sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+        const data = Object.entries(timeSeries)
+          .map(([timestamp, values]) => ({
+            timestamp,
+            open: parseFloat(values['1. open']),
+            high: parseFloat(values['2. high']),
+            low: parseFloat(values['3. low']),
+            close: parseFloat(values['4. close']),
+            volume: parseInt(values['5. volume'])
+          }))
+          .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
 
         const response = {
           symbol,
@@ -218,11 +246,10 @@ router.get('/intraday/:symbol',
           source: 'alpha_vantage'
         };
 
-        return res.json(response);
+        return sendSuccess(res, response, 'Quote retrieved successfully');
       }
 
       throw new Error('No intraday data available');
-
     } catch (error) {
       console.error(`Intraday data error for ${req.params.symbol}:`, error);
       res.status(500).json({
@@ -238,17 +265,18 @@ router.get('/intraday/:symbol',
  * POST /api/market-data/batch
  * Get quotes for multiple symbols
  */
-router.post('/batch',
+router.post(
+  '/batch',
   body('symbols').isArray({ min: 1, max: 10 }),
   body('symbols.*').isAlpha().isLength({ min: 1, max: 5 }),
   validateRequest,
-  async(req, res) => {
+  async (req, res) => {
     try {
       const { symbols } = req.body;
       const results = {};
 
       // Process symbols in parallel with error handling
-      const promises = symbols.map(async(symbol) => {
+      const promises = symbols.map(async symbol => {
         try {
           const data = await apiService.makeApiRequest({
             service: 'yahoo',
@@ -267,7 +295,10 @@ router.post('/batch',
               price: meta.regularMarketPrice,
               previousClose: meta.previousClose,
               change: meta.regularMarketPrice - meta.previousClose,
-              changePercent: ((meta.regularMarketPrice - meta.previousClose) / meta.previousClose * 100).toFixed(2),
+              changePercent: (
+                ((meta.regularMarketPrice - meta.previousClose) / meta.previousClose) *
+                100
+              ).toFixed(2),
               volume: meta.regularMarketVolume,
               currency: meta.currency,
               source: 'yahoo_finance'
@@ -286,7 +317,6 @@ router.post('/batch',
         symbols: results,
         timestamp: new Date().toISOString()
       });
-
     } catch (error) {
       console.error('Batch market data error:', error);
       res.status(500).json({

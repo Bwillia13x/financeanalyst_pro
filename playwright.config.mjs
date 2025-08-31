@@ -21,7 +21,7 @@ export default defineConfig({
       ],
   use: {
     // Force IPv4 loopback to avoid ::1 binding issues in sandboxed envs
-    baseURL: process.env.PW_BASE_URL || 'http://127.0.0.1:5173',
+    baseURL: process.env.PW_BASE_URL || 'http://localhost:5173',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',

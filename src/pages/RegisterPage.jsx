@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate, useLocation, Navigate } from 'react-router-dom';
+
 import Register from '../components/auth/Register';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -18,12 +19,12 @@ const RegisterPage = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
       </div>
     );
   }
 
-  const handleRegister = (registerData) => {
+  const handleRegister = _registerData => {
     // Navigate to intended destination or dashboard
     const from = location.state?.from?.pathname || '/financial-model-workspace';
     navigate(from, { replace: true });
@@ -33,12 +34,7 @@ const RegisterPage = () => {
     navigate('/login', { state: location.state });
   };
 
-  return (
-    <Register
-      onRegister={handleRegister}
-      onLogin={handleLogin}
-    />
-  );
+  return <Register onRegister={handleRegister} onLogin={handleLogin} />;
 };
 
 export default RegisterPage;

@@ -7,7 +7,7 @@ describe('API Health endpoint', () => {
   let server;
   let baseUrl;
 
-  beforeAll(async() => {
+  beforeAll(async () => {
     if (!canBind) return;
     server = app.listen(0);
     await new Promise(resolve => server.once('listening', resolve));
@@ -15,7 +15,7 @@ describe('API Health endpoint', () => {
     baseUrl = `http://127.0.0.1:${port}`;
   });
 
-  afterAll(async() => {
+  afterAll(async () => {
     if (!canBind) return;
     if (server) {
       await new Promise(resolve => server.close(resolve));
@@ -23,12 +23,13 @@ describe('API Health endpoint', () => {
   });
 
   const maybeIt = canBind ? it : it.skip;
-  maybeIt('returns healthy status with metadata', async() => {
+  maybeIt('returns healthy status with metadata', async () => {
     const res = await fetch(`${baseUrl}/api/health`);
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json).toHaveProperty('status', 'healthy');
-    expect(json).toHaveProperty('timestamp');
-    expect(typeof json.uptime).toBe('number');
+    expect(json.success).toBe(true);
+    expect(json.data).toHaveProperty('status', 'healthy');
+    expect(json.data).toHaveProperty('timestamp');
+    expect(typeof json.data.uptime).toBe('number');
   });
 });

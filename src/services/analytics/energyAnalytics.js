@@ -3,11 +3,8 @@
  * Specialized tools for oil & gas, renewable energy, and utility analysis
  */
 
-import { EventEmitter } from 'events';
-
-class EnergyAnalyticsService extends EventEmitter {
+class EnergyAnalyticsService {
   constructor() {
-    super();
     this.commodityPrices = {
       oil: { current_price: 75, volatility: 0.35, mean_reversion: 0.15 },
       gas: { current_price: 3.5, volatility: 0.45, mean_reversion: 0.2 },
@@ -53,10 +50,10 @@ class EnergyAnalyticsService extends EventEmitter {
         portfolio_optimization: this.optimizePortfolio(assetData)
       };
 
-      this.emit('analysis:completed', { type: 'oil_gas_assets', analysis });
+      console.log('Oil & gas assets analysis completed:', { type: 'oil_gas_assets', analysis });
       return analysis;
     } catch (error) {
-      this.emit('analysis:error', { type: 'oil_gas_assets', error });
+      console.error('Oil & gas assets analysis failed:', error);
       throw error;
     }
   }
@@ -167,10 +164,10 @@ class EnergyAnalyticsService extends EventEmitter {
         financing_optimization: this.optimizeProjectFinancing(projectData)
       };
 
-      this.emit('analysis:completed', { type: 'renewable_project', analysis });
+      console.log('Renewable project analysis completed:', { type: 'renewable_project', analysis });
       return analysis;
     } catch (error) {
-      this.emit('analysis:error', { type: 'renewable_project', error });
+      console.error('Renewable project analysis failed:', error);
       throw error;
     }
   }

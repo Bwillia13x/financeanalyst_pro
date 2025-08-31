@@ -1,15 +1,17 @@
 #!/bin/bash
 
 # FinanceAnalyst Pro - Production Deployment Script
-# This script handles the complete deployment process
+# This script handles the complete deployment pipeline for the platform
 
 set -e  # Exit on any error
 
 # Configuration
 PROJECT_NAME="financeanalyst-pro"
-BUILD_DIR="build"
-BACKUP_DIR="backups"
-LOG_FILE="deployment.log"
+AWS_REGION="us-east-1"
+ECR_REPOSITORY="${PROJECT_NAME}"
+ECS_CLUSTER="${PROJECT_NAME}"
+ECS_SERVICE="${PROJECT_NAME}-service"
+ENVIRONMENT=${1:-"staging"}
 
 # Colors for output
 RED='\033[0;31m'
@@ -18,355 +20,356 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# Logging function
-log() {
-    echo -e "${BLUE}[$(date +'%Y-%m-%d %H:%M:%S')]${NC} $1" | tee -a $LOG_FILE
+# Logging functions
+log_info() {
+    echo -e "${BLUE}[INFO]${NC} $1"
 }
 
-error() {
-    echo -e "${RED}[ERROR]${NC} $1" | tee -a $LOG_FILE
-    exit 1
+log_success() {
+    echo -e "${GREEN}[SUCCESS]${NC} $1"
 }
 
-success() {
-    echo -e "${GREEN}[SUCCESS]${NC} $1" | tee -a $LOG_FILE
+log_warning() {
+    echo -e "${YELLOW}[WARNING]${NC} $1"
 }
 
-warning() {
-    echo -e "${YELLOW}[WARNING]${NC} $1" | tee -a $LOG_FILE
+log_error() {
+    echo -e "${RED}[ERROR]${NC} $1"
 }
-
-# Check if environment is provided
-if [ -z "$1" ]; then
-    error "Usage: $0 <environment> [options]
-    
-Environments:
-  staging     Deploy to staging environment
-  production  Deploy to production environment
-  
-Options:
-  --skip-tests    Skip running tests
-  --skip-build    Skip building (use existing build)
-  --dry-run       Show what would be deployed without actually deploying"
-fi
-
-ENVIRONMENT=$1
-SKIP_TESTS=false
-SKIP_BUILD=false
-DRY_RUN=false
-DEPLOY_BACKEND=false
-
-# Parse additional options
-shift
-while [[ $# -gt 0 ]]; do
-    case $1 in
-        --skip-tests)
-            SKIP_TESTS=true
-            shift
-            ;;
-        --skip-build)
-            SKIP_BUILD=true
-            shift
-            ;;
-        --dry-run)
-            DRY_RUN=true
-            shift
-            ;;
-        --deploy-backend)
-            DEPLOY_BACKEND=true
-            shift
-            ;;
-        *)
-            error "Unknown option: $1"
-            ;;
-    esac
-done
-
-log "Starting deployment to $ENVIRONMENT environment"
-
-# Validate environment
-if [[ "$ENVIRONMENT" != "staging" && "$ENVIRONMENT" != "production" ]]; then
-    error "Invalid environment: $ENVIRONMENT. Must be 'staging' or 'production'"
-fi
-
-# Check if we're on the correct branch for production
-if [[ "$ENVIRONMENT" == "production" ]]; then
-    CURRENT_BRANCH=$(git branch --show-current)
-    if [[ "$CURRENT_BRANCH" != "main" ]]; then
-        error "Production deployments must be from 'main' branch. Current branch: $CURRENT_BRANCH"
-    fi
-fi
 
 # Pre-deployment checks
-log "Running pre-deployment checks..."
+pre_deployment_checks() {
+    log_info "Running pre-deployment checks..."
 
-# Check if Node.js is installed
-if ! command -v node &> /dev/null; then
-    error "Node.js is not installed"
-fi
-
-# Check Node.js version
-NODE_VERSION=$(node --version)
-log "Node.js version: $NODE_VERSION"
-
-# Check if npm is installed
-if ! command -v npm &> /dev/null; then
-    error "npm is not installed"
-fi
-
-# Check if git working directory is clean
-if [[ -n $(git status --porcelain) ]]; then
-    warning "Git working directory is not clean. Uncommitted changes detected."
-    if [[ "$ENVIRONMENT" == "production" ]]; then
-        error "Production deployment requires a clean git working directory"
-    fi
-fi
-
-# Install dependencies
-log "Installing dependencies..."
-npm ci
-
-# Run tests (unless skipped)
-if [[ "$SKIP_TESTS" == false ]]; then
-    log "Running tests..."
-    npm test -- --run
-    success "All tests passed"
-else
-    warning "Skipping tests"
-fi
-
-# Run linting
-log "Running code quality checks..."
-npm run lint
-npm run format:check
-success "Code quality checks passed"
-
-# Build application (unless skipped)
-if [[ "$SKIP_BUILD" == false ]]; then
-    log "Building application for $ENVIRONMENT..."
-    
-    # Copy environment-specific configuration
-    if [[ -f ".env.$ENVIRONMENT" ]]; then
-        cp ".env.$ENVIRONMENT" .env.local
-        log "Using environment configuration: .env.$ENVIRONMENT"
-    else
-        warning "No environment-specific configuration found: .env.$ENVIRONMENT"
-    fi
-    
-    # Build the application
-    npm run build
-    success "Build completed successfully"
-    
-    # Verify build output
-    if [[ ! -d "$BUILD_DIR" ]]; then
-        error "Build directory not found: $BUILD_DIR"
-    fi
-    
-    BUILD_SIZE=$(du -sh $BUILD_DIR | cut -f1)
-    log "Build size: $BUILD_SIZE"
-else
-    warning "Skipping build"
-fi
-
-# Create backup of current deployment (production only)
-if [[ "$ENVIRONMENT" == "production" && "$DRY_RUN" == false ]]; then
-    log "Creating backup of current deployment..."
-    BACKUP_NAME="backup-$(date +'%Y%m%d-%H%M%S')"
-    mkdir -p $BACKUP_DIR
-    
-    # This would backup your current production files
-    # Adjust based on your deployment target (S3, server, etc.)
-    log "Backup created: $BACKUP_NAME"
-fi
-
-# Backend deployment (if applicable)
-if [ "$DEPLOY_BACKEND" = "true" ]; then
-  echo "🔧 Deploying backend services..."
-  
-  # Check if we have backend deployment configuration
-  if [ -f "backend/package.json" ]; then
-    cd backend
-    
-    # Deploy to Render, Railway, or Heroku based on environment
-    if [ ! -z "$RENDER_SERVICE_ID" ]; then
-      echo "Deploying backend to Render..."
-      # Render deploys automatically on git push to connected repository
-      echo "✅ Backend deployment triggered via git push (Render auto-deploy)"
-    elif [ ! -z "$RAILWAY_PROJECT_ID" ]; then
-      echo "Deploying backend to Railway..."
-      if command -v railway &> /dev/null; then
-        railway up
-        echo "✅ Backend deployed to Railway"
-      else
-        echo "❌ Railway CLI not found. Install with: npm install -g @railway/cli"
-      fi
-    elif command -v heroku &> /dev/null; then
-      echo "Deploying backend to Heroku..."
-      heroku git:remote -a "$HEROKU_APP_NAME"
-      git push heroku main
-      echo "✅ Backend deployed to Heroku"
-    else
-      echo "⚠️  No backend deployment configuration found"
-    fi
-    
-    cd ..
-  else
-    echo "⚠️  No backend found - skipping backend deployment"
-  fi
-fi
-
-# Deployment based on environment
-if [[ "$DRY_RUN" == true ]]; then
-    log "DRY RUN: Would deploy to $ENVIRONMENT environment"
-    log "Build directory: $BUILD_DIR"
-    log "Files to deploy:"
-    find $BUILD_DIR -type f | head -20
-    if [[ $(find $BUILD_DIR -type f | wc -l) -gt 20 ]]; then
-        log "... and $(( $(find $BUILD_DIR -type f | wc -l) - 20 )) more files"
-    fi
-else
-    case $ENVIRONMENT in
-        staging)
-            log "Deploying to staging environment..."
-            deploy_to_staging
-            ;;
-        production)
-            log "Deploying to production environment..."
-            deploy_to_production
-            ;;
-    esac
-fi
-
-# Deployment functions
-deploy_to_staging() {
-    log "Executing staging deployment..."
-    
-    # Example: Deploy to staging server
-    # rsync -avz --delete $BUILD_DIR/ user@staging-server:/var/www/html/
-    
-    # Example: Deploy to AWS S3
-    # aws s3 sync $BUILD_DIR/ s3://staging-bucket/ --delete
-    
-    # Example: Deploy to Netlify
-    # netlify deploy --dir=$BUILD_DIR --site=staging-site-id
-    
-    # Example: Deploy to Vercel
-    # vercel --prod --yes
-    
-    log "Staging deployment completed"
-    
-    # Run smoke tests
-    run_smoke_tests "https://staging.financeanalyst.pro"
-}
-
-deploy_to_production() {
-    log "Executing production deployment..."
-    
-    # Additional production checks
-    log "Running final production checks..."
-    
-    # Check if staging deployment is healthy
-    if ! check_staging_health; then
-        error "Staging environment is not healthy. Aborting production deployment."
-    fi
-    
-    # Production deployment to Netlify
-    echo "🚀 Starting production deployment..."
-    if command -v netlify &> /dev/null; then
-      echo "Deploying to Netlify production..."
-      netlify deploy --prod --dir dist --message "Production deployment $(date)"
-      if [ $? -eq 0 ]; then
-        echo "✅ Production deployment successful"
-      else
-        echo "❌ Production deployment failed"
+    # Check AWS CLI configuration
+    if ! aws sts get-caller-identity &> /dev/null; then
+        log_error "AWS CLI not configured. Please run 'aws configure'"
         exit 1
-      fi
-    else
-      echo "❌ Netlify CLI not found. Install with: npm install -g netlify-cli"
-      exit 1
     fi
-    
-    # Health check for production
-    echo "⚡ Running production health check..."
-    if [ ! -z "$PRODUCTION_URL" ]; then
-      sleep 30  # Allow time for deployment to propagate
-      curl -f "$PRODUCTION_URL/health" || { echo "❌ Production health check failed"; exit 1; }
-      echo "✅ Production health check passed"
-    else
-      echo "⚠️  PRODUCTION_URL not set - skipping health check"
+
+    # Check if Docker is running
+    if ! docker info &> /dev/null; then
+        log_error "Docker is not running"
+        exit 1
     fi
-    
-    log "Production deployment completed"
-    
-    # Run post-deployment verification
-    run_post_deployment_tests "https://financeanalyst.pro"
-    
-    # Send notifications
-    send_deployment_notification
+
+    # Check if required environment variables are set
+    required_vars=("AWS_ACCOUNT_ID" "DOCKER_USERNAME" "DOCKER_PASSWORD")
+    for var in "${required_vars[@]}"; do
+        if [[ -z "${!var}" ]]; then
+            log_error "Required environment variable $var is not set"
+            exit 1
+        fi
+    done
+
+    log_success "Pre-deployment checks passed"
 }
 
-# Health check functions
-check_staging_health() {
-    log "Checking staging environment health..."
-    
-    # Example health check
-    if curl -f -s "https://staging.financeanalyst.pro/health" > /dev/null; then
+# Build and push Docker image
+build_and_push_image() {
+    log_info "Building and pushing Docker image..."
+
+    # Get git commit hash for image tagging
+    GIT_COMMIT=$(git rev-parse --short HEAD)
+    IMAGE_TAG="${GIT_COMMIT}-${ENVIRONMENT}"
+
+    # Build Docker image
+    log_info "Building Docker image with tag: ${IMAGE_TAG}"
+    docker build \
+        --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
+        --build-arg VCS_REF=${GIT_COMMIT} \
+        --build-arg BUILD_VERSION=${IMAGE_TAG} \
+        --build-arg NODE_ENV=production \
+        -t ${PROJECT_NAME}:${IMAGE_TAG} \
+        -t ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${IMAGE_TAG} \
+        -t ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:latest \
+        .
+
+    # Authenticate with ECR
+    log_info "Authenticating with AWS ECR..."
+    aws ecr get-login-password --region ${AWS_REGION} | \
+        docker login --username AWS --password-stdin \
+        ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
+
+    # Push image to ECR
+    log_info "Pushing image to ECR..."
+    docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${IMAGE_TAG}
+    docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:latest
+
+    log_success "Docker image built and pushed successfully"
+
+    # Return image URI for task definition update
+    echo "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${IMAGE_TAG}"
+}
+
+# Update ECS task definition
+update_task_definition() {
+    local image_uri=$1
+
+    log_info "Updating ECS task definition..."
+
+    # Get current task definition
+    CURRENT_TASK_DEF=$(aws ecs describe-task-definition \
+        --task-definition ${PROJECT_NAME} \
+        --region ${AWS_REGION} \
+        --query 'taskDefinition' \
+        --output json)
+
+    # Create new task definition with updated image
+    NEW_TASK_DEF=$(echo "${CURRENT_TASK_DEF}" | jq --arg IMAGE "${image_uri}" '
+        .containerDefinitions[0].image = $IMAGE |
+        .containerDefinitions[0].environment = [
+            {"name": "NODE_ENV", "value": "production"},
+            {"name": "PORT", "value": "3000"},
+            {"name": "NEXT_PUBLIC_API_URL", "value": "https://api.'${PROJECT_NAME}'.pro"}
+        ]
+    ')
+
+    # Register new task definition
+    TASK_DEF_ARN=$(aws ecs register-task-definition \
+        --cli-input-json "${NEW_TASK_DEF}" \
+        --region ${AWS_REGION} \
+        --query 'taskDefinition.taskDefinitionArn' \
+        --output text)
+
+    log_success "Task definition updated: ${TASK_DEF_ARN}"
+
+    echo "${TASK_DEF_ARN}"
+}
+
+# Deploy to ECS
+deploy_to_ecs() {
+    local task_def_arn=$1
+
+    log_info "Deploying to ECS..."
+
+    # Update service with new task definition
+    aws ecs update-service \
+        --cluster ${ECS_CLUSTER} \
+        --service ${ECS_SERVICE} \
+        --task-definition ${TASK_DEF_ARN} \
+        --force-new-deployment \
+        --region ${AWS_REGION} \
+        --query 'service.serviceArn' \
+        --output text
+
+    log_info "Waiting for deployment to complete..."
+
+    # Wait for service to become stable
+    aws ecs wait services-stable \
+        --cluster ${ECS_CLUSTER} \
+        --services ${ECS_SERVICE} \
+        --region ${AWS_REGION}
+
+    log_success "ECS deployment completed successfully"
+}
+
+# Run health checks
+run_health_checks() {
+    log_info "Running post-deployment health checks..."
+
+    local health_check_url
+    if [[ "${ENVIRONMENT}" == "production" ]]; then
+        health_check_url="https://financeanalyst.pro/api/health"
+    else
+        health_check_url="https://staging.financeanalyst.pro/api/health"
+    fi
+
+    # Wait for application to be ready
+    local max_attempts=30
+    local attempt=1
+
+    while [[ $attempt -le $max_attempts ]]; do
+        log_info "Health check attempt ${attempt}/${max_attempts}..."
+
+        if curl -f -s "${health_check_url}" > /dev/null; then
+            log_success "Health check passed"
+            return 0
+        fi
+
+        sleep 10
+        ((attempt++))
+    done
+
+    log_error "Health check failed after ${max_attempts} attempts"
+    return 1
+}
+
+# Update CloudFront distribution (production only)
+update_cloudfront() {
+    if [[ "${ENVIRONMENT}" != "production" ]]; then
         return 0
-    else
-        return 1
+    fi
+
+    log_info "Updating CloudFront distribution..."
+
+    aws cloudfront create-invalidation \
+        --distribution-id ${CLOUDFRONT_DISTRIBUTION_ID} \
+        --paths "/*" \
+        --region ${AWS_REGION}
+
+    log_success "CloudFront cache invalidated"
+}
+
+# Send deployment notifications
+send_notifications() {
+    local status=$1
+    local commit_hash=$(git rev-parse --short HEAD)
+    local deployer=$(git log -1 --pretty=format:'%an')
+
+    log_info "Sending deployment notifications..."
+
+    # Slack notification
+    if [[ -n "${SLACK_WEBHOOK_URL}" ]]; then
+        local color="good"
+        if [[ "${status}" != "success" ]]; then
+            color="danger"
+        fi
+
+        curl -X POST -H 'Content-type: application/json' \
+            --data "{
+                \"attachments\": [
+                    {
+                        \"color\": \"${color}\",
+                        \"title\": \"${PROJECT_NAME} Deployment ${status}\",
+                        \"fields\": [
+                            {
+                                \"title\": \"Environment\",
+                                \"value\": \"${ENVIRONMENT}\",
+                                \"short\": true
+                            },
+                            {
+                                \"title\": \"Commit\",
+                                \"value\": \"${commit_hash}\",
+                                \"short\": true
+                            },
+                            {
+                                \"title\": \"Deployed by\",
+                                \"value\": \"${deployer}\",
+                                \"short\": true
+                            }
+                        ]
+                    }
+                ]
+            }" \
+            ${SLACK_WEBHOOK_URL}
+    fi
+
+    # Email notification (if configured)
+    if [[ -n "${DEPLOYMENT_EMAIL}" ]]; then
+        echo "Deployment ${status} for ${PROJECT_NAME} in ${ENVIRONMENT} environment" | \
+        mail -s "${PROJECT_NAME} Deployment ${status}" ${DEPLOYMENT_EMAIL}
     fi
 }
 
-run_smoke_tests() {
-    local URL=$1
-    log "Running smoke tests against $URL..."
-    
-    # Example smoke tests
-    if curl -f -s "$URL" > /dev/null; then
-        success "Smoke test passed: Homepage accessible"
-    else
-        error "Smoke test failed: Homepage not accessible"
-    fi
+# Rollback function
+rollback_deployment() {
+    log_warning "Starting deployment rollback..."
+
+    # Get previous task definition
+    PREVIOUS_TASK_DEF=$(aws ecs describe-task-definition \
+        --task-definition ${PROJECT_NAME} \
+        --region ${AWS_REGION} \
+        --query 'taskDefinition.taskDefinitionArn' \
+        --output text)
+
+    # Rollback to previous version
+    aws ecs update-service \
+        --cluster ${ECS_CLUSTER} \
+        --service ${ECS_SERVICE} \
+        --task-definition ${PREVIOUS_TASK_DEF} \
+        --force-new-deployment \
+        --region ${AWS_REGION}
+
+    log_warning "Rollback completed"
 }
 
-run_post_deployment_tests() {
-    local URL=$1
-    log "Running post-deployment tests against $URL..."
-    
-    # Run comprehensive tests
-    # npm run test:e2e -- --baseUrl=$URL
-    
-    success "Post-deployment tests completed"
-}
-
-send_deployment_notification() {
-    log "Sending deployment notification..."
-    
-    # Example: Send Slack notification
-    if [ ! -z "$SLACK_WEBHOOK_URL" ]; then
-      curl -X POST -H 'Content-type: application/json' \
-        --data "{\"text\":\"🚀 FinanceAnalyst Pro deployed successfully to $ENVIRONMENT at $(date)\"}" \
-        "$SLACK_WEBHOOK_URL"
-      echo "✅ Slack notification sent"
-    elif [ ! -z "$DISCORD_WEBHOOK_URL" ]; then
-      curl -X POST -H 'Content-type: application/json' \
-        --data "{\"content\":\"🚀 FinanceAnalyst Pro deployed successfully to $ENVIRONMENT at $(date)\"}" \
-        "$DISCORD_WEBHOOK_URL"
-      echo "✅ Discord notification sent"
-    else
-      echo "⚠️  No notification webhook configured - skipping notification"
-    fi
-    log "Deployment notification sent"
-}
-
-# Cleanup
+# Cleanup function
 cleanup() {
-    log "Cleaning up temporary files..."
-    rm -f .env.local
+    log_info "Cleaning up deployment artifacts..."
+
+    # Remove local Docker images (keep last 3)
+    docker image prune -f
+
+    # Remove old ECR images (keep last 10)
+    aws ecr describe-images \
+        --repository-name ${ECR_REPOSITORY} \
+        --region ${AWS_REGION} \
+        --query 'imageDetails[*].imageDigest' \
+        --output text | \
+    head -n -10 | \
+    xargs -I {} aws ecr batch-delete-image \
+        --repository-name ${ECR_REPOSITORY} \
+        --image-digests digest={} \
+        --region ${AWS_REGION} || true
+
+    log_success "Cleanup completed"
 }
 
-# Set up cleanup trap
-trap cleanup EXIT
+# Main deployment function
+main() {
+    log_info "Starting ${PROJECT_NAME} deployment to ${ENVIRONMENT}..."
 
-success "Deployment to $ENVIRONMENT completed successfully!"
-log "Deployment log saved to: $LOG_FILE"
+    # Trap for cleanup on exit
+    trap cleanup EXIT
+
+    # Run pre-deployment checks
+    pre_deployment_checks
+
+    # Build and push Docker image
+    local image_uri
+    image_uri=$(build_and_push_image)
+
+    # Update task definition
+    local task_def_arn
+    task_def_arn=$(update_task_definition "${image_uri}")
+
+    # Deploy to ECS
+    deploy_to_ecs "${task_def_arn}"
+
+    # Run health checks
+    if ! run_health_checks; then
+        log_error "Health checks failed, initiating rollback..."
+        rollback_deployment
+        send_notifications "failed"
+        exit 1
+    fi
+
+    # Update CloudFront (production only)
+    update_cloudfront
+
+    # Send success notifications
+    send_notifications "success"
+
+    log_success "🎉 Deployment completed successfully!"
+    log_info "Application is available at: https://${ENVIRONMENT}.financeanalyst.pro"
+}
+
+# Error handler
+error_handler() {
+    local exit_code=$?
+    log_error "Deployment failed with exit code ${exit_code}"
+
+    # Send failure notifications
+    send_notifications "failed"
+
+    # Attempt rollback on failure
+    if [[ ${exit_code} -ne 0 ]]; then
+        log_warning "Attempting rollback..."
+        rollback_deployment
+    fi
+
+    exit ${exit_code}
+}
+
+# Set error handler
+trap error_handler ERR
+
+# Validate environment parameter
+if [[ "${ENVIRONMENT}" != "staging" && "${ENVIRONMENT}" != "production" ]]; then
+    log_error "Invalid environment: ${ENVIRONMENT}. Must be 'staging' or 'production'"
+    exit 1
+fi
+
+# Run main deployment
+main "$@"

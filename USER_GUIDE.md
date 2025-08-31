@@ -1,6 +1,8 @@
 # FinanceAnalyst Pro - User Guide
 
-Welcome to FinanceAnalyst Pro, your comprehensive financial modeling and analysis platform. This guide will help you get started and make the most of our powerful features.
+## Welcome to FinanceAnalyst Pro
+
+FinanceAnalyst Pro is a comprehensive AI-powered financial analysis platform designed for finance professionals, analysts, and investment teams. This guide covers all the powerful features available in the platform, including the latest AI, collaboration, and industry-specific tools.
 
 ## 🚀 Quick Start
 
@@ -209,6 +211,111 @@ Access powerful commands instantly with our Command Palette:
 - **Live Chat**: Available during business hours
 - **Documentation**: Comprehensive online docs
 - **Video Calls**: Scheduled support sessions
+
+---
+
+## 🎯 Latest Features
+
+### 🤖 AI Financial Assistant
+The AI Financial Assistant provides intelligent, conversational financial analysis.
+
+**How to Use:**
+1. Click the **blue chat bubble** (🤖) in the bottom-right corner
+2. Ask questions like:
+   - "What's my portfolio risk?"
+   - "Analyze AAPL performance"
+   - "Calculate portfolio metrics"
+   - "Suggest rebalancing strategy"
+
+**Key Features:**
+- Natural language processing
+- Context-aware responses
+- Real-time market insights
+- Financial expertise and recommendations
+
+### 🔄 Real-Time Collaboration
+Collaborative editing allows multiple users to work on financial models simultaneously.
+
+**How to Use:**
+1. Navigate to **Financial Model Workspace**
+2. Click the **"Collaborate"** button in the toolbar
+3. Share the session link with team members
+4. Start collaborating in real-time
+
+**Features:**
+- Live document editing
+- Presence indicators
+- Version control and audit trail
+- Automatic conflict resolution
+
+### 📤 Advanced Export Suite
+Export your financial data in multiple professional formats.
+
+**Supported Formats:**
+- **Excel (.xlsx)**: Full spreadsheet with formulas
+- **PDF Reports**: Professional formatted reports
+- **PowerPoint (.pptx)**: Executive presentations
+- **CSV Data**: Raw data exports
+
+**How to Use:**
+1. Click the **green download button** (📤) in the bottom-right corner
+2. Select desired formats
+3. Configure export options
+4. Download your files
+
+### 📱 Progressive Web App (PWA)
+Works offline and can be installed as a native app.
+
+**Features:**
+- Offline functionality
+- App installation on mobile/desktop
+- Automatic updates
+- Native app experience
+
+### 🏢 Industry Analytics
+Specialized financial analysis tools for different industry sectors.
+
+**Available Industries:**
+- **Banking & Financial Services**: Credit portfolio, Basel III compliance
+- **Healthcare**: Hospital profitability, regulatory compliance
+- **Energy & Utilities**: Energy project valuation, renewable analysis
+- **Real Estate**: Property valuation, REIT analysis
+- **Technology**: SaaS metrics, startup valuation
+
+**How to Use:**
+1. Click the **purple chart button** (📊) in the bottom-right corner
+2. Select your industry
+3. Click "Run Analysis"
+4. View specialized results
+
+### 🛡️ Risk Management Dashboard
+Comprehensive risk assessment using multiple regulatory frameworks.
+
+**Supported Frameworks:**
+- **Basel III**: Banking risk management
+- **COSO ERM**: Enterprise risk management
+- **ISO 31000**: International risk management
+
+**How to Use:**
+1. Click the **red shield button** (🛡️) in the bottom-right corner
+2. Select risk framework
+3. Click "Run Risk Assessment"
+4. Review results and recommendations
+
+---
+
+## 🎛️ Floating Action Buttons
+
+Quick access to all major features:
+
+| Button | Feature | Color | Purpose |
+|--------|---------|-------|---------|
+| 🤖 | AI Assistant | Blue | Intelligent financial queries |
+| 📤 | Export Suite | Green | Multi-format data export |
+| 📊 | Industry Analytics | Purple | Sector-specific analysis |
+| 🛡️ | Risk Management | Red | Comprehensive risk assessment |
+
+---
 
 ### Business Hours
 - **Monday - Friday**: 9:00 AM - 6:00 PM EST

@@ -1,689 +1,630 @@
-// Version Control & Audit Trail Service - Phase 2 Implementation
-export class VersionControlService {
-  constructor() {
-    this.versions = new Map();
+/**
+ * Version Control System for Financial Models
+ * Git-like versioning with branching and merging capabilities
+ * Integrated with collaboration service for team workflows
+ */
+
+class VersionControl {
+  constructor(options = {}) {
+    this.options = {
+      maxVersions: 1000,
+      maxBranches: 50,
+      autoCommit: true,
+      ...options
+    };
+
+    this.repositories = new Map();
     this.branches = new Map();
-    this.auditLog = [];
-    this.currentVersion = null;
-    this.pendingChanges = [];
-    this.mergeStrategies = new Map();
-    this.hooks = new Map();
+    this.commits = new Map();
+    this.tags = new Map();
   }
 
-  // Initialize version control for a model
-  async initializeModel(modelId, initialData, userId) {
-    const initialVersion = {
-      id: this.generateVersionId(),
-      modelId,
-      version: '1.0.0',
-      parentVersion: null,
-      branch: 'main',
-      data: this.deepClone(initialData),
-      metadata: {
-        createdBy: userId,
-        createdAt: new Date().toISOString(),
-        title: 'Initial model version',
-        description: 'Model initialization',
-        tags: ['initial'],
-        size: this.calculateDataSize(initialData)
-      },
-      checksum: await this.calculateChecksum(initialData)
+  /**
+   * Initialize repository for a document/workspace
+   */
+  async initializeRepository(repositoryId, options = {}) {
+    const repository = {
+      id: repositoryId,
+      name: options.name || `Repository ${repositoryId}`,
+      created: new Date(),
+      branches: new Map(),
+      commits: [],
+      tags: new Map(),
+      head: null,
+      defaultBranch: 'main',
+      collaborators: new Set([options.owner || 'system'])
     };
 
-    this.versions.set(initialVersion.id, initialVersion);
-    this.currentVersion = initialVersion.id;
+    // Store repository first before creating branch
+    this.repositories.set(repositoryId, repository);
 
-    // Initialize main branch
-    this.branches.set('main', {
-      name: 'main',
-      head: initialVersion.id,
-      createdAt: new Date().toISOString(),
-      isProtected: true
+    // Create default branch
+    const mainBranch = await this.createBranch(repositoryId, 'main', null, {
+      author: options.owner || 'system'
     });
 
-    this.logAuditEvent({
-      type: 'model_initialized',
-      modelId,
-      versionId: initialVersion.id,
-      userId,
-      timestamp: new Date().toISOString()
-    });
+    repository.branches.set('main', mainBranch);
+    repository.head = mainBranch;
 
-    return initialVersion;
-  }
-
-  // Create new version/commit
-  async createVersion(modelId, changes, metadata, userId) {
-    const parentVersion = this.getVersion(this.currentVersion);
-    if (!parentVersion) {
-      throw new Error('No parent version found');
-    }
-
-    // Apply changes to create new data state
-    const newData = this.applyChanges(parentVersion.data, changes);
-
-    // Validate changes
-    const validation = await this.validateChanges(changes, parentVersion.data, newData);
-    if (!validation.isValid) {
-      throw new Error(`Validation failed: ${validation.errors.join(', ')}`);
-    }
-
-    const newVersion = {
-      id: this.generateVersionId(),
-      modelId,
-      version: this.incrementVersion(parentVersion.version, metadata.changeType || 'minor'),
-      parentVersion: parentVersion.id,
-      branch: parentVersion.branch,
-      data: newData,
-      changes,
-      metadata: {
-        ...metadata,
-        createdBy: userId,
-        createdAt: new Date().toISOString(),
-        changeCount: changes.length,
-        size: this.calculateDataSize(newData),
-        diffSize: this.calculateDiffSize(changes)
-      },
-      checksum: await this.calculateChecksum(newData)
+    // Create initial commit for the main branch
+    const initialCommit = {
+      id: `${repositoryId}_initial_${Date.now()}`,
+      repositoryId,
+      branchId: mainBranch.id,
+      parentCommitId: null,
+      author: options.owner || 'system',
+      message: 'Initial commit',
+      timestamp: new Date(),
+      changes: {},
+      metadata: { type: 'initial' }
     };
 
-    this.versions.set(newVersion.id, newVersion);
-    this.currentVersion = newVersion.id;
+    this.commits.set(initialCommit.id, initialCommit);
+    repository.commits.push(initialCommit);
+    mainBranch.commits.push(initialCommit.id);
+    mainBranch.head = initialCommit.id;
 
-    // Update branch head
-    const branch = this.branches.get(newVersion.branch);
-    if (branch) {
-      branch.head = newVersion.id;
-      branch.lastModified = new Date().toISOString();
-    }
-
-    // Clear pending changes
-    this.pendingChanges = [];
-
-    this.logAuditEvent({
-      type: 'version_created',
-      modelId,
-      versionId: newVersion.id,
-      parentVersionId: parentVersion.id,
-      userId,
-      changeCount: changes.length,
-      timestamp: new Date().toISOString(),
-      metadata
-    });
-
-    return newVersion;
+    return repository;
   }
 
-  // Branch operations
-  async createBranch(branchName, fromVersionId, userId, options = {}) {
-    const sourceVersion = this.getVersion(fromVersionId || this.currentVersion);
-    if (!sourceVersion) {
-      throw new Error('Source version not found');
+  /**
+   * Create branch
+   */
+  async createBranch(repositoryId, branchName, sourceCommitId = null, options = {}) {
+    const repository = this.repositories.get(repositoryId);
+    if (!repository) {
+      throw new Error(`Repository ${repositoryId} not found`);
     }
 
-    if (this.branches.has(branchName)) {
-      throw new Error(`Branch '${branchName}' already exists`);
+    if (repository.branches.size >= this.options.maxBranches) {
+      throw new Error('Maximum number of branches reached');
     }
 
     const branch = {
+      id: `${repositoryId}_${branchName}_${Date.now()}`,
       name: branchName,
-      head: sourceVersion.id,
-      createdBy: userId,
-      createdAt: new Date().toISOString(),
-      sourceVersion: sourceVersion.id,
-      isProtected: options.protected || false,
-      description: options.description || '',
-      tags: options.tags || []
+      repositoryId,
+      created: new Date(),
+      author: options.author || 'system',
+      sourceCommitId,
+      head: sourceCommitId,
+      commits: [],
+      metadata: options.metadata || {}
     };
 
-    this.branches.set(branchName, branch);
-
-    this.logAuditEvent({
-      type: 'branch_created',
-      branchName,
-      sourceVersionId: sourceVersion.id,
-      userId,
-      timestamp: new Date().toISOString()
-    });
+    repository.branches.set(branchName, branch);
+    this.branches.set(branch.id, branch);
 
     return branch;
   }
 
-  async switchBranch(branchName, userId) {
-    const branch = this.branches.get(branchName);
-    if (!branch) {
-      throw new Error(`Branch '${branchName}' not found`);
+  /**
+   * Commit changes
+   */
+  async commit(repositoryId, changes, options = {}) {
+    const repository = this.repositories.get(repositoryId);
+    if (!repository) {
+      throw new Error(`Repository ${repositoryId} not found`);
     }
 
-    const headVersion = this.getVersion(branch.head);
-    if (!headVersion) {
-      throw new Error('Branch head version not found');
+    const currentBranch = repository.head;
+    if (!currentBranch) {
+      throw new Error('No active branch');
     }
 
-    this.currentVersion = headVersion.id;
+    // Create commit
+    const commit = {
+      id: `${repositoryId}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      repositoryId,
+      branchId: currentBranch.id,
+      parentCommitId: currentBranch.head,
+      author: options.author || 'system',
+      message: options.message || 'Auto commit',
+      timestamp: new Date(),
+      changes: this.serializeChanges(changes),
+      metadata: {
+        type: options.type || 'auto',
+        description: options.description || '',
+        tags: options.tags || [],
+        ...options.metadata
+      }
+    };
 
-    this.logAuditEvent({
-      type: 'branch_switched',
-      branchName,
-      versionId: headVersion.id,
-      userId,
-      timestamp: new Date().toISOString()
-    });
+    // Store commit
+    this.commits.set(commit.id, commit);
+    repository.commits.push(commit);
+    currentBranch.commits.push(commit.id);
+    currentBranch.head = commit.id;
 
-    return headVersion;
+    // Prune old commits if needed
+    this.pruneOldCommits(repository);
+
+    return commit;
   }
 
-  async mergeBranch(sourceBranch, targetBranch, userId, strategy = 'auto') {
-    const source = this.branches.get(sourceBranch);
-    const target = this.branches.get(targetBranch);
+  /**
+   * Serialize changes for storage
+   */
+  serializeChanges(changes) {
+    // Convert changes to serializable format
+    if (typeof changes === 'object') {
+      return JSON.parse(JSON.stringify(changes));
+    }
+    return changes;
+  }
 
-    if (!source || !target) {
+  /**
+   * Get commit by ID
+   */
+  getCommit(commitId) {
+    return this.commits.get(commitId);
+  }
+
+  /**
+   * Get commit history for branch
+   */
+  getCommitHistory(repositoryId, branchName = null, limit = 50) {
+    const repository = this.repositories.get(repositoryId);
+    if (!repository) return [];
+
+    const branch = branchName ? repository.branches.get(branchName) : repository.head;
+
+    if (!branch) return [];
+
+    const commits = [];
+    let currentCommitId = branch.head;
+
+    while (currentCommitId && commits.length < limit) {
+      const commit = this.commits.get(currentCommitId);
+      if (!commit) break;
+
+      commits.push(commit);
+      currentCommitId = commit.parentCommitId;
+    }
+
+    return commits;
+  }
+
+  /**
+   * Checkout branch
+   */
+  async checkout(repositoryId, branchName) {
+    const repository = this.repositories.get(repositoryId);
+    if (!repository) {
+      throw new Error(`Repository ${repositoryId} not found`);
+    }
+
+    const branch = repository.branches.get(branchName);
+    if (!branch) {
+      throw new Error(`Branch ${branchName} not found`);
+    }
+
+    repository.head = branch;
+
+    return branch;
+  }
+
+  /**
+   * Merge branches
+   */
+  async merge(repositoryId, sourceBranchName, targetBranchName, options = {}) {
+    const repository = this.repositories.get(repositoryId);
+    if (!repository) {
+      throw new Error(`Repository ${repositoryId} not found`);
+    }
+
+    const sourceBranch = repository.branches.get(sourceBranchName);
+    const targetBranch = repository.branches.get(targetBranchName);
+
+    if (!sourceBranch || !targetBranch) {
       throw new Error('Source or target branch not found');
     }
 
-    const sourceVersion = this.getVersion(source.head);
-    const targetVersion = this.getVersion(target.head);
+    // Find merge base (common ancestor)
+    const mergeBase = this.findMergeBase(sourceBranch, targetBranch);
 
-    // Find common ancestor
-    const commonAncestor = this.findCommonAncestor(sourceVersion.id, targetVersion.id);
-
-    // Collect changes from both branches
-    const sourceChanges = this.getChangesSince(commonAncestor.id, sourceVersion.id);
-    const targetChanges = this.getChangesSince(commonAncestor.id, targetVersion.id);
-
-    // Detect conflicts
-    const conflicts = this.detectConflicts(sourceChanges, targetChanges);
-
-    if (conflicts.length > 0 && strategy === 'auto') {
-      return {
-        success: false,
-        conflicts,
-        requiresManualResolution: true
-      };
+    if (!mergeBase) {
+      throw new Error('No common ancestor found');
     }
 
-    // Apply merge strategy
-    const mergedData = await this.applyMergeStrategy(
-      commonAncestor.data,
-      sourceChanges,
-      targetChanges,
-      conflicts,
-      strategy
-    );
+    // Check for conflicts
+    const conflicts = this.detectMergeConflicts(sourceBranch, targetBranch, mergeBase);
+
+    if (conflicts.length > 0) {
+      if (!options.force) {
+        return {
+          success: false,
+          conflicts,
+          message: 'Merge conflicts detected'
+        };
+      }
+    }
 
     // Create merge commit
-    const mergeVersion = await this.createVersion(
-      targetVersion.modelId,
-      this.generateMergeChanges(targetVersion.data, mergedData),
-      {
-        title: `Merge ${sourceBranch} into ${targetBranch}`,
-        description: `Merged ${sourceChanges.length} changes from ${sourceBranch}`,
-        changeType: 'merge',
-        mergeInfo: {
-          sourceBranch,
-          targetBranch,
-          sourceVersion: sourceVersion.id,
-          targetVersion: targetVersion.id,
-          commonAncestor: commonAncestor.id,
-          conflictsResolved: conflicts.length,
-          strategy
-        }
-      },
-      userId
-    );
+    const mergeCommit = {
+      id: `${repositoryId}_merge_${Date.now()}`,
+      repositoryId,
+      branchId: targetBranch.id,
+      parentCommitId: targetBranch.head,
+      mergeParents: [targetBranch.head, sourceBranch.head],
+      author: options.author || 'system',
+      message: options.message || `Merge branch '${sourceBranchName}' into '${targetBranchName}'`,
+      timestamp: new Date(),
+      changes: this.computeMergeChanges(sourceBranch, targetBranch, mergeBase),
+      metadata: {
+        type: 'merge',
+        sourceBranch: sourceBranchName,
+        targetBranch: targetBranchName,
+        conflictsResolved: conflicts.length,
+        ...options.metadata
+      }
+    };
 
-    this.logAuditEvent({
-      type: 'branch_merged',
-      sourceBranch,
-      targetBranch,
-      mergeVersionId: mergeVersion.id,
-      conflictsCount: conflicts.length,
-      userId,
-      timestamp: new Date().toISOString()
-    });
+    // Store merge commit
+    this.commits.set(mergeCommit.id, mergeCommit);
+    repository.commits.push(mergeCommit);
+    targetBranch.commits.push(mergeCommit.id);
+    targetBranch.head = mergeCommit.id;
 
     return {
       success: true,
-      mergeVersion,
-      conflictsResolved: conflicts.length
+      commit: mergeCommit,
+      conflicts: conflicts.length
     };
   }
 
-  // Change tracking
-  trackChange(change) {
-    const changeRecord = {
-      id: this.generateChangeId(),
-      ...change,
-      timestamp: new Date().toISOString(),
-      status: 'pending'
-    };
+  /**
+   * Find merge base (lowest common ancestor)
+   */
+  findMergeBase(branch1, branch2) {
+    const commits1 = new Set(branch1.commits);
+    const commits2 = new Set(branch2.commits);
 
-    this.pendingChanges.push(changeRecord);
-    return changeRecord;
-  }
-
-  getChanges(versionId, options = {}) {
-    const version = this.getVersion(versionId);
-    if (!version) return [];
-
-    const {
-      includeMetadata = true,
-      filterByType = null,
-      filterByUser = null,
-      since: _since = null
-    } = options;
-
-    let changes = version.changes || [];
-
-    if (filterByType) {
-      changes = changes.filter(change => change.type === filterByType);
-    }
-
-    if (filterByUser) {
-      changes = changes.filter(change => change.userId === filterByUser);
-    }
-
-    if (_since) {
-      const sinceDate = new Date(_since);
-      changes = changes.filter(change => new Date(change.timestamp) >= sinceDate);
-    }
-
-    if (!includeMetadata) {
-      changes = changes.map(({ metadata: _metadata, ...change }) => change);
-    }
-
-    return changes;
-  }
-
-  getChangesSince(ancestorVersionId, versionId) {
-    const changes = [];
-    let currentVersionId = versionId;
-
-    while (currentVersionId && currentVersionId !== ancestorVersionId) {
-      const version = this.getVersion(currentVersionId);
-      if (!version) break;
-
-      if (version.changes) {
-        changes.unshift(...version.changes);
-      }
-
-      currentVersionId = version.parentVersion;
-    }
-
-    return changes;
-  }
-
-  // Audit trail
-  getAuditTrail(options = {}) {
-    const {
-      modelId = null,
-      userId = null,
-      eventType = null,
-      since = null,
-      until = null,
-      limit = null
-    } = options;
-
-    let events = [...this.auditLog];
-
-    if (modelId) {
-      events = events.filter(event => event.modelId === modelId);
-    }
-
-    if (userId) {
-      events = events.filter(event => event.userId === userId);
-    }
-
-    if (eventType) {
-      events = events.filter(event => event.type === eventType);
-    }
-
-    if (since) {
-      const sinceDate = new Date(since);
-      events = events.filter(event => new Date(event.timestamp) >= sinceDate);
-    }
-
-    if (until) {
-      const untilDate = new Date(until);
-      events = events.filter(event => new Date(event.timestamp) <= untilDate);
-    }
-
-    if (limit) {
-      events = events.slice(-limit);
-    }
-
-    return events.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-  }
-
-  logAuditEvent(event) {
-    const auditEvent = {
-      id: this.generateAuditId(),
-      ...event,
-      timestamp: event.timestamp || new Date().toISOString()
-    };
-
-    this.auditLog.push(auditEvent);
-
-    // Emit event for real-time updates
-    this.emitEvent('audit_event', auditEvent);
-  }
-
-  // Version comparison
-  async compareVersions(versionId1, versionId2, options = {}) {
-    const version1 = this.getVersion(versionId1);
-    const version2 = this.getVersion(versionId2);
-
-    if (!version1 || !version2) {
-      throw new Error('One or both versions not found');
-    }
-
-    const diff = this.calculateDiff(version1.data, version2.data, options);
-
-    return {
-      version1: {
-        id: version1.id,
-        version: version1.version,
-        createdAt: version1.metadata.createdAt
-      },
-      version2: {
-        id: version2.id,
-        version: version2.version,
-        createdAt: version2.metadata.createdAt
-      },
-      differences: diff,
-      summary: this.summarizeDiff(diff)
-    };
-  }
-
-  calculateDiff(data1, data2, options = {}) {
-    const { ignoreFields = [], precision = 2 } = options;
-    const diff = [];
-
-    const compare = (obj1, obj2, path = '') => {
-      const keys = new Set([...Object.keys(obj1 || {}), ...Object.keys(obj2 || {})]);
-
-      for (const key of keys) {
-        const fullPath = path ? `${path}.${key}` : key;
-
-        if (ignoreFields.includes(fullPath)) continue;
-
-        const val1 = obj1 ? obj1[key] : undefined;
-        const val2 = obj2 ? obj2[key] : undefined;
-
-        if (val1 === undefined && val2 !== undefined) {
-          diff.push({ type: 'added', path: fullPath, value: val2 });
-        } else if (val1 !== undefined && val2 === undefined) {
-          diff.push({ type: 'removed', path: fullPath, value: val1 });
-        } else if (this.isObject(val1) && this.isObject(val2)) {
-          compare(val1, val2, fullPath);
-        } else if (val1 !== val2) {
-          if (typeof val1 === 'number' && typeof val2 === 'number') {
-            const rounded1 = Math.round(val1 * Math.pow(10, precision)) / Math.pow(10, precision);
-            const rounded2 = Math.round(val2 * Math.pow(10, precision)) / Math.pow(10, precision);
-            if (rounded1 !== rounded2) {
-              diff.push({
-                type: 'modified',
-                path: fullPath,
-                oldValue: val1,
-                newValue: val2,
-                change: val2 - val1,
-                percentChange: val1 !== 0 ? ((val2 - val1) / val1) * 100 : null
-              });
-            }
-          } else {
-            diff.push({ type: 'modified', path: fullPath, oldValue: val1, newValue: val2 });
-          }
-        }
-      }
-    };
-
-    compare(data1, data2);
-    return diff;
-  }
-
-  // Rollback operations
-  async rollbackToVersion(versionId, userId, reason = '') {
-    const targetVersion = this.getVersion(versionId);
-    if (!targetVersion) {
-      throw new Error('Target version not found');
-    }
-
-    const currentVersion = this.getVersion(this.currentVersion);
-
-    // Create rollback version
-    const rollbackChanges = this.generateRollbackChanges(currentVersion.data, targetVersion.data);
-
-    const rollbackVersion = await this.createVersion(
-      currentVersion.modelId,
-      rollbackChanges,
-      {
-        title: `Rollback to version ${targetVersion.version}`,
-        description: `Rolled back from ${currentVersion.version}. Reason: ${reason}`,
-        changeType: 'rollback',
-        rollbackInfo: {
-          targetVersion: versionId,
-          sourceVersion: this.currentVersion,
-          reason
-        }
-      },
-      userId
-    );
-
-    this.logAuditEvent({
-      type: 'version_rollback',
-      modelId: currentVersion.modelId,
-      fromVersionId: this.currentVersion,
-      toVersionId: versionId,
-      rollbackVersionId: rollbackVersion.id,
-      reason,
-      userId,
-      timestamp: new Date().toISOString()
-    });
-
-    return rollbackVersion;
-  }
-
-  // Utility methods
-  getVersion(versionId) {
-    return this.versions.get(versionId);
-  }
-
-  getCurrentVersion() {
-    return this.getVersion(this.currentVersion);
-  }
-
-  getVersionHistory(modelId, options = {}) {
-    const { branch = null, limit = null, since = null } = options;
-
-    let versions = Array.from(this.versions.values()).filter(v => v.modelId === modelId);
-
-    if (branch) {
-      versions = versions.filter(v => v.branch === branch);
-    }
-
-    if (since) {
-      const sinceDate = new Date(since);
-      versions = versions.filter(v => new Date(v.metadata.createdAt) >= sinceDate);
-    }
-
-    versions.sort((a, b) => new Date(b.metadata.createdAt) - new Date(a.metadata.createdAt));
-
-    if (limit) {
-      versions = versions.slice(0, limit);
-    }
-
-    return versions;
-  }
-
-  findCommonAncestor(versionId1, versionId2) {
-    const ancestors1 = this.getAncestors(versionId1);
-    const ancestors2 = this.getAncestors(versionId2);
-
-    for (const ancestor1 of ancestors1) {
-      if (ancestors2.some(ancestor2 => ancestor2.id === ancestor1.id)) {
-        return ancestor1;
+    // Find intersection of commit histories
+    for (const commitId of branch1.commits) {
+      if (commits2.has(commitId)) {
+        return this.commits.get(commitId);
       }
     }
 
     return null;
   }
 
-  getAncestors(versionId) {
-    const ancestors = [];
-    let currentVersionId = versionId;
-
-    while (currentVersionId) {
-      const version = this.getVersion(currentVersionId);
-      if (!version) break;
-
-      ancestors.push(version);
-      currentVersionId = version.parentVersion;
-    }
-
-    return ancestors;
-  }
-
-  // Helper methods
-  generateVersionId() {
-    return `version_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-  }
-
-  generateChangeId() {
-    return `change_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-  }
-
-  generateAuditId() {
-    return `audit_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-  }
-
-  incrementVersion(currentVersion, changeType) {
-    const [major, minor, patch] = currentVersion.split('.').map(Number);
-
-    switch (changeType) {
-      case 'major':
-        return `${major + 1}.0.0`;
-      case 'minor':
-        return `${major}.${minor + 1}.0`;
-      case 'patch':
-      default:
-        return `${major}.${minor}.${patch + 1}`;
-    }
-  }
-
-  async calculateChecksum(data) {
-    const jsonString = JSON.stringify(data, Object.keys(data).sort());
-    const encoder = new TextEncoder();
-    const dataBuffer = encoder.encode(jsonString);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-  }
-
-  calculateDataSize(data) {
-    return JSON.stringify(data).length;
-  }
-
-  calculateDiffSize(changes) {
-    return JSON.stringify(changes).length;
-  }
-
-  deepClone(obj) {
-    return JSON.parse(JSON.stringify(obj));
-  }
-
-  isObject(val) {
-    return val !== null && typeof val === 'object' && !Array.isArray(val);
-  }
-
-  applyChanges(data, changes) {
-    const newData = this.deepClone(data);
-
-    changes.forEach(change => {
-      const { path, type, value, oldValue: _oldValue } = change;
-      const pathArray = path.split('.');
-
-      let current = newData;
-      for (let i = 0; i < pathArray.length - 1; i++) {
-        if (!current[pathArray[i]]) {
-          current[pathArray[i]] = {};
-        }
-        current = current[pathArray[i]];
-      }
-
-      const finalKey = pathArray[pathArray.length - 1];
-
-      switch (type) {
-        case 'add':
-        case 'modify':
-          current[finalKey] = value;
-          break;
-        case 'delete':
-          delete current[finalKey];
-          break;
-      }
-    });
-
-    return newData;
-  }
-
-  async validateChanges(changes, oldData, newData) {
-    const errors = [];
-
-    // Basic validation
-    changes.forEach(change => {
-      if (!change.path) {
-        errors.push('Change missing path');
-      }
-      if (!change.type) {
-        errors.push('Change missing type');
-      }
-    });
-
-    // Data integrity checks
-    try {
-      JSON.stringify(newData);
-    } catch (_e) {
-      errors.push('New data is not serializable');
-    }
-
-    return {
-      isValid: errors.length === 0,
-      errors
-    };
-  }
-
-  detectConflicts(changes1, changes2) {
+  /**
+   * Detect merge conflicts
+   */
+  detectMergeConflicts(sourceBranch, targetBranch, mergeBase) {
     const conflicts = [];
 
-    changes1.forEach(change1 => {
-      changes2.forEach(change2 => {
-        if (change1.path === change2.path && change1.type !== change2.type) {
-          conflicts.push({
-            path: change1.path,
-            conflict: 'type_mismatch',
-            change1,
-            change2
-          });
-        } else if (change1.path === change2.path && change1.value !== change2.value) {
-          conflicts.push({
-            path: change1.path,
-            conflict: 'value_mismatch',
-            change1,
-            change2
-          });
-        }
-      });
-    });
+    // Get changes since merge base for both branches
+    const sourceChanges = this.getChangesSince(sourceBranch, mergeBase?.id);
+    const targetChanges = this.getChangesSince(targetBranch, mergeBase?.id);
+
+    // Find conflicting changes
+    for (const [path, sourceChange] of Object.entries(sourceChanges)) {
+      const targetChange = targetChanges[path];
+
+      if (targetChange && this.areChangesConflicting(sourceChange, targetChange)) {
+        conflicts.push({
+          path,
+          source: sourceChange,
+          target: targetChange
+        });
+      }
+    }
 
     return conflicts;
   }
 
-  emitEvent(eventName, data) {
-    // This would integrate with the event system
-    if (typeof window !== 'undefined' && window.dispatchEvent) {
-      window.dispatchEvent(new CustomEvent(`version_control_${eventName}`, { detail: data }));
+  /**
+   * Get changes since commit
+   */
+  getChangesSince(branch, sinceCommitId) {
+    const changes = {};
+    let currentCommitId = branch.head;
+
+    while (currentCommitId && currentCommitId !== sinceCommitId) {
+      const commit = this.commits.get(currentCommitId);
+      if (!commit) break;
+
+      // Merge changes (later commits override earlier ones)
+      Object.assign(changes, commit.changes);
+      currentCommitId = commit.parentCommitId;
     }
+
+    return changes;
+  }
+
+  /**
+   * Check if changes conflict
+   */
+  areChangesConflicting(change1, change2) {
+    // Simple conflict detection - same path modified differently
+    return change1.value !== change2.value;
+  }
+
+  /**
+   * Compute merge changes
+   */
+  computeMergeChanges(sourceBranch, targetBranch, mergeBase) {
+    const sourceChanges = this.getChangesSince(sourceBranch, mergeBase?.id);
+    const targetChanges = this.getChangesSince(targetBranch, mergeBase?.id);
+
+    // Merge changes (target changes take precedence)
+    return { ...sourceChanges, ...targetChanges };
+  }
+
+  /**
+   * Create tag
+   */
+  async createTag(repositoryId, tagName, commitId, options = {}) {
+    const repository = this.repositories.get(repositoryId);
+    if (!repository) {
+      throw new Error(`Repository ${repositoryId} not found`);
+    }
+
+    const commit = this.commits.get(commitId);
+    if (!commit) {
+      throw new Error(`Commit ${commitId} not found`);
+    }
+
+    const tag = {
+      id: `${repositoryId}_tag_${tagName}`,
+      name: tagName,
+      repositoryId,
+      commitId,
+      author: options.author || 'system',
+      message: options.message || '',
+      created: new Date(),
+      metadata: options.metadata || {}
+    };
+
+    repository.tags.set(tagName, tag);
+    this.tags.set(tag.id, tag);
+
+    return tag;
+  }
+
+  /**
+   * Get repository statistics
+   */
+  getRepositoryStats(repositoryId) {
+    const repository = this.repositories.get(repositoryId);
+    if (!repository) return null;
+
+    const stats = {
+      totalCommits: repository.commits.length,
+      totalBranches: repository.branches.size,
+      totalTags: repository.tags.size,
+      collaborators: repository.collaborators.size,
+      created: repository.created,
+      lastActivity:
+        repository.commits.length > 0
+          ? repository.commits[repository.commits.length - 1].timestamp
+          : repository.created
+    };
+
+    // Branch statistics
+    stats.branches = {};
+    for (const [branchName, branch] of repository.branches) {
+      stats.branches[branchName] = {
+        commits: branch.commits.length,
+        lastCommit:
+          branch.commits.length > 0
+            ? this.commits.get(branch.commits[branch.commits.length - 1])?.timestamp
+            : null
+      };
+    }
+
+    return stats;
+  }
+
+  /**
+   * Prune old commits to maintain performance
+   */
+  pruneOldCommits(repository) {
+    if (repository.commits.length <= this.options.maxVersions) return;
+
+    // Keep only recent commits
+    const commitsToKeep = repository.commits.slice(-this.options.maxVersions);
+    const commitsToRemove = repository.commits.slice(0, -this.options.maxVersions);
+
+    // Remove from storage
+    commitsToRemove.forEach(commit => {
+      this.commits.delete(commit.id);
+    });
+
+    repository.commits = commitsToKeep;
+
+    // Update branches to point to existing commits
+    for (const branch of repository.branches.values()) {
+      if (branch.head && commitsToRemove.some(c => c.id === branch.head)) {
+        // Find the closest ancestor that still exists
+        branch.head = this.findClosestExistingAncestor(branch, commitsToKeep);
+      }
+    }
+  }
+
+  /**
+   * Find closest existing ancestor commit
+   */
+  findClosestExistingAncestor(branch, existingCommits) {
+    const existingCommitIds = new Set(existingCommits.map(c => c.id));
+
+    for (let i = branch.commits.length - 1; i >= 0; i--) {
+      const commitId = branch.commits[i];
+      if (existingCommitIds.has(commitId)) {
+        return commitId;
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Export repository
+   */
+  exportRepository(repositoryId) {
+    const repository = this.repositories.get(repositoryId);
+    if (!repository) return null;
+
+    const exportData = {
+      repository: {
+        id: repository.id,
+        name: repository.name,
+        created: repository.created,
+        defaultBranch: repository.defaultBranch
+      },
+      branches: {},
+      commits: {},
+      tags: {}
+    };
+
+    // Export branches
+    for (const [branchName, branch] of repository.branches) {
+      exportData.branches[branchName] = {
+        id: branch.id,
+        name: branch.name,
+        head: branch.head,
+        commits: branch.commits
+      };
+    }
+
+    // Export commits
+    for (const commit of repository.commits) {
+      exportData.commits[commit.id] = {
+        ...commit,
+        changes: commit.changes // Include changes for full export
+      };
+    }
+
+    // Export tags
+    for (const [tagName, tag] of repository.tags) {
+      exportData.tags[tagName] = tag;
+    }
+
+    return exportData;
+  }
+
+  /**
+   * Import repository
+   */
+  async importRepository(importData) {
+    const repositoryId = importData.repository.id;
+
+    // Initialize repository
+    const repository = await this.initializeRepository(repositoryId, {
+      name: importData.repository.name,
+      owner: 'import'
+    });
+
+    // Import commits
+    for (const [commitId, commitData] of Object.entries(importData.commits)) {
+      this.commits.set(commitId, commitData);
+      repository.commits.push(commitData);
+    }
+
+    // Import branches
+    for (const [branchName, branchData] of Object.entries(importData.branches)) {
+      const branch = {
+        ...branchData,
+        repositoryId,
+        created: new Date(branchData.created || Date.now())
+      };
+
+      repository.branches.set(branchName, branch);
+      this.branches.set(branch.id, branch);
+    }
+
+    // Set head to default branch
+    const defaultBranch = repository.branches.get(importData.repository.defaultBranch);
+    if (defaultBranch) {
+      repository.head = defaultBranch;
+    }
+
+    // Import tags
+    for (const [tagName, tagData] of Object.entries(importData.tags)) {
+      repository.tags.set(tagName, tagData);
+      this.tags.set(tagData.id, tagData);
+    }
+
+    return repository;
+  }
+
+  /**
+   * Get repository info
+   */
+  getRepositoryInfo(repositoryId) {
+    const repository = this.repositories.get(repositoryId);
+    if (!repository) return null;
+
+    return {
+      id: repository.id,
+      name: repository.name,
+      created: repository.created,
+      branches: Array.from(repository.branches.keys()),
+      tags: Array.from(repository.tags.keys()),
+      head: repository.head?.name,
+      collaborators: Array.from(repository.collaborators)
+    };
+  }
+
+  /**
+   * List repositories
+   */
+  listRepositories() {
+    const repositories = [];
+
+    for (const repository of this.repositories.values()) {
+      repositories.push(this.getRepositoryInfo(repository.id));
+    }
+
+    return repositories;
+  }
+
+  /**
+   * Delete repository
+   */
+  async deleteRepository(repositoryId) {
+    const repository = this.repositories.get(repositoryId);
+    if (!repository) return;
+
+    // Delete all branches
+    for (const branch of repository.branches.values()) {
+      this.branches.delete(branch.id);
+    }
+
+    // Delete all commits
+    for (const commit of repository.commits) {
+      this.commits.delete(commit.id);
+    }
+
+    // Delete all tags
+    for (const tag of repository.tags.values()) {
+      this.tags.delete(tag.id);
+    }
+
+    this.repositories.delete(repositoryId);
+  }
+
+  /**
+   * Get version control statistics
+   */
+  getStats() {
+    return {
+      repositories: this.repositories.size,
+      branches: this.branches.size,
+      commits: this.commits.size,
+      tags: this.tags.size
+    };
   }
 }
 
-export const versionControlService = new VersionControlService();
+// Export singleton instance
+export const versionControl = new VersionControl({
+  maxVersions: 1000,
+  maxBranches: 50,
+  autoCommit: true
+});
+
+export default VersionControl;

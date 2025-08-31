@@ -5,11 +5,30 @@ import cacheService from '../services/cacheService.js';
 
 const router = express.Router();
 
+// Standardized response helpers
+const sendSuccess = (res, data, message = null, status = 200) => {
+  const response = {
+    success: true,
+    data: data,
+    ...(message && { message })
+  };
+  return res.status(status).json(response);
+};
+
+const sendError = (res, message, status = 500, details = null) => {
+  const response = {
+    success: false,
+    message: message,
+    ...(details && { details })
+  };
+  return res.status(status).json(response);
+};
+
 /**
  * GET /api/health
  * General health check endpoint
  */
-router.get('/', async(req, res) => {
+router.get('/', async (req, res) => {
   try {
     const health = {
       status: 'healthy',
@@ -20,10 +39,10 @@ router.get('/', async(req, res) => {
       demoMode: process.env.DEMO_MODE === 'true'
     };
 
-    res.json(health);
+    sendSuccess(res, health, 'System is healthy');
   } catch (error) {
     console.error('Health check failed:', error);
-    res.status(500).json({
+    sendError(res, 'Health check failed', 500, {
       status: 'unhealthy',
       error: error.message,
       timestamp: new Date().toISOString()
@@ -35,22 +54,26 @@ router.get('/', async(req, res) => {
  * GET /api/health/services
  * Check health of external API services
  */
-router.get('/services', async(req, res) => {
+router.get('/services', async (req, res) => {
   try {
     const serviceHealth = await apiService.healthCheck();
 
     const overallStatus = Object.values(serviceHealth).every(
       service => service.status === 'available' || service.status === 'not_configured'
-    ) ? 'healthy' : 'degraded';
+    )
+      ? 'healthy'
+      : 'degraded';
 
-    res.json({
+    const data = {
       status: overallStatus,
       services: serviceHealth,
       timestamp: new Date().toISOString()
-    });
+    };
+
+    sendSuccess(res, data, 'Service health check completed');
   } catch (error) {
     console.error('Service health check failed:', error);
-    res.status(500).json({
+    sendError(res, 'Service health check failed', 500, {
       status: 'unhealthy',
       error: error.message,
       timestamp: new Date().toISOString()
@@ -66,14 +89,16 @@ router.get('/cache', (req, res) => {
   try {
     const cacheStats = cacheService.getStats();
 
-    res.json({
+    const data = {
       status: 'healthy',
       cache: cacheStats,
       timestamp: new Date().toISOString()
-    });
+    };
+
+    sendSuccess(res, data, 'Cache health check completed');
   } catch (error) {
     console.error('Cache health check failed:', error);
-    res.status(500).json({
+    sendError(res, 'Cache health check failed', 500, {
       status: 'unhealthy',
       error: error.message,
       timestamp: new Date().toISOString()
@@ -88,7 +113,10 @@ router.get('/cache', (req, res) => {
 router.delete('/cache', (req, res) => {
   try {
     // Only allow in development or with admin key
-    if (process.env.NODE_ENV === 'production' && req.headers['x-admin-key'] !== process.env.ADMIN_KEY) {
+    if (
+      process.env.NODE_ENV === 'production' &&
+      req.headers['x-admin-key'] !== process.env.ADMIN_KEY
+    ) {
       return res.status(403).json({
         error: 'Forbidden: Admin access required'
       });

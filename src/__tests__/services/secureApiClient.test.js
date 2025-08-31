@@ -10,11 +10,11 @@ describe('SecureApiClient', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
-    
+
     // Mock axios.create to return a mock instance
     mockedAxios.create.mockReturnValue({
       get: vi.fn(),
-      post: vi.fn(), 
+      post: vi.fn(),
       put: vi.fn(),
       delete: vi.fn(),
       interceptors: {
@@ -102,7 +102,7 @@ describe('SecureApiClient', () => {
       const result = await secureApiClient.getBatchQuotes(symbols);
 
       expect(mockClient.post).toHaveBeenCalledWith('/market-data/batch-quotes', {
-        symbols: symbols
+        symbols
       });
       expect(result).toEqual(mockResponse.data);
     });
@@ -216,7 +216,7 @@ describe('SecureApiClient', () => {
   describe('Authentication Integration', () => {
     test('should add authorization header when token exists', () => {
       localStorage.setItem('accessToken', 'test-token');
-      
+
       const mockInterceptor = vi.fn((config) => {
         config.headers = config.headers || {};
         const token = localStorage.getItem('accessToken');
@@ -235,7 +235,7 @@ describe('SecureApiClient', () => {
 
     test('should not add authorization header when no token', () => {
       localStorage.removeItem('accessToken');
-      
+
       const mockInterceptor = vi.fn((config) => {
         const token = localStorage.getItem('accessToken');
         if (token) {
