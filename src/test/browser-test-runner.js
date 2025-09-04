@@ -36,7 +36,7 @@
     tests: new Map(),
 
     // Register a test
-    registerTest: function (category, name, testFunction) {
+    registerTest (category, name, testFunction) {
       if (!this.tests.has(category)) {
         this.tests.set(category, new Map());
       }
@@ -52,7 +52,7 @@
     },
 
     // Run all tests
-    runAllTests: async function () {
+    async runAllTests () {
       console.log('🚀 Starting FinanceAnalyst Pro Browser Test Suite');
       console.log('='.repeat(60));
 
@@ -87,7 +87,7 @@
     },
 
     // Run tests for a specific category
-    runCategoryTests: async function (category, categoryTests) {
+    async runCategoryTests (category, categoryTests) {
       console.log(`🧪 Running ${category} tests...`);
 
       for (const [testName, testInfo] of categoryTests.entries()) {
@@ -136,7 +136,7 @@
     },
 
     // Run a specific test
-    runTest: async function (category, testName) {
+    async runTest (category, testName) {
       const categoryTests = this.tests.get(category);
       if (!categoryTests) {
         console.error(`Category '${category}' not found`);
@@ -169,7 +169,7 @@
     },
 
     // Display final test report
-    displayFinalReport: function () {
+    displayFinalReport () {
       console.log('📊 FINAL TEST REPORT');
       console.log('='.repeat(40));
 
@@ -213,7 +213,7 @@
     },
 
     // Get test statistics
-    getStats: function () {
+    getStats () {
       return {
         ...this.results,
         categories: Array.from(this.tests.keys()),
@@ -222,13 +222,13 @@
     },
 
     // Configure test runner
-    configure: function (newConfig) {
+    configure (newConfig) {
       this.config = { ...this.config, ...newConfig };
       console.log('✅ Test runner configuration updated');
     },
 
     // Clear all test results
-    clearResults: function () {
+    clearResults () {
       this.results = {
         total: 0,
         passed: 0,
@@ -252,7 +252,7 @@
     },
 
     // List all available tests
-    listTests: function () {
+    listTests () {
       console.log('📋 AVAILABLE TESTS');
       console.log('='.repeat(30));
 
@@ -278,21 +278,21 @@
   const testRunner = window.FinanceAnalystTestRunner;
 
   // Unit Tests
-  testRunner.registerTest('unit', 'authentication service exists', async function () {
+  testRunner.registerTest('unit', 'authentication service exists', async () => {
     if (typeof window.authenticationService === 'undefined') {
       throw new Error('Authentication service not found');
     }
     expect(window.authenticationService).toBeDefined();
   });
 
-  testRunner.registerTest('unit', 'security audit service exists', async function () {
+  testRunner.registerTest('unit', 'security audit service exists', async () => {
     if (typeof window.securityAuditService === 'undefined') {
       throw new Error('Security audit service not found');
     }
     expect(window.securityAuditService).toBeDefined();
   });
 
-  testRunner.registerTest('unit', 'mobile responsive service exists', async function () {
+  testRunner.registerTest('unit', 'mobile responsive service exists', async () => {
     if (typeof window.mobileResponsiveService === 'undefined') {
       throw new Error('Mobile responsive service not found');
     }
@@ -300,7 +300,7 @@
   });
 
   // Integration Tests
-  testRunner.registerTest('integration', 'services can initialize', async function () {
+  testRunner.registerTest('integration', 'services can initialize', async () => {
     const services = [
       window.authenticationService,
       window.securityAuditService,
@@ -316,7 +316,7 @@
     expect(true).toBe(true); // If we get here, initialization succeeded
   });
 
-  testRunner.registerTest('integration', 'device detection works', async function () {
+  testRunner.registerTest('integration', 'device detection works', async () => {
     if (!window.mobileResponsiveService) {
       throw new Error('Mobile responsive service not available');
     }
@@ -328,7 +328,7 @@
   });
 
   // E2E Tests
-  testRunner.registerTest('e2e', 'page loads successfully', async function () {
+  testRunner.registerTest('e2e', 'page loads successfully', async () => {
     const mainContent = document.querySelector('main') || document.body;
     expect(mainContent).toBeDefined();
 
@@ -338,7 +338,7 @@
     expect(document.readyState).toBe('complete');
   });
 
-  testRunner.registerTest('e2e', 'basic navigation works', async function () {
+  testRunner.registerTest('e2e', 'basic navigation works', async () => {
     // This would test actual navigation if implemented
     expect(window.location).toBeDefined();
     expect(typeof window.location.href).toBe('string');
@@ -356,32 +356,32 @@
   // Make expect function available globally for tests
   window.expect = function (actual) {
     return {
-      toBe: function (expected) {
+      toBe (expected) {
         if (actual !== expected) {
           throw new Error(`Expected ${expected}, but got ${actual}`);
         }
       },
-      toBeDefined: function () {
+      toBeDefined () {
         if (typeof actual === 'undefined') {
           throw new Error('Expected value to be defined');
         }
       },
-      toBeGreaterThan: function (expected) {
+      toBeGreaterThan (expected) {
         if (!(actual > expected)) {
           throw new Error(`Expected ${actual} to be greater than ${expected}`);
         }
       },
-      toBeLessThan: function (expected) {
+      toBeLessThan (expected) {
         if (!(actual < expected)) {
           throw new Error(`Expected ${actual} to be less than ${expected}`);
         }
       },
-      toContain: function (expected) {
+      toContain (expected) {
         if (!actual || !actual.includes(expected)) {
           throw new Error(`Expected ${actual} to contain ${expected}`);
         }
       },
-      toEqual: function (expected) {
+      toEqual (expected) {
         if (JSON.stringify(actual) !== JSON.stringify(expected)) {
           throw new Error(
             `Expected ${JSON.stringify(expected)}, but got ${JSON.stringify(actual)}`

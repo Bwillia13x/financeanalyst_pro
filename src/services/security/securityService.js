@@ -103,7 +103,7 @@ class SecurityService {
       const encrypted = await crypto.subtle.encrypt(
         {
           name: 'AES-GCM',
-          iv: iv
+          iv
         },
         this.encryptionKey,
         encodedData
@@ -426,7 +426,7 @@ class SecurityService {
         this.logSecurityEvent('threat_detected', {
           type: threatType,
           severity: config.severity,
-          activity: activity,
+          activity,
           timestamp: Date.now()
         });
 

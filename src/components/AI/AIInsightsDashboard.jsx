@@ -1,4 +1,3 @@
-import React, { useState, useEffect, useMemo } from 'react';
 import {
   TrendingUp,
   TrendingDown,
@@ -13,6 +12,7 @@ import {
   Eye,
   EyeOff
 } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
 
 import advancedAIService from '../../services/ai/advancedAIService';
 
@@ -185,7 +185,7 @@ const AIInsightsDashboard = ({
     return (
       <div className={`bg-slate-800 rounded-lg p-6 ${className}`}>
         <div className="flex items-center justify-center h-32">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
           <span className="ml-3 text-slate-300">Loading AI insights...</span>
         </div>
       </div>

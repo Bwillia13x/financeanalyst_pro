@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '../ui/Card';
-import Button from '../ui/Button';
-import { performanceMonitorService } from '../../services/performance/PerformanceMonitorService';
+
 import { bundleOptimizerService } from '../../services/performance/BundleOptimizerService';
 import { cachingService } from '../../services/performance/CachingService';
 import { memoryManagerService } from '../../services/performance/MemoryManagerService';
+import { performanceMonitorService } from '../../services/performance/PerformanceMonitorService';
 import { performanceTestingService } from '../../services/performance/PerformanceTestingService';
+import Button from '../ui/Button';
+import { Card, CardHeader, CardTitle, CardContent } from '../ui/Card';
 
 const PerformanceDashboard = () => {
   const [performanceData, setPerformanceData] = useState(null);

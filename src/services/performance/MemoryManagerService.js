@@ -707,12 +707,8 @@ class MemoryManagerService {
   cleanup() {
     this.forceCleanup();
 
-    // Clear event listeners
-    for (const [element, listeners] of this.eventListeners.entries()) {
-      for (const [listenerId, listenerInfo] of listeners.entries()) {
-        element.removeEventListener(listenerInfo.event, listenerInfo.handler, listenerInfo.options);
-      }
-    }
+    // Clear event listeners - WeakMap doesn't support iteration
+    // We'll reset the entire WeakMap since we can't iterate over it
     this.eventListeners = new WeakMap();
 
     console.log('Full memory cleanup completed');

@@ -1,10 +1,3 @@
-import React, { useState, useEffect } from 'react';
-import Header from '../components/ui/Header';
-
-// UI Components
-import Button from '../components/ui/Button';
-
-// Icons
 import {
   Play,
   Pause,
@@ -35,6 +28,14 @@ import {
   Info,
   HelpCircle
 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+
+import Button from '../components/ui/Button';
+import Header from '../components/ui/Header';
+
+// UI Components
+
+// Icons
 
 // Animation trigger hook
 const useAnimationTrigger = () => {
@@ -149,7 +150,8 @@ const AnimationSystemDemo = () => {
                 background: rgba(255, 0, 0, 0.05) !important;
                 border: 1px solid rgba(255, 0, 0, 0.1) !important;
               }
-            `}</style>
+            `}
+            </style>
           </div>
         )}
 
@@ -597,7 +599,7 @@ const AnimationSystemDemo = () => {
                   <div className="space-y-4">
                     <div className="p-4 bg-card border border-border rounded-lg">
                       <div className="flex items-center gap-3">
-                        <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animation-loading-spin-fast"></div>
+                        <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animation-loading-spin-fast" />
                         <div>
                           <div className="text-sm font-medium text-foreground">Fast Spinner</div>
                           <div className="text-xs text-foreground-secondary">Loading indicator</div>
@@ -607,7 +609,7 @@ const AnimationSystemDemo = () => {
 
                     <div className="p-4 bg-card border border-border rounded-lg">
                       <div className="flex items-center gap-3">
-                        <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animation-loading-spin-slow"></div>
+                        <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animation-loading-spin-slow" />
                         <div>
                           <div className="text-sm font-medium text-foreground">Slow Spinner</div>
                           <div className="text-xs text-foreground-secondary">Gentle loading</div>
@@ -637,14 +639,14 @@ const AnimationSystemDemo = () => {
                             '--progress-value': triggered ? '75%' : '0%',
                             animation: triggered ? 'progress-fill 1s ease-out' : 'none'
                           }}
-                        ></div>
+                        />
                       </div>
                       <div className="text-xs text-foreground-secondary mt-1">75% Complete</div>
                     </div>
 
                     <div className="p-4 bg-card border border-border rounded-lg">
                       <div className="text-sm font-medium text-foreground mb-2">Shimmer Effect</div>
-                      <div className="h-8 bg-background-secondary rounded animation-loading-shimmer"></div>
+                      <div className="h-8 bg-background-secondary rounded animation-loading-shimmer" />
                       <div className="text-xs text-foreground-secondary mt-1">Loading skeleton</div>
                     </div>
                   </div>

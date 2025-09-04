@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState, lazy, Suspense } from 'react';
 
 import Icon from '../../components/AppIcon';
+import CollaborativeEditor from '../../components/Collaboration/CollaborativeEditor';
 import SEOHead from '../../components/SEO/SEOHead';
 import Button from '../../components/ui/Button';
 import Header from '../../components/ui/Header';
 import { useKeyboardShortcutsContext } from '../../components/ui/KeyboardShortcutsProvider';
-import CollaborativeEditor from '../../components/Collaboration/CollaborativeEditor';
 
 // Lazy-load heavy panels to reduce initial TBT
 const AuditTrail = lazy(() => import('./components/AuditTrail'));

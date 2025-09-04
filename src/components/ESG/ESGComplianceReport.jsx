@@ -1,4 +1,3 @@
-import React, { useState, useEffect, useMemo } from 'react';
 import {
   FileText,
   Download,
@@ -15,6 +14,7 @@ import {
   Eye,
   EyeOff
 } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
 
 import esgService from '../../services/esg/esgService';
 
@@ -679,7 +679,7 @@ const ESGComplianceReport = ({
                   className="flex items-center justify-between p-3 bg-slate-600/50 rounded"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                    <div className="w-3 h-3 bg-blue-500 rounded-full" />
                     <span className="text-white font-medium">{asset.symbol}</span>
                   </div>
 
@@ -744,7 +744,7 @@ const ESGComplianceReport = ({
       {/* Loading State */}
       {loading && (
         <div className="flex items-center justify-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
           <span className="ml-3 text-slate-300">Generating compliance report...</span>
         </div>
       )}

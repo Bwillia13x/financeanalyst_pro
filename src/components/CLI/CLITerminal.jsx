@@ -1,4 +1,3 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   Terminal,
   X,
@@ -14,6 +13,7 @@ import {
   BookOpen,
   Save
 } from 'lucide-react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 
 import cliService from '../../services/cli/cliService';
 
@@ -296,7 +296,7 @@ const CLITerminal = ({
           <span className="text-white font-medium text-sm">FinanceAnalyst CLI</span>
           {isProcessing && (
             <div className="flex items-center gap-1">
-              <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
+              <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse" />
               <span className="text-xs text-slate-400">Processing...</span>
             </div>
           )}
@@ -347,9 +347,9 @@ const CLITerminal = ({
                   <div className={`flex-1 ${getOutputClassName(item.type)}`}>
                     {typeof item.content === 'string'
                       ? item.content.split('\n').map((line, lineIndex) => (
-                          <div key={lineIndex} className="whitespace-pre-wrap">
-                            {line}
-                          </div>
+                        <div key={lineIndex} className="whitespace-pre-wrap">
+                          {line}
+                        </div>
                         ))
                       : JSON.stringify(item.content, null, 2)}
                   </div>
@@ -439,7 +439,7 @@ const CLITerminal = ({
                 <X className="w-3 h-3" />
               </button>
 
-              <div className="flex-1"></div>
+              <div className="flex-1" />
 
               <div className="text-xs text-slate-500">Use ↑↓ for history, Tab for completion</div>
             </div>

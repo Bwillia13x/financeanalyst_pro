@@ -1,20 +1,3 @@
-import React, { useState } from 'react';
-import Header from '../components/ui/Header';
-
-// Theme Components
-import {
-  ThemeToggle,
-  ThemeIndicator,
-  ThemeSettings,
-  HighContrastToggle,
-  useTheme
-} from '../components/ui/ThemeProvider';
-
-// UI Components
-import Button from '../components/ui/Button';
-import { MobileCard, MobileGrid } from '../components/ui/MobileLayout';
-
-// Icons
 import {
   TrendingUp,
   BarChart3,
@@ -31,6 +14,24 @@ import {
   Eye,
   EyeOff
 } from 'lucide-react';
+import React, { useState } from 'react';
+
+import Button from '../components/ui/Button';
+import Header from '../components/ui/Header';
+
+// Theme Components
+import { MobileCard, MobileGrid } from '../components/ui/MobileLayout';
+import {
+  ThemeToggle,
+  ThemeIndicator,
+  ThemeSettings,
+  HighContrastToggle,
+  useTheme
+} from '../components/ui/ThemeProvider';
+
+// UI Components
+
+// Icons
 
 // Sample data for demonstrations
 const sampleMetrics = [
@@ -302,7 +303,7 @@ const AccessibilityDemo = () => {
           <h4 className="text-lg font-medium text-foreground mb-4">Reduced Motion</h4>
           <p className="text-foreground-secondary mb-4">Respects user's motion preferences.</p>
           <div className="space-y-2">
-            <div className="w-8 h-8 bg-primary rounded-full animate-pulse"></div>
+            <div className="w-8 h-8 bg-primary rounded-full animate-pulse" />
             <p className="text-xs text-foreground-secondary">
               Animations are disabled if user prefers reduced motion
             </p>

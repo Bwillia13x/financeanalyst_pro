@@ -1,4 +1,3 @@
-import React, { useState, useEffect, useMemo } from 'react';
 import {
   Plus,
   Minus,
@@ -13,6 +12,7 @@ import {
   AlertTriangle,
   CheckCircle
 } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
 
 import optionsPricingService from '../../services/financial/optionsPricingService';
 
@@ -481,7 +481,7 @@ const OptionsStrategyBuilder = ({
       {/* Loading State */}
       {loading && (
         <div className="flex items-center justify-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500" />
           <span className="ml-3 text-slate-300">Building strategy...</span>
         </div>
       )}

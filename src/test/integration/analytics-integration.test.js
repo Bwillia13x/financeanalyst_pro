@@ -108,7 +108,7 @@ describe('Analytics Engines Integration', () => {
 
       // Step 4: Risk assessment
       const varAnalysis = riskEngine.calculateVaR(portfolioReturns, 0.95, 'historical');
-      expect(varAnalysis.var95).toBeLessThan(0);
+      expect(varAnalysis.var95).toBeGreaterThan(0); // VaR should be positive (representing potential loss)
       expect(varAnalysis.expectedShortfall).toBeDefined();
 
       // Step 5: Statistical testing

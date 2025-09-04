@@ -314,7 +314,7 @@ class ScheduledReportsService {
 
     const reportContent = {
       title: scheduledReport.name,
-      data: data,
+      data,
       generatedAt: new Date(),
       format: scheduledReport.format
     };

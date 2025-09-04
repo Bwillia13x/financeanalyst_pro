@@ -301,7 +301,7 @@ describe('Reporting System Integration', () => {
       const jobId = await exportService.exportDashboard(testDashboardConfig, 'pdf');
 
       // Initially should be queued or processing
-      let status = exportService.getExportStatus(jobId);
+      const status = exportService.getExportStatus(jobId);
       expect(status).toBeDefined();
       expect(['queued', 'processing']).toContain(status.status);
 

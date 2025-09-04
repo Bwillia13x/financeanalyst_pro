@@ -16,16 +16,16 @@ import {
   PortfolioCreationForm,
   FinancialModelingForm
 } from '../components/Forms/FinancialForms';
+import FormStateManager, {
+  ManagedFormField,
+  FormValidationSummary
+} from '../components/Forms/FormStateManager';
 import {
   WizardProvider,
   WizardStep,
   WizardNavigation,
   PortfolioOnboardingWizard
 } from '../components/Forms/FormWizard';
-import FormStateManager, {
-  ManagedFormField,
-  FormValidationSummary
-} from '../components/Forms/FormStateManager';
 import Button from '../components/ui/Button';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card';
 

@@ -1,10 +1,3 @@
-import React, { useState } from 'react';
-import Header from '../components/ui/Header';
-
-// UI Components
-import Button from '../components/ui/Button';
-
-// Icons
 import {
   Move,
   Grid,
@@ -20,6 +13,14 @@ import {
   Target,
   Layers
 } from 'lucide-react';
+import React, { useState } from 'react';
+
+import Button from '../components/ui/Button';
+import Header from '../components/ui/Header';
+
+// UI Components
+
+// Icons
 
 // Sample data for demonstrations
 const spacingScale = [
@@ -133,7 +134,8 @@ const SpacingSystemDemo = () => {
                 background: rgba(255, 0, 0, 0.05) !important;
                 border: 1px solid rgba(255, 0, 0, 0.1) !important;
               }
-            `}</style>
+            `}
+            </style>
           </div>
         )}
 
@@ -750,35 +752,35 @@ const SpacingSystemDemo = () => {
                         href="#"
                         className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-background-secondary transition-colors"
                       >
-                        <div className="w-2 h-2 bg-primary rounded-full"></div>
+                        <div className="w-2 h-2 bg-primary rounded-full" />
                         <span className="text-foreground">Dashboard</span>
                       </a>
                       <a
                         href="#"
                         className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-background-secondary transition-colors"
                       >
-                        <div className="w-2 h-2 bg-primary rounded-full"></div>
+                        <div className="w-2 h-2 bg-primary rounded-full" />
                         <span className="text-foreground">Portfolio</span>
                       </a>
                       <a
                         href="#"
                         className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-background-secondary transition-colors"
                       >
-                        <div className="w-2 h-2 bg-primary rounded-full"></div>
+                        <div className="w-2 h-2 bg-primary rounded-full" />
                         <span className="text-foreground">Analytics</span>
                       </a>
                       <a
                         href="#"
                         className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-background-secondary transition-colors"
                       >
-                        <div className="w-2 h-2 bg-primary rounded-full"></div>
+                        <div className="w-2 h-2 bg-primary rounded-full" />
                         <span className="text-foreground">Reports</span>
                       </a>
                       <a
                         href="#"
                         className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-background-secondary transition-colors"
                       >
-                        <div className="w-2 h-2 bg-primary rounded-full"></div>
+                        <div className="w-2 h-2 bg-primary rounded-full" />
                         <span className="text-foreground">Settings</span>
                       </a>
                     </nav>

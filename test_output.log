@@ -1,1576 +1,527 @@
+🚀 Initializing Core Functionality Test Suite...
 
-> financeanalyst-pro@0.1.0 test:run
-> vitest run --reporter=verbose
+📊 Production Monitor initialized
+📊 Production Monitor initialized
+🚀 Enhanced CLI System initializing...
+📋 Command Registry initializing...
+[31;1mFailed to load persisted registry: localStorage is not defined[0m
+✅ Command Registry initialized
+🔌 Plugin Manager initializing...
+[31;1mFailed to load plugin registry: localStorage is not defined[0m
+[31;1mFailed to persist registry: localStorage is not defined[0m
+📝 Registered command: DCF
+[31;1mFailed to persist registry: localStorage is not defined[0m
+📝 Registered command: LBO
+[31;1mFailed to persist registry: localStorage is not defined[0m
+📝 Registered command: COMPS
+[31;1mFailed to persist registry: localStorage is not defined[0m
+📝 Registered command: EPV
+📦 Registered plugin: calculators (Financial Calculators)
+[31;1mFailed to persist registry: localStorage is not defined[0m
+📝 Registered command: QUOTE
+[31;1mFailed to persist registry: localStorage is not defined[0m
+📝 Registered command: CHART
+[31;1mFailed to persist registry: localStorage is not defined[0m
+📝 Registered command: NEWS
+📦 Registered plugin: market-data (Market Data Provider)
+[31;1mFailed to persist registry: localStorage is not defined[0m
+📝 Registered command: PORTFOLIO
+[31;1mFailed to persist registry: localStorage is not defined[0m
+📝 Registered command: ANALYZE
+[31;1mFailed to persist registry: localStorage is not defined[0m
+📝 Registered command: OPTIMIZE
+📦 Registered plugin: portfolio (Portfolio Management)
+[31;1mFailed to persist registry: localStorage is not defined[0m
+📝 Registered command: EXPORT
+[31;1mFailed to persist registry: localStorage is not defined[0m
+📝 Registered command: REPORT
+[31;1mFailed to persist registry: localStorage is not defined[0m
+📝 Registered command: VISUALIZE
+📦 Registered plugin: reporting (Advanced Reporting)
+📝 Registered command: SCHEDULE
+[31;1mFailed to persist registry: localStorage is not defined[0m
+[31;1mFailed to persist registry: localStorage is not defined[0m
+📝 Registered command: WORKFLOW
+[31;1mFailed to persist registry: localStorage is not defined[0m
+📝 Registered command: BATCH
+📦 Registered plugin: automation (Workflow Automation)
+✅ Plugin Manager initialized
+🔒 Security Manager initializing...
+🔒 Security settings persistence not available in current environment
+✅ Security Manager initialized
+🧠 Context Manager initializing...
+🧠 Context persistence not available in current environment
+✅ Context Manager initialized
+📚 Help System initializing...
+🎯 Initializing Interactive Tutorials...
+✅ Interactive Tutorials initialized
+🎯 Initializing Contextual Help...
+✅ Contextual Help initialized
+✅ Help System initialized
+🎯 Auto-Completion System initializing...
+✅ Auto-Completion System initialized
+🎯 Interactive Command System initializing...
+✅ Interactive Command System initialized
+🔗 Command Pipeline System initializing...
+[31;1mFailed to load saved pipelines: localStorage is not defined[0m
+✅ Command Pipeline System initialized
+[31;1mFailed to persist registry: localStorage is not defined[0m
+📝 Registered command: HELP
+📝 Registered command: CLEAR
+📝 Registered command: HISTORY
+📝 Registered command: DCF
+📝 Registered command: COMPS
+📝 Registered command: LBO
+[31;1mFailed to persist registry: localStorage is not defined[0m
+[31;1mFailed to persist registry: localStorage is not defined[0m
+[31;1mCommand 'DCF' already registered, overwriting[0m
+[31;1mFailed to persist registry: localStorage is not defined[0m
+📝 Registered command: QUOTE
+[31;1mCommand 'COMPS' already registered, overwriting[0m
+[31;1mFailed to persist registry: localStorage is not defined[0m
+[31;1mCommand 'LBO' already registered, overwriting[0m
+[31;1mFailed to persist registry: localStorage is not defined[0m
+[31;1mCommand 'QUOTE' already registered, overwriting[0m
+[31;1mFailed to persist registry: localStorage is not defined[0m
+[31;1mCommand 'CHART' already registered, overwriting[0m
+[31;1mFailed to persist registry: localStorage is not defined[0m
+📝 Registered command: CHART
+📝 Registered command: NEWS
+📝 Registered command: PORTFOLIO
+📝 Registered command: ANALYZE
+📝 Registered command: REPORT
+📝 Registered command: EXPORT
+📝 Registered command: VISUALIZE
+📝 Registered command: INTERACTIVE
+📝 Registered command: COMPLETE
+📝 Registered command: PIPELINE
+📝 Registered command: BATCH
+📝 Registered command: JOBS
+📝 Registered command: TUTORIAL
+📝 Registered command: TIPS
+📝 Registered command: LEARN
+🔄 Loading core plugins...
+[31;1mCommand 'NEWS' already registered, overwriting[0m
+[31;1mFailed to persist registry: localStorage is not defined[0m
+[31;1mCommand 'PORTFOLIO' already registered, overwriting[0m
+[31;1mFailed to persist registry: localStorage is not defined[0m
+[31;1mCommand 'ANALYZE' already registered, overwriting[0m
+[31;1mFailed to persist registry: localStorage is not defined[0m
+[31;1mCommand 'REPORT' already registered, overwriting[0m
+[31;1mFailed to persist registry: localStorage is not defined[0m
+[31;1mCommand 'EXPORT' already registered, overwriting[0m
+[31;1mFailed to persist registry: localStorage is not defined[0m
+[31;1mCommand 'VISUALIZE' already registered, overwriting[0m
+[31;1mFailed to persist registry: localStorage is not defined[0m
+[31;1mFailed to persist registry: localStorage is not defined[0m
+[31;1mFailed to persist registry: localStorage is not defined[0m
+[31;1mFailed to persist registry: localStorage is not defined[0m
+[31;1mCommand 'BATCH' already registered, overwriting[0m
+[31;1mFailed to persist registry: localStorage is not defined[0m
+[31;1mFailed to persist registry: localStorage is not defined[0m
+[31;1mFailed to persist registry: localStorage is not defined[0m
+[31;1mFailed to persist registry: localStorage is not defined[0m
+[31;1mFailed to persist registry: localStorage is not defined[0m
+[31;1mFailed to restore CLI state: localStorage is not defined[0m
+🔌 Loaded plugin: calculators v1.0.0
+🔌 Loaded plugin: market-data v1.0.0
+🔌 Loaded plugin: portfolio v1.0.0
+🔌 Loaded plugin: reporting v1.0.0
+🔌 Loaded plugin: automation v1.0.0
+✅ Loaded 5 core plugins
+🚀 Starting production monitoring...
+📈 Metrics collection started
+[INFO] Health check: healthy {
+  memory: { status: 'healthy', value: '0.00%' },
+  errorRate: { status: 'healthy', value: '0.00%' },
+  responseTime: { status: 'healthy', value: '0.00ms' }
+}
+🏥 Health checks started
+✅ Production monitoring started
+✅ Enhanced CLI System initialized successfully
+✅ System initialized successfully
 
+🎯 STARTING COMPREHENSIVE CORE FUNCTIONALITY TESTING
 
- RUN  v3.2.4 /Users/benjaminwilliams/valor-ivx-pro(08.17.2025)/financeanalyst_pro
+============================================================
 
- ✓ src/test/integration/EnterpriseWorkflows.test.jsx > Enterprise Workflows Integration Tests > AI Analytics Service Integration > should initialize and analyze financial data successfully 27ms
- ✓ src/test/integration/EnterpriseWorkflows.test.jsx > Enterprise Workflows Integration Tests > AI Analytics Service Integration > should generate actionable recommendations 1ms
- ✓ src/test/integration/EnterpriseWorkflows.test.jsx > Enterprise Workflows Integration Tests > AI Analytics Service Integration > should handle service health monitoring 5ms
- ✓ src/test/integration/EnterpriseWorkflows.test.jsx > Enterprise Workflows Integration Tests > Collaboration Service Integration > should initialize and manage workspace operations 17ms
- × src/test/integration/EnterpriseWorkflows.test.jsx > Enterprise Workflows Integration Tests > Collaboration Service Integration > should handle real-time collaboration features 28ms
-   → expected null to be truthy
- ✓ src/test/integration/EnterpriseWorkflows.test.jsx > Enterprise Workflows Integration Tests > Business Intelligence Service Integration > should initialize and track user actions 64ms
- ✓ src/test/integration/EnterpriseWorkflows.test.jsx > Enterprise Workflows Integration Tests > Business Intelligence Service Integration > should generate performance and behavior reports 1ms
- ✓ src/test/integration/EnterpriseWorkflows.test.jsx > Enterprise Workflows Integration Tests > Real-time Data Service Integration > should handle real-time data subscriptions and updates 1309ms
- ✓ src/test/integration/EnterpriseWorkflows.test.jsx > Enterprise Workflows Integration Tests > End-to-End Workflow Integration > should complete full enterprise workflow: AI analysis → Collaboration → BI tracking 3ms
- ✓ src/test/integration/EnterpriseWorkflows.test.jsx > Enterprise Workflows Integration Tests > End-to-End Workflow Integration > should handle data updates propagating across all systems 610ms
- ✓ src/test/integration/EnterpriseWorkflows.test.jsx > Enterprise Workflows Integration Tests > End-to-End Workflow Integration > should maintain service resilience during partial failures 1ms
- ✓ src/test/integration/EnterpriseWorkflows.test.jsx > Enterprise Workflows Integration Tests > Performance and Scalability Integration > should handle concurrent operations efficiently 4ms
- ✓ src/test/integration/EnterpriseWorkflows.test.jsx > Enterprise Workflows Integration Tests > Performance and Scalability Integration > should handle large datasets without performance degradation 3ms
- ✓ src/hooks/__tests__/useFinancialStorage.test.jsx > useFinancialStorage > useDCFStorage > initializes with empty state and loads models on mount 24ms
- ✓ src/hooks/__tests__/useFinancialStorage.test.jsx > useFinancialStorage > useDCFStorage > handles loading errors gracefully 4ms
- ✓ src/hooks/__tests__/useFinancialStorage.test.jsx > useFinancialStorage > useDCFStorage > saves a model successfully 10ms
- × src/hooks/__tests__/useFinancialStorage.test.jsx > useFinancialStorage > useDCFStorage > handles save errors 13ms
-   → expected null to be 'Save failed' // Object.is equality
- ✓ src/hooks/__tests__/useFinancialStorage.test.jsx > useFinancialStorage > useDCFStorage > deletes a model successfully 8ms
- ✓ src/hooks/__tests__/useFinancialStorage.test.jsx > useFinancialStorage > useDCFStorage > gets a specific model 4ms
- ✓ src/hooks/__tests__/useFinancialStorage.test.jsx > useFinancialStorage > useWatchlistStorage > loads watchlists on mount 4ms
- ✓ src/hooks/__tests__/useFinancialStorage.test.jsx > useFinancialStorage > useWatchlistStorage > saves a watchlist successfully 4ms
- ✓ src/hooks/__tests__/useFinancialStorage.test.jsx > useFinancialStorage > useUserPreferences > loads default preferences when none exist 7ms
- ✓ src/hooks/__tests__/useFinancialStorage.test.jsx > useFinancialStorage > useUserPreferences > loads existing preferences 64ms
- × src/hooks/__tests__/useFinancialStorage.test.jsx > useFinancialStorage > useUserPreferences > updates a single preference 72ms
-   → expected { theme: 'light', layout: {} } to deeply equal { theme: 'dark', layout: {} }
- ✓ src/hooks/__tests__/useFinancialStorage.test.jsx > useFinancialStorage > useMarketDataCache > gets cached data successfully 1ms
- ✓ src/hooks/__tests__/useFinancialStorage.test.jsx > useFinancialStorage > useMarketDataCache > caches data with custom TTL 0ms
- ✓ src/hooks/__tests__/useFinancialStorage.test.jsx > useFinancialStorage > useMarketDataCache > clears expired cache 1ms
- ✓ src/hooks/__tests__/useFinancialStorage.test.jsx > useFinancialStorage > useStorageStats > loads storage statistics 8ms
- ✓ src/hooks/__tests__/useFinancialStorage.test.jsx > useFinancialStorage > useStorageStats > exports all data 2ms
- ✓ src/hooks/__tests__/useFinancialStorage.test.jsx > useFinancialStorage > useStorageStats > imports data successfully 3ms
- ✓ src/components/ui/__tests__/Button.test.jsx > Button > should render button with text 604ms
- ✓ src/components/ui/__tests__/Button.test.jsx > Button > should handle click events 17ms
- ✓ src/components/ui/__tests__/Button.test.jsx > Button > should be disabled when disabled prop is true 14ms
- ✓ src/components/ui/__tests__/Button.test.jsx > Button > should not call onClick when disabled 23ms
- ✓ src/components/ui/__tests__/Button.test.jsx > Button > should apply custom className 8ms
- ✓ src/components/ui/__tests__/Button.test.jsx > Button > should render with icon when iconName is provided 13ms
- ✓ src/components/ui/__tests__/Button.test.jsx > Button > should render as full width when fullWidth prop is true 5ms
- × src/components/ui/__tests__/Button.test.jsx > Button > should apply different variants correctly 195ms
-   → [2mexpect([22m[31melement[39m[2m).toHaveClass([22m[32m[32m"hover:bg-accent"[32m[39m[2m)[22m
+📝 Testing Basic CLI Commands...
 
-Expected the element to have class:
-[32m  hover:bg-accent[39m
-Received:
-[31m  inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-smooth focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-95 hover:bg-muted hover:text-foreground h-10 px-4 py-2[39m
- ✓ src/components/ui/__tests__/Button.test.jsx > Button > should apply different sizes correctly 27ms
- ✓ src/components/ui/__tests__/Button.test.jsx > Button > should pass through additional props 3ms
- ✓ src/components/ui/__tests__/Button.test.jsx > Button > should show loading state when loading prop is true 7ms
- ✓ src/services/__tests__/financialDataStorage.test.js > FinancialDataStorage > DCF Model Operations > should save DCF model successfully 15ms
- ✓ src/services/__tests__/financialDataStorage.test.js > FinancialDataStorage > DCF Model Operations > should handle save DCF model errors 2ms
- ✓ src/services/__tests__/financialDataStorage.test.js > FinancialDataStorage > DCF Model Operations > should retrieve DCF model successfully 1ms
- ✓ src/services/__tests__/financialDataStorage.test.js > FinancialDataStorage > DCF Model Operations > should handle DCF model retrieval errors gracefully 0ms
- ✓ src/services/__tests__/financialDataStorage.test.js > FinancialDataStorage > DCF Model Operations > should list DCF models 0ms
- ✓ src/services/__tests__/financialDataStorage.test.js > FinancialDataStorage > DCF Model Operations > should delete DCF model 0ms
- × src/services/__tests__/financialDataStorage.test.js > FinancialDataStorage > LBO Model Operations > should save LBO model successfully 8ms
-   → Storage failed
- ✓ src/services/__tests__/financialDataStorage.test.js > FinancialDataStorage > LBO Model Operations > should handle LBO model retrieval errors 1ms
- × src/services/__tests__/financialDataStorage.test.js > FinancialDataStorage > Market Data Operations > should save market data with TTL 1ms
-   → Storage failed
- ✓ src/services/__tests__/financialDataStorage.test.js > FinancialDataStorage > Market Data Operations > should retrieve valid cached market data 0ms
- ✓ src/services/__tests__/financialDataStorage.test.js > FinancialDataStorage > Market Data Operations > should return null for expired market data and remove it 0ms
- ✓ src/services/__tests__/financialDataStorage.test.js > FinancialDataStorage > Market Data Operations > should return null when market data not found 0ms
- ✓ src/services/__tests__/financialDataStorage.test.js > FinancialDataStorage > Market Data Operations > should handle market data retrieval errors 0ms
- × src/services/__tests__/financialDataStorage.test.js > FinancialDataStorage > User Preferences Operations > should save user preferences successfully 0ms
-   → Storage failed
- ✓ src/services/__tests__/financialDataStorage.test.js > FinancialDataStorage > User Preferences Operations > should handle save user preferences errors 0ms
- ✓ src/services/__tests__/financialDataStorage.test.js > FinancialDataStorage > User Preferences Operations > should retrieve user preferences 0ms
- ✓ src/services/__tests__/financialDataStorage.test.js > FinancialDataStorage > User Preferences Operations > should handle user preferences retrieval errors 0ms
- × src/services/__tests__/financialDataStorage.test.js > FinancialDataStorage > Watchlist Operations > should save watchlist successfully 0ms
-   → Storage failed
- ✓ src/services/__tests__/financialDataStorage.test.js > FinancialDataStorage > Watchlist Operations > should retrieve watchlist 0ms
- ✓ src/services/__tests__/financialDataStorage.test.js > FinancialDataStorage > Watchlist Operations > should list watchlists 0ms
- ✓ src/services/__tests__/financialDataStorage.test.js > FinancialDataStorage > Data Export/Import Operations > should export all data successfully 0ms
- ✓ src/services/__tests__/financialDataStorage.test.js > FinancialDataStorage > Data Export/Import Operations > should handle export errors 0ms
- × src/services/__tests__/financialDataStorage.test.js > FinancialDataStorage > Data Export/Import Operations > should import data successfully 0ms
-   → Storage failed
- ✓ src/services/__tests__/financialDataStorage.test.js > FinancialDataStorage > Data Export/Import Operations > should handle import errors 0ms
- ✓ src/services/__tests__/financialDataStorage.test.js > FinancialDataStorage > Statistics and Maintenance > should get financial data statistics 0ms
- × src/services/__tests__/financialDataStorage.test.js > FinancialDataStorage > Statistics and Maintenance > should cleanup expired market data 2ms
-   → marketDataKeys is not iterable
- × src/services/__tests__/financialDataStorage.test.js > FinancialDataStorage > Error Handling and Logging > should log all operations appropriately 0ms
-   → Import failed
- × src/services/__tests__/financialDataStorage.test.js > FinancialDataStorage > Error Handling and Logging > should handle malformed data gracefully 1ms
-   → expected { symbol: 'AAPL' } to be null // Object.is equality
- × src/pages/__tests__/PrivateAnalysis.test.jsx > PrivateAnalysis > renders the component with the default tab active 672ms
-   → Found multiple elements with the text: Financial Spreadsheet
+[INFO] Command executed {
+  command: 'HELP',
+  success: true,
+  responseTime: 4.097124999999998,
+  userId: undefined,
+  sessionId: undefined
+}
+✅ help: PASSED
+[INFO] Command executed {
+  command: 'CLEAR',
+  success: true,
+  responseTime: 0.7792499999999976,
+  userId: undefined,
+  sessionId: undefined
+}
+✅ clear: PASSED
+[INFO] Command executed {
+  command: 'HISTORY',
+  success: true,
+  responseTime: 0.09662500000000307,
+  userId: undefined,
+  sessionId: undefined
+}
+✅ history: PASSED
+[INFO] Command executed {
+  command: 'TUTORIAL',
+  success: true,
+  responseTime: 0.19274999999999665,
+  userId: undefined,
+  sessionId: undefined
+}
+✅ tutorial: PASSED
 
-Here are the matching elements:
+💰 Testing Financial Calculations...
 
-[36m<span[39m
-  [33mclass[39m=[32m"hidden sm:inline"[39m
-[36m>[39m
-  [0mFinancial Spreadsheet[0m
-[36m</span>[39m
+[INFO] Command executed {
+  command: 'DCF',
+  success: true,
+  responseTime: 0.21279100000000284,
+  userId: undefined,
+  sessionId: undefined
+}
+✅ DCF Analysis - Apple: PASSED
+[INFO] Command executed {
+  command: 'COMPS',
+  success: true,
+  responseTime: 0.1755420000000001,
+  userId: undefined,
+  sessionId: undefined
+}
+✅ Comps Analysis - Tech Sector: PASSED
+[INFO] Command executed {
+  command: 'LBO',
+  success: true,
+  responseTime: 0.13937499999999403,
+  userId: undefined,
+  sessionId: undefined
+}
+✅ LBO Analysis - Tesla: PASSED
 
-[36m<span[39m
-  [33mclass[39m=[32m"text-sm font-medium"[39m
-[36m>[39m
-  [0mFinancial Spreadsheet[0m
-[36m</span>[39m
+📊 Testing Market Data Functionality...
 
-(If this is intentional, then use the `*AllBy*` variant of the query (like `queryAllByText`, `getAllByText`, or `findAllByText`)).
+[INFO] Command executed {
+  command: 'QUOTE',
+  success: true,
+  responseTime: 0.16645799999999866,
+  userId: undefined,
+  sessionId: undefined
+}
+✅ Quote - Apple: PASSED
+[INFO] Command executed {
+  command: 'QUOTE',
+  success: true,
+  responseTime: 0.04954199999999531,
+  userId: undefined,
+  sessionId: undefined
+}
+✅ Quote - Microsoft: PASSED
+[INFO] Command executed {
+  command: 'CHART',
+  success: true,
+  responseTime: 1.4627079999999992,
+  userId: undefined,
+  sessionId: undefined
+}
+✅ Chart Data - Apple: PASSED
+[INFO] Command executed {
+  command: 'NEWS',
+  success: true,
+  responseTime: 0.134999999999998,
+  userId: undefined,
+  sessionId: undefined
+}
+✅ Market News: PASSED
 
-[36m<body>[39m
-  [36m<div>[39m
-    [36m<div[39m
-      [33mclass[39m=[32m"min-h-screen bg-slate-900 relative"[39m
-    [36m>[39m
-      [36m<a[39m
-        [33mclass[39m=[32m"
-        sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4
-        bg-primary text-primary-foreground px-4 py-2 rounded-md z-[9999]
-        font-medium shadow-lg transition-all duration-200
-        focus:outline-2 focus:outline-blue-500 focus:outline-offset-2
-      "[39m
-        [33mhref[39m=[32m"#main-content"[39m
-      [36m>[39m
-        [0mSkip to main content[0m
-      [36m</a>[39m
-      [36m<header[39m
-        [33mclass[39m=[32m"fixed top-0 left-0 right-0 z-[1000] bg-card border-b border-border h-[60px]"[39m
-        [33mrole[39m=[32m"banner"[39m
-      [36m>[39m
-        [36m<div[39m
-          [33mclass[39m=[32m"flex items-center justify-between h-full px-4 sm:px-6"[39m
-        [36m>[39m
-          [36m<div[39m
-            [33mclass[39m=[32m"flex items-center"[39m
-          [36m>[39m
-            [36m<div[39m
-              [33mclass[39m=[32m"flex items-center space-x-2"[39m
-            [36m>[39m
-              [36m<div[39m
-                [33mclass[39m=[32m"w-6 h-6 sm:w-8 sm:h-8 bg-primary rounded-lg flex items-center justify-center"[39m
-              [36m>[39m
-                [36m<svg[39m
-                  [33mclass[39m=[32m"lucide lucide-trending-up sm:w-5 sm:h-5 text-white"[39m
-                  [33mfill[39m=[32m"none"[39m
-                  [33mheight[39m=[32m"16"[39m
-                  [33mstroke[39m=[32m"currentColor"[39m
-                  [33mstroke-linecap[39m=[32m"round"[39m
-                  [33mstroke-linejoin[39m=[32m"round"[39m
-                  [33mstroke-width[39m=[32m"2"[39m
-                  [33mviewBox[39m=[32m"0 0 24 24"[39m
-                  [33mwidth[39m=[32m"16"[39m
-                  [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
-                [36m>[39m
-                  [36m<polyline[39m
-                    [33mpoints[39m=[32m"22 7 13.5 15.5 8.5 10.5 2 17"[39m
-                  [36m/>[39m
-                  [36m<polyline[39m
-                    [33mpoints[39m=[32m"16 7 22 7 22 13"[39m
-                  [36m/>[39m
-                [36m</svg>[39m
-              [36m</div>[39m
-              [36m<span[39m
-                [33mclass[39m=[32m"text-lg sm:text-xl font-semibold text-foreground"[39m
-              [36m>[39m
-                [36m<span[39m
-                  [33mclass[39m=[32m"hidden sm:inline"[39m
-                [36m>[39m
-                  [0mFinanceAnalyst Pro[0m
-                [36m</span>[39m
-                [36m<span[39m
-                  [33mclass[39m=[32m"sm:hidden"[39m
-                [36m>[39m
-                  [0mFinanceAnalyst[0m
-                [36m</span>[39m
-              [36m</span>[39m
-            [36m</div>[39m
-          [36m</div>[39m
-          [36m<button[39m
-            [33maria-expanded[39m=[32m"false"[39m
-            [33maria-label[39m=[32m"Toggle mobile menu"[39m
-            [33mclass[39m=[32m"lg:hidden flex items-center justify-center w-10 h-10 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"[39m
-          [36m>[39m
-            [36m<svg[39m
-              [33mclass[39m=[32m"lucide lucide-menu"[39m
-              [33mfill[39m=[32m"none"[39m
-              [33mheight[39m=[32m"20"[39m
-              [33mstroke[39m=[32m"currentColor"[39m
-              [33mstroke-linecap[39m=[32m"round"[39m
-              [33mstroke-linejoin[39m=[32m"round"[39m
-              [33mstroke-width[39m=[32m"2"[39m
-              [33mviewBox[39m=[32m"0 0 24 24"[39m
-              [33mwidth[39m=[32m"20"[39m
-              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
-            [36m>[39m
-              [36m<line[39m
-                [33mx1[39m=[32m"4"[39m
-                [33mx2[39m=[32m"20"[39m
-                [33my1[39m=[32m"12"[39m
-                [33my2[39m=[32m"12"[39m
-              [36m/>[39m
-              [36m<line[39m
-                [33mx1[39m=[32m"4"[39m
-                [33mx2[39m=[32m"20"[39m
-                [33my1[39m=[32m"6"[39m
-                [33my2[39m=[32m"6"[39m
-              [36m/>[39m
-              [36m<line[39m
-                [33mx1[39m=[32m"4"[39m
-                [33mx2[39m=[32m"20"[39m
-                [33my1[39m=[32m"18"[39m
-                [33my2[39m=[32m"18"[39m
-              [36m/>[39m
-            [36m</svg>[39m
-          [36m</button>[39m
-          [36m<nav[39m
-            [33maria-label[39m=[32m"Main navigation"[39m
-            [33mclass[39m=[32m"hidden lg:flex items-center ml-8 space-x-1"[39m
-            [33mrole[39m=[32m"navigation"[39m
-          [36m>[39m
-            [36m<a[39m
-              [33mclass[39m=[32m"
-                relative px-6 py-3 text-sm font-medium transition-smooth rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2
-                text-muted-foreground hover:text-foreground hover:bg-muted
-              "[39m
-              [33mhref[39m=[32m"/financial-model-workspace"[39m
-              [33mtitle[39m=[32m"Primary financial modeling environment with terminal interface and formula builder"[39m
-            [36m>[39m
-              [0mWorkspace[0m
-            [36m</a>[39m
-            [36m<a[39m
-              [33mclass[39m=[32m"
-                relative px-6 py-3 text-sm font-medium transition-smooth rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2
-                text-muted-foreground hover:text-foreground hover:bg-muted
-              "[39m
-              [33mhref[39m=[32m"/portfolio-management"[39m
-              [33mtitle[39m=[32m"Comprehensive portfolio management dashboard with real-time tracking and analytics"[39m
-            [36m>[39m
-              [0mPortfolio[0m
-            [36m</a>[39m
-            [36m<a[39m
-              [33mclass[39m=[32m"
-                relative px-6 py-3 text-sm font-medium transition-smooth rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2
-                text-muted-foreground hover:text-foreground hover:bg-muted
-              "[39m
-              [33mhref[39m=[32m"/ai-insights"[39m
-              [33mtitle[39m=[32m"AI-powered financial analysis and intelligent investment recommendations"[39m
-            [36m>[39m
-              [0mAI Insights[0m
-            [36m</a>[39m
-            [36m<a[39m
-              [33mclass[39m=[32m"
-                relative px-6 py-3 text-sm font-medium transition-smooth rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2
-                text-muted-foreground hover:text-foreground hover:bg-...
- ✓ tests/integration/api-ecosystem.test.js > API Ecosystem & SDKs Tests > 1. RESTful API Endpoints > Should authenticate API requests 1ms
- ✓ tests/integration/api-ecosystem.test.js > API Ecosystem & SDKs Tests > 1. RESTful API Endpoints > Should handle rate limiting 0ms
- × tests/integration/api-ecosystem.test.js > API Ecosystem & SDKs Tests > 1. RESTful API Endpoints > Should validate input parameters 8ms
-   → expected [ 'symbol is required' ] to include 'Symbol is required'
- ✓ tests/integration/api-ecosystem.test.js > API Ecosystem & SDKs Tests > 1. RESTful API Endpoints > Should return consistent response format 1ms
- ✓ tests/integration/api-ecosystem.test.js > API Ecosystem & SDKs Tests > 2. Webhook Service > Should register and manage webhooks 0ms
- ✓ tests/integration/api-ecosystem.test.js > API Ecosystem & SDKs Tests > 2. Webhook Service > Should deliver webhook events with retry logic 0ms
- ✓ tests/integration/api-ecosystem.test.js > API Ecosystem & SDKs Tests > 2. Webhook Service > Should handle webhook delivery failures and retries 0ms
- ✓ tests/integration/api-ecosystem.test.js > API Ecosystem & SDKs Tests > 3. Python SDK > Should initialize client and handle authentication 0ms
- ✓ tests/integration/api-ecosystem.test.js > API Ecosystem & SDKs Tests > 3. Python SDK > Should perform specialized analytics via Python SDK 0ms
- ✓ tests/integration/api-ecosystem.test.js > API Ecosystem & SDKs Tests > 3. Python SDK > Should handle AI/ML operations via Python SDK 0ms
- ✓ tests/integration/api-ecosystem.test.js > API Ecosystem & SDKs Tests > 3. Python SDK > Should manage error handling in Python SDK 0ms
- ✓ tests/integration/api-ecosystem.test.js > API Ecosystem & SDKs Tests > 4. JavaScript SDK > Should support multiple environments (Node.js, Browser, AMD) 0ms
- ✓ tests/integration/api-ecosystem.test.js > API Ecosystem & SDKs Tests > 4. JavaScript SDK > Should handle event-driven operations 0ms
- ✓ tests/integration/api-ecosystem.test.js > API Ecosystem & SDKs Tests > 4. JavaScript SDK > Should provide utility functions 0ms
- ✓ tests/integration/api-ecosystem.test.js > API Ecosystem & SDKs Tests > 5. API Performance & Scalability > Should handle concurrent API requests 0ms
- ✓ tests/integration/api-ecosystem.test.js > API Ecosystem & SDKs Tests > 5. API Performance & Scalability > Should maintain response times under load 0ms
- ✓ tests/integration/api-ecosystem.test.js > API Ecosystem & SDKs Tests > 6. API Security & Compliance > Should validate request signatures for webhooks 0ms
- ✓ tests/integration/api-ecosystem.test.js > API Ecosystem & SDKs Tests > 6. API Security & Compliance > Should enforce API versioning and deprecation 0ms
- × src/pages/__tests__/PrivateAnalysis.test.jsx > PrivateAnalysis > switches tabs when a tab is clicked 316ms
-   → Found multiple elements with the text: Financial Modeling
+📁 Testing Portfolio Management...
 
-Here are the matching elements:
+[INFO] Command executed {
+  command: 'PORTFOLIO',
+  success: true,
+  responseTime: 0.12383400000000222,
+  userId: undefined,
+  sessionId: undefined
+}
+✅ Portfolio Create: PASSED
+[INFO] Command executed {
+  command: 'PORTFOLIO',
+  success: true,
+  responseTime: 0.09799999999999898,
+  userId: undefined,
+  sessionId: undefined
+}
+✅ Add Holdings: PASSED
+[INFO] Command executed {
+  command: 'PORTFOLIO',
+  success: true,
+  responseTime: 0.043124999999996305,
+  userId: undefined,
+  sessionId: undefined
+}
+✅ Portfolio List: PASSED
+[INFO] Command executed {
+  command: 'PORTFOLIO',
+  success: true,
+  responseTime: 0.031083000000002414,
+  userId: undefined,
+  sessionId: undefined
+}
+✅ Portfolio Analysis: PASSED
+[INFO] Command executed {
+  command: 'PORTFOLIO',
+  success: true,
+  responseTime: 0.09270799999999468,
+  userId: undefined,
+  sessionId: undefined
+}
+✅ Portfolio Export: PASSED
 
-[36m<span[39m
-  [33mclass[39m=[32m"hidden sm:inline"[39m
-[36m>[39m
-  [0mFinancial Modeling[0m
-[36m</span>[39m
+📋 Testing Reporting Functionality...
 
-[36m<span[39m
-  [33mclass[39m=[32m"text-sm font-medium"[39m
-[36m>[39m
-  [0mFinancial Modeling[0m
-[36m</span>[39m
+[INFO] Command executed {
+  command: 'REPORT',
+  success: true,
+  responseTime: 0.2731670000000008,
+  userId: undefined,
+  sessionId: undefined
+}
+✅ Generate Report: PASSED
+[INFO] Command executed {
+  command: 'EXPORT',
+  success: true,
+  responseTime: 0.1074169999999981,
+  userId: undefined,
+  sessionId: undefined
+}
+✅ Export Data - Excel: PASSED
+[INFO] Command executed {
+  command: 'EXPORT',
+  success: true,
+  responseTime: 0.09675000000000011,
+  userId: undefined,
+  sessionId: undefined
+}
+✅ Export Data - CSV: PASSED
+[INFO] Command executed {
+  command: 'VISUALIZE',
+  success: true,
+  responseTime: 0.08500000000000085,
+  userId: undefined,
+  sessionId: undefined
+}
+✅ Visualize Data: PASSED
 
-(If this is intentional, then use the `*AllBy*` variant of the query (like `queryAllByText`, `getAllByText`, or `findAllByText`)).
+🤖 Testing Automation Features...
 
-[36m<body>[39m
-  [36m<div>[39m
-    [36m<div[39m
-      [33mclass[39m=[32m"min-h-screen bg-slate-900 relative"[39m
-    [36m>[39m
-      [36m<a[39m
-        [33mclass[39m=[32m"
-        sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4
-        bg-primary text-primary-foreground px-4 py-2 rounded-md z-[9999]
-        font-medium shadow-lg transition-all duration-200
-        focus:outline-2 focus:outline-blue-500 focus:outline-offset-2
-      "[39m
-        [33mhref[39m=[32m"#main-content"[39m
-      [36m>[39m
-        [0mSkip to main content[0m
-      [36m</a>[39m
-      [36m<header[39m
-        [33mclass[39m=[32m"fixed top-0 left-0 right-0 z-[1000] bg-card border-b border-border h-[60px]"[39m
-        [33mrole[39m=[32m"banner"[39m
-      [36m>[39m
-        [36m<div[39m
-          [33mclass[39m=[32m"flex items-center justify-between h-full px-4 sm:px-6"[39m
-        [36m>[39m
-          [36m<div[39m
-            [33mclass[39m=[32m"flex items-center"[39m
-          [36m>[39m
-            [36m<div[39m
-              [33mclass[39m=[32m"flex items-center space-x-2"[39m
-            [36m>[39m
-              [36m<div[39m
-                [33mclass[39m=[32m"w-6 h-6 sm:w-8 sm:h-8 bg-primary rounded-lg flex items-center justify-center"[39m
-              [36m>[39m
-                [36m<svg[39m
-                  [33mclass[39m=[32m"lucide lucide-trending-up sm:w-5 sm:h-5 text-white"[39m
-                  [33mfill[39m=[32m"none"[39m
-                  [33mheight[39m=[32m"16"[39m
-                  [33mstroke[39m=[32m"currentColor"[39m
-                  [33mstroke-linecap[39m=[32m"round"[39m
-                  [33mstroke-linejoin[39m=[32m"round"[39m
-                  [33mstroke-width[39m=[32m"2"[39m
-                  [33mviewBox[39m=[32m"0 0 24 24"[39m
-                  [33mwidth[39m=[32m"16"[39m
-                  [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
-                [36m>[39m
-                  [36m<polyline[39m
-                    [33mpoints[39m=[32m"22 7 13.5 15.5 8.5 10.5 2 17"[39m
-                  [36m/>[39m
-                  [36m<polyline[39m
-                    [33mpoints[39m=[32m"16 7 22 7 22 13"[39m
-                  [36m/>[39m
-                [36m</svg>[39m
-              [36m</div>[39m
-              [36m<span[39m
-                [33mclass[39m=[32m"text-lg sm:text-xl font-semibold text-foreground"[39m
-              [36m>[39m
-                [36m<span[39m
-                  [33mclass[39m=[32m"hidden sm:inline"[39m
-                [36m>[39m
-                  [0mFinanceAnalyst Pro[0m
-                [36m</span>[39m
-                [36m<span[39m
-                  [33mclass[39m=[32m"sm:hidden"[39m
-                [36m>[39m
-                  [0mFinanceAnalyst[0m
-                [36m</span>[39m
-              [36m</span>[39m
-            [36m</div>[39m
-          [36m</div>[39m
-          [36m<button[39m
-            [33maria-expanded[39m=[32m"false"[39m
-            [33maria-label[39m=[32m"Toggle mobile menu"[39m
-            [33mclass[39m=[32m"lg:hidden flex items-center justify-center w-10 h-10 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"[39m
-          [36m>[39m
-            [36m<svg[39m
-              [33mclass[39m=[32m"lucide lucide-menu"[39m
-              [33mfill[39m=[32m"none"[39m
-              [33mheight[39m=[32m"20"[39m
-              [33mstroke[39m=[32m"currentColor"[39m
-              [33mstroke-linecap[39m=[32m"round"[39m
-              [33mstroke-linejoin[39m=[32m"round"[39m
-              [33mstroke-width[39m=[32m"2"[39m
-              [33mviewBox[39m=[32m"0 0 24 24"[39m
-              [33mwidth[39m=[32m"20"[39m
-              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
-            [36m>[39m
-              [36m<line[39m
-                [33mx1[39m=[32m"4"[39m
-                [33mx2[39m=[32m"20"[39m
-                [33my1[39m=[32m"12"[39m
-                [33my2[39m=[32m"12"[39m
-              [36m/>[39m
-              [36m<line[39m
-                [33mx1[39m=[32m"4"[39m
-                [33mx2[39m=[32m"20"[39m
-                [33my1[39m=[32m"6"[39m
-                [33my2[39m=[32m"6"[39m
-              [36m/>[39m
-              [36m<line[39m
-                [33mx1[39m=[32m"4"[39m
-                [33mx2[39m=[32m"20"[39m
-                [33my1[39m=[32m"18"[39m
-                [33my2[39m=[32m"18"[39m
-              [36m/>[39m
-            [36m</svg>[39m
-          [36m</button>[39m
-          [36m<nav[39m
-            [33maria-label[39m=[32m"Main navigation"[39m
-            [33mclass[39m=[32m"hidden lg:flex items-center ml-8 space-x-1"[39m
-            [33mrole[39m=[32m"navigation"[39m
-          [36m>[39m
-            [36m<a[39m
-              [33mclass[39m=[32m"
-                relative px-6 py-3 text-sm font-medium transition-smooth rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2
-                text-muted-foreground hover:text-foreground hover:bg-muted
-              "[39m
-              [33mhref[39m=[32m"/financial-model-workspace"[39m
-              [33mtitle[39m=[32m"Primary financial modeling environment with terminal interface and formula builder"[39m
-            [36m>[39m
-              [0mWorkspace[0m
-            [36m</a>[39m
-            [36m<a[39m
-              [33mclass[39m=[32m"
-                relative px-6 py-3 text-sm font-medium transition-smooth rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2
-                text-muted-foreground hover:text-foreground hover:bg-muted
-              "[39m
-              [33mhref[39m=[32m"/portfolio-management"[39m
-              [33mtitle[39m=[32m"Comprehensive portfolio management dashboard with real-time tracking and analytics"[39m
-            [36m>[39m
-              [0mPortfolio[0m
-            [36m</a>[39m
-            [36m<a[39m
-              [33mclass[39m=[32m"
-                relative px-6 py-3 text-sm font-medium transition-smooth rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2
-                text-muted-foreground hover:text-foreground hover:bg-muted
-              "[39m
-              [33mhref[39m=[32m"/ai-insights"[39m
-              [33mtitle[39m=[32m"AI-powered financial analysis and intelligent investment recommendations"[39m
-            [36m>[39m
-              [0mAI Insights[0m
-            [36m</a>[39m
-            [36m<a[39m
-              [33mclass[39m=[32m"
-                relative px-6 py-3 text-sm font-medium transition-smooth rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2
-                text-muted-foreground hover:text-foreground hover:bg-...
- × src/pages/__tests__/PrivateAnalysis.test.jsx > PrivateAnalysis > saves and loads an analysis 266ms
-   → Found multiple elements with the text: Save
+🔍 Testing Create Pipeline with role: analyst
+[31;1m[WARN] Security event: permission_denied {[0m
+[31;1m  userId: 'test-user-analyst',[0m
+[31;1m  command: 'PIPELINE',[0m
+[31;1m  required: 'utility:write',[0m
+[31;1m  userRole: undefined[0m
+[31;1m}[0m
+❌ Create Pipeline: FAILED
+🔍 Testing Batch Commands with role: analyst
+[31;1m[WARN] Security event: blocked_request { reason: undefined, userId: 'test-user-analyst', command: '"quote' }[0m
+[31;1m[WARN] Security event: blocked_request { reason: undefined, userId: 'test-user-analyst', command: 'AAPL"' }[0m
+[31;1m[WARN] Security event: blocked_request { reason: undefined, userId: 'test-user-analyst', command: '"quote' }[0m
+[31;1m[WARN] Security event: blocked_request { reason: undefined, userId: 'test-user-analyst', command: 'MSFT"' }[0m
+[31;1m[WARN] Security event: blocked_request { reason: undefined, userId: 'test-user-analyst', command: '"quote' }[0m
+[31;1m[WARN] Security event: blocked_request { reason: undefined, userId: 'test-user-analyst', command: 'TSLA"' }[0m
+[INFO] Command executed {
+  command: 'BATCH',
+  success: true,
+  responseTime: 1.158417,
+  userId: 'test-user-analyst',
+  sessionId: 'test-session-1756770002701'
+}
+✅ Batch Commands: PASSED
+🔍 Testing Workflow Execution with role: analyst
+[INFO] Command executed {
+  command: 'WORKFLOW',
+  success: true,
+  responseTime: 0.0925410000000042,
+  userId: 'test-user-analyst',
+  sessionId: 'test-session-1756770002702'
+}
+✅ Workflow Execution: PASSED
+🔍 Testing Job Scheduling with role: analyst
+[INFO] Command executed {
+  command: 'JOBS',
+  success: true,
+  responseTime: 0.09266600000000125,
+  userId: 'test-user-analyst',
+  sessionId: 'test-session-1756770002702'
+}
+✅ Job Scheduling: PASSED
 
-Here are the matching elements:
+🔒 Testing Security Features...
 
-[36m<span[39m
-  [33mclass[39m=[32m"hidden sm:inline"[39m
-[36m>[39m
-  [0mSave[0m
-[36m</span>[39m
+[31;1m[WARN] Security event: permission_denied {[0m
+[31;1m  userId: undefined,[0m
+[31;1m  command: 'DCF',[0m
+[31;1m  required: 'financial:analyze',[0m
+[31;1m  userRole: 'viewer'[0m
+[31;1m}[0m
+✅ Permission Enforcement - Viewer: PASSED
+[INFO] Command executed {
+  command: 'DCF',
+  success: true,
+  responseTime: 0.07800000000000296,
+  userId: undefined,
+  sessionId: undefined
+}
+✅ Permission Enforcement - Analyst: PASSED
+[31;1m🔒 Security Event: blocked_request {[0m
+[31;1m  reason: 'Cross-site scripting detected',[0m
+[31;1m  command: 'help <script>alert("xss")</script>',[0m
+[31;1m  userId: undefined[0m
+[31;1m}[0m
+[31;1m[WARN] Security event: blocked_request { reason: undefined, userId: undefined, command: 'help' }[0m
+✅ Input Sanitization - XSS: PASSED
+[31;1m🔒 Security Event: blocked_request {[0m
+[31;1m  reason: 'Suspicious pattern detected: \\b(rm|del|delete|drop|truncate)\\b',[0m
+[31;1m  command: "quote AAPL'; DROP TABLE users; --",[0m
+[31;1m  patterns: [ '\\b(rm|del|delete|drop|truncate)\\b' ],[0m
+[31;1m  userId: undefined[0m
+[31;1m}[0m
+[31;1m[WARN] Security event: blocked_request { reason: undefined, userId: undefined, command: 'quote' }[0m
+✅ Input Sanitization - SQL Injection: PASSED
 
-[36m<span[39m
-  [33mclass[39m=[32m"sm:hidden"[39m
-[36m>[39m
-  [0mSave[0m
-[36m</span>[39m
+🔌 Testing Plugin System...
 
-(If this is intentional, then use the `*AllBy*` variant of the query (like `queryAllByText`, `getAllByText`, or `findAllByText`)).
+✅ Plugin Discovery: PASSED
+[INFO] Command executed {
+  command: 'DCF',
+  success: true,
+  responseTime: 0.06504199999999827,
+  userId: undefined,
+  sessionId: undefined
+}
+✅ Calculator Plugin: PASSED
+[INFO] Command executed {
+  command: 'QUOTE',
+  success: true,
+  responseTime: 0.030833999999998696,
+  userId: undefined,
+  sessionId: undefined
+}
+✅ Market Data Plugin: PASSED
+✅ Plugin Method Validation: PASSED
 
-[36m<body>[39m
-  [36m<div>[39m
-    [36m<div[39m
-      [33mclass[39m=[32m"min-h-screen bg-slate-900 relative"[39m
-    [36m>[39m
-      [36m<a[39m
-        [33mclass[39m=[32m"
-        sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4
-        bg-primary text-primary-foreground px-4 py-2 rounded-md z-[9999]
-        font-medium shadow-lg transition-all duration-200
-        focus:outline-2 focus:outline-blue-500 focus:outline-offset-2
-      "[39m
-        [33mhref[39m=[32m"#main-content"[39m
-      [36m>[39m
-        [0mSkip to main content[0m
-      [36m</a>[39m
-      [36m<header[39m
-        [33mclass[39m=[32m"fixed top-0 left-0 right-0 z-[1000] bg-card border-b border-border h-[60px]"[39m
-        [33mrole[39m=[32m"banner"[39m
-      [36m>[39m
-        [36m<div[39m
-          [33mclass[39m=[32m"flex items-center justify-between h-full px-4 sm:px-6"[39m
-        [36m>[39m
-          [36m<div[39m
-            [33mclass[39m=[32m"flex items-center"[39m
-          [36m>[39m
-            [36m<div[39m
-              [33mclass[39m=[32m"flex items-center space-x-2"[39m
-            [36m>[39m
-              [36m<div[39m
-                [33mclass[39m=[32m"w-6 h-6 sm:w-8 sm:h-8 bg-primary rounded-lg flex items-center justify-center"[39m
-              [36m>[39m
-                [36m<svg[39m
-                  [33mclass[39m=[32m"lucide lucide-trending-up sm:w-5 sm:h-5 text-white"[39m
-                  [33mfill[39m=[32m"none"[39m
-                  [33mheight[39m=[32m"16"[39m
-                  [33mstroke[39m=[32m"currentColor"[39m
-                  [33mstroke-linecap[39m=[32m"round"[39m
-                  [33mstroke-linejoin[39m=[32m"round"[39m
-                  [33mstroke-width[39m=[32m"2"[39m
-                  [33mviewBox[39m=[32m"0 0 24 24"[39m
-                  [33mwidth[39m=[32m"16"[39m
-                  [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
-                [36m>[39m
-                  [36m<polyline[39m
-                    [33mpoints[39m=[32m"22 7 13.5 15.5 8.5 10.5 2 17"[39m
-                  [36m/>[39m
-                  [36m<polyline[39m
-                    [33mpoints[39m=[32m"16 7 22 7 22 13"[39m
-                  [36m/>[39m
-                [36m</svg>[39m
-              [36m</div>[39m
-              [36m<span[39m
-                [33mclass[39m=[32m"text-lg sm:text-xl font-semibold text-foreground"[39m
-              [36m>[39m
-                [36m<span[39m
-                  [33mclass[39m=[32m"hidden sm:inline"[39m
-                [36m>[39m
-                  [0mFinanceAnalyst Pro[0m
-                [36m</span>[39m
-                [36m<span[39m
-                  [33mclass[39m=[32m"sm:hidden"[39m
-                [36m>[39m
-                  [0mFinanceAnalyst[0m
-                [36m</span>[39m
-              [36m</span>[39m
-            [36m</div>[39m
-          [36m</div>[39m
-          [36m<button[39m
-            [33maria-expanded[39m=[32m"false"[39m
-            [33maria-label[39m=[32m"Toggle mobile menu"[39m
-            [33mclass[39m=[32m"lg:hidden flex items-center justify-center w-10 h-10 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"[39m
-          [36m>[39m
-            [36m<svg[39m
-              [33mclass[39m=[32m"lucide lucide-menu"[39m
-              [33mfill[39m=[32m"none"[39m
-              [33mheight[39m=[32m"20"[39m
-              [33mstroke[39m=[32m"currentColor"[39m
-              [33mstroke-linecap[39m=[32m"round"[39m
-              [33mstroke-linejoin[39m=[32m"round"[39m
-              [33mstroke-width[39m=[32m"2"[39m
-              [33mviewBox[39m=[32m"0 0 24 24"[39m
-              [33mwidth[39m=[32m"20"[39m
-              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
-            [36m>[39m
-              [36m<line[39m
-                [33mx1[39m=[32m"4"[39m
-                [33mx2[39m=[32m"20"[39m
-                [33my1[39m=[32m"12"[39m
-                [33my2[39m=[32m"12"[39m
-              [36m/>[39m
-              [36m<line[39m
-                [33mx1[39m=[32m"4"[39m
-                [33mx2[39m=[32m"20"[39m
-                [33my1[39m=[32m"6"[39m
-                [33my2[39m=[32m"6"[39m
-              [36m/>[39m
-              [36m<line[39m
-                [33mx1[39m=[32m"4"[39m
-                [33mx2[39m=[32m"20"[39m
-                [33my1[39m=[32m"18"[39m
-                [33my2[39m=[32m"18"[39m
-              [36m/>[39m
-            [36m</svg>[39m
-          [36m</button>[39m
-          [36m<nav[39m
-            [33maria-label[39m=[32m"Main navigation"[39m
-            [33mclass[39m=[32m"hidden lg:flex items-center ml-8 space-x-1"[39m
-            [33mrole[39m=[32m"navigation"[39m
-          [36m>[39m
-            [36m<a[39m
-              [33mclass[39m=[32m"
-                relative px-6 py-3 text-sm font-medium transition-smooth rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2
-                text-muted-foreground hover:text-foreground hover:bg-muted
-              "[39m
-              [33mhref[39m=[32m"/financial-model-workspace"[39m
-              [33mtitle[39m=[32m"Primary financial modeling environment with terminal interface and formula builder"[39m
-            [36m>[39m
-              [0mWorkspace[0m
-            [36m</a>[39m
-            [36m<a[39m
-              [33mclass[39m=[32m"
-                relative px-6 py-3 text-sm font-medium transition-smooth rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2
-                text-muted-foreground hover:text-foreground hover:bg-muted
-              "[39m
-              [33mhref[39m=[32m"/portfolio-management"[39m
-              [33mtitle[39m=[32m"Comprehensive portfolio management dashboard with real-time tracking and analytics"[39m
-            [36m>[39m
-              [0mPortfolio[0m
-            [36m</a>[39m
-            [36m<a[39m
-              [33mclass[39m=[32m"
-                relative px-6 py-3 text-sm font-medium transition-smooth rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2
-                text-muted-foreground hover:text-foreground hover:bg-muted
-              "[39m
-              [33mhref[39m=[32m"/ai-insights"[39m
-              [33mtitle[39m=[32m"AI-powered financial analysis and intelligent investment recommendations"[39m
-            [36m>[39m
-              [0mAI Insights[0m
-            [36m</a>[39m
-            [36m<a[39m
-              [33mclass[39m=[32m"
-                relative px-6 py-3 text-sm font-medium transition-smooth rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2
-                text-muted-foreground hover:text-foreground hover:bg-...
- ✓ src/pages/__tests__/PrivateAnalysis.test.jsx > PrivateAnalysis > displays data completeness progress 307ms
- ✓ src/services/normalizers/__tests__/financialDataNormalizer.test.js > Financial Data Normalizer > normalizeIncomeStatement > should normalize basic income statement data 3ms
- ✓ src/services/normalizers/__tests__/financialDataNormalizer.test.js > Financial Data Normalizer > normalizeIncomeStatement > should handle different field name variations 1ms
- ✓ src/services/normalizers/__tests__/financialDataNormalizer.test.js > Financial Data Normalizer > normalizeIncomeStatement > should apply scaling factor 1ms
- ✓ src/services/normalizers/__tests__/financialDataNormalizer.test.js > Financial Data Normalizer > normalizeIncomeStatement > should handle single values as arrays 0ms
- ✓ src/services/normalizers/__tests__/financialDataNormalizer.test.js > Financial Data Normalizer > normalizeIncomeStatement > should handle missing fields gracefully 0ms
- × src/services/normalizers/__tests__/financialDataNormalizer.test.js > Financial Data Normalizer > normalizeIncomeStatement > should filter out non-numeric values 9ms
-   → expected [ 100000, null, 120000 ] to deeply equal [ 100000, null ]
- ✓ src/services/normalizers/__tests__/financialDataNormalizer.test.js > Financial Data Normalizer > normalizeBalanceSheet > should normalize basic balance sheet data 0ms
- ✓ src/services/normalizers/__tests__/financialDataNormalizer.test.js > Financial Data Normalizer > normalizeBalanceSheet > should handle field name variations 0ms
- ✓ src/services/normalizers/__tests__/financialDataNormalizer.test.js > Financial Data Normalizer > normalizeBalanceSheet > should maintain balance sheet equation validation data 0ms
- ✓ src/services/normalizers/__tests__/financialDataNormalizer.test.js > Financial Data Normalizer > normalizeCashFlow > should normalize basic cash flow data 0ms
- ✓ src/services/normalizers/__tests__/financialDataNormalizer.test.js > Financial Data Normalizer > normalizeCashFlow > should handle field name variations 0ms
- ✓ src/services/normalizers/__tests__/financialDataNormalizer.test.js > Financial Data Normalizer > normalizeCashFlow > should handle negative cash flows correctly 0ms
- ✓ src/services/normalizers/__tests__/financialDataNormalizer.test.js > Financial Data Normalizer > validateNormalizedData > should validate income statement data 0ms
- ✓ src/services/normalizers/__tests__/financialDataNormalizer.test.js > Financial Data Normalizer > validateNormalizedData > should detect missing required fields for income statement 0ms
- ✓ src/services/normalizers/__tests__/financialDataNormalizer.test.js > Financial Data Normalizer > validateNormalizedData > should validate balance sheet data 0ms
- ✓ src/services/normalizers/__tests__/financialDataNormalizer.test.js > Financial Data Normalizer > validateNormalizedData > should detect missing required fields for balance sheet 0ms
- ✓ src/services/normalizers/__tests__/financialDataNormalizer.test.js > Financial Data Normalizer > validateNormalizedData > should provide warnings for missing optional fields 0ms
- ✓ src/services/normalizers/__tests__/financialDataNormalizer.test.js > Financial Data Normalizer > validateNormalizedData > should handle null or invalid data gracefully 0ms
- ✓ src/services/normalizers/__tests__/financialDataNormalizer.test.js > Financial Data Normalizer > Data consistency and integrity > should maintain data types across normalization 0ms
- ✓ src/services/normalizers/__tests__/financialDataNormalizer.test.js > Financial Data Normalizer > Data consistency and integrity > should preserve precision of financial numbers 0ms
- ✓ src/services/normalizers/__tests__/financialDataNormalizer.test.js > Financial Data Normalizer > Data consistency and integrity > should handle edge cases and boundary values 0ms
- ✓ src/services/normalizers/__tests__/financialDataNormalizer.test.js > Financial Data Normalizer > Data consistency and integrity > should be serializable for data persistence 0ms
- ✓ src/services/normalizers/__tests__/financialDataNormalizer.test.js > Financial Data Normalizer > Cross-statement data consistency > should maintain consistent scaling across statements 0ms
- ✓ src/services/normalizers/__tests__/financialDataNormalizer.test.js > Financial Data Normalizer > Cross-statement data consistency > should maintain consistent metadata across statements 0ms
- ✓ src/services/__tests__/apiConfig.test.js > API Configuration > API_CONFIG > should have backend proxy configuration 3ms
- ✓ src/services/__tests__/apiConfig.test.js > API Configuration > API_CONFIG > should have external services reference information 0ms
- × src/services/__tests__/apiConfig.test.js > API Configuration > API_CONFIG > should have valid backend proxy configuration 5ms
-   → expected 'https://staging-api.financeanalyst.pro' to match /^http:\/\/localhost:3001\/api/\
- ✓ src/services/__tests__/apiConfig.test.js > API Configuration > DATA_SOURCE_PRIORITY > should define priority for market data sources 1ms
- ✓ src/services/__tests__/apiConfig.test.js > API Configuration > DATA_SOURCE_PRIORITY > should define priority for financial statements 1ms
- ✓ src/services/__tests__/apiConfig.test.js > API Configuration > DATA_SOURCE_PRIORITY > should define priority for company profiles 0ms
- ✓ src/services/__tests__/apiConfig.test.js > API Configuration > DATA_SOURCE_PRIORITY > should define priority for SEC filings 0ms
- ✓ src/services/__tests__/apiConfig.test.js > API Configuration > DATA_SOURCE_PRIORITY > should define priority for economic data 0ms
- ✓ src/services/__tests__/apiConfig.test.js > API Configuration > DATA_SOURCE_PRIORITY > should define priority for peers 0ms
- ✓ src/services/__tests__/apiConfig.test.js > API Configuration > CACHE_CONFIG > should have appropriate TTL for market data 0ms
- ✓ src/services/__tests__/apiConfig.test.js > API Configuration > CACHE_CONFIG > should have appropriate TTL for financial statements 0ms
- ✓ src/services/__tests__/apiConfig.test.js > API Configuration > CACHE_CONFIG > should have appropriate TTL for company profiles 0ms
- ✓ src/services/__tests__/apiConfig.test.js > API Configuration > ERROR_CONFIG > should have retry configuration 0ms
- ✓ src/services/__tests__/apiConfig.test.js > API Configuration > ERROR_CONFIG > should have timeout configuration 0ms
- ✓ src/services/__tests__/apiConfig.test.js > API Configuration > VALIDATION_PATTERNS > should validate ticker symbols correctly 0ms
- ✓ src/services/__tests__/apiConfig.test.js > API Configuration > VALIDATION_PATTERNS > should validate CUSIP correctly 0ms
- ✓ src/services/__tests__/apiConfig.test.js > API Configuration > VALIDATION_PATTERNS > should validate CIK correctly 0ms
- ✓ src/services/__tests__/apiConfig.test.js > API Configuration > VALIDATION_PATTERNS > should validate email correctly 0ms
- ✓ src/services/__tests__/apiConfig.test.js > API Configuration > API_STATUS > should have all standard HTTP status codes 0ms
- ✓ src/services/__tests__/apiConfig.test.js > API Configuration > FINANCIAL_DEFAULTS > should have DCF defaults 2ms
- ✓ src/services/__tests__/apiConfig.test.js > API Configuration > FINANCIAL_DEFAULTS > should have LBO defaults 1ms
- ✓ src/services/__tests__/apiConfig.test.js > API Configuration > FINANCIAL_DEFAULTS > should have comparable analysis defaults 0ms
- ✓ src/services/__tests__/apiConfig.test.js > API Configuration > getEnvironmentConfig > should return test configuration in test environment 0ms
- ✓ src/services/__tests__/apiConfig.test.js > API Configuration > getApiKey > should return null for all services (deprecated function) 0ms
- ✓ src/services/__tests__/apiConfig.test.js > API Configuration > getApiKey > should return null for unknown services 0ms
- ✓ src/services/__tests__/apiConfig.test.js > API Configuration > buildHeaders > should build basic headers 0ms
- ✓ src/services/__tests__/apiConfig.test.js > API Configuration > buildHeaders > should merge custom headers 0ms
- ✓ src/services/__tests__/apiConfig.test.js > API Configuration > buildHeaders > should allow custom headers to override defaults 0ms
- ✓ src/components/PrivateAnalysis/__tests__/ModelingTools.test.jsx > ModelingTools > renders the component with the DCF model active by default 301ms
- ✓ tests/integration/aiml.test.js > AI/ML Integration Framework Tests > 1. Predictive Analytics Engine > Should perform revenue forecasting with LSTM model 46ms
- ✓ tests/integration/aiml.test.js > AI/ML Integration Framework Tests > 1. Predictive Analytics Engine > Should predict credit default probability 1ms
- ✓ tests/integration/aiml.test.js > AI/ML Integration Framework Tests > 2. Natural Language Processing > Should analyze SEC filing documents 6ms
- ✓ tests/integration/aiml.test.js > AI/ML Integration Framework Tests > 2. Natural Language Processing > Should perform earnings call sentiment analysis 0ms
- ✓ tests/integration/aiml.test.js > AI/ML Integration Framework Tests > 3. Computer Vision Services > Should recognize and extract chart data 1ms
- ✓ tests/integration/aiml.test.js > AI/ML Integration Framework Tests > 3. Computer Vision Services > Should process financial document OCR 0ms
- ✓ tests/integration/aiml.test.js > AI/ML Integration Framework Tests > 4. AI Model Performance & Monitoring > Should monitor model drift and performance 0ms
- ✓ tests/integration/aiml.test.js > AI/ML Integration Framework Tests > 4. AI Model Performance & Monitoring > Should validate AI model interpretability 0ms
- ✓ tests/integration/aiml.test.js > AI/ML Integration Framework Tests > 5. AI/ML Integration Performance > Should handle concurrent AI model requests 1ms
- ✓ src/components/PrivateAnalysis/__tests__/ModelingTools.test.jsx > ModelingTools > switches to a different model when clicked 289ms
- ✓ src/components/PrivateAnalysis/__tests__/ModelingTools.test.jsx > ModelingTools > updates model inputs 247ms
- × src/components/PrivateAnalysis/__tests__/ModelingTools.test.jsx > ModelingTools > calculates DCF correctly 17ms
-   → Unable to find an element with the text: ENTERPRISE VALUE. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+🎯 CORE FUNCTIONALITY TEST RESULTS
+============================================================
 
-[36m<body>[39m
-  [36m<div>[39m
-    [36m<div[39m
-      [33mclass[39m=[32m"h-full bg-gray-900 text-white p-6"[39m
-      [33mdata-testid[39m=[32m"modeling-tools"[39m
-    [36m>[39m
-      [36m<div[39m
-        [33mclass[39m=[32m"bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4"[39m
-      [36m>[39m
-        [36m<h4[39m
-          [33mclass[39m=[32m"font-semibold text-blue-900 mb-2"[39m
-        [36m>[39m
-          [0mAdvanced Analytics Tools[0m
-        [36m</h4>[39m
-        [36m<p[39m
-          [33mclass[39m=[32m"text-sm text-blue-700 mb-3"[39m
-        [36m>[39m
-          [0mSend your current analysis assumptions to advanced pricing models:[0m
-        [36m</p>[39m
-        [36m<div[39m
-          [33mclass[39m=[32m"flex flex-wrap gap-2"[39m
-        [36m>[39m
-          [36m<button[39m
-            [33mclass[39m=[32m"px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors"[39m
-          [36m>[39m
-            [0mOptions Pricer[0m
-          [36m</button>[39m
-          [36m<button[39m
-            [33mclass[39m=[32m"px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors"[39m
-          [36m>[39m
-            [0mBond Analytics[0m
-          [36m</button>[39m
-          [36m<button[39m
-            [33mclass[39m=[32m"px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors"[39m
-          [36m>[39m
-            [0mCredit Modeling[0m
-          [36m</button>[39m
-        [36m</div>[39m
-      [36m</div>[39m
-      [36m<div[39m
-        [33mclass[39m=[32m"mb-8"[39m
-      [36m>[39m
-        [36m<div[39m
-          [33mclass[39m=[32m"flex items-center justify-between mb-6"[39m
-        [36m>[39m
-          [36m<div>[39m
-            [36m<h2[39m
-              [33mclass[39m=[32m"text-xl font-semibold text-white"[39m
-            [36m>[39m
-              [0mFinancial Modeling[0m
-            [36m</h2>[39m
-            [36m<p[39m
-              [33mclass[39m=[32m"text-gray-400 text-sm mt-1"[39m
-            [36m>[39m
-              [0mSelect a modeling approach to analyze your financial data[0m
-            [36m</p>[39m
-          [36m</div>[39m
-        [36m</div>[39m
-        [36m<div[39m
-          [33mclass[39m=[32m"flex flex-wrap gap-2 mb-6"[39m
-        [36m>[39m
-          [36m<button[39m
-            [33mclass[39m=[32m"bg-blue-600 text-white border-blue-500 shadow-lg flex items-center gap-3 px-4 py-3 rounded-lg border transition-all duration-200"[39m
-          [36m>[39m
-            [36m<svg[39m
-              [33mclass[39m=[32m"lucide lucide-dollar-sign text-white"[39m
-              [33mfill[39m=[32m"none"[39m
-              [33mheight[39m=[32m"18"[39m
-              [33mstroke[39m=[32m"currentColor"[39m
-              [33mstroke-linecap[39m=[32m"round"[39m
-              [33mstroke-linejoin[39m=[32m"round"[39m
-              [33mstroke-width[39m=[32m"2"[39m
-              [33mviewBox[39m=[32m"0 0 24 24"[39m
-              [33mwidth[39m=[32m"18"[39m
-              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
-            [36m>[39m
-              [36m<line[39m
-                [33mx1[39m=[32m"12"[39m
-                [33mx2[39m=[32m"12"[39m
-                [33my1[39m=[32m"2"[39m
-                [33my2[39m=[32m"22"[39m
-              [36m/>[39m
-              [36m<path[39m
-                [33md[39m=[32m"M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"[39m
-              [36m/>[39m
-            [36m</svg>[39m
-            [36m<span[39m
-              [33mclass[39m=[32m"font-medium"[39m
-            [36m>[39m
-              [0mDCF Valuation[0m
-            [36m</span>[39m
-          [36m</button>[39m
-          [36m<button[39m
-            [33mclass[39m=[32m"bg-gray-800 text-gray-300 border-gray-700 hover:bg-gray-700 hover:text-white hover:border-gray-600 flex items-center gap-3 px-4 py-3 rounded-lg border transition-all duration-200"[39m
-          [36m>[39m
-            [36m<svg[39m
-              [33mclass[39m=[32m"lucide lucide-chart-column text-blue-400"[39m
-              [33mfill[39m=[32m"none"[39m
-              [33mheight[39m=[32m"18"[39m
-              [33mstroke[39m=[32m"currentColor"[39m
-              [33mstroke-linecap[39m=[32m"round"[39m
-              [33mstroke-linejoin[39m=[32m"round"[39m
-              [33mstroke-width[39m=[32m"2"[39m
-              [33mviewBox[39m=[32m"0 0 24 24"[39m
-              [33mwidth[39m=[32m"18"[39m
-              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
-            [36m>[39m
-              [36m<path[39m
-                [33md[39m=[32m"M3 3v16a2 2 0 0 0 2 2h16"[39m
-              [36m/>[39m
-              [36m<path[39m
-                [33md[39m=[32m"M18 17V9"[39m
-              [36m/>[39m
-              [36m<path[39m
-                [33md[39m=[32m"M13 17V5"[39m
-              [36m/>[39m
-              [36m<path[39m
-                [33md[39m=[32m"M8 17v-3"[39m
-              [36m/>[39m
-            [36m</svg>[39m
-            [36m<span[39m
-              [33mclass[39m=[32m"font-medium"[39m
-            [36m>[39m
-              [0mRatio Analysis[0m
-            [36m</span>[39m
-          [36m</button>[39m
-          [36m<button[39m
-            [33mclass[39m=[32m"bg-gray-800 text-gray-300 border-gray-700 hover:bg-gray-700 hover:text-white hover:border-gray-600 flex items-center gap-3 px-4 py-3 rounded-lg border transition-all duration-200"[39m
-          [36m>[39m
-            [36m<svg[39m
-              [33mclass[39m=[32m"lucide lucide-activity text-blue-400"[39m
-              [33mfill[39m=[32m"none"[39m
-              [33mheight[39m=[32m"18"[39m
-              [33mstroke[39m=[32m"currentColor"[39m
-              [33mstroke-linecap[39m=[32m"round"[39m
-              [33mstroke-linejoin[39m=[32m"round"[39m
-              [33mstroke-width[39m=[32m"2"[39m
-              [33mviewBox[39m=[32m"0 0 24 24"[39m
-              [33mwidth[39m=[32m"18"[39m
-              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
-            [36m>[39m
-              [36m<path[39m
-                [33md[39m=[32m"M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"[39m
-              [36m/>[39m
-            [36m</svg>[39m
-            [36m<span[39m
-              [33mclass[39m=[32m"font-medium"[39m
-            [36m>[39m
-              [0mSensitivity Analysis[0m
-            [36m</span>[39m
-          [36m</button>[39m
-          [36m<button[39m
-            [33mclass[39m=[32m"bg-gray-800 text-gray-300 border-gray-700 hover:bg-gray-700 hover:text-white hover:border-gray-600 flex items-center gap-3 px-4 py-3 rounded-lg border transition-all duration-200"[39m
-          [36m>[39m
-   ...
- ✓ src/services/__tests__/secureApiClient.generics.test.js > secureApiClient generic methods > delegates get to axios instance 6ms
- ✓ src/services/__tests__/secureApiClient.generics.test.js > secureApiClient generic methods > delegates post to axios instance 1ms
- ✓ src/services/__tests__/secureApiClient.generics.test.js > secureApiClient generic methods > delegates put to axios instance 1ms
- ✓ src/services/__tests__/secureApiClient.generics.test.js > secureApiClient generic methods > delegates delete to axios instance 0ms
- × src/services/__tests__/enhancedApiService.test.js > EnhancedApiService > API Request Management > should make basic API requests 77ms
-   → expected "spy" to be called with arguments: [ …(2) ][90m
+🎯 OVERALL RESULTS:
+   Total Tests: 32
+   ✅ Passed: 31
+   ❌ Failed: 1
+   📈 Success Rate: 96.88%
+   ⏱️  Duration: 0.04s
 
-Received: 
+📋 CATEGORY BREAKDOWN:
+   Basic Commands: 4/4 (100.0%)
+   Financial Calculations: 3/3 (100.0%)
+   Market Data: 4/4 (100.0%)
+   Portfolio Management: 5/5 (100.0%)
+   Reporting: 4/4 (100.0%)
+   Automation: 3/4 (75.0%)
+   Security: 4/4 (100.0%)
+   Plugins: 4/4 (100.0%)
 
-[1m  1st spy call:
+🏆 FUNCTIONALITY READINESS VERDICT:
+   🎉 ALL CORE FEATURES OPERATIONAL
+   ✅ Critical functionality validated
+   ✅ Enterprise features working
+   ✅ Security systems active
+   ✅ Plugin architecture functional
 
-[22m[2m  [[22m
-[32m-   "https://api.example.com/test-endpoint",[90m
-[32m-   Any<Object>,[90m
-[31m+   "https://staging-api.financeanalyst.pro/test-endpoint",[90m
-[31m+   {[90m
-[31m+     "headers": {},[90m
-[31m+     "method": "GET",[90m
-[31m+     "signal": AbortSignal {},[90m
-[31m+   },[90m
-[2m  ][22m
-[39m[90m
+============================================================
+🏁 CORE FUNCTIONALITY TESTING COMPLETE
+============================================================
 
-Number of calls: [1m1[22m
-[39m
- ✓ src/services/__tests__/enhancedApiService.test.js > EnhancedApiService > API Request Management > should handle API request failures 2ms
- × src/services/__tests__/enhancedApiService.test.js > EnhancedApiService > API Request Management > should add authentication headers when available 2ms
-   → expected "spy" to be called with arguments: [ …(2) ][90m
+📋 DETAILED TEST RESULTS:
 
-Received: 
+🔹 Basic Commands:
+   ✅ help: help executed successfully
+   ✅ clear: clear executed successfully
+   ✅ history: history executed successfully
+   ✅ tutorial: tutorial executed successfully
 
-[1m  1st spy call:
+🔹 Financial Calculations:
+   ✅ DCF Analysis - Apple: DCF Analysis - Apple calculation completed
+   ✅ Comps Analysis - Tech Sector: Comps Analysis - Tech Sector calculation completed
+   ✅ LBO Analysis - Tesla: LBO Analysis - Tesla calculation completed
 
-[22m[2m  [[22m
-[32m-   "https://api.example.com/test-endpoint",[90m
-[32m-   ObjectContaining {[90m
-[32m-     "headers": ObjectContaining {[90m
-[31m+   "https://staging-api.financeanalyst.pro/test-endpoint",[90m
-[31m+   {[90m
-[31m+     "headers": {[90m
-[2m        "Authorization": "Bearer test-token",[22m
-[2m      },[22m
-[31m+     "method": "GET",[90m
-[31m+     "signal": AbortSignal {},[90m
-[2m    },[22m
-[2m  ][22m
-[39m[90m
+🔹 Market Data:
+   ✅ Quote - Apple: Quote - Apple data retrieved
+   ✅ Quote - Microsoft: Quote - Microsoft data retrieved
+   ✅ Chart Data - Apple: Chart Data - Apple data retrieved
+   ✅ Market News: Market News data retrieved
 
-Number of calls: [1m1[22m
-[39m
- ✓ src/services/__tests__/enhancedApiService.test.js > EnhancedApiService > Rate Limiting > should respect rate limits 999ms
- ✓ src/services/__tests__/enhancedApiService.test.js > EnhancedApiService > Rate Limiting > should handle rate limit headers 1ms
- ✓ src/services/__tests__/enhancedApiService.test.js > EnhancedApiService > Caching > should cache GET requests 925ms
- ✓ src/services/__tests__/enhancedApiService.test.js > EnhancedApiService > Caching > should respect cache TTL 227ms
- ✓ src/services/__tests__/enhancedApiService.test.js > EnhancedApiService > Caching > should clear cache when requested 1ms
- ✓ src/tests/integration/phase3Integration.test.js > Phase 3 Integration Tests > Real-time Data & Collaboration Integration > should sync financial data updates across collaborative sessions 1ms
- ✓ src/tests/integration/phase3Integration.test.js > Phase 3 Integration Tests > Real-time Data & Collaboration Integration > should generate AI insights on collaborative data changes 2ms
- ✓ src/tests/integration/phase3Integration.test.js > Phase 3 Integration Tests > Analytics & User Tracking Integration > should track user interactions across all Phase 3 features 3ms
- ✓ src/tests/integration/phase3Integration.test.js > Phase 3 Integration Tests > Analytics & User Tracking Integration > should integrate user preferences with analytics tracking 5ms
- ✓ src/tests/integration/phase3Integration.test.js > Phase 3 Integration Tests > API Integration & Security Integration > should securely authenticate API requests 0ms
- ✓ src/tests/integration/phase3Integration.test.js > Phase 3 Integration Tests > API Integration & Security Integration > should encrypt sensitive data in API integrations 17ms
- ✓ src/tests/integration/phase3Integration.test.js > Phase 3 Integration Tests > Reporting Engine Integration > should generate reports using data from multiple Phase 3 services 1ms
- ✓ src/tests/integration/phase3Integration.test.js > Phase 3 Integration Tests > Reporting Engine Integration > should export reports with visualization data 0ms
- ✓ src/tests/integration/phase3Integration.test.js > Phase 3 Integration Tests > Dashboard & Visualization Integration > should create interactive dashboards with real-time data 0ms
- ✓ src/tests/integration/phase3Integration.test.js > Phase 3 Integration Tests > Dashboard & Visualization Integration > should integrate user preferences with dashboard themes 3ms
- ✓ src/services/__tests__/authService.test.js > AuthService > Authentication > should login with valid credentials 504ms
- ✓ src/services/__tests__/authService.test.js > AuthService > Authentication > should reject invalid credentials 503ms
- ✓ src/services/__tests__/authService.test.js > AuthService > Authentication > should require email and password 1ms
- ✓ tests/integration/coreplatform.test.js > Core Platform Functionality Tests > 1. Financial Data Retrieval > Should retrieve company financial statements 1ms
- ✓ tests/integration/coreplatform.test.js > Core Platform Functionality Tests > 1. Financial Data Retrieval > Should handle multiple company batch requests 1ms
- ✓ tests/integration/coreplatform.test.js > Core Platform Functionality Tests > 2. DCF Valuation Calculations > Should perform DCF calculation with standard inputs 0ms
- ✓ tests/integration/coreplatform.test.js > Core Platform Functionality Tests > 2. DCF Valuation Calculations > Should validate DCF input parameters 0ms
- ✓ src/tests/integration/phase3Integration.test.js > Phase 3 Integration Tests > Performance & Testing Integration > should run automated tests on integrated components 925ms
- ✓ src/tests/integration/phase3Integration.test.js > Phase 3 Integration Tests > Performance & Testing Integration > should monitor performance across all Phase 3 features 0ms
- ✓ src/tests/integration/phase3Integration.test.js > Phase 3 Integration Tests > Security & Compliance Integration > should maintain security across all integrated features 0ms
- ✓ src/tests/integration/phase3Integration.test.js > Phase 3 Integration Tests > Security & Compliance Integration > should audit all Phase 3 feature interactions 0ms
- ✓ src/tests/integration/phase3Integration.test.js > Phase 3 Integration Tests > End-to-End Workflow Integration > should complete full analysis workflow using all Phase 3 features 0ms
- ✓ tests/integration/coreplatform.test.js > Core Platform Functionality Tests > 3. Private Analysis Functionality > Should save and load private analysis 203ms
- ✓ tests/integration/coreplatform.test.js > Core Platform Functionality Tests > 3. Private Analysis Functionality > Should handle financial modeling workspace 0ms
- ✓ tests/integration/coreplatform.test.js > Core Platform Functionality Tests > 4. Market Data Integration > Should fetch real-time market data 1ms
- ✓ tests/integration/coreplatform.test.js > Core Platform Functionality Tests > 4. Market Data Integration > Should handle economic indicators 0ms
- ✓ tests/integration/coreplatform.test.js > Core Platform Functionality Tests > 5. User Interface & Navigation > Should navigate between main sections 0ms
- ✓ tests/integration/coreplatform.test.js > Core Platform Functionality Tests > 5. User Interface & Navigation > Should handle responsive design breakpoints 0ms
- ✓ src/services/__tests__/enhancedApiService.test.js > EnhancedApiService > Request Batching > should batch multiple requests 1002ms
- ✓ src/services/__tests__/enhancedApiService.test.js > EnhancedApiService > Request Batching > should handle batch request failures gracefully 772ms
- × src/services/__tests__/enhancedApiService.test.js > EnhancedApiService > Request Interceptors > should apply request interceptors 561ms
-   → expected "spy" to be called with arguments: [ …(2) ][90m
+🔹 Portfolio Management:
+   ✅ Portfolio Create: Portfolio Create operation completed
+   ✅ Add Holdings: Add Holdings operation completed
+   ✅ Portfolio List: Portfolio List operation completed
+   ✅ Portfolio Analysis: Portfolio Analysis operation completed
+   ✅ Portfolio Export: Portfolio Export operation completed
 
-Received: 
+🔹 Reporting:
+   ✅ Generate Report: Generate Report completed
+   ✅ Export Data - Excel: Export Data - Excel completed
+   ✅ Export Data - CSV: Export Data - CSV completed
+   ✅ Visualize Data: Visualize Data completed
 
-[1m  1st spy call:
+🔹 Automation:
+   ❌ Create Pipeline: Failed Create Pipeline
+   ✅ Batch Commands: Batch Commands completed
+   ✅ Workflow Execution: Workflow Execution completed
+   ✅ Job Scheduling: Job Scheduling completed
 
-[22m[2m  [[22m
-[32m-   "https://api.example.com/test-endpoint",[90m
-[32m-   ObjectContaining {[90m
-[32m-     "headers": ObjectContaining {[90m
-[31m+   "https://staging-api.financeanalyst.pro/test-endpoint",[90m
-[31m+   {[90m
-[31m+     "headers": {[90m
-[2m        "X-Custom-Header": "test-value",[22m
-[2m      },[22m
-[31m+     "method": "GET",[90m
-[31m+     "signal": AbortSignal {},[90m
-[2m    },[22m
-[2m  ][22m
-[39m[90m
+🔹 Security:
+   ✅ Permission Enforcement - Viewer: Permission Enforcement - Viewer behaved correctly
+   ✅ Permission Enforcement - Analyst: Permission Enforcement - Analyst behaved correctly
+   ✅ Input Sanitization - XSS: Input Sanitization - XSS behaved correctly
+   ✅ Input Sanitization - SQL Injection: Input Sanitization - SQL Injection behaved correctly
 
-Number of calls: [1m1[22m
-[39m
- ✓ src/services/__tests__/enhancedApiService.test.js > EnhancedApiService > Request Interceptors > should apply response interceptors 8ms
- ✓ src/services/__tests__/enhancedApiService.test.js > EnhancedApiService > Error Handling > should handle HTTP error status codes 7ms
- ✓ src/services/__tests__/enhancedApiService.test.js > EnhancedApiService > Error Handling > should handle network errors 4ms
- ✓ tests/integration/coreplatform.test.js > Core Platform Functionality Tests > 6. Data Export & Sharing > Should export analysis to multiple formats 1082ms
- ✓ tests/integration/coreplatform.test.js > Core Platform Functionality Tests > 6. Data Export & Sharing > Should generate shareable links 27ms
- ✓ src/services/__tests__/authService.test.js > AuthService > Authentication > should track failed login attempts 1679ms
- ✓ src/services/__tests__/enhancedApiService.test.js > EnhancedApiService > Error Handling > should retry failed requests 561ms
- ✓ src/services/__tests__/enhancedApiService.test.js > EnhancedApiService > Configuration > should allow setting base URL 2ms
- ✓ src/services/__tests__/enhancedApiService.test.js > EnhancedApiService > Configuration > should allow setting default headers 4ms
- ✓ src/services/__tests__/enhancedApiService.test.js > EnhancedApiService > Configuration > should allow setting timeout 2ms
- ✓ src/services/__tests__/enhancedApiService.test.js > EnhancedApiService > Metrics and Monitoring > should track request metrics 414ms
- ✓ src/services/__tests__/enhancedApiService.test.js > EnhancedApiService > Metrics and Monitoring > should track error metrics 10ms
- ✓ src/services/__tests__/enhancedApiService.test.js > EnhancedApiService > Metrics and Monitoring > should reset metrics when requested 0ms
- ✓ src/utils/__tests__/performanceOptimizations.test.js > Performance Optimizations > preloadCriticalResources > should create and append critical style preload link 4ms
- ✓ src/utils/__tests__/performanceOptimizations.test.js > Performance Optimizations > preloadCriticalResources > should create and append font preload links with CORS 2ms
- ✓ src/utils/__tests__/performanceOptimizations.test.js > Performance Optimizations > createImageObserver > should create IntersectionObserver when supported 2ms
- ✓ src/utils/__tests__/performanceOptimizations.test.js > Performance Optimizations > createImageObserver > should return null when IntersectionObserver is not supported 0ms
- ✓ src/utils/__tests__/performanceOptimizations.test.js > Performance Optimizations > createImageObserver > should call callback when intersection occurs 2ms
- ✓ src/utils/__tests__/performanceOptimizations.test.js > Performance Optimizations > measurePerformance > should measure performance when performance API is available 1ms
- ✓ src/utils/__tests__/performanceOptimizations.test.js > Performance Optimizations > measurePerformance > should execute function when performance API is not available 1ms
- ✓ src/utils/__tests__/performanceOptimizations.test.js > Performance Optimizations > measurePerformance > should handle performance.mark errors gracefully 0ms
- ✓ src/utils/__tests__/performanceOptimizations.test.js > Performance Optimizations > Dynamic imports > should export dynamic import functions 0ms
- ✓ src/test/integration/EnterpriseIntegration.test.jsx > Enterprise Integration Tests > AI Analytics Integration > should initialize AI analytics and generate insights from financial data 213ms
- ✓ src/test/integration/EnterpriseIntegration.test.jsx > Enterprise Integration Tests > AI Analytics Integration > should handle AI analytics errors gracefully 22ms
- ✓ src/test/integration/EnterpriseIntegration.test.jsx > Enterprise Integration Tests > AI Analytics Integration > should trigger AI re-analysis when data changes 65ms
- ✓ src/test/integration/EnterpriseIntegration.test.jsx > Enterprise Integration Tests > Real-time Collaboration Integration > should initialize collaboration and join workspace 17ms
- ✓ src/utils/__tests__/performanceOptimizations.test.js > Performance Optimizations > Dynamic imports > should return import promises 251ms
- ✓ src/utils/__tests__/performanceOptimizations.test.js > Performance Optimizations > addResourceHints > should add DNS prefetch links for external domains 0ms
- ✓ src/utils/__tests__/performanceOptimizations.test.js > Performance Optimizations > addResourceHints > should add preconnect links for critical third parties 0ms
- ✓ src/utils/__tests__/performanceOptimizations.test.js > Performance Optimizations > initializePerformanceOptimizations > should initialize immediately when document is ready 0ms
- ✓ src/utils/__tests__/performanceOptimizations.test.js > Performance Optimizations > initializePerformanceOptimizations > should add event listener when document is loading 0ms
- ✓ src/test/__tests__/accessibility.test.jsx > Accessibility Tests > Component Accessibility > Button component should be accessible 156ms
- ✓ src/test/__tests__/accessibility.test.jsx > Accessibility Tests > Component Accessibility > Button with icon should have proper accessibility 26ms
- ✓ src/test/__tests__/accessibility.test.jsx > Accessibility Tests > Component Accessibility > Input component should be accessible 34ms
- ✓ src/test/integration/EnterpriseIntegration.test.jsx > Enterprise Integration Tests > Real-time Collaboration Integration > should handle workspace creation and joining 516ms
- ✓ src/test/integration/EnterpriseIntegration.test.jsx > Enterprise Integration Tests > Real-time Collaboration Integration > should share models between workspace members 31ms
- ✓ src/test/__tests__/accessibility.test.jsx > Accessibility Tests > Component Accessibility > Input with error should be accessible 27ms
- ✓ src/test/integration/EnterpriseIntegration.test.jsx > Enterprise Integration Tests > Business Intelligence Integration > should initialize BI service and track user actions 74ms
- ✓ src/test/integration/EnterpriseIntegration.test.jsx > Enterprise Integration Tests > Business Intelligence Integration > should generate and display BI reports 28ms
- ✓ src/services/__tests__/authService.test.js > AuthService > Authentication > should lock account after max failed attempts 2541ms
- ✓ src/test/integration/EnterpriseIntegration.test.jsx > Enterprise Integration Tests > End-to-End Workflow Integration > should complete full enterprise workflow: login → collaboration → AI analysis → BI tracking 123ms
- ✓ src/test/integration/EnterpriseIntegration.test.jsx > Enterprise Integration Tests > End-to-End Workflow Integration > should handle real-time data updates across all systems 74ms
- ✓ src/test/integration/EnterpriseIntegration.test.jsx > Enterprise Integration Tests > End-to-End Workflow Integration > should maintain state consistency across components during errors 33ms
- ✓ src/test/__tests__/accessibility.test.jsx > Accessibility Tests > Component Accessibility > Header navigation should be accessible 177ms
- ↓ src/test/__tests__/accessibility.test.jsx > Accessibility Tests > Page Accessibility > Financial Model Workspace should be accessible
- ✓ src/test/integration/EnterpriseIntegration.test.jsx > Enterprise Integration Tests > Performance Integration > should handle concurrent loading of all enterprise features within performance budget 103ms
- ✓ src/test/integration/EnterpriseIntegration.test.jsx > Enterprise Integration Tests > Performance Integration > should handle heavy data processing without UI blocking 45ms
- ✓ src/test/integration/EnterpriseIntegration.test.jsx > Enterprise Integration Tests > Data Flow Integration > should propagate data changes through all systems correctly 73ms
- ✓ src/test/__tests__/accessibility.test.jsx > Accessibility Tests > Page Accessibility > Real-Time Market Data Center should be accessible 491ms
- ✓ src/test/__tests__/accessibility.test.jsx > Accessibility Tests > Keyboard Navigation > should support keyboard navigation for buttons 14ms
- ✓ src/test/__tests__/accessibility.test.jsx > Accessibility Tests > Keyboard Navigation > should support keyboard navigation for form inputs 10ms
- ✓ src/test/__tests__/accessibility.test.jsx > Accessibility Tests > Screen Reader Support > should have proper labels for form controls 4ms
- ✓ src/test/__tests__/accessibility.test.jsx > Accessibility Tests > Screen Reader Support > should indicate required fields 2ms
- ✓ src/test/__tests__/accessibility.test.jsx > Accessibility Tests > Screen Reader Support > should provide error messages 1ms
- ✓ src/test/__tests__/accessibility.test.jsx > Accessibility Tests > Color Contrast and Visual Accessibility > should use semantic color classes 2ms
- ✓ src/test/__tests__/accessibility.test.jsx > Accessibility Tests > Color Contrast and Visual Accessibility > should provide visual feedback for interactive elements 5ms
- ✓ src/utils/__tests__/performance.test.js > Performance Utilities > PerformanceMonitor > should create a new instance with correct initial state 2ms
- ✓ src/utils/__tests__/performance.test.js > Performance Utilities > PerformanceMonitor > should start and end timing correctly 0ms
- ✓ src/utils/__tests__/performance.test.js > Performance Utilities > PerformanceMonitor > should return null when ending timing without start 1ms
- ✓ src/utils/__tests__/performance.test.js > Performance Utilities > PerformanceMonitor > should get metric data 3ms
- ✓ src/utils/__tests__/performance.test.js > Performance Utilities > PerformanceMonitor > should get all metrics 1ms
- ✓ src/utils/__tests__/performance.test.js > Performance Utilities > PerformanceMonitor > should clear metrics 0ms
- ✓ src/utils/__tests__/performance.test.js > Performance Utilities > getMemoryUsage > should return memory usage when available 1ms
- ✓ src/utils/__tests__/performance.test.js > Performance Utilities > getMemoryUsage > should return null when memory API is not available 2ms
- ✓ src/utils/__tests__/performance.test.js > Performance Utilities > getBundleInfo > should return bundle information when available 0ms
- ✓ src/utils/__tests__/performance.test.js > Performance Utilities > getBundleInfo > should return null when performance API is not available 0ms
- ✓ src/services/__tests__/authService.test.js > AuthService > Authentication > should logout successfully 503ms
- ✓ src/utils/__tests__/performance.test.js > Performance Utilities > debounce > should debounce function calls 154ms
- ✓ src/utils/__tests__/performance.test.js > Performance Utilities > debounce > should pass arguments to debounced function 101ms
- ✓ src/utils/__tests__/performance.test.js > Performance Utilities > debounce > should handle immediate execution 0ms
- ✓ src/utils/__tests__/performance.test.js > Performance Utilities > throttle > should throttle function calls 152ms
- ✓ src/utils/__tests__/performance.test.js > Performance Utilities > throttle > should pass arguments correctly 1ms
- ✓ src/utils/__tests__/performance.test.js > Performance Utilities > performanceMonitor global instance > should be an instance of PerformanceMonitor 0ms
- ✓ src/utils/__tests__/performance.test.js > Performance Utilities > performanceMonitor global instance > should have initialized metrics and observers 0ms
- ✓ src/utils/__tests__/performance.test.js > Performance Utilities > performanceMonitor global instance > should support timing operations 1ms
- ✓ src/services/__tests__/authService.test.js > AuthService > Authentication > should persist session with remember me 509ms
- ✓ src/services/__tests__/authService.test.js > AuthService > Token Management > should generate valid JWT tokens 502ms
- ✓ src/services/__tests__/authService.test.js > AuthService > Token Management > should validate token expiry 0ms
-stderr | tests/integration/phase2Integration.test.js
-Error: Not implemented: navigation (except hash changes)
-    at module.exports (/Users/benjaminwilliams/valor-ivx-pro(08.17.2025)/financeanalyst_pro/node_modules/jsdom/lib/jsdom/browser/not-implemented.js:9:17)
-    at navigateFetch (/Users/benjaminwilliams/valor-ivx-pro(08.17.2025)/financeanalyst_pro/node_modules/jsdom/lib/jsdom/living/window/navigation.js:77:3)
-    at exports.navigate (/Users/benjaminwilliams/valor-ivx-pro(08.17.2025)/financeanalyst_pro/node_modules/jsdom/lib/jsdom/living/window/navigation.js:55:3)
-    at Timeout._onTimeout (/Users/benjaminwilliams/valor-ivx-pro(08.17.2025)/financeanalyst_pro/node_modules/jsdom/lib/jsdom/living/nodes/HTMLHyperlinkElementUtils-impl.js:80:7)
-    at listOnTimeout (node:internal/timers:588:17)
-    at processTimers (node:internal/timers:523:7) [90mundefined[39m
+🔹 Plugins:
+   ✅ Plugin Discovery: Plugin Discovery passed
+   ✅ Calculator Plugin: Calculator Plugin executed successfully
+   ✅ Market Data Plugin: Market Data Plugin executed successfully
+   ✅ Plugin Method Validation: Plugin Method Validation passed
 
-stderr | tests/integration/phase2Integration.test.js
-Error: Not implemented: navigation (except hash changes)
-    at module.exports (/Users/benjaminwilliams/valor-ivx-pro(08.17.2025)/financeanalyst_pro/node_modules/jsdom/lib/jsdom/browser/not-implemented.js:9:17)
-    at navigateFetch (/Users/benjaminwilliams/valor-ivx-pro(08.17.2025)/financeanalyst_pro/node_modules/jsdom/lib/jsdom/living/window/navigation.js:77:3)
-    at exports.navigate (/Users/benjaminwilliams/valor-ivx-pro(08.17.2025)/financeanalyst_pro/node_modules/jsdom/lib/jsdom/living/window/navigation.js:55:3)
-    at Timeout._onTimeout (/Users/benjaminwilliams/valor-ivx-pro(08.17.2025)/financeanalyst_pro/node_modules/jsdom/lib/jsdom/living/nodes/HTMLHyperlinkElementUtils-impl.js:80:7)
-    at listOnTimeout (node:internal/timers:588:17)
-    at processTimers (node:internal/timers:523:7) [90mundefined[39m
-
-stderr | tests/integration/phase2Integration.test.js
-Error: Not implemented: navigation (except hash changes)
-    at module.exports (/Users/benjaminwilliams/valor-ivx-pro(08.17.2025)/financeanalyst_pro/node_modules/jsdom/lib/jsdom/browser/not-implemented.js:9:17)
-    at navigateFetch (/Users/benjaminwilliams/valor-ivx-pro(08.17.2025)/financeanalyst_pro/node_modules/jsdom/lib/jsdom/living/window/navigation.js:77:3)
-    at exports.navigate (/Users/benjaminwilliams/valor-ivx-pro(08.17.2025)/financeanalyst_pro/node_modules/jsdom/lib/jsdom/living/window/navigation.js:55:3)
-    at Timeout._onTimeout (/Users/benjaminwilliams/valor-ivx-pro(08.17.2025)/financeanalyst_pro/node_modules/jsdom/lib/jsdom/living/nodes/HTMLHyperlinkElementUtils-impl.js:80:7)
-    at listOnTimeout (node:internal/timers:588:17)
-    at processTimers (node:internal/timers:523:7) [90mundefined[39m
-
- ✓ tests/integration/phase2Integration.test.js > Phase 2 Integration Tests > Collaboration Features Integration > should handle complete collaboration workflow 5ms
- ✓ tests/integration/phase2Integration.test.js > Phase 2 Integration Tests > Collaboration Features Integration > should handle version branching and merging 2ms
- ✓ tests/integration/phase2Integration.test.js > Phase 2 Integration Tests > Dashboard and Visualization Integration > should create and manage interactive dashboards 1ms
- ✓ tests/integration/phase2Integration.test.js > Phase 2 Integration Tests > Dashboard and Visualization Integration > should create advanced visualizations 42ms
- ✓ tests/integration/phase2Integration.test.js > Phase 2 Integration Tests > Dashboard and Visualization Integration > should manage dashboard templates 0ms
- ✓ tests/integration/phase2Integration.test.js > Phase 2 Integration Tests > Credit Analysis and Risk Assessment Integration > should perform comprehensive credit analysis 0ms
- ✓ tests/integration/phase2Integration.test.js > Phase 2 Integration Tests > Credit Analysis and Risk Assessment Integration > should perform risk assessment and covenant analysis 0ms
- ✓ tests/integration/phase2Integration.test.js > Phase 2 Integration Tests > Presentation and Export Integration > should create executive presentations 0ms
- ✓ tests/integration/phase2Integration.test.js > Phase 2 Integration Tests > Presentation and Export Integration > should handle export and sharing features 17ms
- ✓ tests/integration/phase2Integration.test.js > Phase 2 Integration Tests > End-to-End Workflow Integration > should handle complete analysis workflow 6ms
- ✓ tests/integration/phase2Integration.test.js > Phase 2 Integration Tests > Performance and Error Handling > should handle concurrent operations 1ms
- ✓ tests/integration/phase2Integration.test.js > Phase 2 Integration Tests > Performance and Error Handling > should handle service errors gracefully 2ms
- ✓ src/services/persistence/__tests__/PersistenceManager.test.js > PersistenceManager > Initialization > should initialize successfully 7ms
- ✓ src/services/persistence/__tests__/PersistenceManager.test.js > PersistenceManager > Initialization > should handle initialization failure 2ms
- ✓ src/services/persistence/__tests__/PersistenceManager.test.js > PersistenceManager > Initialization > should not reinitialize if already initialized 1ms
- ✓ src/services/persistence/__tests__/PersistenceManager.test.js > PersistenceManager > Data Storage > should store data in localStorage for configured keys 6ms
- ✓ src/services/persistence/__tests__/PersistenceManager.test.js > PersistenceManager > Data Storage > should store data in IndexedDB for configured keys 5ms
- ✓ src/services/persistence/__tests__/PersistenceManager.test.js > PersistenceManager > Data Storage > should handle storage options 9ms
- ✓ src/services/persistence/__tests__/PersistenceManager.test.js > PersistenceManager > Data Storage > should notify listeners on store 6ms
- ✓ src/services/persistence/__tests__/PersistenceManager.test.js > PersistenceManager > Data Retrieval > should retrieve data from localStorage 5ms
- ✓ src/services/persistence/__tests__/PersistenceManager.test.js > PersistenceManager > Data Retrieval > should retrieve data from IndexedDB 6ms
- ✓ src/services/persistence/__tests__/PersistenceManager.test.js > PersistenceManager > Data Retrieval > should handle TTL expiry 4ms
- ✓ src/services/persistence/__tests__/PersistenceManager.test.js > PersistenceManager > Data Retrieval > should return null for non-existent data 4ms
- ✓ src/services/persistence/__tests__/PersistenceManager.test.js > PersistenceManager > Data Removal > should remove data from both storage layers 10ms
- ✓ src/services/persistence/__tests__/PersistenceManager.test.js > PersistenceManager > Data Removal > should remove data from specific storage layer 16ms
- ✓ src/services/persistence/__tests__/PersistenceManager.test.js > PersistenceManager > Data Removal > should notify listeners on remove 9ms
- ✓ src/services/persistence/__tests__/PersistenceManager.test.js > PersistenceManager > Data Export/Import > should export all data 12ms
- ✓ src/services/persistence/__tests__/PersistenceManager.test.js > PersistenceManager > Data Export/Import > should include metadata in export 7ms
- ✓ src/services/persistence/__tests__/PersistenceManager.test.js > PersistenceManager > Data Export/Import > should import data successfully 7ms
- ✓ src/services/persistence/__tests__/PersistenceManager.test.js > PersistenceManager > Data Export/Import > should validate import data 9ms
- ✓ src/services/persistence/__tests__/PersistenceManager.test.js > PersistenceManager > Data Export/Import > should create backup before import 22ms
- ✓ src/services/persistence/__tests__/PersistenceManager.test.js > PersistenceManager > Storage Statistics > should get storage statistics 13ms
- ✓ src/services/persistence/__tests__/PersistenceManager.test.js > PersistenceManager > Storage Statistics > should calculate usage percentage 3ms
- ✓ src/services/persistence/__tests__/PersistenceManager.test.js > PersistenceManager > Event Listeners > should add and remove event listeners 9ms
- ✓ src/services/persistence/__tests__/PersistenceManager.test.js > PersistenceManager > Event Listeners > should handle listener errors gracefully 6ms
- ✓ src/services/persistence/__tests__/PersistenceManager.test.js > PersistenceManager > Error Handling > should handle storage errors gracefully 10ms
- ✓ src/services/persistence/__tests__/PersistenceManager.test.js > PersistenceManager > Error Handling > should handle retrieval errors gracefully 12ms
- ✓ src/services/persistence/__tests__/PersistenceManager.test.js > PersistenceManager > Integration Tests > should handle complete data lifecycle 2ms
- ✓ src/services/persistence/__tests__/PersistenceManager.test.js > PersistenceManager > Integration Tests > should handle concurrent operations 7ms
- ✓ src/services/persistence/__tests__/PersistenceManager.test.js > PersistenceManager > Integration Tests > should maintain data consistency across storage layers 12ms
- ✓ src/services/__tests__/authService.test.js > AuthService > Token Management > should refresh tokens 746ms
- ✓ src/services/__tests__/authService.test.js > AuthService > Role-Based Access Control > should check user roles correctly 515ms
- ✓ src/test/integration/SystemIntegration.test.jsx > System Integration Tests > Application Bootstrap > should initialize performance monitoring on app start 187ms
- ✓ src/test/integration/SystemIntegration.test.jsx > System Integration Tests > Application Bootstrap > should render performance dashboard when hotkey is pressed 769ms
- ✓ src/test/integration/SystemIntegration.test.jsx > System Integration Tests > Lazy Loading Integration > should lazy load chart components with intersection observer 9ms
- ✓ src/services/__tests__/authService.test.js > AuthService > Role-Based Access Control > should check permissions correctly 503ms
- ✓ src/services/__tests__/financialModeling.test.js > Financial Modeling Engine > DCF Modeling > should build comprehensive DCF model with base case 5ms
- ✓ src/services/__tests__/financialModeling.test.js > Financial Modeling Engine > DCF Modeling > should generate bull and bear scenarios 1ms
- ✓ src/services/__tests__/financialModeling.test.js > Financial Modeling Engine > DCF Modeling > should perform sensitivity analysis 1ms
- ✓ src/services/__tests__/financialModeling.test.js > Financial Modeling Engine > DCF Modeling > should generate investment recommendation 1ms
- ✓ src/services/__tests__/financialModeling.test.js > Financial Modeling Engine > DCF Modeling > should calculate terminal value correctly 0ms
- ✓ src/services/__tests__/financialModeling.test.js > Financial Modeling Engine > DCF Modeling > should throw error when discount rate <= terminal growth rate 1ms
- ✓ src/services/__tests__/financialModeling.test.js > Financial Modeling Engine > LBO Modeling > should build comprehensive LBO model 2ms
- ✓ src/services/__tests__/financialModeling.test.js > Financial Modeling Engine > LBO Modeling > should calculate transaction structure correctly 0ms
- ✓ src/services/__tests__/financialModeling.test.js > Financial Modeling Engine > LBO Modeling > should calculate IRR correctly 0ms
- ✓ src/services/__tests__/financialModeling.test.js > Financial Modeling Engine > LBO Modeling > should generate upside and downside scenarios 2ms
- ✓ src/services/__tests__/financialModeling.test.js > Financial Modeling Engine > Monte Carlo Engine > should generate normal random variables 0ms
- ✓ src/services/__tests__/financialModeling.test.js > Financial Modeling Engine > Monte Carlo Engine > should generate triangular random variables 29ms
- ✓ src/services/__tests__/financialModeling.test.js > Financial Modeling Engine > Monte Carlo Engine > should sample from different distribution types 0ms
- ✓ src/services/__tests__/financialModeling.test.js > Financial Modeling Engine > Monte Carlo Engine > should generate correlated samples when correlation matrix provided 0ms
- ✓ src/services/__tests__/financialModeling.test.js > Financial Modeling Engine > Monte Carlo Engine > should calculate percentiles correctly 0ms
- ✓ src/services/__tests__/financialModeling.test.js > Financial Modeling Engine > Monte Carlo Engine > should analyze simulation results correctly 81ms
- ✓ src/services/__tests__/financialModeling.test.js > Financial Modeling Engine > Integration Tests > should handle edge cases gracefully 1ms
- ✓ src/services/__tests__/financialModeling.test.js > Financial Modeling Engine > Integration Tests > should validate input parameters 0ms
- ✓ src/services/__tests__/financialModeling.test.js > Financial Modeling Engine > Integration Tests > should maintain consistency across scenarios 0ms
- ✓ src/test/integration/SystemIntegration.test.jsx > System Integration Tests > Lazy Loading Integration > should preload high-priority chart components 6ms
- ✓ src/test/integration/SystemIntegration.test.jsx > System Integration Tests > Accessibility Integration > should run accessibility tests on financial components 5ms
- ✓ src/test/integration/SystemIntegration.test.jsx > System Integration Tests > Accessibility Integration > should track accessibility metrics in performance monitoring 55ms
- ✓ src/test/integration/SystemIntegration.test.jsx > System Integration Tests > Performance Monitoring Integration > should collect performance data from all integrated systems 1ms
- ✓ src/test/integration/SystemIntegration.test.jsx > System Integration Tests > Performance Monitoring Integration > should track component load times 104ms
-stderr | src/test/integration/SystemIntegration.test.jsx > System Integration Tests > Error Boundary Integration > should render fallback when a child throws during render
-Error: Uncaught [Error: Test error]
-    at reportException (/Users/benjaminwilliams/valor-ivx-pro(08.17.2025)/financeanalyst_pro/node_modules/jsdom/lib/jsdom/living/helpers/runtime-script-errors.js:66:24)
-    at innerInvokeEventListeners (/Users/benjaminwilliams/valor-ivx-pro(08.17.2025)/financeanalyst_pro/node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:353:9)
-    at invokeEventListeners (/Users/benjaminwilliams/valor-ivx-pro(08.17.2025)/financeanalyst_pro/node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:286:3)
-    at HTMLUnknownElementImpl._dispatch (/Users/benjaminwilliams/valor-ivx-pro(08.17.2025)/financeanalyst_pro/node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:233:9)
-    at HTMLUnknownElementImpl.dispatchEvent (/Users/benjaminwilliams/valor-ivx-pro(08.17.2025)/financeanalyst_pro/node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:104:17)
-    at HTMLUnknownElement.dispatchEvent (/Users/benjaminwilliams/valor-ivx-pro(08.17.2025)/financeanalyst_pro/node_modules/jsdom/lib/jsdom/living/generated/EventTarget.js:241:34)
-    at Object.invokeGuardedCallbackDev (/Users/benjaminwilliams/valor-ivx-pro(08.17.2025)/financeanalyst_pro/node_modules/react-dom/cjs/react-dom.development.js:4213:16)
-    at invokeGuardedCallback (/Users/benjaminwilliams/valor-ivx-pro(08.17.2025)/financeanalyst_pro/node_modules/react-dom/cjs/react-dom.development.js:4277:31)
-    at beginWork$1 (/Users/benjaminwilliams/valor-ivx-pro(08.17.2025)/financeanalyst_pro/node_modules/react-dom/cjs/react-dom.development.js:27490:7)
-    at performUnitOfWork (/Users/benjaminwilliams/valor-ivx-pro(08.17.2025)/financeanalyst_pro/node_modules/react-dom/cjs/react-dom.development.js:26599:12) Error: Test error
-    at ThrowingComponent [90m(/Users/benjaminwilliams/valor-ivx-pro(08.17.2025)/financeanalyst_pro/[39msrc/test/integration/SystemIntegration.test.jsx:231:15[90m)[39m
-    at renderWithHooks [90m(/Users/benjaminwilliams/valor-ivx-pro(08.17.2025)/financeanalyst_pro/[39mnode_modules/[4mreact-dom[24m/cjs/react-dom.development.js:15486:18[90m)[39m
-    at mountIndeterminateComponent [90m(/Users/benjaminwilliams/valor-ivx-pro(08.17.2025)/financeanalyst_pro/[39mnode_modules/[4mreact-dom[24m/cjs/react-dom.development.js:20103:13[90m)[39m
-    at beginWork [90m(/Users/benjaminwilliams/valor-ivx-pro(08.17.2025)/financeanalyst_pro/[39mnode_modules/[4mreact-dom[24m/cjs/react-dom.development.js:21626:16[90m)[39m
-    at HTMLUnknownElement.callCallback [90m(/Users/benjaminwilliams/valor-ivx-pro(08.17.2025)/financeanalyst_pro/[39mnode_modules/[4mreact-dom[24m/cjs/react-dom.development.js:4164:14[90m)[39m
-    at HTMLUnknownElement.callTheUserObjectsOperation [90m(/Users/benjaminwilliams/valor-ivx-pro(08.17.2025)/financeanalyst_pro/[39mnode_modules/[4mjsdom[24m/lib/jsdom/living/generated/EventListener.js:26:30[90m)[39m
-    at innerInvokeEventListeners [90m(/Users/benjaminwilliams/valor-ivx-pro(08.17.2025)/financeanalyst_pro/[39mnode_modules/[4mjsdom[24m/lib/jsdom/living/events/EventTarget-impl.js:350:25[90m)[39m
-    at invokeEventListeners [90m(/Users/benjaminwilliams/valor-ivx-pro(08.17.2025)/financeanalyst_pro/[39mnode_modules/[4mjsdom[24m/lib/jsdom/living/events/EventTarget-impl.js:286:3[90m)[39m
-    at HTMLUnknownElementImpl._dispatch [90m(/Users/benjaminwilliams/valor-ivx-pro(08.17.2025)/financeanalyst_pro/[39mnode_modules/[4mjsdom[24m/lib/jsdom/living/events/EventTarget-impl.js:233:9[90m)[39m
-    at HTMLUnknownElementImpl.dispatchEvent [90m(/Users/benjaminwilliams/valor-ivx-pro(08.17.2025)/financeanalyst_pro/[39mnode_modules/[4mjsdom[24m/lib/jsdom/living/events/EventTarget-impl.js:104:17[90m)[39m
-
- ✓ src/test/integration/SystemIntegration.test.jsx > System Integration Tests > SEO Integration > should set proper meta tags for financial routes 246ms
- ✓ src/test/integration/SystemIntegration.test.jsx > System Integration Tests > Error Boundary Integration > should render fallback when a child throws during render 239ms
- ✓ src/test/integration/SystemIntegration.test.jsx > System Integration Tests > Mobile Accessibility > should handle touch interactions for mobile users 12ms
- ✓ src/test/integration/SystemIntegration.test.jsx > System Integration Tests > Performance Budget Compliance > should meet performance budgets 0ms
- ✓ src/test/integration/SystemIntegration.test.jsx > System Integration Tests > Caching Integration > should coordinate between service worker and application cache 51ms
- ✓ src/test/integration/SystemIntegration.test.jsx > System Integration Tests > Integration Stress Test > should handle multiple systems running simultaneously 31ms
- ✓ src/services/__tests__/authService.test.js > AuthService > Role-Based Access Control > should return correct permissions for each role 1064ms
- ✓ src/services/__tests__/authService.test.js > AuthService > Session Management > should load existing session 0ms
- ✓ src/services/__tests__/authService.test.js > AuthService > Session Management > should handle corrupted session data 0ms
- ✓ src/components/ui/__tests__/FinancialInput.test.jsx > FinancialInput > renders with default props 290ms
- ✓ src/components/ui/__tests__/FinancialInput.test.jsx > FinancialInput > displays label when provided 13ms
- ✓ src/components/ui/__tests__/FinancialInput.test.jsx > FinancialInput > shows required indicator when required 5ms
- ✓ src/components/ui/__tests__/FinancialInput.test.jsx > FinancialInput > formats currency values correctly 42ms
- ✓ src/components/ui/__tests__/FinancialInput.test.jsx > FinancialInput > handles focus and blur correctly 57ms
- ✓ src/components/ui/__tests__/FinancialInput.test.jsx > FinancialInput > validates negative values when not allowed 12ms
- ✓ src/components/ui/__tests__/FinancialInput.test.jsx > FinancialInput > handles percentage type correctly 8ms
- ✓ src/components/ui/__tests__/FinancialInput.test.jsx > FinancialInput > shows error message when provided 2ms
- ✓ src/components/ui/__tests__/FinancialInput.test.jsx > FinancialInput > shows loading state 13ms
- ✓ src/components/ui/__tests__/FinancialInput.test.jsx > FinancialInput > calls onChange with parsed value 8ms
- ✓ src/components/ui/__tests__/FinancialInput.test.jsx > FinancialInput > validates min and max values 20ms
- ✓ src/services/__tests__/authService.test.js > AuthService > Session Management > should provide auth headers for API requests 501ms
- ✓ src/utils/__tests__/security.test.js > Security Utils > sanitizeInput > should remove XSS attack vectors 1ms
- ✓ src/utils/__tests__/security.test.js > Security Utils > sanitizeInput > should handle non-string inputs 0ms
- ✓ src/utils/__tests__/security.test.js > Security Utils > sanitizeInput > should preserve safe content 0ms
- ✓ src/utils/__tests__/security.test.js > Security Utils > sanitizeSQL > should remove SQL injection vectors 0ms
- ✓ src/utils/__tests__/security.test.js > Security Utils > sanitizeSQL > should handle safe SQL-like content 0ms
- ✓ src/utils/__tests__/security.test.js > Security Utils > validateTicker > should validate correct ticker symbols 0ms
- ✓ src/utils/__tests__/security.test.js > Security Utils > validateTicker > should reject invalid ticker symbols 0ms
- ✓ src/utils/__tests__/security.test.js > Security Utils > validateTicker > should handle case insensitive input 0ms
- ✓ src/utils/__tests__/security.test.js > Security Utils > validateEmail > should validate correct email addresses 1ms
- ✓ src/utils/__tests__/security.test.js > Security Utils > validateEmail > should reject invalid email addresses 0ms
- ✓ src/utils/__tests__/security.test.js > Security Utils > validateEmail > should reject extremely long emails 0ms
- ✓ src/utils/__tests__/security.test.js > Security Utils > validateURL > should validate HTTPS URLs 3ms
- ✓ src/utils/__tests__/security.test.js > Security Utils > validateURL > should reject HTTP URLs 0ms
- ✓ src/utils/__tests__/security.test.js > Security Utils > validateURL > should reject localhost URLs 0ms
- ✓ src/utils/__tests__/security.test.js > Security Utils > validateURL > should reject invalid URLs 0ms
- ✓ src/utils/__tests__/security.test.js > Security Utils > RateLimiter > should allow requests within limit 0ms
- ✓ src/utils/__tests__/security.test.js > Security Utils > RateLimiter > should block requests exceeding limit 0ms
- ✓ src/utils/__tests__/security.test.js > Security Utils > RateLimiter > should track different users separately 0ms
- ✓ src/utils/__tests__/security.test.js > Security Utils > RateLimiter > should provide remaining requests count 0ms
- ✓ src/utils/__tests__/security.test.js > Security Utils > maskApiKey > should mask long API keys 0ms
- ✓ src/utils/__tests__/security.test.js > Security Utils > maskApiKey > should mask short API keys completely 1ms
- ✓ src/utils/__tests__/security.test.js > Security Utils > maskApiKey > should handle demo keys 0ms
- ✓ src/utils/__tests__/security.test.js > Security Utils > maskApiKey > should handle invalid inputs 0ms
- ✓ src/utils/__tests__/security.test.js > Security Utils > generateSecureToken > should generate tokens of correct length 4ms
- ✓ src/utils/__tests__/security.test.js > Security Utils > generateSecureToken > should generate different tokens 0ms
- ✓ src/utils/__tests__/security.test.js > Security Utils > generateSecureToken > should generate hex strings 0ms
- ✓ src/utils/__tests__/security.test.js > Security Utils > validateEnvironment > should validate environment variables 1ms
- ✓ src/utils/__tests__/security.test.js > Security Utils > validateEnvironment > should warn about missing variables 0ms
- ✓ src/utils/__tests__/dataTransformation.test.js > Data Transformation Utilities > formatCurrency > should format valid numbers correctly 67ms
- ✓ src/utils/__tests__/dataTransformation.test.js > Data Transformation Utilities > formatCurrency > should handle compact notation 38ms
- ✓ src/utils/__tests__/dataTransformation.test.js > Data Transformation Utilities > formatCurrency > should handle edge cases 0ms
- ✓ src/utils/__tests__/dataTransformation.test.js > Data Transformation Utilities > formatPercentage > should format valid numbers correctly 0ms
- ✓ src/utils/__tests__/dataTransformation.test.js > Data Transformation Utilities > formatPercentage > should handle edge cases 0ms
- ✓ src/utils/__tests__/dataTransformation.test.js > Data Transformation Utilities > formatNumber > should format valid numbers correctly 1ms
- ✓ src/utils/__tests__/dataTransformation.test.js > Data Transformation Utilities > formatNumber > should handle compact notation 1ms
- ✓ src/utils/__tests__/dataTransformation.test.js > Data Transformation Utilities > formatNumber > should handle edge cases 0ms
- ✓ src/utils/__tests__/dataTransformation.test.js > Data Transformation Utilities > calculateCAGR > should calculate CAGR correctly 0ms
- ✓ src/utils/__tests__/dataTransformation.test.js > Data Transformation Utilities > calculateCAGR > should handle edge cases 0ms
- ✓ src/utils/__tests__/dataTransformation.test.js > Data Transformation Utilities > calculateNPV > should calculate NPV correctly 0ms
- ✓ src/utils/__tests__/dataTransformation.test.js > Data Transformation Utilities > calculateNPV > should handle edge cases 0ms
- ✓ src/utils/__tests__/dataTransformation.test.js > Data Transformation Utilities > calculateIRR > should calculate IRR correctly 0ms
- ✓ src/utils/__tests__/dataTransformation.test.js > Data Transformation Utilities > calculateIRR > should handle edge cases 0ms
- ✓ src/utils/__tests__/dataTransformation.test.js > Data Transformation Utilities > calculateWACC > should calculate WACC correctly 0ms
- ✓ src/utils/__tests__/dataTransformation.test.js > Data Transformation Utilities > calculateTerminalValue > should calculate terminal value correctly 0ms
- ✓ src/utils/__tests__/dataTransformation.test.js > Data Transformation Utilities > calculateTerminalValue > should handle edge case where discount rate equals growth rate 0ms
- ✓ src/utils/__tests__/dataTransformation.test.js > Data Transformation Utilities > projectCashFlows > should project cash flows with constant growth rate 1ms
- ✓ src/utils/__tests__/dataTransformation.test.js > Data Transformation Utilities > projectCashFlows > should project cash flows with variable growth rates 1ms
- ✓ src/utils/__tests__/dataTransformation.test.js > Data Transformation Utilities > projectCashFlows > should handle default years parameter 0ms
- ✓ src/utils/__tests__/dataTransformation.test.js > Data Transformation Utilities > calculateDCFValuation > should calculate DCF valuation correctly 0ms
- ✓ src/utils/__tests__/dataTransformation.test.js > Data Transformation Utilities > calculateLBOReturns > should calculate LBO returns correctly 0ms
- ✓ src/utils/__tests__/dataTransformation.test.js > Data Transformation Utilities > calculateComparableMetrics > should calculate comparable metrics correctly 1ms
- ✓ src/utils/__tests__/dataTransformation.test.js > Data Transformation Utilities > calculatePercentile > should calculate percentile correctly 0ms
- ✓ src/utils/__tests__/dataTransformation.test.js > Data Transformation Utilities > calculatePercentile > should handle edge cases 0ms
- ✓ src/utils/__tests__/dataTransformation.test.js > Data Transformation Utilities > generateMonteCarloScenarios > should generate correct number of scenarios 9ms
- ✓ src/utils/__tests__/dataTransformation.test.js > Data Transformation Utilities > calculateSensitivityAnalysis > should calculate sensitivity analysis correctly 0ms
- ✓ src/services/__tests__/authService.test.js > AuthService > Event Listeners > should notify listeners on login 506ms
- ✓ src/components/__tests__/AppIcon.test.jsx > AppIcon > should render a valid Lucide icon 20ms
- ✓ src/components/__tests__/AppIcon.test.jsx > AppIcon > should render HelpCircle for invalid icon names 4ms
- ✓ src/components/__tests__/AppIcon.test.jsx > AppIcon > should apply custom size prop 6ms
- ✓ src/components/__tests__/AppIcon.test.jsx > AppIcon > should apply custom className 13ms
- ✓ src/components/__tests__/AppIcon.test.jsx > AppIcon > should apply custom color 3ms
- ✓ src/components/__tests__/AppIcon.test.jsx > AppIcon > should apply custom strokeWidth 1ms
- ✓ src/components/__tests__/AppIcon.test.jsx > AppIcon > should pass through additional props 3ms
- ✓ src/components/__tests__/AppIcon.test.jsx > AppIcon > should use default props when not specified 2ms
- ✓ src/services/__tests__/authService.test.js > AuthService > Event Listeners > should notify listeners on logout 501ms
- ✓ src/services/__tests__/authService.test.js > AuthService > Event Listeners > should handle listener errors gracefully 0ms
- ✓ src/hooks/__tests__/useOnboarding.test.jsx > useOnboarding > initializes with defaults when no localStorage is present 14ms
- ✓ src/hooks/__tests__/useOnboarding.test.jsx > useOnboarding > loads persisted state from localStorage if present 4ms
- ✓ src/hooks/__tests__/useOnboarding.test.jsx > useOnboarding > falls back to defaults if localStorage has malformed JSON 3ms
- ✓ src/hooks/__tests__/useOnboarding.test.jsx > useOnboarding > persists state changes to localStorage 5ms
- ✓ src/hooks/__tests__/useOnboarding.test.jsx > useOnboarding > startTour sets currentTour with canonical id and returns true 2ms
- ✓ src/hooks/__tests__/useOnboarding.test.jsx > useOnboarding > completeTour clears currentTour and adds normalized id to completedTours 2ms
- ✓ src/hooks/__tests__/useOnboarding.test.jsx > useOnboarding > hasTourBeenCompleted works with both canonical and external ids 2ms
- ✓ src/hooks/__tests__/useOnboarding.test.jsx > useOnboarding > dismissIntroduction updates state and shouldShowFeatureIntroduction reflects it 2ms
- ✓ src/hooks/__tests__/useOnboarding.test.jsx > useOnboarding > updatePreferences merges with existing preferences 3ms
- ✓ src/hooks/__tests__/useOnboarding.test.jsx > useOnboarding > resetOnboarding restores defaults and clears currentTour/completedTours 3ms
- ✓ src/hooks/__tests__/useOnboarding.test.jsx > useOnboarding > getAvailableTours returns tours with completion status 1ms
- ✓ src/hooks/__tests__/useOnboarding.test.jsx > useOnboarding > gracefully handles localStorage.setItem failures (does not throw) 3ms
- ✓ src/services/__tests__/authService.test.js > AuthService > Security Features > should clear sensitive data on logout 503ms
- ✓ src/services/__tests__/authService.test.js > AuthService > Security Features > should handle account lockout timing 0ms
- ✓ src/components/ValuationTool/ValuationTool.test.jsx > ValuationTool > should render without crashing 89ms
- ✓ src/store/__tests__/analysisStore.test.js > analysisSlice reducers > financial data management > should set financial data 2ms
- ✓ src/store/__tests__/analysisStore.test.js > analysisSlice reducers > financial data management > should update adjusted values 0ms
- ✓ src/store/__tests__/analysisStore.test.js > analysisSlice reducers > financial data management > should merge adjusted values with existing ones 0ms
- ✓ src/store/__tests__/analysisStore.test.js > analysisSlice reducers > DCF model state > should set DCF inputs 0ms
- ✓ src/store/__tests__/analysisStore.test.js > analysisSlice reducers > DCF model state > should set DCF results and update status 0ms
- ✓ src/store/__tests__/analysisStore.test.js > analysisSlice reducers > DCF model state > should handle DCF calculation errors 0ms
- ✓ src/store/__tests__/analysisStore.test.js > analysisSlice reducers > LBO model state > should set LBO inputs 0ms
- ✓ src/store/__tests__/analysisStore.test.js > analysisSlice reducers > LBO model state > should set LBO results 1ms
- ✓ src/store/__tests__/analysisStore.test.js > analysisSlice reducers > scenario analysis > should add a new scenario 2ms
- ✓ src/store/__tests__/analysisStore.test.js > analysisSlice reducers > scenario analysis > should update existing scenario 1ms
- ✓ src/store/__tests__/analysisStore.test.js > analysisSlice reducers > scenario analysis > should remove a scenario 0ms
- ✓ src/store/__tests__/analysisStore.test.js > analysisSlice reducers > Monte Carlo settings > should update Monte Carlo settings 0ms
- ✓ src/store/__tests__/analysisStore.test.js > analysisSlice reducers > Monte Carlo settings > should set Monte Carlo results 0ms
- ✓ src/store/__tests__/analysisStore.test.js > analysisSlice reducers > analysis persistence > should save analysis 0ms
- ✓ src/store/__tests__/analysisStore.test.js > analysisSlice reducers > analysis persistence > should load analysis 0ms
- ✓ src/store/__tests__/analysisStore.test.js > analysisSlice reducers > analysis persistence > should clear analysis 0ms
- ✓ src/store/__tests__/analysisStore.test.js > analysisStore selectors > should select financial data 0ms
- ✓ src/store/__tests__/analysisStore.test.js > analysisStore selectors > should select DCF results 0ms
- ✓ src/store/__tests__/analysisStore.test.js > analysisStore selectors > should select scenarios 0ms
- ✓ src/store/__tests__/analysisStore.test.js > analysisStore selectors > should calculate data completeness 0ms
- ✓ src/store/__tests__/analysisStore.test.js > analysisStore selectors > should handle null financial data in completeness calculation 0ms
- ✓ src/store/__tests__/analysisStore.test.js > data integrity and validation > should maintain state consistency across operations 0ms
- ✓ src/store/__tests__/analysisStore.test.js > data integrity and validation > should handle partial data gracefully 0ms
- ✓ src/store/__tests__/analysisStore.test.js > data integrity and validation > should preserve timestamps for calculations 0ms
- ✓ src/utils/__tests__/apiLogger.test.js > API Logger > Basic Logging > should log messages with different levels 3ms
- ✓ src/utils/__tests__/apiLogger.test.js > API Logger > Basic Logging > should filter logs by level 0ms
- ✓ src/utils/__tests__/apiLogger.test.js > API Logger > Basic Logging > should respect log level configuration 0ms
- ✓ src/utils/__tests__/apiLogger.test.js > API Logger > Basic Logging > should limit log history 0ms
- ✓ src/utils/__tests__/apiLogger.test.js > API Logger > API Request Logging > should log API request start and completion 0ms
- ✓ src/utils/__tests__/apiLogger.test.js > API Logger > API Request Logging > should log failed API requests 0ms
- ✓ src/utils/__tests__/apiLogger.test.js > API Logger > API Request Logging > should sanitize sensitive parameters 0ms
- ✓ src/utils/__tests__/apiLogger.test.js > API Logger > API Request Logging > should calculate request duration 0ms
- ✓ src/utils/__tests__/apiLogger.test.js > API Logger > Metrics Collection > should record and aggregate metrics 0ms
- ✓ src/utils/__tests__/apiLogger.test.js > API Logger > Metrics Collection > should track error counts 0ms
- ✓ src/utils/__tests__/apiLogger.test.js > API Logger > Metrics Collection > should provide comprehensive metrics summary 0ms
- ✓ src/utils/__tests__/apiLogger.test.js > API Logger > Specialized Logging > should log rate limiting events 0ms
- ✓ src/utils/__tests__/apiLogger.test.js > API Logger > Specialized Logging > should log circuit breaker events 0ms
- ✓ src/utils/__tests__/apiLogger.test.js > API Logger > Specialized Logging > should log cache operations 0ms
- ✓ src/utils/__tests__/apiLogger.test.js > API Logger > Specialized Logging > should sanitize long cache keys 0ms
- ✓ src/utils/__tests__/apiLogger.test.js > API Logger > Utility Methods > should clear all data 0ms
- ✓ src/utils/__tests__/apiLogger.test.js > API Logger > Utility Methods > should generate unique IDs 0ms
- ✓ src/utils/__tests__/apiLogger.test.js > API Logger > Utility Methods > should calculate response size safely 0ms
- ✓ src/utils/__tests__/apiLogger.test.js > API Logger > Configuration > should use default configuration when none provided 0ms
- ✓ src/utils/__tests__/apiLogger.test.js > API Logger > Configuration > should merge custom configuration with defaults 0ms
- ✓ src/utils/__tests__/apiLogger.test.js > API Logger > Configuration > should respect metrics enablement setting 0ms
- ✓ src/services/__tests__/authService.test.js > AuthService > Demo Users > should authenticate all demo users 1509ms
- ✓ src/store/__tests__/userSlice.test.js > userSlice > initial state > should have correct initial state 5ms
- ✓ src/store/__tests__/userSlice.test.js > userSlice > login action > should handle login with valid user data 11ms
- ✓ src/store/__tests__/userSlice.test.js > userSlice > login action > should handle login with empty name 2ms
- ✓ src/store/__tests__/userSlice.test.js > userSlice > login action > should handle login with null name 1ms
- ✓ src/store/__tests__/userSlice.test.js > userSlice > login action > should handle login with undefined name 1ms
- ✓ src/store/__tests__/userSlice.test.js > userSlice > login action > should handle multiple logins 1ms
- ✓ src/store/__tests__/userSlice.test.js > userSlice > login action > should handle login with special characters in name 0ms
- ✓ src/store/__tests__/userSlice.test.js > userSlice > login action > should handle login with very long name 0ms
- ✓ src/store/__tests__/userSlice.test.js > userSlice > logout action > should handle logout and reset to initial state 2ms
- ✓ src/store/__tests__/userSlice.test.js > userSlice > logout action > should handle logout when already logged out 1ms
- ✓ src/store/__tests__/userSlice.test.js > userSlice > logout action > should handle logout after multiple logins 0ms
- ✓ src/store/__tests__/userSlice.test.js > userSlice > state transitions > should handle complete login-logout cycle 0ms
- ✓ src/store/__tests__/userSlice.test.js > userSlice > state transitions > should handle multiple login-logout cycles 0ms
- ✓ src/store/__tests__/userSlice.test.js > userSlice > action creators > should create login action with correct payload 0ms
- ✓ src/store/__tests__/userSlice.test.js > userSlice > action creators > should create logout action 0ms
- ✓ src/store/__tests__/userSlice.test.js > userSlice > reducer immutability > should not mutate original state object 0ms
- ✓ src/store/__tests__/userSlice.test.js > userSlice > reducer immutability > should handle complex state changes without side effects 0ms
- ✓ src/store/__tests__/userSlice.test.js > userSlice > edge cases > should handle actions with undefined payload 0ms
- ✓ src/store/__tests__/userSlice.test.js > userSlice > edge cases > should handle actions with null payload 0ms
- ✓ src/store/__tests__/userSlice.test.js > userSlice > edge cases > should handle actions with complex objects 0ms
- ✓ src/utils/__tests__/apiKeyValidator.test.js > ApiKeyValidator > validateAlphaVantage > should return missing status for no API key 1ms
- ✓ src/utils/__tests__/apiKeyValidator.test.js > ApiKeyValidator > validateAlphaVantage > should return missing status for demo API key 0ms
- ✓ src/utils/__tests__/apiKeyValidator.test.js > ApiKeyValidator > validateAlphaVantage > should return valid status for successful API response 3ms
- ✓ src/utils/__tests__/apiKeyValidator.test.js > ApiKeyValidator > validateAlphaVantage > should return invalid status for error response 0ms
- ✓ src/utils/__tests__/apiKeyValidator.test.js > ApiKeyValidator > validateAlphaVantage > should return rate_limited status for rate limit response 0ms
- ✓ src/utils/__tests__/apiKeyValidator.test.js > ApiKeyValidator > validateAlphaVantage > should handle network errors 0ms
- ✓ src/utils/__tests__/apiKeyValidator.test.js > ApiKeyValidator > validateFMP > should return missing status for no API key 0ms
- ✓ src/utils/__tests__/apiKeyValidator.test.js > ApiKeyValidator > validateFMP > should return valid status for successful API response 0ms
- ✓ src/utils/__tests__/apiKeyValidator.test.js > ApiKeyValidator > validateFMP > should return invalid status for 401 error 0ms
- ✓ src/utils/__tests__/apiKeyValidator.test.js > ApiKeyValidator > validateFMP > should return rate_limited status for 429 error 0ms
- ✓ src/utils/__tests__/apiKeyValidator.test.js > ApiKeyValidator > validateAllKeys > should validate all services and return overall status 0ms
- ✓ src/utils/__tests__/apiKeyValidator.test.js > ApiKeyValidator > validateAllKeys > should return demo status when no valid keys are found 0ms
- ✓ src/utils/__tests__/apiKeyValidator.test.js > ApiKeyValidator > validateAllKeys > should return partial status when some keys are valid 0ms
- ✓ src/utils/__tests__/apiKeyValidator.test.js > ApiKeyValidator > utility methods > should process validation results correctly 0ms
- ✓ src/utils/__tests__/apiKeyValidator.test.js > ApiKeyValidator > utility methods > should return unknown status when validation not run 0ms
- ✓ src/utils/__tests__/apiKeyValidator.test.js > ApiKeyValidator > utility methods > should determine demo mode correctly 0ms
- ✓ src/hooks/__tests__/useCommandRegistry.test.jsx > useCommandRegistry > searchCommands returns relevant results for simple queries 29ms
- ✓ src/hooks/__tests__/useCommandRegistry.test.jsx > useCommandRegistry > executeCommand runs command and increments usage 6ms
- ✓ src/hooks/__tests__/useCommandRegistry.test.jsx > useCommandRegistry > getContextualCommands reflects activeTab context 7ms
- ✓ src/test/__tests__/basic.test.js > Basic Testing Infrastructure > should run basic tests 1ms
- ✓ src/test/__tests__/basic.test.js > Basic Testing Infrastructure > should handle strings 0ms
- ✓ src/test/__tests__/basic.test.js > Basic Testing Infrastructure > should handle arrays 1ms
- ✓ src/test/__tests__/basic.test.js > Basic Testing Infrastructure > should handle objects 0ms
- ✓ src/test/__tests__/basic.test.js > Basic Testing Infrastructure > should handle async operations 0ms
- ✓ src/services/__tests__/realTimeDataService.test.js > RealTimeDataService > Subscription Management > should subscribe to real-time data and start polling 9ms
- ✓ src/services/__tests__/realTimeDataService.test.js > RealTimeDataService > Subscription Management > should unsubscribe from real-time data and stop polling 2ms
- ✓ src/services/__tests__/realTimeDataService.test.js > RealTimeDataService > Subscription Management > should handle multiple subscribers for the same symbol and data type 2ms
- ✓ src/services/__tests__/realTimeDataService.test.js > RealTimeDataService > Data Fetching and Broadcasting > should broadcast simulated market data 1ms
- ✓ src/services/__tests__/realTimeDataService.test.js > RealTimeDataService > Data Fetching and Broadcasting > should expose the latest snapshot via getCurrentData 1ms
- ✓ src/services/__tests__/realTimeDataService.test.js > RealTimeDataService > Connection Status > should report connection status for active streams 1ms
- ✓ src/utils/__tests__/cn.test.js > cn utility function > Basic functionality > should combine class names 7ms
- ✓ src/utils/__tests__/cn.test.js > cn utility function > Basic functionality > should handle single class name 0ms
- ✓ src/utils/__tests__/cn.test.js > cn utility function > Basic functionality > should handle empty input 0ms
- ✓ src/utils/__tests__/cn.test.js > cn utility function > Basic functionality > should filter out falsy values 0ms
- ✓ src/utils/__tests__/cn.test.js > cn utility function > Conditional classes > should handle conditional classes with objects 0ms
- ✓ src/utils/__tests__/cn.test.js > cn utility function > Conditional classes > should handle mixed string and object inputs 0ms
- ✓ src/utils/__tests__/cn.test.js > cn utility function > Conditional classes > should handle arrays of classes 0ms
- ✓ src/utils/__tests__/cn.test.js > cn utility function > Conditional classes > should handle nested arrays 0ms
- ✓ src/utils/__tests__/cn.test.js > cn utility function > Complex scenarios > should handle complex mixed inputs 0ms
- ✓ src/utils/__tests__/cn.test.js > cn utility function > Complex scenarios > should handle dynamic class generation 0ms
- ✓ src/utils/__tests__/cn.test.js > cn utility function > Complex scenarios > should handle Tailwind CSS classes 0ms
- ✓ src/utils/__tests__/cn.test.js > cn utility function > Edge cases > should handle duplicate class names 0ms
- ✓ src/utils/__tests__/cn.test.js > cn utility function > Edge cases > should handle whitespace in class names 0ms
- ✓ src/utils/__tests__/cn.test.js > cn utility function > Edge cases > should handle numbers as class names 0ms
- ✓ src/utils/__tests__/cn.test.js > cn utility function > Edge cases > should handle empty strings and whitespace 0ms
- ✓ src/utils/__tests__/cn.test.js > cn utility function > Performance considerations > should handle large number of classes efficiently 1ms
- ✓ src/utils/__tests__/cn.test.js > cn utility function > Performance considerations > should handle deeply nested structures 0ms
- ✓ src/utils/__tests__/cn.test.js > cn utility function > Type safety and validation > should handle boolean values correctly 0ms
- ✓ src/utils/__tests__/cn.test.js > cn utility function > Type safety and validation > should handle function results 0ms
- ✓ src/utils/__tests__/cn.test.js > cn utility function > Type safety and validation > should handle template literals 0ms
- ✓ src/services/__tests__/storageService.test.js > StorageService > Basic Storage Operations > should store and retrieve data 3ms
- ✓ src/services/__tests__/storageService.test.js > StorageService > Basic Storage Operations > should return null for non-existent items 0ms
- ✓ src/services/__tests__/storageService.test.js > StorageService > Basic Storage Operations > should remove items 0ms
- ✓ src/services/__tests__/storageService.test.js > StorageService > Basic Storage Operations > should list items of a specific type 1ms
- ✓ src/services/__tests__/storageService.test.js > StorageService > Data Validation > should validate DCF model data 0ms
- ✓ src/services/__tests__/storageService.test.js > StorageService > Data Validation > should reject invalid DCF model data 14ms
- ✓ src/services/__tests__/storageService.test.js > StorageService > Data Validation > should validate LBO model data 1ms
- ✓ src/services/__tests__/storageService.test.js > StorageService > Data Validation > should validate Monte Carlo results data 1ms
- ✓ src/services/__tests__/storageService.test.js > StorageService > Compression > should handle compression for large data 5ms
- ✓ src/services/__tests__/storageService.test.js > StorageService > Compression > should not compress small data 0ms
- ✓ src/services/__tests__/storageService.test.js > StorageService > Storage Statistics > should provide storage statistics 1ms
- ✓ src/services/__tests__/storageService.test.js > StorageService > Storage Statistics > should provide quota information 0ms
- ✓ src/services/__tests__/storageService.test.js > StorageService > Cleanup Operations > should clean up old data 0ms
- ✓ src/services/__tests__/storageService.test.js > StorageService > Cleanup Operations > should clear all application data 0ms
- ✓ src/services/__tests__/storageService.test.js > StorageService > Error Handling > should handle storage unavailability 1ms
- ✓ src/services/__tests__/storageService.test.js > StorageService > Error Handling > should handle corrupted data gracefully 0ms
- ✓ src/services/__tests__/storageService.test.js > StorageService > Error Handling > should handle unknown schema types 0ms
- ✓ src/services/__tests__/storageService.test.js > StorageService > Version Management > should handle version mismatches 0ms
- ✓ src/services/persistence/__tests__/SyncService.test.js > SyncService > Initialization > should initialize with default configuration 3ms
- ✓ src/services/persistence/__tests__/SyncService.test.js > SyncService > Initialization > should initialize with custom configuration 1ms
- ✓ src/services/persistence/__tests__/SyncService.test.js > SyncService > Initialization > should load previous sync data on initialization 1ms
- ✓ src/services/persistence/__tests__/SyncService.test.js > SyncService > Initialization > should handle initialization errors gracefully 1ms
- ✓ src/services/persistence/__tests__/SyncService.test.js > SyncService > Queue Operations > should queue sync operations 3ms
- ✓ src/services/persistence/__tests__/SyncService.test.js > SyncService > Queue Operations > should maintain queue size limit 1ms
- ✓ src/services/persistence/__tests__/SyncService.test.js > SyncService > Sync Status > should return current sync status 1ms
- ✓ src/services/persistence/__tests__/SyncService.test.js > SyncService > Sync Status > should track sync progress 1ms
- ✓ src/services/persistence/__tests__/SyncService.test.js > SyncService > Event Management > should add and remove event listeners 1ms
- ✓ src/services/persistence/__tests__/SyncService.test.js > SyncService > Event Management > should notify listeners of events 1ms
- ✓ src/services/persistence/__tests__/SyncService.test.js > SyncService > Utility Functions > should generate unique operation IDs 1ms
- ✓ src/services/persistence/__tests__/SyncService.test.js > SyncService > Utility Functions > should determine storage type based on data type 1ms
- ✓ src/services/persistence/__tests__/SyncService.test.js > SyncService > Utility Functions > should calculate data checksums 0ms
- ✓ src/services/__tests__/encryptionService.test.js > EncryptionService > Initialization > should check crypto support correctly 2ms
- ✓ src/services/__tests__/encryptionService.test.js > EncryptionService > Initialization > should handle unsupported crypto environment 0ms
- ✓ src/services/__tests__/encryptionService.test.js > EncryptionService > Initialization > should initialize with password successfully 1ms
- ✓ src/services/__tests__/encryptionService.test.js > EncryptionService > Initialization > should handle initialization failure 1ms
- ✓ src/services/__tests__/encryptionService.test.js > EncryptionService > Key Management > should derive key from password with salt 4ms
- ✓ src/services/__tests__/encryptionService.test.js > EncryptionService > Key Management > should generate random salt when not provided 1ms
- ✓ src/services/__tests__/encryptionService.test.js > EncryptionService > Key Management > should generate random encryption key 0ms
- ✓ src/services/__tests__/encryptionService.test.js > EncryptionService > Key Management > should throw error when generating key without crypto support 1ms
- ✓ src/services/__tests__/encryptionService.test.js > EncryptionService > Data Encryption/Decryption > should encrypt data successfully 0ms
- ✓ src/services/__tests__/encryptionService.test.js > EncryptionService > Data Encryption/Decryption > should decrypt data successfully 0ms
- ✓ src/services/__tests__/encryptionService.test.js > EncryptionService > Data Encryption/Decryption > should handle encryption without crypto support 0ms
- ✓ src/services/__tests__/encryptionService.test.js > EncryptionService > Data Encryption/Decryption > should decrypt data successfully 0ms
- ✓ src/services/__tests__/encryptionService.test.js > EncryptionService > Data Encryption/Decryption > should handle decryption of non-encrypted data 0ms
- ✓ src/services/__tests__/encryptionService.test.js > EncryptionService > Data Classification > should classify data as internal by default 0ms
- ✓ src/services/__tests__/encryptionService.test.js > EncryptionService > Data Classification > should classify data as confidential when containing financial info 0ms
- ✓ src/services/__tests__/encryptionService.test.js > EncryptionService > Data Classification > should classify data as restricted when containing sensitive patterns 0ms
- ✓ src/services/__tests__/encryptionService.test.js > EncryptionService > Data Classification > should classify data as public when context indicates 0ms
- ✓ src/services/__tests__/encryptionService.test.js > EncryptionService > Data Classification > should determine encryption requirement correctly 0ms
- ✓ src/services/__tests__/encryptionService.test.js > EncryptionService > Selective Field Encryption > should encrypt sensitive fields only 0ms
- ✓ src/services/__tests__/encryptionService.test.js > EncryptionService > Selective Field Encryption > should encrypt entire object for restricted data 0ms
- ✓ src/services/__tests__/encryptionService.test.js > EncryptionService > Selective Field Encryption > should decrypt sensitive fields 0ms
- ✓ src/services/__tests__/encryptionService.test.js > EncryptionService > Utility Functions > should get nested values correctly 0ms
- ✓ src/services/__tests__/encryptionService.test.js > EncryptionService > Utility Functions > should set nested values correctly 0ms
- ✓ src/services/__tests__/encryptionService.test.js > EncryptionService > Utility Functions > should generate hash for data integrity 0ms
- ✓ src/services/__tests__/encryptionService.test.js > EncryptionService > Utility Functions > should verify data integrity 0ms
- ✓ src/services/__tests__/encryptionService.test.js > EncryptionService > Utility Functions > should handle integrity verification without hash 0ms
- ✓ src/services/__tests__/encryptionService.test.js > EncryptionService > Key Import/Export > should export key successfully 0ms
- ✓ src/services/__tests__/encryptionService.test.js > EncryptionService > Key Import/Export > should import key successfully 0ms
- ✓ src/services/__tests__/encryptionService.test.js > EncryptionService > Key Import/Export > should throw error when exporting without key 0ms
- ✓ src/services/__tests__/encryptionService.test.js > EncryptionService > Service Management > should clear keys from memory 0ms
- ✓ src/services/__tests__/encryptionService.test.js > EncryptionService > Service Management > should return correct status 0ms
- ✓ src/services/__tests__/encryptionService.test.js > EncryptionService > Service Management > should handle secure wipe for different data types 0ms
- ✓ src/services/__tests__/encryptionService.test.js > EncryptionService > Constants > should export correct data classification constants 0ms
- ✓ src/services/__tests__/encryptionService.test.js > EncryptionService > Constants > should export correct encryption configuration 0ms
- ✓ src/services/normalizers/__tests__/contractTests.test.js > Data Normalizer Contract Tests > normalizeQuote contract > should always return required fields with proper types 2ms
- ✓ src/services/normalizers/__tests__/contractTests.test.js > Data Normalizer Contract Tests > normalizeQuote contract > should handle Yahoo Finance API format 0ms
- ✓ src/services/normalizers/__tests__/contractTests.test.js > Data Normalizer Contract Tests > normalizeQuote contract > should handle Alpha Vantage API format 0ms
- ✓ src/services/normalizers/__tests__/contractTests.test.js > Data Normalizer Contract Tests > normalizeQuote contract > should handle Polygon.io API format 0ms
- ✓ src/services/normalizers/__tests__/contractTests.test.js > Data Normalizer Contract Tests > normalizeQuote contract > should calculate missing change values 0ms
- ✓ src/services/normalizers/__tests__/contractTests.test.js > Data Normalizer Contract Tests > normalizeQuote contract > should handle partial data gracefully 0ms
- ✓ src/services/normalizers/__tests__/contractTests.test.js > Data Normalizer Contract Tests > normalizeQuote contract > should preserve fallback from previous widget data 0ms
- ✓ src/services/normalizers/__tests__/contractTests.test.js > Data Normalizer Contract Tests > normalizeQuote contract > should handle edge cases and invalid data 5ms
- ✓ src/services/normalizers/__tests__/contractTests.test.js > Data Normalizer Contract Tests > normalizeQuote contract > should maintain timestamp format consistency 0ms
- ✓ src/services/normalizers/__tests__/contractTests.test.js > Data Normalizer Contract Tests > normalizeQuote contract > should handle source field consistently 0ms
- ✓ src/services/normalizers/__tests__/contractTests.test.js > Data Normalizer Contract Tests > normalizeQuote contract > should preserve numeric precision 0ms
- ✓ src/services/normalizers/__tests__/contractTests.test.js > Data Normalizer Contract Tests > Cross-normalizer consistency > should produce consistent output formats across normalizers 1ms
- ✓ src/services/normalizers/__tests__/contractTests.test.js > Data Normalizer Contract Tests > Data pipeline integration contracts > should be compatible with Redux store structure 0ms
- ✓ src/services/normalizers/__tests__/contractTests.test.js > Data Normalizer Contract Tests > Data pipeline integration contracts > should maintain referential transparency 2ms
- ✓ src/services/normalizers/__tests__/contractTests.test.js > Data Normalizer Contract Tests > Data pipeline integration contracts > should be composable with other data transformations 0ms
- ✓ src/services/__tests__/dataValidationService.test.js > DataValidationService > Financial Data Validation > should validate basic financial data structure using the new service 2ms
- ✓ src/services/__tests__/dataValidationService.test.js > DataValidationService > Financial Data Validation > should reject invalid financial data types using the new service 1ms
- ✓ src/services/__tests__/dataValidationService.test.js > DataValidationService > Financial Data Validation > should produce a warning for out-of-range revenue 0ms
- ✓ src/services/__tests__/dataValidationService.test.js > DataValidationService > DCF Model Validation > should validate DCF model inputs using the new service 0ms
- ✓ src/services/__tests__/dataValidationService.test.js > DataValidationService > DCF Model Validation > should reject invalid discount rates using the new service 1ms
- ✓ src/services/__tests__/dataValidationService.test.js > DataValidationService > DCF Model Validation > should validate cash flow arrays using the new service 1ms
- ✓ src/services/__tests__/dataValidationService.test.js > DataValidationService > LBO Model Validation > should validate LBO model structure using the new service 0ms
- ✓ src/services/__tests__/dataValidationService.test.js > DataValidationService > LBO Model Validation > should validate debt-to-equity ratios using the new service 0ms
- ✓ src/services/__tests__/dataValidationService.test.js > DataValidationService > Market Data Validation > should validate stock price data using the new service 1ms
- ✓ src/services/__tests__/dataValidationService.test.js > DataValidationService > Market Data Validation > should reject invalid stock symbols using the new service 0ms
- ✓ src/services/__tests__/dataValidationService.test.js > DataValidationService > Market Data Validation > should validate price ranges using the new service 0ms
- ✓ src/services/__tests__/dataValidationService.test.js > DataValidationService > Input Sanitization > should sanitize string inputs 1ms
- ✓ src/services/__tests__/dataValidationService.test.js > DataValidationService > Input Sanitization > should handle null and undefined inputs 0ms
- ✓ src/services/__tests__/dataValidationService.test.js > DataValidationService > Input Sanitization > should preserve safe strings 0ms
- ✓ src/services/__tests__/dataValidationService.test.js > DataValidationService > Range Validation > should validate numeric ranges 0ms
- ✓ src/services/__tests__/dataValidationService.test.js > DataValidationService > Range Validation > should validate percentage ranges 0ms
- ✓ src/services/__tests__/dataValidationService.test.js > DataValidationService > Data Type Validation > should validate numbers 0ms
- ✓ src/services/__tests__/dataValidationService.test.js > DataValidationService > Data Type Validation > should validate arrays 0ms
- ✓ src/services/__tests__/dataValidationService.test.js > DataValidationService > Data Type Validation > should validate objects 0ms
- ✓ src/services/__tests__/dataValidationService.test.js > DataValidationService > Business Logic Validation > should validate financial ratios 0ms
- ✓ src/services/__tests__/dataValidationService.test.js > DataValidationService > Business Logic Validation > should flag concerning financial ratios 0ms
- ✓ src/services/__tests__/dataValidationService.test.js > DataValidationService > Error Handling > should handle validation errors gracefully 1ms
- ✓ src/services/__tests__/dataValidationService.test.js > DataValidationService > Error Handling > should provide meaningful error messages 0ms
- ✓ src/test/__tests__/presenceMock.test.js > tests/utils/presenceMock - installPresenceMocks > installs without throwing and returns uninstall handle 2ms
- ✓ src/test/__tests__/presenceMock.test.js > tests/utils/presenceMock - installPresenceMocks > joinSession + getActiveUsers returns deterministic { id, name } 3ms
- ✓ src/test/__tests__/presenceMock.test.js > tests/utils/presenceMock - installPresenceMocks > supports multiple users for same model 2ms
- ✓ src/test/__tests__/presenceMock.test.js > tests/utils/presenceMock - installPresenceMocks > stubs heartbeat monitoring to avoid side-effects 1ms
- ✓ src/services/normalizers/__tests__/marketDataNormalizer.test.js > normalizeQuote > maps price to currentPrice 2ms
- ✓ src/services/normalizers/__tests__/marketDataNormalizer.test.js > normalizeQuote > derives change and changePercent when missing and previousClose present 0ms
- ✓ src/services/normalizers/__tests__/marketDataNormalizer.test.js > normalizeQuote > derives previousClose from prevWidget.currentValue if missing 0ms
- ✓ src/services/normalizers/__tests__/marketDataNormalizer.test.js > normalizeQuote > keeps provided change and changePercent when present 0ms
- ✓ src/services/normalizers/__tests__/marketDataNormalizer.test.js > normalizeQuote > uses fallbacks for dayHigh/dayLow/volume/marketCap from prevWidget else null 0ms
- ✓ src/services/normalizers/__tests__/marketDataNormalizer.test.js > normalizeQuote > defaults source and timestamp when missing 0ms
- ✓ src/services/normalizers/__tests__/marketDataNormalizer.test.js > normalizeQuote > accepts raw.currentPrice too 0ms
- ✓ src/services/normalizers/__tests__/marketDataNormalizer.test.js > normalizeQuote > does not compute changePercent if previousClose is zero or undefined 0ms
- ✓ tests/integration/premium-data.test.js > Premium Data Integration Tests > 1. Bloomberg Terminal Integration > Should authenticate and fetch market data 8ms
- ✓ tests/integration/premium-data.test.js > Premium Data Integration Tests > 1. Bloomberg Terminal Integration > Should fetch company fundamentals with historical data 2ms
- ✓ tests/integration/premium-data.test.js > Premium Data Integration Tests > 1. Bloomberg Terminal Integration > Should handle Bloomberg rate limiting 1ms
- ✓ tests/integration/premium-data.test.js > Premium Data Integration Tests > 2. Refinitiv Eikon Integration > Should authenticate and fetch pricing data 0ms
- ✓ tests/integration/premium-data.test.js > Premium Data Integration Tests > 2. Refinitiv Eikon Integration > Should fetch ESG data and scores 0ms
- ✓ tests/integration/premium-data.test.js > Premium Data Integration Tests > 2. Refinitiv Eikon Integration > Should handle Refinitiv API failures with fallback 0ms
- ✓ tests/integration/premium-data.test.js > Premium Data Integration Tests > 3. S&P Capital IQ Integration > Should authenticate with session management 1ms
- ✓ tests/integration/premium-data.test.js > Premium Data Integration Tests > 3. S&P Capital IQ Integration > Should fetch company financials with comprehensive data 0ms
- ✓ tests/integration/premium-data.test.js > Premium Data Integration Tests > 3. S&P Capital IQ Integration > Should handle session expiry and token refresh 1ms
- ✓ tests/integration/premium-data.test.js > Premium Data Integration Tests > 4. Data Integration & Normalization > Should normalize data across all providers 1ms
- ✓ tests/integration/premium-data.test.js > Premium Data Integration Tests > 4. Data Integration & Normalization > Should handle data quality validation 1ms
- ✓ tests/integration/premium-data.test.js > Premium Data Integration Tests > 4. Data Integration & Normalization > Should implement intelligent caching strategy 1ms
- ✓ tests/integration/premium-data.test.js > Premium Data Integration Tests > 5. Premium Data Performance & Reliability > Should measure end-to-end data retrieval performance 1ms
- ✓ tests/integration/premium-data.test.js > Premium Data Integration Tests > 5. Premium Data Performance & Reliability > Should validate data consistency across providers 0ms
- ✓ tests/integration/premium-data.test.js > Premium Data Integration Tests > 6. Error Handling & Resilience > Should gracefully handle provider outages 0ms
- ✓ tests/integration/premium-data.test.js > Premium Data Integration Tests > 6. Error Handling & Resilience > Should handle partial data scenarios 0ms
- ✓ tests/integration/industryanalytics.test.js > Industry-Specific Analytics Tests > 1. Banking & Financial Services Analytics > Should perform credit portfolio risk assessment 2ms
- ✓ tests/integration/industryanalytics.test.js > Industry-Specific Analytics Tests > 1. Banking & Financial Services Analytics > Should calculate Basel III capital requirements 0ms
- ✓ tests/integration/industryanalytics.test.js > Industry-Specific Analytics Tests > 2. Real Estate & REITs Analytics > Should perform property DCF valuation 0ms
- ✓ tests/integration/industryanalytics.test.js > Industry-Specific Analytics Tests > 2. Real Estate & REITs Analytics > Should analyze REIT portfolio metrics 0ms
- ✓ tests/integration/industryanalytics.test.js > Industry-Specific Analytics Tests > 3. Healthcare & Biotech Analytics > Should model drug development pipeline 0ms
- ✓ tests/integration/industryanalytics.test.js > Industry-Specific Analytics Tests > 3. Healthcare & Biotech Analytics > Should calculate clinical trial success probabilities 0ms
- ✓ tests/integration/industryanalytics.test.js > Industry-Specific Analytics Tests > 4. Energy & Utilities Analytics > Should perform oil & gas reserves valuation 0ms
- ✓ tests/integration/industryanalytics.test.js > Industry-Specific Analytics Tests > 4. Energy & Utilities Analytics > Should analyze renewable energy project economics 0ms
- ✓ tests/integration/industryanalytics.test.js > Industry-Specific Analytics Tests > 5. Technology Sector Analytics > Should analyze SaaS metrics and unit economics 0ms
- ✓ tests/integration/industryanalytics.test.js > Industry-Specific Analytics Tests > 5. Technology Sector Analytics > Should evaluate platform business model economics 0ms
- ✓ tests/integration/industryanalytics.test.js > Industry-Specific Analytics Tests > 6. Cross-Industry Validation > Should validate analytics consistency across industries 1ms
- ✓ tests/integration/industryanalytics.test.js > Industry-Specific Analytics Tests > 6. Cross-Industry Validation > Should handle industry-specific data format conversions 1ms
- ✓ tests/integration/institutional.test.js > Institutional Features Tests > 1. Multi-Entity Management > Should create and manage entity hierarchies 2ms
- ✓ tests/integration/institutional.test.js > Institutional Features Tests > 1. Multi-Entity Management > Should consolidate financial data across entities 0ms
- ✓ tests/integration/institutional.test.js > Institutional Features Tests > 2. White-Labeling Service > Should configure custom branding 0ms
- ✓ tests/integration/institutional.test.js > Institutional Features Tests > 2. White-Labeling Service > Should generate branded exports 0ms
- ✓ tests/integration/institutional.test.js > Institutional Features Tests > 3. Compliance Workflow Engine > Should initiate SOX compliance workflow 0ms
- ✓ tests/integration/institutional.test.js > Institutional Features Tests > 3. Compliance Workflow Engine > Should track compliance workflow progress 0ms
- ✓ tests/integration/institutional.test.js > Institutional Features Tests > 3. Compliance Workflow Engine > Should handle compliance workflow approvals 0ms
- ✓ tests/integration/institutional.test.js > Institutional Features Tests > 4. Audit Trail Management > Should log comprehensive audit events 0ms
- ✓ tests/integration/institutional.test.js > Institutional Features Tests > 4. Audit Trail Management > Should provide audit trail analytics 0ms
- ✓ tests/integration/institutional.test.js > Institutional Features Tests > 5. Permission Management System > Should manage role-based permissions 0ms
- ✓ tests/integration/institutional.test.js > Institutional Features Tests > 5. Permission Management System > Should validate permission inheritance 0ms
- ✓ tests/integration/institutional.test.js > Institutional Features Tests > 6. Institutional Integration Performance > Should handle large-scale multi-entity operations 0ms
- ✓ tests/integration/security-compliance.test.js > Security & Compliance Testing > 1. Authentication & Authorization > Should enforce strong authentication mechanisms 1ms
- ✓ tests/integration/security-compliance.test.js > Security & Compliance Testing > 1. Authentication & Authorization > Should implement proper authorization controls 0ms
- ✓ tests/integration/security-compliance.test.js > Security & Compliance Testing > 2. Data Protection & Encryption > Should implement comprehensive data encryption 0ms
- ✓ tests/integration/security-compliance.test.js > Security & Compliance Testing > 2. Data Protection & Encryption > Should protect against data breaches 0ms
- ✓ tests/integration/security-compliance.test.js > Security & Compliance Testing > 3. Regulatory Compliance > Should comply with SOX requirements 0ms
- ✓ tests/integration/security-compliance.test.js > Security & Compliance Testing > 3. Regulatory Compliance > Should comply with GDPR requirements 0ms
- ✓ tests/integration/security-compliance.test.js > Security & Compliance Testing > 3. Regulatory Compliance > Should meet financial industry compliance standards 0ms
- ✓ tests/integration/security-compliance.test.js > Security & Compliance Testing > 4. Vulnerability Assessment > Should identify and mitigate security vulnerabilities 0ms
- ✓ tests/integration/security-compliance.test.js > Security & Compliance Testing > 4. Vulnerability Assessment > Should implement security monitoring and incident response 0ms
- ✓ tests/integration/security-compliance.test.js > Security & Compliance Testing > 5. Privacy and Data Governance > Should implement comprehensive data governance 0ms
- ✓ tests/integration/security-compliance.test.js > Security & Compliance Testing > 6. Business Continuity and Disaster Recovery > Should ensure business continuity capabilities 0ms
- ✓ tests/integration/security-compliance.test.js > Security & Compliance Testing > 7. Third-Party Risk Management > Should assess and manage third-party security risks 0ms
- ✓ tests/integration/performance-load.test.js > Performance & Load Testing > 1. API Response Time Performance > Should meet response time SLAs for core endpoints 2ms
- ✓ tests/integration/performance-load.test.js > Performance & Load Testing > 1. API Response Time Performance > Should handle concurrent request load 1ms
- ✓ tests/integration/performance-load.test.js > Performance & Load Testing > 2. Database Performance > Should optimize database query performance 1ms
- ✓ tests/integration/performance-load.test.js > Performance & Load Testing > 3. Memory and Resource Management > Should manage memory efficiently under load 1ms
- ✓ tests/integration/performance-load.test.js > Performance & Load Testing > 3. Memory and Resource Management > Should handle large dataset processing 0ms
- ✓ tests/integration/performance-load.test.js > Performance & Load Testing > 4. Frontend Performance > Should meet frontend performance benchmarks 0ms
- ✓ tests/integration/performance-load.test.js > Performance & Load Testing > 5. Stress Testing > Should handle extreme load conditions 0ms
- ✓ tests/integration/performance-load.test.js > Performance & Load Testing > 5. Stress Testing > Should recover from system failures 0ms
- ✓ tests/integration/performance-load.test.js > Performance & Load Testing > 6. Scalability Testing > Should demonstrate horizontal scalability 0ms
- ✓ tests/integration/performance-load.test.js > Performance & Load Testing > 7. Performance Monitoring & Alerts > Should provide comprehensive performance monitoring 0ms
- ✓ tests/integration/edge-cases.test.jsx > Edge Cases Integration Tests > Data Validation Edge Cases > handles malformed financial data gracefully 3ms
- ✓ tests/integration/edge-cases.test.jsx > Edge Cases Integration Tests > Data Validation Edge Cases > handles extreme numerical values 1ms
- ✓ tests/integration/edge-cases.test.jsx > Edge Cases Integration Tests > Data Validation Edge Cases > handles empty or missing data gracefully 1ms
- ✓ tests/integration/edge-cases.test.jsx > Edge Cases Integration Tests > Performance Under Load > handles multiple simultaneous DCF calculations 3ms
- ✓ tests/integration/edge-cases.test.jsx > Edge Cases Integration Tests > Performance Under Load > handles large dataset processing 1ms
- ↓ tests/integration/edge-cases.test.jsx > Edge Cases Integration Tests > Network Failure Scenarios > handles API timeouts gracefully
- ↓ tests/integration/edge-cases.test.jsx > Edge Cases Integration Tests > Network Failure Scenarios > handles intermittent connectivity
- ↓ tests/integration/edge-cases.test.jsx > Edge Cases Integration Tests > Memory Management > properly cleans up resources on unmount
- ↓ tests/integration/edge-cases.test.jsx > Edge Cases Integration Tests > Memory Management > handles rapid component mounting/unmounting
- ↓ tests/integration/edge-cases.test.jsx > Edge Cases Integration Tests > Browser Compatibility > handles missing modern browser features
- ↓ tests/integration/edge-cases.test.jsx > Edge Cases Integration Tests > Browser Compatibility > handles missing localStorage
- ↓ tests/integration/edge-cases.test.jsx > Edge Cases Integration Tests > Accessibility Edge Cases > handles screen reader navigation
- ↓ tests/integration/edge-cases.test.jsx > Edge Cases Integration Tests > Accessibility Edge Cases > handles high contrast mode
- ✓ tests/integration/advanced-modeling.test.js > Advanced Modeling Framework Tests > 1. Monte Carlo Simulation Engine > Should run DCF Monte Carlo with parameter distributions 2ms
- ✓ tests/integration/advanced-modeling.test.js > Advanced Modeling Framework Tests > 1. Monte Carlo Simulation Engine > Should handle correlated variables in simulation 0ms
- ✓ tests/integration/advanced-modeling.test.js > Advanced Modeling Framework Tests > 2. Portfolio Optimization Engine > Should optimize portfolio for maximum Sharpe ratio 0ms
- ✓ tests/integration/advanced-modeling.test.js > Advanced Modeling Framework Tests > 2. Portfolio Optimization Engine > Should perform minimum variance optimization 0ms
- ✓ tests/integration/advanced-modeling.test.js > Advanced Modeling Framework Tests > 2. Portfolio Optimization Engine > Should handle optimization with ESG constraints 0ms
- ✓ tests/integration/advanced-modeling.test.js > Advanced Modeling Framework Tests > 3. Scenario Planning Engine > Should analyze multiple economic scenarios 0ms
- ✓ tests/integration/advanced-modeling.test.js > Advanced Modeling Framework Tests > 3. Scenario Planning Engine > Should perform stress testing scenarios 0ms
- ✓ tests/integration/advanced-modeling.test.js > Advanced Modeling Framework Tests > 4. Sensitivity Analysis Engine > Should perform single-variable sensitivity analysis 0ms
- ✓ tests/integration/advanced-modeling.test.js > Advanced Modeling Framework Tests > 4. Sensitivity Analysis Engine > Should create tornado diagram for key variables 1ms
- ✓ tests/integration/advanced-modeling.test.js > Advanced Modeling Framework Tests > 4. Sensitivity Analysis Engine > Should perform two-variable sensitivity analysis 2ms
- ✓ tests/integration/advanced-modeling.test.js > Advanced Modeling Framework Tests > 5. Model Integration & Performance > Should integrate multiple modeling engines 0ms
- ↓ src/utils/__tests__/monitoring.test.js > MonitoringService > Initialization > should initialize with correct environment settings
- ↓ src/utils/__tests__/monitoring.test.js > MonitoringService > Initialization > should setup global error handlers
- ↓ src/utils/__tests__/monitoring.test.js > MonitoringService > Google Analytics Integration > should initialize Google Analytics with correct tracking ID
- ↓ src/utils/__tests__/monitoring.test.js > MonitoringService > Google Analytics Integration > should not initialize GA without tracking ID
- ↓ src/utils/__tests__/monitoring.test.js > MonitoringService > Error Tracking > should track errors with Sentry when available
- ↓ src/utils/__tests__/monitoring.test.js > MonitoringService > Error Tracking > should log errors to console
- ↓ src/utils/__tests__/monitoring.test.js > MonitoringService > Error Tracking > should not track errors when error reporting is disabled
- ↓ src/utils/__tests__/monitoring.test.js > MonitoringService > Event Tracking > should track events with Google Analytics
- ↓ src/utils/__tests__/monitoring.test.js > MonitoringService > Event Tracking > should send events to custom analytics endpoint
- ↓ src/utils/__tests__/monitoring.test.js > MonitoringService > Event Tracking > should not track events when analytics is disabled
- ↓ src/utils/__tests__/monitoring.test.js > MonitoringService > Page View Tracking > should track page views with correct data
- ↓ src/utils/__tests__/monitoring.test.js > MonitoringService > User Interaction Tracking > should track user interactions correctly
- ↓ src/utils/__tests__/monitoring.test.js > MonitoringService > Performance Monitoring > should monitor memory usage when available
- ↓ src/utils/__tests__/monitoring.test.js > MonitoringService > Performance Monitoring > should monitor API performance
- ↓ src/utils/__tests__/monitoring.test.js > MonitoringService > Performance Monitoring > should track Core Web Vitals metrics
- ↓ src/utils/__tests__/monitoring.test.js > MonitoringService > Custom Analytics > should send data to custom analytics endpoint in production
- ↓ src/utils/__tests__/monitoring.test.js > MonitoringService > Custom Analytics > should not send to custom analytics in non-production
- ↓ src/utils/__tests__/monitoring.test.js > MonitoringService > Custom Analytics > should handle analytics endpoint failures gracefully
- ↓ src/utils/__tests__/monitoring.test.js > MonitoringService > Resource Monitoring > should monitor resource loading when PerformanceObserver is available
- ↓ src/utils/__tests__/monitoring.test.js > MonitoringService > Global Error Handling > should handle unhandled promise rejections
- ↓ src/utils/__tests__/monitoring.test.js > MonitoringService > Global Error Handling > should handle JavaScript errors
- ↓ src/utils/__tests__/monitoring.test.js > MonitoringService > Hotjar Integration > should initialize Hotjar with correct ID
- ↓ src/utils/__tests__/monitoring.test.js > MonitoringService > Hotjar Integration > should not initialize Hotjar without ID
- ↓ src/utils/__tests__/monitoring.test.js > MonitoringService > Component Performance Monitoring > should monitor component performance
+[INFO] Metrics collected {
+  commandsTotal: 26,
+  successRate: '100.00%',
+  avgResponseTime: '0.38ms',
+  errorRate: '0.00%',
+  activeUsers: 1
+}
+[INFO] Health check: healthy {
+  memory: { status: 'healthy', value: '0.00%' },
+  errorRate: { status: 'healthy', value: '0.00%' },
+  responseTime: { status: 'healthy', value: '0.38ms' }
+}
+[INFO] Metrics collected {
+  commandsTotal: 26,
+  successRate: '100.00%',
+  avgResponseTime: '0.38ms',
+  errorRate: '0.00%',
+  activeUsers: 1
+}
+[INFO] Metrics collected {
+  commandsTotal: 26,
+  successRate: '100.00%',
+  avgResponseTime: '0.38ms',
+  errorRate: '0.00%',
+  activeUsers: 1
+}

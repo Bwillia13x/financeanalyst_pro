@@ -1,4 +1,3 @@
-import React, { useState, useEffect, useMemo } from 'react';
 import {
   BarChart3,
   TrendingUp,
@@ -15,6 +14,7 @@ import {
   Eye,
   EyeOff
 } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
 
 import portfolioAnalyticsService from '../../services/financial/portfolioAnalyticsService';
 
@@ -369,7 +369,7 @@ const PortfolioAnalyticsDashboard = ({
                 {defaultPortfolio.assets.map((asset, index) => (
                   <div key={asset.symbol} className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                      <div className="w-3 h-3 bg-blue-500 rounded-full" />
                       <span className="text-sm text-white">{asset.symbol}</span>
                     </div>
                     <div className="flex items-center gap-4">
@@ -549,7 +549,7 @@ const PortfolioAnalyticsDashboard = ({
                             style={{
                               width: `${(contribution / analyticsResults.riskAttribution.totalPortfolioRisk) * 100}%`
                             }}
-                          ></div>
+                          />
                         </div>
                         <span className="text-xs text-slate-400 w-16">
                           {formatPercent(contribution)}
@@ -583,7 +583,7 @@ const PortfolioAnalyticsDashboard = ({
         {/* Loading State */}
         {loading && (
           <div className="flex items-center justify-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
             <span className="ml-3 text-slate-300">Calculating portfolio analytics...</span>
           </div>
         )}

@@ -1,0 +1,568 @@
+# Quality Gates Workflow
+# Automated quality assurance and testing gates
+
+name: Quality Gates
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    # Run quality checks daily at 2 AM UTC
+    - cron: '0 2 * * *'
+
+env:
+  NODE_VERSION: '20'
+  CACHE_KEY: quality-gates-${{ hashFiles('package-lock.json', '.eslintrc.js', 'vite.config.mjs') }}
+
+jobs:
+  # Code Quality Gate
+  code-quality:
+    name: Code Quality Gate
+    runs-on: ubuntu-latest
+    outputs:
+      quality-score: ${{ steps.quality.outputs.score }}
+      quality-passed: ${{ steps.quality.outputs.passed }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Cache quality tools
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            node_modules/.cache
+          key: ${{ env.CACHE_KEY }}
+          restore-keys: |
+            quality-gates-
+
+      - name: Lint Code
+        run: npm run lint:strict
+
+      - name: Format Check
+        run: npm run format:check
+
+      - name: Type Check
+        run: npm run type-check
+
+      - name: Security Audit
+        run: npm audit --audit-level=moderate
+
+      - name: Dependency Check
+        run: |
+          npx license-checker --production --excludePrivatePackages --csv > licenses.csv
+          npx license-checker --production --excludePrivatePackages --summary
+
+      - name: Code Quality Score
+        id: quality
+        run: |
+          # Calculate quality score based on various metrics
+          LINT_EXIT_CODE=$?
+
+          if [ $LINT_EXIT_CODE -eq 0 ]; then
+            echo "score=95" >> $GITHUB_OUTPUT
+            echo "passed=true" >> $GITHUB_OUTPUT
+          else
+            echo "score=70" >> $GITHUB_OUTPUT
+            echo "passed=false" >> $GITHUB_OUTPUT
+          fi
+
+  # Unit Test Gate
+  unit-tests:
+    name: Unit Test Gate
+    runs-on: ubuntu-latest
+    needs: code-quality
+    if: needs.code-quality.outputs.quality-passed == 'true'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Unit Tests
+        run: npm run test:unit
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./coverage/lcov.info
+          flags: unit-tests
+          fail_ci_if_error: true
+
+      - name: Coverage Gate Check
+        run: |
+          COVERAGE=$(npx istanbul report text-summary | grep -oP 'Lines\s*:\s*\K\d+(?=\%)')
+          echo "Coverage: ${COVERAGE}%"
+
+          if [ "$COVERAGE" -lt 80 ]; then
+            echo "❌ Coverage too low: ${COVERAGE}% (minimum 80%)"
+            exit 1
+          else
+            echo "✅ Coverage acceptable: ${COVERAGE}%"
+          fi
+
+  # Integration Test Gate
+  integration-tests:
+    name: Integration Test Gate
+    runs-on: ubuntu-latest
+    needs: unit-tests
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Setup Playwright
+        run: npx playwright install --with-deps
+
+      - name: Run Integration Tests
+        run: npm run test:integration
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: integration-test-results
+          path: test-results/
+
+  # Performance Gate
+  performance-gate:
+    name: Performance Gate
+    runs-on: ubuntu-latest
+    needs: integration-tests
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build for performance testing
+        run: npm run build:prod
+
+      - name: Bundle Size Check
+        run: |
+          BUNDLE_SIZE=$(du -sh dist/assets/*.js | awk '{print $1}')
+          echo "Bundle size: $BUNDLE_SIZE"
+
+          # Check if bundle is too large (>5MB)
+          BUNDLE_BYTES=$(du -b dist/assets/*.js | awk '{sum += $1} END {print sum}')
+          if [ "$BUNDLE_BYTES" -gt 5242880 ]; then
+            echo "❌ Bundle too large: $BUNDLE_SIZE (>5MB)"
+            exit 1
+          else
+            echo "✅ Bundle size acceptable: $BUNDLE_SIZE"
+          fi
+
+      - name: Lighthouse Performance Audit
+        run: |
+          npm run lighthouse:ci
+
+          # Check Lighthouse scores
+          PERFORMANCE=$(jq '.categories.performance.score' lighthouse-results.json)
+          ACCESSIBILITY=$(jq '.categories.accessibility.score' lighthouse-results.json)
+          BEST_PRACTICES=$(jq '.categories."best-practices".score' lighthouse-results.json)
+          SEO=$(jq '.categories.seo.score' lighthouse-results.json)
+
+          echo "Performance: $(($PERFORMANCE * 100))%"
+          echo "Accessibility: $(($ACCESSIBILITY * 100))%"
+          echo "Best Practices: $(($BEST_PRACTICES * 100))%"
+          echo "SEO: $(($SEO * 100))%"
+
+          # Performance gate: minimum 80
+          if [ "$(echo "$PERFORMANCE < 0.8" | bc -l)" = "1" ]; then
+            echo "❌ Performance score too low: $(($PERFORMANCE * 100))%"
+            exit 1
+          fi
+
+          # Accessibility gate: minimum 90
+          if [ "$(echo "$ACCESSIBILITY < 0.9" | bc -l)" = "1" ]; then
+            echo "❌ Accessibility score too low: $(($ACCESSIBILITY * 100))%"
+            exit 1
+          fi
+
+      - name: Upload performance results
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance-results
+          path: |
+            lighthouse-results.json
+            perf-results.json
+
+  # Security Gate
+  security-gate:
+    name: Security Gate
+    runs-on: ubuntu-latest
+    needs: code-quality
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Security Scan
+        run: |
+          # Run npm audit with high severity
+          npm audit --audit-level=high
+
+          # Check for critical vulnerabilities
+          CRITICAL_VULNS=$(npm audit --audit-level=critical --json | jq '.metadata.vulnerabilities.critical // 0')
+
+          if [ "$CRITICAL_VULNS" -gt 0 ]; then
+            echo "❌ Critical vulnerabilities found: $CRITICAL_VULNS"
+            npm audit --audit-level=critical
+            exit 1
+          else
+            echo "✅ No critical vulnerabilities found"
+          fi
+
+      - name: CodeQL Security Scan
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+
+      - name: Dependency Vulnerability Scan
+        uses: github/super-linter/slim@v5
+        env:
+          DEFAULT_BRANCH: main
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VALIDATE_ALL_CODEBASE: false
+          VALIDATE_JAVASCRIPT_ES: true
+          VALIDATE_JSON: true
+
+  # E2E Test Gate
+  e2e-tests:
+    name: E2E Test Gate
+    runs-on: ubuntu-latest
+    needs: [performance-gate, security-gate]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Setup Playwright
+        run: npx playwright install --with-deps
+
+      - name: Run E2E Tests
+        run: npm run test:e2e
+
+      - name: Run Critical Path Tests
+        run: npm run test:critical
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-test-results
+          path: |
+            test-results/
+            playwright-report/
+
+  # Accessibility Gate
+  accessibility-gate:
+    name: Accessibility Gate
+    runs-on: ubuntu-latest
+    needs: e2e-tests
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Setup Playwright
+        run: npx playwright install --with-deps
+
+      - name: Run Accessibility Tests
+        run: npm run test:accessibility
+
+      - name: Axe Core Accessibility Scan
+        run: |
+          npx playwright test src/test/accessibility/ --grep accessibility
+
+          # Generate accessibility report
+          npx axe-playwright --url http://localhost:5173 > accessibility-report.json
+
+      - name: Upload accessibility results
+        uses: actions/upload-artifact@v4
+        with:
+          name: accessibility-results
+          path: |
+            accessibility-report.json
+            test-results/
+
+  # Quality Gate Summary
+  quality-gate-summary:
+    name: Quality Gate Summary
+    runs-on: ubuntu-latest
+    needs: [code-quality, unit-tests, integration-tests, performance-gate, security-gate, e2e-tests, accessibility-gate]
+    if: always()
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Generate Quality Report
+        run: |
+          echo "# Quality Gate Report" > quality-report.md
+          echo "" >> quality-report.md
+          echo "## Summary" >> quality-report.md
+          echo "" >> quality-report.md
+
+          # Calculate overall score
+          TOTAL_TESTS=7
+          PASSED_TESTS=0
+
+          # Check each job status
+          if [ "${{ needs.code-quality.result }}" = "success" ]; then
+            echo "✅ Code Quality: PASSED" >> quality-report.md
+            PASSED_TESTS=$((PASSED_TESTS + 1))
+          else
+            echo "❌ Code Quality: FAILED" >> quality-report.md
+          fi
+
+          if [ "${{ needs.unit-tests.result }}" = "success" ]; then
+            echo "✅ Unit Tests: PASSED" >> quality-report.md
+            PASSED_TESTS=$((PASSED_TESTS + 1))
+          else
+            echo "❌ Unit Tests: FAILED" >> quality-report.md
+          fi
+
+          if [ "${{ needs.integration-tests.result }}" = "success" ]; then
+            echo "✅ Integration Tests: PASSED" >> quality-report.md
+            PASSED_TESTS=$((PASSED_TESTS + 1))
+          else
+            echo "❌ Integration Tests: FAILED" >> quality-report.md
+          fi
+
+          if [ "${{ needs.performance-gate.result }}" = "success" ]; then
+            echo "✅ Performance Gate: PASSED" >> quality-report.md
+            PASSED_TESTS=$((PASSED_TESTS + 1))
+          else
+            echo "❌ Performance Gate: FAILED" >> quality-report.md
+          fi
+
+          if [ "${{ needs.security-gate.result }}" = "success" ]; then
+            echo "✅ Security Gate: PASSED" >> quality-report.md
+            PASSED_TESTS=$((PASSED_TESTS + 1))
+          else
+            echo "❌ Security Gate: FAILED" >> quality-report.md
+          fi
+
+          if [ "${{ needs.e2e-tests.result }}" = "success" ]; then
+            echo "✅ E2E Tests: PASSED" >> quality-report.md
+            PASSED_TESTS=$((PASSED_TESTS + 1))
+          else
+            echo "❌ E2E Tests: FAILED" >> quality-report.md
+          fi
+
+          if [ "${{ needs.accessibility-gate.result }}" = "success" ]; then
+            echo "✅ Accessibility Gate: PASSED" >> quality-report.md
+            PASSED_TESTS=$((PASSED_TESTS + 1))
+          else
+            echo "❌ Accessibility Gate: FAILED" >> quality-report.md
+          fi
+
+          SUCCESS_RATE=$((PASSED_TESTS * 100 / TOTAL_TESTS))
+          echo "" >> quality-report.md
+          echo "## Overall Score" >> quality-report.md
+          echo "" >> quality-report.md
+          echo "**Passed:** $PASSED_TESTS/$TOTAL_TESTS" >> quality-report.md
+          echo "**Success Rate:** $SUCCESS_RATE%" >> quality-report.md
+          echo "" >> quality-report.md
+
+          if [ $SUCCESS_RATE -ge 90 ]; then
+            echo "🎉 **QUALITY GATE: PASSED**" >> quality-report.md
+            echo "✅ Code meets production quality standards" >> quality-report.md
+          elif [ $SUCCESS_RATE -ge 75 ]; then
+            echo "⚠️ **QUALITY GATE: CONDITIONAL PASS**" >> quality-report.md
+            echo "⚠️ Minor issues detected, review recommended" >> quality-report.md
+          else
+            echo "❌ **QUALITY GATE: FAILED**" >> quality-report.md
+            echo "❌ Critical quality issues detected, deployment blocked" >> quality-report.md
+          fi
+
+      - name: Upload Quality Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: quality-report
+          path: quality-report.md
+
+      - name: Quality Gate Decision
+        run: |
+          SUCCESS_RATE=$((PASSED_TESTS * 100 / TOTAL_TESTS))
+
+          if [ $SUCCESS_RATE -ge 90 ]; then
+            echo "🎉 Quality gate passed with $SUCCESS_RATE% success rate"
+            echo "✅ Proceeding with deployment"
+          elif [ $SUCCESS_RATE -ge 75 ]; then
+            echo "⚠️ Quality gate conditionally passed with $SUCCESS_RATE% success rate"
+            echo "⚠️ Manual review recommended"
+          else
+            echo "❌ Quality gate failed with $SUCCESS_RATE% success rate"
+            echo "❌ Deployment blocked - manual intervention required"
+            exit 1
+          fi
+
+  # Quality Gate Approval (Manual)
+  quality-approval:
+    name: Quality Gate Approval
+    runs-on: ubuntu-latest
+    needs: quality-gate-summary
+    if: needs.quality-gate-summary.result == 'success'
+    environment: quality-gate
+
+    steps:
+      - name: Quality Gate Approval Required
+        run: |
+          echo "🔍 Quality gate completed successfully"
+          echo "⏳ Waiting for manual approval to proceed with deployment"
+          echo ""
+          echo "To approve:"
+          echo "1. Review the quality report in artifacts"
+          echo "2. Check test results and performance metrics"
+          echo "3. Approve this job to proceed with deployment"
+          echo ""
+          echo "Or reject to block deployment"
+
+      - name: Manual Approval
+        uses: trstringer/manual-approval@v1
+        with:
+          secret: ${{ github.TOKEN }}
+          approvers: devops-team,security-team
+          minimum-approvals: 2
+          issue-title: "Quality Gate Approval Required for ${{ github.ref_name }}"
+          issue-body: |
+            ## Quality Gate Approval Required
+
+            **Branch:** `${{ github.ref_name }}`
+            **Commit:** `${{ github.sha }}`
+            **Run:** `${{ github.run_id }}`
+
+            ### Quality Report Summary
+            - Code Quality: ${{ needs.code-quality.result == 'success' && '✅ PASSED' || '❌ FAILED' }}
+            - Unit Tests: ${{ needs.unit-tests.result == 'success' && '✅ PASSED' || '❌ FAILED' }}
+            - Integration Tests: ${{ needs.integration-tests.result == 'success' && '✅ PASSED' || '❌ FAILED' }}
+            - Performance Gate: ${{ needs.performance-gate.result == 'success' && '✅ PASSED' || '❌ FAILED' }}
+            - Security Gate: ${{ needs.security-gate.result == 'success' && '✅ PASSED' || '❌ FAILED' }}
+            - E2E Tests: ${{ needs.e2e-tests.result == 'success' && '✅ PASSED' || '❌ FAILED' }}
+            - Accessibility Gate: ${{ needs.accessibility-gate.result == 'success' && '✅ PASSED' || '❌ FAILED' }}
+
+            ### Artifacts Available
+            - [Quality Report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            - [Test Results](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            - [Performance Results](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+
+            ### Next Steps
+            Approve this request to proceed with deployment to staging environment.
+
+          additional-approved-options: |
+            Approved - Proceed with deployment
+          additional-rejected-options: |
+            Rejected - Block deployment
+
+  # Deployment Gate (only if approved)
+  deployment-gate:
+    name: Deployment Gate
+    runs-on: ubuntu-latest
+    needs: quality-approval
+    if: needs.quality-approval.result == 'success'
+    environment: deployment-gate
+
+    steps:
+      - name: Deployment Gate Check
+        run: |
+          echo "🎯 Quality gates passed and approved!"
+          echo "🚀 Ready to proceed with deployment"
+          echo ""
+          echo "Next steps:"
+          echo "1. Staging deployment will begin automatically"
+          echo "2. Production deployment requires additional approval"
+          echo "3. Monitor deployment progress in subsequent jobs"
+
+      - name: Create Deployment Notification
+        run: |
+          echo "## 🚀 Deployment Approved" > deployment-notification.md
+          echo "" >> deployment-notification.md
+          echo "**Branch:** ${{ github.ref_name }}" >> deployment-notification.md
+          echo "**Commit:** ${{ github.sha }}" >> deployment-notification.md
+          echo "**Approved by:** ${{ github.actor }}" >> deployment-notification.md
+          echo "**Timestamp:** $(date)" >> deployment-notification.md
+          echo "" >> deployment-notification.md
+          echo "### Quality Gates Status" >> deployment-notification.md
+          echo "- ✅ Code Quality" >> deployment-notification.md
+          echo "- ✅ Testing" >> deployment-notification.md
+          echo "- ✅ Security" >> deployment-notification.md
+          echo "- ✅ Performance" >> deployment-notification.md
+          echo "" >> deployment-notification.md
+          echo "**Status:** Ready for deployment" >> deployment-notification.md
+
+      - name: Upload Deployment Notification
+        uses: actions/upload-artifact@v4
+        with:
+          name: deployment-notification
+          path: deployment-notification.md

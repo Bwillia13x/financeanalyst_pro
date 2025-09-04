@@ -17,6 +17,6 @@ export {
 export {
   default as StatisticalAnalysisEngine,
   statisticalAnalysisEngine
-} from './StatisticalAnalysisEngine.jsx';
+} from './StatisticalAnalysisEngine.js';
 
 // Note: Named exports (e.g., riskAssessmentEngine) are available from the main exports above

@@ -169,14 +169,14 @@ class APIIntegrationService {
       requests,
       period,
       requestsMade: [],
-      canMakeRequest: function () {
+      canMakeRequest () {
         const now = Date.now();
         // Remove expired requests
         this.requestsMade = this.requestsMade.filter(time => now - time < this.period);
 
         return this.requestsMade.length < this.requests;
       },
-      recordRequest: function () {
+      recordRequest () {
         this.requestsMade.push(Date.now());
       }
     };

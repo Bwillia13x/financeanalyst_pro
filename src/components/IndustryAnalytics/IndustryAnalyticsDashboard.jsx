@@ -13,13 +13,13 @@ import {
 } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 
-import Button from '../ui/Button';
-import { Card } from '../ui/Card';
 import BankingAnalyticsService from '../../services/analytics/bankingAnalytics';
-import HealthcareAnalyticsService from '../../services/analytics/healthcareAnalytics';
 import EnergyAnalyticsService from '../../services/analytics/energyAnalytics';
+import HealthcareAnalyticsService from '../../services/analytics/healthcareAnalytics';
 import RealEstateAnalyticsService from '../../services/analytics/realEstateAnalytics';
 import TechnologyAnalyticsService from '../../services/analytics/technologyAnalytics';
+import Button from '../ui/Button';
+import { Card } from '../ui/Card';
 
 const IndustryAnalyticsDashboard = ({ isOpen, onClose }) => {
   const [selectedIndustry, setSelectedIndustry] = useState(null);
@@ -224,7 +224,7 @@ const IndustryAnalyticsDashboard = ({ isOpen, onClose }) => {
                         </p>
                         {isAnalyzing && selectedIndustry === industry.id && (
                           <div className="mt-2">
-                            <div className="animate-pulse bg-gray-200 dark:bg-gray-700 h-2 rounded"></div>
+                            <div className="animate-pulse bg-gray-200 dark:bg-gray-700 h-2 rounded" />
                             <p className="text-xs text-gray-500 mt-1">Analyzing...</p>
                           </div>
                         )}

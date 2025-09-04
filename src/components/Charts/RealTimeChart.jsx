@@ -1,3 +1,4 @@
+import { Play, Pause, RotateCcw, TrendingUp, TrendingDown, Activity } from 'lucide-react';
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import {
   LineChart,
@@ -9,7 +10,6 @@ import {
   ResponsiveContainer,
   ReferenceLine
 } from 'recharts';
-import { Play, Pause, RotateCcw, TrendingUp, TrendingDown, Activity } from 'lucide-react';
 
 import { cn } from '../../utils/cn';
 import Button from '../ui/Button';
@@ -97,7 +97,7 @@ export const RealTimeChart = ({
             ws.send(
               JSON.stringify({
                 type: 'subscribe',
-                symbol: symbol,
+                symbol,
                 channels: ['price', 'volume', 'trades']
               })
             );

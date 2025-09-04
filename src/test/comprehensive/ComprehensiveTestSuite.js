@@ -7,20 +7,20 @@
 import { describe, it, expect, beforeAll, afterAll, vi, beforeEach } from 'vitest';
 
 // Import all services
+import { analyticsEngine } from '../../services/analytics/AnalyticsEngine';
+import { apiIntegrationService } from '../../services/api/APIIntegrationService';
+import { mobileNavigationService } from '../../services/mobile/MobileNavigationService';
+import { mobilePerformanceService } from '../../services/mobile/MobilePerformanceService';
+import { mobileResponsiveService } from '../../services/mobile/MobileResponsiveService';
+import { offlineStorageService } from '../../services/mobile/OfflineStorageService';
+import { pushNotificationService } from '../../services/mobile/PushNotificationService';
+import { pwaService } from '../../services/mobile/PWAService';
+import { touchInteractionService } from '../../services/mobile/TouchInteractionService';
+import { realtimeService } from '../../services/realtime/RealtimeService';
 import { authenticationService } from '../../services/security/AuthenticationService';
 import { securityAuditService } from '../../services/security/SecurityAuditService';
 import { dataProtectionService } from '../../services/security/DataProtectionService';
 import { complianceMonitoringService } from '../../services/security/ComplianceMonitoringService';
-import { mobileResponsiveService } from '../../services/mobile/MobileResponsiveService';
-import { pwaService } from '../../services/mobile/PWAService';
-import { touchInteractionService } from '../../services/mobile/TouchInteractionService';
-import { mobileNavigationService } from '../../services/mobile/MobileNavigationService';
-import { pushNotificationService } from '../../services/mobile/PushNotificationService';
-import { offlineStorageService } from '../../services/mobile/OfflineStorageService';
-import { mobilePerformanceService } from '../../services/mobile/MobilePerformanceService';
-import { analyticsEngine } from '../../services/analytics/AnalyticsEngine';
-import { realtimeService } from '../../services/realtime/RealtimeService';
-import { apiIntegrationService } from '../../services/api/APIIntegrationService';
 
 class ComprehensiveTestSuite {
   constructor() {
@@ -770,7 +770,7 @@ class ComprehensiveTestSuite {
     // Log security event
     const event = securityAuditService.logSecurityEvent({
       event: 'USER_LOGIN',
-      userId: userId
+      userId
     });
     expect(event).toBeDefined();
 
@@ -852,7 +852,7 @@ class ComprehensiveTestSuite {
 
     // Add portfolio item
     const portfolioItem = await offlineStorageService.storePortfolioData({
-      userId: userId,
+      userId,
       symbol: 'AAPL',
       quantity: 100,
       price: 150.0
@@ -864,9 +864,9 @@ class ComprehensiveTestSuite {
 
     // Generate report
     const reportData = {
-      userId: userId,
+      userId,
       portfolio: [portfolioItem],
-      marketData: marketData,
+      marketData,
       timestamp: Date.now()
     };
 
@@ -874,7 +874,7 @@ class ComprehensiveTestSuite {
     await offlineStorageService.storeAnalyticsEvent({
       event: 'report_generated',
       data: reportData,
-      userId: userId
+      userId
     });
 
     // Logout
@@ -898,7 +898,7 @@ class ComprehensiveTestSuite {
 
     for (const holding of holdings) {
       await offlineStorageService.storePortfolioData({
-        userId: userId,
+        userId,
         ...holding
       });
     }
@@ -915,11 +915,11 @@ class ComprehensiveTestSuite {
     await offlineStorageService.storeAnalyticsEvent({
       event: 'portfolio_analyzed',
       data: {
-        totalValue: totalValue,
+        totalValue,
         holdingsCount: portfolio.length,
-        userId: userId
+        userId
       },
-      userId: userId
+      userId
     });
 
     return true;
@@ -933,7 +933,7 @@ class ComprehensiveTestSuite {
 
     // Generate comprehensive report
     const report = {
-      userId: userId,
+      userId,
       type: 'comprehensive',
       sections: {
         portfolio: await offlineStorageService.getPortfolioData(userId),
@@ -947,7 +947,7 @@ class ComprehensiveTestSuite {
     await offlineStorageService.storeAnalyticsEvent({
       event: 'comprehensive_report_generated',
       data: report,
-      userId: userId
+      userId
     });
 
     // Verify report structure
@@ -1233,8 +1233,8 @@ class ComprehensiveTestSuite {
     // Log access attempt
     securityAuditService.logSecurityEvent({
       event: 'ACCESS_DENIED',
-      userId: userId,
-      resource: resource,
+      userId,
+      resource,
       ipAddress: '192.168.1.100'
     });
 

@@ -21,9 +21,9 @@ import {
 } from 'lucide-react';
 import React, { useState, useRef, useEffect } from 'react';
 
-import secureApiClient from '../../services/secureApiClient';
-import { NaturalLanguageQueryService } from '../../services/ai/naturalLanguageQuery';
 import { AdvancedAIService } from '../../services/ai/advancedAIService';
+import { NaturalLanguageQueryService } from '../../services/ai/naturalLanguageQuery';
+import secureApiClient from '../../services/secureApiClient';
 
 const AIFinancialAssistant = ({
   isOpen = false,

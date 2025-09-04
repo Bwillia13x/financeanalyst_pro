@@ -1,4 +1,3 @@
-import React, { useState, useEffect, useMemo } from 'react';
 import {
   AlertTriangle,
   TrendingDown,
@@ -16,6 +15,7 @@ import {
   BarChart3,
   Activity
 } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
 
 import portfolioAnalyticsService from '../../services/financial/portfolioAnalyticsService';
 
@@ -590,7 +590,7 @@ const StressTestingDashboard = ({
       {/* Loading State */}
       {isRunning && (
         <div className="flex items-center justify-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500" />
           <span className="ml-3 text-slate-300">Running stress tests...</span>
         </div>
       )}

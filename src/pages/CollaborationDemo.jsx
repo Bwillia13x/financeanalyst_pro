@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card';
-import Button from '../components/ui/Button';
-import Input from '../components/ui/Input';
+
 import CollaborativeEditor from '../components/Collaboration/CollaborativeEditor';
+import Button from '../components/ui/Button';
+import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card';
+import Input from '../components/ui/Input';
 import { collaborationService } from '../services/collaboration/CollaborationService';
 import { presenceSystem } from '../services/collaboration/PresenceSystem';
 import { versionControl } from '../services/collaboration/VersionControl';

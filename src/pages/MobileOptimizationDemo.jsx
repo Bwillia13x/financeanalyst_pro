@@ -1,21 +1,3 @@
-import React, { useState, useRef } from 'react';
-import Header from '../components/ui/Header';
-import {
-  MobileContainer,
-  MobileCard,
-  MobileActionSheet,
-  MobileSwipeContainer,
-  MobileTabBar,
-  MobilePullToRefresh,
-  MobileGrid,
-  MobileInput,
-  MobileSelect
-} from '../components/ui/MobileLayout';
-
-// Enhanced Button with mobile variants
-import Button from '../components/ui/Button';
-
-// Icons
 import {
   TrendingUp,
   BarChart3,
@@ -34,6 +16,25 @@ import {
   Trash2,
   Plus
 } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+
+import Button from '../components/ui/Button';
+import Header from '../components/ui/Header';
+import {
+  MobileContainer,
+  MobileCard,
+  MobileActionSheet,
+  MobileSwipeContainer,
+  MobileTabBar,
+  MobilePullToRefresh,
+  MobileGrid,
+  MobileInput,
+  MobileSelect
+} from '../components/ui/MobileLayout';
+
+// Enhanced Button with mobile variants
+
+// Icons
 
 // Sample data for demonstrations
 const sampleData = [

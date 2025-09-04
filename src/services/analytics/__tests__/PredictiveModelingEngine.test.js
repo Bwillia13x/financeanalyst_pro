@@ -152,7 +152,7 @@ describe('PredictiveModelingEngine', () => {
 
       expect(result).toBeDefined();
       expect(result.method).toBe('Multiple Linear Regression');
-      expect(result.coefficients).toHaveLength(3);
+      expect(result.coefficients).toHaveLength(4); // intercept + 3 predictors
       expect(result.statistics.rSquared).toBeGreaterThanOrEqual(0);
       expect(result.statistics.rSquared).toBeLessThanOrEqual(1);
       expect(result.fitted).toHaveLength(y.length);

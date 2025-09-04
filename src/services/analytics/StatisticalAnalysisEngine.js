@@ -653,7 +653,7 @@ class StatisticalAnalysisEngine extends FinancialAnalyticsEngine {
     } else {
       const r = q > 0 ? 1 - p : p;
       const r2 = Math.sqrt(-Math.log(r));
-      let result =
+      const result =
         (((((c1 * r2 + c2) * r2 + c3) * r2 + c4) * r2 + c5) * r2 + c6) /
         ((((d1 * r2 + d2) * r2 + d3) * r2 + d4) * r2 + 1.0);
       return q > 0 ? result : -result;
@@ -692,9 +692,9 @@ class StatisticalAnalysisEngine extends FinancialAnalyticsEngine {
     const eps = 1e-8;
     const fpmin = 1e-30;
 
-    let qab = a + b;
-    let qap = a + 1;
-    let qam = a - 1;
+    const qab = a + b;
+    const qap = a + 1;
+    const qam = a - 1;
     let c = 1;
     let d = 1 - (qab * x) / qap;
 
@@ -703,7 +703,7 @@ class StatisticalAnalysisEngine extends FinancialAnalyticsEngine {
     let h = d;
 
     for (let m = 1; m <= maxIterations; m++) {
-      let m2 = 2 * m;
+      const m2 = 2 * m;
       let aa = (m * (b - m) * x) / ((qam + m2) * (a + m2));
       d = 1 + aa * d;
 

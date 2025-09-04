@@ -444,7 +444,7 @@ describe('Security System Integration', () => {
       // Log event for the user
       securityAuditService.logSecurityEvent({
         event: 'USER_CREATED',
-        userId: userId
+        userId
       });
 
       // Verify consistency

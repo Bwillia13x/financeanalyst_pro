@@ -1,4 +1,3 @@
-import React, { useState, useEffect, useRef } from 'react';
 import {
   MessageSquare,
   TrendingUp,
@@ -10,6 +9,7 @@ import {
   BarChart3,
   Activity
 } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
 
 import advancedAIService from '../../services/ai/advancedAIService';
 
@@ -338,7 +338,7 @@ const RealTimeSentimentAnalyzer = ({
               <span>Last updated: {lastUpdate.toLocaleTimeString()}</span>
               {isAutoRefresh && (
                 <span className="flex items-center gap-1">
-                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
                   Auto-refresh on
                 </span>
               )}

@@ -1,4 +1,3 @@
-import React, { useState, useEffect, useMemo } from 'react';
 import {
   BarChart3,
   TrendingUp,
@@ -15,6 +14,7 @@ import {
   Activity,
   PieChart
 } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
 
 import portfolioAnalyticsService from '../../services/financial/portfolioAnalyticsService';
 
@@ -581,7 +581,7 @@ const FactorInvestingDashboard = ({
       {/* Loading State */}
       {loading && (
         <div className="flex items-center justify-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500" />
           <span className="ml-3 text-slate-300">Optimizing portfolio...</span>
         </div>
       )}

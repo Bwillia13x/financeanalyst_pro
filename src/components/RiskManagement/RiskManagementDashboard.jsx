@@ -15,9 +15,9 @@ import {
 } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 
+import { RiskAssessmentService } from '../../services/risk/riskAssessmentTools';
 import Button from '../ui/Button';
 import { Card } from '../ui/Card';
-import { RiskAssessmentService } from '../../services/risk/riskAssessmentTools';
 
 const RiskManagementDashboard = ({ isOpen, onClose, portfolioData }) => {
   const [selectedFramework, setSelectedFramework] = useState('basel_iii');
@@ -204,7 +204,7 @@ const RiskManagementDashboard = ({ isOpen, onClose, portfolioData }) => {
               <Button onClick={runRiskAssessment} disabled={isAnalyzing} className="w-full">
                 {isAnalyzing ? (
                   <div className="flex items-center">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
                     Analyzing Risk...
                   </div>
                 ) : (

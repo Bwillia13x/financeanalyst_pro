@@ -14,7 +14,7 @@ export const testConfig = {
     bail: false, // Stop on first failure
     slowTestThreshold: 1000, // Mark tests slower than 1s as slow
     grep: null, // Filter tests by pattern
-    invert: false, // Invert grep pattern
+    invert: false // Invert grep pattern
   },
 
   // Environment-specific settings
@@ -277,7 +277,7 @@ export const testConfig = {
       'First Input Delay': 100, // ms
       'Cumulative Layout Shift': 0.1,
       'Speed Index': 3000, // ms
-      'Total Blocking Time': 200, // ms
+      'Total Blocking Time': 200 // ms
     },
 
     budgets: {

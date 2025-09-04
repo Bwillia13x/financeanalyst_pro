@@ -190,7 +190,7 @@ class AnalyticsService {
   // ===== USER JOURNEY TRACKING =====
   trackUserJourney(step, properties = {}) {
     const journeyEvent = {
-      step: step,
+      step,
       timestamp: new Date().toISOString(),
       session_id: this.sessionId,
       user_id: this.userId,
@@ -206,7 +206,7 @@ class AnalyticsService {
   trackFeatureUsage(featureName, action = 'used', properties = {}) {
     const featureEvent = {
       feature_name: featureName,
-      action: action,
+      action,
       timestamp: new Date().toISOString(),
       session_id: this.sessionId,
       user_id: this.userId,
@@ -229,7 +229,7 @@ class AnalyticsService {
   trackConversion(conversionType, value = null, properties = {}) {
     const conversionEvent = {
       conversion_type: conversionType,
-      value: value,
+      value,
       timestamp: new Date().toISOString(),
       session_id: this.sessionId,
       user_id: this.userId,
@@ -244,8 +244,8 @@ class AnalyticsService {
   trackAbandonment(flowName, step, reason = null, properties = {}) {
     const abandonmentEvent = {
       flow_name: flowName,
-      step: step,
-      reason: reason,
+      step,
+      reason,
       timestamp: new Date().toISOString(),
       session_id: this.sessionId,
       user_id: this.userId,
@@ -409,7 +409,7 @@ class AnalyticsService {
     try {
       const eventData = {
         event: eventName,
-        properties: properties,
+        properties,
         timestamp: new Date().toISOString()
       };
 
@@ -554,12 +554,12 @@ export const trackFormComplete = (formName, properties = {}) => {
 };
 
 export const trackOnboardingStep = (step, properties = {}) => {
-  analytics.trackUserJourney('onboarding_step', { step: step, ...properties });
+  analytics.trackUserJourney('onboarding_step', { step, ...properties });
 };
 
 export const trackSearchQuery = (query, resultsCount, properties = {}) => {
   analytics.trackEvent('search', {
-    query: query,
+    query,
     results_count: resultsCount,
     ...properties
   });

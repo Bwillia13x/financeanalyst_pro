@@ -311,7 +311,7 @@ class DataProtectionService {
       const encrypted = await crypto.subtle.encrypt(
         {
           name: this.options.encryptionAlgorithm,
-          iv: iv
+          iv
         },
         keyData.key,
         dataBuffer

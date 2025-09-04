@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from 'react';
 import {
   Code,
   Book,
@@ -14,6 +13,7 @@ import {
   Eye,
   EyeOff
 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 
 const DeveloperPortal = ({ className = '' }) => {
   const [activeTab, setActiveTab] = useState('overview');
@@ -38,7 +38,7 @@ const DeveloperPortal = ({ className = '' }) => {
             description: 'Stock symbol (e.g., AAPL)'
           }
         ],
-        example: `GET /market/quote/AAPL`,
+        example: 'GET /market/quote/AAPL',
         response: `{
   "symbol": "AAPL",
   "price": 150.25,
@@ -75,7 +75,7 @@ const DeveloperPortal = ({ className = '' }) => {
         path: '/market/indices',
         description: 'Get major market indices',
         parameters: [],
-        example: `GET /market/indices`
+        example: 'GET /market/indices'
       }
     ],
     analytics: [
@@ -554,7 +554,7 @@ const DeveloperPortal = ({ className = '' }) => {
                   <div className="bg-slate-800 rounded-lg p-4 min-h-64">
                     {isTesting ? (
                       <div className="flex items-center justify-center h-full">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500"></div>
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500" />
                       </div>
                     ) : testResults ? (
                       <div className="space-y-3">

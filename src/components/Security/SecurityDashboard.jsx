@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '../ui/Card';
-import Button from '../ui/Button';
+
 import { authenticationService } from '../../services/security/AuthenticationService';
 import { securityAuditService } from '../../services/security/SecurityAuditService';
+import Button from '../ui/Button';
+import { Card, CardHeader, CardTitle, CardContent } from '../ui/Card';
 
 const SecurityDashboard = () => {
   const [authData, setAuthData] = useState(null);
@@ -37,7 +38,7 @@ const SecurityDashboard = () => {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-accent mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-accent mx-auto mb-4" />
           <p className="text-foreground-secondary">Loading security dashboard...</p>
         </div>
       </div>

@@ -1,0 +1,225 @@
+groups:
+  - name: financeanalyst.alerts
+    rules:
+      # Application Health Alerts
+      - alert: FinanceAnalystDown
+        expr: up{job="financeanalyst"} == 0
+        for: 5m
+        labels:
+          severity: critical
+          service: financeanalyst
+        annotations:
+          summary: "FinanceAnalyst application is down"
+          description: "FinanceAnalyst has been down for more than 5 minutes."
+
+      - alert: FinanceAnalystHighErrorRate
+        expr: rate(http_requests_total{status=~"[5]", job="financeanalyst"}[5m]) / rate(http_requests_total{job="financeanalyst"}[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+          service: financeanalyst
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate is {{ $value | printf \"%.2f\" }}% (threshold: 5%)"
+
+      - alert: FinanceAnalystHighErrorRateCritical
+        expr: rate(http_requests_total{status=~"[5]", job="financeanalyst"}[5m]) / rate(http_requests_total{job="financeanalyst"}[5m]) > 0.10
+        for: 2m
+        labels:
+          severity: critical
+          service: financeanalyst
+        annotations:
+          summary: "Critical error rate detected"
+          description: "Error rate is {{ $value | printf \"%.2f\" }}% (threshold: 10%)"
+
+      # Performance Alerts
+      - alert: FinanceAnalystHighResponseTime
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{job="financeanalyst"}[5m])) > 2
+        for: 5m
+        labels:
+          severity: warning
+          service: financeanalyst
+        annotations:
+          summary: "High response time detected"
+          description: "95th percentile response time is {{ $value | printf \"%.2f\" }}s (threshold: 2s)"
+
+      - alert: FinanceAnalystHighResponseTimeCritical
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{job="financeanalyst"}[5m])) > 5
+        for: 2m
+        labels:
+          severity: critical
+          service: financeanalyst
+        annotations:
+          summary: "Critical response time detected"
+          description: "95th percentile response time is {{ $value | printf \"%.2f\" }}s (threshold: 5s)"
+
+      # System Resource Alerts
+      - alert: FinanceAnalystHighCPUUsage
+        expr: 100 - (avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 85
+        for: 5m
+        labels:
+          severity: warning
+          service: financeanalyst
+        annotations:
+          summary: "High CPU usage detected"
+          description: "CPU usage is {{ $value | printf \"%.1f\" }}% (threshold: 85%)"
+
+      - alert: FinanceAnalystHighMemoryUsage
+        expr: (1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100 > 90
+        for: 5m
+        labels:
+          severity: warning
+          service: financeanalyst
+        annotations:
+          summary: "High memory usage detected"
+          description: "Memory usage is {{ $value | printf \"%.1f\" }}% (threshold: 90%)"
+
+      - alert: FinanceAnalystLowDiskSpace
+        expr: (node_filesystem_size_bytes{mountpoint="/"} - node_filesystem_free_bytes{mountpoint="/"}) / node_filesystem_size_bytes{mountpoint="/"} * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+          service: financeanalyst
+        annotations:
+          summary: "Low disk space detected"
+          description: "Disk usage is {{ $value | printf \"%.1f\" }}% (threshold: 85%)"
+
+      # Database Alerts
+      - alert: FinanceAnalystHighDBConnections
+        expr: pg_stat_activity_count{datname="financeanalyst_prod"} > 80
+        for: 5m
+        labels:
+          severity: warning
+          service: database
+        annotations:
+          summary: "High database connection count"
+          description: "Database has {{ $value }} active connections (threshold: 80)"
+
+      - alert: FinanceAnalystDBReplicationLag
+        expr: pg_replication_lag > 300
+        for: 5m
+        labels:
+          severity: warning
+          service: database
+        annotations:
+          summary: "High database replication lag"
+          description: "Replication lag is {{ $value }} seconds (threshold: 300s)"
+
+      # Redis Alerts
+      - alert: FinanceAnalystRedisDown
+        expr: up{job="redis"} == 0
+        for: 2m
+        labels:
+          severity: warning
+          service: redis
+        annotations:
+          summary: "Redis is down"
+          description: "Redis has been down for more than 2 minutes"
+
+      - alert: FinanceAnalystRedisHighMemoryUsage
+        expr: redis_memory_used_bytes / redis_memory_max_bytes * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+          service: redis
+        annotations:
+          summary: "High Redis memory usage"
+          description: "Redis memory usage is {{ $value | printf \"%.1f\" }}% (threshold: 80%)"
+
+      # Business Logic Alerts
+      - alert: FinanceAnalystLowSuccessfulRequests
+        expr: rate(http_requests_total{status="200", job="financeanalyst"}[5m]) < 1
+        for: 10m
+        labels:
+          severity: warning
+          service: financeanalyst
+        annotations:
+          summary: "Low successful request rate"
+          description: "Successful request rate is {{ $value | printf \"%.2f\" }} req/s (threshold: 1 req/s)"
+
+      - alert: FinanceAnalystHighFailedAuthentications
+        expr: rate(authentication_failures_total[5m]) > 5
+        for: 5m
+        labels:
+          severity: warning
+          service: financeanalyst
+        annotations:
+          summary: "High authentication failure rate"
+          description: "Authentication failure rate is {{ $value | printf \"%.2f\" }} failures/min (threshold: 5/min)"
+
+      # API Endpoint Specific Alerts
+      - alert: FinanceAnalystSlowEndpoint
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{job="financeanalyst", endpoint=~"/api/.*"}[5m])) > 3
+        for: 5m
+        labels:
+          severity: warning
+          service: financeanalyst
+        annotations:
+          summary: "Slow API endpoint detected"
+          description: "Endpoint {{ $labels.endpoint }} has 95th percentile response time of {{ $value | printf \"%.2f\" }}s"
+
+      # Deployment Alerts
+      - alert: FinanceAnalystDeploymentFailed
+        expr: financeanalyst_deployment_status{status="failed"} == 1
+        for: 1m
+        labels:
+          severity: critical
+          service: deployment
+        annotations:
+          summary: "Deployment failed"
+          description: "FinanceAnalyst deployment failed for version {{ $labels.version }}"
+
+      # Security Alerts
+      - alert: FinanceAnalystSecurityEvent
+        expr: rate(security_events_total{severity="high"}[5m]) > 0
+        for: 1m
+        labels:
+          severity: critical
+          service: security
+        annotations:
+          summary: "Security event detected"
+          description: "High severity security event detected: {{ $labels.event_type }}"
+
+      - alert: FinanceAnalystSuspiciousActivity
+        expr: rate(suspicious_requests_total[5m]) > 10
+        for: 5m
+        labels:
+          severity: warning
+          service: security
+        annotations:
+          summary: "Suspicious activity detected"
+          description: "Suspicious request rate is {{ $value | printf \"%.1f\" }} requests/min"
+
+  - name: financeanalyst.business
+    rules:
+      # Business Metric Alerts
+      - alert: FinanceAnalystLowActiveUsers
+        expr: financeanalyst_active_users < 10
+        for: 15m
+        labels:
+          severity: info
+          service: business
+        annotations:
+          summary: "Low active user count"
+          description: "Only {{ $value }} active users (threshold: 10)"
+
+      - alert: FinanceAnalystHighQueueDepth
+        expr: financeanalyst_queue_depth > 100
+        for: 5m
+        labels:
+          severity: warning
+          service: business
+        annotations:
+          summary: "High analysis queue depth"
+          description: "Analysis queue has {{ $value }} pending items (threshold: 100)"
+
+      - alert: FinanceAnalystFailedCalculations
+        expr: rate(failed_calculations_total[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+          service: business
+        annotations:
+          summary: "High failed calculation rate"
+          description: "Failed calculation rate is {{ $value | printf \"%.3f\" }} per minute"
+

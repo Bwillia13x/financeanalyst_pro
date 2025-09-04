@@ -29,6 +29,12 @@ class CrossBrowserTestSuite {
       { name: 'Private Analysis', url: 'http://localhost:5173/private-analysis' },
       { name: 'Real-time Dashboard', url: 'http://localhost:5173/realtime-dashboard' }
     ];
+
+    // Modern JS and CSS features to test
+    this.modernFeatures = {
+      js: ['async', 'await', 'Promise', 'fetch', 'Map', 'Set'],
+      css: ['grid', 'flexbox', 'css-variables', 'backdrop-filter']
+    };
   }
 
   async runAllTests() {

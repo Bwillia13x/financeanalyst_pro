@@ -1,4 +1,5 @@
 import React from 'react';
+
 import Button from '../components/ui/Button';
 import Header from '../components/ui/Header';
 
@@ -217,7 +218,8 @@ const ButtonVariantsDemo = () => {
 // Glow effect for premium features
 <Button variant="glow" size="lg">
   Upgrade to Pro
-</Button>`}</pre>
+</Button>`}
+            </pre>
           </div>
         </div>
       </div>

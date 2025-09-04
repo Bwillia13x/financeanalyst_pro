@@ -320,6 +320,7 @@ class DataFetchingService {
   ) {
     this.cache = new Map();
     this.cacheExpiry = new Map();
+    this.cacheStats = new Map(); // Cache access statistics
     this.logger = apiLogger;
     this.client = secureApiClient;
 
@@ -357,7 +358,15 @@ class DataFetchingService {
       this.rateLimiters[source] = {
         requests: [],
         limit: rateLimits[source].requests,
-        period: rateLimits[source].period
+        period: rateLimits[source].period,
+        // Enhanced rate limiting with sliding window
+        windowStart: Date.now(),
+        requestCount: 0,
+        adaptiveLimit: rateLimits[source].requests,
+        // Concurrent request management
+        activeRequests: 0,
+        maxConcurrent: Math.max(1, Math.floor(rateLimits[source].requests / 10)),
+        queue: []
       };
     });
   }
@@ -367,14 +376,36 @@ class DataFetchingService {
     if (!limiter) return true;
 
     const now = Date.now();
+
+    // Clean up old requests (sliding window)
     limiter.requests = limiter.requests.filter(time => now - time < limiter.period);
 
-    if (limiter.requests.length >= limiter.limit) {
+    // Adaptive rate limiting based on recent performance
+    this.adaptRateLimit(limiter, source);
+
+    // Check concurrent request limit
+    if (limiter.activeRequests >= limiter.maxConcurrent) {
+      // Queue the request
+      return new Promise((resolve, reject) => {
+        limiter.queue.push({ resolve, reject, timestamp: now });
+        // Set timeout for queued requests (30 seconds max wait)
+        setTimeout(() => {
+          const index = limiter.queue.findIndex(item => item.timestamp === now);
+          if (index > -1) {
+            limiter.queue.splice(index, 1);
+            reject(new Error(`Rate limit queue timeout for ${source}`));
+          }
+        }, 30000);
+      });
+    }
+
+    // Check rate limit
+    if (limiter.requests.length >= limiter.adaptiveLimit) {
       const oldestRequest = Math.min(...limiter.requests);
       const waitTime = limiter.period - (now - oldestRequest);
 
       // Log rate limiting event
-      this.logger.logRateLimit(source, waitTime, limiter.limit - limiter.requests.length);
+      this.logger.logRateLimit(source, waitTime, limiter.adaptiveLimit - limiter.requests.length);
 
       throw new Error(
         `Rate limit exceeded for ${source}. Please wait ${Math.ceil(waitTime / 1000)} seconds.`
@@ -382,7 +413,49 @@ class DataFetchingService {
     }
 
     limiter.requests.push(now);
+    limiter.activeRequests++;
+    limiter.requestCount++;
+
+    // Set up cleanup for active request count
+    setTimeout(() => {
+      limiter.activeRequests = Math.max(0, limiter.activeRequests - 1);
+      // Process queued requests
+      if (limiter.queue.length > 0 && limiter.activeRequests < limiter.maxConcurrent) {
+        const queued = limiter.queue.shift();
+        queued.resolve(true);
+      }
+    }, 1000); // Assume request completes within 1 second
+
     return true;
+  }
+
+  /**
+   * Adaptive rate limiting based on API response patterns
+   */
+  adaptRateLimit(limiter, source) {
+    const now = Date.now();
+    const windowSize = 60000; // 1 minute window
+
+    // Reset counters if window has passed
+    if (now - limiter.windowStart > windowSize) {
+      limiter.windowStart = now;
+      limiter.requestCount = 0;
+    }
+
+    // Adjust limit based on recent activity
+    const utilizationRate = limiter.requestCount / limiter.limit;
+
+    if (utilizationRate > 0.8) {
+      // High utilization - reduce limit temporarily
+      limiter.adaptiveLimit = Math.max(1, Math.floor(limiter.limit * 0.7));
+    } else if (utilizationRate < 0.3) {
+      // Low utilization - gradually increase limit
+      limiter.adaptiveLimit = Math.min(limiter.limit, limiter.adaptiveLimit + 1);
+    }
+
+    // Add jitter to prevent thundering herd
+    const jitter = Math.random() * 0.1 * limiter.period;
+    limiter.period = limiter.period + jitter;
   }
 
   getCacheKey(method, params) {
@@ -390,30 +463,211 @@ class DataFetchingService {
   }
 
   getFromCache(key) {
-    const expiry = this.cacheExpiry.get(key);
-    if (expiry && Date.now() > expiry) {
-      this.cache.delete(key);
-      this.cacheExpiry.delete(key);
-      this.logger.logCache('miss', key, { reason: 'expired' });
+    try {
+      const expiry = this.cacheExpiry.get(key);
+      if (expiry && Date.now() > expiry) {
+        this.cache.delete(key);
+        this.cacheExpiry.delete(key);
+        this.logger.logCache('miss', key, { reason: 'expired' });
+        return null;
+      }
+
+      const cached = this.cache.get(key);
+      if (cached !== undefined) {
+        // Update access statistics
+        this.updateCacheStats(key, 'hit');
+        this.logger.logCache('hit', key, {
+          size: JSON.stringify(cached).length,
+          accessCount: this.cacheStats.get(key)?.accessCount || 1
+        });
+        return cached;
+      }
+
+      this.updateCacheStats(key, 'miss');
+      this.logger.logCache('miss', key, { reason: 'not_found' });
+      return null;
+    } catch (error) {
+      this.logger.logCache('error', key, { error: error.message });
       return null;
     }
-    const cached = this.cache.get(key);
-    if (cached !== undefined) {
-      this.logger.logCache('hit', key, { size: JSON.stringify(cached).length });
-      return cached;
-    }
-    this.logger.logCache('miss', key, { reason: 'not_found' });
-    return null;
   }
 
   setCache(key, data, ttlMinutes = 60) {
-    this.cache.set(key, data);
-    this.cacheExpiry.set(key, Date.now() + ttlMinutes * 60 * 1000);
-    this.logger.logCache('set', key, {
-      ttlMinutes,
-      size: JSON.stringify(data).length,
-      expiresAt: new Date(Date.now() + ttlMinutes * 60 * 1000).toISOString()
-    });
+    try {
+      // Memory management - prevent cache from growing too large
+      if (this.cache.size >= 1000) {
+        // Max 1000 cache entries
+        this.evictOldEntries();
+      }
+
+      const size = JSON.stringify(data).length;
+      const expiresAt = Date.now() + ttlMinutes * 60 * 1000;
+
+      this.cache.set(key, data);
+      this.cacheExpiry.set(key, expiresAt);
+
+      // Initialize cache statistics
+      if (!this.cacheStats) {
+        this.cacheStats = new Map();
+      }
+      this.cacheStats.set(key, {
+        size,
+        accessCount: 0,
+        hitCount: 0,
+        missCount: 0,
+        createdAt: Date.now(),
+        expiresAt
+      });
+
+      this.logger.logCache('set', key, {
+        ttlMinutes,
+        size,
+        expiresAt: new Date(expiresAt).toISOString(),
+        cacheSize: this.cache.size
+      });
+
+      return true;
+    } catch (error) {
+      this.logger.logCache('error', key, { error: error.message, action: 'set' });
+      return false;
+    }
+  }
+
+  /**
+   * Update cache access statistics
+   */
+  updateCacheStats(key, type) {
+    if (!this.cacheStats) {
+      this.cacheStats = new Map();
+    }
+
+    const stats = this.cacheStats.get(key) || {
+      accessCount: 0,
+      hitCount: 0,
+      missCount: 0
+    };
+
+    stats.accessCount++;
+    if (type === 'hit') {
+      stats.hitCount++;
+    } else {
+      stats.missCount++;
+    }
+
+    this.cacheStats.set(key, stats);
+  }
+
+  /**
+   * Evict old entries to manage memory
+   */
+  evictOldEntries() {
+    try {
+      const entries = Array.from(this.cache.entries());
+      const now = Date.now();
+
+      // Sort by expiry time and access count (LRU-like eviction)
+      entries.sort(([, a], [, b]) => {
+        const aExpiry = this.cacheExpiry.get(a) || 0;
+        const bExpiry = this.cacheExpiry.get(b) || 0;
+        const aStats = this.cacheStats.get(a);
+        const bStats = this.cacheStats.get(b);
+
+        // Prioritize keeping recently accessed items
+        const aScore = now - aExpiry - (aStats?.accessCount || 0) * 1000;
+        const bScore = now - bExpiry - (bStats?.accessCount || 0) * 1000;
+
+        return bScore - aScore; // Higher score = more likely to be evicted
+      });
+
+      // Remove 20% of entries
+      const toRemove = Math.ceil(entries.length * 0.2);
+      for (let i = 0; i < toRemove; i++) {
+        const [key] = entries[i];
+        this.cache.delete(key);
+        this.cacheExpiry.delete(key);
+        this.cacheStats.delete(key);
+      }
+
+      this.logger.logCache('eviction', 'system', {
+        evicted: toRemove,
+        remaining: this.cache.size
+      });
+    } catch (error) {
+      this.logger.logCache('error', 'eviction', { error: error.message });
+    }
+  }
+
+  /**
+   * Get cache statistics
+   */
+  getCacheStats() {
+    if (!this.cacheStats) return { total: 0, hitRate: 0, size: 0 };
+
+    const stats = Array.from(this.cacheStats.values());
+    const totalAccess = stats.reduce((sum, s) => sum + s.accessCount, 0);
+    const totalHits = stats.reduce((sum, s) => sum + s.hitCount, 0);
+
+    return {
+      total: this.cache.size,
+      hitRate: totalAccess > 0 ? (totalHits / totalAccess) * 100 : 0,
+      size: stats.reduce((sum, s) => sum + s.size, 0),
+      avgSize: stats.length > 0 ? stats.reduce((sum, s) => sum + s.size, 0) / stats.length : 0
+    };
+  }
+
+  /**
+   * Clear expired cache entries
+   */
+  clearExpiredCache() {
+    try {
+      const now = Date.now();
+      let cleared = 0;
+
+      for (const [key, expiry] of this.cacheExpiry.entries()) {
+        if (now > expiry) {
+          this.cache.delete(key);
+          this.cacheExpiry.delete(key);
+          this.cacheStats?.delete(key);
+          cleared++;
+        }
+      }
+
+      if (cleared > 0) {
+        this.logger.logCache('cleanup', 'system', { cleared, remaining: this.cache.size });
+      }
+
+      return cleared;
+    } catch (error) {
+      this.logger.logCache('error', 'cleanup', { error: error.message });
+      return 0;
+    }
+  }
+
+  /**
+   * Warm up cache with frequently accessed data
+   */
+  async warmupCache() {
+    try {
+      // Cache commonly requested data
+      const commonSymbols = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'TSLA'];
+
+      for (const symbol of commonSymbols) {
+        try {
+          await this.fetchCompanyProfile(symbol);
+          await this.fetchFinancialStatements(symbol);
+        } catch (error) {
+          // Ignore errors during warmup
+          this.logger.logCache('warmup_error', symbol, { error: error.message });
+        }
+      }
+
+      this.logger.logCache('warmup', 'system', {
+        symbols: commonSymbols.length,
+        cacheSize: this.cache.size
+      });
+    } catch (error) {
+      this.logger.logCache('error', 'warmup', { error: error.message });
+    }
   }
 
   // Fetch company profile guarded by circuit breaker, retries, and rate limiting

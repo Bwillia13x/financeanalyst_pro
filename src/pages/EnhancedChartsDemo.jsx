@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
+
+import { EnhancedTooltip } from '../components/ui/charts/ChartTheme';
+import RevenueBreakdown from '../components/ui/charts/RevenueBreakdown';
+import SensitivityHeatmap from '../components/ui/charts/SensitivityHeatmap';
 import Header from '../components/ui/Header';
 
 // Enhanced Chart Components
-import RevenueBreakdown from '../components/ui/charts/RevenueBreakdown';
-import SensitivityHeatmap from '../components/ui/charts/SensitivityHeatmap';
-import { EnhancedTooltip } from '../components/ui/charts/ChartTheme';
 
 // Sample Data
 const revenueData = [
@@ -171,19 +172,19 @@ const EnhancedChartsDemo = () => {
                   <h3 className="text-lg font-semibold text-foreground mb-4">Key Features</h3>
                   <ul className="space-y-2 text-foreground-secondary">
                     <li className="flex items-center gap-2">
-                      <span className="w-2 h-2 bg-success rounded-full"></span>
+                      <span className="w-2 h-2 bg-success rounded-full" />
                       Interactive hover effects
                     </li>
                     <li className="flex items-center gap-2">
-                      <span className="w-2 h-2 bg-info rounded-full"></span>
+                      <span className="w-2 h-2 bg-info rounded-full" />
                       Center total display
                     </li>
                     <li className="flex items-center gap-2">
-                      <span className="w-2 h-2 bg-warning rounded-full"></span>
+                      <span className="w-2 h-2 bg-warning rounded-full" />
                       Detailed legend with percentages
                     </li>
                     <li className="flex items-center gap-2">
-                      <span className="w-2 h-2 bg-purple rounded-full"></span>
+                      <span className="w-2 h-2 bg-purple rounded-full" />
                       Chart controls and export options
                     </li>
                   </ul>
@@ -237,15 +238,15 @@ const EnhancedChartsDemo = () => {
                   <h3 className="text-lg font-semibold text-foreground mb-4">Color Coding</h3>
                   <div className="space-y-3">
                     <div className="flex items-center gap-3">
-                      <div className="w-4 h-4 rounded bg-green-200"></div>
+                      <div className="w-4 h-4 rounded bg-green-200" />
                       <span className="text-sm text-foreground-secondary">Positive Impact</span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <div className="w-4 h-4 rounded bg-red-200"></div>
+                      <div className="w-4 h-4 rounded bg-red-200" />
                       <span className="text-sm text-foreground-secondary">Negative Impact</span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <div className="w-4 h-4 rounded bg-gray-200"></div>
+                      <div className="w-4 h-4 rounded bg-gray-200" />
                       <span className="text-sm text-foreground-secondary">Neutral</span>
                     </div>
                   </div>

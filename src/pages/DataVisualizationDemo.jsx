@@ -1,4 +1,3 @@
-import React, { useState, useMemo } from 'react';
 import {
   TrendingUp,
   TrendingDown,
@@ -13,19 +12,18 @@ import {
   Settings,
   RefreshCw
 } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
 
 // Import all chart components
-import InstitutionalChart, { CHART_TYPES } from '../components/Charts/InstitutionalChart';
-import RealTimeChart from '../components/Charts/RealTimeChart';
-import InteractiveDashboard, {
-  DASHBOARD_PRESETS
-} from '../components/Dashboards/InteractiveDashboard';
 import {
   CandlestickChart,
   OHLCChart,
   VolumeChart,
   IndicatorsChart
 } from '../components/Charts/FinancialCharts';
+import InstitutionalChart, { CHART_TYPES } from '../components/Charts/InstitutionalChart';
+import RealTimeChart from '../components/Charts/RealTimeChart';
+import InteractiveDashboard from '../components/Dashboards/InteractiveDashboard';
 import Button from '../components/ui/Button';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card';
 

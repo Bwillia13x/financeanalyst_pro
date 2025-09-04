@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinanceAnalyst Pro - Monitoring Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .card-icon {
+            font-size: 1.5rem;
+            margin-right: 10px;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .metric-label {
+            font-weight: 500;
+            color: #555;
+        }
+
+        .metric-value {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-left: 8px;
+        }
+
+        .status-healthy { background-color: #28a745; }
+        .status-warning { background-color: #ffc107; }
+        .status-critical { background-color: #dc3545; }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 8px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s ease;
+        }
+
+        .alert-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .alert-item {
+            padding: 8px;
+            margin-bottom: 8px;
+            border-radius: 4px;
+            border-left: 4px solid;
+        }
+
+        .alert-critical { border-color: #dc3545; background: #f8d7da; }
+        .alert-warning { border-color: #ffc107; background: #fff3cd; }
+        .alert-info { border-color: #17a2b8; background: #d1ecf1; }
+
+        .chart-container {
+            height: 200px;
+            position: relative;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .refresh-indicator {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #f5c6cb;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 CLI Monitoring Dashboard</h1>
+            <p>Real-time monitoring and analytics for FinanceAnalyst Pro CLI</p>
+        </div>
+
+        <div id="error-message" class="error-message hidden">
+            <strong>Error:</strong> <span id="error-text"></span>
+        </div>
+
+        <div class="controls">
+            <button id="refresh-btn" class="btn btn-primary">
+                🔄 Refresh Data
+                <span id="refresh-indicator" class="refresh-indicator hidden"></span>
+            </button>
+            <button id="export-btn" class="btn btn-secondary">📥 Export Data</button>
+            <button id="reset-btn" class="btn btn-success">🔄 Reset Metrics</button>
+        </div>
+
+        <div class="dashboard">
+            <!-- System Health Card -->
+            <div class="card" id="health-card">
+                <div class="card-header">
+                    <span class="card-icon">🏥</span>
+                    <span class="card-title">System Health</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Status:</span>
+                    <span class="metric-value">
+                        <span id="health-status">Loading...</span>
+                        <span id="health-indicator" class="status-indicator"></span>
+                    </span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Uptime:</span>
+                    <span class="metric-value" id="uptime">0s</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Last Check:</span>
+                    <span class="metric-value" id="last-check">-</span>
+                </div>
+            </div>
+
+            <!-- Command Metrics Card -->
+            <div class="card" id="commands-card">
+                <div class="card-header">
+                    <span class="card-icon">⚡</span>
+                    <span class="card-title">Command Metrics</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Total Commands:</span>
+                    <span class="metric-value" id="total-commands">0</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Success Rate:</span>
+                    <span class="metric-value" id="success-rate">0%</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Avg Response Time:</span>
+                    <span class="metric-value" id="avg-response-time">0ms</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Commands/Minute:</span>
+                    <span class="metric-value" id="commands-per-minute">0</span>
+                </div>
+            </div>
+
+            <!-- User Activity Card -->
+            <div class="card" id="users-card">
+                <div class="card-header">
+                    <span class="card-icon">👥</span>
+                    <span class="card-title">User Activity</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Active Users:</span>
+                    <span class="metric-value" id="active-users">0</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Total Users:</span>
+                    <span class="metric-value" id="total-users">0</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Peak Concurrent:</span>
+                    <span class="metric-value" id="peak-concurrent">0</span>
+                </div>
+            </div>
+
+            <!-- Security Metrics Card -->
+            <div class="card" id="security-card">
+                <div class="card-header">
+                    <span class="card-icon">🛡️</span>
+                    <span class="card-title">Security Metrics</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Rate Limit Hits:</span>
+                    <span class="metric-value" id="rate-limit-hits">0</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Blocked Requests:</span>
+                    <span class="metric-value" id="blocked-requests">0</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Suspicious Patterns:</span>
+                    <span class="metric-value" id="suspicious-patterns">0</span>
+                </div>
+            </div>
+
+            <!-- Performance Metrics Card -->
+            <div class="card" id="performance-card">
+                <div class="card-header">
+                    <span class="card-icon">📈</span>
+                    <span class="card-title">Performance</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Memory Usage:</span>
+                    <span class="metric-value" id="memory-usage">0%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="memory-bar" style="width: 0%"></div>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Error Rate:</span>
+                    <span class="metric-value" id="error-rate">0%</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Registered Commands:</span>
+                    <span class="metric-value" id="registered-commands">0</span>
+                </div>
+            </div>
+
+            <!-- Active Alerts Card -->
+            <div class="card" id="alerts-card">
+                <div class="card-header">
+                    <span class="card-icon">🚨</span>
+                    <span class="card-title">Active Alerts</span>
+                </div>
+                <div class="alert-list" id="alerts-list">
+                    <div class="alert-item alert-info">
+                        <strong>No active alerts</strong><br>
+                        System is operating normally
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity Section -->
+        <div class="card">
+            <div class="card-header">
+                <span class="card-icon">📋</span>
+                <span class="card-title">Recent Activity</span>
+            </div>
+            <div id="recent-activity">
+                <p>Loading recent activity...</p>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Import the enhanced CLI to access monitoring data
+        import { enhancedCLI } from './src/services/cli/enhanced-cli.js';
+
+        let refreshInterval;
+        let isRefreshing = false;
+
+        // DOM elements
+        const errorMessage = document.getElementById('error-message');
+        const errorText = document.getElementById('error-text');
+        const refreshBtn = document.getElementById('refresh-btn');
+        const refreshIndicator = document.getElementById('refresh-indicator');
+        const exportBtn = document.getElementById('export-btn');
+        const resetBtn = document.getElementById('reset-btn');
+
+        // Initialize dashboard
+        async function initializeDashboard() {
+            try {
+                // Check if CLI is initialized
+                if (!enhancedCLI.isInitialized) {
+                    await enhancedCLI.initialize();
+                }
+
+                // Start auto-refresh
+                startAutoRefresh();
+
+                // Load initial data
+                await refreshData();
+
+            } catch (error) {
+                showError('Failed to initialize dashboard: ' + error.message);
+                console.error('Dashboard initialization error:', error);
+            }
+        }
+
+        // Start auto-refresh every 30 seconds
+        function startAutoRefresh() {
+            refreshInterval = setInterval(async () => {
+                if (!isRefreshing) {
+                    await refreshData();
+                }
+            }, 30000);
+        }
+
+        // Refresh all data
+        async function refreshData() {
+            if (isRefreshing) return;
+
+            isRefreshing = true;
+            refreshBtn.disabled = true;
+            refreshIndicator.classList.remove('hidden');
+
+            try {
+                await Promise.all([
+                    updateHealthStatus(),
+                    updateCommandMetrics(),
+                    updateUserActivity(),
+                    updateSecurityMetrics(),
+                    updatePerformanceMetrics(),
+                    updateAlerts(),
+                    updateRecentActivity()
+                ]);
+
+                hideError();
+
+            } catch (error) {
+                showError('Failed to refresh data: ' + error.message);
+                console.error('Data refresh error:', error);
+            } finally {
+                isRefreshing = false;
+                refreshBtn.disabled = false;
+                refreshIndicator.classList.add('hidden');
+            }
+        }
+
+        // Update system health
+        async function updateHealthStatus() {
+            const health = enhancedCLI.getHealthStatus();
+
+            document.getElementById('health-status').textContent = health.status;
+            document.getElementById('uptime').textContent = formatUptime(health.uptime);
+            document.getElementById('last-check').textContent = formatTimestamp(health.lastCheck);
+
+            // Update status indicator
+            const indicator = document.getElementById('health-indicator');
+            indicator.className = 'status-indicator';
+
+            if (health.status === 'healthy') {
+                indicator.classList.add('status-healthy');
+            } else if (health.status === 'warning') {
+                indicator.classList.add('status-warning');
+            } else {
+                indicator.classList.add('status-critical');
+            }
+        }
+
+        // Update command metrics
+        async function updateCommandMetrics() {
+            const metrics = enhancedCLI.getMonitoringMetrics();
+
+            document.getElementById('total-commands').textContent = metrics.commands.total;
+            document.getElementById('success-rate').textContent =
+                metrics.commands.total > 0 ?
+                ((metrics.commands.successful / metrics.commands.total) * 100).toFixed(1) + '%' : '0%';
+            document.getElementById('avg-response-time').textContent =
+                metrics.commands.avgResponseTime.toFixed(2) + 'ms';
+            document.getElementById('commands-per-minute').textContent = metrics.commands.ratePerMinute;
+        }
+
+        // Update user activity
+        async function updateUserActivity() {
+            const metrics = enhancedCLI.getMonitoringMetrics();
+
+            document.getElementById('active-users').textContent = metrics.users.active;
+            document.getElementById('total-users').textContent = metrics.users.total;
+            document.getElementById('peak-concurrent').textContent = metrics.users.peakConcurrent;
+        }
+
+        // Update security metrics
+        async function updateSecurityMetrics() {
+            const metrics = enhancedCLI.getMonitoringMetrics();
+
+            document.getElementById('rate-limit-hits').textContent = metrics.security.rateLimitHits;
+            document.getElementById('blocked-requests').textContent = metrics.security.blockedRequests;
+            document.getElementById('suspicious-patterns').textContent = metrics.security.suspiciousPatterns;
+        }
+
+        // Update performance metrics
+        async function updatePerformanceMetrics() {
+            const metrics = enhancedCLI.getMonitoringMetrics();
+
+            const memoryUsage = (metrics.performance.memoryUsage * 100).toFixed(1);
+            document.getElementById('memory-usage').textContent = memoryUsage + '%';
+            document.getElementById('memory-bar').style.width = memoryUsage + '%';
+
+            const errorRate = metrics.commands.total > 0 ?
+                ((metrics.commands.failed / metrics.commands.total) * 100).toFixed(1) : '0';
+            document.getElementById('error-rate').textContent = errorRate + '%';
+
+            document.getElementById('registered-commands').textContent = metrics.commands.registeredCommands || 0;
+        }
+
+        // Update alerts
+        async function updateAlerts() {
+            const alerts = enhancedCLI.getActiveAlerts();
+            const alertsList = document.getElementById('alerts-list');
+
+            if (alerts.active.length === 0) {
+                alertsList.innerHTML = `
+                    <div class="alert-item alert-info">
+                        <strong>No active alerts</strong><br>
+                        System is operating normally
+                    </div>
+                `;
+            } else {
+                alertsList.innerHTML = alerts.active.map(alert => `
+                    <div class="alert-item alert-${getAlertClass(alert.severity)}">
+                        <strong>${alert.type}</strong><br>
+                        ${alert.message}<br>
+                        <small>${formatTimestamp(alert.timestamp)}</small>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // Update recent activity
+        async function updateRecentActivity() {
+            const metrics = enhancedCLI.getMonitoringMetrics();
+            const activityDiv = document.getElementById('recent-activity');
+
+            if (metrics.errors.recent.length > 0) {
+                activityDiv.innerHTML = `
+                    <h4>Recent Errors:</h4>
+                    ${metrics.errors.recent.slice(0, 5).map(error => `
+                        <div style="margin-bottom: 10px; padding: 8px; background: #f8f9fa; border-radius: 4px;">
+                            <strong>${error.type}:</strong> ${error.error}<br>
+                            <small>${formatTimestamp(error.timestamp)}</small>
+                        </div>
+                    `).join('')}
+                `;
+            } else {
+                activityDiv.innerHTML = '<p>No recent errors or activity to display.</p>';
+            }
+        }
+
+        // Utility functions
+        function formatUptime(ms) {
+            const seconds = Math.floor(ms / 1000);
+            const minutes = Math.floor(seconds / 60);
+            const hours = Math.floor(minutes / 60);
+            const days = Math.floor(hours / 24);
+
+            if (days > 0) return `${days}d ${hours % 24}h`;
+            if (hours > 0) return `${hours}h ${minutes % 60}m`;
+            if (minutes > 0) return `${minutes}m ${seconds % 60}s`;
+            return `${seconds}s`;
+        }
+
+        function formatTimestamp(timestamp) {
+            if (!timestamp) return '-';
+            return new Date(timestamp).toLocaleString();
+        }
+
+        function getAlertClass(severity) {
+            switch (severity) {
+                case 'critical': return 'critical';
+                case 'warning': return 'warning';
+                default: return 'info';
+            }
+        }
+
+        function showError(message) {
+            errorText.textContent = message;
+            errorMessage.classList.remove('hidden');
+        }
+
+        function hideError() {
+            errorMessage.classList.add('hidden');
+        }
+
+        // Event listeners
+        refreshBtn.addEventListener('click', refreshData);
+
+        exportBtn.addEventListener('click', async () => {
+            try {
+                const data = enhancedCLI.exportMonitoringData();
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `cli-monitoring-${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            } catch (error) {
+                showError('Failed to export data: ' + error.message);
+            }
+        });
+
+        resetBtn.addEventListener('click', async () => {
+            if (confirm('Are you sure you want to reset all monitoring metrics? This action cannot be undone.')) {
+                try {
+                    enhancedCLI.resetMonitoringMetrics();
+                    await refreshData();
+                } catch (error) {
+                    showError('Failed to reset metrics: ' + error.message);
+                }
+            }
+        });
+
+        // Initialize dashboard when page loads
+        document.addEventListener('DOMContentLoaded', initializeDashboard);
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            if (refreshInterval) {
+                clearInterval(refreshInterval);
+            }
+        });
+    </script>
+</body>
+</html>

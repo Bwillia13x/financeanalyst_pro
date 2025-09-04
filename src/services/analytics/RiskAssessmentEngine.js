@@ -514,11 +514,47 @@ class RiskAssessmentEngine extends FinancialAnalyticsEngine {
       },
       benchmarkAttribution,
       riskBudget: this.calculateRiskBudget(marginalContributions, portfolioVolatility),
-      recommendations: this.generateAttributionRecommendations(marginalContributions)
+      recommendations: this.generateAttributionRecommendations(marginalContributions, assets)
     };
 
     this.setCache(cacheKey, result);
     return result;
+  }
+
+  /**
+   * Calculate benchmark attribution - how much of the portfolio risk is due to active management
+   */
+  calculateBenchmarkAttribution(assets, weights, benchmarkWeights) {
+    const portfolioVolatility = this.calculatePortfolioVolatility(assets, weights);
+    const benchmarkVolatility = this.calculatePortfolioVolatility(assets, benchmarkWeights);
+
+    // Calculate active weights (portfolio - benchmark)
+    const activeWeights = weights.map((weight, i) => weight - benchmarkWeights[i]);
+
+    // Calculate attribution using Brinson-style attribution
+    const attribution = {
+      systematicRisk: benchmarkVolatility,
+      activeRisk: Math.sqrt(Math.max(0, portfolioVolatility ** 2 - benchmarkVolatility ** 2)),
+      trackingError: Math.sqrt(
+        activeWeights.reduce((sum, activeWeight, i) => {
+          const asset = assets[i];
+          const assetVolatility = asset.volatility || 0.2; // Default volatility if not provided
+          return sum + activeWeight ** 2 * assetVolatility ** 2;
+        }, 0)
+      ),
+      informationRatio:
+        (portfolioVolatility - benchmarkVolatility) /
+        Math.sqrt(
+          activeWeights.reduce((sum, activeWeight, i) => {
+            const asset = assets[i];
+            const assetVolatility = asset.volatility || 0.2;
+            return sum + activeWeight ** 2 * assetVolatility ** 2;
+          }, 0)
+        ),
+      activeWeights
+    };
+
+    return attribution;
   }
 
   /**
@@ -589,6 +625,71 @@ class RiskAssessmentEngine extends FinancialAnalyticsEngine {
   }
 
   /**
+   * Calculate interaction effects between assets
+   */
+  calculateInteractionEffects(assets, weights) {
+    const interactions = [];
+
+    // Calculate pairwise correlations and their effects on portfolio risk
+    for (let i = 0; i < assets.length; i++) {
+      for (let j = i + 1; j < assets.length; j++) {
+        const asset1 = assets[i];
+        const asset2 = assets[j];
+        const weight1 = weights[i];
+        const weight2 = weights[j];
+
+        // Calculate correlation effect (simplified)
+        const correlation = this.calculateAssetCorrelation(asset1, asset2);
+        const covariance = correlation * (asset1.volatility || 0.2) * (asset2.volatility || 0.2);
+        const interactionEffect = 2 * weight1 * weight2 * covariance;
+
+        if (Math.abs(interactionEffect) > 0.001) {
+          // Only include significant interactions
+          interactions.push({
+            assetPair: [asset1.symbol, asset2.symbol],
+            correlation,
+            covariance,
+            weightProduct: weight1 * weight2,
+            interactionEffect,
+            riskImpact: Math.abs(interactionEffect)
+          });
+        }
+      }
+    }
+
+    // Sort by risk impact (most significant first)
+    return interactions.sort((a, b) => b.riskImpact - a.riskImpact);
+  }
+
+  /**
+   * Calculate correlation between two assets (simplified)
+   */
+  calculateAssetCorrelation(asset1, asset2) {
+    // Simplified correlation calculation
+    // In a real implementation, this would use historical returns
+    const defaultCorrelation = 0.3; // Default positive correlation
+
+    // Use provided correlation if available
+    if (asset1.correlation && asset1.correlation[asset2.symbol]) {
+      return asset1.correlation[asset2.symbol];
+    }
+    if (asset2.correlation && asset2.correlation[asset1.symbol]) {
+      return asset2.correlation[asset1.symbol];
+    }
+
+    // Use sector-based correlation
+    if (asset1.sector && asset2.sector) {
+      if (asset1.sector === asset2.sector) {
+        return 0.7; // High correlation within same sector
+      } else {
+        return 0.2; // Lower correlation between different sectors
+      }
+    }
+
+    return defaultCorrelation;
+  }
+
+  /**
    * Calculate risk budget utilization
    */
   calculateRiskBudget(contributions, totalRisk) {
@@ -602,7 +703,7 @@ class RiskAssessmentEngine extends FinancialAnalyticsEngine {
   /**
    * Generate attribution-based recommendations
    */
-  generateAttributionRecommendations(contributions) {
+  generateAttributionRecommendations(contributions, assets) {
     const recommendations = [];
     const highRiskContributors = contributions.filter(c => c.riskContributionPercent > 15);
 

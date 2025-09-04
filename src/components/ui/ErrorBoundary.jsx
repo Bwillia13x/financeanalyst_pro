@@ -20,14 +20,16 @@ class ErrorBoundary extends Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div style={{
+        <div
+          style={{
           padding: '20px',
           border: '1px solid #ccc',
           borderRadius: '8px',
           backgroundColor: '#f8f9fa',
           textAlign: 'center',
           margin: '20px 0'
-        }}>
+        }}
+        >
           <h3 style={{ color: '#dc3545', marginBottom: '10px' }}>Something went wrong</h3>
           <p style={{ marginBottom: '15px' }}>
             An error occurred while rendering this component.

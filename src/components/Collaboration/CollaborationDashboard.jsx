@@ -1,4 +1,3 @@
-import React, { useState, useEffect, useMemo } from 'react';
 import {
   Users,
   Plus,
@@ -20,6 +19,7 @@ import {
   UserCheck,
   UserX
 } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
 
 import collaborationService from '../../services/collaboration/collaborationService';
 
@@ -239,7 +239,7 @@ const CollaborationDashboard = ({
 
           {loading ? (
             <div className="flex items-center justify-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
             </div>
           ) : (
             <div className="space-y-2">
@@ -257,7 +257,7 @@ const CollaborationDashboard = ({
                     <h5 className="text-white font-medium truncate">{workspace.name}</h5>
                     <div className="flex items-center gap-1">
                       {workspace.activeSessions.size > 0 && (
-                        <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                        <div className="w-2 h-2 bg-green-400 rounded-full" />
                       )}
                       {workspace.ownerId === userId && (
                         <span className="px-1.5 py-0.5 bg-blue-500/20 text-blue-300 text-xs rounded">
@@ -346,7 +346,7 @@ const CollaborationDashboard = ({
 
                       <div className="flex items-center gap-2">
                         {member.isOnline && (
-                          <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                          <div className="w-2 h-2 bg-green-400 rounded-full" />
                         )}
                         <span className="text-xs text-slate-400">
                           Joined {formatDate(member.joinedAt)}

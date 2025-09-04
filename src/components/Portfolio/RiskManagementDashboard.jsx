@@ -1,4 +1,3 @@
-import React, { useState, useEffect, useMemo } from 'react';
 import {
   Shield,
   AlertTriangle,
@@ -15,6 +14,7 @@ import {
   Zap,
   BarChart3
 } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
 
 import portfolioAnalyticsService from '../../services/financial/portfolioAnalyticsService';
 
@@ -434,7 +434,7 @@ const RiskManagementDashboard = ({
                   return (
                     <div key={asset.symbol} className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                        <div className="w-3 h-3 bg-red-500 rounded-full" />
                         <span className="text-sm text-white">{asset.symbol}</span>
                       </div>
                       <div className="text-right">
@@ -466,7 +466,7 @@ const RiskManagementDashboard = ({
                       style={{
                         width: `${Math.min((riskMetrics.varPercentage / 100 / defaultThresholds.varLimit) * 100, 100)}%`
                       }}
-                    ></div>
+                    />
                   </div>
                 </div>
 
@@ -483,7 +483,7 @@ const RiskManagementDashboard = ({
                       style={{
                         width: `${Math.min((riskMetrics.volatility / defaultThresholds.volatilityLimit) * 100, 100)}%`
                       }}
-                    ></div>
+                    />
                   </div>
                 </div>
 
@@ -500,7 +500,7 @@ const RiskManagementDashboard = ({
                       style={{
                         width: `${Math.min((riskMetrics.concentration / defaultThresholds.concentrationLimit) * 100, 100)}%`
                       }}
-                    ></div>
+                    />
                   </div>
                 </div>
               </div>
@@ -534,7 +534,7 @@ const RiskManagementDashboard = ({
       {/* Loading State */}
       {loading && (
         <div className="flex items-center justify-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-500"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-500" />
           <span className="ml-3 text-slate-300">Calculating risk metrics...</span>
         </div>
       )}

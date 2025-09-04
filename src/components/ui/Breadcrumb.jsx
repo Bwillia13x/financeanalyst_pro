@@ -1,8 +1,3 @@
-import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { cn } from '../../utils/cn';
-
-// Enhanced Icons
 import {
   ChevronRight,
   Home,
@@ -20,6 +15,12 @@ import {
   Filter,
   ArrowLeft
 } from 'lucide-react';
+import React from 'react';
+import { Link, useLocation } from 'react-router-dom';
+
+import { cn } from '../../utils/cn';
+
+// Enhanced Icons
 
 /**
  * Enhanced Breadcrumb Navigation Component

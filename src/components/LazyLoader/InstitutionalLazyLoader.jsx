@@ -140,11 +140,11 @@ export const InstitutionalLazyLoader = ({
   const defaultFallback = (
     <div className="flex items-center justify-center p-8 bg-background-secondary border border-border rounded-lg">
       <div className="text-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-accent mx-auto mb-4"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-accent mx-auto mb-4" />
         <p className="text-sm text-foreground-secondary">Loading...</p>
         {priority === 'high' && (
           <div className="mt-2 w-24 h-1 bg-background-tertiary rounded-full overflow-hidden">
-            <div className="h-full bg-brand-accent animate-pulse"></div>
+            <div className="h-full bg-brand-accent animate-pulse" />
           </div>
         )}
       </div>
@@ -315,7 +315,7 @@ export function withInstitutionalLazyLoad(Component, options = {}) {
           className="min-h-[200px] flex items-center justify-center bg-background-secondary rounded-lg"
         >
           <div className="text-center text-foreground-muted">
-            <div className="animate-pulse w-8 h-8 bg-brand-accent/20 rounded-full mx-auto mb-2"></div>
+            <div className="animate-pulse w-8 h-8 bg-brand-accent/20 rounded-full mx-auto mb-2" />
             <p className="text-sm">Component will load when visible</p>
           </div>
         </div>

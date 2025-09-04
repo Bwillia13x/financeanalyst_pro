@@ -8,6 +8,7 @@ import IndustryAnalyticsDashboard from '../IndustryAnalytics/IndustryAnalyticsDa
 import OfflineIndicator from '../PWA/OfflineIndicator';
 import PWAInstallPrompt from '../PWA/PWAInstallPrompt';
 import RiskManagementDashboard from '../RiskManagement/RiskManagementDashboard';
+
 import Header from './Header';
 
 const MainLayout = () => {

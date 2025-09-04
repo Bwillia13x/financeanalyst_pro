@@ -1,4 +1,3 @@
-import React, { useState, useEffect, useMemo } from 'react';
 import {
   Leaf,
   Users,
@@ -18,6 +17,7 @@ import {
   Eye,
   EyeOff
 } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
 
 import esgService from '../../services/esg/esgService';
 
@@ -418,7 +418,7 @@ const ESGAnalysisDashboard = ({
                         style={{
                           width: `${(esgMetrics.carbonData.scope1 / esgMetrics.carbonData.totalEmissions) * 100}%`
                         }}
-                      ></div>
+                      />
                     </div>
                   </div>
 
@@ -435,7 +435,7 @@ const ESGAnalysisDashboard = ({
                         style={{
                           width: `${(esgMetrics.carbonData.scope2 / esgMetrics.carbonData.totalEmissions) * 100}%`
                         }}
-                      ></div>
+                      />
                     </div>
                   </div>
 
@@ -452,7 +452,7 @@ const ESGAnalysisDashboard = ({
                         style={{
                           width: `${(esgMetrics.carbonData.scope3 / esgMetrics.carbonData.totalEmissions) * 100}%`
                         }}
-                      ></div>
+                      />
                     </div>
                   </div>
                 </div>
@@ -585,7 +585,7 @@ const ESGAnalysisDashboard = ({
                     className="flex items-center justify-between p-3 bg-slate-600/50 rounded"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                      <div className="w-3 h-3 bg-blue-500 rounded-full" />
                       <span className="text-white font-medium">{asset.symbol}</span>
                     </div>
                     <div className="flex items-center gap-6">
@@ -660,7 +660,7 @@ const ESGAnalysisDashboard = ({
         {/* Loading State */}
         {loading && (
           <div className="flex items-center justify-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500" />
             <span className="ml-3 text-slate-300">Analyzing ESG data...</span>
           </div>
         )}

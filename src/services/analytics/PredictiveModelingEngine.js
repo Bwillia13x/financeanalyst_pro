@@ -34,7 +34,7 @@ class PredictiveModelingEngine extends FinancialAnalyticsEngine {
     }
 
     // Differencing (I component)
-    let differencedData = this.difference(data, params.d);
+    const differencedData = this.difference(data, params.d);
 
     // Fit ARIMA model
     const model = this.fitARIMA(differencedData, params.p, params.q);
@@ -147,11 +147,11 @@ class PredictiveModelingEngine extends FinancialAnalyticsEngine {
    */
   generateARIMAForecasts(model, originalData, params, periods) {
     const forecasts = [];
-    let currentData = [...originalData];
+    const currentData = [...originalData];
 
     for (let i = 0; i < periods; i++) {
       // Apply differencing
-      let differenced = this.difference(currentData, params.d);
+      const differenced = this.difference(currentData, params.d);
 
       // Generate forecast
       const forecast = this.generateARIMAStep(model, differenced, params);
@@ -414,7 +414,7 @@ class PredictiveModelingEngine extends FinancialAnalyticsEngine {
    */
   generateSimpleForecasts(fitted, alpha, periods) {
     const forecasts = [];
-    let lastValue = fitted[fitted.length - 1];
+    const lastValue = fitted[fitted.length - 1];
 
     for (let i = 0; i < periods; i++) {
       forecasts.push(lastValue);
@@ -495,7 +495,7 @@ class PredictiveModelingEngine extends FinancialAnalyticsEngine {
       },
       fitted,
       residuals,
-      diagnostics: this.performRegressionDiagnostics(residuals, fitted)
+      diagnostics: this.performResidualDiagnostics(residuals)
     };
 
     this.setCache(cacheKey, result);
@@ -924,7 +924,7 @@ class PredictiveModelingEngine extends FinancialAnalyticsEngine {
     const autocorrelation = this.calculateAutocorrelation(residuals, 1);
 
     return {
-      residuals: residuals,
+      residuals,
       mean: this.round(mean),
       std: this.round(std),
       autocorrelation: this.round(autocorrelation),

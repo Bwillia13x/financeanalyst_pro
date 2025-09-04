@@ -10,6 +10,12 @@ class VisualizationService {
     this.chartTemplates = new Map();
     this.visualizations = new Map();
     this.themes = new Map();
+
+    // Enhanced real-time features
+    this.realTimeConnections = new Map();
+    this.updateBuffers = new Map();
+    this.performanceMetrics = new Map();
+    this.persistenceQueue = [];
     this.isInitialized = false;
 
     this.initializeService();
@@ -413,23 +419,467 @@ class VisualizationService {
   }
 
   updateVisualizationData(visualizationId, newData, options = {}) {
+    const startTime = performance.now();
+
+    try {
+      const visualization = this.visualizations.get(visualizationId);
+      if (!visualization) {
+        throw new Error(`Visualization ${visualizationId} not found`);
+      }
+
+      // Buffer updates for performance
+      if (options.buffered) {
+        return this.bufferUpdate(visualizationId, newData, options);
+      }
+
+      // Apply update strategy
+      if (options.append) {
+        visualization.data = [...visualization.data, ...newData];
+      } else if (options.merge) {
+        visualization.data = this.mergeData(visualization.data, newData);
+      } else {
+        visualization.data = newData;
+      }
+
+      visualization.updatedAt = new Date().toISOString();
+      visualization.version = (visualization.version || 0) + 1;
+
+      this.visualizations.set(visualizationId, visualization);
+
+      // Record performance metrics
+      this.recordPerformanceMetric(visualizationId, 'update', performance.now() - startTime);
+
+      // Queue for persistence if needed
+      if (options.persist) {
+        this.queueForPersistence(visualizationId, visualization);
+      }
+
+      // Notify real-time subscribers
+      this.notifyRealTimeSubscribers(visualizationId, {
+        type: 'data_updated',
+        data: visualization,
+        options
+      });
+
+      return visualization;
+    } catch (error) {
+      this.recordPerformanceMetric(visualizationId, 'update_error', performance.now() - startTime);
+      throw error;
+    }
+  }
+
+  /**
+   * Buffer updates for performance optimization
+   */
+  bufferUpdate(visualizationId, newData, options) {
+    const bufferKey = `${visualizationId}_buffer`;
+    let buffer = this.updateBuffers.get(bufferKey);
+
+    if (!buffer) {
+      buffer = {
+        updates: [],
+        timeoutId: null,
+        lastUpdate: Date.now()
+      };
+      this.updateBuffers.set(bufferKey, buffer);
+    }
+
+    buffer.updates.push({ data: newData, options });
+
+    // Clear existing timeout
+    if (buffer.timeoutId) {
+      clearTimeout(buffer.timeoutId);
+    }
+
+    // Set new timeout for batched update
+    buffer.timeoutId = setTimeout(() => {
+      this.processBufferedUpdates(visualizationId);
+    }, options.bufferDelay || 100);
+
+    return { buffered: true, bufferSize: buffer.updates.length };
+  }
+
+  /**
+   * Process buffered updates
+   */
+  async processBufferedUpdates(visualizationId) {
+    const bufferKey = `${visualizationId}_buffer`;
+    const buffer = this.updateBuffers.get(bufferKey);
+
+    if (!buffer || buffer.updates.length === 0) return;
+
+    const startTime = performance.now();
     const visualization = this.visualizations.get(visualizationId);
-    if (!visualization) {
-      throw new Error(`Visualization ${visualizationId} not found`);
+
+    if (!visualization) return;
+
+    try {
+      // Merge all buffered updates
+      let mergedData = visualization.data;
+
+      for (const update of buffer.updates) {
+        if (update.options.append) {
+          mergedData = [...mergedData, ...update.data];
+        } else if (update.options.merge) {
+          mergedData = this.mergeData(mergedData, update.data);
+        } else {
+          mergedData = update.data;
+        }
+      }
+
+      // Apply the merged update
+      visualization.data = mergedData;
+      visualization.updatedAt = new Date().toISOString();
+      visualization.version = (visualization.version || 0) + 1;
+
+      this.visualizations.set(visualizationId, visualization);
+
+      // Record performance metrics
+      this.recordPerformanceMetric(
+        visualizationId,
+        'buffered_update',
+        performance.now() - startTime,
+        buffer.updates.length
+      );
+
+      // Queue for persistence if any update required it
+      const needsPersistence = buffer.updates.some(u => u.options.persist);
+      if (needsPersistence) {
+        this.queueForPersistence(visualizationId, visualization);
+      }
+
+      // Notify real-time subscribers
+      this.notifyRealTimeSubscribers(visualizationId, {
+        type: 'buffered_data_updated',
+        data: visualization,
+        updatesProcessed: buffer.updates.length
+      });
+    } finally {
+      // Clean up buffer
+      this.updateBuffers.delete(bufferKey);
+    }
+  }
+
+  /**
+   * Merge data objects
+   */
+  mergeData(existingData, newData) {
+    if (!existingData || !newData) return newData || existingData;
+
+    if (Array.isArray(existingData) && Array.isArray(newData)) {
+      // Merge arrays by key if objects, otherwise concatenate
+      if (existingData.length > 0 && typeof existingData[0] === 'object') {
+        const keyField =
+          'id' in existingData[0]
+            ? 'id'
+            : 'symbol' in existingData[0]
+              ? 'symbol'
+              : 'date' in existingData[0]
+                ? 'date'
+                : null;
+
+        if (keyField) {
+          const merged = [...existingData];
+          newData.forEach(newItem => {
+            const existingIndex = merged.findIndex(item => item[keyField] === newItem[keyField]);
+            if (existingIndex >= 0) {
+              merged[existingIndex] = { ...merged[existingIndex], ...newItem };
+            } else {
+              merged.push(newItem);
+            }
+          });
+          return merged;
+        }
+      }
+      return [...existingData, ...newData];
     }
 
-    if (options.append) {
-      visualization.data = [...visualization.data, ...newData];
-    } else if (options.merge) {
-      visualization.data = this.mergeData(visualization.data, newData);
-    } else {
-      visualization.data = newData;
+    if (typeof existingData === 'object' && typeof newData === 'object') {
+      return { ...existingData, ...newData };
     }
 
-    visualization.updatedAt = new Date().toISOString();
-    this.visualizations.set(visualizationId, visualization);
+    return newData;
+  }
 
-    return visualization;
+  /**
+   * Real-time subscription management
+   */
+  subscribeToVisualization(visualizationId, callback, options = {}) {
+    const connectionId = `${visualizationId}_${Date.now()}_${Math.random()}`;
+    const connection = {
+      id: connectionId,
+      visualizationId,
+      callback,
+      options,
+      subscribedAt: Date.now(),
+      lastActivity: Date.now(),
+      messageCount: 0
+    };
+
+    if (!this.realTimeConnections.has(visualizationId)) {
+      this.realTimeConnections.set(visualizationId, new Map());
+    }
+
+    this.realTimeConnections.get(visualizationId).set(connectionId, connection);
+
+    // Set up heartbeat for connection monitoring
+    if (options.heartbeatInterval) {
+      connection.heartbeatInterval = setInterval(() => {
+        this.notifyRealTimeSubscribers(
+          visualizationId,
+          {
+            type: 'heartbeat',
+            connectionId,
+            timestamp: Date.now()
+          },
+          [connectionId]
+        );
+      }, options.heartbeatInterval);
+    }
+
+    return connectionId;
+  }
+
+  unsubscribeFromVisualization(connectionId) {
+    for (const [visualizationId, connections] of this.realTimeConnections.entries()) {
+      if (connections.has(connectionId)) {
+        const connection = connections.get(connectionId);
+
+        // Clear heartbeat interval
+        if (connection.heartbeatInterval) {
+          clearInterval(connection.heartbeatInterval);
+        }
+
+        connections.delete(connectionId);
+
+        // Clean up empty connection maps
+        if (connections.size === 0) {
+          this.realTimeConnections.delete(visualizationId);
+        }
+
+        return true;
+      }
+    }
+    return false;
+  }
+
+  notifyRealTimeSubscribers(visualizationId, message, specificConnections = null) {
+    const connections = this.realTimeConnections.get(visualizationId);
+    if (!connections) return 0;
+
+    let notified = 0;
+    const targetConnections = specificConnections || Array.from(connections.keys());
+
+    targetConnections.forEach(connectionId => {
+      const connection = connections.get(connectionId);
+      if (connection) {
+        try {
+          connection.callback(message);
+          connection.lastActivity = Date.now();
+          connection.messageCount++;
+          notified++;
+        } catch (error) {
+          console.error(`Error notifying real-time subscriber ${connectionId}:`, error);
+          // Remove broken connections
+          this.unsubscribeFromVisualization(connectionId);
+        }
+      }
+    });
+
+    return notified;
+  }
+
+  /**
+   * Performance monitoring
+   */
+  recordPerformanceMetric(visualizationId, operation, duration, additionalData = null) {
+    const metric = {
+      visualizationId,
+      operation,
+      duration,
+      timestamp: Date.now(),
+      additionalData
+    };
+
+    if (!this.performanceMetrics.has(visualizationId)) {
+      this.performanceMetrics.set(visualizationId, []);
+    }
+
+    const metrics = this.performanceMetrics.get(visualizationId);
+    metrics.push(metric);
+
+    // Keep only last 100 metrics per visualization
+    if (metrics.length > 100) {
+      metrics.shift();
+    }
+
+    // Log significant performance issues
+    if (duration > 1000) {
+      // More than 1 second
+      console.warn(`Performance issue in ${visualizationId}: ${operation} took ${duration}ms`);
+    }
+
+    return metric;
+  }
+
+  getPerformanceMetrics(visualizationId, operation = null, timeRange = 3600000) {
+    // Last hour
+    const metrics = this.performanceMetrics.get(visualizationId) || [];
+    const cutoffTime = Date.now() - timeRange;
+
+    let filteredMetrics = metrics.filter(m => m.timestamp > cutoffTime);
+
+    if (operation) {
+      filteredMetrics = filteredMetrics.filter(m => m.operation === operation);
+    }
+
+    if (filteredMetrics.length === 0) return null;
+
+    const durations = filteredMetrics.map(m => m.duration);
+
+    return {
+      count: filteredMetrics.length,
+      averageDuration: durations.reduce((sum, d) => sum + d, 0) / durations.length,
+      minDuration: Math.min(...durations),
+      maxDuration: Math.max(...durations),
+      p95Duration: this.calculatePercentile(durations, 95),
+      lastUpdated: Math.max(...filteredMetrics.map(m => m.timestamp))
+    };
+  }
+
+  calculatePercentile(values, percentile) {
+    const sorted = [...values].sort((a, b) => a - b);
+    const index = (percentile / 100) * (sorted.length - 1);
+    const lower = Math.floor(index);
+    const upper = Math.ceil(index);
+
+    if (lower === upper) return sorted[lower];
+
+    const weight = index - lower;
+    return sorted[lower] * (1 - weight) + sorted[upper] * weight;
+  }
+
+  /**
+   * Persistence queue management
+   */
+  queueForPersistence(visualizationId, data) {
+    this.persistenceQueue.push({
+      id: visualizationId,
+      data: { ...data },
+      timestamp: Date.now(),
+      retries: 0
+    });
+
+    // Trigger persistence processing (could be debounced)
+    this.processPersistenceQueue();
+  }
+
+  async processPersistenceQueue() {
+    if (this.persistenceQueue.length === 0) return;
+
+    // Process in batches to avoid overwhelming storage
+    const batchSize = 5;
+    const batch = this.persistenceQueue.splice(0, batchSize);
+
+    for (const item of batch) {
+      try {
+        await this.persistVisualization(item.id, item.data);
+        console.log(`Persisted visualization ${item.id}`);
+      } catch (error) {
+        item.retries++;
+        if (item.retries < 3) {
+          // Re-queue with backoff
+          setTimeout(
+            () => {
+              this.persistenceQueue.unshift(item);
+            },
+            Math.pow(2, item.retries) * 1000
+          );
+        } else {
+          console.error(
+            `Failed to persist visualization ${item.id} after ${item.retries} retries:`,
+            error
+          );
+        }
+      }
+    }
+  }
+
+  async persistVisualization(visualizationId, data) {
+    // In a real implementation, this would save to a database or local storage
+    try {
+      const key = `viz_${visualizationId}`;
+      const serializedData = JSON.stringify({
+        ...data,
+        persistedAt: new Date().toISOString()
+      });
+
+      // Use localStorage for demo purposes
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem(key, serializedData);
+      }
+
+      return true;
+    } catch (error) {
+      throw new Error(`Persistence failed for ${visualizationId}: ${error.message}`);
+    }
+  }
+
+  async loadPersistedVisualization(visualizationId) {
+    try {
+      const key = `viz_${visualizationId}`;
+
+      if (typeof localStorage !== 'undefined') {
+        const data = localStorage.getItem(key);
+        if (data) {
+          const parsed = JSON.parse(data);
+          this.visualizations.set(visualizationId, parsed);
+          return parsed;
+        }
+      }
+
+      return null;
+    } catch (error) {
+      console.error(`Failed to load persisted visualization ${visualizationId}:`, error);
+      return null;
+    }
+  }
+
+  /**
+   * Connection health monitoring
+   */
+  getConnectionHealth(visualizationId = null) {
+    if (visualizationId) {
+      const connections = this.realTimeConnections.get(visualizationId);
+      if (!connections) return { status: 'no_connections' };
+
+      const connectionList = Array.from(connections.values());
+      const activeConnections = connectionList.filter(
+        c => Date.now() - c.lastActivity < 30000 // Active within 30 seconds
+      );
+
+      return {
+        totalConnections: connectionList.length,
+        activeConnections: activeConnections.length,
+        averageMessageCount:
+          connectionList.reduce((sum, c) => sum + c.messageCount, 0) / connectionList.length,
+        oldestConnection: Math.min(...connectionList.map(c => c.subscribedAt)),
+        newestConnection: Math.max(...connectionList.map(c => c.subscribedAt))
+      };
+    }
+
+    // Overall health
+    const allConnections = Array.from(this.realTimeConnections.values()).flatMap(connections =>
+      Array.from(connections.values())
+    );
+
+    return {
+      totalVisualizations: this.realTimeConnections.size,
+      totalConnections: allConnections.length,
+      activeConnections: allConnections.filter(c => Date.now() - c.lastActivity < 30000).length,
+      persistenceQueueSize: this.persistenceQueue.length,
+      updateBuffersActive: this.updateBuffers.size
+    };
   }
 
   generateChart(visualizationConfig) {

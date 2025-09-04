@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+
 import Header from '../components/ui/Header';
 import {
   PulseDot,
@@ -313,7 +314,8 @@ const MicroInteractionsDemo = () => {
   <FinancialTableSkeleton rows={10} />
 ) : (
   <DataTable data={data} />
-)}`}</pre>
+)}`}
+              </pre>
             </div>
 
             <div className="bg-slate-900 text-slate-100 p-6 rounded-lg">
@@ -330,7 +332,8 @@ const MicroInteractionsDemo = () => {
 <StatusIndicator
   status={connectionStatus}
   showLabel
-/>`}</pre>
+/>`}
+              </pre>
             </div>
           </div>
         </div>

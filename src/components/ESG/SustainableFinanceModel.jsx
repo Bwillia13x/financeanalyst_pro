@@ -1,4 +1,3 @@
-import React, { useState, useEffect, useMemo } from 'react';
 import {
   TrendingUp,
   TrendingDown,
@@ -15,6 +14,7 @@ import {
   Eye,
   EyeOff
 } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
 
 import esgService from '../../services/esg/esgService';
 
@@ -62,7 +62,7 @@ const SustainableFinanceModel = ({
       const results = await esgService.modelSustainablePortfolio(defaultPortfolio, {
         carbonReductionTarget: defaultTargets.carbonReductionTarget,
         esgScoreTarget: defaultTargets.esgScoreTarget,
-        timeHorizon: timeHorizon
+        timeHorizon
       });
 
       setModelResults(results);
@@ -349,7 +349,7 @@ const SustainableFinanceModel = ({
                     <div
                       className="bg-blue-500 h-3 rounded-full"
                       style={{ width: `${(scenarioMetrics.currentESG / 100) * 100}%` }}
-                    ></div>
+                    />
                   </div>
                 </div>
 
@@ -362,7 +362,7 @@ const SustainableFinanceModel = ({
                     <div
                       className="bg-green-500 h-3 rounded-full"
                       style={{ width: `${(scenarioMetrics.projectedESG / 100) * 100}%` }}
-                    ></div>
+                    />
                   </div>
                 </div>
 
@@ -375,7 +375,7 @@ const SustainableFinanceModel = ({
                     <div
                       className="bg-yellow-500 h-3 rounded-full"
                       style={{ width: `${(defaultTargets.esgScoreTarget / 100) * 100}%` }}
-                    ></div>
+                    />
                   </div>
                 </div>
               </div>
@@ -395,7 +395,7 @@ const SustainableFinanceModel = ({
                       style={{
                         width: `${Math.min((scenarioMetrics.currentCarbon / 200) * 100, 100)}%`
                       }}
-                    ></div>
+                    />
                   </div>
                 </div>
 
@@ -410,7 +410,7 @@ const SustainableFinanceModel = ({
                       style={{
                         width: `${Math.min((scenarioMetrics.projectedCarbon / 200) * 100, 100)}%`
                       }}
-                    ></div>
+                    />
                   </div>
                 </div>
 
@@ -425,7 +425,7 @@ const SustainableFinanceModel = ({
                     <div
                       className="bg-yellow-500 h-3 rounded-full"
                       style={{ width: `${defaultTargets.carbonReductionTarget * 100}%` }}
-                    ></div>
+                    />
                   </div>
                 </div>
               </div>
@@ -493,7 +493,7 @@ const SustainableFinanceModel = ({
                               ? 'bg-yellow-500'
                               : 'bg-green-500'
                         }`}
-                      ></div>
+                      />
                       <h5 className="text-white font-medium">{projection.scenario}</h5>
                     </div>
 
@@ -599,7 +599,7 @@ const SustainableFinanceModel = ({
       {/* Loading State */}
       {loading && (
         <div className="flex items-center justify-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500" />
           <span className="ml-3 text-slate-300">Modeling sustainable finance scenario...</span>
         </div>
       )}

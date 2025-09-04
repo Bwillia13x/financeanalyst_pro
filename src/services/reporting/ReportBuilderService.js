@@ -848,7 +848,7 @@ class ReportBuilderService {
       sections: report.sections,
       data: report.data,
       metadata: report.metadata,
-      theme: theme,
+      theme,
       generated: new Date()
     };
 

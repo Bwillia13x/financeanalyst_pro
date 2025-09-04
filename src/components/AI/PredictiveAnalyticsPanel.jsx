@@ -1,4 +1,3 @@
-import React, { useState, useEffect, useMemo } from 'react';
 import {
   TrendingUp,
   TrendingDown,
@@ -10,6 +9,7 @@ import {
   Clock,
   Zap
 } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
 
 import advancedAIService from '../../services/ai/advancedAIService';
 
@@ -136,7 +136,7 @@ const PredictiveAnalyticsPanel = ({
       {/* Loading State */}
       {loading && (
         <div className="p-8 text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500 mx-auto mb-4" />
           <p className="text-slate-300">Generating predictions...</p>
         </div>
       )}
@@ -177,7 +177,7 @@ const PredictiveAnalyticsPanel = ({
               <div className="text-xs text-slate-400">Avg Confidence</div>
             </div>
             <div className="text-center">
-              <div className={`flex items-center justify-center gap-1`}>
+              <div className={'flex items-center justify-center gap-1'}>
                 {trendInfo && <trendInfo.icon className={`w-4 h-4 ${trendInfo.color}`} />}
                 <span className={`text-xl font-bold ${trendInfo.color}`}>
                   {predictionStats.trend > 0 ? '+' : ''}

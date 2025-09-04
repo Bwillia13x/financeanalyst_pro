@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card';
-import Button from '../components/ui/Button';
-import ReportGallery from '../components/Reports/ReportGallery';
+
 import ReportBuilder from '../components/Reports/ReportBuilder';
+import ReportGallery from '../components/Reports/ReportGallery';
+import Button from '../components/ui/Button';
+import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card';
 import { reportBuilderService } from '../services/reporting/ReportBuilderService';
 import { scheduledReportsService } from '../services/reporting/ScheduledReportsService';
 
@@ -330,7 +331,7 @@ const Reports = () => {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-accent mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-accent mx-auto mb-4" />
           <p className="text-foreground-secondary">Processing...</p>
         </div>
       </div>

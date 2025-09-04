@@ -2,6 +2,7 @@ import React, { useState, useCallback } from 'react';
 
 import { cn } from '../../../utils/cn';
 import { Card, CardContent, CardHeader, CardTitle } from '../Card';
+
 import { CHART_THEME, EnhancedTooltip, ChartControls } from './ChartTheme';
 
 const SensitivityHeatmap = ({

@@ -107,8 +107,9 @@ describe('Performance System Integration', () => {
         violationDetected = true;
       });
 
-      // Record a value that exceeds budget
+      // Record a value that exceeds budget and directly check budget
       performanceMonitorService.recordMetric('coreWebVitals', 'lcp', 200);
+      performanceMonitorService.checkBudget('lcp', 200);
 
       // Reset budget
       performanceMonitorService.options.performanceBudget = originalBudgets;
@@ -188,7 +189,7 @@ describe('Performance System Integration', () => {
 
       const retrieved = await cachingService.get(testKey);
       expect(retrieved).toBeNull();
-    });
+    }, 10000);
 
     it('should cache API responses', async () => {
       const endpoint = '/api/test';

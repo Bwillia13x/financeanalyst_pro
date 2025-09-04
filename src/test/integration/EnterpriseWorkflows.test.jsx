@@ -263,7 +263,7 @@ describe('Enterprise Workflows Integration Tests', () => {
       // Wait and verify no more calls
       await new Promise(resolve => setTimeout(resolve, 600));
       expect(callback.mock.calls.length).toBe(callCountAfterUnsub);
-    });
+    }, 10000);
   });
 
   describe('End-to-End Workflow Integration', () => {

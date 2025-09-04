@@ -1,7 +1,3 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { cn } from '../../utils/cn';
-
-// Icons
 import {
   Search,
   Filter,
@@ -20,6 +16,11 @@ import {
   ArrowUp,
   ArrowDown
 } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+
+import { cn } from '../../utils/cn';
+
+// Icons
 
 /**
  * Enhanced Search and Discovery Component
@@ -231,7 +232,7 @@ export const SearchComponent = ({
       return;
     }
 
-    let filteredResults = mockSearchResults.filter(result => {
+    const filteredResults = mockSearchResults.filter(result => {
       const matchesQuery =
         result.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         result.description.toLowerCase().includes(searchQuery.toLowerCase());

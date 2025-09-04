@@ -630,7 +630,7 @@ class MonitoringService {
     if (this.enableAnalytics && !this.isTestMode) {
       this.trackEvent('feature_usage', {
         feature_name: featureName,
-        action: action,
+        action,
         session_id: this.getSessionId(),
         timestamp: new Date().toISOString(),
         ...metadata
@@ -644,8 +644,8 @@ class MonitoringService {
   trackUserJourney(step, funnel = 'main', metadata = {}) {
     if (this.enableAnalytics && !this.isTestMode) {
       this.trackEvent('user_journey', {
-        step: step,
-        funnel: funnel,
+        step,
+        funnel,
         session_id: this.getSessionId(),
         timestamp: new Date().toISOString(),
         ...metadata
@@ -698,8 +698,8 @@ class MonitoringService {
     if (this.enableAnalytics && !this.isTestMode) {
       this.trackEvent('business_metric', {
         metric_name: metricName,
-        value: value,
-        unit: unit,
+        value,
+        unit,
         session_id: this.getSessionId(),
         timestamp: new Date().toISOString(),
         ...metadata

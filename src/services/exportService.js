@@ -4,6 +4,7 @@
  */
 
 import jsPDF from 'jspdf';
+
 import XLSX from '../utils/exceljs-compat.js';
 import 'jspdf-autotable';
 

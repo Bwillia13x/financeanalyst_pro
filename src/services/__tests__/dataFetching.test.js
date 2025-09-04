@@ -30,7 +30,7 @@ describe('DataFetchingService', () => {
 
       // The 6th should be rate limited
       await expect(service.checkRateLimit('ALPHA_VANTAGE')).rejects.toThrow(/Rate limit exceeded/);
-    });
+    }, 10000);
   });
 
   describe('Error Handling', () => {

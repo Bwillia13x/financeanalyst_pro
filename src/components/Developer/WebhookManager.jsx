@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from 'react';
 import {
   Zap,
   Plus,
@@ -13,6 +12,7 @@ import {
   Eye,
   EyeOff
 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 
 const WebhookManager = ({ className = '' }) => {
   const [webhooks, setWebhooks] = useState([

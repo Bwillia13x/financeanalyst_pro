@@ -144,7 +144,7 @@ class PerformanceMonitorService {
 
       this.recordMetric('bundleMetrics', 'initialLoad', {
         totalTime: bundleLoadTime,
-        domContentTime: domContentTime,
+        domContentTime,
         domInteractive: entry.domInteractive - entry.fetchStart
       });
     });
@@ -428,6 +428,7 @@ class PerformanceMonitorService {
       bundleMetrics: this.getCategorySummary('bundleMetrics'),
       memoryMetrics: this.getCategorySummary('memoryMetrics'),
       networkMetrics: this.getCategorySummary('networkMetrics'),
+      custom: this.getCategorySummary('custom'),
       budgets: {
         exceeded: Array.from(this.budgets.exceeded),
         warnings: Array.from(this.budgets.warnings)

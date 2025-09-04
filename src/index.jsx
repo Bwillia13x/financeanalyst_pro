@@ -1,12 +1,45 @@
+// Polyfills for cross-browser compatibility
+import 'core-js/stable';
+import 'regenerator-runtime/runtime';
+
+// Conditionally load polyfills only if needed
+const loadPolyfills = async () => {
+  if (typeof Promise === 'undefined') {
+    const promisePolyfill = await import('promise-polyfill');
+    // eslint-disable-next-line no-global-assign
+    Promise = promisePolyfill.default;
+  }
+
+  if (typeof fetch === 'undefined') {
+    await import('whatwg-fetch');
+  }
+};
+
+// Load polyfills asynchronously
+loadPolyfills().catch(console.warn);
+
+if (!Array.prototype.includes) {
+  Array.prototype.includes = function (searchElement) {
+    return this.indexOf(searchElement) !== -1;
+  };
+}
+
+if (!String.prototype.includes) {
+  String.prototype.includes = function (searchString) {
+    return this.indexOf(searchString) !== -1;
+  };
+}
+
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
+
 import App from './App';
+import analytics, { trackFeatureAccess } from './utils/analytics.jsx';
 import { initializePerformanceMonitoring } from './utils/performanceMonitoring';
-import { initializeSecurity } from './utils/securityHeaders';
 import PWAService from './utils/pwaService';
+import { initializeSecurity } from './utils/securityHeaders';
 import { unregisterSW } from './utils/serviceWorker';
-import analytics, { trackFeatureAccess, trackUserJourney } from './utils/analytics';
 
 const container = document.getElementById('root');
 const root = createRoot(container);
@@ -18,7 +51,7 @@ initializePerformanceMonitoring();
 analytics.initializeAnalytics();
 
 // Track app initialization
-trackUserJourney('app_initialized', {
+trackFeatureAccess('app_initialized', {
   userAgent: navigator.userAgent,
   timestamp: new Date().toISOString(),
   url: window.location.href

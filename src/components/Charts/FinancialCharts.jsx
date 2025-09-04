@@ -1,3 +1,4 @@
+import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import React, { useMemo } from 'react';
 import {
   ComposedChart,
@@ -14,7 +15,6 @@ import {
   Cell,
   ReferenceLine
 } from 'recharts';
-import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 
 import { cn } from '../../utils/cn';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/Card';

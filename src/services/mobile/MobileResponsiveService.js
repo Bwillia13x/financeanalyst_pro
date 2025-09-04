@@ -103,10 +103,10 @@ class MobileResponsiveService {
     this.currentDevice = {
       type: deviceType,
       category: deviceCategory,
-      userAgent: userAgent,
-      screenWidth: screenWidth,
-      screenHeight: screenHeight,
-      pixelRatio: pixelRatio,
+      userAgent,
+      screenWidth,
+      screenHeight,
+      pixelRatio,
       touchSupport: 'ontouchstart' in window || navigator.maxTouchPoints > 0,
       isMobile: deviceType === 'mobile',
       isTablet: deviceType === 'tablet',
@@ -127,7 +127,7 @@ class MobileResponsiveService {
     const angle = orientation ? orientation.angle : window.innerWidth > window.innerHeight ? 90 : 0;
 
     this.currentOrientation = {
-      angle: angle,
+      angle,
       type: angle === 0 || angle === 180 ? 'portrait' : 'landscape',
       isPortrait: angle === 0 || angle === 180,
       isLandscape: angle === 90 || angle === 270
@@ -529,7 +529,7 @@ class MobileResponsiveService {
         this.emit('breakpointChange', {
           from: previousBreakpoint,
           to: currentBreakpoint,
-          width: width
+          width
         });
       }
     };

@@ -1,4 +1,3 @@
-import React, { useState, useEffect, useMemo } from 'react';
 import {
   BarChart3,
   TrendingUp,
@@ -12,6 +11,7 @@ import {
   Target,
   Zap
 } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
 
 import derivativesService from '../../services/financial/derivativesService';
 
@@ -441,7 +441,7 @@ const DerivativesAnalysisDashboard = ({
       {/* Loading State */}
       {loading && (
         <div className="flex items-center justify-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500" />
           <span className="ml-3 text-slate-300">Calculating derivative value...</span>
         </div>
       )}

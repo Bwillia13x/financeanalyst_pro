@@ -2,6 +2,9 @@ import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 // Import all analytics engines
+import InstitutionalChart, { CHART_TYPES } from '../components/Charts/InstitutionalChart';
+import Button from '../components/ui/Button';
+import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card';
 import {
   financialAnalyticsEngine,
   RiskAssessmentEngine,
@@ -11,9 +14,6 @@ import {
 } from '../services/analytics';
 
 // Import UI components
-import Button from '../components/ui/Button';
-import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card';
-import InstitutionalChart, { CHART_TYPES } from '../components/Charts/InstitutionalChart';
 
 // Initialize analytics engines
 const riskEngine = new RiskAssessmentEngine();
@@ -436,7 +436,7 @@ const AdvancedAnalyticsDemo = () => {
           {isAnalyzing && (
             <div className="mt-4 text-center">
               <div className="inline-flex items-center gap-2 text-foreground-secondary">
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-brand-accent"></div>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-brand-accent" />
                 Running analysis...
               </div>
             </div>
@@ -656,7 +656,7 @@ const AdvancedAnalyticsDemo = () => {
                     className="flex items-center justify-between p-3 border border-border rounded-md"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+                      <div className="w-3 h-3 rounded-full bg-blue-500" />
                       <span className="font-medium">{asset.asset}</span>
                     </div>
 

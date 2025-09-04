@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '../ui/Card';
-import Button from '../ui/Button';
-import Input from '../ui/Input';
+
 import { collaborationService } from '../../services/collaboration/CollaborationService';
 import { presenceSystem } from '../../services/collaboration/PresenceSystem';
+import Button from '../ui/Button';
+import { Card, CardHeader, CardTitle, CardContent } from '../ui/Card';
+import Input from '../ui/Input';
 
 const CollaborativeEditor = ({ documentId, userId, initialContent = {} }) => {
   const [content, setContent] = useState(initialContent);

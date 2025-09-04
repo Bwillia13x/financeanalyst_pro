@@ -484,11 +484,11 @@ class RealtimeDataService {
       alphavantage: {
         action: 'subscribe',
         symbols: [symbol],
-        type: type
+        type
       },
       fmp: {
         type: 'subscribe',
-        symbol: symbol,
+        symbol,
         event: type
       },
       yahoo: {
@@ -515,11 +515,11 @@ class RealtimeDataService {
       alphavantage: {
         action: 'unsubscribe',
         symbols: [symbol],
-        type: type
+        type
       },
       fmp: {
         type: 'unsubscribe',
-        symbol: symbol,
+        symbol,
         event: type
       },
       yahoo: {

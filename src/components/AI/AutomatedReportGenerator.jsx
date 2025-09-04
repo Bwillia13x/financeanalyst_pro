@@ -1,4 +1,3 @@
-import React, { useState, useRef } from 'react';
 import {
   FileText,
   Download,
@@ -11,6 +10,7 @@ import {
   AlertTriangle,
   CheckCircle
 } from 'lucide-react';
+import React, { useState, useRef } from 'react';
 
 import advancedAIService from '../../services/ai/advancedAIService';
 
@@ -410,7 +410,7 @@ ${insights?.insights?.[0]?.action || 'Monitor key performance indicators and mar
         >
           {isGenerating ? (
             <>
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white" />
               Generating Report...
             </>
           ) : (

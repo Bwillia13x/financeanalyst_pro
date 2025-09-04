@@ -1,27 +1,3 @@
-import React, { useState } from 'react';
-import Header from '../components/ui/Header';
-
-// Empty State Components
-import {
-  EmptyState,
-  PortfolioEmptyState,
-  AnalysisEmptyState,
-  SearchEmptyState,
-  ChartEmptyState,
-  ErrorEmptyState,
-  NetworkEmptyState,
-  FileEmptyState,
-  FolderEmptyState,
-  MessageEmptyState,
-  CompactEmptyState,
-  IllustratedEmptyState,
-  EmptyStateIcons
-} from '../components/ui/EmptyState';
-
-// UI Components
-import Button from '../components/ui/Button';
-
-// Icons
 import {
   TrendingUp,
   BarChart3,
@@ -44,6 +20,31 @@ import {
   Clock,
   MessageCircle
 } from 'lucide-react';
+import React, { useState } from 'react';
+
+import Button from '../components/ui/Button';
+import {
+  EmptyState,
+  PortfolioEmptyState,
+  AnalysisEmptyState,
+  SearchEmptyState,
+  ChartEmptyState,
+  ErrorEmptyState,
+  NetworkEmptyState,
+  FileEmptyState,
+  FolderEmptyState,
+  MessageEmptyState,
+  CompactEmptyState,
+  IllustratedEmptyState,
+  EmptyStateIcons
+} from '../components/ui/EmptyState';
+import Header from '../components/ui/Header';
+
+// Empty State Components
+
+// UI Components
+
+// Icons
 
 // Sample Illustrations
 const PortfolioIllustration = () => (

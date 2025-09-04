@@ -1,30 +1,3 @@
-import React, { useState } from 'react';
-import Header from '../components/ui/Header';
-
-// Breadcrumb Components
-import {
-  Breadcrumb,
-  BreadcrumbCompact,
-  BreadcrumbWithSearch,
-  BreadcrumbWithActions,
-  NavigationProvider,
-  useBreadcrumbs,
-  pageIcons,
-  breadcrumbLabels
-} from '../components/ui/Breadcrumb';
-
-// Search and Discovery Components
-import {
-  SearchComponent,
-  SearchCommandPalette,
-  DiscoveryPanel,
-  NavigationHierarchy
-} from '../components/ui/SearchAndDiscovery';
-
-// UI Components
-import Button from '../components/ui/Button';
-
-// Icons
 import {
   Home,
   Search,
@@ -52,6 +25,34 @@ import {
   Share,
   Edit
 } from 'lucide-react';
+import React, { useState } from 'react';
+
+import {
+  Breadcrumb,
+  BreadcrumbCompact,
+  BreadcrumbWithSearch,
+  BreadcrumbWithActions,
+  NavigationProvider,
+  useBreadcrumbs,
+  pageIcons,
+  breadcrumbLabels
+} from '../components/ui/Breadcrumb';
+import Button from '../components/ui/Button';
+import Header from '../components/ui/Header';
+
+// Breadcrumb Components
+
+// Search and Discovery Components
+import {
+  SearchComponent,
+  SearchCommandPalette,
+  DiscoveryPanel,
+  NavigationHierarchy
+} from '../components/ui/SearchAndDiscovery';
+
+// UI Components
+
+// Icons
 
 // Sample data for demonstrations
 const breadcrumbExamples = [

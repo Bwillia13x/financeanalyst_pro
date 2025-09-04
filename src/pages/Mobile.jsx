@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card';
-import Button from '../components/ui/Button';
+
 import MobileDashboard from '../components/Mobile/MobileDashboard';
+import Button from '../components/ui/Button';
+import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card';
+import { mobileNavigationService } from '../services/mobile/MobileNavigationService';
+import { mobilePerformanceService } from '../services/mobile/MobilePerformanceService';
 import { mobileResponsiveService } from '../services/mobile/MobileResponsiveService';
+import { offlineStorageService } from '../services/mobile/OfflineStorageService';
+import { pushNotificationService } from '../services/mobile/PushNotificationService';
 import { pwaService } from '../services/mobile/PWAService';
 import { touchInteractionService } from '../services/mobile/TouchInteractionService';
-import { mobileNavigationService } from '../services/mobile/MobileNavigationService';
-import { pushNotificationService } from '../services/mobile/PushNotificationService';
-import { offlineStorageService } from '../services/mobile/OfflineStorageService';
-import { mobilePerformanceService } from '../services/mobile/MobilePerformanceService';
 
 const Mobile = () => {
   const [activeSection, setActiveSection] = useState('dashboard');
@@ -222,7 +223,7 @@ const Mobile = () => {
         <div className="max-w-7xl mx-auto px-6 py-8">
           <div className="text-center">
             <h2 className="text-2xl font-bold text-foreground mb-4">Mobile Services</h2>
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-accent mx-auto mb-4"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-accent mx-auto mb-4" />
             <p className="text-foreground-secondary mb-6">
               Initializing mobile optimization services...
             </p>

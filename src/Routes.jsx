@@ -1,5 +1,6 @@
 import React, { Suspense, lazy } from 'react';
 import { Routes, Route } from 'react-router-dom';
+
 import LoadingSpinner from './components/ui/LoadingSpinner';
 import MainLayout from './components/ui/MainLayout';
 import NotFound from './pages/NotFound';

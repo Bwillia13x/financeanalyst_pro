@@ -1,7 +1,3 @@
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
-// Temporarily disabled drag and drop for build compatibility
-// import { DndContext } from '@dnd-kit/core';
-// import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import {
   Plus,
   Settings,
@@ -18,6 +14,10 @@ import {
   LineChart,
   Activity
 } from 'lucide-react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
+// Temporarily disabled drag and drop for build compatibility
+// import { DndContext } from '@dnd-kit/core';
+// import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 
 import { cn } from '../../utils/cn';
 import InstitutionalChart, { CHART_TYPES } from '../Charts/InstitutionalChart';
