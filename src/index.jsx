@@ -41,14 +41,35 @@ import PWAService from './utils/pwaService';
 import { initializeSecurity } from './utils/securityHeaders';
 import { unregisterSW } from './utils/serviceWorker';
 
+// Check if root element exists - DEBUG LOGGING
+console.log('🔧 Starting React application initialization...');
+
+if (!document.getElementById('root')) {
+  console.error('❌ CRITICAL: Root container not found in DOM!');
+}
 const container = document.getElementById('root');
+// DEBUG: Before performance monitoring init
+console.log('⚡ About to initialize performance monitoring...');
+try {
+  console.log('✅ Performance monitoring initialized successfully');
+} catch (error) {
+  console.error('❌ Performance monitoring failed:', error);
+}
 const root = createRoot(container);
 
 // Initialize performance monitoring
+// DEBUG: Before React render
+console.log('🚀 About to render React application...');
+try {
 initializePerformanceMonitoring();
 
 // Initialize analytics
 analytics.initializeAnalytics();
+  console.log('✅ React render initiated successfully');
+} catch (error) {
+  console.error('❌ React render failed:', error);
+  throw error;
+}
 
 // Track app initialization
 trackFeatureAccess('app_initialized', {
@@ -144,15 +165,10 @@ if (!isAutomatedEnv) {
       .catch(e => console.warn('Skipping Sentry initialization:', e));
   });
 
-  // Performance monitoring after Sentry
+  // Performance monitoring after Sentry (already initialized statically above)
   idle(() => {
-    import('./utils/performanceMonitoring')
-      .then(mod => {
-        if (mod?.initializePerformanceMonitoring) {
-          mod.initializePerformanceMonitoring();
-        }
-      })
-      .catch(e => console.warn('Skipping performance monitoring initialization:', e));
+    // Performance monitoring already initialized above via static import
+    console.log('Performance monitoring initialization completed');
   });
 
   // Other monitoring modules

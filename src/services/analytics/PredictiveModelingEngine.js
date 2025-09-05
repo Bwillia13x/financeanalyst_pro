@@ -29,18 +29,27 @@ class PredictiveModelingEngine extends FinancialAnalyticsEngine {
     const cached = this.getCache(cacheKey);
     if (cached) return cached;
 
-    if (!Array.isArray(data) || data.length < params.p + params.q + 10) {
+    // Validate parameters
+    const { p, d, q } = params || {};
+    if (!Number.isInteger(p) || !Number.isInteger(d) || !Number.isInteger(q) || p < 0 || d < 0 || q < 0) {
+      throw new Error('Invalid ARIMA parameters');
+    }
+    if (!Number.isInteger(forecastPeriods) || forecastPeriods <= 0) {
+      throw new Error('Invalid forecast periods');
+    }
+
+    if (!Array.isArray(data) || data.length < p + q + 10) {
       throw new Error('Insufficient data for ARIMA modeling');
     }
 
     // Differencing (I component)
-    const differencedData = this.difference(data, params.d);
+    const differencedData = this.difference(data, d);
 
     // Fit ARIMA model
-    const model = this.fitARIMA(differencedData, params.p, params.q);
+    const model = this.fitARIMA(differencedData, p, q);
 
     // Generate forecasts
-    const forecasts = this.generateARIMAForecasts(model, data, params, forecastPeriods);
+    const forecasts = this.generateARIMAForecasts(model, data, { p, d, q }, forecastPeriods);
 
     // Calculate confidence intervals
     const confidenceIntervals = this.calculateForecastConfidenceIntervals(
@@ -246,6 +255,20 @@ class PredictiveModelingEngine extends FinancialAnalyticsEngine {
       throw new Error('Insufficient data for exponential smoothing');
     }
 
+    // Validate alpha and periods
+    if (typeof alpha !== 'number' || alpha <= 0 || alpha >= 1) {
+      throw new Error('Invalid alpha: must be between 0 and 1');
+    }
+    if (!Number.isInteger(periods) || periods <= 0) {
+      throw new Error('Invalid forecast periods');
+    }
+
+    // Validate smoothing method
+    const validTypes = new Set(['simple', 'double', 'triple']);
+    if (!validTypes.has(type)) {
+      throw new Error('Invalid smoothing method');
+    }
+
     const result = {
       method: `Exponential Smoothing (${type})`,
       parameters: { alpha, type },
@@ -447,8 +470,15 @@ class PredictiveModelingEngine extends FinancialAnalyticsEngine {
       throw new Error('Dependent and independent variable arrays must have same length');
     }
 
+    if (n < k + 1) {
+      throw new Error('Insufficient data for regression');
+    }
+
     // Add intercept term
-    const XWithIntercept = [[...Array(n)].fill(1), ...X];
+    // Detect if an intercept column is already present (all ones)
+    const hasIntercept = X.some(col => Array.isArray(col) && col.every(v => v === 1));
+    const intercept = new Array(n).fill(1);
+    const XWithIntercept = hasIntercept ? [...X] : [intercept, ...X];
 
     // Calculate regression coefficients using normal equations
     const coefficients = this.calculateRegressionCoefficients(XWithIntercept, y);
@@ -595,6 +625,23 @@ class PredictiveModelingEngine extends FinancialAnalyticsEngine {
       throw new Error('Invalid random forest data');
     }
 
+    if (features.length < 5) {
+      throw new Error('Insufficient data for random forest');
+    }
+
+    // Validate hyperparameters
+    if (!Number.isInteger(nEstimators) || nEstimators <= 0) {
+      throw new Error('Invalid random forest parameter: nEstimators must be a positive integer');
+    }
+    if (!Number.isInteger(maxDepth) || maxDepth <= 0) {
+      throw new Error('Invalid random forest parameter: maxDepth must be a positive integer');
+    }
+    if (!Number.isInteger(minSamplesSplit) || minSamplesSplit <= 1) {
+      throw new Error(
+        'Invalid random forest parameter: minSamplesSplit must be an integer greater than 1'
+      );
+    }
+
     // Simplified random forest implementation
     const trees = [];
     const featureImportance = new Array(features[0].length).fill(0);
@@ -641,6 +688,18 @@ class PredictiveModelingEngine extends FinancialAnalyticsEngine {
 
     this.setCache(cacheKey, result);
     return result;
+  }
+
+  updateFeatureImportance(tree, featureImportance) {
+    const traverse = node => {
+      if (!node) return;
+      if (node.type === 'node' && typeof node.featureIndex === 'number') {
+        featureImportance[node.featureIndex] += 1;
+        traverse(node.left);
+        traverse(node.right);
+      }
+    };
+    traverse(tree);
   }
 
   /**

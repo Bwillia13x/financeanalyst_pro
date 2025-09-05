@@ -2,9 +2,60 @@ import { Bot, Download, BarChart3, Shield } from 'lucide-react';
 import React, { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 
+// Temporarily commenting out complex imports for debugging:
+// import IndustryAnalyticsDashboard from '../IndustryAnalytics/IndustryAnalyticsDashboard';
+// import OfflineIndicator from '../PWA/OfflineIndicator';
+// import PWAInstallPrompt from '../PWA/PWAInstallPrompt';
 import AIFinancialAssistant from '../AIAssistant/AIFinancialAssistant';
 import ExportPanel from '../ExportPanel/ExportPanel';
+// import IndustryAnalyticsDashboard from '../IndustryAnalytics/IndustryAnalyticsDashboard';
+// import IndustryAnalyticsDashboard from '../IndustryAnalytics/IndustryAnalyticsDashboard';
+// import IndustryAnalyticsDashboard from '../IndustryAnalytics/IndustryAnalyticsDashboard';
+// import IndustryAnalyticsDashboard from '../IndustryAnalytics/IndustryAnalyticsDashboard';
+// import IndustryAnalyticsDashboard from '../IndustryAnalytics/IndustryAnalyticsDashboard';
+// import IndustryAnalyticsDashboard from '../IndustryAnalytics/IndustryAnalyticsDashboard';
 import IndustryAnalyticsDashboard from '../IndustryAnalytics/IndustryAnalyticsDashboard';
+// const IndustryAnalyticsDashboard = () => null;
+// Placeholder components for disabled complex imports
+// const IndustryAnalyticsDashboard = () => null;
+// const OfflineIndicator = () => null;
+// const PWAInstallPrompt = () => null;
+// const IndustryAnalyticsDashboard = () => null;
+// const OfflineIndicator = () => null;
+// const IndustryAnalyticsDashboard = () => null;
+// const OfflineIndicator = () => null;
+// const PWAInstallPrompt = () => null;
+// const IndustryAnalyticsDashboard = () => null;
+// const OfflineIndicator = () => null;
+// const PWAInstallPrompt = () => null;
+// const IndustryAnalyticsDashboard = () => null;
+// const OfflineIndicator = () => null;
+// const PWAInstallPrompt = () => null;
+// const PWAInstallPrompt = () => null;
+// Commented out placeholder now that components are imported
+// const OfflineIndicator = () => null;
+// const PWAInstallPrompt = () => null;
+// Commented out complex dashboard states for debugging
+// import OfflineIndicator from '../PWA/OfflineIndicator';
+// import PWAInstallPrompt from '../PWA/PWAInstallPrompt';
+// import RiskManagementDashboard from '../RiskManagement/RiskManagementDashboard';
+// const [isIndustryAnalyticsOpen, setIsIndustryAnalyticsOpen] = useState(false);
+// import OfflineIndicator from '../PWA/OfflineIndicator';
+// import PWAInstallPrompt from '../PWA/PWAInstallPrompt';
+// import RiskManagementDashboard from '../RiskManagement/RiskManagementDashboard';
+// const [isRiskManagementOpen, setIsRiskManagementOpen] = useState(false);
+// import OfflineIndicator from '../PWA/OfflineIndicator';
+// import PWAInstallPrompt from '../PWA/PWAInstallPrompt';
+// import OfflineIndicator from '../PWA/OfflineIndicator';
+// import PWAInstallPrompt from '../PWA/PWAInstallPrompt';
+// import RiskManagementDashboard from '../RiskManagement/RiskManagementDashboard';
+// import OfflineIndicator from '../PWA/OfflineIndicator';
+// import PWAInstallPrompt from '../PWA/PWAInstallPrompt';
+// import RiskManagementDashboard from '../RiskManagement/RiskManagementDashboard';
+// import OfflineIndicator from '../PWA/OfflineIndicator';
+// import PWAInstallPrompt from '../PWA/PWAInstallPrompt';
+// import RiskManagementDashboard from '../RiskManagement/RiskManagementDashboard';
+// import RiskManagementDashboard from '../RiskManagement/RiskManagementDashboard';
 import OfflineIndicator from '../PWA/OfflineIndicator';
 import PWAInstallPrompt from '../PWA/PWAInstallPrompt';
 import RiskManagementDashboard from '../RiskManagement/RiskManagementDashboard';
@@ -12,9 +63,18 @@ import RiskManagementDashboard from '../RiskManagement/RiskManagementDashboard';
 import Header from './Header';
 
 const MainLayout = () => {
+  console.log('MainLayout component rendering...');
   const [isAIAssistantOpen, setIsAIAssistantOpen] = useState(false);
   const [isExportPanelOpen, setIsExportPanelOpen] = useState(false);
   const [isIndustryAnalyticsOpen, setIsIndustryAnalyticsOpen] = useState(false);
+// Commented out toggle functions for debugging
+// const toggleIndustryAnalytics = () => {
+//   setIsIndustryAnalyticsOpen(!isIndustryAnalyticsOpen);
+// };
+
+// const toggleRiskManagement = () => {
+//   setIsRiskManagementOpen(!isRiskManagementOpen);
+// };
   const [isRiskManagementOpen, setIsRiskManagementOpen] = useState(false);
 
   const toggleAIAssistant = () => {
@@ -35,9 +95,21 @@ const MainLayout = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      {/* Disabled complex PWA components for debugging */}
+      {/* <OfflineIndicator />
+      <PWAInstallPrompt /> */}
       <Header />
 
       <main className="flex-1">
+      {/* <OfflineIndicator /> */}
+      {/* <PWAInstallPrompt /> */}
+      {/* <OfflineIndicator /> */}
+      {/* <PWAInstallPrompt /> */}
+      {/* <OfflineIndicator /> */}
+      {/* <PWAInstallPrompt /> */}
+      {/* Disabled PWA Components */}
+      {/* <OfflineIndicator /> */}
+      {/* <PWAInstallPrompt /> */}
         <Outlet />
       </main>
 
@@ -111,8 +183,38 @@ const MainLayout = () => {
             { symbol: 'GOOGL', shares: 50, price: 2800.0, value: 140000.0 }
           ]
         }}
-        title="Financial Analysis Export"
       />
+      {/* Disabled complex components for debugging */}
+      {/* <IndustryAnalyticsDashboard
+        isOpen={isIndustryAnalyticsOpen}
+        onClose={toggleIndustryAnalytics}
+      />
+
+      <RiskManagementDashboard
+        isOpen={isRiskManagementOpen}
+        onClose={toggleRiskManagement}
+        portfolioData={{
+          assets: [
+            { type: 'equity', value: 500000, riskRating: 'medium', sector: 'technology' },
+            { type: 'bond', value: 300000, riskRating: 'low', sector: 'government' },
+            { type: 'derivative', value: 100000, riskRating: 'high', sector: 'commodity' }
+          ],
+          liabilities: [
+            { type: 'debt', value: 200000, interestRate: 0.05, maturity: 5 },
+            { type: 'equity', value: 700000, dividend: 0.03 }
+          ],
+          marketConditions: {
+            volatility: 0.25,
+            interestRate: 0.045,
+            gdpGrowth: 0.025
+          }
+        }}
+      /> */}
+      {/* Disabled Industry Analytics Dashboard */}
+      {/* <IndustryAnalyticsDashboard
+        isOpen={isIndustryAnalyticsOpen}
+        onClose={toggleIndustryAnalytics}
+      {/* Disabled Risk Management Dashboard */}
 
       {/* Industry Analytics Dashboard */}
       <IndustryAnalyticsDashboard

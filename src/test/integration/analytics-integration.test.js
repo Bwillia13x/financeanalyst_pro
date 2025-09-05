@@ -28,45 +28,45 @@ describe('Analytics Engines Integration', () => {
           weight: 0.25,
           expectedReturn: 0.12,
           volatility: 0.25,
-          returns: Array.from({ length: 252 }, () => 0.0005 + Math.random() * 0.002 - 0.001)
+          returns: Array.from({ length: 252 }, () => Math.random() * 0.004 - 0.002)
         },
         {
           symbol: 'MSFT',
           weight: 0.2,
           expectedReturn: 0.1,
           volatility: 0.22,
-          returns: Array.from({ length: 252 }, () => 0.0004 + Math.random() * 0.0018 - 0.0009)
+          returns: Array.from({ length: 252 }, () => Math.random() * 0.003 - 0.0015)
         },
         {
           symbol: 'GOOGL',
           weight: 0.15,
           expectedReturn: 0.11,
           volatility: 0.28,
-          returns: Array.from({ length: 252 }, () => 0.00045 + Math.random() * 0.0022 - 0.0011)
+          returns: Array.from({ length: 252 }, () => Math.random() * 0.0045 - 0.00225)
         },
         {
           symbol: 'TSLA',
           weight: 0.1,
           expectedReturn: 0.18,
           volatility: 0.45,
-          returns: Array.from({ length: 252 }, () => 0.0007 + Math.random() * 0.0035 - 0.00175)
+          returns: Array.from({ length: 252 }, () => Math.random() * 0.007 - 0.0035)
         },
         {
           symbol: 'BND',
           weight: 0.15,
           expectedReturn: 0.04,
           volatility: 0.08,
-          returns: Array.from({ length: 252 }, () => 0.00015 + Math.random() * 0.0006 - 0.0003)
+          returns: Array.from({ length: 252 }, () => Math.random() * 0.0012 - 0.0006)
         },
         {
           symbol: 'SPY',
           weight: 0.15,
           expectedReturn: 0.08,
           volatility: 0.18,
-          returns: Array.from({ length: 252 }, () => 0.0003 + Math.random() * 0.0014 - 0.0007)
+          returns: Array.from({ length: 252 }, () => Math.random() * 0.0028 - 0.0014)
         }
       ],
-      benchmark: Array.from({ length: 252 }, () => 0.00025 + Math.random() * 0.001 - 0.0005)
+      benchmark: Array.from({ length: 252 }, () => Math.random() * 0.002 - 0.001)
     };
 
     // Clear all caches

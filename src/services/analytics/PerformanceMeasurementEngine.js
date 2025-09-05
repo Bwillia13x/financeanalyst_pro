@@ -138,7 +138,7 @@ class PerformanceMeasurementEngine extends FinancialAnalyticsEngine {
       !Array.isArray(benchmarkReturns) ||
       portfolioReturns.length !== benchmarkReturns.length
     ) {
-      return 0;
+      throw new Error('Invalid inputs for information ratio');
     }
 
     const excessReturns = portfolioReturns.map((r, i) => r - benchmarkReturns[i]);
@@ -571,6 +571,10 @@ class PerformanceMeasurementEngine extends FinancialAnalyticsEngine {
       Array.isArray(benchmarkWeights) &&
       Array.isArray(portfolioReturns) &&
       Array.isArray(benchmarkReturns) &&
+      portfolioWeights.length > 0 &&
+      benchmarkWeights.length > 0 &&
+      portfolioReturns.length > 0 &&
+      benchmarkReturns.length > 0 &&
       portfolioWeights.length === benchmarkWeights.length &&
       portfolioWeights.length === portfolioReturns.length &&
       benchmarkWeights.length === benchmarkReturns.length

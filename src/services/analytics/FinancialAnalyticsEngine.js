@@ -53,7 +53,7 @@ class FinancialAnalyticsEngine {
    * @returns {Object} Returns analysis
    */
   calculateReturns(prices, frequency = 'daily') {
-    const cacheKey = `returns_${frequency}_${prices.length}`;
+    const cacheKey = `returns_${frequency}_${prices.length}_${prices[0]}_${prices[prices.length - 1]}`;
     const cached = this.getCache(cacheKey);
     if (cached) return cached;
 
@@ -61,17 +61,15 @@ class FinancialAnalyticsEngine {
       throw new Error('Insufficient price data for returns calculation');
     }
 
-    // Validate for invalid values (null, undefined, NaN, Infinity, -Infinity, non-numeric)
-    const hasInvalidValues = prices.some(
-      price =>
-        price == null || // null or undefined
-        typeof price !== 'number' || // non-numeric
-        !isFinite(price) || // Infinity, -Infinity, NaN
-        isNaN(price)
-    );
+    // Validate for invalid values with nuanced handling
+    const hasNonNumeric = prices.some(price => price == null || typeof price !== 'number');
+    if (hasNonNumeric) {
+      return 0; // Non-numeric/null/undefined -> return 0
+    }
 
-    if (hasInvalidValues) {
-      return 0; // Return 0 for invalid data as expected by tests
+    const hasNonFinite = prices.some(price => !Number.isFinite(price));
+    if (hasNonFinite) {
+      throw new Error('Invalid numeric values in price data'); // NaN or Infinity -> throw
     }
 
     const returns = [];
@@ -178,7 +176,8 @@ class FinancialAnalyticsEngine {
 
     const annualizedVolatility = this.calculateVolatility(returns, frequency);
 
-    if (annualizedVolatility === 0) return annualizedReturn >= riskFreeRate ? Infinity : -Infinity;
+    if (annualizedVolatility === 0 || Math.abs(annualizedVolatility) < 1e-12)
+      return annualizedReturn >= riskFreeRate ? Infinity : -Infinity;
 
     return (annualizedReturn - riskFreeRate) / annualizedVolatility;
   }
@@ -272,8 +271,32 @@ class FinancialAnalyticsEngine {
       throw new Error('Insufficient data for VaR calculation');
     }
 
+    // Validate confidence level
+    if (typeof confidenceLevel !== 'number' || confidenceLevel <= 0 || confidenceLevel >= 1) {
+      throw new Error('Confidence level must be a number between 0 and 1 (exclusive)');
+    }
+
     let var95, var99, expectedShortfall;
     const alpha = 1 - confidenceLevel;
+
+    // Handle constant or near-constant returns: VaR should be ~0
+    const mean = returns.reduce((sum, r) => sum + r, 0) / returns.length;
+    const variance = returns.reduce((sum, r) => sum + Math.pow(r - mean, 2), 0) / (returns.length - 1);
+    const std = Math.sqrt(variance);
+    if (!isFinite(std) || std < 1e-12) {
+      return {
+        method,
+        confidenceLevel,
+        var95: 0,
+        var99: 0,
+        expectedShortfall: 0,
+        riskMetrics: {
+          volatility: 0,
+          maxDrawdown: 0,
+          downsideDeviation: 0
+        }
+      };
+    }
 
     switch (method) {
       case 'historical':

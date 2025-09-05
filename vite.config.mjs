@@ -43,7 +43,13 @@ export default defineConfig({
         '/Users/benjaminwilliams/financeanalyst_pro-1',
         '/Users/benjaminwilliams/valor-ivx-pro(08.17.2025)/financeanalyst_pro',
         '/Users/benjaminwilliams/financeanalyst_pro',
+        process.cwd(), // Add current working directory to filesystem access
       ],
+    },
+    // Explicitly configure headers and CORS for JavaScript module loading
+    headers: {
+      'Cross-Origin-Opener-Policy': 'same-origin',
+      'Cross-Origin-Embedder-Policy': 'credentialless',
     },
     proxy: {
       '/v8/finance/chart': {

@@ -1,5 +1,35 @@
 {
   "compilerOptions": {
     "baseUrl": "./src"
-  }
+  },
+  "exclude": [
+    "node_modules",
+    "dist",
+    "__tests__",
+    "tests",
+    "test-results",
+    "*.config.js",
+    "*.config.mjs",
+    "*.config.cjs",
+    "coverage",
+    "build",
+    "public",
+    "docs",
+    "*.md",
+    "*.log",
+    "*.json",
+    "package-lock.json",
+    "yarn.lock",
+    "vite.config.mjs",
+    "jest.config.js",
+    "playwright.config.mjs",
+    "vitest.config.js",
+    "vitest.ui.config.mjs",
+    "vitest.unit.config.mjs",
+    "tsconfig.json",
+    "tsconfig.node.json",
+    "eslint.config.js",
+    "postcss.config.cjs",
+    "tailwind.config.js"
+  ]
 }

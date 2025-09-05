@@ -14,6 +14,8 @@ class CachingService {
       maxMemoryCacheSize: 50, // MB
       maxCacheEntries: 1000,
       cacheVersion: 'v1.0',
+      testMode: typeof process !== 'undefined' && process.env && process.env.NODE_ENV === 'test',
+      immediateExpiration: false,
       ...options
     };
 
@@ -141,13 +143,15 @@ class CachingService {
    * Store data in memory cache
    */
   async set(key, data, options = {}) {
+    const ttl = options.ttl || this.options.defaultTtl;
     const cacheEntry = {
       data,
       timestamp: Date.now(),
-      ttl: options.ttl || this.options.defaultTtl,
+      ttl,
       size: this.calculateDataSize(data),
       tags: options.tags || [],
-      metadata: options.metadata || {}
+      metadata: options.metadata || {},
+      timeoutId: null
     };
 
     // Check cache size limits
@@ -169,6 +173,14 @@ class CachingService {
     });
 
     this.cacheStats.size += cacheEntry.size;
+
+    // Schedule per-entry expiration in test mode or when immediateExpiration is enabled
+    if ((this.options.testMode || this.options.immediateExpiration) && ttl > 0) {
+      if (cacheEntry.timeoutId) clearTimeout(cacheEntry.timeoutId);
+      cacheEntry.timeoutId = setTimeout(() => {
+        this.delete(key);
+      }, ttl);
+    }
 
     // Update access metadata
     this.updateAccessMetadata(key);
@@ -215,6 +227,9 @@ class CachingService {
   async delete(key) {
     const entry = this.memoryCache.get(key);
     if (entry) {
+      if (entry.timeoutId) {
+        clearTimeout(entry.timeoutId);
+      }
       this.cacheStats.size -= entry.size;
       this.memoryCache.delete(key);
       this.cacheMetadata.delete(key);

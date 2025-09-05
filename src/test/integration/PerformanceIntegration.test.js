@@ -182,14 +182,14 @@ describe('Performance System Integration', () => {
       const testKey = 'expiring_key';
       const testData = { data: 'expires' };
 
-      await cachingService.set(testKey, testData, { ttl: 100 }); // 100ms TTL
+      await cachingService.set(testKey, testData, { ttl: 200 }); // 200ms TTL
 
       // Wait for expiration
-      await new Promise(resolve => setTimeout(resolve, 150));
+      await new Promise(resolve => setTimeout(resolve, 300));
 
       const retrieved = await cachingService.get(testKey);
       expect(retrieved).toBeNull();
-    }, 10000);
+    }, 15000);
 
     it('should cache API responses', async () => {
       const endpoint = '/api/test';

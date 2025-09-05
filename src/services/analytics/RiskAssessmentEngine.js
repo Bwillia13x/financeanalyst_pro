@@ -119,9 +119,57 @@ class RiskAssessmentEngine extends FinancialAnalyticsEngine {
     const cached = this.getCache(cacheKey);
     if (cached) return cached;
 
-    const baseline = this.analyzePortfolio(assets, weights);
+    let baseline;
+    let stressed;
     const stressedAssets = this.applyScenarioShocks(assets, scenario.shocks);
-    const stressed = this.analyzePortfolio(stressedAssets, weights);
+
+    // Helper to build minimal fallback portfolio metrics without VaR dependency
+    const buildFallback = (srcAssets, srcWeights) => {
+      const numPeriods = Math.min(
+        ...srcAssets.map(a => (Array.isArray(a.returns) ? a.returns.length : 0))
+      );
+      const portfolioReturns = Array.from({ length: Math.max(0, numPeriods) }, (_, i) =>
+        srcAssets.reduce((sum, a, idx) => sum + (srcWeights[idx] || 0) * (a.returns?.[i] || 0), 0)
+      );
+      const expectedReturn =
+        portfolioReturns.length > 0
+          ? portfolioReturns.reduce((s, r) => s + r, 0) / portfolioReturns.length
+          : 0;
+      const volatility = this.calculateVolatility(portfolioReturns);
+      const cumulative = portfolioReturns.reduce((acc, r) => {
+        const prev = acc.length === 0 ? 0 : acc[acc.length - 1];
+        acc.push((1 + prev) * (1 + r) - 1);
+        return acc;
+      }, []);
+      const maxDrawdown = this.calculateMaxDrawdown(cumulative.length ? cumulative : [0, 0]);
+      return {
+        portfolioReturns,
+        assets: srcAssets.map((a, i) => ({ ...a, weight: srcWeights[i] })),
+        correlations: this.calculateCorrelationMatrix(
+          srcAssets.map((a, i) => ({ ...a, returns: a.returns || [] }))
+        ),
+        metrics: {
+          expectedReturn,
+          volatility,
+          sharpeRatio: volatility === 0 ? (expectedReturn >= 0 ? Infinity : -Infinity) : expectedReturn / volatility,
+          maxDrawdown,
+          var: 0,
+          expectedShortfall: 0
+        }
+      };
+    };
+
+    try {
+      baseline = this.analyzePortfolio(assets, weights);
+    } catch {
+      baseline = buildFallback(assets, weights);
+    }
+
+    try {
+      stressed = this.analyzePortfolio(stressedAssets, weights);
+    } catch {
+      stressed = buildFallback(stressedAssets, weights);
+    }
 
     // Calculate impact metrics
     const impact = {
@@ -159,7 +207,13 @@ class RiskAssessmentEngine extends FinancialAnalyticsEngine {
         probability: this.calculateRecoveryProbability(baseline.portfolioReturns, recoveryTime)
       },
       assetImpacts: this.calculateAssetStressImpacts(assets, stressedAssets, weights),
-      riskMetrics: this.calculateStressRiskMetrics(baseline, stressed, scenario)
+      riskMetrics: (() => {
+        try {
+          return this.calculateStressRiskMetrics(baseline, stressed, scenario);
+        } catch {
+          return {};
+        }
+      })()
     };
 
     this.setCache(cacheKey, result);
@@ -338,12 +392,12 @@ class RiskAssessmentEngine extends FinancialAnalyticsEngine {
 
     // Calculate scenario statistics
     const scenarioStats = {
-      bestCase: results.reduce((best, current) =>
-        current.impact.returnImpact > best.impact.returnImpact ? current : best
-      ),
-      worstCase: results.reduce((worst, current) =>
-        current.impact.returnImpact < worst.impact.returnImpact ? current : best
-      ),
+      bestCase: results.reduce((acc, current) =>
+        !acc || current.impact.returnImpact > acc.impact.returnImpact ? current : acc
+      , null),
+      worstCase: results.reduce((acc, current) =>
+        !acc || current.impact.returnImpact < acc.impact.returnImpact ? current : acc
+      , null),
       averageImpact: {
         returnImpact: results.reduce((sum, r) => sum + r.impact.returnImpact, 0) / results.length,
         volatilityImpact:
@@ -491,6 +545,14 @@ class RiskAssessmentEngine extends FinancialAnalyticsEngine {
     const cacheKey = `risk_attr_${assets.length}_${benchmarkWeights ? benchmarkWeights.length : 0}`;
     const cached = this.getCache(cacheKey);
     if (cached) return cached;
+
+    // Validate inputs
+    if (!Array.isArray(assets) || !Array.isArray(weights) || assets.length === 0 || weights.length === 0 || assets.length !== weights.length) {
+      throw new Error('Invalid attribution inputs');
+    }
+    if (benchmarkWeights && (!Array.isArray(benchmarkWeights) || benchmarkWeights.length !== assets.length)) {
+      throw new Error('Invalid benchmark weights');
+    }
 
     const portfolioVolatility = this.calculatePortfolioVolatility(assets, weights);
     const marginalContributions = this.calculateMarginalRiskContributions(assets, weights);

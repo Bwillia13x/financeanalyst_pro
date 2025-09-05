@@ -1,5 +1,6 @@
 // Accessibility Testing Framework with axe-core
 import axeCore from 'axe-core';
+import { reportPerformanceMetric } from './performanceMonitoring';
 
 // Minimize noise and side effects during unit/integration tests
 const IS_TEST_MODE = import.meta.env && import.meta.env.MODE === 'test';
@@ -61,18 +62,12 @@ class AccessibilityTester {
       this.storeResults(results);
 
       // During Vitest, emit a minimal metric without heavy logging/storage to satisfy tests
-      if (IS_TEST_MODE) {
-        import('./performanceMonitoring')
-          .then(mod => {
-            if (mod?.reportPerformanceMetric) {
-              mod.reportPerformanceMetric('accessibility_test', {
-                violations: results.violations?.length || 0,
-                score: this.calculateAccessibilityScore(),
-                timestamp: Date.now()
-              });
-            }
-          })
-          .catch(() => {});
+      if (IS_TEST_MODE && reportPerformanceMetric) {
+        reportPerformanceMetric('accessibility_test', {
+          violations: results.violations?.length || 0,
+          score: this.calculateAccessibilityScore(),
+          timestamp: Date.now()
+        });
       }
 
       return results;

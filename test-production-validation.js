@@ -17,9 +17,17 @@ if (typeof window === 'undefined') {
     }
   };
 
-  global.navigator = {
-    userAgent: 'Production Validation Environment'
-  };
+  // Define navigator with configurable properties
+  Object.defineProperty(global, 'navigator', {
+    value: {
+      userAgent: 'Production Validation Environment',
+      platform: 'NodeJS',
+      appVersion: 'Production Validation 1.0'
+    },
+    writable: true,
+    enumerable: true,
+    configurable: true
+  });
 }
 
 class ProductionValidator {

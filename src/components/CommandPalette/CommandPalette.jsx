@@ -21,6 +21,7 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 
 import { useCommandRegistry } from '../../hooks/useCommandRegistry';
+import { default as monitoringApi } from '../../utils/monitoring';
 
 const CommandPalette = ({
   isOpen,
@@ -40,21 +41,13 @@ const CommandPalette = ({
   const openTimestampRef = useRef(null);
   const monitoringRef = useRef(null);
 
-  // Lazy-load monitoring utilities to keep them out of primary chunks
-  const getMonitoring = async () => {
-    if (monitoringRef.current) return monitoringRef.current;
-    try {
-      const mod = await import('../../utils/monitoring');
-      const api = mod?.default || mod;
-      monitoringRef.current = api;
-      return api;
-    } catch (_e) {
-      // Fallback no-op implementation to avoid conditional checks
-      const noop = { trackEvent: () => {}, trackError: () => {} };
-      monitoringRef.current = noop;
-      return noop;
-    }
-  };
+ // Direct reference to monitoring utilities
+ const getMonitoring = async () => {
+   if (!monitoringRef.current) {
+     monitoringRef.current = monitoringApi || { trackEvent: () => {}, trackError: () => {} };
+   }
+   return monitoringRef.current;
+ };
 
   // Get command registry and search functionality
   const {

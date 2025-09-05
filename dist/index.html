@@ -20,9 +20,15 @@
   <!-- Favicons and Icons -->
   <link rel="icon" href="/favicon.ico" sizes="any" />
   <link rel="icon" href="/favicon.ico" sizes="16x16" type="image/x-icon" />
+<!-- <link rel="icon" href="/assets/images/favicon.svg" sizes="16x16" type="image/x-icon" /> -->
+<!-- <link rel="icon" href="/assets/images/favicon.svg" sizes="32x32" type="image/x-icon" /> -->
   <link rel="icon" href="/favicon.ico" sizes="32x32" type="image/x-icon" />
   <link rel="icon" href="/assets/images/favicon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="/assets/images/apple-touch-icon.svg" />
+<!-- Disabled favicon icons for debugging -->
+<!-- <link rel="icon" href="/assets/images/favicon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="/assets/images/apple-touch-icon.svg" />
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/images/apple-touch-icon.svg" /> -->
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/apple-touch-icon.svg" />
   <link rel="manifest" href="/manifest.json" />
 
@@ -36,15 +42,38 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   
+<!-- DISABLED RESOURCE PRELOADS FOR DEBUGGING -->
   <!-- Preload critical CSS -->
   <link rel="preload" href="/assets/critical.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
   <noscript><link rel="stylesheet" href="/assets/critical.css"></noscript>
+<!-- <link rel="preload" href="/assets/critical.css" as="style" onload="this.onload=null;this.rel='stylesheet'"> -->
 
-  <!-- Preload critical JavaScript chunks for faster loading -->
-  <link rel="modulepreload" href="/assets/react-core-Dcw16QML.js">
-  <link rel="modulepreload" href="/assets/state-vendor-DoYcEyXC.js">
-  <link rel="modulepreload" href="/assets/utils-vendor-DUg4_aAP.js">
-  <link rel="modulepreload" href="/assets/react-router-8B5hvpKv.js">
+  <!-- Preload critical JavaScript chunks for faster loading (only in production) -->
+<!-- Disabled Google Fonts preloads -->
+<!-- <link rel="dns-prefetch" href="//fonts.googleapis.com">
+<link rel="dns-prefetch" href="//fonts.gstatic.com">
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> -->
+  <script>
+<!-- Disabled icon preloads for debugging -->
+<!-- <link rel="preload" href="/assets/images/favicon.svg" as="image" type="image/svg+xml">
+<link rel="preload" href="/assets/images/apple-touch-icon.svg" as="image" type="image/svg+xml"> -->
+    // Only load modulepreloads in production, skip in dev to avoid stale filename issues
+    if (window.location.hostname !== 'localhost' && window.location.protocol === 'https:') {
+      const chunks = ['react-core-Dcw16QML.js', 'state-vendor-DoYcEyXC.js', 'utils-vendor-DUg4_aAP.js', 'react-router-8B5hvpKv.js'];
+      chunks.forEach(chunk => {
+        const link = document.createElement('link');
+<!-- Disabled resource hints for debugging -->
+<!-- <link rel="dns-prefetch" href="//query1.finance.yahoo.com">
+<link rel="preconnect" href="https://query1.finance.yahoo.com" crossorigin>
+<link rel="dns-prefetch" href="//www.alphavantage.co">
+<link rel="preconnect" href="https://www.alphavantage.co" crossorigin> -->
+        link.rel = 'modulepreload';
+        link.href = `/assets/${chunk}`;
+        document.head.appendChild(link);
+      });
+    }
+  </script>
 
   <!-- Preload critical resources -->
   <link rel="preload" href="/assets/images/favicon.svg" as="image" type="image/svg+xml">
@@ -55,19 +84,19 @@
   <link rel="preconnect" href="https://query1.finance.yahoo.com" crossorigin>
   <link rel="dns-prefetch" href="//www.alphavantage.co">
   <link rel="preconnect" href="https://www.alphavantage.co" crossorigin>
-  <script type="module" crossorigin src="/assets/main-CTFp5Hp0.js"></script>
-  <link rel="modulepreload" crossorigin href="/assets/react-core-BUGRc1ND.js">
-  <link rel="modulepreload" crossorigin href="/assets/ui-vendor-DIC23sCL.js">
-  <link rel="modulepreload" crossorigin href="/assets/vendor-S8vQmFxH.js">
-  <link rel="modulepreload" crossorigin href="/assets/react-dom-kEHM6ABo.js">
+  <script type="module" crossorigin src="/assets/main-DV2WgFyj.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/react-core-DhDTUKUi.js">
+  <link rel="modulepreload" crossorigin href="/assets/ui-vendor-KpsiAJ0R.js">
+  <link rel="modulepreload" crossorigin href="/assets/vendor-DyOgp-IL.js">
+  <link rel="modulepreload" crossorigin href="/assets/react-dom-BkkMqq3R.js">
   <link rel="modulepreload" crossorigin href="/assets/data-vendor-vzM7rUwp.js">
   <link rel="modulepreload" crossorigin href="/assets/utils-vendor-DUg4_aAP.js">
-  <link rel="modulepreload" crossorigin href="/assets/d3-vendor-DrquhV2X.js">
-  <link rel="modulepreload" crossorigin href="/assets/recharts-vendor-CyLIxcoZ.js">
-  <link rel="modulepreload" crossorigin href="/assets/react-router-Brt91dlH.js">
-  <link rel="modulepreload" crossorigin href="/assets/advanced-analytics-C96jAcfh.js">
-  <link rel="modulepreload" crossorigin href="/assets/export-vendor-B4r91GVs.js">
-  <link rel="modulepreload" crossorigin href="/assets/ai-vendor-DLvykzyK.js">
+  <link rel="modulepreload" crossorigin href="/assets/d3-vendor-CNs8vvNs.js">
+  <link rel="modulepreload" crossorigin href="/assets/recharts-vendor-ChIrd679.js">
+  <link rel="modulepreload" crossorigin href="/assets/react-router-BrE769RO.js">
+  <link rel="modulepreload" crossorigin href="/assets/advanced-analytics-Tk579G3-.js">
+  <link rel="modulepreload" crossorigin href="/assets/export-vendor-vun1-c2j.js">
+  <link rel="modulepreload" crossorigin href="/assets/ai-vendor-Brw4xCnn.js">
 </head>
 
 <body>
@@ -148,6 +177,19 @@
                     </div>\
                   </div>\
                 </main>\
+<!-- Test script to validate JavaScript loading -->
+<script>
+  console.log('✅ JAVASCRIPT LOADING VALIDATION: Page loaded successfully');
+  console.log('📍 Location:', window.location.href);
+  console.log('🕒 Timestamp:', new Date().toISOString());
+
+  // Test if our debug logs from index.jsx would show
+  const testLog = localStorage.getItem('js_loaded');
+  if (!testLog) {
+    localStorage.setItem('js_loaded', 'true');
+    console.log('🔧 FRESCOCTIC JS MODULE LOADING TEST PASSED');
+  }
+</script>
               </div>'
             );
           }

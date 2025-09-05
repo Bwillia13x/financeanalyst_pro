@@ -15,6 +15,7 @@ import { initializePerformanceMonitoring } from './utils/performanceMonitoring';
 import { initializePerformanceTracking } from './utils/performanceTracker';
 
 function App() {
+  console.log('App component rendering...');
   // Initialize performance monitoring and tracking
   React.useEffect(() => {
     initializePerformanceMonitoring();

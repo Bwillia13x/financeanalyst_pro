@@ -29,6 +29,7 @@ const DataVisualizationDemo = lazy(() => import('./pages/DataVisualizationDemo')
 const EnhancedChartsDemo = lazy(() => import('./pages/EnhancedChartsDemo'));
 
 const AppRoutes = () => {
+  console.log('Routes component rendering...');
   return (
     <Suspense fallback={<LoadingSpinner />}>
       <Routes>

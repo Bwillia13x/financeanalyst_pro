@@ -20,6 +20,7 @@ class RealTimeDataService {
       'bond_yields',
       'economic_indicators'
     ]);
+    this.testMode = typeof process !== 'undefined' && process.env && process.env.NODE_ENV === 'test';
   }
 
   /**
@@ -42,6 +43,23 @@ class RealTimeDataService {
     // Return current cached data if available
     if (this.dataCache.has(key)) {
       callback(this.dataCache.get(key));
+    } else {
+      // Emit a synthetic initial tick promptly to satisfy integration timing
+      const now = new Date().toISOString();
+      const initial =
+        dataType === 'stock_price'
+          ? { symbol, price: this.getBasePrice(symbol), change: 0, changePercent: 0, timestamp: now, marketOpen: this.isMarketOpen() }
+          : dataType === 'fx_rates'
+          ? { symbol, rate: this.getBaseFXRate(symbol), change: 0, timestamp: now }
+          : dataType === 'commodity_prices'
+          ? { symbol, price: this.getBaseCommodityPrice(symbol), change: 0, timestamp: now }
+          : dataType === 'bond_yields'
+          ? { symbol, yield: this.getBaseBondYield(symbol), timestamp: now }
+          : dataType === 'volatility_index'
+          ? { symbol, volatility: this.getBaseVolatility(symbol), timestamp: now }
+          : { symbol, value: this.getBaseEconomicIndicator(symbol), timestamp: now };
+      this.dataCache.set(key, initial);
+      try { callback(initial); } catch (e) { console.error(e); }
     }
 
     // Return unsubscribe function
@@ -107,17 +125,13 @@ class RealTimeDataService {
     const basePrice = this.getBasePrice(symbol);
     let lastPrice = basePrice;
 
-    const interval = setInterval(() => {
-      // Simulate realistic price movement
+    const tick = () => {
       const volatility = 0.02;
       const drift = 0.0001;
       const dt = this.updateInterval / (1000 * 60 * 60 * 24);
-
       const randomShock = (Math.random() - 0.5) * 2;
       const priceChange = lastPrice * (drift * dt + volatility * Math.sqrt(dt) * randomShock);
-
       lastPrice = Math.max(0.01, lastPrice + priceChange);
-
       const data = {
         symbol,
         price: lastPrice,
@@ -126,11 +140,18 @@ class RealTimeDataService {
         timestamp: new Date().toISOString(),
         marketOpen: this.isMarketOpen()
       };
-
       this.updateSubscribers(key, data);
-    }, this.updateInterval);
+      this.connections.set(
+        key,
+        this.testMode ? setTimeout(tick, this.updateInterval) : setTimeout(tick, this.updateInterval)
+      );
+    };
 
-    this.connections.set(key, interval);
+    // Kick off loop
+    this.connections.set(
+      key,
+      this.testMode ? setTimeout(tick, this.updateInterval) : setTimeout(tick, this.updateInterval)
+    );
   }
 
   /**

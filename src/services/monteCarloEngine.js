@@ -342,10 +342,14 @@ class MonteCarloEngine {
       return spare * stdDev + mean;
     }
 
-    const u1 = Math.random();
-    const u2 = Math.random();
-    const z0 = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
-    const z1 = Math.sqrt(-2 * Math.log(u1)) * Math.sin(2 * Math.PI * u2);
+    let u1 = 0, u2 = 0;
+    // Avoid u1 being 0
+    while (u1 === 0) u1 = Math.random();
+    u2 = Math.random();
+
+    const mag = Math.sqrt(-2 * Math.log(u1));
+    const z0 = mag * Math.cos(2 * Math.PI * u2);
+    const z1 = mag * Math.sin(2 * Math.PI * u2);
 
     this.spareNormal = z1;
     return z0 * stdDev + mean;

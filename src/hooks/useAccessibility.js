@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 
 import { accessibilityTester } from '../utils/accessibilityTesting';
+import { reportPerformanceMetric } from '../utils/performanceMonitoring';
 
 // Minimize side effects during unit/integration tests
 const IS_TEST_MODE = import.meta.env && import.meta.env.MODE === 'test';
@@ -50,18 +51,14 @@ export function useAccessibility(options = {}) {
         setLastTestTime(Date.now());
 
         // Report to performance monitoring
-        import('../utils/performanceMonitoring')
-          .then(mod => {
-            if (mod?.reportPerformanceMetric) {
-              mod.reportPerformanceMetric('accessibility_test', {
-                violations: testResults.violations?.length || 0,
-                score: accessibilityTester.calculateAccessibilityScore(),
-                componentType,
-                timestamp: Date.now()
-              });
-            }
-          })
-          .catch(() => {});
+        if (!IS_TEST_MODE && reportPerformanceMetric) {
+          reportPerformanceMetric('accessibility_test', {
+            violations: testResults.violations?.length || 0,
+            score: accessibilityTester.calculateAccessibilityScore(),
+            componentType,
+            timestamp: Date.now()
+          });
+        }
 
         // Call callbacks
         if (testResults.violations?.length > 0) {
@@ -96,18 +93,14 @@ export function useAccessibility(options = {}) {
         setLastTestTime(Date.now());
 
         // Report specific component test
-        import('../utils/performanceMonitoring')
-          .then(mod => {
-            if (mod?.reportPerformanceMetric) {
-              mod.reportPerformanceMetric('financial_component_accessibility', {
-                componentType: type,
-                violations: testResults.violations?.length || 0,
-                score: accessibilityTester.calculateAccessibilityScore(),
-                timestamp: Date.now()
-              });
-            }
-          })
-          .catch(() => {});
+        if (!IS_TEST_MODE && reportPerformanceMetric) {
+          reportPerformanceMetric('financial_component_accessibility', {
+            componentType: type,
+            violations: testResults.violations?.length || 0,
+            score: accessibilityTester.calculateAccessibilityScore(),
+            timestamp: Date.now()
+          });
+        }
 
         return testResults;
       } catch (error) {
@@ -127,19 +120,15 @@ export function useAccessibility(options = {}) {
     try {
       const navResults = await accessibilityTester.testKeyboardNavigation();
 
-      import('../utils/performanceMonitoring')
-        .then(mod => {
-          if (mod?.reportPerformanceMetric) {
-            mod.reportPerformanceMetric('keyboard_navigation_test', {
-              focusableElements: navResults.focusableElementsCount,
-              tabOrderIssues: navResults.tabOrderIssues?.length || 0,
-              focusVisibilityIssues: navResults.focusVisibilityIssues?.length || 0,
-              passed: navResults.passed,
-              timestamp: Date.now()
-            });
-          }
-        })
-        .catch(() => {});
+      if (!IS_TEST_MODE && reportPerformanceMetric) {
+        reportPerformanceMetric('keyboard_navigation_test', {
+          focusableElements: navResults.focusableElementsCount,
+          tabOrderIssues: navResults.tabOrderIssues?.length || 0,
+          focusVisibilityIssues: navResults.focusVisibilityIssues?.length || 0,
+          passed: navResults.passed,
+          timestamp: Date.now()
+        });
+      }
 
       return navResults;
     } catch (error) {
