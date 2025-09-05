@@ -54,26 +54,7 @@
 <link rel="dns-prefetch" href="//fonts.gstatic.com">
 <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> -->
-  <script>
-<!-- Disabled icon preloads for debugging -->
-<!-- <link rel="preload" href="/assets/images/favicon.svg" as="image" type="image/svg+xml">
-<link rel="preload" href="/assets/images/apple-touch-icon.svg" as="image" type="image/svg+xml"> -->
-    // Only load modulepreloads in production, skip in dev to avoid stale filename issues
-    if (window.location.hostname !== 'localhost' && window.location.protocol === 'https:') {
-      const chunks = ['react-core-Dcw16QML.js', 'state-vendor-DoYcEyXC.js', 'utils-vendor-DUg4_aAP.js', 'react-router-8B5hvpKv.js'];
-      chunks.forEach(chunk => {
-        const link = document.createElement('link');
-<!-- Disabled resource hints for debugging -->
-<!-- <link rel="dns-prefetch" href="//query1.finance.yahoo.com">
-<link rel="preconnect" href="https://query1.finance.yahoo.com" crossorigin>
-<link rel="dns-prefetch" href="//www.alphavantage.co">
-<link rel="preconnect" href="https://www.alphavantage.co" crossorigin> -->
-        link.rel = 'modulepreload';
-        link.href = `/assets/${chunk}`;
-        document.head.appendChild(link);
-      });
-    }
-  </script>
+  
 
   <!-- Preload critical resources -->
   <link rel="preload" href="/assets/images/favicon.svg" as="image" type="image/svg+xml">
@@ -164,19 +145,6 @@
                     </div>\
                   </div>\
                 </main>\
-<!-- Test script to validate JavaScript loading -->
-<script>
-  console.log('✅ JAVASCRIPT LOADING VALIDATION: Page loaded successfully');
-  console.log('📍 Location:', window.location.href);
-  console.log('🕒 Timestamp:', new Date().toISOString());
-
-  // Test if our debug logs from index.jsx would show
-  const testLog = localStorage.getItem('js_loaded');
-  if (!testLog) {
-    localStorage.setItem('js_loaded', 'true');
-    console.log('🔧 FRESCOCTIC JS MODULE LOADING TEST PASSED');
-  }
-</script>
               </div>'
             );
           }
