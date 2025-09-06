@@ -1,6 +1,9 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 
-import { accessibilityTester } from '../utils/accessibilityTesting';
+// Build-time flag to strip a11y tooling from production bundles entirely
+// Enable by setting VITE_ENABLE_A11Y_DEV=true for development diagnostics only.
+// eslint-disable-next-line no-undef
+const A11Y_BUILD_ENABLED = typeof __ENABLE_A11Y_DEV__ !== 'undefined' && __ENABLE_A11Y_DEV__;
 import { reportPerformanceMetric } from '../utils/performanceMonitoring';
 
 // Minimize side effects during unit/integration tests
@@ -37,12 +40,13 @@ export function useAccessibility(options = {}) {
   // Run accessibility tests
   const runTests = useCallback(
     async (element = null, testOptions = {}) => {
-      if (!enabled) return null;
+      if (!enabled || !A11Y_BUILD_ENABLED) return null;
 
       const targetElement = element || elementRef.current || document;
       setIsLoading(true);
 
       try {
+        const { accessibilityTester } = await import('src/utils/accessibilityTesting');
         const testResults = await accessibilityTester.runTests(targetElement, testOptions);
 
         setResults(testResults);
@@ -81,10 +85,11 @@ export function useAccessibility(options = {}) {
   // Test specific financial component
   const testFinancialComponent = useCallback(
     async (selector, type = componentType) => {
-      if (!enabled) return null;
+      if (!enabled || !A11Y_BUILD_ENABLED) return null;
 
       setIsLoading(true);
       try {
+        const { accessibilityTester } = await import('src/utils/accessibilityTesting');
         const testResults = await accessibilityTester.testFinancialComponent(selector, type);
 
         setResults(testResults);
@@ -115,9 +120,10 @@ export function useAccessibility(options = {}) {
 
   // Test keyboard navigation
   const testKeyboardNavigation = useCallback(async () => {
-    if (!enabled) return null;
+    if (!enabled || !A11Y_BUILD_ENABLED) return null;
 
     try {
+      const { accessibilityTester } = await import('src/utils/accessibilityTesting');
       const navResults = await accessibilityTester.testKeyboardNavigation();
 
       if (!IS_TEST_MODE && reportPerformanceMetric) {
@@ -139,9 +145,10 @@ export function useAccessibility(options = {}) {
 
   // Test color contrast
   const testColorContrast = useCallback(async () => {
-    if (!enabled) return null;
+    if (!enabled || !A11Y_BUILD_ENABLED) return null;
 
     try {
+      const { accessibilityTester } = await import('src/utils/accessibilityTesting');
       const contrastResults = await accessibilityTester.testColorContrast();
 
       import('../utils/performanceMonitoring')
@@ -166,9 +173,10 @@ export function useAccessibility(options = {}) {
 
   // Test form accessibility
   const testFormAccessibility = useCallback(async () => {
-    if (!enabled) return null;
+    if (!enabled || !A11Y_BUILD_ENABLED) return null;
 
     try {
+      const { accessibilityTester } = await import('src/utils/accessibilityTesting');
       const formResults = await accessibilityTester.testFormAccessibility();
 
       import('../utils/performanceMonitoring')
@@ -192,10 +200,11 @@ export function useAccessibility(options = {}) {
   }, [enabled]);
 
   // Generate comprehensive report
-  const generateReport = useCallback(() => {
-    if (!results) return null;
+  const generateReport = useCallback(async () => {
+    if (!results || !A11Y_BUILD_ENABLED) return null;
 
     try {
+      const { accessibilityTester } = await import('src/utils/accessibilityTesting');
       const report = accessibilityTester.generateReport();
 
       // Store report data for performance monitoring
@@ -221,7 +230,7 @@ export function useAccessibility(options = {}) {
 
   // Set up automatic testing
   useEffect(() => {
-    if (!enabled || !autoTest || IS_TEST_MODE) return;
+    if (!enabled || !autoTest || IS_TEST_MODE || !A11Y_BUILD_ENABLED) return;
 
     const runAutoTest = () => {
       runTests();
@@ -280,6 +289,8 @@ export function useAppAccessibility() {
 
   const runGlobalAccessibilityCheck = useCallback(async () => {
     try {
+      if (!A11Y_BUILD_ENABLED) return null;
+      const { accessibilityTester } = await import('src/utils/accessibilityTesting');
       // Run comprehensive tests on the entire document
       const results = await accessibilityTester.runTests(document);
       const score = accessibilityTester.calculateAccessibilityScore();
@@ -320,7 +331,7 @@ export function useAppAccessibility() {
 
   // Check accessibility when route changes
   useEffect(() => {
-    if (IS_TEST_MODE) return;
+    if (IS_TEST_MODE || !A11Y_BUILD_ENABLED) return;
     const checkOnRouteChange = () => {
       setTimeout(() => {
         runGlobalAccessibilityCheck();
@@ -412,6 +423,8 @@ export function useAccessibilityMonitor(options = {}) {
 
     const monitor = async () => {
       try {
+        if (!A11Y_BUILD_ENABLED) return;
+        const { accessibilityTester } = await import('src/utils/accessibilityTesting');
         const results = await accessibilityTester.runTests(document);
         const score = accessibilityTester.calculateAccessibilityScore();
 

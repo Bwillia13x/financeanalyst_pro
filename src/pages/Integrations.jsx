@@ -22,6 +22,7 @@ import React, { useState } from 'react';
 import Button from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import Header from '../components/ui/Header';
+import StatusBadge from '../components/ui/StatusBadge';
 
 const Integrations = () => {
   const [activeCategory, setActiveCategory] = useState('all');
@@ -44,7 +45,7 @@ const Integrations = () => {
       status: 'connected',
       provider: 'Bloomberg L.P.',
       icon: Globe,
-      color: 'bg-orange-500',
+      color: 'bg-warning',
       features: ['Real-time market data', 'Historical data', 'News feeds', 'Analytics'],
       pricing: 'Enterprise',
       lastSync: '2 minutes ago'
@@ -57,7 +58,7 @@ const Integrations = () => {
       status: 'available',
       provider: 'Interactive Brokers',
       icon: BarChart3,
-      color: 'bg-blue-500',
+      color: 'bg-accent',
       features: ['Portfolio tracking', 'Order execution', 'Account data', 'Risk management'],
       pricing: 'Free with account',
       lastSync: null
@@ -70,7 +71,7 @@ const Integrations = () => {
       status: 'error',
       provider: 'Refinitiv',
       icon: Database,
-      color: 'bg-indigo-500',
+      color: 'bg-accent',
       features: ['Market data', 'Company fundamentals', 'ESG data', 'Research'],
       pricing: 'Subscription',
       lastSync: 'Failed 2 hours ago'
@@ -83,7 +84,7 @@ const Integrations = () => {
       status: 'connected',
       provider: 'Alpha Vantage Inc.',
       icon: TrendingUp,
-      color: 'bg-green-500',
+      color: 'bg-success',
       features: ['Stock prices', 'Technical indicators', 'Forex data', 'Crypto data'],
       pricing: 'Freemium',
       lastSync: '10 minutes ago'
@@ -96,7 +97,7 @@ const Integrations = () => {
       status: 'connected',
       provider: 'Slack Technologies',
       icon: LinkIcon,
-      color: 'bg-purple-500',
+      color: 'bg-accent',
       features: ['Alert notifications', 'Report sharing', 'Team collaboration', 'Bot integration'],
       pricing: 'Free/Paid',
       lastSync: '5 minutes ago'
@@ -109,7 +110,7 @@ const Integrations = () => {
       status: 'available',
       provider: 'Salesforce',
       icon: BarChart3,
-      color: 'bg-cyan-500',
+      color: 'bg-accent',
       features: ['Data visualization', 'Dashboard creation', 'Advanced analytics', 'Reporting'],
       pricing: 'Subscription',
       lastSync: null
@@ -122,7 +123,7 @@ const Integrations = () => {
       status: 'configured',
       provider: 'Custom',
       icon: Webhook,
-      color: 'bg-gray-500',
+      color: 'bg-muted',
       features: ['Real-time updates', 'Custom triggers', 'Data streaming', 'Event notifications'],
       pricing: 'Free',
       lastSync: 'Continuous'
@@ -135,7 +136,7 @@ const Integrations = () => {
       status: 'connected',
       provider: 'Microsoft',
       icon: FileText,
-      color: 'bg-emerald-500',
+      color: 'bg-success',
       features: ['Data export', 'Model templates', 'Live data feeds', 'Automated reports'],
       pricing: 'Office 365',
       lastSync: '1 hour ago'
@@ -145,20 +146,15 @@ const Integrations = () => {
   const getStatusInfo = status => {
     switch (status) {
       case 'connected':
-        return {
-          icon: CheckCircle,
-          color: 'text-green-500',
-          bg: 'bg-green-100',
-          text: 'Connected'
-        };
+        return { icon: CheckCircle, tone: 'success', label: 'Connected' };
       case 'configured':
-        return { icon: Settings, color: 'text-blue-500', bg: 'bg-blue-100', text: 'Configured' };
+        return { icon: Settings, tone: 'neutral', label: 'Configured' };
       case 'error':
-        return { icon: AlertTriangle, color: 'text-red-500', bg: 'bg-red-100', text: 'Error' };
+        return { icon: AlertTriangle, tone: 'destructive', label: 'Error' };
       case 'available':
-        return { icon: Clock, color: 'text-gray-500', bg: 'bg-gray-100', text: 'Available' };
+        return { icon: Clock, tone: 'neutral', label: 'Available' };
       default:
-        return { icon: Clock, color: 'text-gray-500', bg: 'bg-gray-100', text: 'Unknown' };
+        return { icon: Clock, tone: 'neutral', label: 'Unknown' };
     }
   };
 
@@ -168,7 +164,7 @@ const Integrations = () => {
       : integrations.filter(integration => integration.category === activeCategory);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <Header />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -178,8 +174,8 @@ const Integrations = () => {
           transition={{ duration: 0.5 }}
         >
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Integrations</h1>
-            <p className="text-gray-600">
+            <h1 className="text-3xl font-bold text-foreground mb-2">Integrations</h1>
+            <p className="text-foreground-secondary">
               Connect your financial analysis platform with external data sources and tools
             </p>
           </div>
@@ -188,48 +184,48 @@ const Integrations = () => {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
             <Card className="p-6">
               <div className="flex items-center space-x-3">
-                <div className="p-2 bg-green-100 rounded-lg">
-                  <CheckCircle className="w-5 h-5 text-green-600" />
+                <div className="p-2 bg-success/10 rounded-lg">
+                  <CheckCircle className="w-5 h-5 text-success" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-gray-900">5</p>
-                  <p className="text-sm text-gray-600">Connected</p>
+                  <p className="text-2xl font-bold text-foreground">5</p>
+                  <p className="text-sm text-foreground-secondary">Connected</p>
                 </div>
               </div>
             </Card>
 
             <Card className="p-6">
               <div className="flex items-center space-x-3">
-                <div className="p-2 bg-blue-100 rounded-lg">
-                  <Zap className="w-5 h-5 text-blue-600" />
+                <div className="p-2 bg-accent/10 rounded-lg">
+                  <Zap className="w-5 h-5 text-accent" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-gray-900">3</p>
-                  <p className="text-sm text-gray-600">Available</p>
+                  <p className="text-2xl font-bold text-foreground">3</p>
+                  <p className="text-sm text-foreground-secondary">Available</p>
                 </div>
               </div>
             </Card>
 
             <Card className="p-6">
               <div className="flex items-center space-x-3">
-                <div className="p-2 bg-red-100 rounded-lg">
-                  <AlertTriangle className="w-5 h-5 text-red-600" />
+                <div className="p-2 bg-destructive/10 rounded-lg">
+                  <AlertTriangle className="w-5 h-5 text-destructive" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-gray-900">1</p>
-                  <p className="text-sm text-gray-600">Error</p>
+                  <p className="text-2xl font-bold text-foreground">1</p>
+                  <p className="text-sm text-foreground-secondary">Error</p>
                 </div>
               </div>
             </Card>
 
             <Card className="p-6">
               <div className="flex items-center space-x-3">
-                <div className="p-2 bg-purple-100 rounded-lg">
-                  <Database className="w-5 h-5 text-purple-600" />
+                <div className="p-2 bg-accent/10 rounded-lg">
+                  <Database className="w-5 h-5 text-accent" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-gray-900">50+</p>
-                  <p className="text-sm text-gray-600">Available</p>
+                  <p className="text-2xl font-bold text-foreground">50+</p>
+                  <p className="text-sm text-foreground-secondary">Available</p>
                 </div>
               </div>
             </Card>
@@ -244,8 +240,8 @@ const Integrations = () => {
                   onClick={() => setActiveCategory(category.id)}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                     activeCategory === category.id
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-white text-gray-700 hover:bg-gray-100'
+                      ? 'bg-accent text-accent-foreground'
+                      : 'bg-card text-foreground hover:bg-muted/50'
                   }`}
                 >
                   {category.label}
@@ -272,51 +268,69 @@ const Integrations = () => {
                           <integration.icon className="w-5 h-5 text-white" />
                         </div>
                         <div>
-                          <h3 className="font-semibold text-gray-900">{integration.name}</h3>
-                          <p className="text-sm text-gray-600">{integration.provider}</p>
+                          <h3 className="font-semibold text-foreground">{integration.name}</h3>
+                          <p className="text-sm text-foreground-secondary">{integration.provider}</p>
                         </div>
                       </div>
-                      <div className={`p-1 rounded-full ${statusInfo.bg}`}>
-                        <statusInfo.icon className={`w-4 h-4 ${statusInfo.color}`} />
+                      <div
+                        className={`p-1 rounded-full ${
+                          statusInfo.tone === 'success'
+                            ? 'bg-success/10'
+                            : statusInfo.tone === 'destructive'
+                              ? 'bg-destructive/10'
+                              : statusInfo.tone === 'warning'
+                                ? 'bg-warning/10'
+                                : 'bg-muted'
+                        }`}
+                      >
+                        <statusInfo.icon
+                          className={`w-4 h-4 ${
+                            statusInfo.tone === 'success'
+                              ? 'text-success'
+                              : statusInfo.tone === 'destructive'
+                                ? 'text-destructive'
+                                : statusInfo.tone === 'warning'
+                                  ? 'text-warning'
+                                  : 'text-foreground-secondary'
+                          }`}
+                        />
                       </div>
                     </div>
 
-                    <p className="text-sm text-gray-600 mb-4">{integration.description}</p>
+                    <p className="text-sm text-foreground-secondary mb-4">{integration.description}</p>
 
                     <div className="space-y-3 mb-4">
                       <div className="flex justify-between text-sm">
-                        <span className="text-gray-600">Status</span>
-                        <span
-                          className={`px-2 py-1 rounded-full text-xs font-medium ${statusInfo.bg} ${statusInfo.color}`}
-                        >
-                          {statusInfo.text}
-                        </span>
+                        <span className="text-foreground-secondary">Status</span>
+                        <StatusBadge tone={statusInfo.tone} size="xs" variant="soft">
+                          {statusInfo.label}
+                        </StatusBadge>
                       </div>
                       <div className="flex justify-between text-sm">
-                        <span className="text-gray-600">Pricing</span>
+                        <span className="text-foreground-secondary">Pricing</span>
                         <span className="font-medium">{integration.pricing}</span>
                       </div>
                       {integration.lastSync && (
                         <div className="flex justify-between text-sm">
-                          <span className="text-gray-600">Last Sync</span>
+                          <span className="text-foreground-secondary">Last Sync</span>
                           <span className="font-medium">{integration.lastSync}</span>
                         </div>
                       )}
                     </div>
 
                     <div className="mb-4">
-                      <h4 className="text-sm font-medium text-gray-900 mb-2">Features</h4>
+                      <h4 className="text-sm font-medium text-foreground mb-2">Features</h4>
                       <div className="flex flex-wrap gap-1">
                         {integration.features.slice(0, 3).map((feature, index) => (
                           <span
                             key={index}
-                            className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-md"
+                            className="px-2 py-1 bg-muted text-foreground-secondary text-xs rounded-md"
                           >
                             {feature}
                           </span>
                         ))}
                         {integration.features.length > 3 && (
-                          <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-md">
+                          <span className="px-2 py-1 bg-muted text-foreground-secondary text-xs rounded-md">
                             +{integration.features.length - 3} more
                           </span>
                         )}
@@ -338,7 +352,7 @@ const Integrations = () => {
                         <Button
                           variant="outline"
                           size="sm"
-                          className="flex-1 text-red-600 border-red-200"
+                          className="flex-1 text-destructive border-destructive/30 hover:bg-destructive/10"
                         >
                           <AlertTriangle className="w-4 h-4 mr-1" />
                           Fix Error
@@ -360,14 +374,14 @@ const Integrations = () => {
           <div className="mt-12">
             <Card className="p-8 text-center">
               <div className="flex justify-center mb-4">
-                <div className="p-3 bg-gray-100 rounded-lg">
-                  <Code className="w-8 h-8 text-gray-600" />
+                <div className="p-3 bg-muted rounded-lg">
+                  <Code className="w-8 h-8 text-foreground-secondary" />
                 </div>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              <h3 className="text-xl font-semibold text-foreground mb-2">
                 Need a Custom Integration?
               </h3>
-              <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
+              <p className="text-foreground-secondary mb-6 max-w-2xl mx-auto">
                 We can help you build custom integrations with your specific data sources, trading
                 platforms, or internal systems. Contact our integration team to discuss your
                 requirements.

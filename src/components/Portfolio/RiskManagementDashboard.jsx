@@ -1,20 +1,5 @@
-import {
-  Shield,
-  AlertTriangle,
-  TrendingUp,
-  TrendingDown,
-  Activity,
-  Target,
-  Bell,
-  BellOff,
-  Settings,
-  RefreshCw,
-  Eye,
-  EyeOff,
-  Zap,
-  BarChart3
-} from 'lucide-react';
-import React, { useState, useEffect, useMemo } from 'react';
+import { Shield, AlertTriangle, TrendingUp, Activity, Bell, BellOff, RefreshCw, Zap } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 
 import portfolioAnalyticsService from '../../services/financial/portfolioAnalyticsService';
 
@@ -24,7 +9,7 @@ const RiskManagementDashboard = ({
   onRiskAlert,
   className = ''
 }) => {
-  const [activeView, setActiveView] = useState('dashboard');
+  const [activeView] = useState('dashboard');
   const [alertsEnabled, setAlertsEnabled] = useState(true);
   const [realTimeMonitoring, setRealTimeMonitoring] = useState(true);
   const [riskMetrics, setRiskMetrics] = useState(null);
@@ -196,7 +181,7 @@ const RiskManagementDashboard = ({
   };
 
   // Helper functions for risk calculations
-  const calculateMaxDrawdown = portfolio => {
+  const calculateMaxDrawdown = _portfolio => {
     // Simplified max drawdown calculation
     return 0.15; // Mock value
   };
@@ -219,7 +204,7 @@ const RiskManagementDashboard = ({
     return (expectedReturn - riskFreeRate) / volatility;
   };
 
-  const calculateSortinoRatio = portfolio => {
+  const calculateSortinoRatio = _portfolio => {
     const expectedReturn = 0.08;
     const riskFreeRate = 0.03;
     const downsideVolatility = 0.18; // Mock downside volatility
@@ -227,7 +212,7 @@ const RiskManagementDashboard = ({
     return (expectedReturn - riskFreeRate) / downsideVolatility;
   };
 
-  const calculatePortfolioBeta = portfolio => {
+  const calculatePortfolioBeta = _portfolio => {
     // Simplified beta calculation
     return 1.05; // Mock value
   };
@@ -247,13 +232,13 @@ const RiskManagementDashboard = ({
 
   const getRiskColor = (value, threshold, inverse = false) => {
     if (inverse) {
-      if (value < threshold) return 'text-red-400';
-      if (value < threshold * 1.2) return 'text-yellow-400';
-      return 'text-green-400';
+      if (value < threshold) return 'text-destructive';
+      if (value < threshold * 1.2) return 'text-warning';
+      return 'text-success';
     } else {
-      if (value > threshold) return 'text-red-400';
-      if (value > threshold * 0.8) return 'text-yellow-400';
-      return 'text-green-400';
+      if (value > threshold) return 'text-destructive';
+      if (value > threshold * 0.8) return 'text-warning';
+      return 'text-success';
     }
   };
 
@@ -273,16 +258,16 @@ const RiskManagementDashboard = ({
   };
 
   return (
-    <div className={`bg-slate-800 rounded-lg overflow-hidden ${className}`}>
+    <div className={`bg-card border border-border rounded-lg overflow-hidden ${className}`}>
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-slate-700">
+      <div className="flex items-center justify-between p-4 border-b border-border">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-red-500/20 rounded-lg">
-            <Shield className="w-5 h-5 text-red-400" />
+          <div className="p-2 bg-destructive/20 rounded-lg">
+            <Shield className="w-5 h-5 text-destructive" />
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-white">Risk Management</h3>
-            <p className="text-xs text-slate-400">
+            <h3 className="text-lg font-semibold text-foreground">Risk Management</h3>
+            <p className="text-xs text-foreground-secondary">
               {alerts.length} active alert{alerts.length !== 1 ? 's' : ''}
             </p>
           </div>
@@ -293,8 +278,8 @@ const RiskManagementDashboard = ({
             onClick={() => setAlertsEnabled(!alertsEnabled)}
             className={`p-2 rounded-lg transition-colors ${
               alertsEnabled
-                ? 'text-green-400 hover:bg-green-500/20'
-                : 'text-slate-400 hover:bg-slate-700'
+                ? 'text-success hover:bg-success/20'
+                : 'text-foreground-secondary hover:bg-muted'
             }`}
             aria-label={alertsEnabled ? 'Disable alerts' : 'Enable alerts'}
           >
@@ -304,8 +289,8 @@ const RiskManagementDashboard = ({
             onClick={() => setRealTimeMonitoring(!realTimeMonitoring)}
             className={`p-2 rounded-lg transition-colors ${
               realTimeMonitoring
-                ? 'text-blue-400 hover:bg-blue-500/20'
-                : 'text-slate-400 hover:bg-slate-700'
+                ? 'text-accent hover:bg-accent/20'
+                : 'text-foreground-secondary hover:bg-muted'
             }`}
             aria-label={realTimeMonitoring ? 'Disable monitoring' : 'Enable monitoring'}
           >
@@ -314,7 +299,7 @@ const RiskManagementDashboard = ({
           <button
             onClick={calculateRiskMetrics}
             disabled={loading}
-            className="p-2 text-slate-400 hover:text-white hover:bg-slate-700 rounded-lg transition-colors disabled:opacity-50"
+            className="p-2 text-foreground-secondary hover:text-foreground hover:bg-muted rounded-lg transition-colors disabled:opacity-50"
             aria-label="Refresh metrics"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
@@ -324,7 +309,7 @@ const RiskManagementDashboard = ({
 
       {/* Active Alerts */}
       {alerts.length > 0 && (
-        <div className="p-4 border-b border-slate-700">
+        <div className="p-4 border-b border-border">
           <div className="space-y-3">
             {alerts.map(alert => {
               const Icon = getAlertIcon(alert.type);
@@ -333,29 +318,29 @@ const RiskManagementDashboard = ({
                   key={alert.id}
                   className={`p-3 rounded-lg border ${
                     alert.type === 'warning'
-                      ? 'bg-yellow-900/20 border-yellow-500/30'
-                      : 'bg-blue-900/20 border-blue-500/30'
+                      ? 'bg-warning/10 border-warning/30'
+                      : 'bg-accent/10 border-accent/30'
                   }`}
                 >
                   <div className="flex items-start gap-3">
                     <Icon
                       className={`w-5 h-5 mt-0.5 ${
-                        alert.type === 'warning' ? 'text-yellow-400' : 'text-blue-400'
+                        alert.type === 'warning' ? 'text-warning' : 'text-accent'
                       }`}
                     />
                     <div className="flex-1">
                       <div className="flex items-center justify-between">
-                        <h4 className="text-sm font-semibold text-white">{alert.title}</h4>
+                        <h4 className="text-sm font-semibold text-foreground">{alert.title}</h4>
                         <button
                           onClick={() => dismissAlert(alert.id)}
-                          className="text-slate-400 hover:text-white"
+                          className="text-foreground-secondary hover:text-foreground"
                           aria-label="Dismiss alert"
                         >
                           ×
                         </button>
                       </div>
-                      <p className="text-sm text-slate-300 mt-1">{alert.message}</p>
-                      <div className="flex items-center gap-4 mt-2 text-xs text-slate-400">
+                      <p className="text-sm text-foreground-secondary mt-1">{alert.message}</p>
+                      <div className="flex items-center gap-4 mt-2 text-xs text-foreground-secondary">
                         <span>Current: {alert.value.toFixed(1)}%</span>
                         <span>Threshold: {alert.threshold.toFixed(1)}%</span>
                       </div>
@@ -373,25 +358,25 @@ const RiskManagementDashboard = ({
         <div className="p-4 space-y-6">
           {/* Key Risk Metrics */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="bg-slate-700/50 rounded-lg p-4">
+            <div className="bg-muted rounded-lg p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-slate-400">VaR (95%)</span>
-                <Shield className="w-4 h-4 text-red-400" />
+                <span className="text-sm text-foreground-secondary">VaR (95%)</span>
+                <Shield className="w-4 h-4 text-destructive" />
               </div>
               <div
                 className={`text-xl font-bold ${getRiskColor(riskMetrics.varPercentage / 100, defaultThresholds.varLimit)}`}
               >
                 {formatCurrency(riskMetrics.var)}
               </div>
-              <div className="text-xs text-slate-400">
+              <div className="text-xs text-foreground-secondary">
                 {formatPercent(riskMetrics.varPercentage / 100)}
               </div>
             </div>
 
-            <div className="bg-slate-700/50 rounded-lg p-4">
+            <div className="bg-muted rounded-lg p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-slate-400">Volatility</span>
-                <Activity className="w-4 h-4 text-purple-400" />
+                <span className="text-sm text-foreground-secondary">Volatility</span>
+                <Activity className="w-4 h-4 text-accent" />
               </div>
               <div
                 className={`text-xl font-bold ${getRiskColor(riskMetrics.volatility, defaultThresholds.volatilityLimit)}`}
@@ -400,20 +385,20 @@ const RiskManagementDashboard = ({
               </div>
             </div>
 
-            <div className="bg-slate-700/50 rounded-lg p-4">
+            <div className="bg-muted rounded-lg p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-slate-400">Sharpe Ratio</span>
-                <TrendingUp className="w-4 h-4 text-green-400" />
+                <span className="text-sm text-foreground-secondary">Sharpe Ratio</span>
+                <TrendingUp className="w-4 h-4 text-success" />
               </div>
-              <div className="text-xl font-bold text-green-400">
+              <div className="text-xl font-bold text-success">
                 {riskMetrics.sharpeRatio.toFixed(2)}
               </div>
             </div>
 
-            <div className="bg-slate-700/50 rounded-lg p-4">
+            <div className="bg-muted rounded-lg p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-slate-400">Liquidity Score</span>
-                <Zap className="w-4 h-4 text-blue-400" />
+                <span className="text-sm text-foreground-secondary">Liquidity Score</span>
+                <Zap className="w-4 h-4 text-accent" />
               </div>
               <div
                 className={`text-xl font-bold ${getRiskColor(riskMetrics.liquidityScore, defaultThresholds.liquidityThreshold, true)}`}
@@ -426,22 +411,22 @@ const RiskManagementDashboard = ({
           {/* Risk Breakdown */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Risk by Asset */}
-            <div className="bg-slate-700/50 rounded-lg p-4">
-              <h4 className="text-sm font-semibold text-white mb-4">Risk by Asset</h4>
+            <div className="bg-muted rounded-lg p-4">
+              <h4 className="text-sm font-semibold text-foreground mb-4">Risk by Asset</h4>
               <div className="space-y-3">
                 {defaultPortfolio.assets.map((asset, index) => {
                   const varContribution = riskMetrics.valueAtRisk.components?.[index];
                   return (
                     <div key={asset.symbol} className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="w-3 h-3 bg-red-500 rounded-full" />
-                        <span className="text-sm text-white">{asset.symbol}</span>
+                        <div className="w-3 h-3 bg-destructive rounded-full" />
+                        <span className="text-sm text-foreground">{asset.symbol}</span>
                       </div>
                       <div className="text-right">
-                        <div className="text-sm text-white font-medium">
+                        <div className="text-sm text-foreground font-medium">
                           {formatCurrency(varContribution?.varContribution || 0)}
                         </div>
-                        <div className="text-xs text-slate-400">
+                        <div className="text-xs text-foreground-secondary">
                           {varContribution?.percentageContribution.toFixed(1) || 0}%
                         </div>
                       </div>
@@ -452,17 +437,17 @@ const RiskManagementDashboard = ({
             </div>
 
             {/* Risk Limits */}
-            <div className="bg-slate-700/50 rounded-lg p-4">
-              <h4 className="text-sm font-semibold text-white mb-4">Risk Limits</h4>
+            <div className="bg-muted rounded-lg p-4">
+              <h4 className="text-sm font-semibold text-foreground mb-4">Risk Limits</h4>
               <div className="space-y-4">
                 <div>
                   <div className="flex justify-between text-sm mb-1">
-                    <span className="text-slate-400">VaR Limit</span>
-                    <span className="text-white">{formatPercent(defaultThresholds.varLimit)}</span>
+                    <span className="text-foreground-secondary">VaR Limit</span>
+                    <span className="text-foreground">{formatPercent(defaultThresholds.varLimit)}</span>
                   </div>
-                  <div className="w-full bg-slate-600 rounded-full h-2">
+                  <div className="w-full bg-muted rounded-full h-2">
                     <div
-                      className="bg-red-500 h-2 rounded-full"
+                      className="bg-destructive h-2 rounded-full"
                       style={{
                         width: `${Math.min((riskMetrics.varPercentage / 100 / defaultThresholds.varLimit) * 100, 100)}%`
                       }}
@@ -472,14 +457,14 @@ const RiskManagementDashboard = ({
 
                 <div>
                   <div className="flex justify-between text-sm mb-1">
-                    <span className="text-slate-400">Volatility Limit</span>
-                    <span className="text-white">
+                    <span className="text-foreground-secondary">Volatility Limit</span>
+                    <span className="text-foreground">
                       {formatPercent(defaultThresholds.volatilityLimit)}
                     </span>
                   </div>
-                  <div className="w-full bg-slate-600 rounded-full h-2">
+                  <div className="w-full bg-muted rounded-full h-2">
                     <div
-                      className="bg-purple-500 h-2 rounded-full"
+                      className="bg-accent h-2 rounded-full"
                       style={{
                         width: `${Math.min((riskMetrics.volatility / defaultThresholds.volatilityLimit) * 100, 100)}%`
                       }}
@@ -489,14 +474,14 @@ const RiskManagementDashboard = ({
 
                 <div>
                   <div className="flex justify-between text-sm mb-1">
-                    <span className="text-slate-400">Concentration Limit</span>
-                    <span className="text-white">
+                    <span className="text-foreground-secondary">Concentration Limit</span>
+                    <span className="text-foreground">
                       {formatPercent(defaultThresholds.concentrationLimit)}
                     </span>
                   </div>
-                  <div className="w-full bg-slate-600 rounded-full h-2">
+                  <div className="w-full bg-muted rounded-full h-2">
                     <div
-                      className="bg-yellow-500 h-2 rounded-full"
+                      className="bg-warning h-2 rounded-full"
                       style={{
                         width: `${Math.min((riskMetrics.concentration / defaultThresholds.concentrationLimit) * 100, 100)}%`
                       }}
@@ -509,21 +494,21 @@ const RiskManagementDashboard = ({
 
           {/* Additional Metrics */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-slate-700/50 rounded-lg p-4">
-              <div className="text-sm text-slate-400 mb-1">Max Drawdown</div>
-              <div className="text-lg font-semibold text-red-400">
+            <div className="bg-muted rounded-lg p-4">
+              <div className="text-sm text-foreground-secondary mb-1">Max Drawdown</div>
+              <div className="text-lg font-semibold text-destructive">
                 {formatPercent(riskMetrics.maxDrawdown)}
               </div>
             </div>
-            <div className="bg-slate-700/50 rounded-lg p-4">
-              <div className="text-sm text-slate-400 mb-1">Sortino Ratio</div>
-              <div className="text-lg font-semibold text-green-400">
+            <div className="bg-muted rounded-lg p-4">
+              <div className="text-sm text-foreground-secondary mb-1">Sortino Ratio</div>
+              <div className="text-lg font-semibold text-success">
                 {riskMetrics.sortinoRatio.toFixed(2)}
               </div>
             </div>
-            <div className="bg-slate-700/50 rounded-lg p-4">
-              <div className="text-sm text-slate-400 mb-1">Portfolio Beta</div>
-              <div className="text-lg font-semibold text-blue-400">
+            <div className="bg-muted rounded-lg p-4">
+              <div className="text-sm text-foreground-secondary mb-1">Portfolio Beta</div>
+              <div className="text-lg font-semibold text-accent">
                 {riskMetrics.beta.toFixed(2)}
               </div>
             </div>
@@ -534,17 +519,17 @@ const RiskManagementDashboard = ({
       {/* Loading State */}
       {loading && (
         <div className="flex items-center justify-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-500" />
-          <span className="ml-3 text-slate-300">Calculating risk metrics...</span>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-destructive" />
+          <span className="ml-3 text-foreground-secondary">Calculating risk metrics...</span>
         </div>
       )}
 
       {/* Empty State */}
       {!loading && !riskMetrics && (
         <div className="p-8 text-center">
-          <Shield className="w-12 h-12 text-slate-500 mx-auto mb-4" />
-          <h4 className="text-slate-400 mb-2">No Risk Data Available</h4>
-          <p className="text-sm text-slate-500">
+          <Shield className="w-12 h-12 text-foreground-secondary mx-auto mb-4" />
+          <h4 className="text-foreground-secondary mb-2">No Risk Data Available</h4>
+          <p className="text-sm text-foreground-secondary">
             Risk metrics will appear here once portfolio data is loaded.
           </p>
         </div>

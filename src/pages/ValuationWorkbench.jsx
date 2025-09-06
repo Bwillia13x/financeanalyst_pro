@@ -2,7 +2,6 @@ import { useState, useMemo, useEffect } from 'react';
 
 import { Card, Pill } from 'src/components/ui/UIHelpers.jsx';
 
-import Header from '../components/ui/Header';
 import AssumptionsPanel from '../components/ValuationWorkbench/AssumptionsPanel';
 import { AuditTrail, useAuditTrail } from '../components/ValuationWorkbench/AuditTrail';
 import { AxisPicker } from '../components/ValuationWorkbench/AxisPicker';
@@ -114,9 +113,6 @@ const ValuationWorkbench = () => {
 
   return (
     <div className="min-h-[100dvh] bg-background text-foreground">
-      <Header />
-
-      <div className="pt-[60px]">
         {/* Page Header */}
         <div className="border-b border-border bg-card">
           <div className="flex items-center justify-between p-4">
@@ -277,7 +273,6 @@ const ValuationWorkbench = () => {
             sheet into the assumptions; set priors from historical distributions.
           </div>
         </div>
-      </div>
     </div>
   );
 };

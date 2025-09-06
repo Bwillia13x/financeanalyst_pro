@@ -6,6 +6,7 @@ import SEOHead from '../../components/SEO/SEOHead';
 import Button from '../../components/ui/Button';
 import Header from '../../components/ui/Header';
 import { useKeyboardShortcutsContext } from '../../components/ui/KeyboardShortcutsProvider';
+import StatusBadge from '../../components/ui/StatusBadge';
 
 // Lazy-load heavy panels to reduce initial TBT
 const AuditTrail = lazy(() => import('./components/AuditTrail'));
@@ -116,8 +117,8 @@ const FinancialModelWorkspace = () => {
   }, [activeLayout]);
 
   const PanelFallback = ({ className = '' }) => (
-    <div className={`w-full h-full bg-gray-900 flex items-center justify-center ${className}`}>
-      <div className="animate-pulse text-gray-400 text-sm">Loading…</div>
+    <div className={`w-full h-full bg-muted flex items-center justify-center ${className}`}>
+      <div className="animate-pulse text-foreground-secondary text-sm">Loading…</div>
     </div>
   );
 
@@ -206,9 +207,9 @@ const FinancialModelWorkspace = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
+    <div className="min-h-screen bg-background text-foreground">
       <SEOHead
-        title="Financial Model Workspace | FinanceAnalyst Pro"
+        title="Financial Model Workspace | Valor-IVX"
         description="Professional financial modeling workspace with advanced DCF analysis, LBO tools, and real-time collaboration features for finance professionals."
         canonical="/"
         keywords="financial modeling, DCF analysis, LBO modeling, financial workspace, valuation tools, Excel alternative"
@@ -218,18 +219,14 @@ const FinancialModelWorkspace = () => {
       {/* Main Workspace */}
       <main id="main-content" className="flex flex-col h-screen pt-16" role="main">
         {/* Toolbar */}
-        <div className="bg-gray-800 border-b border-gray-700 px-4 py-2 flex items-center justify-between">
+        <div className="bg-card border-b border-border px-4 py-2 flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
               <Icon name="FileText" className="w-5 h-5 text-blue-400" />
               <span className="font-medium">{modelState.name}</span>
-              <span
-                className={`text-xs px-2 py-1 rounded ${
-                  modelState.saved ? 'bg-green-900 text-green-300' : 'bg-yellow-900 text-yellow-300'
-                }`}
-              >
+              <StatusBadge tone={modelState.saved ? 'success' : 'warning'} size="xs" variant="soft">
                 {modelState.saved ? 'Saved' : 'Unsaved'}
-              </span>
+              </StatusBadge>
             </div>
           </div>
 
@@ -271,7 +268,7 @@ const FinancialModelWorkspace = () => {
               <select
                 value={leftPanelContent}
                 onChange={e => setLeftPanelContent(e.target.value)}
-                className="bg-gray-700 border border-gray-600 rounded px-2 py-1 text-sm"
+                className="bg-muted border border-border rounded px-2 py-1 text-sm text-foreground"
                 aria-label="Select left panel content"
               >
                 <option value="terminal">Terminal</option>
@@ -284,7 +281,7 @@ const FinancialModelWorkspace = () => {
                 <select
                   value={rightPanelContent}
                   onChange={e => setRightPanelContent(e.target.value)}
-                  className="bg-gray-700 border border-gray-600 rounded px-2 py-1 text-sm"
+                  className="bg-muted border border-border rounded px-2 py-1 text-sm text-foreground"
                   aria-label="Select right panel content"
                 >
                   <option value="results">Results</option>
@@ -301,7 +298,7 @@ const FinancialModelWorkspace = () => {
           <div
             className={`${
               activeLayout === 'dual-pane' ? 'w-1/2' : 'w-full'
-            } border-r border-gray-700 overflow-hidden`}
+            } border-r border-border overflow-hidden`}
           >
             {renderLeftPanel()}
           </div>
@@ -317,8 +314,8 @@ const FinancialModelWorkspace = () => {
         {/* Collaborative Editor Overlay */}
         {isCollaborationEnabled && (
           <div className="absolute top-20 right-4 w-80 h-96 z-50">
-            <div className="bg-gray-800 border border-gray-600 rounded-lg shadow-xl h-full">
-              <div className="flex items-center justify-between p-3 border-b border-gray-600">
+            <div className="bg-card border border-border rounded-lg shadow-xl h-full">
+              <div className="flex items-center justify-between p-3 border-b border-border">
                 <div className="flex items-center space-x-2">
                   <Icon name="Users" className="w-4 h-4 text-blue-400" />
                   <span className="text-sm font-medium">Live Collaboration</span>

@@ -1,4 +1,5 @@
 import express from 'express';
+import { generateAccessToken, generateRefreshToken } from '../utils/auth.js';
 
 const router = express.Router();
 
@@ -209,6 +210,30 @@ router.post('/logout', (req, res) => {
     success: true,
     message: 'Logged out successfully'
   });
+});
+
+// Admin login that issues signed JWT usable with protected endpoints
+router.post('/admin-login', (req, res) => {
+  const { email, password } = req.body || {};
+  // Minimal validation; in production validate against user store
+  if (!email || !password) {
+    return res.status(400).json({ success: false, message: 'Email and password required' });
+  }
+  // Simple demo credential gate; replace with real check
+  const isDemoAdmin = email.toLowerCase() === 'admin@financeanalyst.pro' && password === 'admin123';
+  if (!isDemoAdmin && process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'test') {
+    return res.status(401).json({ success: false, message: 'Invalid credentials' });
+  }
+
+  const user = {
+    id: 'admin-user-001',
+    email,
+    name: 'Admin User',
+    role: 'admin'
+  };
+  const accessToken = generateAccessToken(user);
+  const refreshToken = generateRefreshToken(user);
+  return res.status(200).json({ success: true, user, accessToken, refreshToken });
 });
 
 export default router;

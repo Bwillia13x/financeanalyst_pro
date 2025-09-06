@@ -37,8 +37,8 @@ class PerformanceMeasurementEngine extends FinancialAnalyticsEngine {
     }
 
     // Basic return calculations
-    const portfolioStats = this.calculateReturns(portfolioReturns);
-    const benchmarkStats = benchmarkReturns ? this.calculateReturns(benchmarkReturns) : null;
+    const portfolioStats = this.calculateReturnStats(portfolioReturns);
+    const benchmarkStats = benchmarkReturns ? this.calculateReturnStats(benchmarkReturns) : null;
 
     // Risk-adjusted performance metrics
     const sharpeRatio = this.calculateSharpeRatio(portfolioReturns, undefined, riskFreeRate);
@@ -105,6 +105,49 @@ class PerformanceMeasurementEngine extends FinancialAnalyticsEngine {
         bestMonth: this.round(Math.max(...portfolioReturns)),
         worstMonth: this.round(Math.min(...portfolioReturns))
       }
+    };
+
+    this.setCache(cacheKey, result);
+    return result;
+  }
+
+  /**
+   * Calculate return statistics for returns data (not prices)
+   */
+  calculateReturnStats(returns) {
+    const cacheKey = `return_stats_${returns.length}`;
+    const cached = this.getCache(cacheKey);
+    if (cached) return cached;
+
+    if (!Array.isArray(returns) || returns.length < 2) {
+      throw new Error('Insufficient return data');
+    }
+
+    // Calculate total return
+    const totalReturn = returns.reduce((acc, r) => acc * (1 + r), 1) - 1;
+
+    // Annualize return (assuming daily returns)
+    const annualizedReturn = this.annualizeReturn(totalReturn, returns.length);
+
+    // Calculate volatility
+    const volatility = this.calculateVolatility(returns);
+
+    // Calculate Sharpe ratio
+    const sharpeRatio = this.calculateSharpeRatio(returns);
+
+    // Calculate cumulative returns
+    const cumulativeReturns = [0];
+    for (let i = 0; i < returns.length; i++) {
+      const cumRet = returns.slice(0, i + 1).reduce((acc, r) => acc * (1 + r), 1) - 1;
+      cumulativeReturns.push(cumRet);
+    }
+
+    const result = {
+      totalReturn,
+      annualizedReturn,
+      volatility,
+      sharpeRatio,
+      cumulativeReturns
     };
 
     this.setCache(cacheKey, result);

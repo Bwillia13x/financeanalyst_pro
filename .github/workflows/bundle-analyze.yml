@@ -1,0 +1,61 @@
+name: Bundle Analyze
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Generate PWA icons
+        run: npm run icons:generate || true
+
+      - name: Build (prod)
+        run: npm run build:prod
+
+      - name: Generate analyzer JSON
+        run: npx vite-bundle-analyzer --mode json "dist/assets/*.js" > bundle-analysis.json
+
+      - name: Collect gzipped sizes
+        run: node scripts/collect-gzip-sizes.js bundle-sizes.json
+
+      - name: Comment PR with top chunks
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const sizes = JSON.parse(fs.readFileSync('bundle-sizes.json','utf8'));
+            const top = sizes.files.slice(0, 15);
+            let md = '## Top JS Chunks (gzipped)\n\n';
+            md += `Total: ${(sizes.totalBytesGzip/1024).toFixed(2)} KB\n\n`;
+            md += '| Chunk | Size (KB) |\n|---|---:|\n';
+            for (const f of top) md += `| ${f.file} | ${f.kbGzip} |\n`;
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: md
+            });
+
+      - name: Upload analyzer output
+        uses: actions/upload-artifact@v4
+        with:
+          name: bundle-analysis
+          path: |
+            bundle-analysis.json
+            dist/assets
+            bundle-sizes.json

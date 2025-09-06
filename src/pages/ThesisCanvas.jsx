@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 
-import PersistentCLI from '../components/CLI/PersistentCLI';
+// CLI is mounted globally in App
 import Header from '../components/ui/Header';
 import canvasApiService from '../services/canvasApiService';
 
@@ -33,7 +33,7 @@ const TYPES = [
 // ———————————— UI Components ————————————
 const Card = React.memo(({ title, right, children, className = '', actions }) => {
   const cardClasses = [
-    'rounded-2xl border border-slate-200 bg-white shadow-sm transition-shadow hover:shadow-md',
+    'rounded-2xl border border-border bg-card shadow-sm transition-shadow hover:shadow-md',
     className
   ]
     .filter(Boolean)
@@ -41,10 +41,10 @@ const Card = React.memo(({ title, right, children, className = '', actions }) =>
   return (
     <section className={cardClasses}>
       {(title || right || actions) && (
-        <header className="flex items-center justify-between border-b border-slate-200 px-4 py-2.5">
+        <header className="flex items-center justify-between border-b border-border px-4 py-2.5">
           <div className="flex items-center gap-2">
             {title && (
-              <h3 className="text-[13px] font-semibold tracking-wide text-slate-700">{title}</h3>
+              <h3 className="text-[13px] font-semibold tracking-wide text-foreground">{title}</h3>
             )}
             {right}
           </div>
@@ -59,12 +59,12 @@ Card.displayName = 'Card';
 
 const Pill = React.memo(({ children, tone = 'slate', onClick, className = '' }) => {
   const tones = {
-    slate: 'bg-slate-50 text-slate-700 border-slate-200',
-    blue: 'bg-blue-50 text-blue-700 border-blue-200',
-    amber: 'bg-amber-50 text-amber-700 border-amber-200',
-    green: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-    red: 'bg-rose-50 text-rose-700 border-rose-200',
-    violet: 'bg-violet-50 text-violet-700 border-violet-200'
+    slate: 'bg-muted text-foreground border-border',
+    blue: 'bg-accent/10 text-accent border-accent',
+    amber: 'bg-warning/10 text-warning border-warning',
+    green: 'bg-success/10 text-success border-success',
+    red: 'bg-destructive/10 text-destructive border-destructive',
+    violet: 'bg-accent/10 text-accent border-accent'
   };
   const pillClasses = [
     'inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] transition-all',
@@ -90,10 +90,10 @@ Pill.displayName = 'Pill';
 const Button = React.memo(
   ({ children, variant = 'default', size = 'sm', onClick, disabled, className = '' }) => {
     const variants = {
-      default: 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50',
-      primary: 'border-blue-600 bg-blue-600 text-white hover:bg-blue-700',
-      danger: 'border-rose-600 bg-rose-600 text-white hover:bg-rose-700',
-      ghost: 'border-transparent text-slate-700 hover:bg-slate-100'
+      default: 'border-border bg-card text-foreground hover:bg-muted/50',
+      primary: 'border-accent bg-accent text-accent-foreground hover:opacity-90',
+      danger: 'border-destructive bg-destructive text-destructive-foreground hover:opacity-90',
+      ghost: 'border-transparent text-foreground hover:bg-muted'
     };
     const sizes = {
       sm: 'px-2 py-1 text-[12px]',
@@ -365,7 +365,7 @@ const Minimap = React.memo(({ nodes, edges, viewport }) => {
   }, [nodes]);
   const viewBox = `${bounds.minX} ${bounds.minY} ${bounds.maxX - bounds.minX} ${bounds.maxY - bounds.minY}`;
   return (
-    <div className="absolute bottom-4 right-4 overflow-hidden rounded-lg border border-slate-300 bg-white/95 shadow-lg">
+    <div className="absolute bottom-4 right-4 overflow-hidden rounded-lg border border-border-secondary bg-card/95 shadow-lg">
       <svg width={width} height={height} viewBox={viewBox}>
         <rect
           x={bounds.minX}
@@ -446,12 +446,12 @@ const SearchPanel = React.memo(({ nodes, onNodeSelect, onFilter }) => {
           value={query}
           onChange={e => setQuery(e.target.value)}
           placeholder="Search nodes…"
-          className="w-full rounded-md border border-slate-300 px-2 py-1 text-[12px]"
+          className="w-full rounded-md border border-border px-2 py-1 text-[12px] bg-background text-foreground"
         />
         <select
           value={typeFilter}
           onChange={e => setTypeFilter(e.target.value)}
-          className="w-full rounded-md border border-slate-300 px-2 py-1 text-[12px]"
+          className="w-full rounded-md border border-border px-2 py-1 text-[12px] bg-background text-foreground"
         >
           <option value="all">All Types</option>
           {TYPES.map(t => (
@@ -465,10 +465,10 @@ const SearchPanel = React.memo(({ nodes, onNodeSelect, onFilter }) => {
             <button
               key={n.id}
               onClick={() => onNodeSelect(n.id)}
-              className="w-full text-left cursor-pointer rounded border border-slate-200 px-2 py-1 text-[11px] hover:bg-slate-50"
+              className="w-full text-left cursor-pointer rounded border border-border px-2 py-1 text-[11px] hover:bg-muted/50"
             >
               <span className="font-medium">{TYPES.find(t => t.k === n.type)?.label}</span>
-              <span className="ml-1 text-slate-500">{(n.text || '').slice(0, 50)}…</span>
+              <span className="ml-1 text-foreground-secondary">{(n.text || '').slice(0, 50)}…</span>
             </button>
           ))}
         </div>
@@ -698,7 +698,7 @@ function Canvas({ nodes, setNodes, edges, setEdges, selectedIds, setSelectedIds,
   }, []);
 
   return (
-    <div className="relative h-[640px] overflow-hidden rounded-2xl border border-slate-200 bg-slate-50">
+    <div className="relative h-[640px] overflow-hidden rounded-2xl border border-border bg-background-secondary">
       <div className="pointer-events-none absolute left-2 top-2 z-10 flex gap-1 text-[11px]">
         <Pill tone="slate">Space/Meta/Ctrl + Drag = Pan</Pill>
         <Pill tone="blue">Wheel = Zoom ({Math.round(transform.scale * 100)}%)</Pill>
@@ -805,7 +805,7 @@ function Inspector({ nodes, selectedIds, updateNode, deleteNodes }) {
   if (selectedNodes.length === 0)
     return (
       <Card title="Inspector">
-        <div className="text-[12px] text-slate-500">Select a node to edit its properties.</div>
+        <div className="text-[12px] text-foreground-secondary">Select a node to edit its properties.</div>
       </Card>
     );
   if (selectedNodes.length > 1)
@@ -820,15 +820,15 @@ function Inspector({ nodes, selectedIds, updateNode, deleteNodes }) {
         }
       >
         <div className="space-y-2 text-[12px]">
-          <div className="text-slate-600">Multiple nodes selected</div>
+          <div className="text-foreground-secondary">Multiple nodes selected</div>
           <div className="space-y-1">
             {selectedNodes.map(n => (
               <div
                 key={n.id}
-                className="flex items-center gap-2 rounded border border-slate-200 px-2 py-1"
+                className="flex items-center gap-2 rounded border border-border px-2 py-1"
               >
                 <span className="font-medium">{TYPES.find(t => t.k === n.type)?.icon}</span>
-                <span className="truncate text-slate-700">{n.text || 'Untitled'}</span>
+                <span className="truncate text-foreground">{n.text || 'Untitled'}</span>
               </div>
             ))}
           </div>
@@ -848,14 +848,14 @@ function Inspector({ nodes, selectedIds, updateNode, deleteNodes }) {
     >
       <div className="space-y-3 text-[13px]">
         <div>
-          <label htmlFor={`node-type-${node.id}`} className="mb-1 block text-slate-600">
+          <label htmlFor={`node-type-${node.id}`} className="mb-1 block text-foreground-secondary">
             Type
           </label>
           <select
             id={`node-type-${node.id}`}
             value={node.type}
             onChange={e => updateNode({ ...node, type: e.target.value })}
-            className="w-full rounded-md border border-slate-300 px-2 py-1"
+            className="w-full rounded-md border border-border px-2 py-1 bg-background text-foreground"
           >
             {TYPES.map(t => (
               <option key={t.k} value={t.k}>
@@ -865,14 +865,14 @@ function Inspector({ nodes, selectedIds, updateNode, deleteNodes }) {
           </select>
         </div>
         <div>
-          <label htmlFor={`node-content-${node.id}`} className="mb-1 block text-slate-600">
+          <label htmlFor={`node-content-${node.id}`} className="mb-1 block text-foreground-secondary">
             Content
           </label>
           <textarea
             id={`node-content-${node.id}`}
             value={node.text}
             onChange={e => updateNode({ ...node, text: e.target.value })}
-            className="h-24 w-full rounded-md border border-slate-300 p-2 text-[12px]"
+            className="h-24 w-full rounded-md border border-border p-2 text-[12px] bg-background text-foreground"
             placeholder="Enter your thesis, claim, or evidence here…"
           />
         </div>
@@ -884,11 +884,11 @@ function Inspector({ nodes, selectedIds, updateNode, deleteNodes }) {
             onChange={e => updateNode({ ...node, collapsed: e.target.checked })}
             className="rounded"
           />
-          <label htmlFor="collapsed" className="text-slate-700">
+          <label htmlFor="collapsed" className="text-foreground">
             Collapse children
           </label>
         </div>
-        <div className="border-t border-slate-200 pt-2 text-[11px] text-slate-500">
+        <div className="border-t border-border pt-2 text-[11px] text-foreground-secondary">
           <div>ID: {node.id}</div>
           <div>
             Position: ({node.x}, {node.y})
@@ -909,7 +909,7 @@ function Palette({ onAdd }) {
           <button
             key={t.k}
             onClick={() => onAdd(t.k)}
-            className="flex items-center gap-2 rounded-md border border-slate-200 bg-white px-2 py-1 hover:bg-slate-50"
+            className="flex items-center gap-2 rounded-md border border-border bg-card px-2 py-1 hover:bg-muted/50"
           >
             <span>{t.icon}</span>
             <span>{t.label}</span>
@@ -1556,14 +1556,7 @@ const ThesisCanvas = () => {
         </div>
       </div>
 
-      {/* Persistent CLI */}
-      <PersistentCLI
-        currentContext={{ page: 'canvas', canvasData }}
-        onNavigate={path => {
-          // Handle navigation if needed
-          console.log('Navigate to:', path);
-        }}
-      />
+      {/* CLI is mounted globally in App */}
     </div>
   );
 };

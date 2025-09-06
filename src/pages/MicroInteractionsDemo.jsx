@@ -150,12 +150,12 @@ const MicroInteractionsDemo = () => {
         <div className="mb-12">
           <h2 className="text-2xl font-semibold text-foreground mb-6">Interactive Hover Cards</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <HoverCard scale glow className="p-6 bg-white border border-slate-200 rounded-lg">
+            <HoverCard scale glow className="p-6 bg-card border border-border rounded-lg">
               <h3 className="text-lg font-medium text-foreground mb-2">Scale + Glow</h3>
               <p className="text-foreground-secondary">Hover to see the scale and glow effect</p>
             </HoverCard>
 
-            <HoverCard lift className="p-6 bg-white border border-slate-200 rounded-lg">
+            <HoverCard lift className="p-6 bg-card border border-border rounded-lg">
               <h3 className="text-lg font-medium text-foreground mb-2">Lift Effect</h3>
               <p className="text-foreground-secondary">Hover to see the lift animation</p>
             </HoverCard>
@@ -164,7 +164,7 @@ const MicroInteractionsDemo = () => {
               scale={false}
               lift={false}
               glow
-              className="p-6 bg-white border border-slate-200 rounded-lg"
+              className="p-6 bg-card border border-border rounded-lg"
             >
               <h3 className="text-lg font-medium text-foreground mb-2">Glow Only</h3>
               <p className="text-foreground-secondary">Hover for glow effect only</p>
@@ -177,19 +177,19 @@ const MicroInteractionsDemo = () => {
           <h2 className="text-2xl font-semibold text-foreground mb-6">Ripple Effects</h2>
           <div className="flex flex-wrap gap-4">
             <RippleButton
-              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-smooth"
               rippleColor="rgba(255, 255, 255, 0.3)"
             >
               Click for Ripple
             </RippleButton>
             <RippleButton
-              className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+              className="px-6 py-3 bg-success text-success-foreground rounded-lg hover:opacity-90 transition-smooth"
               rippleColor="rgba(255, 255, 255, 0.4)"
             >
               Green Ripple
             </RippleButton>
             <RippleButton
-              className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+              className="px-6 py-3 bg-accent text-accent-foreground rounded-lg hover:opacity-90 transition-smooth"
               rippleColor="rgba(255, 255, 255, 0.3)"
             >
               Purple Ripple
@@ -224,25 +224,25 @@ const MicroInteractionsDemo = () => {
         <div className="mb-12">
           <h2 className="text-2xl font-semibold text-foreground mb-6">Animated Numbers</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="p-6 bg-white border border-slate-200 rounded-lg text-center">
-              <AnimatedNumber value={animatedValue} className="text-3xl font-bold text-blue-600" />
+            <div className="p-6 bg-card border border-border rounded-lg text-center">
+              <AnimatedNumber value={animatedValue} className="text-3xl font-bold text-primary" />
               <p className="text-sm text-foreground-secondary mt-2">Formatted Number</p>
             </div>
-            <div className="p-6 bg-white border border-slate-200 rounded-lg text-center">
+            <div className="p-6 bg-card border border-border rounded-lg text-center">
               <AnimatedNumber
                 value={animatedValue}
                 duration={2000}
                 format={n => `$${n.toLocaleString()}`}
-                className="text-3xl font-bold text-green-600"
+                className="text-3xl font-bold text-success"
               />
               <p className="text-sm text-foreground-secondary mt-2">Currency Format</p>
             </div>
-            <div className="p-6 bg-white border border-slate-200 rounded-lg text-center">
+            <div className="p-6 bg-card border border-border rounded-lg text-center">
               <AnimatedNumber
                 value={animatedValue}
                 duration={500}
                 format={n => `${(n / 1000).toFixed(1)}K`}
-                className="text-3xl font-bold text-purple-600"
+                className="text-3xl font-bold text-accent"
               />
               <p className="text-sm text-foreground-secondary mt-2">Compact Format</p>
             </div>
@@ -255,25 +255,25 @@ const MicroInteractionsDemo = () => {
           <div className="flex flex-wrap gap-4">
             <button
               onClick={() => showNotification('success')}
-              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+              className="px-4 py-2 bg-success text-success-foreground rounded-lg hover:opacity-90 transition-smooth"
             >
               Show Success Toast
             </button>
             <button
               onClick={() => showNotification('error')}
-              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              className="px-4 py-2 bg-destructive text-destructive-foreground rounded-lg hover:opacity-90 transition-smooth"
             >
               Show Error Toast
             </button>
             <button
               onClick={() => showNotification('warning')}
-              className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors"
+              className="px-4 py-2 bg-warning text-warning-foreground rounded-lg hover:opacity-90 transition-smooth"
             >
               Show Warning Toast
             </button>
             <button
               onClick={() => showNotification('info')}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-smooth"
             >
               Show Info Toast
             </button>
@@ -302,7 +302,7 @@ const MicroInteractionsDemo = () => {
         <div>
           <h2 className="text-2xl font-semibold text-foreground mb-6">Practical Usage Examples</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="bg-slate-900 text-slate-100 p-6 rounded-lg">
+            <div className="bg-background text-foreground p-6 rounded-lg border border-border">
               <h3 className="text-lg font-medium mb-4">Loading States</h3>
               <pre className="text-sm overflow-x-auto">{`// Use with existing components
 <LoadingWrapper isLoading={loading}>
@@ -318,7 +318,7 @@ const MicroInteractionsDemo = () => {
               </pre>
             </div>
 
-            <div className="bg-slate-900 text-slate-100 p-6 rounded-lg">
+            <div className="bg-background text-foreground p-6 rounded-lg border border-border">
               <h3 className="text-lg font-medium mb-4">Interactive Feedback</h3>
               <pre className="text-sm overflow-x-auto">{`// Enhanced button with ripple
 <RippleButton

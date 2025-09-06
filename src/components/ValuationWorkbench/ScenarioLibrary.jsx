@@ -1,4 +1,5 @@
 import { Card } from 'src/components/ui/UIHelpers.jsx';
+import PresetButton from '../ui/PresetButton';
 
 const ScenarioLibrary = ({
   scenarios,
@@ -80,31 +81,16 @@ const ScenarioLibrary = ({
     <Card
       title="Scenario Library"
       right={
-        <button
-          onClick={save}
-          className="rounded-md border border-slate-200 bg-white px-2 py-1 text-[12px] hover:bg-slate-50"
-        >
-          Save Current
-        </button>
+        <PresetButton onClick={save} size="sm">Save Current</PresetButton>
       }
     >
       <div className="flex items-center justify-between text-[12px] mb-2">
-        <div className="text-slate-600">{scenarios.length} saved</div>
+        <div className="text-foreground-secondary">{scenarios.length} saved</div>
         <div className="flex items-center gap-2">
-          <button
-            onClick={exportCSV}
-            className="rounded-md border border-slate-200 bg-white px-2 py-1 hover:bg-slate-50"
-          >
-            Export CSV
-          </button>
-          <button
-            onClick={exportJSON}
-            className="rounded-md border border-slate-200 bg-white px-2 py-1 hover:bg-slate-50"
-          >
-            Export JSON
-          </button>
-          <label className="rounded-md border border-slate-200 bg-white px-2 py-1 hover:bg-slate-50 cursor-pointer">
-            Import JSON
+          <PresetButton onClick={exportCSV} size="sm">Export CSV</PresetButton>
+          <PresetButton onClick={exportJSON} size="sm">Export JSON</PresetButton>
+          <label className="cursor-pointer">
+            <PresetButton size="sm">Import JSON</PresetButton>
             <input type="file" accept=".json" onChange={importJSON} className="hidden" />
           </label>
         </div>
@@ -113,20 +99,20 @@ const ScenarioLibrary = ({
         {scenarios.map(s => (
           <li
             key={s.id}
-            className="flex items-center justify-between rounded border border-slate-200 px-2 py-1"
+            className="flex items-center justify-between rounded border border-border px-2 py-1"
           >
             <div className="flex flex-col">
-              <span className="font-medium text-slate-800">{s.name}</span>
-              <span className="text-slate-500">{new Date(s.created).toLocaleString()}</span>
+              <span className="font-medium text-foreground">{s.name}</span>
+              <span className="text-foreground-secondary">{new Date(s.created).toLocaleString()}</span>
             </div>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => load(s)}
-                className="rounded-md border border-slate-200 bg-white px-2 py-1 hover:bg-slate-50"
+                className="rounded-md border border-border bg-card px-2 py-1 hover:bg-muted"
               >
                 Load
               </button>
-              <button onClick={() => del(s.id)} className="text-rose-600 hover:text-rose-800">
+              <button onClick={() => del(s.id)} className="text-destructive hover:opacity-80">
                 Delete
               </button>
             </div>

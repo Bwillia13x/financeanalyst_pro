@@ -17,6 +17,12 @@ const Performance = () => {
   const [customMetric, setCustomMetric] = useState('');
   const [customMetricValue, setCustomMetricValue] = useState('');
   const [customMetricCategory, setCustomMetricCategory] = useState('custom');
+  const [latencySummary, setLatencySummary] = useState(null);
+  const [latencyError, setLatencyError] = useState(null);
+  const [latencyHistory, setLatencyHistory] = useState([]);
+  const [cacheStats, setCacheStats] = useState(null);
+  const [warming, setWarming] = useState(false);
+  const [serverWarming, setServerWarming] = useState(false);
 
   // Initialize all performance services
   useEffect(() => {
@@ -68,6 +74,85 @@ const Performance = () => {
 
     setInitializationStatus(status);
     setIsInitialized(Object.values(status).every(s => s === 'initialized'));
+  };
+
+  // Fetch backend latency summary when viewing Monitoring tab
+  useEffect(() => {
+    if (activeTab !== 'monitoring') return;
+    let cancelled = false;
+    const apiBase = import.meta.env.VITE_API_BASE_URL || '/api';
+    const load = () => {
+      const controller = new AbortController();
+      fetch(`${apiBase}/health/latency`, { signal: controller.signal })
+        .then(r => r.json())
+        .then(json => {
+          if (cancelled) return;
+          if (json?.success) {
+            setLatencySummary(json.data);
+            setLatencyError(null);
+            setLatencyHistory(prev => {
+              const next = [...prev, { ts: Date.now(), latency: json.data.latency }];
+              return next.slice(-10);
+            });
+          } else {
+            setLatencyError(json?.message || 'Failed to load latency summary');
+          }
+        })
+        .catch(() => !cancelled && setLatencyError('Failed to load latency summary'));
+      return controller;
+    };
+    let controller = load();
+    // Load cache stats alongside latency
+    fetch(`${apiBase}/health/cache`).then(r => r.json()).then(json => {
+      if (!cancelled && json?.success) setCacheStats(json.data);
+    }).catch(() => {});
+    const id = setInterval(() => {
+      controller?.abort();
+      controller = load();
+    }, 15000);
+    return () => { cancelled = true; clearInterval(id); controller?.abort(); };
+  }, [activeTab]);
+
+  const warmCaches = async () => {
+    try {
+      setWarming(true);
+      const apiBase = import.meta.env.VITE_API_BASE_URL || '/api';
+      const endpoints = [
+        '/market-data/quote/AAPL',
+        '/market-data/quote/MSFT',
+        '/financial-statements/income/AAPL?period=annual&limit=3',
+        '/financial-statements/balance/AAPL?period=annual&limit=3',
+        '/financial-statements/cash-flow/AAPL?period=annual&limit=3',
+        '/economic-data/indicators',
+        '/economic-data/treasury-rates'
+      ];
+      for (const p of endpoints) {
+        try { await fetch(`${apiBase}${p}`, { cache: 'no-store' }); } catch { /* ignore */ }
+      }
+      // Refresh cache stats
+      const json = await fetch(`${apiBase}/health/cache`).then(r => r.json());
+      if (json?.success) setCacheStats(json.data);
+    } finally {
+      setWarming(false);
+    }
+  };
+
+  const warmCachesServer = async () => {
+    try {
+      setServerWarming(true);
+      const apiBase = import.meta.env.VITE_API_BASE_URL || '/api';
+      const adminKey = import.meta.env.VITE_ADMIN_KEY;
+      const resp = await fetch(`${apiBase}/health/warmup`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(adminKey ? { 'x-admin-key': adminKey } : {})
+        }
+      }).then(r => r.json());
+      if (resp?.success) setCacheStats(resp.data);
+    } finally {
+      setServerWarming(false);
+    }
   };
 
   const recordCustomMetric = () => {
@@ -235,9 +320,92 @@ const Performance = () => {
                   <CardTitle>Cache Statistics</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <pre className="text-xs bg-background-secondary p-4 rounded overflow-auto max-h-96">
-                    {JSON.stringify(cachingService.getStats(), null, 2)}
-                  </pre>
+                  {cacheStats ? (
+                    <div className="space-y-2 text-sm">
+                      <div className="flex gap-4">
+                        <div>Hits: <span className="font-mono">{cacheStats.cache.hits}</span></div>
+                        <div>Misses: <span className="font-mono">{cacheStats.cache.misses}</span></div>
+                        <div>Sets: <span className="font-mono">{cacheStats.cache.sets}</span></div>
+                        <div>Hit rate: <span className="font-mono">{(cacheStats.cache.hitRate * 100).toFixed(1)}%</span></div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        {Object.entries(cacheStats.cache.cacheKeys || {}).map(([k,v]) => (
+                          <div key={k} className="p-2 border border-border rounded bg-background">
+                            <div className="text-xs text-muted-foreground">{k}</div>
+                            <div className="font-mono">{v}</div>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="flex gap-2 mt-2">
+                        <button onClick={warmCaches} disabled={warming} className="px-3 py-2 rounded bg-primary text-primary-foreground">
+                          {warming ? 'Warming…' : 'Warm Caches (Client)'}
+                        </button>
+                        <button
+                          onClick={warmCachesServer}
+                          disabled={serverWarming || (!import.meta.env.DEV && !import.meta.env.VITE_ADMIN_KEY)}
+                          className="px-3 py-2 rounded bg-secondary text-secondary-foreground disabled:opacity-50"
+                          title={(!import.meta.env.DEV && !import.meta.env.VITE_ADMIN_KEY) ? 'Set VITE_ADMIN_KEY to enable in production' : ''}
+                        >
+                          {serverWarming ? 'Warming…' : 'Warm Caches (Server)'}
+                        </button>
+                      </div>
+                      {!import.meta.env.DEV && !import.meta.env.VITE_ADMIN_KEY && (
+                        <div className="text-xs text-muted-foreground mt-1">Tip: set VITE_ADMIN_KEY to enable server warmup in production.</div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="text-sm text-foreground-secondary">Loading cache stats…</div>
+                  )}
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>API Latency (p50/p95/mean)</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {!latencySummary && !latencyError && (
+                    <div className="text-sm text-foreground-secondary">Loading latency summary…</div>
+                  )}
+                  {latencyError && (
+                    <div className="text-sm text-destructive">{latencyError}</div>
+                  )}
+                  {latencySummary && (
+                    <div className="space-y-3">
+                      <div className="text-xs text-muted-foreground">
+                        Timestamp: {new Date(latencySummary.timestamp).toLocaleString()}
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {Object.entries(latencySummary.latency || {}).map(([service, stats]) => (
+                          <div key={service} className="p-3 rounded border border-border bg-background">
+                            <div className="flex justify-between text-sm font-medium">
+                              <span className="text-foreground">{service}</span>
+                              <span className="text-foreground-secondary">n={stats.count}</span>
+                            </div>
+                            <div className="mt-1 text-xs text-foreground-secondary">
+                              mean: {stats.mean}ms • p50: {stats.p50}ms • p95: {stats.p95}ms
+                            </div>
+                            {/* Basic trend sparkline for p95 over last samples */}
+                            <div className="mt-2 h-10 grid grid-cols-10 gap-1 items-end">
+                              {Array.from({ length: 10 }).map((_, i) => {
+                                const sample = latencyHistory[latencyHistory.length - 10 + i];
+                                const value = sample?.latency?.[service]?.p95 || 0;
+                                const max = 3000; // clamp for simple visualization
+                                const height = Math.max(1, Math.min(100, Math.round((value / max) * 100)));
+                                const color = value > 2000 ? 'bg-red-400' : value > 1200 ? 'bg-yellow-400' : 'bg-green-400';
+                                return <div key={i} className={`${color}`} style={{ height: `${height}%` }} title={`${value}ms`} />;
+                              })}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      {(latencySummary.alerts || []).length > 0 && (
+                        <div className="mt-2 p-3 rounded bg-yellow-50 text-yellow-800 border border-yellow-200 text-sm">
+                          {latencySummary.alerts.length} service(s) above threshold.
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </div>

@@ -225,7 +225,7 @@ const ScenarioAnalysisSensitivityTools = () => {
             </div>
 
             <div className="flex items-center space-x-4">
-              <span>© {new Date().getFullYear()} FinanceAnalyst Pro</span>
+              <span>© {new Date().getFullYear()} Valor-IVX</span>
               <span>•</span>
               <span>SOX Compliant</span>
               <span>•</span>

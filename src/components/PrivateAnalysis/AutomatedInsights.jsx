@@ -33,6 +33,7 @@ import {
   ResponsiveContainer,
   Line
 } from 'recharts';
+import { PieChart as LazyPieChart } from '../ui/LazyChart';
 
 const AutomatedInsights = ({
   modelData: _modelData,

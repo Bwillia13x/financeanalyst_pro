@@ -1,0 +1,41 @@
+name: Cache Warmup
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+  push:
+    branches: [ main ]
+
+jobs:
+  warmup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install backend deps
+        run: |
+          cd backend
+          npm ci
+
+      - name: Start backend
+        run: |
+          cd backend
+          node server.js &
+
+      - name: Wait for backend
+        run: npx wait-on http://localhost:3001/api/health
+
+      - name: Warmup caches
+        env:
+          API_BASE_URL: http://localhost:3001/api
+        run: |
+          npm ci
+          npm run cache:warmup
+

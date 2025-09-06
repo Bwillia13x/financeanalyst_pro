@@ -1,0 +1,43 @@
+name: Accessibility (axe-core)
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+  push:
+    branches: [ main ]
+
+jobs:
+  axe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Build (prod)
+        run: npm run build:prod
+
+      - name: Start preview
+        run: npm run preview -- --port 4173 &
+
+      - name: Wait for preview
+        run: npx wait-on http://localhost:4173
+
+      - name: Run axe-core CLI (key routes)
+        run: |
+          npx @axe-core/cli http://localhost:4173
+          npx @axe-core/cli http://localhost:4173/private-analysis
+          npx @axe-core/cli http://localhost:4173/financial-model-workspace
+          npx @axe-core/cli http://localhost:4173/portfolio-management
+          npx @axe-core/cli http://localhost:4173/valuation-workbench
+          npx @axe-core/cli http://localhost:4173/analytics
+          npx @axe-core/cli http://localhost:4173/performance
+

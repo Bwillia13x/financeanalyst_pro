@@ -1,4 +1,5 @@
 import app from './app.js';
+import { startBackgroundRefresh } from './services/refreshService.js';
 const PORT = process.env.PORT || 3001;
 
 // Start server
@@ -11,6 +12,8 @@ app.listen(PORT, () => {
   if (process.env.DEMO_MODE === 'true') {
     console.log('🎭 Running in DEMO MODE - API keys not required');
   }
+  // Start background refresh if enabled
+  try { startBackgroundRefresh(); } catch {}
 });
 
 export default app;

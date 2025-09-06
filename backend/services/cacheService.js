@@ -19,7 +19,7 @@ class CacheService {
     });
 
     this.economicDataCache = new NodeCache({
-      stdTTL: 3600, // 1 hour for economic data
+      stdTTL: parseInt(process.env.CACHE_TTL_ECONOMIC_DATA) || 3600, // default 1 hour
       checkperiod: 300
     });
 

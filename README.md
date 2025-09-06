@@ -199,16 +199,60 @@ src/
 │   └── ...
 └── components/             # Reusable UI components
 
+## Production Notes
+
+- Content Security Policy is tightened in Netlify config (no `unsafe-eval`, no external Google Fonts domains).
+- Demo routes are gated via `VITE_ENABLE_DEMOS`; ensure `false` in production.
+- Backend must be available for health checks and data provider status.
+
+### Self-hosted Fonts
+
+Place font files under `public/assets/fonts` and the app will use them automatically:
+
+Recommended files:
+- `/public/assets/fonts/Inter-Variable.woff2`
+- `/public/assets/fonts/JetBrainsMono-Regular.woff2`
+
+The CSS `@font-face` is pre-wired with `font-display: swap` in `src/styles/tailwind.css`. Without files present, the app falls back to system fonts.
+
+### AI Action Logbook
+
+- Backend records each AI assistant action to an in-memory logbook:
+  - `GET /api/ai-assistant/logs` returns recent entries
+  - `POST /api/ai-assistant/logs` appends entries
+- Frontend page at `/ai-log` shows recent entries and provides JSON/CSV export.
+- In production, viewing logs requires an admin role (`Authorization: Bearer <token>`). In non‑prod, access is open for easier testing.
+- Consider persisting logs to a database in production.
+
+### Admin Login (Optional)
+
+- A lightweight admin login is available at `/admin-login` for environments without SSO.
+- Control visibility with `VITE_ENABLE_ADMIN_LOGIN` (default: enabled in dev, disabled in production).
+- Successful login stores tokens in `localStorage` and exposes admin-only routes (e.g., `/ai-log`).
+
+### Background Refresh
+
+- Enable background cache refresh to improve p95 latency on hot endpoints:
+  - Set `BACKGROUND_REFRESH=true` and (optionally) `BACKGROUND_REFRESH_INTERVAL_SEC=300` in server env.
+  - The server warms up market/financial/economic endpoints and refreshes at the configured interval.
+
 ## 🧪 Local Dev Notes
 
 - Backend: `http://localhost:3001` (CORS allows `http://localhost:5173`).
 - Frontend (Vite): `http://localhost:5173`.
+- One-command dev (frontend + backend): `npm run start:with-backend`.
+- Dev QA hub: `http://localhost:5173/__dev/nav` (dev builds only) for quick route checks.
+- Offline fallback page is included to reduce PWA errors during local testing.
 - Auth mocks: `POST /api/auth/login`, `/api/auth/refresh`, `/api/auth/logout` (dev only).
 - Error reporting: `POST /api/errors` accepts JSON payload and returns 200.
 - Collaboration defaults: `VITE_ENABLE_COLLABORATION=false`, `VITE_COLLAB_WS_MOCK=true` in `.env.example`.
 - SEO base URL: configure via `VITE_SITE_URL` (defaults to `https://valor-ivx.com`).
 - External fetch fallbacks: gated by `VITE_ALLOW_DIRECT_FETCH` (default `false`).
 ```
+
+### Dev Shortcuts
+
+- Alt+D opens the Dev Navigation hub (`/__dev/nav`) when running in development mode.
 
 ## 🔧 Configuration
 
@@ -317,6 +361,18 @@ npm run test:coverage
 # Run specific test file
 npm test -- src/utils/__tests__/dataTransformation.test.js
 ```
+
+### Playwright DevNav Smoke
+
+Run a quick smoke that crawls the Dev QA hub and verifies top routes render without 404s:
+
+```bash
+PW_USE_DEV_SERVER=1 npx playwright test tests/e2e/dev-nav-smoke.spec.ts
+```
+
+Notes:
+- `PW_USE_DEV_SERVER=1` starts the Vite dev server + backend so `__dev/nav` is available.
+- The smoke visits links on the DevNav page and asserts the app renders (no NotFound).
 
 ### Test Structure
 ```

@@ -157,7 +157,10 @@ class MonitoringService {
    */
   initializeHotjar() {
     const hotjarId = import.meta.env.VITE_HOTJAR_ID;
-    if (!hotjarId) return;
+    if (!hotjarId || hotjarId.includes('your_') || hotjarId.includes('_id_here')) {
+      console.warn('Hotjar ID not configured, skipping Hotjar initialization');
+      return;
+    }
     if (typeof window === 'undefined' || typeof document === 'undefined') return;
 
     (function (h, o, t, j, a, r) {
@@ -195,14 +198,15 @@ class MonitoringService {
    * Monitor Core Web Vitals
    */
   monitorCoreWebVitals() {
-    // Dynamically import web-vitals library
+    // Dynamically import web-vitals library with correct syntax for v3+
     import('web-vitals')
-      .then(({ getCLS, getFID, getFCP, getLCP, getTTFB }) => {
-        getCLS(this.sendToAnalytics.bind(this));
-        getFID(this.sendToAnalytics.bind(this));
-        getFCP(this.sendToAnalytics.bind(this));
-        getLCP(this.sendToAnalytics.bind(this));
-        getTTFB(this.sendToAnalytics.bind(this));
+      .then((webVitals) => {
+        const { getCLS, getFID, getFCP, getLCP, getTTFB } = webVitals;
+        if (getCLS) getCLS(this.sendToAnalytics.bind(this));
+        if (getFID) getFID(this.sendToAnalytics.bind(this));
+        if (getFCP) getFCP(this.sendToAnalytics.bind(this));
+        if (getLCP) getLCP(this.sendToAnalytics.bind(this));
+        if (getTTFB) getTTFB(this.sendToAnalytics.bind(this));
       })
       .catch(console.warn);
   }
@@ -531,28 +535,39 @@ class MonitoringService {
   trackCoreWebVitals() {
     if (this.isProduction && this.enablePerformanceMonitoring && !this.isTestMode) {
       try {
-        // Dynamic import for web-vitals
+        // Dynamic import for web-vitals with correct syntax for v3+
         import('web-vitals')
-          .then(({ getCLS, getFID, getFCP, getLCP, getTTFB }) => {
-            getCLS(metric => {
-              this.trackPerformanceMetric('CLS', metric.value, 'score');
-            });
+          .then((webVitals) => {
+            const { getCLS, getFID, getFCP, getLCP, getTTFB } = webVitals;
+            if (getCLS) {
+              getCLS(metric => {
+                this.trackPerformanceMetric('CLS', metric.value, 'score');
+              });
+            }
 
-            getFID(metric => {
-              this.trackPerformanceMetric('FID', metric.value, 'ms');
-            });
+            if (getFID) {
+              getFID(metric => {
+                this.trackPerformanceMetric('FID', metric.value, 'ms');
+              });
+            }
 
-            getFCP(metric => {
-              this.trackPerformanceMetric('FCP', metric.value, 'ms');
-            });
+            if (getFCP) {
+              getFCP(metric => {
+                this.trackPerformanceMetric('FCP', metric.value, 'ms');
+              });
+            }
 
-            getLCP(metric => {
-              this.trackPerformanceMetric('LCP', metric.value, 'ms');
-            });
+            if (getLCP) {
+              getLCP(metric => {
+                this.trackPerformanceMetric('LCP', metric.value, 'ms');
+              });
+            }
 
-            getTTFB(metric => {
-              this.trackPerformanceMetric('TTFB', metric.value, 'ms');
-            });
+            if (getTTFB) {
+              getTTFB(metric => {
+                this.trackPerformanceMetric('TTFB', metric.value, 'ms');
+              });
+            }
 
             console.log('Core Web Vitals tracking initialized');
           })

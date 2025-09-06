@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { Pill } from 'src/components/ui/UIHelpers.jsx';
+import QuickOutputs from '../components/ui/QuickOutputs';
 
 import Compare from '../components/ModelLab/Compare';
 import DriverInspector from '../components/ModelLab/DriverInspector';
@@ -8,7 +9,6 @@ import EnhancedLibrary from '../components/ModelLab/EnhancedLibrary';
 import TemplateGallery from '../components/ModelLab/TemplateGallery';
 import TestsPanel from '../components/ModelLab/TestsPanel';
 import ValidatedAssumptionsForm from '../components/ModelLab/ValidatedAssumptionsForm';
-import Header from '../components/ui/Header';
 import { computeModelOutputs } from '../services/calculators';
 import { modelStore } from '../services/modelStore';
 import { runTests } from '../utils/modelLabCalculations';
@@ -106,10 +106,9 @@ const ModelLab = () => {
 
   return (
     <div className="min-h-[100dvh] bg-background text-foreground">
-      <Header />
 
       {/* Main Content */}
-      <div className="pt-[60px]">
+      <div>
         {/* Page Header */}
         <div className="border-b border-border bg-card">
           <div className="flex items-center justify-between p-4">
@@ -233,31 +232,9 @@ const ModelLab = () => {
                         </div>
                       ) : (
                         <>
-                          <div className="grid grid-cols-2 gap-3 text-[13px]">
-                            {active.kind !== 'LBO' ? (
-                              <>
-                                <div className="rounded-xl border border-border p-3">
-                                  <div className="text-muted-foreground">Enterprise Value</div>
-                                  <div className="text-lg font-semibold">
-                                    {active.outputs?.ev !== undefined
-                                      ? active.outputs.ev >= 1e9
-                                        ? `$${(active.outputs.ev / 1e9).toFixed(0)}B`
-                                        : active.outputs.ev >= 1e6
-                                          ? `$${(active.outputs.ev / 1e6).toFixed(0)}M`
-                                          : `$${active.outputs.ev.toFixed(0)}`
-                                      : '—'}
-                                  </div>
-                                </div>
-                                <div className="rounded-xl border border-border p-3">
-                                  <div className="text-muted-foreground">Per‑share</div>
-                                  <div className="text-2xl font-bold">
-                                    {active.outputs?.perShare !== undefined
-                                      ? `$${active.outputs.perShare.toFixed(2)}`
-                                      : '—'}
-                                  </div>
-                                </div>
-                              </>
-                            ) : (
+                          {active.kind !== 'LBO' ? (
+                            <QuickOutputs outputs={active.outputs} />
+                          ) : (
                               <div className="rounded-xl border border-border p-3">
                                 <div className="text-muted-foreground">Equity IRR (sketch)</div>
                                 <div className="text-2xl font-bold">
@@ -266,8 +243,7 @@ const ModelLab = () => {
                                     : '—'}
                                 </div>
                               </div>
-                            )}
-                          </div>
+                          )}
                           {active.outputs?.warnings?.length > 0 && (
                             <div className="mt-3 p-2 bg-amber-50 border border-amber-200 rounded text-[11px]">
                               <div className="font-medium text-amber-800 mb-1">Warnings:</div>

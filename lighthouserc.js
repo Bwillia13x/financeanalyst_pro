@@ -2,7 +2,7 @@ module.exports = {
   ci: {
     collect: {
       // Serve the built application locally for testing
-      startServerCommand: 'npm run preview',
+      startServerCommand: 'npm run preview:with-backend:ci',
       startServerReadyPattern: 'Local:',
       startServerReadyTimeout: 30000,
       url: [

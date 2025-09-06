@@ -22,16 +22,28 @@ dotenv.config();
 const app = express();
 
 // Security middleware
+const isProd = process.env.NODE_ENV === 'production';
+const scriptSrc = ["'self'", 'https://static.rocket.new', 'https://www.googletagmanager.com', 'https://static.hotjar.com'];
+if (!isProd) scriptSrc.push("'unsafe-eval'");
+
 app.use(helmet({
   crossOriginEmbedderPolicy: false,
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
-      scriptSrc: ["'self'", "'unsafe-eval'", 'https://static.rocket.new', 'https://www.googletagmanager.com', 'https://static.hotjar.com'],
-      fontSrc: ["'self'", 'https://fonts.gstatic.com'],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      scriptSrc,
+      fontSrc: ["'self'"],
       imgSrc: ["'self'", 'data:', 'blob:', 'https:'],
-      connectSrc: ["'self'", 'https://www.google-analytics.com', 'https://www.googletagmanager.com', 'https://script.hotjar.com', 'https://in.hotjar.com', 'https://api.hotjar.com']
+      connectSrc: [
+        "'self'",
+        'https://www.google-analytics.com',
+        'https://www.googletagmanager.com',
+        'https://script.hotjar.com',
+        'https://in.hotjar.com',
+        'https://api.hotjar.com',
+        'https://o*.ingest.sentry.io'
+      ]
     }
   }
 }));
@@ -120,4 +132,3 @@ app.use((error, req, res, _next) => {
 });
 
 export default app;
-

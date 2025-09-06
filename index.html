@@ -3,15 +3,15 @@
 
 <head>
   <meta charset="utf-8" />
-  <title>financeanalyst-pro</title>
+  <title>Valor-IVX</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#0f172a" />
   <meta name="msapplication-TileColor" content="#0f172a" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="FinancePro" />
+  <meta name="apple-mobile-web-app-title" content="Valor-IVX" />
   <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="application-name" content="FinanceAnalyst Pro" />
+  <meta name="application-name" content="Valor-IVX" />
 
   <!-- PWA Description -->
   <meta name="description" content="Advanced financial modeling and analysis platform with real-time data integration" />
@@ -37,10 +37,7 @@
   <meta name="msapplication-TileImage" content="/favicon.ico" />
   
   <!-- Performance optimizations -->
-  <link rel="dns-prefetch" href="//fonts.googleapis.com">
-  <link rel="dns-prefetch" href="//fonts.gstatic.com">
-  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Removed external font preconnects; using self-hosted/system fonts -->
   
 <!-- DISABLED RESOURCE PRELOADS FOR DEBUGGING -->
   <!-- Preload critical CSS -->
@@ -55,10 +52,15 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> -->
   
+  
+  <!-- Preload critical resources only when needed -->
+  <!-- Removed preload for favicon.svg and apple-touch-icon.svg as they cause warnings when not used immediately -->
+  <!-- Optional: Dev modulepreload for entry (Vite resolves in dev). In prod, Vite injects hashed assets. -->
+  <link rel="modulepreload" href="/src/index.jsx" />
 
-  <!-- Preload critical resources -->
-  <link rel="preload" href="/assets/images/favicon.svg" as="image" type="image/svg+xml">
-  <link rel="preload" href="/assets/images/apple-touch-icon.svg" as="image" type="image/svg+xml">
+  <!-- Optional self-hosted font preloads (ensure files exist) -->
+  <link rel="preload" href="/assets/fonts/Inter-Variable.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/assets/fonts/JetBrainsMono-Regular.woff2" as="font" type="font/woff2" crossorigin>
 
   <!-- Resource hints for external services -->
   <link rel="dns-prefetch" href="//query1.finance.yahoo.com">
@@ -73,7 +75,7 @@
     <!-- Inline preloader for immediate First Contentful Paint -->
     <div id="app-preloader" class="app-preloader">
       <div class="app-preloader-spinner"></div>
-      <p class="app-preloader-title">Loading FinanceAnalyst Pro...</p>
+      <p class="app-preloader-title">Loading Valor-IVX...</p>
       <p class="app-preloader-subtitle">Professional Financial Modeling Platform</p>
     </div>
     <script>
@@ -126,7 +128,7 @@
               '<div class="min-h-screen bg-gray-50">\
                 <header class="border-b bg-white">\
                   <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center">\
-                    <h1 class="text-lg font-semibold text-gray-900">FinanceAnalyst Pro</h1>\
+                    <h1 class="text-lg font-semibold text-gray-900">Valor-IVX</h1>\
                     <span class="ml-2 text-xs text-gray-500">(Audit Mode)</span>\
                   </div>\
                 </header>\

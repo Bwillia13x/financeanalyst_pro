@@ -2,9 +2,9 @@ import { CheckCircle, XCircle, AlertTriangle, Key, Wifi } from 'lucide-react';
 import React from 'react';
 
 import { Alert, AlertDescription } from '../../../components/ui/Alert';
-import { Badge } from '../../../components/ui/Badge';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/Card';
 import { Progress } from '../../../components/ui/Progress';
+import StatusBadge from '../../../components/ui/StatusBadge';
 
 const ApiStatusPanel = ({
   apiHealthStatus = {},
@@ -16,29 +16,29 @@ const ApiStatusPanel = ({
     switch (status) {
       case 'healthy':
       case 'connected':
-        return <CheckCircle className="h-4 w-4 text-green-500" />;
+        return <CheckCircle className="h-4 w-4 text-success" />;
       case 'error':
       case 'disconnected':
-        return <XCircle className="h-4 w-4 text-red-500" />;
+        return <XCircle className="h-4 w-4 text-destructive" />;
       case 'warning':
-        return <AlertTriangle className="h-4 w-4 text-yellow-500" />;
+        return <AlertTriangle className="h-4 w-4 text-warning" />;
       default:
-        return <AlertTriangle className="h-4 w-4 text-gray-400" />;
+        return <AlertTriangle className="h-4 w-4 text-foreground-secondary" />;
     }
   };
 
-  const getStatusColor = status => {
+  const getStatusTone = status => {
     switch (status) {
       case 'healthy':
       case 'connected':
-        return 'bg-green-100 text-green-800';
+        return 'success';
       case 'error':
       case 'disconnected':
-        return 'bg-red-100 text-red-800';
+        return 'destructive';
       case 'warning':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'warning';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'neutral';
     }
   };
 
@@ -63,9 +63,9 @@ const ApiStatusPanel = ({
               Real Data: {realDataEnabled ? 'Enabled' : 'Disabled'}
             </span>
           </div>
-          <Badge className={getStatusColor(realDataEnabled ? 'connected' : 'disconnected')}>
+          <StatusBadge tone={getStatusTone(realDataEnabled ? 'connected' : 'disconnected')} variant="soft">
             {realDataEnabled ? 'Live' : 'Demo Mode'}
-          </Badge>
+          </StatusBadge>
         </div>
 
         {/* Connection Health */}
@@ -89,15 +89,15 @@ const ApiStatusPanel = ({
                   {getStatusIcon(source.status)}
                   <span>{source.name}</span>
                   {source.requiresKey && (
-                    <Key className="h-3 w-3 text-gray-400" title="Requires API Key" />
+                    <Key className="h-3 w-3 text-foreground-secondary" title="Requires API Key" />
                   )}
                 </div>
                 <div className="flex items-center gap-2">
-                  <Badge variant="outline" className={`text-xs ${getStatusColor(source.status)}`}>
+                  <StatusBadge tone={getStatusTone(source.status)} size="xs" variant="soft">
                     {source.status}
-                  </Badge>
+                  </StatusBadge>
                   {source.status === 'connected' && (
-                    <span className="text-xs text-gray-500">{source.latency}ms</span>
+                    <span className="text-xs text-foreground-secondary">{source.latency}ms</span>
                   )}
                 </div>
               </div>
@@ -148,7 +148,7 @@ const ApiStatusPanel = ({
             <AlertDescription className="text-sm">
               Running in demo mode. Add API keys to enable real-time data.
               <br />
-              <span className="text-xs text-gray-600">
+              <span className="text-xs text-foreground-secondary">
                 Set VITE_ALPHA_VANTAGE_API_KEY or VITE_FMP_API_KEY in your .env file
               </span>
             </AlertDescription>

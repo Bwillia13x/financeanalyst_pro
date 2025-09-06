@@ -107,6 +107,64 @@ router.get('/cache', (req, res) => {
 });
 
 /**
+ * POST /api/health/warmup
+ * Warm up common caches server-side (dev/admin)
+ */
+router.post('/warmup', async (req, res) => {
+  try {
+    // Only allow in development or with admin key
+    if (
+      process.env.NODE_ENV === 'production' &&
+      req.headers['x-admin-key'] !== process.env.ADMIN_KEY
+    ) {
+      return res.status(403).json({ error: 'Forbidden: Admin access required' });
+    }
+
+    const tasks = [
+      () => apiService.makeApiRequest({ service: 'yahoo', endpoint: 'AAPL', params: { range: '1d', interval: '1m' }, cacheType: 'market', cacheTtl: 60 }),
+      () => apiService.makeApiRequest({ service: 'yahoo', endpoint: 'MSFT', params: { range: '1d', interval: '1m' }, cacheType: 'market', cacheTtl: 60 }),
+      () => apiService.makeApiRequest({ service: 'fmp', endpoint: '/income-statement/AAPL', params: { period: 'annual', limit: 3 }, cacheType: 'financial', cacheTtl: 21600 }).catch(() => null),
+      () => apiService.makeApiRequest({ service: 'fmp', endpoint: '/balance-sheet-statement/AAPL', params: { period: 'annual', limit: 3 }, cacheType: 'financial', cacheTtl: 21600 }).catch(() => null),
+      () => apiService.makeApiRequest({ service: 'fmp', endpoint: '/cash-flow-statement/AAPL', params: { period: 'annual', limit: 3 }, cacheType: 'financial', cacheTtl: 21600 }).catch(() => null),
+      () => apiService.makeApiRequest({ service: 'fred', endpoint: 'series/observations', params: { series_id: 'DGS10', limit: 1, sort_order: 'desc' }, cacheType: 'economic', cacheTtl: 1800 }).catch(() => null)
+    ];
+    await Promise.all(tasks.map(fn => fn()))
+    const cacheStats = cacheService.getStats();
+    return sendSuccess(res, { warmed: true, cache: cacheStats }, 'Cache warmup complete');
+  } catch (error) {
+    console.error('Warmup failed:', error);
+    return sendError(res, 'Warmup failed', 500, { error: error.message });
+  }
+});
+
+/**
+ * GET /api/health/latency
+ * Returns latency summary per external service
+ */
+router.get('/latency', (req, res) => {
+  try {
+    const latency = apiService.getLatencySummary();
+    const alertThreshold = parseInt(process.env.API_LATENCY_P95_ALERT_MS || '1500', 10);
+    const alerts = Object.entries(latency)
+      .filter(([_, stats]) => stats.p95 && stats.p95 > alertThreshold)
+      .map(([service, stats]) => ({ service, p95: stats.p95, threshold: alertThreshold }));
+    if (alerts.length && process.env.NODE_ENV !== 'production') {
+      console.warn('Latency alerts:', alerts);
+    }
+    const data = {
+      status: 'ok',
+      latency,
+      alerts,
+      timestamp: new Date().toISOString()
+    };
+    sendSuccess(res, data, 'Latency summary');
+  } catch (error) {
+    console.error('Latency summary failed:', error);
+    sendError(res, 'Latency summary failed', 500, { error: error.message });
+  }
+});
+
+/**
  * DELETE /api/health/cache
  * Clear all caches (development/admin endpoint)
  */

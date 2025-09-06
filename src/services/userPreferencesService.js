@@ -64,7 +64,10 @@ class UserPreferencesService {
       keyboardShortcuts: true,
       mouseNavigation: true,
       touchGestures: true,
-      commandPalette: true
+      commandPalette: true,
+
+      // CLI
+      alwaysShowCLI: true
     };
 
     this.initializeService();
@@ -693,7 +696,7 @@ class UserPreferencesService {
       navigation: {
         name: 'Keyboard & Navigation',
         icon: 'Navigation',
-        preferences: ['keyboardShortcuts', 'mouseNavigation', 'touchGestures', 'commandPalette']
+        preferences: ['keyboardShortcuts', 'mouseNavigation', 'touchGestures', 'commandPalette', 'alwaysShowCLI']
       }
     };
   }

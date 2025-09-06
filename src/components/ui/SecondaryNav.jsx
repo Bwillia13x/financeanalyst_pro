@@ -1,5 +1,5 @@
 import { ChevronDown, MoreHorizontal } from 'lucide-react';
-import React, { useState } from 'react';
+import React, { useState, memo, useMemo, useCallback } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
 import { cn } from '../../utils/cn';
@@ -25,14 +25,19 @@ const SecondaryNav = ({
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [_isMobileMenuOpen, _setIsMobileMenuOpen] = useState(false);
 
-  const visibleItems =
-    showMoreButton && items.length > maxVisibleItems ? items.slice(0, maxVisibleItems) : items;
+  // Memoize computed navigation items to prevent unnecessary recalculations
+  const visibleItems = useMemo(() =>
+    showMoreButton && items.length > maxVisibleItems ? items.slice(0, maxVisibleItems) : items,
+    [items, showMoreButton, maxVisibleItems]
+  );
 
-  const hiddenItems =
-    showMoreButton && items.length > maxVisibleItems ? items.slice(maxVisibleItems) : [];
+  const hiddenItems = useMemo(() =>
+    showMoreButton && items.length > maxVisibleItems ? items.slice(maxVisibleItems) : [],
+    [items, showMoreButton, maxVisibleItems]
+  );
 
-  // Handle predefined navigation configurations
-  const getNavigationItems = () => {
+  // Memoize navigation items to prevent unnecessary recalculations
+  const navigationItems = useMemo(() => {
     if (navigation === 'analysisTools') {
       return [
         {
@@ -69,11 +74,9 @@ const SecondaryNav = ({
       ];
     }
     return items;
-  };
+  }, [navigation, items]);
 
-  const navigationItems = getNavigationItems();
-
-  const renderNavItem = (item, index) => {
+  const renderNavItem = useCallback((item, index) => {
     const isActive = activeItem ? activeItem === item.id : location.pathname === item.path;
     const handleClick = onItemClick ? () => onItemClick(item.id) : undefined;
 
@@ -81,7 +84,7 @@ const SecondaryNav = ({
       <button
         key={item.id || index}
         type="button"
-        onKeyDown={e => e.key === 'Enter' && handleClick?.()}
+        onKeyDown={(e) => e.key === 'Enter' && handleClick?.()}
         className={cn(
           'relative px-3 py-2 sm:px-4 sm:py-2 text-sm font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 cursor-pointer',
           isActive
@@ -115,7 +118,7 @@ const SecondaryNav = ({
     }
 
     return content;
-  };
+  }, [activeItem, location.pathname, onItemClick]);
 
   if (variant === 'dropdown') {
     return (
@@ -135,24 +138,24 @@ const SecondaryNav = ({
         </Button>
 
         {isDropdownOpen && (
-          <div className="absolute top-full left-0 mt-2 w-56 bg-popover border border-border rounded-lg shadow-elevation-2 py-2 z-50">
+          <div className="absolute top-full left-0 mt-2 w-72 bg-popover border border-border rounded-xl shadow-elevation-3 py-3 z-50 max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
             <nav role="navigation" aria-label={ariaLabel}>
               {items.map((item, index) => (
                 <Link
                   key={item.path || index}
                   to={item.path}
                   className={cn(
-                    'flex items-center px-4 py-2 text-sm text-popover-foreground hover:bg-muted transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-inset',
-                    location.pathname === item.path && 'bg-muted'
+                    'flex items-center px-4 py-3 text-sm text-popover-foreground hover:bg-muted/80 hover:text-popover-foreground transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-inset rounded-md mx-1',
+                    location.pathname === item.path && 'bg-primary/5 text-primary font-medium'
                   )}
                   onClick={() => setIsDropdownOpen(false)}
                   aria-current={location.pathname === item.path ? 'page' : undefined}
                 >
-                  {item.icon && <item.icon className="w-4 h-4 mr-3" aria-hidden="true" />}
-                  <div>
-                    <div className="font-medium">{item.label}</div>
+                  {item.icon && <item.icon className="w-5 h-5 mr-3 text-muted-foreground" aria-hidden="true" />}
+                  <div className="flex-1 min-w-0">
+                    <div className="font-medium truncate">{item.label}</div>
                     {item.description && (
-                      <div className="text-xs text-muted-foreground">{item.description}</div>
+                      <div className="text-xs text-muted-foreground mt-0.5 truncate">{item.description}</div>
                     )}
                   </div>
                 </Link>
@@ -277,4 +280,5 @@ export const AnalysisToolsNav = ({ className }) => {
   );
 };
 
-export default SecondaryNav;
+// Memoize the SecondaryNav component to prevent unnecessary re-renders
+export default memo(SecondaryNav);

@@ -1,20 +1,8 @@
 import { motion } from 'framer-motion';
-import { BarChart3, Users, Clock, Activity, Target, Eye, Zap, Calendar } from 'lucide-react';
+import { BarChart3, Users, Clock, Activity, Target, Eye, Zap, Calendar, PieChart as PieChartIcon } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-  Area,
-  AreaChart
-} from 'recharts';
+// Lazy wrappers for charts to avoid loading recharts in initial bundle
+import { BarChart as LazyBarChart, AreaChart as LazyAreaChart, PieChart as LazyPieChart } from '../ui/LazyChart';
 
 import analyticsService from '../../services/analyticsService';
 
@@ -259,55 +247,20 @@ const UserAnalyticsDashboard = ({ className = '' }) => {
               <Activity className="w-5 h-5 mr-2" />
               Feature Usage
             </h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={generateFeatureUsageChart()}>
-                <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-                <XAxis
-                  dataKey="name"
-                  tick={{ fontSize: 12 }}
-                  angle={-45}
-                  textAnchor="end"
-                  height={80}
-                />
-                <YAxis tick={{ fontSize: 12 }} />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: 'rgba(15, 23, 42, 0.9)',
-                    border: 'none',
-                    borderRadius: '8px',
-                    color: 'white'
-                  }}
-                />
-                <Bar dataKey="usage" fill="#3b82f6" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+            <div className="h-[300px]">
+              <LazyBarChart data={generateFeatureUsageChart()} />
+            </div>
           </div>
 
           {/* Session Distribution */}
           <div className="bg-slate-50 dark:bg-slate-700 rounded-lg p-4">
             <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4 flex items-center">
-              <PieChart className="w-5 h-5 mr-2" />
+              <PieChartIcon className="w-5 h-5 mr-2" />
               Session Duration
             </h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={generateSessionDistributionChart()}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                  outerRadius={80}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {generateSessionDistributionChart().map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
+            <div className="h-[300px]">
+              <LazyPieChart data={generateSessionDistributionChart()} />
+            </div>
           </div>
         </div>
 
@@ -317,28 +270,9 @@ const UserAnalyticsDashboard = ({ className = '' }) => {
             <Calendar className="w-5 h-5 mr-2" />
             Usage Patterns (24 Hours)
           </h3>
-          <ResponsiveContainer width="100%" height={200}>
-            <AreaChart data={generateTimePatternChart()}>
-              <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-              <XAxis dataKey="hour" tick={{ fontSize: 12 }} />
-              <YAxis tick={{ fontSize: 12 }} />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: 'rgba(15, 23, 42, 0.9)',
-                  border: 'none',
-                  borderRadius: '8px',
-                  color: 'white'
-                }}
-              />
-              <Area
-                type="monotone"
-                dataKey="activity"
-                stroke="#8b5cf6"
-                fill="#8b5cf6"
-                fillOpacity={0.3}
-              />
-            </AreaChart>
-          </ResponsiveContainer>
+          <div className="h-[200px]">
+            <LazyAreaChart data={generateTimePatternChart()} />
+          </div>
         </div>
 
         {/* Current Session Info */}

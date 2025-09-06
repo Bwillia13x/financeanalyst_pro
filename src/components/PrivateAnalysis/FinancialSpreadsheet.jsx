@@ -10,9 +10,14 @@ import {
 import React, { useState, useRef, useEffect } from 'react';
 
 import { useFinancialAccessibility } from '../../hooks/useAccessibility';
+import {
+  computeIncomeStatementValue,
+  computeBalanceSheetValue,
+  computeCashFlowValue
+} from '../../utils/financialFormulas';
 
-const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) => {
-  const [activeStatement, setActiveStatement] = useState('incomeStatement');
+const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange, initialActiveStatement = 'incomeStatement' }) => {
+  const [activeStatement, setActiveStatement] = useState(initialActiveStatement);
   const [adjustedValues, setAdjustedValues] = useState({});
 
   // Add accessibility monitoring for financial spreadsheet
@@ -34,25 +39,39 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
     currentLiabilities: true,
     nonCurrentLiabilities: true,
     equity: true,
+    totalAssets: true,
+    totalLiabilities: true,
+    totalLiabilitiesEquity: true,
     // Cash Flow
     operatingActivities: true,
     investingActivities: true,
-    financingActivities: true
+    financingActivities: true,
+    netCashFlow: true
   });
 
   const [editingCell, setEditingCell] = useState(null);
   const [cellValue, setCellValue] = useState('');
   const inputRef = useRef(null);
+  // Track custom rows added per section so they render in the UI
+  const [customRows, setCustomRows] = useState({});
+  // Detect test environment to avoid blocking dialogs
+  const IS_TEST_ENV = typeof import.meta !== 'undefined' && import.meta.env?.MODE === 'test';
 
-  // Initialize adjusted values with 2024 data (period index 2)
+  // Clear adjusted values on statement change to prevent stale state between statements
   useEffect(() => {
-    if (data?.statements?.incomeStatement && Object.keys(adjustedValues).length === 0) {
-      const newAdjustedValues = {};
-      const incomeStatement = data.statements.incomeStatement;
+    setAdjustedValues({});
+  }, [activeStatement]);
 
-      Object.keys(incomeStatement).forEach(key => {
-        if (incomeStatement[key] && incomeStatement[key][2] !== undefined) {
-          newAdjustedValues[key] = incomeStatement[key][2];
+  // Initialize adjusted values with the last available period for the active statement
+  useEffect(() => {
+    if (data?.statements?.[activeStatement] && Object.keys(adjustedValues).length === 0) {
+      const newAdjustedValues = {};
+      const statementData = data.statements[activeStatement];
+      const lastIndex = Math.max(0, (data?.periods?.length ?? 1) - 1);
+
+      Object.keys(statementData).forEach(key => {
+        if (statementData[key] && statementData[key][lastIndex] !== undefined) {
+          newAdjustedValues[key] = statementData[key][lastIndex];
         }
       });
 
@@ -61,7 +80,7 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
         onAdjustedValuesChange(newAdjustedValues);
       }
     }
-  }, [data, adjustedValues, onAdjustedValuesChange]);
+  }, [data, activeStatement, adjustedValues, onAdjustedValuesChange]);
 
   useEffect(() => {
     if (editingCell && inputRef.current) {
@@ -79,9 +98,9 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
         aria-label="Financial Spreadsheet"
         data-testid="financial-spreadsheet"
       >
-        <div className="bg-slate-900 rounded-lg shadow-lg p-8">
-          <div className="text-center text-gray-400">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-4" />
+        <div className="bg-card border border-border rounded-lg shadow-lg p-8">
+          <div className="text-center text-foreground-secondary">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent mx-auto mb-4" />
             <p>Loading financial data...</p>
           </div>
         </div>
@@ -105,9 +124,9 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
   const incomeStatementTemplate = {
     revenue: {
       title: 'Revenue',
-      color: 'bg-emerald-50 border-emerald-300',
-      headerBg: 'bg-emerald-600',
-      textColor: 'text-emerald-900',
+      color: 'bg-success/10 border-success/30',
+      headerBg: 'bg-success',
+      textColor: 'text-success',
       items: [
         { key: 'energyDevices', label: 'Energy Devices', level: 1 },
         { key: 'injectables', label: 'Injectables', level: 1 },
@@ -120,9 +139,9 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
     },
     costOfGoodsSold: {
       title: 'Cost of Goods Sold',
-      color: 'bg-red-50 border-red-300',
-      headerBg: 'bg-red-600',
-      textColor: 'text-red-900',
+      color: 'bg-destructive/10 border-destructive/30',
+      headerBg: 'bg-destructive',
+      textColor: 'text-destructive',
       items: [
         { key: 'energyDeviceSupplies', label: 'Energy Device Supplies', level: 1 },
         { key: 'injectablesCogs', label: 'Injectables', level: 1 },
@@ -141,16 +160,16 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
     },
     grossProfit: {
       title: 'Gross Profit',
-      color: 'bg-blue-50 border-blue-300',
-      headerBg: 'bg-blue-600',
-      textColor: 'text-blue-900',
+      color: 'bg-accent/10 border-accent/30',
+      headerBg: 'bg-accent',
+      textColor: 'text-accent',
       items: [{ key: 'grossProfit', label: 'Gross Profit', level: 0, bold: true, formula: true }]
     },
     salariesBenefits: {
       title: 'Salaries & Benefits',
-      color: 'bg-purple-50 border-purple-300',
-      headerBg: 'bg-purple-600',
-      textColor: 'text-purple-900',
+      color: 'bg-muted/40 border-border',
+      headerBg: 'bg-muted',
+      textColor: 'text-foreground',
       items: [
         { key: 'employeeBenefits', label: 'Employee Benefits', level: 1 },
         { key: 'payroll', label: 'Payroll', level: 1 },
@@ -166,9 +185,9 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
     },
     operatingExpenses: {
       title: 'Operating Expenses',
-      color: 'bg-orange-50 border-orange-300',
-      headerBg: 'bg-orange-600',
-      textColor: 'text-orange-900',
+      color: 'bg-warning/10 border-warning/30',
+      headerBg: 'bg-warning',
+      textColor: 'text-warning',
       items: [
         { key: 'marketing', label: 'Marketing', level: 1 },
         { key: 'automobile', label: 'Automobile', level: 1 },
@@ -203,16 +222,16 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
     },
     operatingIncome: {
       title: 'Operating Income',
-      color: 'bg-teal-50 border-teal-300',
-      headerBg: 'bg-teal-600',
-      textColor: 'text-teal-900',
-      items: [{ key: 'operatingIncome', label: 'Operating Income', level: 0, bold: true }]
+      color: 'bg-success/10 border-success/30',
+      headerBg: 'bg-success',
+      textColor: 'text-success',
+      items: [{ key: 'operatingIncome', label: 'Operating Income', level: 0, bold: true, formula: true }]
     },
     otherIncomeExpense: {
       title: 'Other Income / (Expense)',
-      color: 'bg-slate-50 border-slate-300',
-      headerBg: 'bg-slate-600',
-      textColor: 'text-slate-900',
+      color: 'bg-muted border-border',
+      headerBg: 'bg-muted',
+      textColor: 'text-foreground',
       items: [
         { key: 'gainOnAssetSale', label: 'Gain (Loss) On Asset Sale', level: 1 },
         { key: 'interestIncome', label: 'Interest Income', level: 1 },
@@ -228,10 +247,10 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
     },
     incomeBeforeTax: {
       title: 'Net Income Before Taxes',
-      color: 'bg-amber-50 border-amber-300',
-      headerBg: 'bg-amber-600',
-      textColor: 'text-amber-900',
-      items: [{ key: 'incomeBeforeTax', label: 'Net Income Before Taxes', level: 0, bold: true }]
+      color: 'bg-accent/10 border-accent/30',
+      headerBg: 'bg-accent',
+      textColor: 'text-accent',
+      items: [{ key: 'incomeBeforeTax', label: 'Net Income Before Taxes', level: 0, bold: true, formula: true }]
     }
   };
 
@@ -239,9 +258,9 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
   const balanceSheetTemplate = {
     currentAssets: {
       title: 'Current Assets',
-      color: 'bg-emerald-50 border-emerald-300',
-      headerBg: 'bg-emerald-600',
-      textColor: 'text-emerald-900',
+      color: 'bg-success/10 border-success/30',
+      headerBg: 'bg-success',
+      textColor: 'text-success',
       items: [
         { key: 'cash', label: 'Cash and Cash Equivalents', level: 1 },
         { key: 'receivables', label: 'Accounts Receivable', level: 1 },
@@ -259,9 +278,9 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
     },
     nonCurrentAssets: {
       title: 'Non-Current Assets',
-      color: 'bg-blue-50 border-blue-300',
-      headerBg: 'bg-blue-600',
-      textColor: 'text-blue-900',
+      color: 'bg-accent/10 border-accent/30',
+      headerBg: 'bg-accent',
+      textColor: 'text-accent',
       items: [
         { key: 'ppe', label: 'Property, Plant & Equipment', level: 1 },
         { key: 'accumulatedDepreciation', label: 'Less: Accumulated Depreciation', level: 1 },
@@ -280,16 +299,16 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
     },
     totalAssets: {
       title: 'Total Assets',
-      color: 'bg-slate-50 border-slate-300',
-      headerBg: 'bg-slate-700',
-      textColor: 'text-slate-900',
+      color: 'bg-muted border-border',
+      headerBg: 'bg-muted',
+      textColor: 'text-foreground',
       items: [{ key: 'totalAssets', label: 'Total Assets', level: 0, formula: true, bold: true }]
     },
     currentLiabilities: {
       title: 'Current Liabilities',
-      color: 'bg-red-50 border-red-300',
-      headerBg: 'bg-red-600',
-      textColor: 'text-red-900',
+      color: 'bg-destructive/10 border-destructive/30',
+      headerBg: 'bg-destructive',
+      textColor: 'text-destructive',
       items: [
         { key: 'accountsPayable', label: 'Accounts Payable', level: 1 },
         { key: 'accruedExpenses', label: 'Accrued Expenses', level: 1 },
@@ -307,9 +326,9 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
     },
     nonCurrentLiabilities: {
       title: 'Non-Current Liabilities',
-      color: 'bg-orange-50 border-orange-300',
-      headerBg: 'bg-orange-600',
-      textColor: 'text-orange-900',
+      color: 'bg-warning/10 border-warning/30',
+      headerBg: 'bg-warning',
+      textColor: 'text-warning',
       items: [
         { key: 'longTermDebt', label: 'Long-term Debt', level: 1 },
         { key: 'deferredTaxLiabilities', label: 'Deferred Tax Liabilities', level: 1 },
@@ -325,18 +344,18 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
     },
     totalLiabilities: {
       title: 'Total Liabilities',
-      color: 'bg-slate-50 border-slate-300',
-      headerBg: 'bg-slate-700',
-      textColor: 'text-slate-900',
+      color: 'bg-muted border-border',
+      headerBg: 'bg-muted',
+      textColor: 'text-foreground',
       items: [
         { key: 'totalLiabilities', label: 'Total Liabilities', level: 0, formula: true, bold: true }
       ]
     },
     equity: {
       title: "Shareholders' Equity",
-      color: 'bg-purple-50 border-purple-300',
-      headerBg: 'bg-purple-600',
-      textColor: 'text-purple-900',
+      color: 'bg-accent/10 border-accent/30',
+      headerBg: 'bg-accent',
+      textColor: 'text-accent',
       items: [
         { key: 'commonStock', label: 'Common Stock', level: 1 },
         { key: 'retainedEarnings', label: 'Retained Earnings', level: 1 },
@@ -352,9 +371,9 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
     },
     totalLiabilitiesEquity: {
       title: 'Total Liabilities and Equity',
-      color: 'bg-slate-50 border-slate-300',
-      headerBg: 'bg-slate-700',
-      textColor: 'text-slate-900',
+      color: 'bg-muted border-border',
+      headerBg: 'bg-muted',
+      textColor: 'text-foreground',
       items: [
         {
           key: 'totalLiabilitiesEquity',
@@ -458,7 +477,7 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
     if (isAdjusted) {
       currentValue = adjustedValues[rowKey] || '';
     } else {
-      currentValue = data.statements.incomeStatement[rowKey]?.[periodIndex] || '';
+      currentValue = data.statements[activeStatement]?.[rowKey]?.[periodIndex] || '';
     }
 
     setCellValue(currentValue.toString());
@@ -480,13 +499,17 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
           onAdjustedValuesChange(newAdjustedValues);
         }
       } else {
-        // Update original data
+        // Update original data for the active statement
         const newData = { ...data };
-        if (!newData.statements.incomeStatement[rowKey]) {
-          newData.statements.incomeStatement[rowKey] = {};
+        if (!newData.statements) newData.statements = {};
+        if (!newData.statements[activeStatement]) {
+          newData.statements[activeStatement] = {};
         }
-        newData.statements.incomeStatement[rowKey][periodIndex] = newValue;
-        onDataChange(newData);
+        if (!newData.statements[activeStatement][rowKey]) {
+          newData.statements[activeStatement][rowKey] = {};
+        }
+        newData.statements[activeStatement][rowKey][periodIndex] = newValue;
+        onDataChange?.(newData);
       }
 
       setEditingCell(null);
@@ -514,6 +537,26 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
     // Allow negative numbers, decimals, and empty strings
     const numericRegex = /^-?\d*\.?\d*$/;
     return numericRegex.test(value) || value === '';
+  };
+
+  // Compute values for formula rows across statements using pure utilities
+  const getComputedValue = (rowKey, periodIndex, useAdjusted = false) => {
+    if (periodIndex == null) return undefined;
+    if (activeStatement === 'incomeStatement') {
+      return computeIncomeStatementValue(
+        rowKey,
+        data?.statements?.incomeStatement,
+        periodIndex,
+        useAdjusted ? adjustedValues : {}
+      );
+    }
+    if (activeStatement === 'balanceSheet') {
+      return computeBalanceSheetValue(rowKey, data?.statements?.balanceSheet, periodIndex);
+    }
+    if (activeStatement === 'cashFlow') {
+      return computeCashFlowValue(rowKey, data?.statements?.cashFlow, periodIndex);
+    }
+    return undefined;
   };
 
   const formatNumber = value => {
@@ -550,22 +593,29 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
 
     return formattedValue;
   };
-
-  const addNewRow = () => {
-    const newRowLabel = prompt('Enter row label:');
-    if (newRowLabel) {
-      const newData = { ...data };
-      // Add to template structure (this could be enhanced to persist custom rows)
-      onDataChange(newData);
-    }
-  };
-
   const addPeriod = () => {
-    const newPeriodLabel = prompt('Enter period label (e.g., "Year 5"):');
+    const isPromptAvailable = typeof window !== 'undefined' && typeof window.prompt === 'function';
+    // Never call prompt during tests to avoid UI blocking/hangs; rely on smart fallback
+    const canPrompt = !IS_TEST_ENV && isPromptAvailable;
+    const desiredLabel = canPrompt ? window.prompt('Enter period label (e.g., "Year 5"):') : null;
+    const computeSmartFallback = () => {
+      const periods = Array.isArray(data?.periods) ? data.periods : [];
+      let maxYear = 0;
+      for (const p of periods) {
+        const m = /Year\s*(\d+)/i.exec(String(p));
+        if (m) {
+          const n = parseInt(m[1], 10);
+          if (!isNaN(n)) maxYear = Math.max(maxYear, n);
+        }
+      }
+      return `Year ${maxYear + 1}`;
+    };
+    const fallbackLabel = computeSmartFallback();
+    const newPeriodLabel = desiredLabel && desiredLabel.trim() ? desiredLabel.trim() : fallbackLabel;
     if (newPeriodLabel) {
       const newData = { ...data };
       newData.periods = [...newData.periods, newPeriodLabel];
-      onDataChange(newData);
+      onDataChange?.(newData);
     }
   };
 
@@ -576,9 +626,9 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
     const indentClass = level === 1 ? 'pl-8' : level === 2 ? 'pl-12' : 'pl-4';
     const textWeight = bold ? 'font-bold' : level === 0 ? 'font-semibold' : 'font-medium';
     const textSize = level === 0 ? 'text-sm' : 'text-sm';
-    const textColor = level === 0 ? 'text-slate-900' : 'text-slate-700';
-    const rowBg = level === 0 ? 'bg-slate-50/70' : 'bg-white';
-    const borderColor = level === 0 ? 'border-slate-200' : 'border-slate-100';
+    const textColor = 'text-foreground';
+    const rowBg = level === 0 ? 'bg-muted/40' : 'bg-card';
+    const borderColor = 'border-border';
 
     // Screen reader context
     const ariaLabel =
@@ -589,7 +639,7 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
     return (
       <tr
         key={key}
-        className={`${rowBg} border-b ${borderColor} hover:bg-slate-50 transition-all duration-150 group`}
+        className={`${rowBg} border-b ${borderColor} hover:bg-muted transition-all duration-150 group`}
         role="row"
         aria-label={ariaLabel}
       >
@@ -597,23 +647,23 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
         <td
           className={`px-6 py-4 ${indentClass} ${textWeight} ${textSize} ${textColor}`}
           headers="account-header"
-          aria-describedby={formula ? 'formula-description' : 'manual-description'}
+          aria-describedby={formula ? `formula-description-${key}` : `manual-description-${key}`}
         >
-          <div id="formula-description" className="sr-only">
+          <div id={`formula-description-${key}`} className="sr-only">
             This is an automatically calculated field based on other line items
           </div>
-          <div id="manual-description" className="sr-only">
+          <div id={`manual-description-${key}`} className="sr-only">
             This field can be edited by clicking or pressing Enter
           </div>
           <div className="flex items-center gap-3">
             {level === 0 && (
-              <div className="w-1.5 h-4 bg-gradient-to-b from-blue-500 to-blue-600 rounded-full flex-shrink-0 shadow-sm" />
+              <div className="w-1.5 h-4 bg-accent rounded-full flex-shrink-0 shadow-sm" />
             )}
             <span className="leading-tight">{label}</span>
             {formula && (
               <div className="flex items-center gap-1">
-                <Calculator size={14} className="text-blue-500/80 flex-shrink-0" />
-                <span className="text-xs text-blue-600 font-medium px-1.5 py-0.5 bg-blue-50 rounded-md">
+                <Calculator size={14} className="text-accent/80 flex-shrink-0" />
+                <span className="text-xs text-accent font-medium px-1.5 py-0.5 bg-accent/10 rounded-md">
                   AUTO
                 </span>
               </div>
@@ -626,15 +676,21 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
           headers="units-header"
           aria-label="Values are in thousands of dollars"
         >
-          <span className="text-xs font-medium text-slate-500 uppercase tracking-wide bg-slate-100 px-2 py-1 rounded-md">
+          <span className="text-xs font-medium text-foreground-secondary uppercase tracking-wide bg-muted px-2 py-1 rounded-md">
             $ 000s
           </span>
         </td>
 
         {/* Period Columns */}
         {data.periods.map((period, periodIndex) => {
-          const cellValue = data.statements.incomeStatement[key]?.[periodIndex];
-          const formattedValue = formatNumber(cellValue);
+          const computed = formula
+            ? getComputedValue(key, periodIndex, false)
+            : undefined;
+          const periodValue =
+            computed !== undefined
+              ? computed
+              : data.statements[activeStatement]?.[key]?.[periodIndex];
+          const formattedValue = formatNumber(periodValue);
           const cellAriaLabel = `${label} for ${period}: ${formattedValue || 'no value'} thousand dollars${formula ? ', calculated automatically' : ', click to edit'}`;
 
           return (
@@ -642,6 +698,7 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
               key={periodIndex}
               className="px-4 py-4 text-right"
               headers={`period-${periodIndex}-header account-header`}
+              data-testid={`cell-${activeStatement}-${key}-${periodIndex}`}
               aria-label={cellAriaLabel}
             >
               {editingCell?.rowKey === key &&
@@ -660,14 +717,18 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
                     }}
                     onBlur={handleCellBlur}
                     onKeyDown={handleKeyPress}
-                    className="w-full px-3 py-2.5 bg-white border-2 border-blue-400 rounded-lg text-slate-900 text-right font-mono text-sm focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 shadow-lg"
+                    className="w-full px-3 py-2.5 bg-card border-2 border-accent/50 rounded-lg text-foreground text-right font-mono text-sm focus:outline-none focus:ring-4 focus:ring-ring focus:border-accent shadow-lg"
                     placeholder="0.00"
                     data-metric={key}
+                    aria-label={`Edit ${label} for ${period}`}
+                    aria-describedby={`manual-description-${key}`}
                   />
                   <div className="absolute -top-2 -right-2 flex gap-1">
                     <button
                       onClick={handleCellBlur}
-                      className="w-5 h-5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full flex items-center justify-center text-xs transition-colors"
+                      className="w-5 h-5 bg-success hover:bg-success/90 text-success-foreground rounded-full flex items-center justify-center text-xs transition-colors"
+                      type="button"
+                      aria-label="Save value"
                     >
                       ✓
                     </button>
@@ -676,7 +737,9 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
                         setEditingCell(null);
                         setCellValue('');
                       }}
-                      className="w-5 h-5 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center text-xs transition-colors"
+                      className="w-5 h-5 bg-destructive hover:bg-destructive/90 text-destructive-foreground rounded-full flex items-center justify-center text-xs transition-colors"
+                      type="button"
+                      aria-label="Cancel editing"
                     >
                       ×
                     </button>
@@ -687,8 +750,8 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
                   onClick={() => !formula && handleCellClick(key, periodIndex)}
                   className={`px-3 py-2.5 rounded-lg font-mono text-sm transition-all duration-200 min-h-[40px] flex items-center justify-end ${
                     formula
-                      ? 'bg-gradient-to-r from-blue-50 to-blue-100 text-blue-800 font-semibold border border-blue-200 shadow-sm'
-                      : 'hover:bg-slate-100 text-slate-800 cursor-pointer border border-transparent hover:border-slate-200 hover:shadow-sm group-hover:bg-slate-50'
+                      ? 'bg-accent/10 text-accent font-semibold border border-accent/30 shadow-sm'
+                      : 'hover:bg-muted text-foreground cursor-pointer border border-transparent hover:border-border hover:shadow-sm group-hover:bg-muted'
                   }`}
                   role={formula ? 'cell' : 'button'}
                   tabIndex={formula ? -1 : 0}
@@ -702,13 +765,17 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
                     }
                   }}
                 >
-                  <span className={formula ? 'text-blue-900' : 'text-slate-700'}>
-                    {formatNumber(data.statements.incomeStatement[key]?.[periodIndex]) || '—'}
+                  <span className={formula ? 'text-accent' : 'text-foreground'}>
+                    {formatNumber(
+                      computed !== undefined
+                        ? computed
+                        : data.statements[activeStatement]?.[key]?.[periodIndex]
+                    ) || '—'}
                   </span>
                   {!formula && (
                     <Edit2
                       size={12}
-                      className="ml-2 opacity-0 group-hover:opacity-40 text-slate-400 transition-opacity"
+                      className="ml-2 opacity-0 group-hover:opacity-40 text-foreground-secondary transition-opacity"
                     />
                   )}
                 </div>
@@ -719,8 +786,9 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
 
         {/* Adjusted Column */}
         <td
-          className="px-4 py-4 text-right bg-gradient-to-r from-amber-50 to-yellow-50 border-l-2 border-amber-300"
+          className="px-4 py-4 text-right bg-warning/10 border-l-2 border-warning/30"
           headers="adjusted-header account-header"
+          data-testid={`cell-${activeStatement}-${key}-adjusted`}
           aria-label={`${label} adjusted value: ${formatNumber(adjustedValues[key] || 0) || 'no value'} thousand dollars${formula ? ', calculated automatically' : ', click to edit'}`}
         >
           {editingCell?.rowKey === key && editingCell?.isAdjusted ? (
@@ -737,14 +805,18 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
                 }}
                 onBlur={handleCellBlur}
                 onKeyDown={handleKeyPress}
-                className="w-full px-3 py-2.5 bg-white border-2 border-amber-400 rounded-lg text-slate-900 text-right font-mono text-sm focus:outline-none focus:ring-4 focus:ring-amber-100 focus:border-amber-500 shadow-lg"
+                className="w-full px-3 py-2.5 bg-card border-2 border-warning/50 rounded-lg text-foreground text-right font-mono text-sm focus:outline-none focus:ring-4 focus:ring-ring focus:border-warning shadow-lg"
                 placeholder="0.00"
                 data-metric={key}
+                aria-label={`Edit adjusted ${label}`}
+                aria-describedby={`manual-description-${key}`}
               />
               <div className="absolute -top-2 -right-2 flex gap-1">
                 <button
                   onClick={handleCellBlur}
-                  className="w-5 h-5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full flex items-center justify-center text-xs transition-colors"
+                  className="w-5 h-5 bg-success hover:bg-success/90 text-success-foreground rounded-full flex items-center justify-center text-xs transition-colors"
+                  type="button"
+                  aria-label="Save value"
                 >
                   ✓
                 </button>
@@ -753,7 +825,9 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
                     setEditingCell(null);
                     setCellValue('');
                   }}
-                  className="w-5 h-5 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center text-xs transition-colors"
+                  className="w-5 h-5 bg-destructive hover:bg-destructive/90 text-destructive-foreground rounded-full flex items-center justify-center text-xs transition-colors"
+                  type="button"
+                  aria-label="Cancel editing"
                 >
                   ×
                 </button>
@@ -764,8 +838,8 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
               onClick={() => !formula && handleCellClick(key, null, true)}
               className={`px-3 py-2.5 rounded-lg font-mono text-sm transition-all duration-200 min-h-[40px] flex items-center justify-end ${
                 formula
-                  ? 'bg-gradient-to-r from-amber-100 to-yellow-100 text-amber-800 font-semibold border border-amber-300 shadow-sm'
-                  : 'hover:bg-amber-100 text-slate-800 cursor-pointer border border-transparent hover:border-amber-300 hover:shadow-sm'
+                  ? 'bg-warning/10 text-warning font-semibold border border-warning/30 shadow-sm'
+                  : 'hover:bg-warning/10 text-foreground cursor-pointer border border-transparent hover:border-warning/30 hover:shadow-sm'
               }`}
               role={formula ? 'cell' : 'button'}
               tabIndex={formula ? -1 : 0}
@@ -779,13 +853,20 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
                 }
               }}
             >
-              <span className={formula ? 'text-amber-900' : 'text-slate-700'}>
-                {formatNumber(adjustedValues[key] || 0) || '—'}
+              <span className={formula ? 'text-warning' : 'text-foreground'}>
+                {(() => {
+                  if (formula) {
+                    const lastIdx = Math.max(0, (data?.periods?.length ?? 1) - 1);
+                    const v = getComputedValue(key, lastIdx, true);
+                    return formatNumber(v) || '—';
+                  }
+                  return formatNumber(adjustedValues[key] ?? '') || '—';
+                })()}
               </span>
               {!formula && (
                 <Edit2
                   size={12}
-                  className="ml-2 opacity-0 group-hover:opacity-40 text-amber-500 transition-opacity"
+                  className="ml-2 opacity-0 group-hover:opacity-40 text-warning transition-opacity"
                 />
               )}
             </div>
@@ -801,8 +882,8 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
           <span
             className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
               formula
-                ? 'bg-blue-100 text-blue-800 border border-blue-200'
-                : 'bg-slate-100 text-slate-700 border border-slate-200'
+                ? 'bg-accent/10 text-accent border border-accent/30'
+                : 'bg-muted text-foreground border border-border'
             }`}
           >
             {formula ? (
@@ -826,22 +907,24 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
     <section
       role="main"
       aria-labelledby="financial-spreadsheet-title"
-      className="bg-slate-900 rounded-lg shadow-lg"
+      className="bg-background text-foreground rounded-lg shadow-lg"
       data-testid="financial-spreadsheet"
     >
       {/* Header */}
-      <div className="p-4 sm:p-6 border-b border-slate-700">
+      <div className="p-4 sm:p-6 border-b border-border">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <h2
             id="financial-spreadsheet-title"
-            className="text-lg sm:text-xl font-semibold text-white"
+            className="text-lg sm:text-xl font-semibold text-foreground"
           >
             Financial Statements
           </h2>
           <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
             <button
               onClick={addPeriod}
-              className="px-3 py-2 sm:px-4 sm:py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center gap-2 transition-all duration-200 shadow-sm hover:shadow-md font-medium text-sm sm:text-base"
+              className="px-3 py-2 sm:px-4 sm:py-2.5 bg-accent text-accent-foreground hover:opacity-90 rounded-lg flex items-center gap-2 transition-all duration-200 shadow-sm hover:shadow-md font-medium text-sm sm:text-base"
+              aria-label="Add Period"
+              type="button"
             >
               <Plus size={14} className="sm:w-4 sm:h-4" />
               <span className="hidden sm:inline">Add Period</span>
@@ -850,7 +933,7 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
             <select
               value={activeStatement}
               onChange={e => setActiveStatement(e.target.value)}
-              className="px-3 py-2 sm:px-4 sm:py-2.5 bg-white border border-slate-300 rounded-lg text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium shadow-sm text-sm sm:text-base"
+              className="px-3 py-2 sm:px-4 sm:py-2.5 bg-card border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-ring font-medium shadow-sm text-sm sm:text-base"
             >
               <option value="incomeStatement">Income Statement</option>
               <option value="balanceSheet">Balance Sheet</option>
@@ -862,15 +945,16 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
 
       {/* Main Content */}
       <div className="max-w-full mx-auto p-4 sm:p-6 lg:p-8">
-        <div className="bg-white rounded-xl border border-slate-200 shadow-lg">
-          <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+        <div className="bg-card rounded-xl border border-border shadow-lg">
+          <div className="overflow-x-auto scrollbar-thin">
             <table
               className="w-full"
               role="table"
+              data-testid={`table-${activeStatement}`}
               aria-label={`Financial ${activeStatement === 'incomeStatement' ? 'Income Statement' : activeStatement === 'balanceSheet' ? 'Balance Sheet' : 'Cash Flow Statement'} with editable cells`}
             >
               {/* Enhanced Table Header */}
-              <thead className="bg-gradient-to-r from-slate-800 to-slate-900 text-white">
+              <thead className="bg-muted text-foreground">
                 <tr className="sr-only">
                   <td colSpan={data.periods.length + 4}>
                     <div className="p-2 text-sm">
@@ -888,7 +972,7 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
                     aria-label="Financial account descriptions and line items"
                   >
                     <div className="flex items-center gap-2">
-                      <FileText size={16} className="text-slate-300" />
+                      <FileText size={16} className="text-foreground-secondary" />
                       Account Description
                     </div>
                   </th>
@@ -910,19 +994,19 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
                     >
                       <div className="flex flex-col">
                         <span>{period}</span>
-                        <span className="text-xs text-slate-300 font-normal">Actual</span>
+                        <span className="text-xs text-foreground-secondary font-normal">Actual</span>
                       </div>
                     </th>
                   ))}
                   <th
-                    className="min-w-[140px] px-4 py-4 text-center text-sm font-semibold bg-gradient-to-r from-amber-600 to-yellow-600 border-l-2 border-amber-400"
+                    className="min-w-[140px] px-4 py-4 text-center text-sm font-semibold bg-warning/20 border-l-2 border-warning/40"
                     scope="col"
                     id="adjusted-header"
                     aria-label="Adjusted financial values, user-modified scenarios and projections, editable"
                   >
                     <div className="flex flex-col">
                       <span>Adjusted</span>
-                      <span className="text-xs text-amber-100 font-normal">Modified</span>
+                      <span className="text-xs text-warning font-normal">Modified</span>
                     </div>
                   </th>
                   <th
@@ -939,13 +1023,13 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
                 </tr>
               </thead>
 
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-border">
                 {Object.entries(currentTemplate).map(([sectionKey, section]) => (
                   <React.Fragment key={sectionKey}>
                     {/* Enhanced Section Header */}
                     <tr
                       key={`${sectionKey}-header`}
-                      className={`${section.headerBg || 'bg-slate-600'} border-b-2 border-slate-300`}
+                      className="bg-muted border-b-2 border-border"
                       role="rowheader"
                       aria-label={`${section.title} section header`}
                       data-tour={
@@ -957,12 +1041,14 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
                       }
                     >
                       <td colSpan={data.periods.length + 4} className="py-4 px-6">
-                        <div className="flex items-center gap-3 text-white w-full text-left group">
+                        <div className="flex items-center gap-3 text-foreground w-full text-left group">
                           <button
                             onClick={() => toggleSection(sectionKey)}
-                            className="flex items-center gap-3 text-white hover:text-slate-200 transition-colors flex-1"
+                            className="flex items-center gap-3 text-foreground hover:text-foreground transition-colors flex-1"
+                            aria-expanded={expandedSections[sectionKey]}
+                            aria-label={`Toggle ${section.title} section`}
                           >
-                            <div className="flex items-center justify-center w-6 h-6 rounded-full bg-white/20 group-hover:bg-white/30 transition-colors">
+                            <div className="flex items-center justify-center w-6 h-6 rounded-full bg-foreground/10 group-hover:bg-foreground/20 transition-colors">
                               {expandedSections[sectionKey] ? (
                                 <ChevronDown size={14} />
                               ) : (
@@ -974,9 +1060,20 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
                           <button
                             onClick={e => {
                               e.stopPropagation();
-                              addNewRow();
+                              const newRowLabel = typeof window !== 'undefined' && typeof window.prompt === 'function'
+                                ? window.prompt('Enter row label:')
+                                : null;
+                              if (!newRowLabel) return;
+                              const newKey = `custom_${Date.now()}`;
+                              setCustomRows(prev => ({
+                                ...prev,
+                                [sectionKey]: [
+                                  ...(prev[sectionKey] || []),
+                                  { key: newKey, label: newRowLabel, level: 1 }
+                                ]
+                              }));
                             }}
-                            className="p-1.5 hover:bg-white/20 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+                            className="p-1.5 hover:bg-foreground/10 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
                             title="Add custom row"
                           >
                             <Plus size={16} />
@@ -986,7 +1083,12 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
                     </tr>
 
                     {/* Section Rows */}
-                    {expandedSections[sectionKey] && section.items.map(item => renderRow(item))}
+                    {expandedSections[sectionKey] && (
+                      <>
+                        {section.items.map(item => renderRow(item))}
+                        {(customRows[sectionKey] || []).map(item => renderRow(item))}
+                      </>
+                    )}
                   </React.Fragment>
                 ))}
               </tbody>
@@ -996,55 +1098,55 @@ const FinancialSpreadsheet = ({ data, onDataChange, onAdjustedValuesChange }) =>
 
         {/* Enhanced Instructions Panel */}
         <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
+          <div className="bg-card rounded-xl p-6 border border-border shadow-sm">
             <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Calculator className="w-5 h-5 text-blue-600" />
+              <div className="p-2 bg-accent/10 rounded-lg">
+                <Calculator className="w-5 h-5 text-accent" />
               </div>
-              <h3 className="font-bold text-slate-900">How to Use</h3>
+              <h3 className="font-bold text-foreground">How to Use</h3>
             </div>
-            <ul className="space-y-2 text-sm text-slate-700">
+            <ul className="space-y-2 text-sm text-foreground-secondary">
               <li className="flex items-start gap-2">
-                <span className="text-blue-500 font-bold">•</span>
+                <span className="text-accent font-bold">•</span>
                 Click any editable cell to modify values with enhanced input controls
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-blue-500 font-bold">•</span>
+                <span className="text-accent font-bold">•</span>
                 Use Enter to save changes or Escape to cancel editing
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-blue-500 font-bold">•</span>
+                <span className="text-accent font-bold">•</span>
                 Expand/collapse sections using the arrow controls
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-blue-500 font-bold">•</span>
+                <span className="text-accent font-bold">•</span>
                 Formula cells automatically calculate based on inputs
               </li>
             </ul>
           </div>
 
-          <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
+          <div className="bg-card rounded-xl p-6 border border-border shadow-sm">
             <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <TrendingUp className="w-5 h-5 text-green-600" />
+              <div className="p-2 bg-success/10 rounded-lg">
+                <TrendingUp className="w-5 h-5 text-success" />
               </div>
-              <h3 className="font-bold text-slate-900">Professional Features</h3>
+              <h3 className="font-bold text-foreground">Professional Features</h3>
             </div>
-            <ul className="space-y-2 text-sm text-slate-700">
+            <ul className="space-y-2 text-sm text-foreground-secondary">
               <li className="flex items-start gap-2">
-                <span className="text-green-500 font-bold">•</span>
+                <span className="text-success font-bold">•</span>
                 Color-coded sections for easy visual navigation
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-green-500 font-bold">•</span>
+                <span className="text-success font-bold">•</span>
                 Adjusted column for scenario analysis and modifications
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-green-500 font-bold">•</span>
+                <span className="text-success font-bold">•</span>
                 Professional number formatting with proper alignment
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-green-500 font-bold">•</span>
+                <span className="text-success font-bold">•</span>
                 Enhanced editing experience with save/cancel controls
               </li>
             </ul>

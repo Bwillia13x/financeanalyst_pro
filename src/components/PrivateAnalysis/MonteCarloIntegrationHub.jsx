@@ -267,13 +267,13 @@ const MonteCarloIntegrationHub = ({
   ];
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6" data-testid="monte-carlo-simulation">
+    <div className="bg-card text-foreground border border-border rounded-lg shadow-lg p-6" data-testid="monte-carlo-simulation">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-3">
-          <Zap className="text-purple-600" size={28} />
+          <Zap className="text-accent" size={28} />
           <div>
-            <h2 className="text-2xl font-bold text-gray-800">Monte Carlo Integration Hub</h2>
-            <p className="text-gray-600">Cross-model risk analysis & unified simulations</p>
+            <h2 className="text-2xl font-bold text-foreground">Monte Carlo Integration Hub</h2>
+            <p className="text-foreground-secondary">Cross-model risk analysis & unified simulations</p>
           </div>
         </div>
 
@@ -283,8 +283,8 @@ const MonteCarloIntegrationHub = ({
             disabled={isRunning}
             className={`px-6 py-2 rounded-lg font-medium flex items-center space-x-2 ${
               isRunning
-                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                : 'bg-purple-600 hover:bg-purple-700 text-white'
+                ? 'bg-muted text-foreground-secondary cursor-not-allowed'
+                : 'bg-accent hover:bg-accent/90 text-accent-foreground'
             }`}
             whileHover={!isRunning ? { scale: 1.02 } : {}}
             whileTap={!isRunning ? { scale: 0.98 } : {}}
@@ -299,24 +299,29 @@ const MonteCarloIntegrationHub = ({
       {isRunning && (
         <div className="mb-6">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-gray-700">Simulation Progress</span>
-            <span className="text-sm text-gray-500">{progress.toFixed(0)}%</span>
+            <span className="text-sm font-medium text-foreground">Simulation Progress</span>
+            <span className="text-sm text-foreground-secondary">{progress.toFixed(0)}%</span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
+          <div className="w-full bg-muted rounded-full h-2">
             <div
-              className="bg-purple-600 h-2 rounded-full transition-all duration-300"
+              className="bg-accent h-2 rounded-full transition-all duration-300"
               style={{ width: `${progress}%` }}
+              role="progressbar"
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={Math.round(progress)}
+              aria-label="Simulation progress"
             />
           </div>
         </div>
       )}
 
       {/* Simulation Settings */}
-      <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-        <h3 className="font-semibold mb-3">Simulation Settings</h3>
+      <div className="mb-6 p-4 bg-card border border-border rounded-lg">
+        <h3 className="font-semibold mb-3 text-foreground">Simulation Settings</h3>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="iterations">
+            <label className="block text-sm font-medium text-foreground mb-1" htmlFor="iterations">
               Iterations
             </label>
             <input
@@ -329,13 +334,13 @@ const MonteCarloIntegrationHub = ({
                   iterations: parseInt(e.target.value) || 10000
                 }))
               }
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+              className="w-full px-3 py-2 bg-card text-foreground border border-border rounded-lg"
             />
           </div>
 
           <div>
             <label
-              className="block text-sm font-medium text-gray-700 mb-1"
+              className="block text-sm font-medium text-foreground mb-1"
               htmlFor="confidence-level"
             >
               Confidence Level
@@ -349,7 +354,7 @@ const MonteCarloIntegrationHub = ({
                   confidenceLevel: parseFloat(e.target.value)
                 }))
               }
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+              className="w-full px-3 py-2 bg-card text-foreground border border-border rounded-lg"
             >
               <option value={0.9}>90%</option>
               <option value={0.95}>95%</option>
@@ -370,7 +375,7 @@ const MonteCarloIntegrationHub = ({
                 }
                 className="mr-2"
               />
-              <span className="text-sm text-gray-700">Cross-Model Correlations</span>
+              <span className="text-sm text-foreground">Cross-Model Correlations</span>
             </label>
           </div>
 
@@ -387,16 +392,16 @@ const MonteCarloIntegrationHub = ({
                 }
                 className="mr-2"
               />
-              <span className="text-sm text-gray-700">Cross-Model Analysis</span>
+              <span className="text-sm text-foreground">Cross-Model Analysis</span>
             </label>
           </div>
         </div>
       </div>
 
       {/* Analysis Tabs */}
-      <div className="border-b border-gray-200 mb-6">
-        <nav className="-mb-px flex space-x-8">
-          {analysisOptions.map(option => {
+      <div className="border-b border-border mb-6">
+        <div className="-mb-px flex space-x-8" role="tablist" aria-label="Analysis options">
+          {analysisOptions.map((option, idx) => {
             const Icon = option.icon;
             return (
               <button
@@ -404,16 +409,27 @@ const MonteCarloIntegrationHub = ({
                 onClick={() => setActiveAnalysis(option.id)}
                 className={`py-2 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${
                   activeAnalysis === option.id
-                    ? 'border-purple-500 text-purple-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                    ? 'border-accent text-accent'
+                    : 'border-transparent text-foreground-secondary hover:text-foreground'
                 }`}
+                role="tab"
+                aria-selected={activeAnalysis === option.id}
+                onKeyDown={e => {
+                  if (e.key === 'ArrowRight') {
+                    const next = analysisOptions[(idx + 1) % analysisOptions.length].id;
+                    setActiveAnalysis(next);
+                  } else if (e.key === 'ArrowLeft') {
+                    const prev = analysisOptions[(idx - 1 + analysisOptions.length) % analysisOptions.length].id;
+                    setActiveAnalysis(prev);
+                  }
+                }}
               >
                 <Icon size={16} />
                 <span>{option.label}</span>
               </button>
             );
           })}
-        </nav>
+        </div>
       </div>
 
       {/* Results Display */}
@@ -430,71 +446,71 @@ const MonteCarloIntegrationHub = ({
               {/* Key Metrics Summary */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {integratedResults.dcf && (
-                  <div className="bg-blue-50 p-4 rounded-lg text-center">
-                    <div className="text-2xl font-bold text-blue-600">
+                  <div className="bg-card border border-border p-4 rounded-lg text-center">
+                    <div className="text-2xl font-bold text-accent">
                       {formatCurrency(integratedResults.dcf.analysis?.summary?.mean || 0)}
                     </div>
-                    <div className="text-sm text-gray-600">DCF Expected Value</div>
+                    <div className="text-sm text-foreground-secondary">DCF Expected Value</div>
                   </div>
                 )}
 
                 {integratedResults.lbo && (
-                  <div className="bg-green-50 p-4 rounded-lg text-center">
-                    <div className="text-2xl font-bold text-green-600">
+                  <div className="bg-card border border-border p-4 rounded-lg text-center">
+                    <div className="text-2xl font-bold text-success">
                       {formatPercent(integratedResults.lbo.analysis?.summary?.mean || 0)}
                     </div>
-                    <div className="text-sm text-gray-600">LBO Expected IRR</div>
+                    <div className="text-sm text-foreground-secondary">LBO Expected IRR</div>
                   </div>
                 )}
 
                 {integratedResults.correlation && (
-                  <div className="bg-purple-50 p-4 rounded-lg text-center">
-                    <div className="text-2xl font-bold text-purple-600">
+                  <div className="bg-card border border-border p-4 rounded-lg text-center">
+                    <div className="text-2xl font-bold text-accent">
                       {(integratedResults.correlation.dcfLboCorrelation || 0).toFixed(2)}
                     </div>
-                    <div className="text-sm text-gray-600">DCF-LBO Correlation</div>
+                    <div className="text-sm text-foreground-secondary">DCF-LBO Correlation</div>
                   </div>
                 )}
 
-                <div className="bg-orange-50 p-4 rounded-lg text-center">
-                  <div className="text-2xl font-bold text-orange-600">
+                <div className="bg-card border border-border p-4 rounded-lg text-center">
+                  <div className="text-2xl font-bold text-warning">
                     {simulationSettings.iterations.toLocaleString()}
                   </div>
-                  <div className="text-sm text-gray-600">Simulations Run</div>
+                  <div className="text-sm text-foreground-secondary">Simulations Run</div>
                 </div>
               </div>
 
               {/* Risk Correlation Matrix */}
               {integratedResults.correlation && (
-                <div className="bg-gray-50 rounded-lg p-6">
-                  <h3 className="text-lg font-semibold mb-4">Cross-Model Risk Analysis</h3>
+                <div className="bg-card border border-border rounded-lg p-6">
+                  <h3 className="text-lg font-semibold text-foreground mb-4">Cross-Model Risk Analysis</h3>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="bg-white p-4 rounded-lg">
-                      <div className="font-medium text-gray-800 mb-2">Correlation Strength</div>
-                      <div className="text-2xl font-bold text-purple-600">
+                    <div className="bg-card border border-border p-4 rounded-lg">
+                      <div className="font-medium text-foreground mb-2">Correlation Strength</div>
+                      <div className="text-2xl font-bold text-accent">
                         {integratedResults.correlation.interpretation}
                       </div>
-                      <div className="text-sm text-gray-600">
+                      <div className="text-sm text-foreground-secondary">
                         {integratedResults.correlation.riskImplication}
                       </div>
                     </div>
 
-                    <div className="bg-white p-4 rounded-lg">
-                      <div className="font-medium text-gray-800 mb-2">Risk Diversification</div>
-                      <div className="text-2xl font-bold text-blue-600">
+                    <div className="bg-card border border-border p-4 rounded-lg">
+                      <div className="font-medium text-foreground mb-2">Risk Diversification</div>
+                      <div className="text-2xl font-bold text-accent">
                         {Math.abs(integratedResults.correlation.dcfLboCorrelation) < 0.5
                           ? 'High'
                           : 'Low'}
                       </div>
-                      <div className="text-sm text-gray-600">Portfolio benefit</div>
+                      <div className="text-sm text-foreground-secondary">Portfolio benefit</div>
                     </div>
 
-                    <div className="bg-white p-4 rounded-lg">
-                      <div className="font-medium text-gray-800 mb-2">Confidence Level</div>
-                      <div className="text-2xl font-bold text-green-600">
+                    <div className="bg-card border border-border p-4 rounded-lg">
+                      <div className="font-medium text-foreground mb-2">Confidence Level</div>
+                      <div className="text-2xl font-bold text-success">
                         {formatPercent(simulationSettings.confidenceLevel)}
                       </div>
-                      <div className="text-sm text-gray-600">Statistical confidence</div>
+                      <div className="text-sm text-foreground-secondary">Statistical confidence</div>
                     </div>
                   </div>
                 </div>
@@ -503,10 +519,10 @@ const MonteCarloIntegrationHub = ({
               {/* Distribution Charts */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div
-                  className="bg-gray-50 rounded-lg p-4"
+                  className="bg-card border border-border rounded-lg p-4"
                   data-testid="valuation-distribution-chart"
                 >
-                  <h4 className="font-semibold mb-3">Valuation Distribution</h4>
+                  <h4 className="font-semibold text-foreground mb-3">Valuation Distribution</h4>
                   <ResponsiveContainer width="100%" height={300}>
                     <AreaChart data={generateHistogramData()}>
                       <CartesianGrid strokeDasharray="3 3" />
@@ -524,64 +540,64 @@ const MonteCarloIntegrationHub = ({
                   </ResponsiveContainer>
                 </div>
 
-                <div className="bg-gray-50 rounded-lg p-4" data-testid="confidence-intervals">
-                  <h4 className="font-semibold mb-3">Confidence Intervals (95%)</h4>
+                <div className="bg-card border border-border rounded-lg p-4" data-testid="confidence-intervals">
+                  <h4 className="font-semibold text-foreground mb-3">Confidence Intervals (95%)</h4>
                   <div className="space-y-3">
                     <div className="flex justify-between">
-                      <span>P5 (5th percentile):</span>
-                      <span className="font-medium">$125.00</span>
+                      <span className="text-foreground-secondary">P5 (5th percentile):</span>
+                      <span className="font-medium text-foreground">$125.00</span>
                     </div>
                     <div className="flex justify-between">
-                      <span>P50 (Median):</span>
-                      <span className="font-medium">$150.00</span>
+                      <span className="text-foreground-secondary">P50 (Median):</span>
+                      <span className="font-medium text-foreground">$150.00</span>
                     </div>
                     <div className="flex justify-between">
-                      <span>P95 (95th percentile):</span>
-                      <span className="font-medium">$175.00</span>
+                      <span className="text-foreground-secondary">P95 (95th percentile):</span>
+                      <span className="font-medium text-foreground">$175.00</span>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-gray-50 rounded-lg p-4" data-testid="risk-metrics">
-                <h4 className="font-semibold mb-3">Risk Metrics</h4>
+              <div className="bg-card border border-border rounded-lg p-4" data-testid="risk-metrics">
+                <h4 className="font-semibold text-foreground mb-3">Risk Metrics</h4>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="text-center">
-                    <div className="text-xl font-bold text-red-600">-$25.00</div>
-                    <div className="text-sm text-gray-600">VaR (95%)</div>
+                    <div className="text-xl font-bold text-destructive">-$25.00</div>
+                    <div className="text-sm text-foreground-secondary">VaR (95%)</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-xl font-bold text-orange-600">15%</div>
-                    <div className="text-sm text-gray-600">Volatility</div>
+                    <div className="text-xl font-bold text-warning">15%</div>
+                    <div className="text-sm text-foreground-secondary">Volatility</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-xl font-bold text-blue-600">0.85</div>
-                    <div className="text-sm text-gray-600">Sharpe Ratio</div>
+                    <div className="text-xl font-bold text-accent">0.85</div>
+                    <div className="text-sm text-foreground-secondary">Sharpe Ratio</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-xl font-bold text-green-600">5%</div>
-                    <div className="text-sm text-gray-600">Loss Probability</div>
+                    <div className="text-xl font-bold text-success">5%</div>
+                    <div className="text-sm text-foreground-secondary">Loss Probability</div>
                   </div>
                 </div>
               </div>
 
               {/* Portfolio-Level Insights */}
               {integratedResults.portfolio && (
-                <div className="bg-gray-50 rounded-lg p-6">
-                  <h3 className="text-lg font-semibold mb-4">Portfolio-Weighted Analysis</h3>
+                <div className="bg-card border border-border rounded-lg p-6">
+                  <h3 className="text-lg font-semibold text-foreground mb-4">Portfolio-Weighted Analysis</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="bg-white p-4 rounded-lg">
-                      <div className="font-medium text-gray-800 mb-2">Scenario-Weighted DCF</div>
-                      <div className="text-xl font-bold text-blue-600">
+                    <div className="bg-card border border-border p-4 rounded-lg">
+                      <div className="font-medium text-foreground mb-2">Scenario-Weighted DCF</div>
+                      <div className="text-xl font-bold text-accent">
                         {formatCurrency(integratedResults.portfolio.dcfWeighted || 0)}
                       </div>
                     </div>
 
-                    <div className="bg-white p-4 rounded-lg">
-                      <div className="font-medium text-gray-800 mb-2">
+                    <div className="bg-card border border-border p-4 rounded-lg">
+                      <div className="font-medium text-foreground mb-2">
                         Scenario-Weighted LBO IRR
                       </div>
-                      <div className="text-xl font-bold text-green-600">
+                      <div className="text-xl font-bold text-success">
                         {formatPercent(integratedResults.portfolio.lboWeighted || 0)}
                       </div>
                     </div>
@@ -593,81 +609,81 @@ const MonteCarloIntegrationHub = ({
 
           {/* Individual Analysis Views */}
           {activeAnalysis === 'dcf' && integratedResults.dcf && (
-            <div className="bg-gray-50 rounded-lg p-6">
-              <h3 className="text-lg font-semibold mb-4">DCF Monte Carlo Results</h3>
+            <div className="bg-card border border-border rounded-lg p-6">
+              <h3 className="text-lg font-semibold text-foreground mb-4">DCF Monte Carlo Results</h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="text-center">
-                  <div className="text-lg font-bold text-blue-600">
+                  <div className="text-lg font-bold text-accent">
                     {formatCurrency(integratedResults.dcf.analysis?.summary?.mean || 0)}
                   </div>
-                  <div className="text-sm text-gray-600">Mean Value</div>
+                  <div className="text-sm text-foreground-secondary">Mean Value</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-lg font-bold text-green-600">
+                  <div className="text-lg font-bold text-success">
                     {formatCurrency(
                       integratedResults.dcf.analysis?.percentiles?.pricePerShare?.p95 || 0
                     )}
                   </div>
-                  <div className="text-sm text-gray-600">95th Percentile</div>
+                  <div className="text-sm text-foreground-secondary">95th Percentile</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-lg font-bold text-red-600">
+                  <div className="text-lg font-bold text-destructive">
                     {formatCurrency(
                       integratedResults.dcf.analysis?.percentiles?.pricePerShare?.p5 || 0
                     )}
                   </div>
-                  <div className="text-sm text-gray-600">5th Percentile</div>
+                  <div className="text-sm text-foreground-secondary">5th Percentile</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-lg font-bold text-purple-600">
+                  <div className="text-lg font-bold text-accent">
                     {formatCurrency(
                       integratedResults.dcf.analysis?.summary?.standardDeviation || 0
                     )}
                   </div>
-                  <div className="text-sm text-gray-600">Std Deviation</div>
+                  <div className="text-sm text-foreground-secondary">Std Deviation</div>
                 </div>
               </div>
             </div>
           )}
 
           {activeAnalysis === 'lbo' && integratedResults.lbo && (
-            <div className="bg-gray-50 rounded-lg p-6">
-              <h3 className="text-lg font-semibold mb-4">LBO Monte Carlo Results</h3>
+            <div className="bg-card border border-border rounded-lg p-6">
+              <h3 className="text-lg font-semibold text-foreground mb-4">LBO Monte Carlo Results</h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="text-center">
-                  <div className="text-lg font-bold text-green-600">
+                  <div className="text-lg font-bold text-success">
                     {formatPercent(integratedResults.lbo.analysis?.summary?.mean || 0)}
                   </div>
-                  <div className="text-sm text-gray-600">Mean IRR</div>
+                  <div className="text-sm text-foreground-secondary">Mean IRR</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-lg font-bold text-blue-600">
+                  <div className="text-lg font-bold text-accent">
                     {formatPercent(integratedResults.lbo.analysis?.percentiles?.irr?.p95 || 0)}
                   </div>
-                  <div className="text-sm text-gray-600">95th Percentile IRR</div>
+                  <div className="text-sm text-foreground-secondary">95th Percentile IRR</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-lg font-bold text-red-600">
+                  <div className="text-lg font-bold text-destructive">
                     {formatPercent(integratedResults.lbo.analysis?.percentiles?.irr?.p5 || 0)}
                   </div>
-                  <div className="text-sm text-gray-600">5th Percentile IRR</div>
+                  <div className="text-sm text-foreground-secondary">5th Percentile IRR</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-lg font-bold text-purple-600">
+                  <div className="text-lg font-bold text-accent">
                     {((integratedResults.lbo.analysis?.percentiles?.moic?.p95 || 0) +
                       (integratedResults.lbo.analysis?.percentiles?.moic?.p5 || 0)) /
                       2}
                     x
                   </div>
-                  <div className="text-sm text-gray-600">Avg MOIC</div>
+                  <div className="text-sm text-foreground-secondary">Avg MOIC</div>
                 </div>
               </div>
             </div>
           )}
         </motion.div>
       ) : (
-        <div className="text-center py-12 text-gray-500">
-          <Zap size={48} className="mx-auto mb-4 opacity-50" />
+        <div className="text-center py-12 text-foreground-secondary">
+          <Zap size={48} className="mx-auto mb-4 opacity-50 text-foreground-secondary" />
           <p>Configure settings and run integrated simulation to see cross-model analysis</p>
           <p className="text-sm mt-2">
             {!dcfResults && !lboResults

@@ -70,11 +70,11 @@ const IndustryAnalyticsDashboard = ({ isOpen, onClose }) => {
   ];
 
   const [services] = useState(() => ({
-    banking: new BankingAnalyticsService(),
-    healthcare: new HealthcareAnalyticsService(),
-    energy: new EnergyAnalyticsService(),
-    realEstate: new RealEstateAnalyticsService(),
-    technology: new TechnologyAnalyticsService()
+    banking: BankingAnalyticsService,
+    healthcare: HealthcareAnalyticsService,
+    energy: EnergyAnalyticsService,
+    realEstate: RealEstateAnalyticsService,
+    technology: TechnologyAnalyticsService
   }));
 
   const runAnalysis = async industryId => {

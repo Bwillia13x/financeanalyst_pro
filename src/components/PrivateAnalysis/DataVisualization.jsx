@@ -13,9 +13,6 @@ import {
   Line,
   BarChart,
   Bar,
-  PieChart,
-  Pie,
-  Cell,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -23,6 +20,7 @@ import {
   Legend,
   ResponsiveContainer
 } from 'recharts';
+import { PieChart as LazyPieChart } from '../../components/ui/LazyChart';
 
 const DataVisualization = ({
   dcfData,
@@ -225,23 +223,9 @@ const DataVisualization = ({
   // Scenario Distribution Chart
   const ScenarioDistributionChart = () => (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <ResponsiveContainer width="100%" height={300}>
-        <PieChart>
-          <Pie
-            data={scenarioDistributionData}
-            cx="50%"
-            cy="50%"
-            outerRadius={80}
-            dataKey="probability"
-            label={({ name, probability }) => `${name}: ${probability}%`}
-          >
-            {scenarioDistributionData.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={entry.fill} />
-            ))}
-          </Pie>
-          <Tooltip formatter={value => `${value}%`} />
-        </PieChart>
-      </ResponsiveContainer>
+      <div className="h-[300px]">
+        <LazyPieChart data={scenarioDistributionData} />
+      </div>
 
       <ResponsiveContainer width="100%" height={300}>
         <BarChart data={scenarioDistributionData}>
@@ -328,6 +312,7 @@ const DataVisualization = ({
           className={`px-3 py-2 rounded-lg text-sm transition-colors flex items-center gap-2 ${
             showDetails ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'
           }`}
+          aria-pressed={showDetails}
         >
           {showDetails ? <EyeOff size={14} /> : <Eye size={14} />}
           {showDetails ? 'Hide Details' : 'Show Details'}
@@ -335,7 +320,7 @@ const DataVisualization = ({
       </div>
 
       {/* Chart Type Selector */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3" role="tablist" aria-label="Chart types">
         {chartTypes.map(chart => {
           const Icon = chart.icon;
           return (
@@ -349,6 +334,9 @@ const DataVisualization = ({
               }`}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
+              role="tab"
+              aria-selected={activeChart === chart.id}
+              aria-controls={`chart-panel-${chart.id}`}
             >
               <Icon size={20} className="mx-auto mb-2" />
               <div className="text-xs font-medium">{chart.label}</div>
@@ -366,7 +354,7 @@ const DataVisualization = ({
           {showDetails && <span className="text-sm text-gray-500">{getChartDescription()}</span>}
         </div>
 
-        <div className="min-h-[400px]">{renderChart()}</div>
+        <div className="min-h-[400px]" id={`chart-panel-${activeChart}`} role="tabpanel" aria-labelledby={activeChart}>{renderChart()}</div>
       </div>
 
       {/* Chart Insights */}

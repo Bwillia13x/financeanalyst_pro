@@ -10,7 +10,7 @@ const ConnectionStatus = ({ connectionHealth, lastUpdate }) => {
       case 'warning':
         return 'text-warning';
       case 'error':
-        return 'text-error';
+        return 'text-destructive';
       default:
         return 'text-muted-foreground';
     }
@@ -58,7 +58,7 @@ const ConnectionStatus = ({ connectionHealth, lastUpdate }) => {
                 ? 'bg-success'
                 : status === 'warning'
                   ? 'bg-warning'
-                  : 'bg-error'
+                  : 'bg-destructive'
             }`}
             title={`${source}: ${status}`}
           />

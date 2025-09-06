@@ -50,7 +50,7 @@ const AssumptionsPanel = ({ assumptions, setAssumptions }) => {
         </div>
 
         {/* Operating Assumptions */}
-        <div className="col-span-12 border-t pt-3">
+        <div className="col-span-12 border-t border-border pt-3">
           <div className="grid grid-cols-2 gap-3">
             <NumberInput
               label="Revenue₀"
@@ -106,8 +106,8 @@ const AssumptionsPanel = ({ assumptions, setAssumptions }) => {
         </div>
 
         {/* Reinvestment */}
-        <div className="col-span-12 border-t pt-3">
-          <div className="mb-1 text-[12px] font-semibold text-slate-700">Reinvestment</div>
+        <div className="col-span-12 border-t border-border pt-3">
+          <div className="mb-1 text-[12px] font-semibold text-foreground">Reinvestment</div>
           <div className="grid grid-cols-2 gap-3">
             <Switch
               label="Use Sales‑to‑Capital"

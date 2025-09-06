@@ -18,7 +18,7 @@ const Settings = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
+    <div className="min-h-screen bg-background text-foreground">
       <SEOHead
         title="Settings & Preferences | FinanceAnalyst Pro"
         description="Configure your user preferences, security settings, notifications, and platform customizations for optimal workflow and compliance."
@@ -32,12 +32,12 @@ const Settings = () => {
         {/* Page Header */}
         <div className="mb-8">
           <div className="flex items-center mb-4">
-            <SettingsIcon className="w-8 h-8 text-purple-600 mr-3" />
-            <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
+            <SettingsIcon className="w-8 h-8 text-accent mr-3" />
+            <h1 className="text-3xl font-bold text-foreground">
               Settings & Preferences
             </h1>
           </div>
-          <p className="text-slate-600 dark:text-slate-400 max-w-3xl">
+          <p className="text-foreground-secondary max-w-3xl">
             Configure your workspace, security settings, and preferences to optimize your financial
             analysis workflow.
           </p>
@@ -56,8 +56,8 @@ const Settings = () => {
                       onClick={() => setActiveTab(tab.id)}
                       className={`w-full flex items-center px-4 py-3 text-sm font-medium transition-colors ${
                         activeTab === tab.id
-                          ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border-r-2 border-blue-600'
-                          : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-slate-200'
+                          ? 'bg-primary/10 text-primary border-r-2 border-primary'
+                          : 'text-foreground-secondary hover:bg-muted hover:text-foreground'
                       }`}
                     >
                       <Icon className="w-5 h-5 mr-3" />
@@ -73,7 +73,7 @@ const Settings = () => {
           <div className="lg:col-span-3">
             {activeTab === 'preferences' && (
               <Card className="p-6">
-                <h2 className="text-xl font-semibold text-slate-900 dark:text-white mb-6">
+                <h2 className="text-xl font-semibold text-foreground mb-6">
                   User Preferences
                 </h2>
                 <UserPreferences />
@@ -82,7 +82,7 @@ const Settings = () => {
 
             {activeTab === 'security' && (
               <Card className="p-6">
-                <h2 className="text-xl font-semibold text-slate-900 dark:text-white mb-6">
+                <h2 className="text-xl font-semibold text-foreground mb-6">
                   Security & Access Control
                 </h2>
                 <SecurityDashboard />
@@ -91,15 +91,15 @@ const Settings = () => {
 
             {activeTab === 'notifications' && (
               <Card className="p-6">
-                <h2 className="text-xl font-semibold text-slate-900 dark:text-white mb-6">
+                <h2 className="text-xl font-semibold text-foreground mb-6">
                   Notification Preferences
                 </h2>
                 <div className="space-y-4">
-                  <div className="text-slate-600 dark:text-slate-400">
+                  <div className="text-foreground-secondary">
                     Configure alerts, email notifications, and system messages.
                   </div>
                   {/* Notification settings will be implemented */}
-                  <div className="bg-slate-100 dark:bg-slate-700 rounded-lg p-4 text-center text-slate-500 dark:text-slate-400">
+                  <div className="bg-muted rounded-lg p-4 text-center text-foreground-secondary">
                     Notification settings coming soon
                   </div>
                 </div>
@@ -108,15 +108,15 @@ const Settings = () => {
 
             {activeTab === 'appearance' && (
               <Card className="p-6">
-                <h2 className="text-xl font-semibold text-slate-900 dark:text-white mb-6">
+                <h2 className="text-xl font-semibold text-foreground mb-6">
                   Appearance & Theme
                 </h2>
                 <div className="space-y-4">
-                  <div className="text-slate-600 dark:text-slate-400">
+                  <div className="text-foreground-secondary">
                     Customize the platform appearance, themes, and layout preferences.
                   </div>
                   {/* Appearance settings will be implemented */}
-                  <div className="bg-slate-100 dark:bg-slate-700 rounded-lg p-4 text-center text-slate-500 dark:text-slate-400">
+                  <div className="bg-muted rounded-lg p-4 text-center text-foreground-secondary">
                     Appearance settings coming soon
                   </div>
                 </div>

@@ -4,7 +4,7 @@ module.exports = {
   ci: {
     collect: {
       url: ['http://localhost:4173/', 'http://localhost:4173/valuation-tool', 'http://localhost:4173/private-analysis'],
-      startServerCommand: 'npm run preview',
+      startServerCommand: 'npm run preview:with-backend:ci',
       numberOfRuns: 3,
       settings: {
         chromeFlags: '--no-sandbox --disable-dev-shm-usage',

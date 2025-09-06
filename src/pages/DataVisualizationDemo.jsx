@@ -4,12 +4,10 @@ import {
   DollarSign,
   BarChart3,
   LineChart,
-  PieChart,
   Activity,
   Calendar,
   Download,
   Share2,
-  Settings,
   RefreshCw
 } from 'lucide-react';
 import React, { useState, useMemo } from 'react';
@@ -24,8 +22,11 @@ import {
 import InstitutionalChart, { CHART_TYPES } from '../components/Charts/InstitutionalChart';
 import RealTimeChart from '../components/Charts/RealTimeChart';
 import InteractiveDashboard from '../components/Dashboards/InteractiveDashboard';
+import { Alert, AlertDescription } from '../components/ui/Alert';
 import Button from '../components/ui/Button';
-import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card';
+import { Card, CardContent } from '../components/ui/Card';
+import TabNav from '../components/ui/TabNav';
+import { cn } from '../utils/cn';
 
 // ===== SAMPLE DATA =====
 
@@ -122,7 +123,7 @@ const DataVisualizationDemo = () => {
 
   // Add indicators to stock data
   const stockDataWithIndicators = useMemo(() => {
-    return stockData.map((item, index) => ({
+    return stockData.map(item => ({
       ...item,
       rsi: 30 + Math.random() * 40, // RSI between 30-70
       macd: (Math.random() - 0.5) * 4,
@@ -191,25 +192,8 @@ const DataVisualizationDemo = () => {
         </div>
 
         {/* Navigation Tabs */}
-        <div className="flex items-center gap-1 mt-6">
-          {tabs.map(tab => {
-            const Icon = tab.icon;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={cn(
-                  'flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors',
-                  activeTab === tab.id
-                    ? 'bg-brand-accent text-foreground-inverse'
-                    : 'text-foreground-secondary hover:text-foreground hover:bg-background-secondary'
-                )}
-              >
-                <Icon className="w-4 h-4" />
-                {tab.label}
-              </button>
-            );
-          })}
+        <div className="mt-6">
+          <TabNav items={tabs.map(t => ({ id: t.id, label: t.label, icon: t.icon }))} activeId={activeTab} onChange={setActiveTab} />
         </div>
       </div>
 
@@ -263,8 +247,8 @@ const DataVisualizationDemo = () => {
                       </p>
                       <p className="text-sm text-foreground-secondary mt-1">Trading volume</p>
                     </div>
-                    <div className="w-12 h-12 bg-blue-500/10 rounded-full flex items-center justify-center">
-                      <BarChart3 className="w-6 h-6 text-blue-500" />
+                    <div className="w-12 h-12 bg-accent/10 rounded-full flex items-center justify-center">
+                      <BarChart3 className="w-6 h-6 text-accent" />
                     </div>
                   </div>
                 </CardContent>
@@ -280,8 +264,8 @@ const DataVisualizationDemo = () => {
                       </p>
                       <p className="text-sm text-foreground-secondary mt-1">Peak value</p>
                     </div>
-                    <div className="w-12 h-12 bg-green-500/10 rounded-full flex items-center justify-center">
-                      <TrendingUp className="w-6 h-6 text-green-500" />
+                    <div className="w-12 h-12 bg-success/10 rounded-full flex items-center justify-center">
+                      <TrendingUp className="w-6 h-6 text-success" />
                     </div>
                   </div>
                 </CardContent>
@@ -297,8 +281,8 @@ const DataVisualizationDemo = () => {
                       </p>
                       <p className="text-sm text-foreground-secondary mt-1">Bottom value</p>
                     </div>
-                    <div className="w-12 h-12 bg-red-500/10 rounded-full flex items-center justify-center">
-                      <TrendingDown className="w-6 h-6 text-red-500" />
+                    <div className="w-12 h-12 bg-destructive/10 rounded-full flex items-center justify-center">
+                      <TrendingDown className="w-6 h-6 text-destructive" />
                     </div>
                   </div>
                 </CardContent>
@@ -500,16 +484,13 @@ const DataVisualizationDemo = () => {
         {/* Real-Time Tab */}
         {activeTab === 'realtime' && (
           <div className="space-y-6">
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-              <div className="flex items-center gap-2">
-                <Activity className="w-5 h-5 text-yellow-600" />
-                <h3 className="text-sm font-medium text-yellow-800">Demo Mode</h3>
-              </div>
-              <p className="text-sm text-yellow-700 mt-1">
-                This demo uses simulated data. In a real application, you would connect to live
-                market data feeds.
-              </p>
-            </div>
+            <Alert>
+              <Activity className="w-5 h-5" />
+              <AlertDescription className="text-sm">
+                <span className="font-medium">Demo Mode</span> — This demo uses simulated data. In a real
+                application, you would connect to live market data feeds.
+              </AlertDescription>
+            </Alert>
 
             <RealTimeChart
               dataSource={{
@@ -536,8 +517,8 @@ const DataVisualizationDemo = () => {
               <Card>
                 <CardContent className="p-6">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-green-500/10 rounded-full flex items-center justify-center">
-                      <Activity className="w-6 h-6 text-green-600" />
+                    <div className="w-12 h-12 bg-success/10 rounded-full flex items-center justify-center">
+                      <Activity className="w-6 h-6 text-success" />
                     </div>
                     <div>
                       <p className="text-sm font-medium text-foreground-secondary">Connection</p>
@@ -550,8 +531,8 @@ const DataVisualizationDemo = () => {
               <Card>
                 <CardContent className="p-6">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-blue-500/10 rounded-full flex items-center justify-center">
-                      <RefreshCw className="w-6 h-6 text-blue-600" />
+                    <div className="w-12 h-12 bg-accent/10 rounded-full flex items-center justify-center">
+                      <RefreshCw className="w-6 h-6 text-accent" />
                     </div>
                     <div>
                       <p className="text-sm font-medium text-foreground-secondary">Updates/sec</p>
@@ -564,8 +545,8 @@ const DataVisualizationDemo = () => {
               <Card>
                 <CardContent className="p-6">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-purple-500/10 rounded-full flex items-center justify-center">
-                      <Calendar className="w-6 h-6 text-purple-600" />
+                    <div className="w-12 h-12 bg-accent/10 rounded-full flex items-center justify-center">
+                      <Calendar className="w-6 h-6 text-accent" />
                     </div>
                     <div>
                       <p className="text-sm font-medium text-foreground-secondary">Data Points</p>

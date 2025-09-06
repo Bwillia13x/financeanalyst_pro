@@ -58,6 +58,8 @@ const CurrencyInput = forwardRef(
 
     // Generate unique ID if not provided
     const inputId = id || `currency-input-${Math.random().toString(36).substr(2, 9)}`;
+    const descriptionId = `${inputId}-desc`;
+    const errorId = `${inputId}-error`;
 
     // Get currency configuration
     const currencyConfig = CURRENCY_CONFIG[currency] || CURRENCY_CONFIG.USD;
@@ -300,6 +302,8 @@ const CurrencyInput = forwardRef(
             placeholder={effectivePlaceholder}
             disabled={disabled || loading}
             step={step}
+            aria-invalid={Boolean(error) || !isValid}
+            aria-describedby={(error || !isValid) ? errorId : (description ? descriptionId : undefined)}
             className={cn(
               // Base styles
               'flex w-full rounded-lg border ring-offset-background',
@@ -361,12 +365,12 @@ const CurrencyInput = forwardRef(
 
         {/* Description */}
         {description && !error && isValid && (
-          <p className="text-sm text-muted-foreground">{description}</p>
+          <p id={descriptionId} className="text-sm text-muted-foreground">{description}</p>
         )}
 
         {/* Error message */}
         {(error || !isValid) && (
-          <p className="text-sm text-destructive flex items-center gap-1">
+          <p id={errorId} className="text-sm text-destructive flex items-center gap-1">
             <AlertCircle size={14} />
             {error || validationMessage}
           </p>

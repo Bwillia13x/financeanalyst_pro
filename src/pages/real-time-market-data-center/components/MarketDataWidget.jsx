@@ -3,7 +3,7 @@ import Icon from '../../../components/AppIcon';
 const MarketDataWidget = ({ widget, onResize, onRemove }) => {
   const getChangeColor = change => {
     if (change > 0) return 'text-success';
-    if (change < 0) return 'text-error';
+    if (change < 0) return 'text-destructive';
     return 'text-muted-foreground';
   };
 
@@ -33,7 +33,7 @@ const MarketDataWidget = ({ widget, onResize, onRemove }) => {
 
     if (diffSeconds < 5) return 'bg-success';
     if (diffSeconds < 30) return 'bg-warning';
-    return 'bg-error';
+    return 'bg-destructive';
   };
 
   return (
@@ -58,7 +58,7 @@ const MarketDataWidget = ({ widget, onResize, onRemove }) => {
           </button>
           <button
             onClick={() => onRemove(widget.id)}
-            className="p-1 text-muted-foreground hover:text-error transition-smooth"
+            className="p-1 text-muted-foreground hover:text-destructive transition-smooth"
             title="Remove widget"
           >
             <Icon name="X" size={14} />
@@ -88,7 +88,7 @@ const MarketDataWidget = ({ widget, onResize, onRemove }) => {
             <div
               key={index}
               className={`flex-1 rounded-sm ${
-                point > widget.sparklineData[0] ? 'bg-success' : 'bg-error'
+                point > widget.sparklineData[0] ? 'bg-success' : 'bg-destructive'
               }`}
               style={{
                 height: `${(point / Math.max(...widget.sparklineData)) * 100}%`,

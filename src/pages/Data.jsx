@@ -21,6 +21,8 @@ import React, { useState } from 'react';
 import Button from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import Header from '../components/ui/Header';
+import MetricCard from '../components/ui/MetricCard';
+import TabNav from '../components/ui/TabNav';
 
 const Data = () => {
   const [activeTab, setActiveTab] = useState('sources');
@@ -88,26 +90,26 @@ const Data = () => {
   const getStatusIcon = status => {
     switch (status) {
       case 'connected':
-        return <CheckCircle className="w-5 h-5 text-green-500" />;
+        return <CheckCircle className="w-5 h-5 text-success" />;
       case 'warning':
-        return <AlertCircle className="w-5 h-5 text-yellow-500" />;
+        return <AlertCircle className="w-5 h-5 text-warning" />;
       case 'error':
-        return <AlertCircle className="w-5 h-5 text-red-500" />;
+        return <AlertCircle className="w-5 h-5 text-destructive" />;
       default:
-        return <Clock className="w-5 h-5 text-gray-500" />;
+        return <Clock className="w-5 h-5 text-foreground-secondary" />;
     }
   };
 
   const getStatusColor = status => {
     switch (status) {
       case 'connected':
-        return 'bg-green-100 text-green-800';
+        return 'bg-success/10 text-success border border-success/30';
       case 'warning':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-warning/10 text-warning border border-warning/30';
       case 'error':
-        return 'bg-red-100 text-red-800';
+        return 'bg-destructive/10 text-destructive border border-destructive/30';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-muted text-foreground border border-border';
     }
   };
 
@@ -132,7 +134,7 @@ const Data = () => {
   const renderDataSources = () => (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold text-gray-900">Data Sources</h2>
+        <h2 className="text-xl font-semibold text-foreground">Data Sources</h2>
         <div className="flex space-x-3">
           <Button variant="outline" onClick={handleRefreshAll}>
             <RefreshCw className="w-4 h-4 mr-2" />
@@ -151,12 +153,12 @@ const Data = () => {
             <Card className="p-6">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-gray-100 rounded-lg">
-                    <source.icon className="w-5 h-5 text-gray-600" />
+                  <div className="p-2 bg-muted rounded-lg">
+                    <source.icon className="w-5 h-5 text-foreground-secondary" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-900">{source.name}</h3>
-                    <p className="text-sm text-gray-600">{source.type}</p>
+                    <h3 className="font-semibold text-foreground">{source.name}</h3>
+                    <p className="text-sm text-foreground-secondary">{source.type}</p>
                   </div>
                 </div>
                 {getStatusIcon(source.status)}
@@ -164,7 +166,7 @@ const Data = () => {
 
               <div className="space-y-3">
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Status</span>
+                  <span className="text-foreground-secondary">Status</span>
                   <span
                     className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(source.status)}`}
                   >
@@ -172,20 +174,20 @@ const Data = () => {
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Last Sync</span>
-                  <span className="font-medium">{source.lastSync}</span>
+                  <span className="text-foreground-secondary">Last Sync</span>
+                  <span className="font-medium text-foreground">{source.lastSync}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Records</span>
-                  <span className="font-medium">{source.records}</span>
+                  <span className="text-foreground-secondary">Records</span>
+                  <span className="font-medium text-foreground">{source.records}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Latency</span>
-                  <span className="font-medium">{source.latency}</span>
+                  <span className="text-foreground-secondary">Latency</span>
+                  <span className="font-medium text-foreground">{source.latency}</span>
                 </div>
               </div>
 
-              <div className="mt-4 pt-4 border-t border-gray-200">
+              <div className="mt-4 pt-4 border-t border-border">
                 <Button variant="outline" size="sm" className="w-full">
                   <Settings className="w-4 h-4 mr-2" />
                   Configure
@@ -200,75 +202,44 @@ const Data = () => {
 
   const renderSystemHealth = () => (
     <div className="space-y-6">
-      <h2 className="text-xl font-semibold text-gray-900">System Health</h2>
+      <h2 className="text-xl font-semibold text-foreground">System Health</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="p-6">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="font-medium text-gray-900">Overall Health</h3>
-            <div className="w-3 h-3 bg-green-500 rounded-full" />
-          </div>
-          <p className="text-2xl font-bold text-green-600">Good</p>
-          <p className="text-sm text-gray-600 mt-1">All systems operational</p>
-        </Card>
-
-        <Card className="p-6">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="font-medium text-gray-900">Data Quality</h3>
-            <Shield className="w-5 h-5 text-blue-500" />
-          </div>
-          <p className="text-2xl font-bold text-blue-600">{systemHealth.dataQuality}%</p>
-          <p className="text-sm text-gray-600 mt-1">Quality score</p>
-        </Card>
-
-        <Card className="p-6">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="font-medium text-gray-900">Uptime</h3>
-            <Activity className="w-5 h-5 text-green-500" />
-          </div>
-          <p className="text-2xl font-bold text-green-600">{systemHealth.uptime}%</p>
-          <p className="text-sm text-gray-600 mt-1">Last 30 days</p>
-        </Card>
-
-        <Card className="p-6">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="font-medium text-gray-900">Throughput</h3>
-            <Zap className="w-5 h-5 text-purple-500" />
-          </div>
-          <p className="text-2xl font-bold text-purple-600">{systemHealth.throughput}</p>
-          <p className="text-sm text-gray-600 mt-1">Current rate</p>
-        </Card>
+        <MetricCard label="Overall Health" value="Good" color="success" caption="All systems operational" icon={CheckCircle} />
+        <MetricCard label="Data Quality" value={`${systemHealth.dataQuality}%`} color="primary" caption="Quality score" icon={Shield} />
+        <MetricCard label="Uptime" value={`${systemHealth.uptime}%`} color="success" caption="Last 30 days" icon={Activity} />
+        <MetricCard label="Throughput" value={systemHealth.throughput} color="accent" caption="Current rate" icon={Zap} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card className="p-6">
-          <h3 className="font-semibold text-gray-900 mb-4">Data Flow Monitoring</h3>
+          <h3 className="font-semibold text-foreground mb-4">Data Flow Monitoring</h3>
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Market Data Ingestion</span>
+              <span className="text-sm text-foreground-secondary">Market Data Ingestion</span>
               <div className="flex items-center space-x-2">
-                <div className="w-2 h-2 bg-green-500 rounded-full" />
+                <div className="w-2 h-2 bg-success rounded-full" />
                 <span className="text-sm font-medium">Active</span>
               </div>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Fundamental Data Processing</span>
+              <span className="text-sm text-foreground-secondary">Fundamental Data Processing</span>
               <div className="flex items-center space-x-2">
-                <div className="w-2 h-2 bg-green-500 rounded-full" />
+                <div className="w-2 h-2 bg-success rounded-full" />
                 <span className="text-sm font-medium">Active</span>
               </div>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Real-time Updates</span>
+              <span className="text-sm text-foreground-secondary">Real-time Updates</span>
               <div className="flex items-center space-x-2">
-                <div className="w-2 h-2 bg-yellow-500 rounded-full" />
+                <div className="w-2 h-2 bg-warning rounded-full" />
                 <span className="text-sm font-medium">Delayed</span>
               </div>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Data Validation</span>
+              <span className="text-sm text-foreground-secondary">Data Validation</span>
               <div className="flex items-center space-x-2">
-                <div className="w-2 h-2 bg-green-500 rounded-full" />
+                <div className="w-2 h-2 bg-success rounded-full" />
                 <span className="text-sm font-medium">Active</span>
               </div>
             </div>
@@ -276,34 +247,34 @@ const Data = () => {
         </Card>
 
         <Card className="p-6">
-          <h3 className="font-semibold text-gray-900 mb-4">Recent Activity</h3>
+          <h3 className="font-semibold text-foreground mb-4">Recent Activity</h3>
           <div className="space-y-3">
             <div className="flex items-center space-x-3">
               <div className="w-2 h-2 bg-green-500 rounded-full" />
               <div className="flex-1">
                 <p className="text-sm font-medium">Bloomberg data sync completed</p>
-                <p className="text-xs text-gray-600">2 minutes ago</p>
+                <p className="text-xs text-foreground-secondary">2 minutes ago</p>
               </div>
             </div>
             <div className="flex items-center space-x-3">
-              <div className="w-2 h-2 bg-blue-500 rounded-full" />
+              <div className="w-2 h-2 bg-primary rounded-full" />
               <div className="flex-1">
                 <p className="text-sm font-medium">Yahoo Finance API updated</p>
-                <p className="text-xs text-gray-600">5 minutes ago</p>
+                <p className="text-xs text-foreground-secondary">5 minutes ago</p>
               </div>
             </div>
             <div className="flex items-center space-x-3">
-              <div className="w-2 h-2 bg-yellow-500 rounded-full" />
+              <div className="w-2 h-2 bg-warning rounded-full" />
               <div className="flex-1">
                 <p className="text-sm font-medium">FactSet connection timeout</p>
-                <p className="text-xs text-gray-600">1 hour ago</p>
+                <p className="text-xs text-foreground-secondary">1 hour ago</p>
               </div>
             </div>
             <div className="flex items-center space-x-3">
-              <div className="w-2 h-2 bg-red-500 rounded-full" />
+              <div className="w-2 h-2 bg-destructive rounded-full" />
               <div className="flex-1">
                 <p className="text-sm font-medium">Refinitiv authentication failed</p>
-                <p className="text-xs text-gray-600">2 hours ago</p>
+                <p className="text-xs text-foreground-secondary">2 hours ago</p>
               </div>
             </div>
           </div>
@@ -314,17 +285,17 @@ const Data = () => {
 
   const renderDataManagement = () => (
     <div className="space-y-6">
-      <h2 className="text-xl font-semibold text-gray-900">Data Management</h2>
+      <h2 className="text-xl font-semibold text-foreground">Data Management</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <Card className="p-6">
           <div className="flex items-center space-x-3 mb-4">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <Download className="w-5 h-5 text-blue-600" />
+            <div className="p-2 bg-primary/10 rounded-lg">
+              <Download className="w-5 h-5 text-primary" />
             </div>
-            <h3 className="font-semibold text-gray-900">Data Export</h3>
+            <h3 className="font-semibold text-foreground">Data Export</h3>
           </div>
-          <p className="text-sm text-gray-600 mb-4">
+          <p className="text-sm text-foreground-secondary mb-4">
             Export data to various formats for external analysis or backup
           </p>
           <Button variant="outline" className="w-full">
@@ -334,12 +305,12 @@ const Data = () => {
 
         <Card className="p-6">
           <div className="flex items-center space-x-3 mb-4">
-            <div className="p-2 bg-green-100 rounded-lg">
-              <Upload className="w-5 h-5 text-green-600" />
+            <div className="p-2 bg-success/10 rounded-lg">
+              <Upload className="w-5 h-5 text-success" />
             </div>
-            <h3 className="font-semibold text-gray-900">Data Import</h3>
+            <h3 className="font-semibold text-foreground">Data Import</h3>
           </div>
-          <p className="text-sm text-gray-600 mb-4">
+          <p className="text-sm text-foreground-secondary mb-4">
             Import custom datasets or historical data from CSV/Excel files
           </p>
           <Button variant="outline" className="w-full">
@@ -349,12 +320,12 @@ const Data = () => {
 
         <Card className="p-6">
           <div className="flex items-center space-x-3 mb-4">
-            <div className="p-2 bg-purple-100 rounded-lg">
-              <Database className="w-5 h-5 text-purple-600" />
+            <div className="p-2 bg-accent/10 rounded-lg">
+              <Database className="w-5 h-5 text-accent" />
             </div>
-            <h3 className="font-semibold text-gray-900">Data Cleanup</h3>
+            <h3 className="font-semibold text-foreground">Data Cleanup</h3>
           </div>
-          <p className="text-sm text-gray-600 mb-4">
+          <p className="text-sm text-foreground-secondary mb-4">
             Clean and validate data to ensure accuracy and consistency
           </p>
           <Button variant="outline" className="w-full">
@@ -364,30 +335,30 @@ const Data = () => {
       </div>
 
       <Card className="p-6">
-        <h3 className="font-semibold text-gray-900 mb-4">Data Storage Overview</h3>
+        <h3 className="font-semibold text-foreground mb-4">Data Storage Overview</h3>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <div className="text-center">
-            <p className="text-2xl font-bold text-blue-600">1.2TB</p>
-            <p className="text-sm text-gray-600">Total Storage</p>
+            <p className="text-2xl font-bold text-primary">1.2TB</p>
+            <p className="text-sm text-foreground-secondary">Total Storage</p>
           </div>
           <div className="text-center">
-            <p className="text-2xl font-bold text-green-600">850GB</p>
-            <p className="text-sm text-gray-600">Used Space</p>
+            <p className="text-2xl font-bold text-success">850GB</p>
+            <p className="text-sm text-foreground-secondary">Used Space</p>
           </div>
           <div className="text-center">
-            <p className="text-2xl font-bold text-orange-600">350GB</p>
-            <p className="text-sm text-gray-600">Available</p>
+            <p className="text-2xl font-bold text-warning">350GB</p>
+            <p className="text-sm text-foreground-secondary">Available</p>
           </div>
           <div className="text-center">
-            <p className="text-2xl font-bold text-purple-600">2.4M</p>
-            <p className="text-sm text-gray-600">Total Records</p>
+            <p className="text-2xl font-bold text-accent">2.4M</p>
+            <p className="text-sm text-foreground-secondary">Total Records</p>
           </div>
         </div>
         <div className="mt-6">
-          <div className="w-full bg-gray-200 rounded-full h-2">
-            <div className="bg-blue-600 h-2 rounded-full" style={{ width: '70%' }} />
+          <div className="w-full bg-muted rounded-full h-2">
+            <div className="bg-primary h-2 rounded-full" style={{ width: '70%' }} />
           </div>
-          <p className="text-sm text-gray-600 mt-2">70% storage utilization</p>
+          <p className="text-sm text-foreground-secondary mt-2">70% storage utilization</p>
         </div>
       </Card>
     </div>
@@ -400,7 +371,7 @@ const Data = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background text-foreground">
       <Header />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -410,28 +381,14 @@ const Data = () => {
           transition={{ duration: 0.5 }}
         >
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Data Center</h1>
-            <p className="text-gray-600">
+            <h1 className="text-3xl font-bold text-foreground mb-2">Data Center</h1>
+            <p className="text-foreground-secondary">
               Monitor, manage, and configure your financial data sources and pipelines
             </p>
           </div>
 
           <div className="mb-6">
-            <nav className="flex space-x-8">
-              {tabs.map(tab => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                    activeTab === tab.id
-                      ? 'border-blue-500 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </nav>
+            <TabNav items={tabs} activeId={activeTab} onChange={setActiveTab} />
           </div>
 
           {tabs.find(tab => tab.id === activeTab)?.component()}

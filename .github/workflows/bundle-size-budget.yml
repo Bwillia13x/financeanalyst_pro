@@ -1,0 +1,30 @@
+name: Bundle Size Budget
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  size-budget:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Build (prod)
+        run: npm run build:prod
+
+      - name: Check gzipped JS size budget
+        run: npm run size:budget
+
+      - name: Check per-chunk JS gzipped budget
+        run: npm run size:chunks

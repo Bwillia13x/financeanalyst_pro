@@ -469,9 +469,9 @@ const AnalysisResults = ({
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <AlertTriangle className="mx-auto h-12 w-12 text-yellow-400 mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">Insufficient Data</h3>
-          <p className="text-gray-500">
+          <AlertTriangle className="mx-auto h-12 w-12 text-warning mb-4" />
+          <h3 className="text-lg font-medium text-foreground mb-2">Insufficient Data</h3>
+          <p className="text-foreground-secondary">
             Please ensure financial data is loaded to generate analysis results.
           </p>
         </div>
@@ -480,34 +480,34 @@ const AnalysisResults = ({
   }
 
   const MetricCard = ({ title, value, trend, description, icon: Icon, benchmark, performance }) => (
-    <div className="bg-gray-800 rounded-xl p-6 border border-gray-700 hover:border-gray-600 transition-all duration-200">
+    <div className="bg-card border border-border rounded-xl p-6 hover:border-border transition-all duration-200">
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
           <div
             className={`p-2 rounded-lg ${
               trend === 'up'
-                ? 'bg-green-900/30 text-green-400'
+                ? 'bg-success/10 text-success'
                 : trend === 'down'
-                  ? 'bg-red-900/30 text-red-400'
-                  : 'bg-gray-700 text-gray-400'
+                  ? 'bg-destructive/10 text-destructive'
+                  : 'bg-muted text-foreground-secondary'
             }`}
           >
             <Icon className="h-5 w-5" />
           </div>
           <div>
-            <div className="text-sm font-medium text-gray-300">{title}</div>
-            <div className="text-xs text-gray-500 mt-1">{description}</div>
+            <div className="text-sm font-medium text-foreground">{title}</div>
+            <div className="text-xs text-foreground-secondary mt-1">{description}</div>
           </div>
         </div>
-        {trend === 'up' && <TrendingUp className="h-5 w-5 text-green-400 flex-shrink-0" />}
-        {trend === 'down' && <TrendingDown className="h-5 w-5 text-red-400 flex-shrink-0" />}
+        {trend === 'up' && <TrendingUp className="h-5 w-5 text-success flex-shrink-0" />}
+        {trend === 'down' && <TrendingDown className="h-5 w-5 text-destructive flex-shrink-0" />}
       </div>
-      <div className="text-3xl font-bold text-white mb-2">{value}</div>
+      <div className="text-3xl font-bold text-foreground mb-2">{value}</div>
       {benchmark && (
-        <div className="border-t border-gray-700 pt-3 mt-3">
+        <div className="border-t border-border pt-3 mt-3">
           <div className="flex justify-between text-xs">
-            <span className="text-gray-400">Industry Avg:</span>
-            <span className="text-gray-300">
+            <span className="text-foreground-secondary">Industry Avg:</span>
+            <span className="text-foreground">
               {typeof benchmark === 'number'
                 ? benchmark.toFixed(1) +
                   (title.includes('%') ? '%' : title.includes('x') ? 'x' : '')
@@ -515,14 +515,14 @@ const AnalysisResults = ({
             </span>
           </div>
           <div className="flex justify-between text-xs mt-1">
-            <span className="text-gray-400">vs Industry:</span>
+            <span className="text-foreground-secondary">vs Industry:</span>
             <span
               className={`font-medium ${
                 performance > 0
-                  ? 'text-green-400'
+                  ? 'text-success'
                   : performance < 0
-                    ? 'text-red-400'
-                    : 'text-gray-300'
+                    ? 'text-destructive'
+                    : 'text-foreground'
               }`}
             >
               {performance > 0 ? '+' : ''}
@@ -535,14 +535,14 @@ const AnalysisResults = ({
   );
 
   return (
-    <div className="space-y-6 p-6 bg-gray-900 text-white h-full">
+    <div className="space-y-6 p-6 bg-background text-foreground h-full">
       {/* Header */}
-      <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
-        <h2 className="text-2xl font-bold text-white mb-6 flex items-center">
-          <BarChart3 className="h-6 w-6 text-blue-400 mr-3" />
+      <div className="bg-card rounded-lg border border-border p-6">
+        <h2 className="text-2xl font-bold text-foreground mb-6 flex items-center">
+          <BarChart3 className="h-6 w-6 text-accent mr-3" />
           Financial Analysis Results
         </h2>
-        <p className="text-gray-400">
+        <p className="text-foreground-secondary">
           Comprehensive analysis of your company&#39;s financial performance and valuation
         </p>
       </div>
@@ -555,18 +555,18 @@ const AnalysisResults = ({
       </div>
 
       {/* Advanced Financial Analysis Tabs */}
-      <div className="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden">
-        <div className="flex border-b border-gray-700">
-          <button className="px-6 py-3 text-sm font-medium text-white bg-blue-600 border-r border-gray-700">
+      <div className="bg-card rounded-lg border border-border overflow-hidden">
+        <div className="flex border-b border-border">
+          <button className="px-6 py-3 text-sm font-medium text-accent-foreground bg-accent border-r border-border">
             Liquidity Analysis
           </button>
-          <button className="px-6 py-3 text-sm font-medium text-gray-400 hover:text-white border-r border-gray-700">
+          <button className="px-6 py-3 text-sm font-medium text-foreground-secondary hover:text-foreground border-r border-border">
             Efficiency Metrics
           </button>
-          <button className="px-6 py-3 text-sm font-medium text-gray-400 hover:text-white border-r border-gray-700">
+          <button className="px-6 py-3 text-sm font-medium text-foreground-secondary hover:text-foreground border-r border-border">
             Risk Assessment
           </button>
-          <button className="px-6 py-3 text-sm font-medium text-gray-400 hover:text-white">
+          <button className="px-6 py-3 text-sm font-medium text-foreground-secondary hover:text-foreground">
             Benchmarking
           </button>
         </div>
@@ -574,30 +574,30 @@ const AnalysisResults = ({
         {/* Liquidity Analysis Panel */}
         <div className="p-6">
           <div className="flex items-center mb-4">
-            <Shield className="h-5 w-5 text-blue-400 mr-2" />
-            <h3 className="text-lg font-semibold text-white">Liquidity Position Analysis</h3>
+            <Shield className="h-5 w-5 text-accent mr-2" />
+            <h3 className="text-lg font-semibold text-foreground">Liquidity Position Analysis</h3>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {analysis.liquidityMetrics.map((metric, index) => (
-              <div key={index} className="bg-gray-700 rounded-lg p-4 border border-gray-600">
+              <div key={index} className="bg-muted rounded-lg p-4 border border-border">
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm font-medium text-gray-200">{metric.name}</span>
+                  <span className="text-sm font-medium text-foreground">{metric.name}</span>
                   <span
                     className={`px-2 py-1 rounded text-xs font-medium ${
                       metric.status === 'excellent'
-                        ? 'bg-green-900/30 text-green-400'
+                        ? 'bg-success/10 text-success'
                         : metric.status === 'good'
-                          ? 'bg-blue-900/30 text-blue-400'
+                          ? 'bg-accent/10 text-accent'
                           : metric.status === 'fair'
-                            ? 'bg-yellow-900/30 text-yellow-400'
-                            : 'bg-red-900/30 text-red-400'
+                            ? 'bg-warning/10 text-warning'
+                            : 'bg-destructive/10 text-destructive'
                     }`}
                   >
                     {metric.status}
                   </span>
                 </div>
-                <div className="text-xl font-bold text-white mb-1">{metric.formatted}</div>
-                <div className="text-xs text-gray-400">
+                <div className="text-xl font-bold text-foreground mb-1">{metric.formatted}</div>
+                <div className="text-xs text-foreground-secondary">
                   Benchmark:{' '}
                   {typeof metric.benchmark === 'number'
                     ? metric.benchmark.toFixed(1) + 'x'
@@ -607,33 +607,33 @@ const AnalysisResults = ({
             ))}
           </div>
 
-          <div className="mt-6 p-4 bg-gray-750 rounded-lg border border-gray-600">
-            <h4 className="font-medium text-gray-200 mb-3 flex items-center">
-              <Eye className="h-4 w-4 text-blue-400 mr-2" />
+          <div className="mt-6 p-4 bg-muted rounded-lg border border-border">
+            <h4 className="font-medium text-foreground mb-3 flex items-center">
+              <Eye className="h-4 w-4 text-accent mr-2" />
               Liquidity Analysis Summary
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
               <div>
-                <span className="text-gray-400">Working Capital:</span>
-                <span className="text-white ml-2 font-medium">
+                <span className="text-foreground-secondary">Working Capital:</span>
+                <span className="text-foreground ml-2 font-medium">
                   {formatCurrency(analysis.financial.workingCapital)}
                 </span>
               </div>
               <div>
-                <span className="text-gray-400">Cash Position:</span>
-                <span className="text-white ml-2 font-medium">
+                <span className="text-foreground-secondary">Cash Position:</span>
+                <span className="text-foreground ml-2 font-medium">
                   {formatCurrency(analysis.liquidity.cashAndEquivalents)}
                 </span>
               </div>
               <div>
-                <span className="text-gray-400">Current Assets:</span>
-                <span className="text-white ml-2 font-medium">
+                <span className="text-foreground-secondary">Current Assets:</span>
+                <span className="text-foreground ml-2 font-medium">
                   {formatCurrency(analysis.liquidity.currentAssets)}
                 </span>
               </div>
               <div>
-                <span className="text-gray-400">Current Liabilities:</span>
-                <span className="text-white ml-2 font-medium">
+                <span className="text-foreground-secondary">Current Liabilities:</span>
+                <span className="text-foreground ml-2 font-medium">
                   {formatCurrency(analysis.liquidity.currentLiabilities)}
                 </span>
               </div>
@@ -643,114 +643,114 @@ const AnalysisResults = ({
       </div>
 
       {/* Efficiency & Operations Analysis */}
-      <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
+      <div className="bg-card rounded-lg border border-border p-6">
         <div className="flex items-center mb-6">
-          <Zap className="h-5 w-5 text-orange-400 mr-2" />
-          <h3 className="text-lg font-semibold text-white">Operational Efficiency Metrics</h3>
+          <Zap className="h-5 w-5 text-warning mr-2" />
+          <h3 className="text-lg font-semibold text-foreground">Operational Efficiency Metrics</h3>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {analysis.efficiencyMetrics.map((metric, index) => (
-            <div key={index} className="bg-gray-700 rounded-lg p-4 border border-gray-600">
-              <div className="text-sm font-medium text-gray-200 mb-2">{metric.name}</div>
-              <div className="text-xl font-bold text-white mb-1">{metric.formatted}</div>
-              <div className="text-xs text-gray-400">{metric.description}</div>
+            <div key={index} className="bg-muted rounded-lg p-4 border border-border">
+              <div className="text-sm font-medium text-foreground mb-2">{metric.name}</div>
+              <div className="text-xl font-bold text-foreground mb-1">{metric.formatted}</div>
+              <div className="text-xs text-foreground-secondary">{metric.description}</div>
             </div>
           ))}
         </div>
 
         <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-gray-750 rounded-lg p-4 border border-gray-600">
+          <div className="bg-muted rounded-lg p-4 border border-border">
             <div className="flex items-center mb-2">
-              <Timer className="h-4 w-4 text-orange-400 mr-2" />
-              <span className="text-sm font-medium text-gray-200">Cash Conversion</span>
+              <Timer className="h-4 w-4 text-warning mr-2" />
+              <span className="text-sm font-medium text-foreground">Cash Conversion</span>
             </div>
-            <div className="text-lg font-bold text-white">
+            <div className="text-lg font-bold text-foreground">
               {analysis.efficiency.cashConversionCycle.toFixed(0)} days
             </div>
-            <div className="text-xs text-gray-400">Time to convert inventory to cash</div>
+            <div className="text-xs text-foreground-secondary">Time to convert inventory to cash</div>
           </div>
-          <div className="bg-gray-750 rounded-lg p-4 border border-gray-600">
+          <div className="bg-muted rounded-lg p-4 border border-border">
             <div className="flex items-center mb-2">
-              <Gauge className="h-4 w-4 text-orange-400 mr-2" />
-              <span className="text-sm font-medium text-gray-200">Asset Productivity</span>
+              <Gauge className="h-4 w-4 text-warning mr-2" />
+              <span className="text-sm font-medium text-foreground">Asset Productivity</span>
             </div>
-            <div className="text-lg font-bold text-white">
+            <div className="text-lg font-bold text-foreground">
               {analysis.financial.assetTurnover.toFixed(2)}x
             </div>
-            <div className="text-xs text-gray-400">Revenue per dollar of assets</div>
+            <div className="text-xs text-foreground-secondary">Revenue per dollar of assets</div>
           </div>
-          <div className="bg-gray-750 rounded-lg p-4 border border-gray-600">
+          <div className="bg-muted rounded-lg p-4 border border-border">
             <div className="flex items-center mb-2">
-              <Users className="h-4 w-4 text-orange-400 mr-2" />
-              <span className="text-sm font-medium text-gray-200">Revenue/Employee</span>
+              <Users className="h-4 w-4 text-warning mr-2" />
+              <span className="text-sm font-medium text-foreground">Revenue/Employee</span>
             </div>
-            <div className="text-lg font-bold text-white">
+            <div className="text-lg font-bold text-foreground">
               {analysis.market.revenuePerEmployee > 0
                 ? formatCurrency(analysis.market.revenuePerEmployee)
                 : 'N/A'}
             </div>
-            <div className="text-xs text-gray-400">Productivity per employee</div>
+            <div className="text-xs text-foreground-secondary">Productivity per employee</div>
           </div>
         </div>
       </div>
 
       {/* Risk Assessment Dashboard */}
-      <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
+      <div className="bg-card rounded-lg border border-border p-6">
         <div className="flex items-center mb-6">
-          <AlertTriangle className="h-5 w-5 text-red-400 mr-2" />
-          <h3 className="text-lg font-semibold text-white">Financial Risk Assessment</h3>
+          <AlertTriangle className="h-5 w-5 text-destructive mr-2" />
+          <h3 className="text-lg font-semibold text-foreground">Financial Risk Assessment</h3>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {analysis.riskMetrics.map((metric, index) => (
-            <div key={index} className="bg-gray-700 rounded-lg p-4 border border-gray-600">
+            <div key={index} className="bg-muted rounded-lg p-4 border border-border">
               <div className="flex justify-between items-center mb-2">
-                <span className="text-sm font-medium text-gray-200">{metric.name}</span>
+                <span className="text-sm font-medium text-foreground">{metric.name}</span>
                 <span
                   className={`px-2 py-1 rounded text-xs font-medium ${
                     metric.level === 'low'
-                      ? 'bg-green-900/30 text-green-400'
+                      ? 'bg-success/10 text-success'
                       : metric.level === 'moderate'
-                        ? 'bg-yellow-900/30 text-yellow-400'
-                        : 'bg-red-900/30 text-red-400'
+                        ? 'bg-warning/10 text-warning'
+                        : 'bg-destructive/10 text-destructive'
                   }`}
                 >
                   {metric.level} risk
                 </span>
               </div>
-              <div className="text-xl font-bold text-white">{metric.formatted}</div>
+              <div className="text-xl font-bold text-foreground">{metric.formatted}</div>
             </div>
           ))}
         </div>
 
-        <div className="mt-6 p-4 bg-gray-750 rounded-lg border border-gray-600">
-          <h4 className="font-medium text-gray-200 mb-3 flex items-center">
-            <Shield className="h-4 w-4 text-red-400 mr-2" />
+        <div className="mt-6 p-4 bg-muted rounded-lg border border-border">
+          <h4 className="font-medium text-foreground mb-3 flex items-center">
+            <Shield className="h-4 w-4 text-destructive mr-2" />
             Risk Analysis Summary
           </h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
             <div>
-              <span className="text-gray-400">Financial Leverage:</span>
+              <span className="text-foreground-secondary">Financial Leverage:</span>
               <span
                 className={`ml-2 font-medium ${
                   analysis.risk.financialLeverage < 2
-                    ? 'text-green-400'
+                    ? 'text-success'
                     : analysis.risk.financialLeverage < 3
-                      ? 'text-yellow-400'
-                      : 'text-red-400'
+                      ? 'text-warning'
+                      : 'text-destructive'
                 }`}
               >
                 {analysis.risk.financialLeverage.toFixed(1)}x
               </span>
             </div>
             <div>
-              <span className="text-gray-400">Interest Coverage:</span>
+              <span className="text-foreground-secondary">Interest Coverage:</span>
               <span
                 className={`ml-2 font-medium ${
                   analysis.risk.interestCoverage > 10
-                    ? 'text-green-400'
+                    ? 'text-success'
                     : analysis.risk.interestCoverage > 5
-                      ? 'text-yellow-400'
-                      : 'text-red-400'
+                      ? 'text-warning'
+                      : 'text-destructive'
                 }`}
               >
                 {analysis.risk.interestCoverage.toFixed(1)}x
@@ -763,26 +763,26 @@ const AnalysisResults = ({
       {/* Financial Performance Summary */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Financial Performance Trends */}
-        <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
-          <h3 className="text-lg font-semibold mb-4 flex items-center text-white">
-            <Activity className="h-5 w-5 text-purple-400 mr-2" />
+        <div className="bg-card rounded-lg border border-border p-6">
+          <h3 className="text-lg font-semibold mb-4 flex items-center text-foreground">
+            <Activity className="h-5 w-5 text-accent mr-2" />
             Performance Trends
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <h4 className="font-medium text-gray-200 mb-3">Revenue Analysis</h4>
+              <h4 className="font-medium text-foreground mb-3">Revenue Analysis</h4>
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-400">Latest Period:</span>
-                  <span className="font-semibold text-white">
+                  <span className="text-sm text-foreground-secondary">Latest Period:</span>
+                  <span className="font-semibold text-foreground">
                     {formatCurrency(analysis.revenue.latest)}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-400">YoY Growth:</span>
+                  <span className="text-sm text-foreground-secondary">YoY Growth:</span>
                   <span
                     className={`font-semibold ${
-                      analysis.revenue.growth > 0 ? 'text-green-400' : 'text-red-400'
+                      analysis.revenue.growth > 0 ? 'text-success' : 'text-destructive'
                     }`}
                   >
                     {analysis.revenue.growth > 0 ? '+' : ''}
@@ -790,35 +790,35 @@ const AnalysisResults = ({
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-400">CAGR:</span>
-                  <span className="font-semibold text-gray-200">
+                  <span className="text-sm text-foreground-secondary">CAGR:</span>
+                  <span className="font-semibold text-foreground">
                     {analysis.revenue.cagr.toFixed(1)}%
                   </span>
                 </div>
               </div>
             </div>
             <div>
-              <h4 className="font-medium text-gray-200 mb-3">Profitability Margins</h4>
+              <h4 className="font-medium text-foreground mb-3">Profitability Margins</h4>
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-400">Gross Margin:</span>
-                  <span className="font-semibold text-white">
+                  <span className="text-sm text-foreground-secondary">Gross Margin:</span>
+                  <span className="font-semibold text-foreground">
                     {analysis.profitability.grossMargin.toFixed(1)}%
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-400">Operating Margin:</span>
-                  <span className="font-semibold text-white">
+                  <span className="text-sm text-foreground-secondary">Operating Margin:</span>
+                  <span className="font-semibold text-foreground">
                     {analysis.profitability.operatingMargin.toFixed(1)}%
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-400">Margin Change:</span>
+                  <span className="text-sm text-foreground-secondary">Margin Change:</span>
                   <span
                     className={`font-semibold ${
                       analysis.profitability.grossMarginChange > 0
-                        ? 'text-green-400'
-                        : 'text-red-400'
+                        ? 'text-success'
+                        : 'text-destructive'
                     }`}
                   >
                     {analysis.profitability.grossMarginChange > 0 ? '+' : ''}
@@ -832,29 +832,29 @@ const AnalysisResults = ({
 
         {/* Valuation Summary */}
         {analysis.dcf && (
-          <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
-            <h3 className="text-lg font-semibold mb-4 flex items-center text-white">
-              <DollarSign className="h-5 w-5 text-green-400 mr-2" />
+          <div className="bg-card rounded-lg border border-border p-6">
+            <h3 className="text-lg font-semibold mb-4 flex items-center text-foreground">
+              <DollarSign className="h-5 w-5 text-success mr-2" />
               DCF Valuation Summary
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="text-center p-4 bg-green-900/30 border border-green-700 rounded-lg">
-                <div className="text-2xl font-bold text-green-400">
+              <div className="text-center p-4 bg-success/10 border border-success/30 rounded-lg">
+                <div className="text-2xl font-bold text-success">
                   {formatCurrency(analysis.dcf.enterpriseValue)}
                 </div>
-                <div className="text-sm text-green-300">Enterprise Value</div>
+                <div className="text-sm text-success/90">Enterprise Value</div>
               </div>
-              <div className="text-center p-4 bg-blue-900/30 border border-blue-700 rounded-lg">
-                <div className="text-2xl font-bold text-blue-400">
+              <div className="text-center p-4 bg-accent/10 border border-accent/30 rounded-lg">
+                <div className="text-2xl font-bold text-accent">
                   {formatCurrency(analysis.dcf.sharePrice)}
                 </div>
-                <div className="text-sm text-blue-300">Price per Share</div>
+                <div className="text-sm text-accent/90">Price per Share</div>
               </div>
-              <div className="text-center p-4 bg-gray-700 border border-gray-600 rounded-lg">
-                <div className="text-2xl font-bold text-gray-300">
+              <div className="text-center p-4 bg-muted border border-border rounded-lg">
+                <div className="text-2xl font-bold text-foreground">
                   {formatCurrency(analysis.dcf.terminalValue)}
                 </div>
-                <div className="text-sm text-gray-400">Terminal Value</div>
+                <div className="text-sm text-foreground-secondary">Terminal Value</div>
               </div>
             </div>
           </div>
@@ -862,9 +862,9 @@ const AnalysisResults = ({
       </div>
 
       {/* Revenue Breakdown */}
-      <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
-        <h3 className="text-lg font-semibold mb-4 flex items-center text-white">
-          <PieChart className="h-5 w-5 text-orange-400 mr-2" />
+      <div className="bg-card rounded-lg border border-border p-6">
+        <h3 className="text-lg font-semibold mb-4 flex items-center text-foreground">
+          <PieChart className="h-5 w-5 text-warning mr-2" />
           Business Unit Performance
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -873,17 +873,17 @@ const AnalysisResults = ({
               ? (unit.value / analysis.revenue.latest) * 100
               : 0;
             return (
-              <div key={index} className="p-4 bg-gray-700 border border-gray-600 rounded-lg">
+              <div key={index} className="p-4 bg-muted border border-border rounded-lg">
                 <div className="flex justify-between items-center mb-2">
-                  <span className="font-medium text-gray-200">{unit.name}</span>
-                  <span className="text-sm text-gray-400">{percentage.toFixed(1)}%</span>
+                  <span className="font-medium text-foreground">{unit.name}</span>
+                  <span className="text-sm text-foreground-secondary">{percentage.toFixed(1)}%</span>
                 </div>
-                <div className="text-lg font-semibold text-white mb-1">
+                <div className="text-lg font-semibold text-foreground mb-1">
                   {formatCurrency(unit.value)}
                 </div>
-                <div className="w-full bg-gray-600 rounded-full h-2">
+                <div className="w-full bg-muted rounded-full h-2">
                   <div
-                    className="bg-blue-500 h-2 rounded-full"
+                    className="bg-accent h-2 rounded-full"
                     style={{ width: `${Math.min(percentage, 100)}%` }}
                   />
                 </div>
@@ -894,60 +894,60 @@ const AnalysisResults = ({
       </div>
 
       {/* Key Insights */}
-      <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
-        <h3 className="text-lg font-semibold mb-4 flex items-center text-white">
-          <CheckCircle className="h-5 w-5 text-green-400 mr-2" />
+      <div className="bg-card rounded-lg border border-border p-6">
+        <h3 className="text-lg font-semibold mb-4 flex items-center text-foreground">
+          <CheckCircle className="h-5 w-5 text-success mr-2" />
           Key Financial Insights
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <h4 className="font-medium text-gray-200 mb-2">Strengths</h4>
-            <ul className="space-y-1 text-sm text-gray-400">
+            <h4 className="font-medium text-foreground mb-2">Strengths</h4>
+            <ul className="space-y-1 text-sm text-foreground-secondary">
               {analysis.revenue.growth > 0 && (
                 <li className="flex items-center">
-                  <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
+                  <CheckCircle className="h-4 w-4 text-success mr-2" />
                   Positive revenue growth trajectory
                 </li>
               )}
               {analysis.profitability.grossMargin > 60 && (
                 <li className="flex items-center">
-                  <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
+                  <CheckCircle className="h-4 w-4 text-success mr-2" />
                   Strong gross margin above 60%
                 </li>
               )}
               {analysis.profitability.grossMarginChange > 0 && (
                 <li className="flex items-center">
-                  <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
+                  <CheckCircle className="h-4 w-4 text-success mr-2" />
                   Improving profitability margins
                 </li>
               )}
               <li className="flex items-center">
-                <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
+                <CheckCircle className="h-4 w-4 text-success mr-2" />
                 Diversified healthcare revenue streams
               </li>
             </ul>
           </div>
           <div>
-            <h4 className="font-medium text-gray-200 mb-2">Areas for Focus</h4>
-            <ul className="space-y-1 text-sm text-gray-400">
+            <h4 className="font-medium text-foreground mb-2">Areas for Focus</h4>
+            <ul className="space-y-1 text-sm text-foreground-secondary">
               {analysis.revenue.growth < 5 && (
                 <li className="flex items-center">
-                  <AlertTriangle className="h-4 w-4 text-yellow-500 mr-2" />
+                  <AlertTriangle className="h-4 w-4 text-warning mr-2" />
                   Revenue growth below industry benchmarks
                 </li>
               )}
               {analysis.profitability.operatingMargin < 20 && (
                 <li className="flex items-center">
-                  <AlertTriangle className="h-4 w-4 text-yellow-500 mr-2" />
+                  <AlertTriangle className="h-4 w-4 text-warning mr-2" />
                   Operating margin optimization opportunities
                 </li>
               )}
               <li className="flex items-center">
-                <AlertTriangle className="h-4 w-4 text-yellow-500 mr-2" />
+                <AlertTriangle className="h-4 w-4 text-warning mr-2" />
                 Monitor competitive positioning in key segments
               </li>
               <li className="flex items-center">
-                <AlertTriangle className="h-4 w-4 text-yellow-500 mr-2" />
+                <AlertTriangle className="h-4 w-4 text-warning mr-2" />
                 Consider strategic initiatives for growth acceleration
               </li>
             </ul>

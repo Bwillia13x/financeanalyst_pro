@@ -1,0 +1,75 @@
+name: Bundle Compare (PR)
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout base
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+
+      - name: Setup Node.js (base)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install deps (base)
+        run: npm ci
+
+      - name: Build (base)
+        run: npm run build:prod
+
+      - name: Collect sizes (base)
+        run: node scripts/collect-gzip-sizes.js base-sizes.json
+
+      - name: Save base artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: base-bundle-sizes
+          path: base-sizes.json
+
+      - name: Checkout PR
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js (PR)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install deps (PR)
+        run: npm ci
+
+      - name: Build (PR)
+        run: npm run build:prod
+
+      - name: Collect sizes (PR)
+        run: node scripts/collect-gzip-sizes.js pr-sizes.json
+
+      - name: Download base artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: base-bundle-sizes
+
+      - name: Compare bundle sizes
+        run: node scripts/compare-gzip-sizes.js base-sizes.json pr-sizes.json
+
+      - name: Comment PR with bundle diff
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const body = fs.readFileSync('bundle-diff.md', 'utf8');
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body
+            });
+

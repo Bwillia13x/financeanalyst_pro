@@ -225,16 +225,16 @@ const MonteCarloSimulation = ({ data, onDataChange: _onDataChange }) => {
 
   return (
     <div
-      className="bg-gray-800 rounded-lg border border-gray-700 p-6"
+      className="bg-card text-foreground rounded-lg border border-border p-6"
       data-testid="monte-carlo-simulation"
     >
       <div className="mb-6">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-          <h2 className="text-2xl font-bold text-white mb-2 flex items-center">
-            <Zap className="inline-block mr-2" />
+          <h2 className="text-2xl font-bold text-foreground mb-2 flex items-center">
+            <Zap className="inline-block mr-2 text-accent" />
             Monte Carlo Simulation
           </h2>
-          <p className="text-gray-400 text-sm">
+          <p className="text-foreground-secondary text-sm">
             Advanced risk analysis using probabilistic modeling • Generate thousands of scenarios •
             Measure uncertainty
           </p>
@@ -242,8 +242,8 @@ const MonteCarloSimulation = ({ data, onDataChange: _onDataChange }) => {
       </div>
 
       <div className="mb-6">
-        <div className="flex space-x-2">
-          {tabs.map(tab => {
+        <div className="flex space-x-2" role="tablist" aria-label="Monte Carlo sections">
+          {tabs.map((tab, idx) => {
             const Icon = tab.icon;
             return (
               <button
@@ -251,9 +251,20 @@ const MonteCarloSimulation = ({ data, onDataChange: _onDataChange }) => {
                 onClick={() => setActiveTab(tab.id)}
                 className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${
                   activeTab === tab.id
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                    ? 'bg-accent text-accent-foreground'
+                    : 'bg-muted text-foreground-secondary hover:bg-muted/80 hover:text-foreground'
                 }`}
+                role="tab"
+                aria-selected={activeTab === tab.id}
+                onKeyDown={e => {
+                  if (e.key === 'ArrowRight') {
+                    const next = tabs[(idx + 1) % tabs.length].id;
+                    setActiveTab(next);
+                  } else if (e.key === 'ArrowLeft') {
+                    const prev = tabs[(idx - 1 + tabs.length) % tabs.length].id;
+                    setActiveTab(prev);
+                  }
+                }}
               >
                 <Icon size={16} />
                 {tab.label}
@@ -274,22 +285,22 @@ const MonteCarloSimulation = ({ data, onDataChange: _onDataChange }) => {
               transition={{ duration: 0.3 }}
             >
               <div className="space-y-6">
-                <div className="bg-gray-700 rounded-lg p-4">
-                  <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
+                <div className="bg-card border border-border rounded-lg p-4">
+                  <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center">
                     🎛️ Simulation Settings
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <label
                         htmlFor="iterations"
-                        className="block text-sm font-medium text-gray-200"
+                        className="block text-sm font-medium text-foreground"
                       >
                         Iterations
                       </label>
                       <input
                         id="iterations"
                         type="number"
-                        className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 bg-card border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
                         value={simulationSettings.iterations}
                         onChange={e =>
                           setSimulationSettings(prev => ({
@@ -301,18 +312,18 @@ const MonteCarloSimulation = ({ data, onDataChange: _onDataChange }) => {
                         max="100000"
                         step="1000"
                       />
-                      <small className="text-gray-400">Leave empty for random</small>
+                      <small className="text-foreground-secondary">Leave empty for random</small>
                     </div>
                     <div className="space-y-2">
                       <label
                         htmlFor="confidenceLevel"
-                        className="block text-sm font-medium text-gray-200"
+                        className="block text-sm font-medium text-foreground"
                       >
                         Confidence Level
                       </label>
                       <select
                         id="confidenceLevel"
-                        className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 bg-card border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
                         value={simulationSettings.confidenceLevel}
                         onChange={e =>
                           setSimulationSettings(prev => ({
@@ -329,14 +340,14 @@ const MonteCarloSimulation = ({ data, onDataChange: _onDataChange }) => {
                     <div className="space-y-2">
                       <label
                         htmlFor="randomSeed"
-                        className="block text-sm font-medium text-gray-200"
+                        className="block text-sm font-medium text-foreground"
                       >
                         Random Seed (Optional)
                       </label>
                       <input
                         id="randomSeed"
                         type="number"
-                        className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 bg-card border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
                         value={simulationSettings.randomSeed || ''}
                         onChange={e =>
                           setSimulationSettings(prev => ({
@@ -348,10 +359,10 @@ const MonteCarloSimulation = ({ data, onDataChange: _onDataChange }) => {
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="flex items-center space-x-2 text-gray-200">
+                      <label className="flex items-center space-x-2 text-foreground">
                         <input
                           type="checkbox"
-                          className="w-4 h-4 text-blue-600 bg-gray-800 border-gray-600 rounded focus:ring-blue-500"
+                          className="w-4 h-4 bg-card border border-border rounded focus:ring-accent"
                           checked={simulationSettings.enableCorrelation}
                           onChange={e =>
                             setSimulationSettings(prev => ({
@@ -366,18 +377,18 @@ const MonteCarloSimulation = ({ data, onDataChange: _onDataChange }) => {
                   </div>
                 </div>
 
-                <div className="bg-gray-700 rounded-lg p-4">
-                  <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
+                <div className="bg-card border border-border rounded-lg p-4">
+                  <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center">
                     📊 Variable Distributions
                   </h3>
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     {Object.entries(distributions).map(([variable, dist]) => (
                       <div
                         key={variable}
-                        className="bg-gray-800 border border-gray-600 rounded-lg p-4"
+                        className="bg-card border border-border rounded-lg p-4"
                       >
                         <div className="flex items-center justify-between mb-3">
-                          <label className="flex items-center space-x-2 text-gray-200">
+                          <label className="flex items-center space-x-2 text-foreground">
                             <input
                               type="checkbox"
                               checked={dist.enabled}
@@ -393,14 +404,14 @@ const MonteCarloSimulation = ({ data, onDataChange: _onDataChange }) => {
                           <div className="space-y-3">
                             <div className="space-y-2">
                               <label
-                                htmlFor="distributionType"
-                                className="block text-sm font-medium text-gray-200"
+                                htmlFor={`distributionType-${variable}`}
+                                className="block text-sm font-medium text-foreground"
                               >
                                 Distribution Type
                               </label>
                               <select
-                                id="distributionType"
-                                className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                id={`distributionType-${variable}`}
+                                className="w-full px-3 py-2 bg-card border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
                                 value={dist.type}
                                 onChange={e => {
                                   const newType = e.target.value;
@@ -440,11 +451,11 @@ const MonteCarloSimulation = ({ data, onDataChange: _onDataChange }) => {
                                 .find(t => t.value === dist.type)
                                 ?.parameters.map(param => (
                                   <div key={param} className="space-y-1">
-                                    <label className="block text-xs font-medium text-gray-300">
+                                    <label className="block text-xs font-medium text-foreground-secondary">
                                       {param.charAt(0).toUpperCase() + param.slice(1)}
                                     </label>
                                     <input
-                                      className="w-full px-2 py-1 bg-gray-700 border border-gray-600 rounded text-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                      className="w-full px-2 py-1 bg-card border border-border rounded text-foreground text-sm focus:outline-none focus:ring-1 focus:ring-accent"
                                       type="number"
                                       value={dist.parameters[param] || ''}
                                       onChange={e =>
@@ -468,8 +479,8 @@ const MonteCarloSimulation = ({ data, onDataChange: _onDataChange }) => {
                 </div>
 
                 {simulationSettings.enableCorrelation && (
-                  <div className="bg-gray-700 rounded-lg p-4">
-                    <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
+                  <div className="bg-card border border-border rounded-lg p-4">
+                    <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center">
                       🔗 Correlation Matrix
                     </h3>
                     <div className="overflow-x-auto">
@@ -485,13 +496,13 @@ const MonteCarloSimulation = ({ data, onDataChange: _onDataChange }) => {
                         <tbody>
                           {Object.keys(distributions).map((variable, i) => (
                             <tr key={variable}>
-                              <td className="font-medium text-gray-200 p-2 border border-gray-600">
+                              <td className="font-medium text-foreground p-2 border border-border">
                                 {distributions.map((dist, _index) => (
                                   <span key={_index}>{dist.name}</span>
                                 ))}
                               </td>
                               {Object.keys(distributions).map((_, j) => (
-                                <td key={j} className="p-2 border border-gray-600">
+                                <td key={j} className="p-2 border border-border">
                                   <input
                                     type="number"
                                     value={correlationMatrix[i][j]}
@@ -502,7 +513,7 @@ const MonteCarloSimulation = ({ data, onDataChange: _onDataChange }) => {
                                     max="1"
                                     step="0.1"
                                     disabled={i === j}
-                                    className="w-full px-2 py-1 bg-gray-800 border border-gray-600 rounded text-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:bg-gray-700 disabled:text-gray-400"
+                                    className="w-full px-2 py-1 bg-card border border-border rounded text-foreground text-sm focus:outline-none focus:ring-1 focus:ring-accent disabled:bg-muted disabled:text-foreground-secondary"
                                   />
                                 </td>
                               ))}
@@ -527,12 +538,12 @@ const MonteCarloSimulation = ({ data, onDataChange: _onDataChange }) => {
             >
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
-                  <h3>🚀 Simulation Control</h3>
+                  <h3 className="text-foreground">🚀 Simulation Control</h3>
                   <div className="flex items-center space-x-2">
                     {!isRunning ? (
                       <button
                         onClick={runSimulation}
-                        className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium flex items-center space-x-2 transition-colors"
+                        className="bg-accent hover:bg-accent/90 disabled:bg-muted disabled:text-foreground-secondary text-accent-foreground px-4 py-2 rounded-lg font-medium flex items-center space-x-2 transition-colors"
                         disabled={Object.values(distributions).every(d => !d.enabled)}
                         data-action="run-simulation"
                       >
@@ -542,7 +553,7 @@ const MonteCarloSimulation = ({ data, onDataChange: _onDataChange }) => {
                     ) : (
                       <button
                         onClick={stopSimulation}
-                        className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium flex items-center space-x-2 transition-colors"
+                        className="bg-destructive hover:bg-destructive/90 text-destructive-foreground px-4 py-2 rounded-lg font-medium flex items-center space-x-2 transition-colors"
                       >
                         <Square size={16} />
                         <span>Stop Simulation</span>
@@ -553,13 +564,18 @@ const MonteCarloSimulation = ({ data, onDataChange: _onDataChange }) => {
 
                 {isRunning && (
                   <div className="mt-4">
-                    <div className="w-full bg-gray-700 rounded-full h-2 mb-2">
+                    <div className="w-full bg-muted rounded-full h-2 mb-2">
                       <div
-                        className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                        className="bg-accent h-2 rounded-full transition-all duration-300"
                         style={{ width: `${progress}%` }}
+                        role="progressbar"
+                        aria-valuemin={0}
+                        aria-valuemax={100}
+                        aria-valuenow={Math.round(progress)}
+                        aria-label="Simulation progress"
                       />
                     </div>
-                    <div className="text-sm text-gray-400 text-center">
+                    <div className="text-sm text-foreground-secondary text-center">
                       {progress.toFixed(1)}% Complete (
                       {Math.floor((progress * simulationSettings.iterations) / 100)} /{' '}
                       {simulationSettings.iterations} iterations)
@@ -567,32 +583,32 @@ const MonteCarloSimulation = ({ data, onDataChange: _onDataChange }) => {
                   </div>
                 )}
 
-                <div className="bg-gray-800 rounded-lg p-4 mt-4">
-                  <h4 className="text-lg font-semibold text-white mb-4 flex items-center">
+                <div className="bg-card border border-border rounded-lg p-4 mt-4">
+                  <h4 className="text-lg font-semibold text-foreground mb-4 flex items-center">
                     📋 Simulation Preview
                   </h4>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="bg-gray-700 rounded-lg p-3 text-center">
-                      <div className="text-sm text-gray-400 mb-1">Iterations</div>
-                      <div className="text-xl font-bold text-white">
+                    <div className="bg-card border border-border rounded-lg p-3 text-center">
+                      <div className="text-sm text-foreground-secondary mb-1">Iterations</div>
+                      <div className="text-xl font-bold text-foreground">
                         {simulationSettings.iterations.toLocaleString()}
                       </div>
                     </div>
-                    <div className="bg-gray-700 rounded-lg p-3 text-center">
-                      <div className="text-sm text-gray-400 mb-1">Variables</div>
-                      <div className="text-xl font-bold text-white">
+                    <div className="bg-card border border-border rounded-lg p-3 text-center">
+                      <div className="text-sm text-foreground-secondary mb-1">Variables</div>
+                      <div className="text-xl font-bold text-foreground">
                         {Object.values(distributions).filter(d => d.enabled).length}
                       </div>
                     </div>
-                    <div className="bg-gray-700 rounded-lg p-3 text-center">
-                      <div className="text-sm text-gray-400 mb-1">Confidence Level</div>
-                      <div className="text-xl font-bold text-white">
+                    <div className="bg-card border border-border rounded-lg p-3 text-center">
+                      <div className="text-sm text-foreground-secondary mb-1">Confidence Level</div>
+                      <div className="text-xl font-bold text-foreground">
                         {(simulationSettings.confidenceLevel * 100).toFixed(0)}%
                       </div>
                     </div>
-                    <div className="bg-gray-700 rounded-lg p-3 text-center">
-                      <div className="text-sm text-gray-400 mb-1">Correlation</div>
-                      <div className="text-xl font-bold text-white">
+                    <div className="bg-card border border-border rounded-lg p-3 text-center">
+                      <div className="text-sm text-foreground-secondary mb-1">Correlation</div>
+                      <div className="text-xl font-bold text-foreground">
                         {simulationSettings.enableCorrelation ? 'Enabled' : 'Disabled'}
                       </div>
                     </div>
@@ -613,15 +629,15 @@ const MonteCarloSimulation = ({ data, onDataChange: _onDataChange }) => {
               {simulationResults ? (
                 <div className="space-y-6">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-xl font-semibold text-white flex items-center">
+                    <h3 className="text-xl font-semibold text-foreground flex items-center">
                       📊 Simulation Results
                     </h3>
                     <div className="flex items-center space-x-2">
-                      <button className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-medium flex items-center space-x-2 transition-colors">
+                      <button className="bg-muted hover:bg-muted/80 text-foreground px-4 py-2 rounded-lg font-medium flex items-center space-x-2 transition-colors">
                         <Download size={16} />
                         Export Results
                       </button>
-                      <button className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium flex items-center space-x-2 transition-colors">
+                      <button className="bg-card border border-border hover:bg-muted text-foreground px-4 py-2 rounded-lg font-medium flex items-center space-x-2 transition-colors">
                         <FileText size={16} />
                         Generate Report
                       </button>
@@ -631,20 +647,20 @@ const MonteCarloSimulation = ({ data, onDataChange: _onDataChange }) => {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {Object.entries(simulationResults.analysis.statistics).map(
                       ([metric, stats]) => (
-                        <div key={metric} className="bg-gray-700 rounded-lg p-4">
-                          <h4 className="text-lg font-semibold text-white mb-3">
+                        <div key={metric} className="bg-card border border-border rounded-lg p-4">
+                          <h4 className="text-lg font-semibold text-foreground mb-3">
                             {metric === 'pricePerShare'
                               ? '💰 Price per Share'
                               : metric === 'enterpriseValue'
                                 ? '🏢 Enterprise Value'
                                 : '📈 Upside %'}
                           </h4>
-                          <div className="text-2xl font-bold text-green-400 mb-2">
+                          <div className="text-2xl font-bold text-success mb-2">
                             {metric === 'upside'
                               ? `${stats.mean.toFixed(1)}%`
                               : formatCurrency(stats.mean)}
                           </div>
-                          <div className="space-y-1 text-sm text-gray-300">
+                          <div className="space-y-1 text-sm text-foreground-secondary">
                             <div>
                               Median:{' '}
                               {metric === 'upside'
@@ -677,10 +693,10 @@ const MonteCarloSimulation = ({ data, onDataChange: _onDataChange }) => {
 
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div
-                      className="bg-gray-700 rounded-lg p-4"
+                      className="bg-card border border-border rounded-lg p-4"
                       data-testid="valuation-distribution-chart"
                     >
-                      <h4>📊 Price Distribution</h4>
+                      <h4 className="text-foreground">📊 Price Distribution</h4>
                       <ResponsiveContainer width="100%" height={300}>
                         <AreaChart data={generateHistogramData}>
                           <CartesianGrid strokeDasharray="3 3" />
@@ -704,8 +720,8 @@ const MonteCarloSimulation = ({ data, onDataChange: _onDataChange }) => {
                       </ResponsiveContainer>
                     </div>
 
-                    <div className="bg-gray-700 rounded-lg p-4">
-                      <h4>🎯 Sensitivity Scatter Plot</h4>
+                    <div className="bg-card border border-border rounded-lg p-4">
+                      <h4 className="text-foreground">🎯 Sensitivity Scatter Plot</h4>
                       <ResponsiveContainer width="100%" height={300}>
                         <ScatterChart data={generateScatterData}>
                           <CartesianGrid strokeDasharray="3 3" />
@@ -742,9 +758,9 @@ const MonteCarloSimulation = ({ data, onDataChange: _onDataChange }) => {
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center py-12 text-center">
-                  <AlertTriangle size={48} className="text-gray-400 mb-4" />
-                  <h3 className="text-xl font-semibold text-white mb-2">No Results Available</h3>
-                  <p className="text-gray-400">Run a simulation to see results here.</p>
+                  <AlertTriangle size={48} className="text-foreground-secondary mb-4" />
+                  <h3 className="text-xl font-semibold text-foreground mb-2">No Results Available</h3>
+                  <p className="text-foreground-secondary">Run a simulation to see results here.</p>
                 </div>
               )}
             </motion.div>
@@ -760,8 +776,8 @@ const MonteCarloSimulation = ({ data, onDataChange: _onDataChange }) => {
             >
               {simulationResults?.analysis ? (
                 <div className="space-y-6">
-                  <div className="bg-gray-700 rounded-lg p-4" data-testid="risk-metrics">
-                    <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
+                  <div className="bg-card border border-border rounded-lg p-4" data-testid="risk-metrics">
+                    <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center">
                       ⚠️ Risk Metrics
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -769,9 +785,9 @@ const MonteCarloSimulation = ({ data, onDataChange: _onDataChange }) => {
                         ([metric, value]) => (
                           <div
                             key={metric}
-                            className="bg-gray-800 rounded-lg p-4 border border-gray-600"
+                            className="bg-card border border-border rounded-lg p-4"
                           >
-                            <h4 className="text-sm font-medium text-gray-300 mb-2">
+                            <h4 className="text-sm font-medium text-foreground-secondary mb-2">
                               {metric === 'var95'
                                 ? 'Value at Risk (95%)'
                                 : metric === 'cvar95'
@@ -780,20 +796,20 @@ const MonteCarloSimulation = ({ data, onDataChange: _onDataChange }) => {
                                     ? 'Probability of Loss'
                                     : 'Sharpe Ratio'}
                             </h4>
-                            <div className="text-xl font-bold text-red-400 mb-1">
+                            <div className="text-xl font-bold text-destructive mb-1">
                               {metric === 'probabilityOfLoss'
                                 ? `${(value * 100).toFixed(1)}%`
                                 : formatCurrency(value)}
                             </div>
-                            <div className="text-xs text-gray-400">Risk measure</div>
+                            <div className="text-xs text-foreground-secondary">Risk measure</div>
                           </div>
                         )
                       )}
                     </div>
                   </div>
 
-                  <div className="bg-gray-700 rounded-lg p-4" data-testid="confidence-intervals">
-                    <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
+                  <div className="bg-card border border-border rounded-lg p-4" data-testid="confidence-intervals">
+                    <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center">
                       📊 Confidence Intervals (
                       {(
                         simulationResults.analysis.confidenceIntervals.pricePerShare?.level * 100
@@ -805,9 +821,9 @@ const MonteCarloSimulation = ({ data, onDataChange: _onDataChange }) => {
                         ([metric, interval]) => (
                           <div
                             key={metric}
-                            className="bg-gray-800 rounded-lg p-4 border border-gray-600"
+                            className="bg-card border border-border rounded-lg p-4"
                           >
-                            <h4 className="text-lg font-semibold text-white mb-3">
+                            <h4 className="text-lg font-semibold text-foreground mb-3">
                               {metric === 'pricePerShare'
                                 ? 'Price per Share'
                                 : metric === 'enterpriseValue'
@@ -816,24 +832,24 @@ const MonteCarloSimulation = ({ data, onDataChange: _onDataChange }) => {
                             </h4>
                             <div className="space-y-3">
                               <div className="flex justify-between items-center">
-                                <span className="text-sm text-gray-400">Lower Bound:</span>
-                                <span className="font-medium text-white">
+                                <span className="text-sm text-foreground-secondary">Lower Bound:</span>
+                                <span className="font-medium text-foreground">
                                   {metric === 'upside'
                                     ? `${interval.lowerBound.toFixed(1)}%`
                                     : formatCurrency(interval.lowerBound)}
                                 </span>
                               </div>
                               <div className="flex justify-between items-center">
-                                <span className="text-sm text-gray-400">Upper Bound:</span>
-                                <span className="font-medium text-white">
+                                <span className="text-sm text-foreground-secondary">Upper Bound:</span>
+                                <span className="font-medium text-foreground">
                                   {metric === 'upside'
                                     ? `${interval.upperBound.toFixed(1)}%`
                                     : formatCurrency(interval.upperBound)}
                                 </span>
                               </div>
                               <div className="flex justify-between items-center">
-                                <span className="text-sm text-gray-400">Width:</span>
-                                <span className="font-medium text-blue-400">
+                                <span className="text-sm text-foreground-secondary">Width:</span>
+                                <span className="font-medium text-accent">
                                   {metric === 'upside'
                                     ? `${interval.width.toFixed(1)}%`
                                     : formatCurrency(interval.width)}
@@ -846,30 +862,30 @@ const MonteCarloSimulation = ({ data, onDataChange: _onDataChange }) => {
                     </div>
                   </div>
 
-                  <div className="bg-gray-700 rounded-lg p-4">
-                    <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
+                  <div className="bg-card border border-border rounded-lg p-4">
+                    <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center">
                       📊 Percentile Analysis
                     </h3>
                     <div className="overflow-x-auto">
                       <table className="w-full">
                         <thead>
-                          <tr className="border-b border-gray-600">
-                            <th className="text-left p-3 text-sm font-medium text-gray-300">
+                          <tr className="border-b border-border">
+                            <th className="text-left p-3 text-sm font-medium text-foreground-secondary">
                               Metric
                             </th>
-                            <th className="text-right p-3 text-sm font-medium text-gray-300">
+                            <th className="text-right p-3 text-sm font-medium text-foreground-secondary">
                               5th %ile
                             </th>
-                            <th className="text-right p-3 text-sm font-medium text-gray-300">
+                            <th className="text-right p-3 text-sm font-medium text-foreground-secondary">
                               25th %ile
                             </th>
-                            <th className="text-right p-3 text-sm font-medium text-gray-300">
+                            <th className="text-right p-3 text-sm font-medium text-foreground-secondary">
                               50th %ile
                             </th>
-                            <th className="text-right p-3 text-sm font-medium text-gray-300">
+                            <th className="text-right p-3 text-sm font-medium text-foreground-secondary">
                               75th %ile
                             </th>
-                            <th className="text-right p-3 text-sm font-medium text-gray-300">
+                            <th className="text-right p-3 text-sm font-medium text-foreground-secondary">
                               95th %ile
                             </th>
                           </tr>
@@ -877,35 +893,35 @@ const MonteCarloSimulation = ({ data, onDataChange: _onDataChange }) => {
                         <tbody>
                           {Object.entries(simulationResults.analysis.percentiles).map(
                             ([metric, percentiles]) => (
-                              <tr key={metric} className="border-b border-gray-600">
-                                <td className="p-3 text-sm text-white">
+                              <tr key={metric} className="border-b border-border">
+                                <td className="p-3 text-sm text-foreground">
                                   {metric === 'pricePerShare'
                                     ? 'Price per Share'
                                     : metric === 'enterpriseValue'
                                       ? 'Enterprise Value'
                                       : 'Upside %'}
                                 </td>
-                                <td className="p-3 text-sm text-right text-gray-300">
+                                <td className="p-3 text-sm text-right text-foreground-secondary">
                                   {metric === 'upside'
                                     ? `${percentiles.p5.toFixed(1)}%`
                                     : formatCurrency(percentiles.p5)}
                                 </td>
-                                <td className="p-3 text-sm text-right text-gray-300">
+                                <td className="p-3 text-sm text-right text-foreground-secondary">
                                   {metric === 'upside'
                                     ? `${percentiles.p25.toFixed(1)}%`
                                     : formatCurrency(percentiles.p25)}
                                 </td>
-                                <td className="p-3 text-sm text-right text-blue-400 font-medium">
+                                <td className="p-3 text-sm text-right text-accent font-medium">
                                   {metric === 'upside'
                                     ? `${percentiles.p50.toFixed(1)}%`
                                     : formatCurrency(percentiles.p50)}
                                 </td>
-                                <td className="p-3 text-sm text-right text-gray-300">
+                                <td className="p-3 text-sm text-right text-foreground-secondary">
                                   {metric === 'upside'
                                     ? `${percentiles.p75.toFixed(1)}%`
                                     : formatCurrency(percentiles.p75)}
                                 </td>
-                                <td className="p-3 text-sm text-right text-gray-300">
+                                <td className="p-3 text-sm text-right text-foreground-secondary">
                                   {metric === 'upside'
                                     ? `${percentiles.p95.toFixed(1)}%`
                                     : formatCurrency(percentiles.p95)}
@@ -920,9 +936,9 @@ const MonteCarloSimulation = ({ data, onDataChange: _onDataChange }) => {
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center py-12 text-center">
-                  <AlertTriangle size={48} className="text-gray-400 mb-4" />
-                  <h3 className="text-xl font-semibold text-white mb-2">No Analysis Available</h3>
-                  <p className="text-gray-400">Run a simulation to see analysis here.</p>
+                  <AlertTriangle size={48} className="text-foreground-secondary mb-4" />
+                  <h3 className="text-xl font-semibold text-foreground mb-2">No Analysis Available</h3>
+                  <p className="text-foreground-secondary">Run a simulation to see analysis here.</p>
                 </div>
               )}
             </motion.div>

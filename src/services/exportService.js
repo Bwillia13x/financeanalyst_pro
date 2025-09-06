@@ -1,12 +1,8 @@
 /**
- * Comprehensive data export service for FinanceAnalyst Pro
+ * Comprehensive data export service for Valor‑IVX
  * Supports Excel, PDF, CSV exports with financial formatting
+ * Heavy libraries are loaded on demand to keep initial bundles small.
  */
-
-import jsPDF from 'jspdf';
-
-import XLSX from '../utils/exceljs-compat.js';
-import 'jspdf-autotable';
 
 class ExportService {
   constructor() {
@@ -59,6 +55,8 @@ class ExportService {
     } = options;
 
     try {
+      // Lazy-load ExcelJS compatibility layer
+      const XLSX = (await import('../utils/exceljs-compat.js')).default;
       const workbook = XLSX.utils.book_new();
 
       // Create main data sheet
@@ -78,7 +76,7 @@ class ExportService {
       }
 
       // Generate file
-      const excelBuffer = XLSX.write(workbook, {
+      const excelBuffer = await XLSX.write(workbook, {
         bookType: 'xlsx',
         type: 'array',
         cellStyles: includeFormatting
@@ -111,6 +109,9 @@ class ExportService {
     } = options;
 
     try {
+      // Lazy-load jsPDF and autotable plugin
+      const { default: jsPDF } = await import('jspdf');
+      await import('jspdf-autotable');
       const doc = new jsPDF({
         orientation,
         unit: 'mm',

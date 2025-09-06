@@ -335,30 +335,30 @@ const AdvancedCharting = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-16">
+    <div className="min-h-screen bg-background pb-16">
       <SEOHead
         title="Advanced Charting & Data Visualization - FinanceAnalyst Pro"
         description="Professional-grade financial charting with real-time data, customizable dashboards, and advanced visualization tools for comprehensive market analysis."
       />
 
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-20">
+      <div className="bg-card border-b border-border sticky top-0 z-20">
         <div className="px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-3">
-                <BarChart3 className="w-8 h-8 text-blue-600" />
+                <BarChart3 className="w-8 h-8 text-accent" />
                 <div>
-                  <h1 className="text-2xl font-bold text-gray-900">Advanced Charting</h1>
-                  <p className="text-sm text-gray-600">Professional financial data visualization</p>
+                  <h1 className="text-2xl font-bold text-foreground">Advanced Charting</h1>
+                  <p className="text-sm text-foreground-secondary">Professional financial data visualization</p>
                 </div>
               </div>
 
               <div className="flex items-center space-x-2">
                 <div
-                  className={`w-2 h-2 rounded-full ${isRealTime ? 'bg-green-400 animate-pulse' : 'bg-gray-400'}`}
+                  className={`w-2 h-2 rounded-full ${isRealTime ? 'bg-success animate-pulse' : 'bg-border-tertiary'}`}
                 />
-                <span className="text-xs text-gray-500">
+                <span className="text-xs text-foreground-secondary">
                   {isRealTime ? 'Live Data' : 'Static Data'}
                 </span>
               </div>
@@ -370,8 +370,8 @@ const AdvancedCharting = () => {
                 onClick={() => setIsRealTime(!isRealTime)}
                 className={`flex items-center space-x-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                   isRealTime
-                    ? 'bg-green-100 text-green-700 hover:bg-green-200'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? 'bg-success/10 text-success hover:bg-success/20'
+                    : 'bg-muted text-foreground-secondary hover:bg-muted/80'
                 }`}
               >
                 {isRealTime ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
@@ -382,7 +382,7 @@ const AdvancedCharting = () => {
               <button
                 onClick={loadChartData}
                 disabled={loading.data}
-                className="flex items-center space-x-2 px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                className="flex items-center space-x-2 px-3 py-1.5 bg-accent text-accent-foreground rounded-lg hover:opacity-90 disabled:opacity-50 transition-colors"
               >
                 <RefreshCw className={`w-4 h-4 ${loading.data ? 'animate-spin' : ''}`} />
                 <span>Refresh</span>
@@ -394,16 +394,16 @@ const AdvancedCharting = () => {
           <div className="mt-4 flex flex-wrap items-center gap-4">
             {/* Timeframe selector */}
             <div className="flex items-center space-x-2">
-              <span className="text-sm font-medium text-gray-700">Timeframe:</span>
-              <div className="flex bg-gray-100 rounded-lg p-1">
+              <span className="text-sm font-medium text-foreground">Timeframe:</span>
+              <div className="flex bg-muted rounded-lg p-1">
                 {timeframeOptions.map(option => (
                   <button
                     key={option.value}
                     onClick={() => setSelectedTimeframe(option.value)}
                     className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
                       selectedTimeframe === option.value
-                        ? 'bg-white text-blue-600 shadow-sm'
-                        : 'text-gray-600 hover:text-gray-900'
+                        ? 'bg-card text-accent shadow-sm'
+                        : 'text-foreground-secondary hover:text-foreground'
                     }`}
                   >
                     {option.label}
@@ -414,23 +414,23 @@ const AdvancedCharting = () => {
 
             {/* Symbol selector */}
             <div className="flex items-center space-x-2">
-              <span className="text-sm font-medium text-gray-700">Symbols:</span>
+              <span className="text-sm font-medium text-foreground">Symbols:</span>
               <div className="flex flex-wrap gap-1">
                 {selectedSymbols.map(symbol => (
                   <span
                     key={symbol}
-                    className="flex items-center space-x-1 px-2 py-1 bg-blue-100 text-blue-700 rounded-md text-xs"
+                    className="flex items-center space-x-1 px-2 py-1 bg-accent/10 text-accent rounded-md text-xs"
                   >
                     <span>{symbol}</span>
                     <button
                       onClick={() => setSelectedSymbols(prev => prev.filter(s => s !== symbol))}
-                      className="hover:bg-blue-200 rounded-full p-0.5"
+                      className="hover:bg-accent/20 rounded-full p-0.5"
                     >
                       <X className="w-3 h-3" />
                     </button>
                   </span>
                 ))}
-                <button className="px-2 py-1 bg-gray-100 text-gray-600 rounded-md text-xs hover:bg-gray-200 transition-colors">
+                <button className="px-2 py-1 bg-muted text-foreground-secondary rounded-md text-xs hover:bg-muted/80 transition-colors">
                   <Plus className="w-3 h-3" />
                 </button>
               </div>
@@ -438,12 +438,12 @@ const AdvancedCharting = () => {
 
             {/* Layout selector */}
             <div className="flex items-center space-x-2">
-              <span className="text-sm font-medium text-gray-700">Layout:</span>
-              <div className="flex bg-gray-100 rounded-lg p-1">
+              <span className="text-sm font-medium text-foreground">Layout:</span>
+              <div className="flex bg-muted rounded-lg p-1">
                 <button
                   onClick={() => setChartLayout('grid')}
                   className={`p-2 rounded-md transition-colors ${
-                    chartLayout === 'grid' ? 'bg-white shadow-sm' : 'hover:bg-gray-200'
+                    chartLayout === 'grid' ? 'bg-card shadow-sm' : 'hover:bg-muted/80'
                   }`}
                   title="Grid Layout"
                 >
@@ -452,7 +452,7 @@ const AdvancedCharting = () => {
                 <button
                   onClick={() => setChartLayout('stack')}
                   className={`p-2 rounded-md transition-colors ${
-                    chartLayout === 'stack' ? 'bg-white shadow-sm' : 'hover:bg-gray-200'
+                    chartLayout === 'stack' ? 'bg-card shadow-sm' : 'hover:bg-muted/80'
                   }`}
                   title="Stacked Layout"
                 >
@@ -473,22 +473,22 @@ const AdvancedCharting = () => {
                 key={chart.id}
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className={`bg-white rounded-xl shadow-sm border overflow-hidden ${`col-span-${chart.position.w} row-span-${chart.position.h}`}`}
+                className={`bg-card rounded-xl shadow-sm border border-border overflow-hidden ${`col-span-${chart.position.w} row-span-${chart.position.h}`}`}
               >
                 {/* Chart Header */}
-                <div className="flex items-center justify-between p-4 border-b border-gray-200">
+                <div className="flex items-center justify-between p-4 border-b border-border">
                   <div className="flex items-center space-x-2">
-                    <div className="p-1 bg-blue-100 rounded">
+                    <div className="p-1 bg-accent/10 rounded">
                       {React.createElement(
                         chartTypes.find(t => t.id === chart.type)?.icon || BarChart3,
-                        { className: 'w-4 h-4 text-blue-600' }
+                        { className: 'w-4 h-4 text-accent' }
                       )}
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-900">
+                      <h3 className="font-semibold text-foreground">
                         {chartTypes.find(t => t.id === chart.type)?.name}
                       </h3>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-foreground-secondary">
                         {chart.symbol || chart.symbols?.join(', ')}
                       </p>
                     </div>
@@ -497,17 +497,17 @@ const AdvancedCharting = () => {
                   <div className="flex items-center space-x-1">
                     <button
                       onClick={() => exportChart(chart.id, 'png')}
-                      className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
+                      className="p-1.5 hover:bg-muted/50 rounded-lg transition-colors"
                       title="Export Chart"
                     >
-                      <Download className="w-4 h-4 text-gray-600" />
+                      <Download className="w-4 h-4 text-foreground-secondary" />
                     </button>
                     <button
                       onClick={() => removeChart(chart.id)}
-                      className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
+                      className="p-1.5 hover:bg-muted/50 rounded-lg transition-colors"
                       title="Remove Chart"
                     >
-                      <X className="w-4 h-4 text-gray-600" />
+                      <X className="w-4 h-4 text-foreground-secondary" />
                     </button>
                   </div>
                 </div>
@@ -525,16 +525,16 @@ const AdvancedCharting = () => {
             ))}
 
             {/* Add Chart Button */}
-            <div className="col-span-6 bg-white border-2 border-dashed border-gray-300 rounded-xl flex items-center justify-center min-h-64 hover:border-blue-400 hover:bg-blue-50 transition-colors cursor-pointer">
+            <div className="col-span-6 bg-card border-2 border-dashed border-border-secondary rounded-xl flex items-center justify-center min-h-64 hover:border-accent hover:bg-accent/10 transition-colors cursor-pointer">
               <div className="text-center">
-                <Plus className="w-8 h-8 text-gray-400 mx-auto mb-3" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Add Chart</h3>
+                <Plus className="w-8 h-8 text-foreground-tertiary mx-auto mb-3" />
+                <h3 className="text-lg font-medium text-foreground mb-2">Add Chart</h3>
                 <div className="grid grid-cols-2 gap-2">
                   {chartTypes.slice(0, 4).map(type => (
                     <button
                       key={type.id}
                       onClick={() => addChart(type.id, selectedSymbols[0])}
-                      className="flex items-center space-x-2 px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm transition-colors"
+                      className="flex items-center space-x-2 px-3 py-2 bg-muted hover:bg-muted/80 rounded-lg text-sm transition-colors"
                     >
                       <type.icon className="w-4 h-4" />
                       <span>{type.name}</span>
@@ -551,22 +551,22 @@ const AdvancedCharting = () => {
                 key={chart.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-white rounded-xl shadow-sm border overflow-hidden"
+                className="bg-card rounded-xl shadow-sm border border-border overflow-hidden"
               >
                 {/* Chart Header */}
-                <div className="flex items-center justify-between p-4 border-b border-gray-200">
+                <div className="flex items-center justify-between p-4 border-b border-border">
                   <div className="flex items-center space-x-2">
-                    <div className="p-1 bg-blue-100 rounded">
+                    <div className="p-1 bg-accent/10 rounded">
                       {React.createElement(
                         chartTypes.find(t => t.id === chart.type)?.icon || BarChart3,
-                        { className: 'w-4 h-4 text-blue-600' }
+                        { className: 'w-4 h-4 text-accent' }
                       )}
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-900">
+                      <h3 className="font-semibold text-foreground">
                         {chartTypes.find(t => t.id === chart.type)?.name}
                       </h3>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-foreground-secondary">
                         {chart.symbol || chart.symbols?.join(', ')}
                       </p>
                     </div>
@@ -575,15 +575,15 @@ const AdvancedCharting = () => {
                   <div className="flex items-center space-x-1">
                     <button
                       onClick={() => exportChart(chart.id, 'png')}
-                      className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
+                      className="p-1.5 hover:bg-muted/50 rounded-lg transition-colors"
                     >
-                      <Download className="w-4 h-4 text-gray-600" />
+                      <Download className="w-4 h-4 text-foreground-secondary" />
                     </button>
                     <button
                       onClick={() => removeChart(chart.id)}
-                      className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
+                      className="p-1.5 hover:bg-muted/50 rounded-lg transition-colors"
                     >
-                      <X className="w-4 h-4 text-gray-600" />
+                      <X className="w-4 h-4 text-foreground-secondary" />
                     </button>
                   </div>
                 </div>
@@ -624,9 +624,9 @@ const ChartRenderer = ({ chart, marketData, timeframe, isRealTime }) => {
 
   // This is a placeholder - in a real implementation, you'd render actual chart components
   return (
-    <div className="h-full flex items-center justify-center bg-gray-50 rounded-lg">
+    <div className="h-full flex items-center justify-center bg-background-secondary rounded-lg">
       <div className="text-center">
-        <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+        <div className="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-3">
           {React.createElement(
             {
               candlestick: CandlestickChart,
@@ -636,19 +636,19 @@ const ChartRenderer = ({ chart, marketData, timeframe, isRealTime }) => {
               heatmap: Grid3X3,
               scatter: Target
             }[chart.type] || BarChart3,
-            { className: 'w-8 h-8 text-blue-600' }
+            { className: 'w-8 h-8 text-accent' }
           )}
         </div>
-        <h3 className="font-semibold text-gray-900 mb-1">
+        <h3 className="font-semibold text-foreground mb-1">
           {chart.type.charAt(0).toUpperCase() + chart.type.slice(1)} Chart
         </h3>
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-foreground-secondary">
           {chart.symbol || chart.symbols?.join(', ')} • {timeframe}
         </p>
         {isRealTime && (
           <div className="flex items-center justify-center space-x-1 mt-2">
-            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-            <span className="text-xs text-green-600">Live Updates</span>
+            <div className="w-2 h-2 bg-success rounded-full animate-pulse" />
+            <span className="text-xs text-success">Live Updates</span>
           </div>
         )}
       </div>

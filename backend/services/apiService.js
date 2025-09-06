@@ -26,6 +26,16 @@ class ApiService {
     // Rate limiting tracking
     this.rateLimits = new Map();
 
+    // Simple latency stats (per service)
+    this.latency = {
+      alphaVantage: [],
+      fmp: [],
+      yahoo: [],
+      fred: [],
+      quandl: []
+    };
+    this.maxLatencySamples = 200; // keep memory bounded
+
     // Setup axios defaults
     this.setupAxiosDefaults();
   }
@@ -36,6 +46,42 @@ class ApiService {
 
     // Global headers
     axios.defaults.headers.common['User-Agent'] = 'FinanceAnalyst-Pro/1.0';
+
+    // Latency tracing
+    const thresholdMs = parseInt(process.env.API_LATENCY_WARN_MS || '1000', 10);
+    axios.interceptors.request.use((config) => {
+      config.metadata = { start: Date.now() };
+      return config;
+    });
+    axios.interceptors.response.use((response) => {
+      const ms = Date.now() - (response.config.metadata?.start || Date.now());
+      const service = response.config.metadata?.service;
+      if (ms > thresholdMs) {
+        const isDev = process.env.NODE_ENV !== 'production';
+        const msg = `Slow API response ${ms}ms for ${response.config?.url}`;
+        if (isDev) console.warn(msg);
+      }
+      if (service && this.latency[service]) {
+        const arr = this.latency[service];
+        arr.push(ms);
+        if (arr.length > this.maxLatencySamples) arr.shift();
+      }
+      return response;
+    }, (error) => {
+      if (error.config && error.config.metadata) {
+        const ms = Date.now() - error.config.metadata.start;
+        const service = error.config.metadata?.service;
+        const isDev = process.env.NODE_ENV !== 'production';
+        const msg = `API error after ${ms}ms for ${error.config?.url}: ${error.message}`;
+        if (isDev) console.warn(msg);
+        if (service && this.latency[service]) {
+          const arr = this.latency[service];
+          arr.push(ms);
+          if (arr.length > this.maxLatencySamples) arr.shift();
+        }
+      }
+      return Promise.reject(error);
+    });
   }
 
   /**
@@ -160,7 +206,8 @@ class ApiService {
         function: functionName,
         apikey: this.apiKeys.alphaVantage,
         ...params
-      }
+      },
+      metadata: { service: 'alphaVantage' }
     });
 
     // Check for API errors
@@ -187,7 +234,8 @@ class ApiService {
       params: {
         apikey: this.apiKeys.fmp,
         ...params
-      }
+      },
+      metadata: { service: 'fmp' }
     });
 
     if (response.data.error) {
@@ -208,7 +256,8 @@ class ApiService {
         includePrePost: true,
         events: 'div,splits',
         ...params
-      }
+      },
+      metadata: { service: 'yahoo' }
     });
 
     return response.data;
@@ -227,7 +276,8 @@ class ApiService {
         api_key: this.apiKeys.fred,
         file_type: 'json',
         ...params
-      }
+      },
+      metadata: { service: 'fred' }
     });
 
     return response.data;
@@ -245,7 +295,8 @@ class ApiService {
       params: {
         api_key: this.apiKeys.quandl,
         ...params
-      }
+      },
+      metadata: { service: 'quandl' }
     });
 
     return response.data;
@@ -301,6 +352,23 @@ class ApiService {
     }
 
     return results;
+  }
+
+  /**
+   * Latency summary per service (p50/p95/mean)
+   */
+  getLatencySummary() {
+    const summarize = (arr) => {
+      if (!arr.length) return { count: 0, mean: 0, p50: 0, p95: 0 };
+      const sorted = [...arr].sort((a, b) => a - b);
+      const quantile = (q) => sorted[Math.min(sorted.length - 1, Math.floor(q * (sorted.length - 1)))];
+      const mean = Math.round(sorted.reduce((a, b) => a + b, 0) / sorted.length);
+      return { count: sorted.length, mean, p50: quantile(0.5), p95: quantile(0.95) };
+    };
+    const services = Object.keys(this.latency);
+    const out = {};
+    for (const s of services) out[s] = summarize(this.latency[s]);
+    return out;
   }
 }
 

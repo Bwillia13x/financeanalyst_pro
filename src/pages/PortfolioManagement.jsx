@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import PortfolioAnalytics from '../components/PortfolioAnalytics/PortfolioAnalytics';
 import PortfolioBuilder from '../components/PortfolioBuilder/PortfolioBuilder';
 import SEOHead from '../components/SEO/SEOHead';
+import MetricCard from '../components/ui/MetricCard';
 import SecondaryNav from '../components/ui/SecondaryNav';
 import secureApiClient from '../services/secureApiClient';
 import { formatCurrency, formatPercentage, formatNumber } from '../utils/formatters';
@@ -136,14 +137,14 @@ const PortfolioManagement = () => {
 
   if (!activePortfolio) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
         <div className="text-center">
-          <PieChart className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">No Portfolio Selected</h3>
-          <p className="text-gray-600 mb-4">Create or select a portfolio to get started</p>
+          <PieChart className="w-16 h-16 text-foreground-secondary mx-auto mb-4" />
+          <h3 className="text-lg font-semibold text-foreground mb-2">No Portfolio Selected</h3>
+          <p className="text-foreground-secondary mb-4">Create or select a portfolio to get started</p>
           <button
             onClick={() => {}}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-smooth"
           >
             Create Portfolio
           </button>
@@ -153,7 +154,7 @@ const PortfolioManagement = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background text-foreground">
       <SEOHead
         title="Portfolio Management | FinanceAnalyst Pro"
         description="Professional portfolio management tools with real-time tracking, risk analysis, and performance analytics"
@@ -161,14 +162,14 @@ const PortfolioManagement = () => {
       />
 
       {/* Header */}
-      <div className="bg-white shadow-sm border-b">
+      <div className="bg-card shadow-sm border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
-              <PieChart className="w-8 h-8 text-blue-600" />
+              <PieChart className="w-8 h-8 text-primary" />
               <div>
-                <h1 className="text-xl font-bold text-gray-900">Portfolio Management</h1>
-                <p className="text-sm text-gray-500">Real-time portfolio tracking & analysis</p>
+                <h1 className="text-xl font-bold text-foreground">Portfolio Management</h1>
+                <p className="text-sm text-foreground-secondary">Real-time portfolio tracking & analysis</p>
               </div>
             </div>
 
@@ -183,12 +184,12 @@ const PortfolioManagement = () => {
                 ]}
                 activeItem={viewMode}
                 onItemClick={itemId => setViewMode(itemId)}
-                className="bg-gray-100 rounded-lg"
+                className="bg-muted rounded-lg"
               />
 
               <button
                 onClick={() => {}}
-                className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="flex items-center space-x-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-smooth"
               >
                 <Plus className="w-4 h-4" />
                 <span>New Portfolio</span>
@@ -237,107 +238,43 @@ const PortfolioCard = ({ portfolio }) => {
     <div className="space-y-6">
       {/* Portfolio Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white rounded-xl shadow-sm p-6 border">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Portfolio Value</p>
-              <p className="text-2xl font-bold text-gray-900">
-                {formatCurrency(portfolio.totalValue)}
-              </p>
-            </div>
-            <div className="p-3 bg-blue-100 rounded-lg">
-              <DollarSign className="w-6 h-6 text-blue-600" />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-sm p-6 border">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Total Gain/Loss</p>
-              <p
-                className={`text-2xl font-bold ${portfolio.totalGainLoss >= 0 ? 'text-green-600' : 'text-red-600'}`}
-              >
-                {formatCurrency(portfolio.totalGainLoss)}
-              </p>
-              <p
-                className={`text-sm ${portfolio.totalGainLossPercent >= 0 ? 'text-green-600' : 'text-red-600'}`}
-              >
-                {formatPercentage(portfolio.totalGainLossPercent)}
-              </p>
-            </div>
-            <div
-              className={`p-3 rounded-lg ${portfolio.totalGainLoss >= 0 ? 'bg-green-100' : 'bg-red-100'}`}
-            >
-              {portfolio.totalGainLoss >= 0 ? (
-                <TrendingUp className="w-6 h-6 text-green-600" />
-              ) : (
-                <TrendingDown className="w-6 h-6 text-red-600" />
-              )}
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-sm p-6 border">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Day Change</p>
-              <p
-                className={`text-2xl font-bold ${portfolio.dailyChange >= 0 ? 'text-green-600' : 'text-red-600'}`}
-              >
-                {formatCurrency(portfolio.dailyChange)}
-              </p>
-              <p
-                className={`text-sm ${portfolio.dailyChangePercent >= 0 ? 'text-green-600' : 'text-red-600'}`}
-              >
-                {formatPercentage(portfolio.dailyChangePercent)}
-              </p>
-            </div>
-            <div
-              className={`p-3 rounded-lg ${portfolio.dailyChange >= 0 ? 'bg-green-100' : 'bg-red-100'}`}
-            >
-              {portfolio.dailyChange >= 0 ? (
-                <TrendingUp className="w-6 h-6 text-green-600" />
-              ) : (
-                <TrendingDown className="w-6 h-6 text-red-600" />
-              )}
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-sm p-6 border">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Dividend Yield</p>
-              <p className="text-2xl font-bold text-gray-900">
-                {formatPercentage(portfolio.dividendYield)}
-              </p>
-              <p className="text-sm text-gray-500">Weighted Average</p>
-            </div>
-            <div className="p-3 bg-purple-100 rounded-lg">
-              <Target className="w-6 h-6 text-purple-600" />
-            </div>
-          </div>
-        </div>
+        <MetricCard label="Portfolio Value" value={formatCurrency(portfolio.totalValue)} color="primary" icon={DollarSign} />
+        <MetricCard
+          label="Total Gain/Loss"
+          value={formatCurrency(portfolio.totalGainLoss)}
+          color={portfolio.totalGainLoss >= 0 ? 'success' : 'destructive'}
+          caption={formatPercentage(portfolio.totalGainLossPercent)}
+          captionColor={portfolio.totalGainLossPercent >= 0 ? 'success' : 'destructive'}
+          icon={portfolio.totalGainLoss >= 0 ? TrendingUp : TrendingDown}
+        />
+        <MetricCard
+          label="Day Change"
+          value={formatCurrency(portfolio.dailyChange)}
+          color={portfolio.dailyChange >= 0 ? 'success' : 'destructive'}
+          caption={formatPercentage(portfolio.dailyChangePercent)}
+          captionColor={portfolio.dailyChangePercent >= 0 ? 'success' : 'destructive'}
+          icon={portfolio.dailyChange >= 0 ? TrendingUp : TrendingDown}
+        />
+        <MetricCard label="Dividend Yield" value={formatPercentage(portfolio.dividendYield)} color="accent" caption="Weighted Average" icon={Target} />
       </div>
 
       {/* Holdings Table */}
-      <div className="bg-white rounded-xl shadow-sm border">
+      <div className="bg-card text-card-foreground rounded-xl shadow-elevation-1 border border-border">
         <div className="px-6 py-4 border-b">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-gray-900">Holdings</h3>
+            <h3 className="text-lg font-semibold text-foreground">Holdings</h3>
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
                 <label
                   htmlFor="portfolio-name"
-                  className="block text-sm font-medium text-gray-700 mb-1"
+                  className="block text-sm font-medium text-foreground mb-1"
                 >
                   Timeframe:
                 </label>
                 <input
                   id="portfolio-name"
                   type="text"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                   placeholder="Enter portfolio name"
                 />
               </div>
@@ -352,102 +289,102 @@ const PortfolioCard = ({ portfolio }) => {
               Portfolio holdings showing symbols, shares, prices, market values, allocations, and
               performance data
             </caption>
-            <thead className="bg-gray-50">
+            <thead className="bg-muted/40">
               <tr role="row">
                 <th
                   scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  className="px-6 py-3 text-left text-xs font-medium text-foreground-secondary uppercase tracking-wider"
                 >
                   Symbol / Name
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  className="px-6 py-3 text-right text-xs font-medium text-foreground-secondary uppercase tracking-wider"
                 >
                   Shares
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  className="px-6 py-3 text-right text-xs font-medium text-foreground-secondary uppercase tracking-wider"
                 >
                   Price
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  className="px-6 py-3 text-right text-xs font-medium text-foreground-secondary uppercase tracking-wider"
                 >
                   Market Value
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  className="px-6 py-3 text-right text-xs font-medium text-foreground-secondary uppercase tracking-wider"
                 >
                   Allocation
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  className="px-6 py-3 text-right text-xs font-medium text-foreground-secondary uppercase tracking-wider"
                 >
                   Day Change
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  className="px-6 py-3 text-right text-xs font-medium text-foreground-secondary uppercase tracking-wider"
                 >
                   Total Gain/Loss
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-card divide-y divide-border">
               {portfolio.holdings.map(holding => (
                 <tr
                   key={holding.symbol}
-                  className="hover:bg-gray-50 focus-within:bg-gray-100"
+                  className="hover:bg-muted/50 focus-within:bg-muted"
                   role="row"
                 >
                   <th scope="row" className="px-6 py-4 whitespace-nowrap font-medium">
                     <div>
-                      <div className="text-sm font-medium text-gray-900">{holding.symbol}</div>
-                      <div className="text-sm text-gray-500">{holding.name}</div>
+                      <div className="text-sm font-medium text-foreground">{holding.symbol}</div>
+                      <div className="text-sm text-foreground-secondary">{holding.name}</div>
                     </div>
                   </th>
                   <td
-                    className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset"
+                    className="px-6 py-4 whitespace-nowrap text-right text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-inset"
                     tabIndex="0"
                     aria-label={`Shares: ${formatNumber(holding.shares)}`}
                   >
                     {formatNumber(holding.shares)}
                   </td>
                   <td
-                    className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset"
+                    className="px-6 py-4 whitespace-nowrap text-right text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-inset"
                     tabIndex="0"
                     aria-label={`Price: ${formatCurrency(holding.currentPrice)}`}
                   >
                     {formatCurrency(holding.currentPrice)}
                   </td>
                   <td
-                    className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset"
+                    className="px-6 py-4 whitespace-nowrap text-right text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-inset"
                     tabIndex="0"
                     aria-label={`Market Value: ${formatCurrency(holding.value)}`}
                   >
                     {formatCurrency(holding.value)}
                   </td>
                   <td
-                    className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset"
+                    className="px-6 py-4 whitespace-nowrap text-right text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-inset"
                     tabIndex="0"
                     aria-label={`Allocation: ${formatPercentage(holding.allocation)}`}
                   >
                     {formatPercentage(holding.allocation)}
                   </td>
                   <td
-                    className={`px-6 py-4 whitespace-nowrap text-right text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset ${holding.dayChange >= 0 ? 'text-green-600' : 'text-red-600'}`}
+                    className={`px-6 py-4 whitespace-nowrap text-right text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-inset ${holding.dayChange >= 0 ? 'text-success' : 'text-destructive'}`}
                     tabIndex="0"
                     aria-label={`Day Change: ${formatCurrency(holding.dayChange)} ${holding.dayChange >= 0 ? 'positive' : 'negative'}`}
                   >
                     {formatCurrency(holding.dayChange)}
                   </td>
                   <td
-                    className={`px-6 py-4 whitespace-nowrap text-right text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset ${holding.gainLoss >= 0 ? 'text-green-600' : 'text-red-600'}`}
+                    className={`px-6 py-4 whitespace-nowrap text-right text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-inset ${holding.gainLoss >= 0 ? 'text-success' : 'text-destructive'}`}
                     tabIndex="0"
                     aria-label={`Total Gain Loss: ${formatCurrency(holding.gainLoss)} ${holding.gainLossPercent >= 0 ? 'positive' : 'negative'} ${formatPercentage(holding.gainLossPercent)} percent`}
                   >
@@ -459,46 +396,46 @@ const PortfolioCard = ({ portfolio }) => {
 
               {/* Cash Row */}
               {portfolio.cash > 0 && (
-                <tr className="hover:bg-gray-50 focus-within:bg-gray-100" role="row">
+                <tr className="hover:bg-muted/50 focus-within:bg-muted" role="row">
                   <th scope="row" className="px-6 py-4 whitespace-nowrap font-medium">
                     <div>
-                      <div className="text-sm font-medium text-gray-900">CASH</div>
-                      <div className="text-sm text-gray-500">Cash & Cash Equivalents</div>
+                      <div className="text-sm font-medium text-foreground">CASH</div>
+                      <div className="text-sm text-foreground-secondary">Cash & Cash Equivalents</div>
                     </div>
                   </th>
                   <td
-                    className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900"
+                    className="px-6 py-4 whitespace-nowrap text-right text-sm text-foreground"
                     aria-label="Shares: Not applicable"
                   >
                     -
                   </td>
                   <td
-                    className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900"
+                    className="px-6 py-4 whitespace-nowrap text-right text-sm text-foreground"
                     aria-label="Price: Not applicable"
                   >
                     -
                   </td>
                   <td
-                    className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset"
+                    className="px-6 py-4 whitespace-nowrap text-right text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-inset"
                     tabIndex="0"
                     aria-label={`Cash Value: ${formatCurrency(portfolio.cash)}`}
                   >
                     {formatCurrency(portfolio.cash)}
                   </td>
                   <td
-                    className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900"
+                    className="px-6 py-4 whitespace-nowrap text-right text-sm text-foreground"
                     aria-label="Cash Allocation: 0.1 percent"
                   >
                     {formatPercentage(0.1)}
                   </td>
                   <td
-                    className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-500"
+                    className="px-6 py-4 whitespace-nowrap text-right text-sm text-foreground-secondary"
                     aria-label="Day Change: Not applicable"
                   >
                     -
                   </td>
                   <td
-                    className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-500"
+                    className="px-6 py-4 whitespace-nowrap text-right text-sm text-foreground-secondary"
                     aria-label="Total Gain Loss: Not applicable"
                   >
                     -

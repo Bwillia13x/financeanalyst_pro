@@ -1,192 +1,46 @@
-/* FinanceAnalyst Pro - Critical Path CSS (kept tiny) */
-:root {
-  --fa-bg: #ffffff;
-  --fa-text: #0f172a; /* slate-900 */
-}
+/* Minimal above-the-fold styles for Valor-IVX */
+/* Keep tiny (<2KB) and stable to reduce CLS */
 
 html, body {
-  background: var(--fa-bg);
-  color: var(--fa-text);
-  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  height: 100%;
 }
 
-/* Ensure root paints immediately */
-#root {
-  display: block;
-  min-height: 100vh;
+body {
+  background-color: #ffffff;
+  color: #0f172a;
+  margin: 0;
 }
 
-/* Keep initial loading indicators visible */
-[data-app-loading="true"], .loading, .loading-spinner {
-  opacity: 1;
+/* Header shell (fixed height) to stabilize layout */
+header[role="banner"] {
+  min-height: 60px;
+  border-bottom: 1px solid rgba(226, 232, 240, 1);
 }
 
-/* Accessibility: avoid long running animations for users who prefer reduced motion */
-@media (prefers-reduced-motion: reduce) {
-  * {
-    animation-duration: 0.001ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.001ms !important;
-    scroll-behavior: auto !important;
-  }
+/* Container padding to avoid content shift under fixed header */
+main[role="main"] {
+  padding-top: 60px;
 }
 
-/* Utility */
-[hidden] { display: none !important; }
-
-/* Mobile Responsiveness */
-@media (max-width: 768px) {
-  /* Navigation adjustments */
-  .navbar, nav {
-    padding: 0.5rem 1rem;
-    flex-direction: column;
-  }
-
-  .nav-links, .nav-menu {
-    flex-direction: column;
-    gap: 1rem;
-    margin-top: 1rem;
-  }
-
-  /* Card responsiveness */
-  .card {
-    margin: 0.5rem;
-    padding: 1rem;
-  }
-
-  /* Table responsiveness */
-  .table-responsive, table {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  /* Button sizing */
-  .btn, button {
-    min-height: 44px; /* iOS touch target size */
-    padding: 0.75rem 1.5rem;
-    font-size: 16px; /* Prevent zoom on iOS */
-  }
-
-  /* Form elements */
-  .form-group, .form-field {
-    margin-bottom: 1rem;
-  }
-
-  .form-input, .form-select, .form-textarea,
-  input, select, textarea {
-    font-size: 16px; /* Prevent zoom on iOS */
-    padding: 0.75rem;
-    min-height: 44px;
-  }
-
-  /* Charts and visualizations */
-  .chart-container, .chart {
-    height: 250px;
-    margin: 1rem 0;
-  }
-
-  /* Modal and overlay */
-  .modal, .dialog {
-    margin: 1rem;
-    max-height: calc(100vh - 2rem);
-    overflow-y: auto;
-  }
-
-  /* Dashboard layout */
-  .dashboard-grid, .grid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-
-  /* Financial tables */
-  .financial-table, .data-table {
-    font-size: 0.875rem;
-  }
-
-  .financial-table th,
-  .financial-table td,
-  .data-table th,
-  .data-table td {
-    padding: 0.5rem;
-    text-align: left;
-  }
-}
-
-@media (max-width: 480px) {
-  /* Extra small screens */
-  .container {
-    padding: 0.5rem;
-  }
-
-  .header, h1, h2 {
-    font-size: 1.25rem;
-    padding: 1rem;
-  }
-
-  /* Stack all elements vertically */
-  .flex-row {
-    flex-direction: column;
-  }
-
-  /* Adjust chart sizes for small screens */
-  .chart-container, .chart {
-    height: 200px;
-  }
-}
-
-/* Touch-friendly interactions */
-@media (hover: none) and (pointer: coarse) {
-  /* Ensure touch targets are adequate */
-  button, .btn, a, [role="button"] {
-    min-height: 44px;
-    min-width: 44px;
-  }
-}
-
-/* App Preloader (moved from inline styles in index.html) */
+/* Basic preloader shell */
 .app-preloader {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100vh;
-  background: #ffffff;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  z-index: 9999;
-  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+  flex-direction: column;
+  height: 50vh;
 }
 
 .app-preloader-spinner {
-  width: 48px;
-  height: 48px;
-  border: 3px solid #e5e7eb; /* slate-200 */
-  border-top: 3px solid #3b82f6; /* blue-500 */
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
-  animation: fa-spin 1s linear infinite;
-  margin-bottom: 16px;
+  border: 3px solid rgba(148, 163, 184, 0.4);
+  border-top-color: #3b82f6;
+  animation: spin 0.9s linear infinite;
 }
 
-@keyframes fa-spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
-.app-preloader-title {
-  color: #374151; /* gray-700 */
-  font-size: 16px;
-  font-weight: 500;
-  margin: 0;
-  text-align: center;
-}
-
-.app-preloader-subtitle {
-  color: #6b7280; /* gray-500 */
-  font-size: 14px;
-  margin: 8px 0 0 0;
-  text-align: center;
-}

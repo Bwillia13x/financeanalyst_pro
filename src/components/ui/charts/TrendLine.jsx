@@ -1,5 +1,29 @@
 import React from 'react';
-import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Dot } from 'recharts';
+import React, { Suspense, lazy } from 'react';
+const LazyLineChart = lazy(() =>
+  import('recharts').then(module => ({
+    default: ({ data, formatValue, dataKey }) => {
+      const { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Dot, Tooltip, CartesianGrid } = module;
+      const CustomDot = props => {
+        const { cx, cy } = props;
+        return (
+          <Dot cx={cx} cy={cy} r={4} fill="var(--color-secondary)" className="transition-all duration-200 hover:r-6" />
+        );
+      };
+      return (
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
+            <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+            <XAxis dataKey="period" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: 'var(--color-muted-foreground)' }} />
+            <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: 'var(--color-muted-foreground)' }} tickFormatter={formatValue} />
+            <Tooltip contentStyle={{ backgroundColor: 'var(--color-popover)', border: '1px solid var(--color-border)', borderRadius: '8px' }} />
+            <Line type="monotone" dataKey={dataKey} stroke="var(--color-secondary)" strokeWidth={3} dot={<CustomDot />} activeDot={{ r: 6, fill: 'var(--color-secondary)', stroke: 'var(--color-background)', strokeWidth: 2 }} className="drop-shadow-sm" />
+          </LineChart>
+        </ResponsiveContainer>
+      );
+    }
+  }))
+);
 
 import { cn } from '../../../utils/cn';
 import { Card, CardContent, CardHeader, CardTitle } from '../Card';
@@ -96,37 +120,9 @@ const TrendLine = ({
       </CardHeader>
       <CardContent className="pt-0">
         <div className="h-80 w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={processedData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
-              <XAxis
-                dataKey="period"
-                axisLine={false}
-                tickLine={false}
-                tick={{ fontSize: 12, fill: 'var(--color-muted-foreground)' }}
-              />
-              <YAxis
-                axisLine={false}
-                tickLine={false}
-                tick={{ fontSize: 12, fill: 'var(--color-muted-foreground)' }}
-                tickFormatter={formatValue}
-              />
-              <Line
-                type="monotone"
-                dataKey={dataKey}
-                stroke="var(--color-secondary)"
-                strokeWidth={3}
-                dot={<CustomDot />}
-                activeDot={{
-                  r: 6,
-                  fill: 'var(--color-secondary)',
-                  stroke: 'var(--color-background)',
-                  strokeWidth: 2
-                }}
-                className="drop-shadow-sm"
-              />
-              <CustomTooltip />
-            </LineChart>
-          </ResponsiveContainer>
+          <Suspense fallback={<div className="flex items-center justify-center h-full text-sm text-muted-foreground">Loading chart…</div>}>
+            <LazyLineChart data={processedData} formatValue={formatValue} dataKey={dataKey} />
+          </Suspense>
         </div>
 
         {/* Key metrics */}

@@ -26,7 +26,7 @@ class MemoryManagerService {
     };
 
     this.objectRegistry = new Map();
-    this.eventListeners = new WeakMap();
+    this.eventListeners = new Map();
     this.timers = new Set();
     this.intervals = new Set();
     this.observers = new Set();
@@ -514,14 +514,19 @@ class MemoryManagerService {
   cleanupUnusedListeners() {
     // Clean up listeners for elements that no longer exist
     for (const [element, listeners] of this.eventListeners.entries()) {
-      if (!document.contains(element)) {
-        for (const [listenerId, listenerInfo] of listeners.entries()) {
-          element.removeEventListener(
-            listenerInfo.event,
-            listenerInfo.handler,
-            listenerInfo.options
-          );
+      try {
+        if (!document.contains(element)) {
+          for (const [listenerId, listenerInfo] of listeners.entries()) {
+            element.removeEventListener(
+              listenerInfo.event,
+              listenerInfo.handler,
+              listenerInfo.options
+            );
+          }
+          this.eventListeners.delete(element);
         }
+      } catch (error) {
+        // Element is not a valid DOM node or document is not available
         this.eventListeners.delete(element);
       }
     }

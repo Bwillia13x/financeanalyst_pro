@@ -138,8 +138,8 @@ const LoadingSkeleton = ({
 }) => {
   const variantClasses = {
     default: 'bg-muted',
-    currency: 'bg-emerald-100',
-    percentage: 'bg-blue-100'
+    currency: 'bg-success/10',
+    percentage: 'bg-primary/10'
   };
 
   return (

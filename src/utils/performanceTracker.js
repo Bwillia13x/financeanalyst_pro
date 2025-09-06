@@ -3,6 +3,12 @@
  * Monitors and reports performance metrics for optimization
  */
 
+import { onCLS } from 'web-vitals/onCLS.js';
+import { onFCP } from 'web-vitals/onFCP.js';
+import { onLCP } from 'web-vitals/onLCP.js';
+import { onINP } from 'web-vitals/onINP.js'; // FID replaced with INP in newer versions
+import { onTTFB } from 'web-vitals/onTTFB.js';
+
 class PerformanceTracker {
   constructor() {
     this.metrics = new Map();
@@ -224,47 +230,69 @@ export const performanceTracker = new PerformanceTracker();
 export const trackWebVitals = () => {
   if (!performanceTracker.isEnabled) return;
 
-  // Track Core Web Vitals
-  import('web-vitals')
-    .then(({ getCLS, getFID, getFCP, getLCP, getTTFB }) => {
-      getCLS(cls => {
+  try {
+    // CLS - Cumulative Layout Shift
+    if (onCLS && typeof onCLS === 'function') {
+      onCLS(cls => {
         window.webVitalsMetrics = window.webVitalsMetrics || {};
         window.webVitalsMetrics.cls = cls.value;
         performanceTracker.track('cls', cls.value);
         performanceTracker.checkBudget('cls', cls.value, PERFORMANCE_BUDGETS.cls);
       });
+    } else {
+      console.warn('onCLS not available in web-vitals');
+    }
 
-      getFID(fid => {
+    // INP - Interaction to Next Paint (replaces FID in newer versions)
+    if (onINP && typeof onINP === 'function') {
+      onINP(inp => {
         window.webVitalsMetrics = window.webVitalsMetrics || {};
-        window.webVitalsMetrics.fid = fid.value;
-        performanceTracker.track('fid', fid.value);
-        performanceTracker.checkBudget('fid', fid.value, PERFORMANCE_BUDGETS.fid);
+        window.webVitalsMetrics.inp = inp.value;
+        performanceTracker.track('inp', inp.value);
+        performanceTracker.checkBudget('inp', inp.value, PERFORMANCE_BUDGETS.fid); // Reuse FID budget for INP
       });
+    } else {
+      console.warn('onINP not available in web-vitals');
+    }
 
-      getFCP(fcp => {
+    // FCP - First Contentful Paint
+    if (onFCP && typeof onFCP === 'function') {
+      onFCP(fcp => {
         window.webVitalsMetrics = window.webVitalsMetrics || {};
         window.webVitalsMetrics.fcp = fcp.value;
         performanceTracker.track('fcp', fcp.value);
         performanceTracker.checkBudget('fcp', fcp.value, PERFORMANCE_BUDGETS.fcp);
       });
+    } else {
+      console.warn('onFCP not available in web-vitals');
+    }
 
-      getLCP(lcp => {
+    // LCP - Largest Contentful Paint
+    if (onLCP && typeof onLCP === 'function') {
+      onLCP(lcp => {
         window.webVitalsMetrics = window.webVitalsMetrics || {};
         window.webVitalsMetrics.lcp = lcp.value;
         performanceTracker.track('lcp', lcp.value);
         performanceTracker.checkBudget('lcp', lcp.value, PERFORMANCE_BUDGETS.lcp);
       });
+    } else {
+      console.warn('onLCP not available in web-vitals');
+    }
 
-      getTTFB(ttfb => {
+    // TTFB - Time to First Byte
+    if (onTTFB && typeof onTTFB === 'function') {
+      onTTFB(ttfb => {
         window.webVitalsMetrics = window.webVitalsMetrics || {};
         window.webVitalsMetrics.ttfb = ttfb.value;
         performanceTracker.track('ttfb', ttfb.value);
         performanceTracker.checkBudget('ttfb', ttfb.value, PERFORMANCE_BUDGETS.ttfb);
       });
-    })
-    .catch(error => {
-      console.warn('Failed to load web-vitals:', error);
-    });
+    } else {
+      console.warn('onTTFB not available in web-vitals');
+    }
+  } catch (error) {
+    console.warn('Failed to load web-vitals:', error);
+  }
 };
 
 // Bundle size monitoring

@@ -1,0 +1,45 @@
+name: Vercel Preview Perf Audit
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  preview-perf:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Wait for Vercel Preview
+        id: vercel
+        uses: patrickedqvist/wait-for-vercel-preview@v1.4.0
+        with:
+          token: ${{ secrets.VERCEL_TOKEN }}
+          max_timeout: 900
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Run Lighthouse against Vercel Preview (multi-URL)
+        run: |
+          URL=${{ steps.vercel.outputs.url }}
+          for PATH in "/" "/financial-model-workspace" "/portfolio-management" "/valuation-workbench" "/ai-insights" "/analytics"; do 
+            SAFE=$(echo "$PATH" | sed 's/\//-/g' | sed 's/^-//'); 
+            OUT="perf-results-$SAFE.json";
+            npx lighthouse "$URL$PATH" --output json --output-path "$OUT" --quiet --chrome-flags="--headless=new";
+            node scripts/budget-check.js "$OUT";
+          done
+
+      - name: Upload perf results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: vercel-preview-perf
+          path: perf-results-*.json

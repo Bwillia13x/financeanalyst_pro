@@ -34,7 +34,7 @@ const WatchlistPanel = ({ watchlist, onRemoveFromWatchlist, onSelectSymbol }) =>
 
   const getChangeColor = change => {
     if (change > 0) return 'text-success';
-    if (change < 0) return 'text-error';
+    if (change < 0) return 'text-destructive';
     return 'text-muted-foreground';
   };
 
@@ -130,7 +130,7 @@ const WatchlistPanel = ({ watchlist, onRemoveFromWatchlist, onSelectSymbol }) =>
 
               <button
                 onClick={() => onRemoveFromWatchlist(item.symbol)}
-                className="p-1 text-muted-foreground hover:text-error transition-smooth focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded"
+                className="p-1 text-muted-foreground hover:text-destructive transition-smooth focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded"
                 title="Remove from watchlist"
                 aria-label={`Remove ${item.symbol} from watchlist`}
               >

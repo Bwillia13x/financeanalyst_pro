@@ -124,6 +124,22 @@ const AIFinancialAssistant = ({
       };
 
       setMessages(prev => [...prev, assistantMessage]);
+
+      // Persist reproducibility log (non-blocking)
+      try {
+        secureApiClient.post('/ai-assistant/logs', {
+          type: 'chat',
+          input: message,
+          context: {
+            page: currentContext?.page,
+            portfolioPresent: Boolean(portfolioData),
+            marketPresent: Boolean(marketData)
+          },
+          output: assistantMessage.content,
+          suggestions: assistantMessage.suggestions,
+          actions: assistantMessage.actions
+        }).catch(() => {});
+      } catch {}
     } catch (error) {
       console.error('AI Assistant error:', error);
 

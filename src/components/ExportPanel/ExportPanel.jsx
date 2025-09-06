@@ -9,7 +9,7 @@ import {
   X,
   Check
 } from 'lucide-react';
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import exportService from '../../services/exportService';
 import Button from '../ui/Button';
@@ -23,6 +23,8 @@ const ExportPanel = ({ isOpen, onClose, data, title = 'Export Data' }) => {
     compressImages: false
   });
   const [isExporting, setIsExporting] = useState(false);
+  const dialogRef = useRef(null);
+  const previouslyFocusedRef = useRef(null);
 
   const exportFormats = [
     {
@@ -113,6 +115,57 @@ const ExportPanel = ({ isOpen, onClose, data, title = 'Export Data' }) => {
     }
   };
 
+  const onKeyDownOverlay = (e) => {
+    if (e.key === 'Escape') {
+      e.stopPropagation();
+      onClose();
+    }
+  };
+
+  // Focus trap for accessibility when modal is open
+  useEffect(() => {
+    if (!isOpen) return;
+    previouslyFocusedRef.current = document.activeElement;
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+
+    const focusableSelectors = [
+      'a[href]','area[href]','input:not([disabled])','select:not([disabled])',
+      'textarea:not([disabled])','button:not([disabled])','[tabindex]:not([tabindex="-1"])'
+    ];
+    const getFocusable = () => Array.from(dialog.querySelectorAll(focusableSelectors.join(',')));
+
+    const focusables = getFocusable();
+    (focusables[0] || dialog).focus();
+
+    const onKeyDown = (e) => {
+      if (e.key !== 'Tab') return;
+      const items = getFocusable();
+      if (items.length === 0) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (e.shiftKey) {
+        if (document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        }
+      } else {
+        if (document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    };
+
+    dialog.addEventListener('keydown', onKeyDown);
+    return () => {
+      dialog.removeEventListener('keydown', onKeyDown);
+      if (previouslyFocusedRef.current && previouslyFocusedRef.current.focus) {
+        previouslyFocusedRef.current.focus();
+      }
+    };
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   return (
@@ -122,6 +175,7 @@ const ExportPanel = ({ isOpen, onClose, data, title = 'Export Data' }) => {
       exit={{ opacity: 0 }}
       className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4"
       onClick={onClose}
+      onKeyDown={onKeyDownOverlay}
     >
       <motion.div
         initial={{ scale: 0.9, opacity: 0 }}
@@ -129,22 +183,28 @@ const ExportPanel = ({ isOpen, onClose, data, title = 'Export Data' }) => {
         exit={{ scale: 0.9, opacity: 0 }}
         className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto"
         onClick={e => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="export-panel-title"
+        aria-describedby="export-panel-desc"
+        ref={dialogRef}
       >
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center" id="export-panel-title">
               <Download className="w-5 h-5 mr-2" />
               Export Options
             </h2>
             <button
               onClick={onClose}
               className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+              aria-label="Close export panel"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
 
-          <div className="mb-6">
+          <div className="mb-6" id="export-panel-desc">
             <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
               Select Export Formats
             </h3>
@@ -157,6 +217,15 @@ const ExportPanel = ({ isOpen, onClose, data, title = 'Export Data' }) => {
                   <div
                     key={format.id}
                     onClick={() => handleFormatToggle(format.id)}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleFormatToggle(format.id);
+                      }
+                    }}
+                    role="checkbox"
+                    aria-checked={isSelected}
+                    tabIndex={0}
                     className={`flex items-start p-3 rounded-lg border cursor-pointer transition-colors ${
                       isSelected
                         ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
@@ -245,6 +314,11 @@ const ExportPanel = ({ isOpen, onClose, data, title = 'Export Data' }) => {
             </div>
           </div>
 
+          {/* Live region for announcing export state */}
+          <div aria-live="polite" className="sr-only">
+            {isExporting ? 'Export in progress' : 'Export ready'}
+          </div>
+
           <div className="flex space-x-3">
             <Button onClick={onClose} variant="secondary" className="flex-1">
               Cancel
@@ -252,6 +326,7 @@ const ExportPanel = ({ isOpen, onClose, data, title = 'Export Data' }) => {
             <Button
               onClick={handleExport}
               disabled={selectedFormats.length === 0 || isExporting}
+              aria-disabled={selectedFormats.length === 0 || isExporting}
               className="flex-1"
             >
               {isExporting ? (

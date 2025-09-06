@@ -1188,8 +1188,8 @@ const AdvancedAnalyticsDemo = () => {
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 activeTab === tab.id
-                  ? 'bg-brand-accent text-foreground-inverse'
-                  : 'text-foreground-secondary hover:text-foreground hover:bg-background-secondary'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'text-foreground-secondary hover:text-foreground hover:bg-muted'
               }`}
             >
               <span>{tab.icon}</span>

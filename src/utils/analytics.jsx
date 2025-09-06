@@ -341,7 +341,7 @@ class AnalyticsService {
     const info = {
       tagName: element.tagName?.toLowerCase(),
       id: element.id,
-      className: element.className,
+      className: String(element.className || ''), // Ensure it's always a string
       textContent: element.textContent?.substring(0, 100),
       dataAttributes: {}
     };
@@ -356,7 +356,7 @@ class AnalyticsService {
     // Get parent context
     if (element.parentElement) {
       info.parentTag = element.parentElement.tagName?.toLowerCase();
-      info.parentClass = element.parentElement.className;
+      info.parentClass = String(element.parentElement.className || ''); // Ensure it's always a string
     }
 
     return info;

@@ -34,16 +34,25 @@ const PersistentCLI = ({
   currentContext = {},
   portfolioData = null,
   marketData = null,
-  onNavigate
+  onNavigate,
+  isExpanded: externalIsExpanded = false,
+  onToggle
 }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [internalIsExpanded, setInternalIsExpanded] = useState(false);
+  const isExpanded = externalIsExpanded !== undefined ? externalIsExpanded : internalIsExpanded;
   const [isMinimized, setIsMinimized] = useState(false);
+  const [cliHeight, setCliHeight] = useState(() => {
+    // Start with 50% of viewport as a reasonable default
+    if (typeof window !== 'undefined') return Math.round(window.innerHeight * 0.5);
+    return 400;
+  });
+  const [isResizing, setIsResizing] = useState(false);
   const [input, setInput] = useState('');
   const [output, setOutput] = useState([
     {
       id: 1,
       type: 'system',
-      content: '💻 FinanceAnalyst Pro Terminal v1.0.0 - Persistent Session Active',
+      content: '💻 Valor-IVX Terminal v1.0.0 - Persistent Session Active',
       timestamp: new Date()
     },
     {
@@ -72,11 +81,17 @@ const PersistentCLI = ({
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isRestored, setIsRestored] = useState(false);
+  const [showResizeHint, setShowResizeHint] = useState(false);
+  const [isMaximized, setIsMaximized] = useState(false);
 
   const inputRef = useRef(null);
   const outputRef = useRef(null);
   const cliProcessor = useRef(null);
   const saveTimeoutRef = useRef(null);
+  const resizeRef = useRef(null);
+  const startYRef = useRef(0);
+  const startHeightRef = useRef(0);
+  const prevHeightRef = useRef(null);
 
   // Load persisted state on mount
   useEffect(() => {
@@ -88,7 +103,7 @@ const PersistentCLI = ({
     if (isRestored) {
       saveStateToStorage();
     }
-  }, [isExpanded, isMinimized, commandHistory, output]);
+  }, [isExpanded, isMinimized, cliHeight, commandHistory, output]);
 
   // Auto-scroll to bottom when output changes
   useEffect(() => {
@@ -103,6 +118,106 @@ const PersistentCLI = ({
       setTimeout(() => inputRef.current?.focus(), 100);
     }
   }, [isExpanded, isMinimized, isRestored]);
+
+  const getMaxHeight = useCallback(() => {
+    try {
+      return Math.max(120, Math.round((typeof window !== 'undefined' ? window.innerHeight : 1000) - 8));
+    } catch {
+      return 1000;
+    }
+  }, []);
+
+  const clampHeight = useCallback((h) => {
+    const maxH = getMaxHeight();
+    const minH = 120; // keep a usable minimum
+    return Math.max(minH, Math.min(maxH, h));
+  }, [getMaxHeight]);
+
+  // Load CLI height from persisted state
+  useEffect(() => {
+    try {
+      const savedState = localStorage.getItem(CLI_STORAGE_KEYS.STATE);
+      if (savedState) {
+        const state = JSON.parse(savedState);
+        if (state.cliHeight && typeof state.cliHeight === 'number') {
+          setCliHeight(clampHeight(state.cliHeight));
+        } else {
+          // initialize with default 50% viewport height
+          setCliHeight(clampHeight(Math.round(window.innerHeight * 0.5)));
+        }
+        if (typeof state.isMaximized === 'boolean') {
+          setIsMaximized(state.isMaximized);
+        }
+        if (!state.resizeHintDismissed) {
+          setShowResizeHint(true);
+        }
+      }
+    } catch (error) {
+      console.warn('Failed to load CLI height:', error);
+    }
+  }, [clampHeight]);
+
+  // Re-clamp height on window resize
+  useEffect(() => {
+    const onResize = () => setCliHeight(h => clampHeight(h));
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, [clampHeight]);
+
+  // Mouse event handlers for resizing
+  const handleMouseDown = useCallback((e) => {
+    e.preventDefault();
+    setIsResizing(true);
+    setIsMaximized(false);
+    startYRef.current = e.clientY;
+    startHeightRef.current = cliHeight;
+
+    // Add global mouse event listeners
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+
+    // Dismiss resize hint on first interaction
+    try {
+      const savedState = JSON.parse(localStorage.getItem(CLI_STORAGE_KEYS.STATE) || '{}');
+      savedState.resizeHintDismissed = true;
+      localStorage.setItem(CLI_STORAGE_KEYS.STATE, JSON.stringify(savedState));
+    } catch {}
+    setShowResizeHint(false);
+  }, [cliHeight]);
+
+  const handleMouseMove = useCallback((e) => {
+    if (!isResizing) return;
+
+    const deltaY = startYRef.current - e.clientY; // Negative when dragging down
+    const newHeight = clampHeight(startHeightRef.current + deltaY);
+
+    setCliHeight(newHeight);
+  }, [isResizing, clampHeight]);
+
+  const handleMouseUp = useCallback(() => {
+    setIsResizing(false);
+
+    // Remove global mouse event listeners
+    document.removeEventListener('mousemove', handleMouseMove);
+    document.removeEventListener('mouseup', handleMouseUp);
+
+    // Save height to localStorage
+    try {
+      const savedState = JSON.parse(localStorage.getItem(CLI_STORAGE_KEYS.STATE) || '{}');
+      savedState.cliHeight = clampHeight(cliHeight);
+      localStorage.setItem(CLI_STORAGE_KEYS.STATE, JSON.stringify(savedState));
+    } catch (error) {
+      console.warn('Failed to save CLI height:', error);
+    }
+  }, [cliHeight, clampHeight]);
+
+  // Cleanup mouse event listeners
+  useEffect(() => {
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [handleMouseMove, handleMouseUp]);
 
   // Initialize CLI processor with context
   useEffect(() => {
@@ -123,7 +238,9 @@ const PersistentCLI = ({
       const savedState = localStorage.getItem(CLI_STORAGE_KEYS.STATE);
       if (savedState) {
         const state = JSON.parse(savedState);
-        setIsExpanded(state.isExpanded || false);
+        if (externalIsExpanded === undefined) {
+          setInternalIsExpanded(state.isExpanded || false);
+        }
         setIsMinimized(state.isMinimized || false);
       }
 
@@ -183,6 +300,8 @@ const PersistentCLI = ({
         const state = {
           isExpanded,
           isMinimized,
+          cliHeight,
+          isMaximized,
           lastUpdated: new Date().toISOString()
         };
         localStorage.setItem(CLI_STORAGE_KEYS.STATE, JSON.stringify(state));
@@ -526,32 +645,59 @@ const PersistentCLI = ({
     }
   };
 
+  // Quick helper to expand CLI to a comfortable default height
+  const expandCLI = useCallback(() => {
+    const target = clampHeight(Math.round((typeof window !== 'undefined' ? window.innerHeight : 800) * 0.5));
+    setCliHeight(target);
+    try {
+      const savedState = JSON.parse(localStorage.getItem(CLI_STORAGE_KEYS.STATE) || '{}');
+      savedState.cliHeight = target;
+      localStorage.setItem(CLI_STORAGE_KEYS.STATE, JSON.stringify(savedState));
+    } catch {}
+    if (externalIsExpanded === undefined) {
+      setInternalIsExpanded(true);
+    } else if (typeof onToggle === 'function') {
+      onToggle();
+    }
+  }, [clampHeight, externalIsExpanded, onToggle]);
+
   return (
     <div className="fixed bottom-0 left-0 right-0 z-30">
       {/* CLI Header Bar */}
       <div
         className="bg-gray-900 border-t border-gray-700 px-4 py-2 flex items-center justify-between cursor-pointer select-none"
-        onClick={() => setIsExpanded(!isExpanded)}
+        onClick={() => {
+          // Clicking the bottom ribbon should ENLARGE to a reasonable size
+          if (!isExpanded) {
+            // Set a default reasonable height (50% of viewport), and persist it
+            expandCLI();
+          } else {
+            // If already expanded, do not collapse on ribbon click; keep size
+          }
+        }}
         role="button"
         tabIndex={0}
         aria-label={`${isExpanded ? 'Collapse' : 'Expand'} terminal`}
         onKeyDown={e => {
           if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
-            setIsExpanded(!isExpanded);
+            if (externalIsExpanded === undefined) {
+              setInternalIsExpanded(!isExpanded);
+            }
           }
         }}
       >
         <div className="flex items-center space-x-3">
           <Terminal className="w-5 h-5 text-green-400" />
-          <span className="text-sm font-mono text-gray-300">FinanceAnalyst Pro Terminal</span>
+          <span className="text-sm font-mono text-gray-300">Valor-IVX Terminal</span>
           <div className="flex items-center space-x-2">
             <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
             <span className="text-xs text-gray-500">Live</span>
           </div>
         </div>
 
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-3">
+          <span className="hidden sm:inline text-[11px] text-gray-500">Ctrl/⌘ + ` to toggle</span>
           {/* Persistence Status Indicator */}
           <div className="flex items-center space-x-1">
             {persistenceStatus.isPersisted && (
@@ -630,6 +776,15 @@ const PersistentCLI = ({
           <button
             className="p-1 hover:bg-gray-800 rounded text-gray-400 hover:text-gray-300"
             title={isExpanded ? 'Collapse' : 'Expand'}
+            onClick={e => {
+              e.stopPropagation();
+              setIsMaximized(false);
+              if (externalIsExpanded === undefined) {
+                setInternalIsExpanded(!isExpanded);
+              } else if (typeof onToggle === 'function') {
+                onToggle();
+              }
+            }}
           >
             {isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
           </button>
@@ -641,7 +796,7 @@ const PersistentCLI = ({
         {isExpanded && !isMinimized && (
           <motion.div
             initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 400, opacity: 1 }}
+            animate={{ height: cliHeight, opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.3, ease: 'easeInOut' }}
             className="bg-gray-900 border-t border-gray-700 overflow-hidden"
@@ -651,7 +806,7 @@ const PersistentCLI = ({
               <div
                 ref={outputRef}
                 className="flex-1 overflow-y-auto p-4 font-mono text-sm space-y-1"
-                style={{ maxHeight: '320px' }}
+                style={{ maxHeight: `${cliHeight - 120}px` }}
               >
                 {output.map(item => (
                   <div
@@ -742,9 +897,87 @@ const PersistentCLI = ({
                 </div>
               </div>
             </div>
+
+            {/* Resize Handle */}
+            <div
+              ref={resizeRef}
+              className={`absolute top-0 left-0 right-0 h-2 cursor-row-resize bg-gray-700 hover:bg-blue-600 transition-colors ${
+                isResizing ? 'bg-blue-600' : ''
+              }`}
+              onMouseDown={handleMouseDown}
+              onDoubleClick={(e) => {
+                e.stopPropagation();
+                const maxH = getMaxHeight();
+                if (!isMaximized) {
+                  // Save current height, maximize
+                  prevHeightRef.current = cliHeight;
+                  const target = clampHeight(maxH);
+                  setCliHeight(target);
+                  setIsMaximized(true);
+                  try {
+                    const savedState = JSON.parse(localStorage.getItem(CLI_STORAGE_KEYS.STATE) || '{}');
+                    savedState.cliHeight = target;
+                    savedState.isMaximized = true;
+                    localStorage.setItem(CLI_STORAGE_KEYS.STATE, JSON.stringify(savedState));
+                  } catch {}
+                } else {
+                  // Restore previous height
+                  const restore = clampHeight(prevHeightRef.current || Math.round(window.innerHeight * 0.5));
+                  setCliHeight(restore);
+                  setIsMaximized(false);
+                  try {
+                    const savedState = JSON.parse(localStorage.getItem(CLI_STORAGE_KEYS.STATE) || '{}');
+                    savedState.cliHeight = restore;
+                    savedState.isMaximized = false;
+                    localStorage.setItem(CLI_STORAGE_KEYS.STATE, JSON.stringify(savedState));
+                  } catch {}
+                }
+                // Dismiss hint if showing
+                setShowResizeHint(false);
+              }}
+              title="Drag to resize CLI"
+            >
+              <div className="flex justify-center items-center h-full">
+                <div className="w-8 h-0.5 bg-gray-400 rounded-full"></div>
+              </div>
+            </div>
+
+            {/* One-time Resize Hint */}
+            {showResizeHint && (
+              <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-800 text-gray-100 text-xs px-2 py-1 rounded shadow border border-gray-700">
+                Drag the bar to resize
+                <button
+                  onClick={() => {
+                    try {
+                      const savedState = JSON.parse(localStorage.getItem(CLI_STORAGE_KEYS.STATE) || '{}');
+                      savedState.resizeHintDismissed = true;
+                      localStorage.setItem(CLI_STORAGE_KEYS.STATE, JSON.stringify(savedState));
+                    } catch {}
+                    setShowResizeHint(false);
+                  }}
+                  className="ml-2 text-gray-400 hover:text-gray-200"
+                  aria-label="Dismiss"
+                >
+                  ×
+                </button>
+              </div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Collapsed Floating Tab to reopen CLI */}
+      {!isExpanded && (
+        <button
+          className="fixed bottom-14 right-6 z-40 px-3 py-1.5 rounded-full border border-gray-600 bg-gray-900 text-gray-100 shadow hover:bg-gray-800 transition-colors"
+          onClick={expandCLI}
+          aria-label="Open CLI"
+          title="Open CLI (Ctrl/⌘ + `)"
+        >
+          <span className="font-mono text-sm">CLI</span>
+          <span className="ml-2 hidden sm:inline text-[10px] text-gray-400">Ctrl/⌘+`</span>
+        </button>
+      )}
     </div>
   );
 };

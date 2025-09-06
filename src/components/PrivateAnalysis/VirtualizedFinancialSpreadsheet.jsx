@@ -18,52 +18,41 @@ const VirtualizedFinancialSpreadsheet = ({
   const [sortConfig, setSortConfig] = useState(null);
   const [selectedRows, setSelectedRows] = useState([]);
 
+  // Helper to make keys human-readable (e.g., totalRevenue -> Total Revenue)
+  const toTitleCase = useCallback(str => {
+    if (!str) return '';
+    return str
+      .replace(/_/g, ' ')
+      .replace(/([A-Z])/g, ' $1')
+      .replace(/^\s*/, '')
+      .replace(/^./, s => s.toUpperCase())
+      .trim();
+  }, []);
+
   // Transform financial data into flat array for virtualization
   const tableData = useMemo(() => {
-    const statement = data[activeStatement] || {};
+    const statement = data?.statements?.[activeStatement] || {};
     const periods = data.periods || [];
-    const flatData = [];
-
-    // Convert hierarchical financial data to flat rows
-    const processSection = (sectionData, sectionName, level = 0) => {
-      Object.entries(sectionData).forEach(([key, item]) => {
-        if (typeof item === 'object' && item.label) {
-          const row = {
-            id: `${sectionName}_${key}`,
-            account: item.label,
-            level,
-            section: sectionName,
-            key,
-            formula: item.formula,
-            isCalculated: !!item.formula,
-            type: item.formula ? 'calculated' : 'manual',
-            ...periods.reduce(
-              (acc, period, index) => ({
-                ...acc,
-                [`period_${index}`]: item.values?.[index] || 0
-              }),
-              {}
-            )
-          };
-          flatData.push(row);
-
-          // Process subsections
-          if (item.items) {
-            processSection(item.items, sectionName, level + 1);
-          }
-        }
-      });
-    };
-
-    // Process all sections of the current statement
-    Object.entries(statement).forEach(([sectionName, sectionData]) => {
-      if (typeof sectionData === 'object' && sectionData.items) {
-        processSection(sectionData.items, sectionName);
-      }
-    });
+    const flatData = Object.entries(statement).map(([key, values]) => ({
+      id: key,
+      account: toTitleCase(key),
+      level: 0,
+      section: activeStatement,
+      key,
+      formula: false,
+      isCalculated: false,
+      type: 'manual',
+      ...periods.reduce(
+        (acc, _period, index) => ({
+          ...acc,
+          [`period_${index}`]: values?.[index] ?? 0
+        }),
+        {}
+      )
+    }));
 
     return flatData.slice(0, maxRows); // Limit for performance
-  }, [data, activeStatement, maxRows]);
+  }, [data, activeStatement, maxRows, toTitleCase]);
 
   // Define table columns dynamically based on periods
   const columns = useMemo(() => {
@@ -101,18 +90,18 @@ const VirtualizedFinancialSpreadsheet = ({
     () => ({
       account: (value, row) => (
         <div className={`flex items-center gap-2 pl-${row.level * 4}`}>
-          {row.level > 0 && <div className="w-4 h-px bg-slate-300" />}
-          <span className={row.level === 0 ? 'font-semibold text-slate-900' : 'text-slate-700'}>
+          {row.level > 0 && <div className="w-4 h-px bg-border" />}
+          <span className={row.level === 0 ? 'font-semibold text-foreground' : 'text-foreground-secondary'}>
             {value}
           </span>
         </div>
       ),
       type: (value, row) => (
         <span
-          className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
+          className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${
             row.isCalculated
-              ? 'bg-blue-100 text-blue-800 border border-blue-200'
-              : 'bg-slate-100 text-slate-700 border border-slate-200'
+              ? 'bg-primary/10 text-primary border-primary/30'
+              : 'bg-muted text-foreground-secondary border-border'
           }`}
         >
           {row.isCalculated ? (
@@ -160,27 +149,21 @@ const VirtualizedFinancialSpreadsheet = ({
 
         // Update the data through the parent component
         if (onDataChange) {
-          const updatedData = { ...data };
-          const statement = updatedData[activeStatement];
-
-          // Navigate to the specific item and update its value
-          const updateNestedValue = (obj, path, _value) => {
-            const keys = path.split('_');
-            let current = obj;
-
-            for (let i = 0; i < keys.length - 1; i++) {
-              if (!current[keys[i]]) return;
-              current = current[keys[i]];
-            }
-
-            const finalKey = keys[keys.length - 1];
-            if (current[finalKey] && current[finalKey].values) {
-              current[finalKey].values[periodIndex] = numericValue;
+          const updatedData = {
+            ...data,
+            statements: {
+              ...data.statements,
+              [activeStatement]: {
+                ...data.statements?.[activeStatement]
+              }
             }
           };
 
-          updateNestedValue(statement, row.id, numericValue);
-          onDataChange(updatedData);
+          if (!updatedData.statements[activeStatement][row.key]) {
+            updatedData.statements[activeStatement][row.key] = {};
+          }
+          updatedData.statements[activeStatement][row.key][periodIndex] = numericValue;
+          onDataChange?.(updatedData);
         }
       }
     },
@@ -247,25 +230,19 @@ const VirtualizedFinancialSpreadsheet = ({
   }, [data, onDataChange]);
 
   return (
-    <section
-      aria-labelledby="virtualized-spreadsheet-title"
-      className="bg-slate-900 rounded-lg shadow-lg"
-    >
+    <section aria-labelledby="virtualized-spreadsheet-title" className="bg-card rounded-lg shadow-elevation-1 border border-border">
       {/* Header */}
-      <div className="p-4 sm:p-6 border-b border-slate-700">
+      <div className="p-4 sm:p-6 border-b border-border">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <TrendingUp className="w-6 h-6 text-blue-600" />
+            <div className="p-2 bg-primary/10 rounded-lg">
+              <TrendingUp className="w-6 h-6 text-primary" />
             </div>
             <div>
-              <h2
-                id="virtualized-spreadsheet-title"
-                className="text-lg sm:text-xl font-semibold text-white"
-              >
+              <h2 id="virtualized-spreadsheet-title" className="text-lg sm:text-xl font-semibold text-foreground">
                 Virtualized Financial Statements
               </h2>
-              <p className="text-xs sm:text-sm text-slate-400">
+              <p className="text-xs sm:text-sm text-foreground-secondary">
                 Optimized for {maxRows.toLocaleString()}+ rows
               </p>
             </div>
@@ -274,7 +251,7 @@ const VirtualizedFinancialSpreadsheet = ({
           <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
             <button
               onClick={addPeriod}
-              className="px-3 py-2 sm:px-4 sm:py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center gap-2 transition-all duration-200 shadow-sm hover:shadow-md font-medium text-sm sm:text-base"
+              className="px-3 py-2 sm:px-4 sm:py-2.5 bg-primary text-primary-foreground rounded-lg flex items-center gap-2 transition-smooth shadow-elevation-1 hover:shadow-elevation-2 font-medium text-sm sm:text-base"
             >
               <Plus size={14} className="sm:w-4 sm:h-4" />
               <span className="hidden sm:inline">Add Period</span>
@@ -284,7 +261,7 @@ const VirtualizedFinancialSpreadsheet = ({
             <select
               value={activeStatement}
               onChange={e => setActiveStatement(e.target.value)}
-              className="px-3 py-2 sm:px-4 sm:py-2.5 bg-white border border-slate-300 rounded-lg text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium shadow-sm text-sm sm:text-base"
+              className="px-3 py-2 sm:px-4 sm:py-2.5 bg-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary font-medium shadow-elevation-1 text-sm sm:text-base"
             >
               <option value="incomeStatement">Income Statement</option>
               <option value="balanceSheet">Balance Sheet</option>
@@ -294,7 +271,7 @@ const VirtualizedFinancialSpreadsheet = ({
         </div>
 
         {/* Performance Stats */}
-        <div className="mt-4 flex items-center gap-4 text-xs text-slate-400">
+        <div className="mt-4 flex items-center gap-4 text-xs text-foreground-secondary">
           <span>Rows: {sortedData.length.toLocaleString()}</span>
           <span>Columns: {columns.length}</span>
           <span>Selected: {selectedRows.length}</span>
@@ -311,6 +288,7 @@ const VirtualizedFinancialSpreadsheet = ({
           columns={columns}
           height={500}
           rowHeight={48}
+          density="compact"
           onCellEdit={handleCellEdit}
           formatters={formatters}
           sortable={true}
@@ -321,7 +299,7 @@ const VirtualizedFinancialSpreadsheet = ({
           onRowSelect={handleRowSelect}
           editableColumns={data.periods?.map((_, index) => `period_${index}`) || []}
           ariaLabel={`${activeStatement} financial data table with ${sortedData.length} rows`}
-          className="rounded-lg border-slate-700"
+          className="rounded-lg border-border bg-card text-card-foreground"
           overscanCount={10}
         />
       </div>

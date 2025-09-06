@@ -9,7 +9,7 @@ class PortfolioAnalyticsService {
 
   // Calculate Value at Risk (VaR) using multiple methodologies
   calculateVaR(portfolio, confidenceLevel = 0.95, timeHorizon = 1, method = 'parametric') {
-    const cacheKey = `var_${JSON.stringify({portfolio, confidenceLevel, timeHorizon, method})}`;
+    const cacheKey = `var_${JSON.stringify({ portfolio, confidenceLevel, timeHorizon, method })}`;
     if (this.cache.has(cacheKey)) {
       return this.cache.get(cacheKey);
     }
@@ -187,7 +187,7 @@ class PortfolioAnalyticsService {
 
       // Calculate portfolio impact
       let portfolioImpact = 0;
-      let assetImpacts = [];
+      const assetImpacts = [];
 
       for (let i = 0; i < assets.length; i++) {
         const asset = assets[i];
@@ -223,7 +223,7 @@ class PortfolioAnalyticsService {
     }
 
     return {
-      portfolio: portfolio,
+      portfolio,
       stressTestResults: results,
       worstCase: results.reduce((worst, current) =>
         Math.abs(current.portfolioImpact) > Math.abs(worst.portfolioImpact) ? current : worst
@@ -234,7 +234,7 @@ class PortfolioAnalyticsService {
 
   // Risk Attribution - Decompose portfolio risk by factors
   riskAttribution(portfolio, factors) {
-    const { assets, weights, covarianceMatrix } = portfolio;
+    const { assets, weights } = portfolio;
 
     // Calculate factor exposures for each asset
     const factorExposures = assets.map(asset => {
@@ -257,12 +257,12 @@ class PortfolioAnalyticsService {
 
       for (let i = 0; i < assets.length; i++) {
         for (let j = 0; j < assets.length; j++) {
-          const exposure_i = factorExposures[i][factor.name] || 0;
-          const exposure_j = factorExposures[j][factor.name] || 0;
-          const weight_i = weights[i];
-          const weight_j = weights[j];
+          const exposureI = factorExposures[i][factor.name] || 0;
+          const exposureJ = factorExposures[j][factor.name] || 0;
+          const weightI = weights[i];
+          const weightJ = weights[j];
 
-          contribution += weight_i * weight_j * exposure_i * exposure_j * factorCovariance[factorIndex][factorIndex];
+          contribution += weightI * weightJ * exposureI * exposureJ * factorCovariance[factorIndex][factorIndex];
         }
       }
 
@@ -292,8 +292,8 @@ class PortfolioAnalyticsService {
     const {
       maxWeight = 1.0,
       minWeight = 0.0,
-      targetVolatility,
-      benchmarkWeights
+      targetVolatility: _targetVolatility,
+      benchmarkWeights: _benchmarkWeights
     } = constraints;
 
     // This is a simplified factor optimization
@@ -304,7 +304,7 @@ class PortfolioAnalyticsService {
 
     // Optimize weights to match target factor exposures
     for (let iteration = 0; iteration < 100; iteration++) {
-      let gradient = new Array(numAssets).fill(0);
+      const gradient = new Array(numAssets).fill(0);
 
       // Calculate factor exposure mismatch
       targetFactors.forEach(factor => {
@@ -414,49 +414,57 @@ class PortfolioAnalyticsService {
     return Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
   }
 
-  // Normal inverse CDF approximation
+  // Normal inverse CDF approximation (Acklam's approximation)
   normalInverseCDF(p) {
-    // Using approximation formula
-    if (p <= 0 || p >= 1) return 0;
+    if (p <= 0 || p >= 1) {
+      throw new Error('Probability p must be in the open interval (0, 1)');
+    }
 
-    const a1 = -39.6968302866538;
-    const a2 = 220.946098424521;
-    const a3 = -275.928510446969;
-    const a4 = 138.357751867269;
-    const a5 = -30.6647980661472;
-    const a6 = 2.50662827745924;
+    const a1 = -39.69683028665376;
+    const a2 = 220.9460984245205;
+    const a3 = -275.9285104469687;
+    const a4 = 138.3577518672690;
+    const a5 = -30.66479806614716;
+    const a6 = 2.506628277459239;
 
-    const b1 = -54.4760987982241;
-    const b2 = 161.585836858041;
-    const b3 = -155.698979859887;
-    const b4 = 66.8013118877197;
-    const b5 = -13.2806815528857;
+    const b1 = -54.47609879822406;
+    const b2 = 161.5858368580409;
+    const b3 = -155.6989798598866;
+    const b4 = 66.80131188771972;
+    const b5 = -13.28068155288572;
 
-    const c1 = -7.78489400243029E-03;
-    const c2 = -0.322396458041136;
-    const c3 = -2.40075827716184;
-    const c4 = -2.54973253934373;
-    const c5 = 4.37466414146497;
-    const c6 = 2.93816398269878;
+    const c1 = -0.007784894002430293;
+    const c2 = -0.3223964580411365;
+    const c3 = -2.400758277161838;
+    const c4 = -2.549732539343734;
+    const c5 = 4.374664141464968;
+    const c6 = 2.938163982698783;
 
-    const d1 = 7.78469570904146E-03;
-    const d2 = 0.32246712907004;
-    const d3 = 2.445134137143;
-    const d4 = 3.75440866190742;
+    const d1 = 0.007784695709041462;
+    const d2 = 0.3224671290700398;
+    const d3 = 2.445134137142996;
+    const d4 = 3.754408661907416;
 
-    const q = p - 0.5;
+    const plow = 0.02425;
+    const phigh = 1 - plow;
 
-    let r;
-    if (Math.abs(q) <= 0.42) {
-      r = q * q;
-      return q * (((a6 * r + a5) * r + a4) * r + a3) * r + a2) * r + a1 /
-                 ((((b5 * r + b4) * r + b3) * r + b2) * r + b1) * r + 1);
+    let q, r;
+    if (p < plow) {
+      // Rational approximation for lower region
+      q = Math.sqrt(-2 * Math.log(p));
+      return (((((c1 * q + c2) * q + c3) * q + c4) * q + c5) * q + c6) /
+             ((((d1 * q + d2) * q + d3) * q + d4) * q + 1);
+    } else if (p > phigh) {
+      // Rational approximation for upper region
+      q = Math.sqrt(-2 * Math.log(1 - p));
+      return -(((((c1 * q + c2) * q + c3) * q + c4) * q + c5) * q + c6) /
+              ((((d1 * q + d2) * q + d3) * q + d4) * q + 1);
     } else {
-      r = q < 0 ? p : 1 - p;
-      r = Math.log(-Math.log(r));
-      const numerator = ((c6 * r + c5) * r + c4) * r + c3) * r + c2) * r + c1;
-      const denominator = ((d4 * r + d3) * r + d2) * r + d1) * r + 1;
-      return q < 0 ? -numerator / denominator : numerator / denominator;
+      // Rational approximation for central region
+      q = p - 0.5;
+      r = q * q;
+      return (((((a1 * r + a2) * r + a3) * r + a4) * r + a5) * r + a6) * q /
+             (((((b1 * r + b2) * r + b3) * r + b4) * r + b5) * r + 1);
     }
   }
 
@@ -473,13 +481,22 @@ class PortfolioAnalyticsService {
     const { assets, weights, covarianceMatrix } = portfolio;
     const components = [];
 
+    // Compute portfolio volatility locally
+    let portfolioVariance = 0;
+    for (let i = 0; i < weights.length; i++) {
+      for (let j = 0; j < weights.length; j++) {
+        portfolioVariance += weights[i] * weights[j] * covarianceMatrix[i][j];
+      }
+    }
+    const portfolioVolatility = Math.sqrt(portfolioVariance) || 1e-12;
+
     for (let i = 0; i < assets.length; i++) {
       let marginalVaR = 0;
       for (let j = 0; j < assets.length; j++) {
         marginalVaR += covarianceMatrix[i][j] * weights[j];
       }
 
-      const assetVaR = (weights[i] * marginalVaR / portfolio.portfolioVolatility) * totalVaR;
+      const assetVaR = (weights[i] * marginalVaR / portfolioVolatility) * totalVaR;
       const percentageContribution = (assetVaR / totalVaR) * 100;
 
       components.push({
@@ -522,7 +539,6 @@ class PortfolioAnalyticsService {
 
     assets.forEach(asset => {
       const benchmarkWeight = benchmark.weights[asset.symbol] || 0;
-      const portfolioWeight = asset.weight || 0;
 
       if (benchmarkWeight > 0) {
         const benchmarkReturn = benchmark.returns[asset.symbol] || 0;
@@ -536,7 +552,7 @@ class PortfolioAnalyticsService {
   }
 
   // Calculate asset allocation effect
-  calculateAssetAllocation(assets, benchmark, period) {
+  calculateAssetAllocation(assets, benchmark, _period) {
     // Simplified asset allocation calculation
     let allocationEffect = 0;
 

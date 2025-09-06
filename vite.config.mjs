@@ -11,6 +11,13 @@ const isPerformanceBuild = process.env.VITE_BUILD_MODE === 'performance'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  define: {
+    __ENABLE_DEMOS__: process.env.VITE_ENABLE_DEMOS === 'true',
+    __MOBILE_SECONDARY_NAV_DRAWER__: process.env.VITE_MOBILE_SECONDARY_NAV_DRAWER === 'true',
+    __VERBOSE_LOGGING__: process.env.VITE_VERBOSE_LOGGING !== 'false',
+    __ENABLE_SENTRY__: Boolean(process.env.VITE_SENTRY_DSN),
+    __ENABLE_A11Y_DEV__: process.env.VITE_ENABLE_A11Y_DEV === 'true',
+  },
   plugins: [
     react(),
     imageOptimization({
@@ -23,7 +30,17 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      src: fileURLToPath(new URL('./src', import.meta.url))
+      src: fileURLToPath(new URL('./src', import.meta.url)),
+      // Avoid bundling axe-core in production: alias accessibilityTesting to a stub unless explicitly enabled
+      'src/utils/accessibilityTesting': (process.env.VITE_ENABLE_A11Y_DEV === 'true')
+        ? fileURLToPath(new URL('./src/utils/accessibilityTesting.js', import.meta.url))
+        : fileURLToPath(new URL('./src/utils/accessibilityTesting.stub.js', import.meta.url)),
+      // Extra belt-and-suspenders: if a11y dev is disabled, point 'axe-core' to a tiny stub
+      ...(process.env.VITE_ENABLE_A11Y_DEV === 'true'
+        ? {}
+        : {
+            'axe-core': fileURLToPath(new URL('./src/utils/axe-core.stub.js', import.meta.url)),
+          })
     },
     // Avoid multiple React copies in dev which can cause invalid hook calls
     dedupe: ['react', 'react-dom']
@@ -118,9 +135,27 @@ export default defineConfig({
             return 'd3-vendor';
           }
 
+          // Icons can be large; split lucide-react separately from other UI
+          if (id.includes('lucide-react')) {
+            return 'icons-vendor';
+          }
+
           // Advanced Analytics - separate chunk for new features
           if (id.includes('AdvancedAnalytics') || id.includes('advancedAnalyticsService')) {
             return 'advanced-analytics';
+          }
+
+          // Analytics pages and BI panels
+          if (id.includes('/pages/Analytics') || id.includes('/components/Analytics')) {
+            return 'analytics-pages';
+          }
+          if (id.includes('/components/BusinessIntelligence')) {
+            return 'bi-dashboard';
+          }
+
+          // Performance pages and dashboards
+          if (id.includes('/pages/Performance') || id.includes('/components/Performance/')) {
+            return 'performance-pages';
           }
 
           // Let React.lazy drive code-splitting for Private Analysis; no forced manual chunk
@@ -146,7 +181,7 @@ export default defineConfig({
           }
 
           // Animation and UI libraries
-          if (id.includes('framer-motion') || id.includes('lucide-react')) {
+          if (id.includes('framer-motion')) {
             return 'ui-vendor';
           }
 
@@ -172,6 +207,14 @@ export default defineConfig({
 
           // Node modules that aren't specifically chunked
           if (id.includes('node_modules')) {
+            // Split remaining node_modules by package to avoid a massive vendor chunk
+            const match = id.split('node_modules/')[1];
+            if (match) {
+              const parts = match.split('/');
+              const pkg = parts[0].startsWith('@') ? `${parts[0]}-${parts[1]}` : parts[0];
+              const safe = pkg.replace(/^@/, '').replace(/\//g, '-');
+              return `vendor-${safe}`;
+            }
             return 'vendor';
           }
         }
@@ -183,7 +226,8 @@ export default defineConfig({
     minify: 'terser',
     terserOptions: {
       compress: {
-        drop_console: true,
+        // Keep warnings and errors; remove noisy logs in production
+        drop_console: false,
         drop_debugger: true,
         pure_funcs: ['console.log', 'console.info', 'console.debug'],
         passes: 2,

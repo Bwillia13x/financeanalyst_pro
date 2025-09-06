@@ -31,17 +31,17 @@ const AdvancedAnalytics = () => {
   const ActiveComponent = tabs.find(tab => tab.id === activeTab)?.component;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-background to-accent/5 p-6">
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Advanced Analytics</h1>
-          <p className="text-gray-600">
+          <h1 className="text-3xl font-bold text-foreground mb-2">Advanced Analytics</h1>
+          <p className="text-foreground-secondary">
             Professional-grade pricing models and risk analytics for complex financial instruments
           </p>
         </div>
 
         <Card className="mb-6">
-          <div className="border-b border-gray-200">
+          <div className="border-b border-border">
             <nav className="flex space-x-8" aria-label="Tabs">
               {tabs.map(tab => (
                 <Button
@@ -50,8 +50,8 @@ const AdvancedAnalytics = () => {
                   onClick={() => setActiveTab(tab.id)}
                   className={`py-4 px-1 border-b-2 font-medium text-sm ${
                     activeTab === tab.id
-                      ? 'border-blue-500 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                      ? 'border-accent text-accent'
+                      : 'border-transparent text-foreground-secondary hover:text-foreground hover:border-border-secondary'
                   }`}
                 >
                   {tab.label}

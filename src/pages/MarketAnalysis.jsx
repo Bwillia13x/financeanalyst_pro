@@ -25,7 +25,7 @@ const MarketAnalysis = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
+    <div className="min-h-screen bg-background">
       <SEOHead
         title="Live Market Analysis | FinanceAnalyst Pro"
         description="Real-time market data, live price feeds, and comprehensive market analysis tools for professional investors."
@@ -38,10 +38,10 @@ const MarketAnalysis = () => {
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Page Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
+          <h1 className="text-3xl font-bold text-foreground mb-2">
             Live Market Analysis
           </h1>
-          <p className="text-slate-600 dark:text-slate-400">
+          <p className="text-foreground-secondary">
             Real-time market data and analysis tools for informed investment decisions
           </p>
         </div>
@@ -77,9 +77,9 @@ const MarketAnalysis = () => {
           <div className="space-y-6">
             {/* Selected Asset Details */}
             {selectedAsset && (
-              <div className="bg-white dark:bg-slate-800 rounded-lg shadow-lg p-6">
-                <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4 flex items-center">
-                  <Activity className="w-5 h-5 mr-2 text-blue-600" />
+              <div className="bg-card rounded-lg border border-border shadow-lg p-6">
+                <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center">
+                  <Activity className="w-5 h-5 mr-2 text-accent" />
                   Asset Details
                 </h3>
                 <LivePriceWidget
@@ -93,41 +93,41 @@ const MarketAnalysis = () => {
             )}
 
             {/* Market Overview */}
-            <div className="bg-white dark:bg-slate-800 rounded-lg shadow-lg p-6">
-              <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4 flex items-center">
-                <Globe className="w-5 h-5 mr-2 text-green-600" />
+            <div className="bg-card rounded-lg border border-border shadow-lg p-6">
+              <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center">
+                <Globe className="w-5 h-5 mr-2 text-success" />
                 Market Overview
               </h3>
               <div className="space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-slate-600 dark:text-slate-400">Market Status</span>
-                  <span className="text-green-600 font-medium">Open</span>
+                  <span className="text-foreground-secondary">Market Status</span>
+                  <span className="text-success font-medium">Open</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-600 dark:text-slate-400">Active Feeds</span>
-                  <span className="text-slate-900 dark:text-white font-medium">28</span>
+                  <span className="text-foreground-secondary">Active Feeds</span>
+                  <span className="text-foreground font-medium">28</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-600 dark:text-slate-400">Last Update</span>
-                  <span className="text-slate-900 dark:text-white font-medium">Live</span>
+                  <span className="text-foreground-secondary">Last Update</span>
+                  <span className="text-foreground font-medium">Live</span>
                 </div>
               </div>
             </div>
 
             {/* Quick Actions */}
-            <div className="bg-white dark:bg-slate-800 rounded-lg shadow-lg p-6">
-              <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4 flex items-center">
-                <Settings className="w-5 h-5 mr-2 text-purple-600" />
+            <div className="bg-card rounded-lg border border-border shadow-lg p-6">
+              <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center">
+                <Settings className="w-5 h-5 mr-2 text-accent" />
                 Quick Actions
               </h3>
               <div className="space-y-2">
-                <button className="w-full text-left px-3 py-2 text-sm text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
+                <button className="w-full text-left px-3 py-2 text-sm text-foreground-secondary hover:bg-muted/80 rounded-lg transition-colors">
                   Create Price Alert
                 </button>
-                <button className="w-full text-left px-3 py-2 text-sm text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
+                <button className="w-full text-left px-3 py-2 text-sm text-foreground-secondary hover:bg-muted/80 rounded-lg transition-colors">
                   Export Market Data
                 </button>
-                <button className="w-full text-left px-3 py-2 text-sm text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
+                <button className="w-full text-left px-3 py-2 text-sm text-foreground-secondary hover:bg-muted/80 rounded-lg transition-colors">
                   Add to Watchlist
                 </button>
               </div>

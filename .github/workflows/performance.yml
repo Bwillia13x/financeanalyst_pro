@@ -44,6 +44,10 @@ jobs:
           http://localhost:3000
           http://localhost:3000/private-analysis
           http://localhost:3000/realtime-dashboard
+          http://localhost:3000/financial-model-workspace
+          http://localhost:3000/portfolio-management
+          http://localhost:3000/analytics
+          http://localhost:3000/performance
         configPath: ./lighthouse.config.js
         uploadArtifacts: true
         temporaryPublicStorage: true
@@ -162,4 +166,3 @@ jobs:
       with:
         name: api-performance-results
         path: api-performance.txt
-

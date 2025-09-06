@@ -41,6 +41,8 @@ const FinancialInput = forwardRef(
 
     // Generate unique ID if not provided
     const inputId = id || `financial-input-${Math.random().toString(36).substr(2, 9)}`;
+    const descriptionId = `${inputId}-desc`;
+    const errorId = `${inputId}-error`;
 
     // Format value for display
     const formatValue = val => {
@@ -228,6 +230,8 @@ const FinancialInput = forwardRef(
             onKeyPress={handleKeyPress}
             placeholder={placeholder}
             disabled={disabled || loading}
+            aria-invalid={Boolean(error) || !isValid}
+            aria-describedby={(error || !isValid) ? errorId : (description ? descriptionId : undefined)}
             className={cn(
               // Base styles
               'flex h-11 w-full rounded-lg border bg-background text-sm ring-offset-background',
@@ -278,13 +282,13 @@ const FinancialInput = forwardRef(
         </div>
 
         {/* Description */}
-        {description && !error && !isValid && (
-          <p className="text-sm text-muted-foreground">{description}</p>
+        {description && (!error && isValid) && (
+          <p id={descriptionId} className="text-sm text-muted-foreground">{description}</p>
         )}
 
         {/* Error message */}
         {(error || !isValid) && (
-          <p className="text-sm text-destructive flex items-center gap-1">
+          <p id={errorId} className="text-sm text-destructive flex items-center gap-1">
             <AlertCircle size={14} />
             {error || 'Invalid input'}
           </p>

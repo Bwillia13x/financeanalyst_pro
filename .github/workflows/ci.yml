@@ -164,12 +164,24 @@ jobs:
     
     - name: Install Playwright browsers
       run: npx playwright install --with-deps
-    
+
     - name: Run integration tests
       run: npm run test:integration
       env:
         VITE_API_BASE_URL: http://localhost:3001/api
         FRONTEND_URL: http://localhost:5173
+
+    - name: Run DevNav smoke (Playwright)
+      if: github.event_name == 'pull_request' || startsWith(github.ref, 'refs/heads/develop')
+      run: PW_USE_DEV_SERVER=1 npx playwright test tests/e2e/dev-nav-smoke.spec.ts --reporter=html
+      env:
+        PW_BASE_URL: http://localhost:5173
+
+    - name: Run Admin login smoke (Playwright)
+      if: github.event_name == 'pull_request' || startsWith(github.ref, 'refs/heads/develop')
+      run: PW_USE_DEV_SERVER=1 npx playwright test tests/e2e/admin-login-ai-log.spec.ts --reporter=html
+      env:
+        PW_BASE_URL: http://localhost:5173
     
     - name: Upload integration test results
       uses: actions/upload-artifact@v4

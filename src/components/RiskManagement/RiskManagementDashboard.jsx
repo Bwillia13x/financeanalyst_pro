@@ -1,19 +1,6 @@
 import { motion } from 'framer-motion';
-import {
-  AlertTriangle,
-  TrendingUp,
-  TrendingDown,
-  Shield,
-  Activity,
-  BarChart3,
-  PieChart,
-  AlertCircle,
-  CheckCircle,
-  X,
-  Target,
-  Zap
-} from 'lucide-react';
-import React, { useState, useEffect } from 'react';
+import { AlertTriangle, TrendingDown, Shield, Activity, BarChart3, AlertCircle, CheckCircle, X, Target, Zap } from 'lucide-react';
+import React, { useState } from 'react';
 
 import { RiskAssessmentService } from '../../services/risk/riskAssessmentTools';
 import Button from '../ui/Button';
@@ -96,16 +83,16 @@ const RiskManagementDashboard = ({ isOpen, onClose, portfolioData }) => {
     }
   };
 
-  const getRiskLevelColor = level => {
+  const getRiskLevelStyles = level => {
     switch (level) {
       case 'low':
-        return 'text-green-600 bg-green-100';
+        return { text: 'text-success', bg: 'bg-success/10' };
       case 'medium':
-        return 'text-yellow-600 bg-yellow-100';
+        return { text: 'text-warning', bg: 'bg-warning/10' };
       case 'high':
-        return 'text-red-600 bg-red-100';
+        return { text: 'text-destructive', bg: 'bg-destructive/10' };
       default:
-        return 'text-gray-600 bg-gray-100';
+        return { text: 'text-foreground-secondary', bg: 'bg-muted' };
     }
   };
 
@@ -136,23 +123,23 @@ const RiskManagementDashboard = ({ isOpen, onClose, portfolioData }) => {
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
-        className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-7xl w-full max-h-[95vh] overflow-hidden"
+        className="bg-card text-foreground border border-border rounded-lg shadow-xl max-w-7xl w-full max-h-[95vh] overflow-hidden"
         onClick={e => e.stopPropagation()}
       >
-        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+        <div className="p-6 border-b border-border">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center">
-                <Shield className="w-6 h-6 mr-3 text-red-500" />
+              <h2 className="text-2xl font-bold text-foreground flex items-center">
+                <Shield className="w-6 h-6 mr-3 text-destructive" />
                 Risk Management Dashboard
               </h2>
-              <p className="text-gray-600 dark:text-gray-400 mt-1">
+              <p className="text-foreground-secondary mt-1">
                 Comprehensive risk assessment and stress testing tools
               </p>
             </div>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+              className="text-foreground-secondary hover:text-foreground"
             >
               <X className="w-6 h-6" />
             </button>
@@ -161,9 +148,9 @@ const RiskManagementDashboard = ({ isOpen, onClose, portfolioData }) => {
 
         <div className="flex h-[80vh]">
           {/* Sidebar */}
-          <div className="w-80 border-r border-gray-200 dark:border-gray-700 p-6 overflow-y-auto">
+          <div className="w-80 border-r border-border p-6 overflow-y-auto">
             <div className="mb-6">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+              <h3 className="text-lg font-semibold text-foreground mb-4">
                 Risk Framework
               </h3>
               <div className="space-y-2">
@@ -176,20 +163,26 @@ const RiskManagementDashboard = ({ isOpen, onClose, portfolioData }) => {
                       key={framework.id}
                       onClick={() => setSelectedFramework(framework.id)}
                       className={`p-3 rounded-lg border cursor-pointer transition-all duration-200 ${
-                        isSelected
-                          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                          : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                        isSelected ? 'border-accent bg-accent/10' : 'border-border hover:bg-muted'
                       }`}
+                      role="button"
+                      tabIndex={0}
+                      aria-pressed={isSelected}
+                      aria-label={`Select ${framework.name} framework`}
+                      onKeyDown={e => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          setSelectedFramework(framework.id);
+                        }
+                      }}
                     >
                       <div className="flex items-center space-x-3">
-                        <IconComponent
-                          className={`w-5 h-5 ${isSelected ? 'text-blue-600' : 'text-gray-500'}`}
-                        />
+                        <IconComponent className={`w-5 h-5 ${isSelected ? 'text-accent' : 'text-foreground-secondary'}`} />
                         <div className="flex-1">
-                          <h4 className="font-medium text-gray-900 dark:text-white">
+                          <h4 className="font-medium text-foreground">
                             {framework.name}
                           </h4>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">
+                          <p className="text-sm text-foreground-secondary">
                             {framework.description}
                           </p>
                         </div>
@@ -220,7 +213,7 @@ const RiskManagementDashboard = ({ isOpen, onClose, portfolioData }) => {
           {/* Main Content */}
           <div className="flex-1 p-6 overflow-y-auto">
             {/* Tab Navigation */}
-            <div className="flex space-x-1 mb-6 border-b border-gray-200 dark:border-gray-700">
+            <div className="flex space-x-1 mb-6 border-b border-border">
               {[
                 { id: 'overview', label: 'Overview', icon: BarChart3 },
                 { id: 'stress-tests', label: 'Stress Tests', icon: TrendingDown },
@@ -234,9 +227,7 @@ const RiskManagementDashboard = ({ isOpen, onClose, portfolioData }) => {
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
                     className={`flex items-center px-4 py-2 border-b-2 font-medium text-sm transition-colors ${
-                      isActive
-                        ? 'border-blue-500 text-blue-600'
-                        : 'border-transparent text-gray-500 hover:text-gray-700'
+                      isActive ? 'border-accent text-accent' : 'border-transparent text-foreground-secondary hover:text-foreground'
                     }`}
                   >
                     <IconComponent className="w-4 h-4 mr-2" />
@@ -250,14 +241,14 @@ const RiskManagementDashboard = ({ isOpen, onClose, portfolioData }) => {
             <div className="space-y-6">
               {activeTab === 'overview' && (
                 <div>
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+                  <h3 className="text-xl font-semibold text-foreground mb-4">
                     Risk Assessment Overview
                   </h3>
 
                   {riskAssessment ? (
                     riskAssessment.error ? (
-                      <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-                        <p className="text-red-700 dark:text-red-400">
+                      <div className="p-4 bg-destructive/10 border border-destructive/30 rounded-lg">
+                        <p className="text-destructive">
                           Error: {riskAssessment.error}
                         </p>
                       </div>
@@ -266,37 +257,33 @@ const RiskManagementDashboard = ({ isOpen, onClose, portfolioData }) => {
                         {Object.entries(riskAssessment.overallRisk || {}).map(
                           ([category, data]) => {
                             const RiskIcon = getRiskIcon(data.level);
-                            const colorClasses = getRiskLevelColor(data.level);
+                            const styles = getRiskLevelStyles(data.level);
 
                             return (
                               <Card key={category} className="p-6">
                                 <div className="flex items-center justify-between mb-4">
-                                  <h4 className="font-medium text-gray-900 dark:text-white capitalize">
+                                  <h4 className="font-medium text-foreground capitalize">
                                     {category.replace(/_/g, ' ')}
                                   </h4>
-                                  <div
-                                    className={`p-2 rounded-full ${colorClasses.replace('text-', 'bg-').replace('-600', '-100')}`}
-                                  >
-                                    <RiskIcon className={`w-5 h-5 ${colorClasses.split(' ')[0]}`} />
+                                  <div className={`p-2 rounded-full ${styles.bg}`}>
+                                    <RiskIcon className={`w-5 h-5 ${styles.text}`} />
                                   </div>
                                 </div>
 
                                 <div className="space-y-2">
                                   <div className="flex justify-between">
-                                    <span className="text-sm text-gray-600 dark:text-gray-400">
+                                    <span className="text-sm text-foreground-secondary">
                                       Risk Level
                                     </span>
-                                    <span
-                                      className={`text-sm font-medium capitalize ${colorClasses.split(' ')[0]}`}
-                                    >
+                                    <span className={`text-sm font-medium capitalize ${styles.text}`}>
                                       {data.level}
                                     </span>
                                   </div>
                                   <div className="flex justify-between">
-                                    <span className="text-sm text-gray-600 dark:text-gray-400">
+                                    <span className="text-sm text-foreground-secondary">
                                       Score
                                     </span>
-                                    <span className="text-sm font-medium">
+                                    <span className="text-sm font-medium text-foreground">
                                       {(data.score * 100).toFixed(1)}%
                                     </span>
                                   </div>
@@ -309,11 +296,11 @@ const RiskManagementDashboard = ({ isOpen, onClose, portfolioData }) => {
                     )
                   ) : (
                     <div className="text-center py-12">
-                      <Shield className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                      <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                      <Shield className="w-16 h-16 text-foreground-secondary mx-auto mb-4" />
+                      <h3 className="text-lg font-medium text-foreground mb-2">
                         Run Risk Assessment
                       </h3>
-                      <p className="text-gray-600 dark:text-gray-400">
+                      <p className="text-foreground-secondary">
                         Select a framework and run a comprehensive risk assessment of your portfolio
                       </p>
                     </div>
@@ -323,7 +310,7 @@ const RiskManagementDashboard = ({ isOpen, onClose, portfolioData }) => {
 
               {activeTab === 'stress-tests' && (
                 <div>
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+                  <h3 className="text-xl font-semibold text-foreground mb-4">
                     Stress Test Results
                   </h3>
 
@@ -333,12 +320,12 @@ const RiskManagementDashboard = ({ isOpen, onClose, portfolioData }) => {
                         ([scenario, result]) => (
                           <Card key={scenario} className="p-6">
                             <div className="flex items-center justify-between mb-4">
-                              <h4 className="font-medium text-gray-900 dark:text-white capitalize">
+                              <h4 className="font-medium text-foreground capitalize">
                                 {scenario.replace(/_/g, ' ')} Scenario
                               </h4>
                               <div className="flex items-center space-x-2">
-                                <TrendingDown className="w-4 h-4 text-red-500" />
-                                <span className="text-sm text-gray-600 dark:text-gray-400">
+                                <TrendingDown className="w-4 h-4 text-destructive" />
+                                <span className="text-sm text-foreground-secondary">
                                   Loss: {(result.portfolioLoss * 100).toFixed(1)}%
                                 </span>
                               </div>
@@ -346,18 +333,18 @@ const RiskManagementDashboard = ({ isOpen, onClose, portfolioData }) => {
 
                             <div className="grid grid-cols-2 gap-4">
                               <div>
-                                <p className="text-sm text-gray-600 dark:text-gray-400">
+                                <p className="text-sm text-foreground-secondary">
                                   Portfolio Value
                                 </p>
-                                <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                                <p className="text-lg font-semibold text-foreground">
                                   ${result.finalValue?.toLocaleString() || 'N/A'}
                                 </p>
                               </div>
                               <div>
-                                <p className="text-sm text-gray-600 dark:text-gray-400">
+                                <p className="text-sm text-foreground-secondary">
                                   Recovery Time
                                 </p>
-                                <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                                <p className="text-lg font-semibold text-foreground">
                                   {result.recoveryTime || 'N/A'} months
                                 </p>
                               </div>
@@ -368,11 +355,11 @@ const RiskManagementDashboard = ({ isOpen, onClose, portfolioData }) => {
                     </div>
                   ) : (
                     <div className="text-center py-12">
-                      <Activity className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                      <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                      <Activity className="w-16 h-16 text-foreground-secondary mx-auto mb-4" />
+                      <h3 className="text-lg font-medium text-foreground mb-2">
                         No Stress Test Results
                       </h3>
-                      <p className="text-gray-600 dark:text-gray-400">
+                      <p className="text-foreground-secondary">
                         Run a risk assessment first to see stress test results
                       </p>
                     </div>
@@ -382,7 +369,7 @@ const RiskManagementDashboard = ({ isOpen, onClose, portfolioData }) => {
 
               {activeTab === 'recommendations' && (
                 <div>
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+                  <h3 className="text-xl font-semibold text-foreground mb-4">
                     Risk Management Recommendations
                   </h3>
 
@@ -392,18 +379,18 @@ const RiskManagementDashboard = ({ isOpen, onClose, portfolioData }) => {
                         <Card key={index} className="p-6">
                           <div className="flex items-start space-x-4">
                             <div className="flex-shrink-0">
-                              <Target className="w-6 h-6 text-blue-500" />
+                              <Target className="w-6 h-6 text-accent" />
                             </div>
                             <div className="flex-1">
-                              <h4 className="font-medium text-gray-900 dark:text-white mb-2">
+                              <h4 className="font-medium text-foreground mb-2">
                                 {rec.title}
                               </h4>
-                              <p className="text-gray-600 dark:text-gray-400 mb-3">
+                              <p className="text-foreground-secondary mb-3">
                                 {rec.description}
                               </p>
                               <div className="flex items-center justify-between">
-                                <span className="text-sm text-gray-500">Impact: {rec.impact}</span>
-                                <span className="text-sm text-gray-500">Effort: {rec.effort}</span>
+                                <span className="text-sm text-foreground-secondary">Impact: {rec.impact}</span>
+                                <span className="text-sm text-foreground-secondary">Effort: {rec.effort}</span>
                               </div>
                             </div>
                           </div>
@@ -412,11 +399,11 @@ const RiskManagementDashboard = ({ isOpen, onClose, portfolioData }) => {
                     </div>
                   ) : (
                     <div className="text-center py-12">
-                      <Target className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                      <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                      <Target className="w-16 h-16 text-foreground-secondary mx-auto mb-4" />
+                      <h3 className="text-lg font-medium text-foreground mb-2">
                         No Recommendations Available
                       </h3>
-                      <p className="text-gray-600 dark:text-gray-400">
+                      <p className="text-foreground-secondary">
                         Run a risk assessment to get personalized recommendations
                       </p>
                     </div>

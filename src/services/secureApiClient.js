@@ -21,6 +21,18 @@ class SecureApiClient {
       }
     });
 
+    // Request interceptor to attach Authorization if present
+    this.client.interceptors.request.use((config) => {
+      try {
+        const token = localStorage.getItem('accessToken');
+        if (token) {
+          config.headers = config.headers || {};
+          config.headers.Authorization = `Bearer ${token}`;
+        }
+      } catch {}
+      return config;
+    });
+
     // Response interceptor for error handling
     this.client.interceptors.response.use(
       response => response,

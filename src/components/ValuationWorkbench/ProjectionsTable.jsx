@@ -43,9 +43,9 @@ const ProjectionsTable = ({ _projections, _onUpdate, _currency = 'USD', _financi
     }
   ];
   return (
-    <div className="overflow-auto rounded-xl border border-slate-200">
+    <div className="overflow-auto rounded-xl border border-border bg-card text-card-foreground">
       <table className="min-w-[720px] text-right text-[12px]">
-        <thead className="bg-slate-50 text-slate-600">
+        <thead className="bg-muted/40 text-foreground">
           <tr>
             <th className="px-2 py-1 text-left">Year</th>
             <th className="px-2 py-1">Revenue</th>
@@ -61,7 +61,7 @@ const ProjectionsTable = ({ _projections, _onUpdate, _currency = 'USD', _financi
         </thead>
         <tbody>
           {rows.map(r => (
-            <tr key={r.year} className="odd:bg-white even:bg-slate-50/40">
+            <tr key={r.year} className="odd:bg-card even:bg-muted/20">
               <td className="px-2 py-1 text-left">{r.year}</td>
               <td className="px-2 py-1">{Cur(r.revenue, 0)}</td>
               <td className="px-2 py-1">{Pct(r.ebitMargin, 1)}</td>

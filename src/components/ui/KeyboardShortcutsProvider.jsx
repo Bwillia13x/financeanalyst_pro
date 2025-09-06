@@ -1,4 +1,4 @@
-import React, { useState, useCallback, createContext, useContext } from 'react';
+import React, { useState, useCallback, createContext, useContext, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts';
@@ -28,8 +28,8 @@ export const KeyboardShortcutsProvider = ({ children }) => {
   const [recentCommands, setRecentCommands] = useState([]);
   const [currentContext, setCurrentContext] = useState({});
 
-  // Define command handlers
-  const commandHandlers = {
+  // Define command handlers (memoized to prevent infinite re-renders)
+  const commandHandlers = useMemo(() => ({
     'open-command-palette': () => setShowCommandPalette(true),
     'open-performance-dashboard': () => {
       const event = new CustomEvent('open-performance-dashboard');
@@ -104,7 +104,7 @@ export const KeyboardShortcutsProvider = ({ children }) => {
         window.dispatchEvent(event);
       }, 100);
     }
-  };
+  }), [navigate]); // Only depend on navigate since it's the only external dependency
 
   // Initialize keyboard shortcuts
   useKeyboardShortcuts(commandHandlers);

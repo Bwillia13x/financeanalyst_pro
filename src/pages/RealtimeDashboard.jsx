@@ -4,8 +4,9 @@ import InstitutionalChart from '../components/Charts/InstitutionalChart';
 import Button from '../components/ui/Button';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card';
 import Input from '../components/ui/Input';
+import StatusBadge from '../components/ui/StatusBadge';
+import Toolbar, { ToolbarLeft, ToolbarRight } from '../components/ui/Toolbar';
 import { apiIntegrationService } from '../services/api/APIIntegrationService';
-import { dataManagementService } from '../services/data/DataManagementService';
 import { realtimeDataService } from '../services/realtime/RealtimeDataService';
 
 const CHART_TYPES = {
@@ -254,32 +255,33 @@ const RealtimeDashboard = () => {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <div className="bg-card border-b border-border p-6">
-        <div className="flex items-center justify-between">
-          <div>
+        <Toolbar>
+          <ToolbarLeft>
             <h1 className="text-3xl font-bold text-foreground">Real-time Financial Dashboard</h1>
             <p className="text-foreground-secondary mt-1">
               Live market data, news, and economic indicators
             </p>
-          </div>
+          </ToolbarLeft>
 
-          <div className="flex items-center gap-4">
+          <ToolbarRight>
             <div className="flex items-center gap-2">
-              <div
-                className={`w-3 h-3 rounded-full ${
+              <StatusBadge
+                tone={
                   connectionStatus === 'connected'
-                    ? 'bg-green-500'
+                    ? 'success'
                     : connectionStatus === 'connecting'
-                      ? 'bg-yellow-500'
-                      : 'bg-red-500'
-                }`}
-              />
-              <span className="text-sm text-foreground-secondary">
+                      ? 'warning'
+                      : 'destructive'
+                }
+                size="sm"
+                variant="soft"
+              >
                 {connectionStatus === 'connected'
                   ? 'Connected'
                   : connectionStatus === 'connecting'
                     ? 'Connecting...'
                     : 'Disconnected'}
-              </span>
+              </StatusBadge>
             </div>
 
             {lastUpdate && (
@@ -287,8 +289,8 @@ const RealtimeDashboard = () => {
                 Last update: {lastUpdate.toLocaleTimeString()}
               </span>
             )}
-          </div>
-        </div>
+          </ToolbarRight>
+        </Toolbar>
       </div>
 
       <div className="p-6 space-y-6">
@@ -324,6 +326,14 @@ const RealtimeDashboard = () => {
                         : 'border-border hover:border-brand-accent/50'
                     }`}
                     onClick={() => handleSymbolSelect(symbol)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleSymbolSelect(symbol);
+                      }
+                    }}
                   >
                     <div className="flex items-center justify-between mb-2">
                       <span className="font-semibold text-foreground">{symbol}</span>
@@ -332,7 +342,7 @@ const RealtimeDashboard = () => {
                           e.stopPropagation();
                           removeFromWatchlist(symbol);
                         }}
-                        className="text-foreground-secondary hover:text-red-500 text-sm"
+                        className="text-foreground-secondary hover:text-destructive text-sm"
                       >
                         ×
                       </button>
@@ -345,7 +355,7 @@ const RealtimeDashboard = () => {
                         </div>
                         <div
                           className={`text-sm ${
-                            (quote.change || 0) >= 0 ? 'text-green-600' : 'text-red-600'
+                            (quote.change || 0) >= 0 ? 'text-success' : 'text-destructive'
                           }`}
                         >
                           {formatPercentage(quote.changePercent || 0)}
@@ -373,9 +383,7 @@ const RealtimeDashboard = () => {
                   <div className="text-2xl font-bold text-foreground">
                     {formatCurrency(totalValue)}
                   </div>
-                  <div
-                    className={`text-sm ${totalChange >= 0 ? 'text-green-600' : 'text-red-600'}`}
-                  >
+                  <div className={`text-sm ${totalChange >= 0 ? 'text-success' : 'text-destructive'}`}>
                     {formatPercentage(totalChange)}
                   </div>
                 </div>
@@ -421,7 +429,7 @@ const RealtimeDashboard = () => {
                       <span className="text-foreground-secondary">Change</span>
                       <span
                         className={`font-semibold ${
-                          (quote.change || 0) >= 0 ? 'text-green-600' : 'text-red-600'
+                          (quote.change || 0) >= 0 ? 'text-success' : 'text-destructive'
                         }`}
                       >
                         {formatCurrency(quote.change || 0)}
@@ -458,21 +466,19 @@ const RealtimeDashboard = () => {
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="text-foreground-secondary">Real-time Data</span>
-                  <div
-                    className={`w-3 h-3 rounded-full ${
-                      isConnected ? 'bg-green-500' : 'bg-red-500'
-                    }`}
-                  />
+                  <StatusBadge tone={isConnected ? 'success' : 'destructive'} size="xs" variant="soft">
+                    {isConnected ? 'Available' : 'Unavailable'}
+                  </StatusBadge>
                 </div>
 
                 <div className="flex items-center justify-between">
                   <span className="text-foreground-secondary">API Services</span>
-                  <div className="w-3 h-3 rounded-full bg-green-500" />
+                  <StatusBadge tone="success" size="xs" variant="soft">Operational</StatusBadge>
                 </div>
 
                 <div className="flex items-center justify-between">
                   <span className="text-foreground-secondary">Cache Status</span>
-                  <div className="w-3 h-3 rounded-full bg-green-500" />
+                  <StatusBadge tone="success" size="xs" variant="soft">Healthy</StatusBadge>
                 </div>
 
                 <div className="pt-2 border-t border-border">

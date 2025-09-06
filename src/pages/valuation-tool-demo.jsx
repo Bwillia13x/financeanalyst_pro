@@ -76,7 +76,7 @@ const ValuationToolDemo = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-background text-foreground">
       <div className="max-w-7xl mx-auto px-6 py-12">
         {/* Header */}
         <motion.div
@@ -84,22 +84,22 @@ const ValuationToolDemo = () => {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-12"
         >
-          <h1 className="text-5xl font-bold text-gray-900 mb-6">Business Valuation Tool</h1>
-          <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+          <h1 className="text-5xl font-bold text-foreground mb-6">Business Valuation Tool</h1>
+          <p className="text-xl text-foreground-secondary mb-8 max-w-3xl mx-auto">
             Professional-grade DCF and LBO analysis for privately held companies. Built for
             investment professionals, private equity firms, and corporate finance teams.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               to="/valuation-tool"
-              className="inline-flex items-center px-8 py-4 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+              className="inline-flex items-center px-8 py-4 bg-primary text-primary-foreground rounded-lg font-semibold hover:opacity-90 transition-smooth"
             >
               <Calculator className="w-5 h-5 mr-2" />
               Try the Tool
             </Link>
             <Link
               to="/valuation-tool/docs"
-              className="inline-flex items-center px-8 py-4 bg-gray-600 text-white rounded-lg font-semibold hover:bg-gray-700 transition-colors"
+              className="inline-flex items-center px-8 py-4 bg-muted text-foreground rounded-lg font-semibold hover:bg-muted/80 border border-border transition-smooth"
             >
               <BookOpen className="w-5 h-5 mr-2" />
               View Documentation
@@ -116,11 +116,11 @@ const ValuationToolDemo = () => {
           {features.map((feature, index) => (
             <div
               key={index}
-              className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow"
+              className="bg-card rounded-xl border border-border shadow-elevation-1 p-6 hover:shadow-elevation-2 transition-smooth"
             >
-              <div className="text-blue-600 mb-4">{feature.icon}</div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">{feature.title}</h3>
-              <p className="text-gray-600 leading-relaxed">{feature.description}</p>
+              <div className="text-primary mb-4">{feature.icon}</div>
+              <h3 className="text-xl font-semibold text-foreground mb-2">{feature.title}</h3>
+              <p className="text-foreground-secondary leading-relaxed">{feature.description}</p>
             </div>
           ))}
         </motion.div>
@@ -131,40 +131,40 @@ const ValuationToolDemo = () => {
           animate={{ opacity: 1, y: 0 }}
           className="mb-16"
         >
-          <h2 className="text-3xl font-bold text-gray-900 text-center mb-8">Example Scenarios</h2>
+          <h2 className="text-3xl font-bold text-foreground text-center mb-8">Example Scenarios</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {exampleScenarios.map((scenario, index) => (
               <div
                 key={index}
-                className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow"
+                className="bg-card rounded-xl border border-border shadow-elevation-1 p-6 hover:shadow-elevation-2 transition-shadow"
               >
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">{scenario.title}</h3>
-                <p className="text-gray-600 mb-4">{scenario.description}</p>
+                <h3 className="text-xl font-semibold text-foreground mb-2">{scenario.title}</h3>
+                <p className="text-foreground-secondary mb-4">{scenario.description}</p>
 
                 <div className="space-y-3">
-                  <div className="border-t pt-3">
-                    <h4 className="font-semibold text-gray-900 mb-2">DCF Assumptions</h4>
+                  <div className="border-t border-border pt-3">
+                    <h4 className="font-semibold text-foreground mb-2">DCF Assumptions</h4>
                     <div className="grid grid-cols-2 gap-2 text-sm">
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Revenue:</span>
+                        <span className="text-foreground-secondary">Revenue:</span>
                         <span className="font-medium">
                           ${(scenario.dcf.revenue / 1000000).toFixed(1)}M
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Growth:</span>
+                        <span className="text-foreground-secondary">Growth:</span>
                         <span className="font-medium">
                           {(scenario.dcf.growth * 100).toFixed(0)}%
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Margin:</span>
+                        <span className="text-foreground-secondary">Margin:</span>
                         <span className="font-medium">
                           {(scenario.dcf.margin * 100).toFixed(0)}%
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Discount:</span>
+                        <span className="text-foreground-secondary">Discount:</span>
                         <span className="font-medium">
                           {(scenario.dcf.discount * 100).toFixed(0)}%
                         </span>
@@ -172,27 +172,27 @@ const ValuationToolDemo = () => {
                     </div>
                   </div>
 
-                  <div className="border-t pt-3">
-                    <h4 className="font-semibold text-gray-900 mb-2">LBO Assumptions</h4>
+                  <div className="border-t border-border pt-3">
+                    <h4 className="font-semibold text-foreground mb-2">LBO Assumptions</h4>
                     <div className="grid grid-cols-2 gap-2 text-sm">
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Price:</span>
+                        <span className="text-foreground-secondary">Price:</span>
                         <span className="font-medium">
                           ${(scenario.lbo.price / 1000000).toFixed(0)}M
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Equity:</span>
+                        <span className="text-foreground-secondary">Equity:</span>
                         <span className="font-medium">
                           {(scenario.lbo.equity * 100).toFixed(0)}%
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Exit Multiple:</span>
+                        <span className="text-foreground-secondary">Exit Multiple:</span>
                         <span className="font-medium">{scenario.lbo.exit}x</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Expected IRR:</span>
+                        <span className="text-foreground-secondary">Expected IRR:</span>
                         <span className="font-medium">{scenario.lbo.irr}</span>
                       </div>
                     </div>
@@ -207,66 +207,66 @@ const ValuationToolDemo = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-xl shadow-lg p-8 mb-16"
+          className="bg-card rounded-xl border border-border shadow-elevation-1 p-8 mb-16"
         >
-          <h2 className="text-3xl font-bold text-gray-900 text-center mb-8">
+          <h2 className="text-3xl font-bold text-foreground text-center mb-8">
             Valuation Methodologies
           </h2>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                <Calculator className="w-5 h-5 mr-2 text-blue-600" />
+              <h3 className="text-xl font-semibold text-foreground mb-4 flex items-center">
+                <Calculator className="w-5 h-5 mr-2 text-primary" />
                 Discounted Cash Flow (DCF)
               </h3>
-              <p className="text-gray-600 mb-4">
+              <p className="text-foreground-secondary mb-4">
                 DCF analysis estimates the value of a business based on its expected future cash
                 flows, discounted back to present value using a risk-adjusted rate.
               </p>
-              <ul className="space-y-2 text-gray-600">
+              <ul className="space-y-2 text-foreground-secondary">
                 <li className="flex items-start">
-                  <span className="text-blue-600 mr-2">•</span>
+                  <span className="text-primary mr-2">•</span>
                   Free cash flow projections for 5+ years
                 </li>
                 <li className="flex items-start">
-                  <span className="text-blue-600 mr-2">•</span>
+                  <span className="text-primary mr-2">•</span>
                   Terminal value calculation using perpetuity growth
                 </li>
                 <li className="flex items-start">
-                  <span className="text-blue-600 mr-2">•</span>
+                  <span className="text-primary mr-2">•</span>
                   Risk-adjusted discount rate application
                 </li>
                 <li className="flex items-start">
-                  <span className="text-blue-600 mr-2">•</span>
+                  <span className="text-primary mr-2">•</span>
                   Enterprise value calculation
                 </li>
               </ul>
             </div>
 
             <div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                <TrendingUp className="w-5 h-5 mr-2 text-green-600" />
+              <h3 className="text-xl font-semibold text-foreground mb-4 flex items-center">
+                <TrendingUp className="w-5 h-5 mr-2 text-success" />
                 Leveraged Buyout (LBO)
               </h3>
-              <p className="text-gray-600 mb-4">
+              <p className="text-foreground-secondary mb-4">
                 LBO analysis evaluates potential returns from acquiring a company using significant
                 debt financing and modeling the exit strategy.
               </p>
-              <ul className="space-y-2 text-gray-600">
+              <ul className="space-y-2 text-foreground-secondary">
                 <li className="flex items-start">
-                  <span className="text-green-600 mr-2">•</span>
+                  <span className="text-success mr-2">•</span>
                   Capital structure modeling (equity vs debt)
                 </li>
                 <li className="flex items-start">
-                  <span className="text-green-600 mr-2">•</span>
+                  <span className="text-success mr-2">•</span>
                   Operational improvement projections
                 </li>
                 <li className="flex items-start">
-                  <span className="text-green-600 mr-2">•</span>
+                  <span className="text-success mr-2">•</span>
                   Exit multiple-based valuation
                 </li>
                 <li className="flex items-start">
-                  <span className="text-green-600 mr-2">•</span>
+                  <span className="text-success mr-2">•</span>
                   IRR and MOIC calculations
                 </li>
               </ul>
@@ -280,7 +280,7 @@ const ValuationToolDemo = () => {
           animate={{ opacity: 1, y: 0 }}
           className="text-center"
         >
-          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl p-8 text-white">
+          <div className="bg-primary rounded-xl p-8 text-primary-foreground">
             <h2 className="text-3xl font-bold mb-4">Ready to Start Your Valuation?</h2>
             <p className="text-xl mb-6 opacity-90">
               Access professional-grade financial modeling tools designed for private company
@@ -288,7 +288,7 @@ const ValuationToolDemo = () => {
             </p>
             <Link
               to="/valuation-tool"
-              className="inline-flex items-center px-8 py-4 bg-white text-blue-600 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
+              className="inline-flex items-center px-8 py-4 bg-card text-foreground rounded-lg font-semibold hover:bg-muted transition-smooth border border-border"
             >
               Launch Valuation Tool
               <ArrowRight className="w-5 h-5 ml-2" />

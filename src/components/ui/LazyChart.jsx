@@ -79,6 +79,41 @@ const LazyAreaChart = lazy(() =>
   }))
 );
 
+const LazyPieChart = lazy(() =>
+  import('recharts').then(module => ({
+    default: ({ data, ...props }) => {
+      const { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } = module;
+      return (
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart {...props}>
+            <Pie
+              data={data}
+              cx="50%"
+              cy="50%"
+              outerRadius={80}
+              dataKey="value"
+              label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+            >
+              {Array.isArray(data)
+                ? data.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color || 'var(--color-primary)'} />
+                  ))
+                : null}
+            </Pie>
+            <Tooltip
+              contentStyle={{
+                backgroundColor: 'var(--color-popover)',
+                border: '1px solid var(--color-border)',
+                borderRadius: '8px'
+              }}
+            />
+          </PieChart>
+        </ResponsiveContainer>
+      );
+    }
+  }))
+);
+
 // Chart wrapper component with loading state
 const ChartWrapper = ({ children, loading = false }) => {
   if (loading) {
@@ -118,6 +153,12 @@ export const ScatterChart = props => (
 export const AreaChart = props => (
   <ChartWrapper>
     <LazyAreaChart {...props} />
+  </ChartWrapper>
+);
+
+export const PieChart = props => (
+  <ChartWrapper>
+    <LazyPieChart {...props} />
   </ChartWrapper>
 );
 

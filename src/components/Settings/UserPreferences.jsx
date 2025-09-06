@@ -63,6 +63,17 @@ const UserPreferences = ({ isOpen, onClose }) => {
     setIsSaving(true);
     try {
       await userPreferencesService.updatePreferences(preferences);
+      // Apply CLI preference immediately
+      try {
+        const raw = localStorage.getItem('fa_cli_state');
+        const state = raw ? JSON.parse(raw) : {};
+        if (preferences.alwaysShowCLI === true) {
+          state.isExpanded = true;
+          window.dispatchEvent(new Event('show-cli'));
+        }
+        state.lastUpdated = new Date().toISOString();
+        localStorage.setItem('fa_cli_state', JSON.stringify(state));
+      } catch {}
       setHasChanges(false);
 
       // Show success notification
@@ -305,6 +316,7 @@ const UserPreferences = ({ isOpen, onClose }) => {
       case 'mouseNavigation':
       case 'touchGestures':
       case 'commandPalette':
+      case 'alwaysShowCLI':
         return (
           <input
             type="checkbox"
@@ -358,6 +370,7 @@ const UserPreferences = ({ isOpen, onClose }) => {
       mouseNavigation: 'Mouse Navigation',
       touchGestures: 'Touch Gestures',
       commandPalette: 'Command Palette'
+      , alwaysShowCLI: 'Always Show CLI'
     };
     return labels[key] || key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
   };

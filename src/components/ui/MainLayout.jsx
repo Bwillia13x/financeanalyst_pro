@@ -1,177 +1,105 @@
-import { Bot, Download, BarChart3, Shield } from 'lucide-react';
-import React, { useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import React, { Suspense, lazy, useState } from 'react';
+import { Bot, Download, Command } from 'lucide-react';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 
-// Temporarily commenting out complex imports for debugging:
-// import IndustryAnalyticsDashboard from '../IndustryAnalytics/IndustryAnalyticsDashboard';
-// import OfflineIndicator from '../PWA/OfflineIndicator';
-// import PWAInstallPrompt from '../PWA/PWAInstallPrompt';
-import AIFinancialAssistant from '../AIAssistant/AIFinancialAssistant';
-import ExportPanel from '../ExportPanel/ExportPanel';
-// import IndustryAnalyticsDashboard from '../IndustryAnalytics/IndustryAnalyticsDashboard';
-// import IndustryAnalyticsDashboard from '../IndustryAnalytics/IndustryAnalyticsDashboard';
-// import IndustryAnalyticsDashboard from '../IndustryAnalytics/IndustryAnalyticsDashboard';
-// import IndustryAnalyticsDashboard from '../IndustryAnalytics/IndustryAnalyticsDashboard';
-// import IndustryAnalyticsDashboard from '../IndustryAnalytics/IndustryAnalyticsDashboard';
-// import IndustryAnalyticsDashboard from '../IndustryAnalytics/IndustryAnalyticsDashboard';
-import IndustryAnalyticsDashboard from '../IndustryAnalytics/IndustryAnalyticsDashboard';
-// const IndustryAnalyticsDashboard = () => null;
-// Placeholder components for disabled complex imports
-// const IndustryAnalyticsDashboard = () => null;
-// const OfflineIndicator = () => null;
-// const PWAInstallPrompt = () => null;
-// const IndustryAnalyticsDashboard = () => null;
-// const OfflineIndicator = () => null;
-// const IndustryAnalyticsDashboard = () => null;
-// const OfflineIndicator = () => null;
-// const PWAInstallPrompt = () => null;
-// const IndustryAnalyticsDashboard = () => null;
-// const OfflineIndicator = () => null;
-// const PWAInstallPrompt = () => null;
-// const IndustryAnalyticsDashboard = () => null;
-// const OfflineIndicator = () => null;
-// const PWAInstallPrompt = () => null;
-// const PWAInstallPrompt = () => null;
-// Commented out placeholder now that components are imported
-// const OfflineIndicator = () => null;
-// const PWAInstallPrompt = () => null;
-// Commented out complex dashboard states for debugging
-// import OfflineIndicator from '../PWA/OfflineIndicator';
-// import PWAInstallPrompt from '../PWA/PWAInstallPrompt';
-// import RiskManagementDashboard from '../RiskManagement/RiskManagementDashboard';
-// const [isIndustryAnalyticsOpen, setIsIndustryAnalyticsOpen] = useState(false);
-// import OfflineIndicator from '../PWA/OfflineIndicator';
-// import PWAInstallPrompt from '../PWA/PWAInstallPrompt';
-// import RiskManagementDashboard from '../RiskManagement/RiskManagementDashboard';
-// const [isRiskManagementOpen, setIsRiskManagementOpen] = useState(false);
-// import OfflineIndicator from '../PWA/OfflineIndicator';
-// import PWAInstallPrompt from '../PWA/PWAInstallPrompt';
-// import OfflineIndicator from '../PWA/OfflineIndicator';
-// import PWAInstallPrompt from '../PWA/PWAInstallPrompt';
-// import RiskManagementDashboard from '../RiskManagement/RiskManagementDashboard';
-// import OfflineIndicator from '../PWA/OfflineIndicator';
-// import PWAInstallPrompt from '../PWA/PWAInstallPrompt';
-// import RiskManagementDashboard from '../RiskManagement/RiskManagementDashboard';
-// import OfflineIndicator from '../PWA/OfflineIndicator';
-// import PWAInstallPrompt from '../PWA/PWAInstallPrompt';
-// import RiskManagementDashboard from '../RiskManagement/RiskManagementDashboard';
-// import RiskManagementDashboard from '../RiskManagement/RiskManagementDashboard';
+const AIFinancialAssistant = lazy(() => import('../AIAssistant/AIFinancialAssistant'));
+const ExportPanel = lazy(() => import('../ExportPanel/ExportPanel'));
+// CLI is mounted globally in App
 import OfflineIndicator from '../PWA/OfflineIndicator';
 import PWAInstallPrompt from '../PWA/PWAInstallPrompt';
-import RiskManagementDashboard from '../RiskManagement/RiskManagementDashboard';
-
 import Header from './Header';
 
 const MainLayout = () => {
-  console.log('MainLayout component rendering...');
+  const location = useLocation();
+  const navigate = useNavigate();
   const [isAIAssistantOpen, setIsAIAssistantOpen] = useState(false);
   const [isExportPanelOpen, setIsExportPanelOpen] = useState(false);
-  const [isIndustryAnalyticsOpen, setIsIndustryAnalyticsOpen] = useState(false);
-// Commented out toggle functions for debugging
-// const toggleIndustryAnalytics = () => {
-//   setIsIndustryAnalyticsOpen(!isIndustryAnalyticsOpen);
-// };
-
-// const toggleRiskManagement = () => {
-//   setIsRiskManagementOpen(!isRiskManagementOpen);
-// };
-  const [isRiskManagementOpen, setIsRiskManagementOpen] = useState(false);
+  // CLI visibility is managed globally in App
 
   const toggleAIAssistant = () => {
     setIsAIAssistantOpen(!isAIAssistantOpen);
+  };
+
+  const toggleCLI = () => {
+    window.dispatchEvent(new Event('toggle-cli'));
   };
 
   const toggleExportPanel = () => {
     setIsExportPanelOpen(!isExportPanelOpen);
   };
 
-  const toggleIndustryAnalytics = () => {
-    setIsIndustryAnalyticsOpen(!isIndustryAnalyticsOpen);
-  };
-
-  const toggleRiskManagement = () => {
-    setIsRiskManagementOpen(!isRiskManagementOpen);
-  };
-
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Disabled complex PWA components for debugging */}
-      {/* <OfflineIndicator />
-      <PWAInstallPrompt /> */}
-      <Header />
-
-      <main className="flex-1">
-      {/* <OfflineIndicator /> */}
-      {/* <PWAInstallPrompt /> */}
-      {/* <OfflineIndicator /> */}
-      {/* <PWAInstallPrompt /> */}
-      {/* <OfflineIndicator /> */}
-      {/* <PWAInstallPrompt /> */}
-      {/* Disabled PWA Components */}
-      {/* <OfflineIndicator /> */}
-      {/* <PWAInstallPrompt /> */}
-        <Outlet />
+    <div className="min-h-screen bg-background text-foreground">
+            <Header />
+      <main className="flex-1 pt-[60px]" id="main-content" role="main" tabIndex="-1" aria-label="Main content">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          {import.meta.env.DEV && (
+            <div className="mb-4 rounded-md border border-dashed border-border bg-muted p-3 text-xs flex items-center justify-between" data-testid="dev-banner">
+              <span className="text-muted-foreground">Development build active</span>
+              <button
+                type="button"
+                onClick={() => navigate('/__dev/nav')}
+                className="px-2 py-1 rounded bg-primary text-primary-foreground hover:opacity-90"
+                aria-label="Open Dev Navigation (Alt+D)"
+                title="Open Dev Navigation (Alt+D)"
+              >
+                Open DevNav (Alt+D)
+              </button>
+            </div>
+          )}
+          {/* Route debugging hook for tests */}
+          <div data-testid="route-path" data-path={location.pathname} className="hidden" />
+          <Outlet />
+        </div>
       </main>
 
       {/* PWA Components */}
       <OfflineIndicator />
       <PWAInstallPrompt />
 
-      {/* Action Buttons */}
-      <div className="fixed bottom-6 right-6 z-50 flex flex-col space-y-3">
-        {/* Risk Management Button */}
-        <button
-          onClick={toggleRiskManagement}
-          className="bg-red-600 hover:bg-red-700 text-white p-4 rounded-full shadow-lg transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-red-300"
-          aria-label="Risk Management"
-          title="Risk Assessment & Management"
-        >
-          <Shield className="w-6 h-6" />
-        </button>
-
-        {/* Industry Analytics Button */}
-        <button
-          onClick={toggleIndustryAnalytics}
-          className="bg-purple-600 hover:bg-purple-700 text-white p-4 rounded-full shadow-lg transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-purple-300"
-          aria-label="Industry Analytics"
-          title="Industry-Specific Analytics"
-        >
-          <BarChart3 className="w-6 h-6" />
-        </button>
-
-        {/* Export Button */}
+      {/* Minimal Floating Actions */}
+      <div className="fixed bottom-6 right-6 z-50 flex flex-col space-y-2">
         <button
           onClick={toggleExportPanel}
-          className="bg-green-600 hover:bg-green-700 text-white p-4 rounded-full shadow-lg transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-green-300"
-          aria-label="Export Data"
-          title="Export Data"
+          className="bg-secondary text-secondary-foreground p-3 rounded-full shadow-elevation-2 hover:shadow-elevation-1 transition-smooth focus:outline-none focus:ring-2 focus:ring-primary"
+          aria-label="Export"
+          title="Export"
         >
-          <Download className="w-6 h-6" />
+          <Download className="w-5 h-5" />
         </button>
-
-        {/* AI Assistant Toggle Button */}
         <button
           onClick={toggleAIAssistant}
-          className="bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-lg transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-300"
-          aria-label="Toggle AI Assistant"
-          title="AI Financial Assistant"
+          className="bg-primary text-primary-foreground p-3 rounded-full shadow-elevation-2 hover:shadow-elevation-1 transition-smooth focus:outline-none focus:ring-2 focus:ring-primary"
+          aria-label="AI Assistant"
+          title="AI Assistant"
         >
-          <Bot className="w-6 h-6" />
+          <Bot className="w-5 h-5" />
+        </button>
+        <button
+          onClick={toggleCLI}
+          className="bg-foreground text-background p-3 rounded-full shadow-elevation-2 hover:shadow-elevation-1 transition-smooth focus:outline-none focus:ring-2 focus:ring-primary"
+          aria-label="CLI"
+          title="CLI"
+        >
+          <Command className="w-5 h-5" />
         </button>
       </div>
 
       {/* AI Assistant Component */}
-      <AIFinancialAssistant
-        isOpen={isAIAssistantOpen}
-        onToggle={toggleAIAssistant}
-        currentContext={{ page: 'main' }}
-      />
+      <Suspense fallback={null}>
+        <AIFinancialAssistant
+          isOpen={isAIAssistantOpen}
+          onToggle={toggleAIAssistant}
+          currentContext={{ page: 'main' }}
+        />
+      </Suspense>
 
       {/* Export Panel Component */}
-      <ExportPanel
-        isOpen={isExportPanelOpen}
-        onClose={toggleExportPanel}
-        data={{
+      <Suspense fallback={null}>
+        <ExportPanel
+          isOpen={isExportPanelOpen}
+          onClose={toggleExportPanel}
+          data={{
           // Sample data - in real usage this would come from current page/context
           summary: {
             totalAssets: 1000000,
@@ -182,67 +110,10 @@ const MainLayout = () => {
             { symbol: 'AAPL', shares: 100, price: 150.0, value: 15000.0 },
             { symbol: 'GOOGL', shares: 50, price: 2800.0, value: 140000.0 }
           ]
-        }}
-      />
-      {/* Disabled complex components for debugging */}
-      {/* <IndustryAnalyticsDashboard
-        isOpen={isIndustryAnalyticsOpen}
-        onClose={toggleIndustryAnalytics}
-      />
-
-      <RiskManagementDashboard
-        isOpen={isRiskManagementOpen}
-        onClose={toggleRiskManagement}
-        portfolioData={{
-          assets: [
-            { type: 'equity', value: 500000, riskRating: 'medium', sector: 'technology' },
-            { type: 'bond', value: 300000, riskRating: 'low', sector: 'government' },
-            { type: 'derivative', value: 100000, riskRating: 'high', sector: 'commodity' }
-          ],
-          liabilities: [
-            { type: 'debt', value: 200000, interestRate: 0.05, maturity: 5 },
-            { type: 'equity', value: 700000, dividend: 0.03 }
-          ],
-          marketConditions: {
-            volatility: 0.25,
-            interestRate: 0.045,
-            gdpGrowth: 0.025
-          }
-        }}
-      /> */}
-      {/* Disabled Industry Analytics Dashboard */}
-      {/* <IndustryAnalyticsDashboard
-        isOpen={isIndustryAnalyticsOpen}
-        onClose={toggleIndustryAnalytics}
-      {/* Disabled Risk Management Dashboard */}
-
-      {/* Industry Analytics Dashboard */}
-      <IndustryAnalyticsDashboard
-        isOpen={isIndustryAnalyticsOpen}
-        onClose={toggleIndustryAnalytics}
-      />
-
-      {/* Risk Management Dashboard */}
-      <RiskManagementDashboard
-        isOpen={isRiskManagementOpen}
-        onClose={toggleRiskManagement}
-        portfolioData={{
-          assets: [
-            { type: 'equity', value: 500000, riskRating: 'medium', sector: 'technology' },
-            { type: 'bond', value: 300000, riskRating: 'low', sector: 'government' },
-            { type: 'derivative', value: 100000, riskRating: 'high', sector: 'commodity' }
-          ],
-          liabilities: [
-            { type: 'debt', value: 200000, interestRate: 0.05, maturity: 5 },
-            { type: 'equity', value: 700000, dividend: 0.03 }
-          ],
-          marketConditions: {
-            volatility: 0.25,
-            interestRate: 0.045,
-            gdpGrowth: 0.025
-          }
-        }}
-      />
+          }}
+        />
+      </Suspense>
+      {/* CLI is mounted globally in App */}
     </div>
   );
 };

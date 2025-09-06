@@ -1,6 +1,6 @@
 import { Slot } from '@radix-ui/react-slot';
 import { cva } from 'class-variance-authority';
-import React, { forwardRef } from 'react';
+import React, { forwardRef, memo, useEffect } from 'react';
 
 import { cn } from '../../utils/cn';
 import Icon from '../AppIcon';
@@ -446,6 +446,21 @@ const Button = forwardRef(
 
     const accessibleLabel = getAccessibleLabel();
 
+    // Performance monitoring for button smoothness
+    useEffect(() => {
+      const renderStart = performance.now();
+
+      return () => {
+        const renderEnd = performance.now();
+        const renderDuration = renderEnd - renderStart;
+
+        // Log slow renders for performance debugging
+        if (renderDuration > 16) { // More than one frame at 60fps
+          console.warn(`Button render took ${renderDuration.toFixed(2)}ms - variant: ${variant}, size: ${size}`);
+        }
+      };
+    });
+
     return (
       <Comp
         className={cn(
@@ -508,4 +523,5 @@ const Button = forwardRef(
 
 Button.displayName = 'Button';
 
-export default Button;
+// Memoize the Button component to prevent unnecessary re-renders
+export default memo(Button);

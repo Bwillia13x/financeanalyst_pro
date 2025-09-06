@@ -1,0 +1,43 @@
+name: Perf Audit (with Backend)
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+  push:
+    branches: [ main ]
+
+jobs:
+  perf:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install deps (root)
+        run: npm ci
+
+      - name: Install deps (backend)
+        run: |
+          cd backend
+          npm ci || true
+
+      - name: Run CI Perf (backend + preview)
+        run: npm run ci:perf
+
+      - name: Upload perf results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lh-perf-results
+          path: |
+            perf-results.json
+            perf-results-*.json
+          retention-days: 14
+

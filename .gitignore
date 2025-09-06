@@ -28,3 +28,4 @@ bundle-report.json
 .env.*
 backend/.env
 backend/.env.*
+.vercel

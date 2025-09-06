@@ -15,15 +15,15 @@ const PrivateAnalysisMinimal = () => {
   console.log('Test message:', testMessage);
 
   return (
-    <div className="min-h-screen bg-slate-900">
+    <div className="min-h-screen bg-background text-foreground">
       <Header />
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold text-white mb-6">Private Analysis Test</h1>
-        <div className="bg-slate-800 rounded-lg p-6">
-          <p className="text-gray-300 mb-4">Active Tab: {activeTab}</p>
-          <p className="text-gray-300 mb-4">Test Message: {testMessage}</p>
+        <h1 className="text-3xl font-bold text-foreground mb-6">Private Analysis Test</h1>
+        <div className="bg-card rounded-lg p-6 border border-border">
+          <p className="text-foreground-secondary mb-4">Active Tab: {activeTab}</p>
+          <p className="text-foreground-secondary mb-4">Test Message: {testMessage}</p>
           <button
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+            className="bg-primary text-primary-foreground px-4 py-2 rounded hover:opacity-90 transition-smooth"
             onClick={() => setTestMessage('Button clicked! Basic functionality working.')}
           >
             Test Button

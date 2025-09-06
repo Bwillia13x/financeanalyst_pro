@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import { NumberInput, Card } from 'src/components/ui/UIHelpers.jsx';
+import PresetButton from '../ui/PresetButton';
 
 // Axis configuration for sensitivity analysis
 export const AxisPicker = ({ onAxisChange, currentConfig }) => {
@@ -51,7 +52,7 @@ export const AxisPicker = ({ onAxisChange, currentConfig }) => {
       <Card className="p-3">
         <button
           onClick={() => setIsExpanded(true)}
-          className="w-full text-left text-[13px] text-slate-600 hover:text-slate-800 transition-colors"
+          className="w-full text-left text-[13px] text-foreground-secondary hover:text-foreground transition-colors"
         >
           ⚙️ Customize Sensitivity Ranges
         </button>
@@ -62,10 +63,10 @@ export const AxisPicker = ({ onAxisChange, currentConfig }) => {
   return (
     <Card className="p-4 space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-[14px] font-semibold text-slate-800">Sensitivity Axis Configuration</h3>
+        <h3 className="text-[14px] font-semibold text-foreground">Sensitivity Axis Configuration</h3>
         <button
           onClick={() => setIsExpanded(false)}
-          className="text-[12px] text-slate-500 hover:text-slate-700"
+          className="text-[12px] text-foreground-secondary hover:text-foreground"
         >
           ✕
         </button>
@@ -73,23 +74,19 @@ export const AxisPicker = ({ onAxisChange, currentConfig }) => {
 
       {/* Quick Presets */}
       <div className="space-y-2">
-        <div className="text-[12px] font-medium text-slate-700">Quick Presets</div>
+        <div className="text-[12px] font-medium text-foreground">Quick Presets</div>
         <div className="flex gap-2">
           {Object.keys(presets).map(preset => (
-            <button
-              key={preset}
-              onClick={() => applyPreset(preset)}
-              className="px-3 py-1 text-[11px] font-medium bg-slate-100 hover:bg-slate-200 rounded-md transition-colors capitalize"
-            >
+            <PresetButton key={preset} onClick={() => applyPreset(preset)} size="sm">
               {preset}
-            </button>
+            </PresetButton>
           ))}
         </div>
       </div>
 
       {/* WACC Range */}
       <div className="space-y-2">
-        <div className="text-[12px] font-medium text-slate-700">WACC Range</div>
+        <div className="text-[12px] font-medium text-foreground">WACC Range</div>
         <div className="grid grid-cols-3 gap-2">
           <NumberInput
             label="Min"
@@ -126,7 +123,7 @@ export const AxisPicker = ({ onAxisChange, currentConfig }) => {
 
       {/* Growth Range */}
       <div className="space-y-2">
-        <div className="text-[12px] font-medium text-slate-700">Terminal Growth Range</div>
+        <div className="text-[12px] font-medium text-foreground">Terminal Growth Range</div>
         <div className="grid grid-cols-3 gap-2">
           <NumberInput
             label="Min"
@@ -163,7 +160,7 @@ export const AxisPicker = ({ onAxisChange, currentConfig }) => {
 
       {/* Exit Multiple Range */}
       <div className="space-y-2">
-        <div className="text-[12px] font-medium text-slate-700">Exit Multiple Range</div>
+        <div className="text-[12px] font-medium text-foreground">Exit Multiple Range</div>
         <div className="grid grid-cols-3 gap-2">
           <NumberInput
             label="Min"
@@ -199,8 +196,8 @@ export const AxisPicker = ({ onAxisChange, currentConfig }) => {
       </div>
 
       {/* Current Ranges Preview */}
-      <div className="pt-2 border-t border-slate-200">
-        <div className="text-[11px] text-slate-600 space-y-1">
+      <div className="pt-2 border-t border-border">
+        <div className="text-[11px] text-foreground-secondary space-y-1">
           <div>
             WACC: {(config.wacc.min * 100).toFixed(1)}% → {(config.wacc.max * 100).toFixed(1)}% (
             {config.wacc.steps} steps)

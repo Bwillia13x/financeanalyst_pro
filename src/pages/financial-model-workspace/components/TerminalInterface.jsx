@@ -189,17 +189,17 @@ const TerminalInterface = ({ onCommandExecute, calculationResults: _calculationR
   return (
     <div className="flex flex-col h-full bg-gray-900 text-green-400 font-mono text-sm">
       {/* Terminal Header */}
-      <div className="flex items-center justify-between px-4 py-2 bg-gray-800 border-b border-gray-700">
+      <div className="flex items-center justify-between px-4 py-2 bg-card border-b border-border">
         <div className="flex items-center space-x-2">
-          <Icon name="Terminal" size={16} className="text-green-400" />
-          <span className="text-green-400 font-medium">Financial Terminal</span>
-          <span className="text-xs text-blue-400">• Enhanced Command Suite</span>
+          <Icon name="Terminal" size={16} className="text-success" />
+          <span className="text-success font-medium">Financial Terminal</span>
+          <span className="text-xs text-accent">• Enhanced Command Suite</span>
         </div>
         <div className="flex items-center space-x-2">
           <div
-            className={`w-2 h-2 rounded-full ${isLoading ? 'bg-yellow-400 animate-pulse' : 'bg-green-400'}`}
+            className={`w-2 h-2 rounded-full ${isLoading ? 'bg-warning animate-pulse' : 'bg-success'}`}
           />
-          <span className="text-xs text-gray-400">{isLoading ? 'Processing...' : 'Connected'}</span>
+          <span className="text-xs text-foreground-secondary">{isLoading ? 'Processing...' : 'Connected'}</span>
         </div>
       </div>
 
@@ -221,28 +221,28 @@ const TerminalInterface = ({ onCommandExecute, calculationResults: _calculationR
           <div key={command.id} className="space-y-1">
             <div className="flex items-start space-x-2">
               {command.type === 'user' && (
-                <span className="text-blue-400 shrink-0">analyst@finpro:~$</span>
+                <span className="text-accent shrink-0">analyst@finpro:~$</span>
               )}
               {command.type === 'system' && (
-                <Icon name="Info" size={14} className="text-yellow-400 mt-0.5 shrink-0" />
+                <Icon name="Info" size={14} className="text-warning mt-0.5 shrink-0" />
               )}
               {command.type === 'success' && (
-                <Icon name="CheckCircle" size={14} className="text-green-400 mt-0.5 shrink-0" />
+                <Icon name="CheckCircle" size={14} className="text-success mt-0.5 shrink-0" />
               )}
               {command.type === 'error' && (
-                <Icon name="XCircle" size={14} className="text-red-400 mt-0.5 shrink-0" />
+                <Icon name="XCircle" size={14} className="text-destructive mt-0.5 shrink-0" />
               )}
               {command.type === 'warning' && (
-                <Icon name="AlertTriangle" size={14} className="text-yellow-400 mt-0.5 shrink-0" />
+                <Icon name="AlertTriangle" size={14} className="text-warning mt-0.5 shrink-0" />
               )}
               {command.type === 'info' && (
-                <Icon name="Info" size={14} className="text-blue-400 mt-0.5 shrink-0" />
+                <Icon name="Info" size={14} className="text-accent mt-0.5 shrink-0" />
               )}
               <div className="flex-1">
                 <pre className="whitespace-pre-wrap break-words">{command.content}</pre>
                 {command.data && (
-                  <div className="mt-2 p-2 bg-gray-800 rounded border border-gray-700">
-                    <div className="text-xs text-gray-400">
+                  <div className="mt-2 p-2 bg-muted rounded border border-border">
+                    <div className="text-xs text-foreground-secondary">
                       Real-time calculation data available • Analysis:{' '}
                       {command.data.analysis || 'financial'}
                     </div>
@@ -255,15 +255,15 @@ const TerminalInterface = ({ onCommandExecute, calculationResults: _calculationR
 
         {/* Loading indicator */}
         {isLoading && (
-          <div className="flex items-center space-x-2 text-yellow-400">
-            <div className="animate-spin w-4 h-4 border-2 border-yellow-400 border-t-transparent rounded-full" />
+          <div className="flex items-center space-x-2 text-warning">
+            <div className="animate-spin w-4 h-4 border-2 border-warning border-t-transparent rounded-full" />
             <span>Processing command...</span>
           </div>
         )}
 
         {/* Input Line */}
         <div className="flex items-center space-x-2 relative">
-          <span className="text-blue-400 shrink-0">analyst@finpro:~$</span>
+          <span className="text-accent shrink-0">analyst@finpro:~$</span>
           <div className="flex-1 relative">
             <input
               ref={inputRef}
@@ -279,14 +279,14 @@ const TerminalInterface = ({ onCommandExecute, calculationResults: _calculationR
 
             {/* Suggestions Dropdown */}
             {showSuggestions && (
-              <div className="absolute top-full left-0 right-0 mt-1 bg-gray-800 border border-gray-600 rounded-md shadow-lg z-10 max-h-48 overflow-y-auto">
+              <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-md shadow-lg z-10 max-h-48 overflow-y-auto">
                 {suggestions.map((suggestion, index) => (
                   <div
                     key={index}
                     className={`px-3 py-2 cursor-pointer text-sm ${
                       index === selectedSuggestion
-                        ? 'bg-gray-700 text-green-400'
-                        : 'text-gray-300 hover:bg-gray-700'
+                        ? 'bg-muted text-success'
+                        : 'text-foreground hover:bg-muted/80'
                     }`}
                     onClick={() => selectSuggestion(suggestion)}
                     role="button"

@@ -12,6 +12,7 @@ const VirtualizedTable = ({
   columns = [],
   height = 400,
   rowHeight = 48,
+  density = 'default', // 'default' | 'compact'
   className,
   onRowClick,
   onCellEdit,
@@ -36,6 +37,10 @@ const VirtualizedTable = ({
   const [editingCell, setEditingCell] = useState(null);
   const listRef = useRef();
   const headerRef = useRef();
+
+  const effectiveRowHeight = useMemo(() => {
+    return density === 'compact' ? Math.max(36, rowHeight - 12) : rowHeight;
+  }, [density, rowHeight]);
 
   // Memoized row data for performance
   const rowData = useMemo(
@@ -149,9 +154,9 @@ const VirtualizedTable = ({
         role="row"
         tabIndex={0}
         className={cn(
-          'flex items-center border-b border-slate-200 transition-colors',
-          isHovered && 'bg-slate-50',
-          isSelected && 'bg-blue-50 border-blue-200'
+          'flex items-center border-b border-border transition-colors',
+          isHovered && 'bg-muted/30',
+          isSelected && 'bg-primary/5 border-primary'
         )}
         onMouseEnter={() => setHoveredRowIndex(index)}
         onMouseLeave={() => setHoveredRowIndex(null)}
@@ -165,7 +170,7 @@ const VirtualizedTable = ({
               type="checkbox"
               checked={isSelected}
               onChange={e => onRowSelect?.(index, e.target.checked)}
-              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+              className="w-4 h-4 text-primary border-border rounded focus:ring-primary"
               aria-label={`Select row ${index + 1}`}
             />
           </div>
@@ -186,8 +191,8 @@ const VirtualizedTable = ({
                 'flex items-center px-4 py-2 text-sm truncate',
                 column.align === 'right' && 'justify-end text-right',
                 column.align === 'center' && 'justify-center text-center',
-                isEditable && 'cursor-pointer hover:bg-blue-50',
-                isEditing && 'bg-blue-100 border border-blue-300 rounded'
+                isEditable && 'cursor-pointer hover:bg-muted/50',
+                isEditing && 'bg-primary/10 border border-primary rounded'
               )}
               style={{
                 width: column.width || 'auto',
@@ -217,8 +222,8 @@ const VirtualizedTable = ({
                 <span
                   className={cn(
                     column.className,
-                    cellValue < 0 && column.key.includes('amount') && 'text-red-600',
-                    cellValue > 0 && column.key.includes('amount') && 'text-green-600'
+                    cellValue < 0 && column.key.includes('amount') && 'text-destructive',
+                    cellValue > 0 && column.key.includes('amount') && 'text-success'
                   )}
                 >
                   {displayValue}
@@ -239,12 +244,12 @@ const VirtualizedTable = ({
       {Array.from({ length: loadingRows }).map((_, index) => (
         <div
           key={`skeleton-${index}`}
-          className="flex items-center border-b border-slate-200"
-          style={{ height: rowHeight }}
+          className="flex items-center border-b border-border"
+          style={{ height: effectiveRowHeight }}
         >
           {selectable && (
             <div className="w-12 px-2">
-              <div className="w-4 h-4 bg-slate-200 rounded" />
+              <div className="w-4 h-4 bg-muted rounded" />
             </div>
           )}
           {columns.map((column, colIndex) => (
@@ -257,7 +262,7 @@ const VirtualizedTable = ({
                 maxWidth: column.maxWidth || 300
               }}
             >
-              <div className="h-4 bg-slate-200 rounded w-3/4" />
+              <div className="h-4 bg-muted rounded w-3/4" />
             </div>
           ))}
         </div>
@@ -270,10 +275,10 @@ const VirtualizedTable = ({
     <div
       ref={headerRef}
       className={cn(
-        'flex items-center bg-slate-50 border-b-2 border-slate-300 font-semibold text-sm text-slate-700',
+        'flex items-center bg-muted/40 border-b-2 border-border font-semibold text-sm text-foreground',
         stickyHeader && 'sticky top-0 z-10'
       )}
-      style={{ height: rowHeight }}
+      style={{ height: effectiveRowHeight }}
       role="row"
       aria-rowindex="1"
     >
@@ -286,7 +291,7 @@ const VirtualizedTable = ({
               const allIndices = data.map((_, index) => index);
               onRowSelect?.(allIndices, e.target.checked);
             }}
-            className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+            className="w-4 h-4 text-primary border-border rounded focus:ring-primary"
             aria-label="Select all rows"
           />
         </div>
@@ -296,7 +301,7 @@ const VirtualizedTable = ({
         <div
           key={column.key}
           className={cn(
-            'flex items-center px-4 py-2 cursor-pointer hover:bg-slate-100 transition-colors',
+            'flex items-center px-4 py-2 cursor-pointer hover:bg-muted transition-colors',
             column.align === 'right' && 'justify-end',
             column.align === 'center' && 'justify-center',
             sortable && 'select-none'
@@ -319,7 +324,7 @@ const VirtualizedTable = ({
         >
           <span>{column.header}</span>
           {sortable && sortConfig?.key === column.key && (
-            <span className="ml-1 text-blue-600">{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
+            <span className="ml-1 text-primary">{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
           )}
         </div>
       ))}
@@ -327,7 +332,7 @@ const VirtualizedTable = ({
   );
 
   return (
-    <div className={cn('border border-slate-200 rounded-lg overflow-hidden', className)}>
+    <div className={cn('border border-border rounded-lg overflow-hidden bg-card text-card-foreground', className)}>
       <TableHeader />
 
       <div
@@ -344,7 +349,7 @@ const VirtualizedTable = ({
             ref={listRef}
             height={height}
             itemCount={data.length}
-            itemSize={estimatedRowHeight || rowHeight}
+            itemSize={estimatedRowHeight || effectiveRowHeight}
             itemData={rowData}
             overscanCount={overscanCount}
             onScroll={onScroll}
@@ -355,7 +360,7 @@ const VirtualizedTable = ({
       </div>
 
       {!loading && data.length === 0 && (
-        <div className="flex items-center justify-center py-12 text-slate-500">
+        <div className="flex items-center justify-center py-12 text-muted-foreground">
           <div className="text-center">
             <div className="text-2xl mb-2">📊</div>
             <div className="font-medium">No data available</div>

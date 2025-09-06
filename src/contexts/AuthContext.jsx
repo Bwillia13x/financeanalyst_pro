@@ -44,36 +44,25 @@ export const AuthProvider = ({ children }) => {
   };
 
   const setupAxiosInterceptors = () => {
-    // Request interceptor to add auth token
-    secureApiClient.interceptors.request.use(
-      (config) => {
-        const token = localStorage.getItem('accessToken');
-        if (token) {
-          config.headers.Authorization = `Bearer ${token}`;
-        }
-        return config;
-      },
-      (error) => Promise.reject(error)
-    );
+    // secureApiClient already attaches tokens via its own interceptors.
+    // For compatibility, if the underlying axios instance is available, add a 401 refresh handler.
+    const axiosInstance = secureApiClient?.client;
+    if (!axiosInstance?.interceptors) return;
 
-    // Response interceptor to handle token refresh
-    secureApiClient.interceptors.response.use(
+    axiosInstance.interceptors.response.use(
       (response) => response,
       async (error) => {
         if (error.response?.status === 401 && !error.config._retry) {
           error.config._retry = true;
-
           try {
             const refreshToken = localStorage.getItem('refreshToken');
             if (refreshToken) {
-              const response = await secureApiClient.post('/auth/refresh', {
-                refreshToken
-              });
-
+              const response = await secureApiClient.post('/auth/refresh', { refreshToken });
               if (response.data.success) {
                 localStorage.setItem('accessToken', response.data.accessToken);
+                error.config.headers = error.config.headers || {};
                 error.config.headers.Authorization = `Bearer ${response.data.accessToken}`;
-                return secureApiClient.request(error.config);
+                return axiosInstance.request(error.config);
               }
             }
           } catch (refreshError) {
@@ -82,7 +71,6 @@ export const AuthProvider = ({ children }) => {
             return Promise.reject(refreshError);
           }
         }
-
         return Promise.reject(error);
       }
     );
@@ -157,9 +145,7 @@ export const AuthProvider = ({ children }) => {
       setUser(null);
       setIsAuthenticated(false);
 
-      // Clear axios interceptors
-      secureApiClient.interceptors.request.clear();
-      secureApiClient.interceptors.response.clear();
+      // Interceptors are attached to internal axios; no need to clear
     }
   };
 

@@ -249,12 +249,12 @@ class PerformanceTestingService {
     this.runningTests.add(name);
 
     try {
-      const startTime = performance.now();
+      const startTime = (performance && performance.now) ? performance.now() : Date.now();
 
       // Run the benchmark function
       const result = await this.executeBenchmarkWithTimeout(benchmark);
 
-      const endTime = performance.now();
+      const endTime = (performance && performance.now) ? performance.now() : Date.now();
       const executionTime = endTime - startTime;
 
       const benchmarkResult = {

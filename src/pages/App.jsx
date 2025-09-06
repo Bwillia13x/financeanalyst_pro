@@ -50,19 +50,19 @@ const App = () => {
   // Minimal render path for audit mode to reduce TBT
   if (isAudit) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-background">
         <Header />
         <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <h1 className="text-3xl font-bold text-gray-900 mb-3">FinanceAnalyst Pro</h1>
-          <p className="text-gray-600 mb-6">
+          <h1 className="text-3xl font-bold text-foreground mb-3">FinanceAnalyst Pro</h1>
+          <p className="text-foreground-secondary mb-6">
             Audit mode active. UI minimized to ensure stable, low TBT measurements.
           </p>
           <div className="grid grid-cols-1 gap-4">
             <Card className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="font-semibold text-gray-900">Getting Started</h2>
-                  <p className="text-sm text-gray-600">
+                  <h2 className="font-semibold text-foreground">Getting Started</h2>
+                  <p className="text-sm text-foreground-secondary">
                     Use the command palette to navigate quickly
                   </p>
                 </div>
@@ -83,7 +83,7 @@ const App = () => {
       title: 'New DCF Model',
       description: 'Start a discounted cash flow analysis',
       icon: Calculator,
-      color: 'bg-blue-500',
+      color: 'bg-primary',
       action: () => navigate('/models?type=dcf')
     },
     {
@@ -91,7 +91,7 @@ const App = () => {
       title: 'Portfolio Overview',
       description: 'View your portfolio performance',
       icon: PieChart,
-      color: 'bg-green-500',
+      color: 'bg-success',
       action: () => navigate('/portfolio')
     },
     {
@@ -99,7 +99,7 @@ const App = () => {
       title: 'Live Market Data',
       description: 'Access real-time market information',
       icon: TrendingUp,
-      color: 'bg-purple-500',
+      color: 'bg-accent',
       action: () => navigate('/real-time-market-data-center')
     },
     {
@@ -107,7 +107,7 @@ const App = () => {
       title: 'Data Sources',
       description: 'Manage your data connections',
       icon: Database,
-      color: 'bg-orange-500',
+      color: 'bg-warning',
       action: () => navigate('/data')
     }
   ];
@@ -173,7 +173,7 @@ const App = () => {
   // Local keyboard handler removed; global Cmd/Ctrl+K handled by KeyboardShortcutsProvider
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <Header />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -188,8 +188,8 @@ const App = () => {
         >
           {/* Header Section */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Financial Analysis Platform</h1>
-            <p className="text-gray-600">
+            <h1 className="text-3xl font-bold text-foreground mb-2">Financial Analysis Platform</h1>
+            <p className="text-foreground-secondary">
               Professional-grade tools for comprehensive financial analysis and portfolio management
             </p>
           </div>
@@ -197,16 +197,16 @@ const App = () => {
           {/* Command Palette Trigger */}
           <div className="mb-8">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground-tertiary w-5 h-5" />
               <input
                 type="text"
                 placeholder="Search models, portfolios, or use Cmd+K for command palette..."
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 onClick={() => showCommandPalette()}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-accent focus:border-transparent"
               />
-              <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-1 text-gray-400">
+              <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-1 text-foreground-tertiary">
                 <Command className="w-4 h-4" />
                 <span className="text-sm">K</span>
               </div>
@@ -215,7 +215,7 @@ const App = () => {
 
           {/* Quick Actions */}
           <div className="mb-8">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Quick Actions</h2>
+            <h2 className="text-xl font-semibold text-foreground mb-4">Quick Actions</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {quickActions.map(action =>
                 isAudit ? (
@@ -247,10 +247,10 @@ const App = () => {
                           <action.icon className="w-5 h-5 text-white" />
                         </div>
                         <div className="flex-1">
-                          <h3 className="font-medium text-gray-900">{action.title}</h3>
-                          <p className="text-sm text-gray-600">{action.description}</p>
+                          <h3 className="font-medium text-foreground">{action.title}</h3>
+                          <p className="text-sm text-foreground-secondary">{action.description}</p>
                         </div>
-                        <ChevronRight className="w-4 h-4 text-gray-400" />
+                        <ChevronRight className="w-4 h-4 text-foreground-tertiary" />
                       </div>
                     </Card>
                   </motion.div>
@@ -262,7 +262,7 @@ const App = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Main Platforms */}
             <div className="lg:col-span-2">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">Platforms</h2>
+              <h2 className="text-xl font-semibold text-foreground mb-4">Platforms</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {platforms.map(platform =>
                   isAudit ? (
@@ -272,16 +272,16 @@ const App = () => {
                           className={`p-6 transition-all duration-200 hover:shadow-lg ${platform.color}`}
                         >
                           <div className="flex items-center justify-between mb-3">
-                            <platform.icon className="w-8 h-8 text-gray-700" />
-                            <span className="text-xs font-medium text-gray-600 bg-white px-2 py-1 rounded-full">
+                            <platform.icon className="w-8 h-8 text-foreground" />
+                            <span className="text-xs font-medium text-foreground-secondary bg-card px-2 py-1 rounded-full">
                               {platform.stats}
                             </span>
                           </div>
-                          <h3 className="font-semibold text-gray-900 mb-2">{platform.title}</h3>
-                          <p className="text-sm text-gray-600 mb-4">{platform.description}</p>
-                          <div className="flex items-center text-sm font-medium text-gray-700">
+                          <h3 className="font-semibold text-foreground mb-2">{platform.title}</h3>
+                          <p className="text-sm text-foreground-secondary mb-4">{platform.description}</p>
+                          <div className="flex items-center text-sm font-medium text-foreground">
                             <span>Open Platform</span>
-                            <ChevronRight className="w-4 h-4 ml-1" />
+                            <ChevronRight className="w-4 h-4 ml-1 text-foreground-tertiary" />
                           </div>
                         </Card>
                       </Link>
@@ -320,17 +320,17 @@ const App = () => {
             <div className="space-y-6">
               {/* Recent Activity */}
               <Card className="p-6">
-                <h3 className="font-semibold text-gray-900 mb-4 flex items-center">
+                <h3 className="font-semibold text-foreground mb-4 flex items-center">
                   <Clock className="w-5 h-5 mr-2" />
                   Recent Activity
                 </h3>
                 <div className="space-y-3">
                   {recentActivity.map(item => (
                     <div key={item.id} className="flex items-center space-x-3 py-2">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full" />
+                      <div className="w-2 h-2 bg-accent rounded-full" />
                       <div className="flex-1">
-                        <p className="text-sm font-medium text-gray-900">{item.title}</p>
-                        <p className="text-xs text-gray-600">{item.time}</p>
+                        <p className="text-sm font-medium text-foreground">{item.title}</p>
+                        <p className="text-xs text-foreground-secondary">{item.time}</p>
                       </div>
                     </div>
                   ))}
@@ -342,47 +342,47 @@ const App = () => {
 
               {/* Favorites */}
               <Card className="p-6">
-                <h3 className="font-semibold text-gray-900 mb-4 flex items-center">
+                <h3 className="font-semibold text-foreground mb-4 flex items-center">
                   <Star className="w-5 h-5 mr-2" />
                   Favorites
                 </h3>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-700">AAPL DCF Model</span>
-                    <ChevronRight className="w-4 h-4 text-gray-400" />
+                    <span className="text-sm text-foreground">AAPL DCF Model</span>
+                    <ChevronRight className="w-4 h-4 text-foreground-tertiary" />
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-700">Growth Portfolio</span>
-                    <ChevronRight className="w-4 h-4 text-gray-400" />
+                    <span className="text-sm text-foreground">Growth Portfolio</span>
+                    <ChevronRight className="w-4 h-4 text-foreground-tertiary" />
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-700">Tech Comps</span>
-                    <ChevronRight className="w-4 h-4 text-gray-400" />
+                    <span className="text-sm text-foreground">Tech Comps</span>
+                    <ChevronRight className="w-4 h-4 text-foreground-tertiary" />
                   </div>
                 </div>
               </Card>
 
               {/* Quick Stats */}
               <Card className="p-6">
-                <h3 className="font-semibold text-gray-900 mb-4 flex items-center">
+                <h3 className="font-semibold text-foreground mb-4 flex items-center">
                   <Zap className="w-5 h-5 mr-2" />
                   Quick Stats
                 </h3>
                 <div className="space-y-3">
                   <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Active Models</span>
+                    <span className="text-sm text-foreground-secondary">Active Models</span>
                     <span className="text-sm font-medium">12</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Portfolio Value</span>
-                    <span className="text-sm font-medium text-green-600">$125,430</span>
+                    <span className="text-sm text-foreground-secondary">Portfolio Value</span>
+                    <span className="text-sm font-medium text-success">$125,430</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Data Sources</span>
+                    <span className="text-sm text-foreground-secondary">Data Sources</span>
                     <span className="text-sm font-medium">5 Connected</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Last Sync</span>
+                    <span className="text-sm text-foreground-secondary">Last Sync</span>
                     <span className="text-sm font-medium">2 min ago</span>
                   </div>
                 </div>

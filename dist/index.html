@@ -3,15 +3,15 @@
 
 <head>
   <meta charset="utf-8" />
-  <title>financeanalyst-pro</title>
+  <title>Valor-IVX</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#0f172a" />
   <meta name="msapplication-TileColor" content="#0f172a" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="FinancePro" />
+  <meta name="apple-mobile-web-app-title" content="Valor-IVX" />
   <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="application-name" content="FinanceAnalyst Pro" />
+  <meta name="application-name" content="Valor-IVX" />
 
   <!-- PWA Description -->
   <meta name="description" content="Advanced financial modeling and analysis platform with real-time data integration" />
@@ -37,10 +37,7 @@
   <meta name="msapplication-TileImage" content="/favicon.ico" />
   
   <!-- Performance optimizations -->
-  <link rel="dns-prefetch" href="//fonts.googleapis.com">
-  <link rel="dns-prefetch" href="//fonts.gstatic.com">
-  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Removed external font preconnects; using self-hosted/system fonts -->
   
 <!-- DISABLED RESOURCE PRELOADS FOR DEBUGGING -->
   <!-- Preload critical CSS -->
@@ -54,49 +51,50 @@
 <link rel="dns-prefetch" href="//fonts.gstatic.com">
 <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> -->
-  <script>
-<!-- Disabled icon preloads for debugging -->
-<!-- <link rel="preload" href="/assets/images/favicon.svg" as="image" type="image/svg+xml">
-<link rel="preload" href="/assets/images/apple-touch-icon.svg" as="image" type="image/svg+xml"> -->
-    // Only load modulepreloads in production, skip in dev to avoid stale filename issues
-    if (window.location.hostname !== 'localhost' && window.location.protocol === 'https:') {
-      const chunks = ['react-core-Dcw16QML.js', 'state-vendor-DoYcEyXC.js', 'utils-vendor-DUg4_aAP.js', 'react-router-8B5hvpKv.js'];
-      chunks.forEach(chunk => {
-        const link = document.createElement('link');
-<!-- Disabled resource hints for debugging -->
-<!-- <link rel="dns-prefetch" href="//query1.finance.yahoo.com">
-<link rel="preconnect" href="https://query1.finance.yahoo.com" crossorigin>
-<link rel="dns-prefetch" href="//www.alphavantage.co">
-<link rel="preconnect" href="https://www.alphavantage.co" crossorigin> -->
-        link.rel = 'modulepreload';
-        link.href = `/assets/${chunk}`;
-        document.head.appendChild(link);
-      });
-    }
-  </script>
-
-  <!-- Preload critical resources -->
-  <link rel="preload" href="/assets/images/favicon.svg" as="image" type="image/svg+xml">
-  <link rel="preload" href="/assets/images/apple-touch-icon.svg" as="image" type="image/svg+xml">
+  
+  
+  <!-- Preload critical resources only when needed -->
+  <!-- Removed preload for favicon.svg and apple-touch-icon.svg as they cause warnings when not used immediately -->
+  <!-- Optional: Dev modulepreload for entry (Vite resolves in dev). In prod, Vite injects hashed assets. -->
+  <link rel="modulepreload" href="/assets/index-Be5ScHiE.jsx" />
 
   <!-- Resource hints for external services -->
   <link rel="dns-prefetch" href="//query1.finance.yahoo.com">
   <link rel="preconnect" href="https://query1.finance.yahoo.com" crossorigin>
   <link rel="dns-prefetch" href="//www.alphavantage.co">
   <link rel="preconnect" href="https://www.alphavantage.co" crossorigin>
-  <script type="module" crossorigin src="/assets/main-DV2WgFyj.js"></script>
-  <link rel="modulepreload" crossorigin href="/assets/react-core-DhDTUKUi.js">
-  <link rel="modulepreload" crossorigin href="/assets/ui-vendor-KpsiAJ0R.js">
-  <link rel="modulepreload" crossorigin href="/assets/vendor-DyOgp-IL.js">
-  <link rel="modulepreload" crossorigin href="/assets/react-dom-BkkMqq3R.js">
-  <link rel="modulepreload" crossorigin href="/assets/data-vendor-vzM7rUwp.js">
+  <script type="module" crossorigin src="/assets/main-CjGWiZeP.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/react-core-C8Yx0pOa.js">
+  <link rel="modulepreload" crossorigin href="/assets/ui-vendor-BmK4WDUb.js">
+  <link rel="modulepreload" crossorigin href="/assets/icons-vendor-cKgDTjas.js">
+  <link rel="modulepreload" crossorigin href="/assets/vendor-decimal.js-light-050swP3P.js">
   <link rel="modulepreload" crossorigin href="/assets/utils-vendor-DUg4_aAP.js">
-  <link rel="modulepreload" crossorigin href="/assets/d3-vendor-CNs8vvNs.js">
-  <link rel="modulepreload" crossorigin href="/assets/recharts-vendor-ChIrd679.js">
-  <link rel="modulepreload" crossorigin href="/assets/react-router-BrE769RO.js">
-  <link rel="modulepreload" crossorigin href="/assets/advanced-analytics-Tk579G3-.js">
-  <link rel="modulepreload" crossorigin href="/assets/export-vendor-vun1-c2j.js">
-  <link rel="modulepreload" crossorigin href="/assets/ai-vendor-Brw4xCnn.js">
+  <link rel="modulepreload" crossorigin href="/assets/vendor-lodash-BNFei-6h.js">
+  <link rel="modulepreload" crossorigin href="/assets/vendor-internmap-DimpeM8k.js">
+  <link rel="modulepreload" crossorigin href="/assets/d3-vendor-Cu4u7Qw6.js">
+  <link rel="modulepreload" crossorigin href="/assets/vendor-tiny-invariant-BM5KeS_Z.js">
+  <link rel="modulepreload" crossorigin href="/assets/vendor-prop-types-BRyfW_6h.js">
+  <link rel="modulepreload" crossorigin href="/assets/vendor-fast-equals-D9U4CsAR.js">
+  <link rel="modulepreload" crossorigin href="/assets/vendor-react-smooth-Dx0AnP6L.js">
+  <link rel="modulepreload" crossorigin href="/assets/vendor-eventemitter3-BmfEc9qQ.js">
+  <link rel="modulepreload" crossorigin href="/assets/vendor-radix-ui-react-compose-refs-C-iufcVO.js">
+  <link rel="modulepreload" crossorigin href="/assets/vendor-radix-ui-react-slot-CokmE4F9.js">
+  <link rel="modulepreload" crossorigin href="/assets/vendor-scheduler-CuPG8W_I.js">
+  <link rel="modulepreload" crossorigin href="/assets/react-dom-C_f9cqFS.js">
+  <link rel="modulepreload" crossorigin href="/assets/vendor-remix-run-router-B8oFyzwi.js">
+  <link rel="modulepreload" crossorigin href="/assets/react-router-C3c4x3zB.js">
+  <link rel="modulepreload" crossorigin href="/assets/recharts-vendor-DR55hbuE.js">
+  <link rel="modulepreload" crossorigin href="/assets/advanced-analytics-CwBzev3k.js">
+  <link rel="modulepreload" crossorigin href="/assets/ai-vendor-Slk96QdN.js">
+  <link rel="modulepreload" crossorigin href="/assets/vendor-core-js-Y8mvYuo_.js">
+  <link rel="modulepreload" crossorigin href="/assets/vendor-regenerator-runtime-QdkxXT86.js">
+  <link rel="modulepreload" crossorigin href="/assets/vendor-react-fast-compare-CYN3HuxQ.js">
+  <link rel="modulepreload" crossorigin href="/assets/vendor-invariant-mVuqF2Px.js">
+  <link rel="modulepreload" crossorigin href="/assets/vendor-shallowequal-Doanbvvk.js">
+  <link rel="modulepreload" crossorigin href="/assets/vendor-react-helmet-async-IAv-ErXI.js">
+  <link rel="modulepreload" crossorigin href="/assets/data-vendor-CqFk6EzU.js">
+  <link rel="modulepreload" crossorigin href="/assets/vendor-web-vitals-ZtyzoSdK.js">
+  <link rel="stylesheet" crossorigin href="/assets/main-BVBVazpm.css">
 </head>
 
 <body>
@@ -105,7 +103,7 @@
     <!-- Inline preloader for immediate First Contentful Paint -->
     <div id="app-preloader" class="app-preloader">
       <div class="app-preloader-spinner"></div>
-      <p class="app-preloader-title">Loading FinanceAnalyst Pro...</p>
+      <p class="app-preloader-title">Loading Valor-IVX...</p>
       <p class="app-preloader-subtitle">Professional Financial Modeling Platform</p>
     </div>
     <script>
@@ -158,7 +156,7 @@
               '<div class="min-h-screen bg-gray-50">\
                 <header class="border-b bg-white">\
                   <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center">\
-                    <h1 class="text-lg font-semibold text-gray-900">FinanceAnalyst Pro</h1>\
+                    <h1 class="text-lg font-semibold text-gray-900">Valor-IVX</h1>\
                     <span class="ml-2 text-xs text-gray-500">(Audit Mode)</span>\
                   </div>\
                 </header>\
@@ -177,19 +175,6 @@
                     </div>\
                   </div>\
                 </main>\
-<!-- Test script to validate JavaScript loading -->
-<script>
-  console.log('✅ JAVASCRIPT LOADING VALIDATION: Page loaded successfully');
-  console.log('📍 Location:', window.location.href);
-  console.log('🕒 Timestamp:', new Date().toISOString());
-
-  // Test if our debug logs from index.jsx would show
-  const testLog = localStorage.getItem('js_loaded');
-  if (!testLog) {
-    localStorage.setItem('js_loaded', 'true');
-    console.log('🔧 FRESCOCTIC JS MODULE LOADING TEST PASSED');
-  }
-</script>
               </div>'
             );
           }

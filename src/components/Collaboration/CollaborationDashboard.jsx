@@ -1,31 +1,11 @@
-import {
-  Users,
-  Plus,
-  Search,
-  Filter,
-  Settings,
-  Share,
-  Clock,
-  UserPlus,
-  FileText,
-  GitBranch,
-  Eye,
-  Edit,
-  Trash2,
-  MoreVertical,
-  Activity,
-  Calendar,
-  BarChart3,
-  UserCheck,
-  UserX
-} from 'lucide-react';
+import { Users, Plus, Search, Settings, UserPlus, GitBranch, Edit, Activity, UserX } from 'lucide-react';
 import React, { useState, useEffect, useMemo } from 'react';
 
 import collaborationService from '../../services/collaboration/collaborationService';
 
 const CollaborationDashboard = ({
   userId,
-  userInfo = {},
+  userInfo: _userInfo = {},
   onWorkspaceSelect,
   onCreateWorkspace,
   className = ''
@@ -155,39 +135,34 @@ const CollaborationDashboard = ({
     });
   };
 
-  const getUserRole = userId => {
-    const member = workspaceUsers.find(u => u.userId === userId);
-    return member?.role || 'Unknown';
-  };
-
   const getActivityIcon = eventType => {
     switch (eventType) {
       case 'user_joined_workspace':
-        return <UserPlus className="w-4 h-4 text-green-400" />;
+        return <UserPlus className="w-4 h-4 text-success" />;
       case 'user_left_workspace':
-        return <UserX className="w-4 h-4 text-red-400" />;
+        return <UserX className="w-4 h-4 text-destructive" />;
       case 'document_edited':
-        return <Edit className="w-4 h-4 text-blue-400" />;
+        return <Edit className="w-4 h-4 text-accent" />;
       case 'version_created':
-        return <GitBranch className="w-4 h-4 text-purple-400" />;
+        return <GitBranch className="w-4 h-4 text-accent" />;
       case 'workspace_created':
-        return <Plus className="w-4 h-4 text-green-400" />;
+        return <Plus className="w-4 h-4 text-success" />;
       default:
-        return <Activity className="w-4 h-4 text-gray-400" />;
+        return <Activity className="w-4 h-4 text-foreground-secondary" />;
     }
   };
 
   return (
-    <div className={`bg-slate-800 rounded-lg overflow-hidden ${className}`}>
+    <div className={`bg-card border border-border rounded-lg overflow-hidden ${className}`}>
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-slate-700">
+      <div className="flex items-center justify-between p-4 border-b border-border">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-blue-500/20 rounded-lg">
-            <Users className="w-5 h-5 text-blue-400" />
+          <div className="p-2 bg-accent/10 rounded-lg">
+            <Users className="w-5 h-5 text-accent" />
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-white">Collaboration</h3>
-            <p className="text-xs text-slate-400">
+            <h3 className="text-lg font-semibold text-foreground">Collaboration</h3>
+            <p className="text-xs text-foreground-secondary">
               {workspaceStats.total} workspaces • {workspaceStats.active} active
             </p>
           </div>
@@ -196,7 +171,7 @@ const CollaborationDashboard = ({
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowCreateModal(true)}
-            className="flex items-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
+            className="flex items-center gap-2 px-3 py-2 bg-accent text-accent-foreground text-sm font-medium rounded-lg transition-colors hover:opacity-90"
           >
             <Plus className="w-4 h-4" />
             New Workspace
@@ -205,23 +180,23 @@ const CollaborationDashboard = ({
       </div>
 
       {/* Search and Filters */}
-      <div className="p-4 border-b border-slate-700">
+      <div className="p-4 border-b border-border">
         <div className="flex items-center gap-4">
           <div className="flex-1 relative">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" />
+            <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground-secondary" />
             <input
               type="text"
               placeholder="Search workspaces..."
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full pl-10 pr-4 py-2 bg-muted border border-border rounded-lg text-foreground text-sm placeholder-foreground-secondary focus:outline-none focus:ring-2 focus:ring-ring"
             />
           </div>
 
           <select
             value={filter}
             onChange={e => setFilter(e.target.value)}
-            className="px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-3 py-2 bg-muted border border-border rounded-lg text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring"
           >
             <option value="all">All Workspaces</option>
             <option value="owned">My Workspaces</option>
@@ -234,12 +209,12 @@ const CollaborationDashboard = ({
       {/* Main Content */}
       <div className="flex h-96">
         {/* Workspaces List */}
-        <div className="w-1/3 border-r border-slate-700 p-4">
-          <h4 className="text-white font-medium mb-4">Workspaces</h4>
+        <div className="w-1/3 border-r border-border p-4">
+          <h4 className="text-foreground font-medium mb-4">Workspaces</h4>
 
           {loading ? (
             <div className="flex items-center justify-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent" />
             </div>
           ) : (
             <div className="space-y-2">
@@ -247,39 +222,48 @@ const CollaborationDashboard = ({
                 <div
                   key={workspace.id}
                   onClick={() => handleWorkspaceSelect(workspace)}
-                  className={`p-3 rounded-lg cursor-pointer transition-colors ${
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleWorkspaceSelect(workspace);
+                    }
+                  }}
+                  aria-label={`Open workspace ${workspace.name}`}
+                  className={`p-3 rounded-lg cursor-pointer transition-colors border ${
                     activeWorkspace?.id === workspace.id
-                      ? 'bg-blue-600/20 border border-blue-500/50'
-                      : 'bg-slate-700/50 hover:bg-slate-700'
+                      ? 'bg-accent/10 border-accent/30'
+                      : 'bg-muted hover:bg-muted/80 border-transparent'
                   }`}
                 >
                   <div className="flex items-center justify-between mb-2">
-                    <h5 className="text-white font-medium truncate">{workspace.name}</h5>
+                    <h5 className="text-foreground font-medium truncate">{workspace.name}</h5>
                     <div className="flex items-center gap-1">
                       {workspace.activeSessions.size > 0 && (
-                        <div className="w-2 h-2 bg-green-400 rounded-full" />
+                        <div className="w-2 h-2 bg-success rounded-full" />
                       )}
                       {workspace.ownerId === userId && (
-                        <span className="px-1.5 py-0.5 bg-blue-500/20 text-blue-300 text-xs rounded">
+                        <span className="px-1.5 py-0.5 bg-accent/10 text-accent text-xs rounded">
                           Owner
                         </span>
                       )}
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between text-xs text-slate-400">
+                  <div className="flex items-center justify-between text-xs text-foreground-secondary">
                     <span>{workspace.members.length} members</span>
                     <span>{workspace.documentCount} documents</span>
                   </div>
 
-                  <div className="text-xs text-slate-500 mt-1">
+                  <div className="text-xs text-foreground-secondary mt-1">
                     Updated {formatDate(workspace.updatedAt)}
                   </div>
                 </div>
               ))}
 
               {filteredWorkspaces.length === 0 && (
-                <div className="text-center py-8 text-slate-400">
+                <div className="text-center py-8 text-foreground-secondary">
                   {searchTerm || filter !== 'all'
                     ? 'No workspaces match your search'
                     : 'No workspaces yet. Create your first workspace!'}
@@ -296,8 +280,8 @@ const CollaborationDashboard = ({
               {/* Workspace Header */}
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="text-xl font-semibold text-white">{activeWorkspace.name}</h4>
-                  <p className="text-sm text-slate-400">
+                  <h4 className="text-xl font-semibold text-foreground">{activeWorkspace.name}</h4>
+                  <p className="text-sm text-foreground-secondary">
                     {workspaceUsers.length} members • {activeWorkspace.documentCount} documents
                   </p>
                 </div>
@@ -307,7 +291,7 @@ const CollaborationDashboard = ({
                     <>
                       <button
                         onClick={() => setShowInviteModal(true)}
-                        className="flex items-center gap-2 px-3 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors"
+                        className="flex items-center gap-2 px-3 py-2 bg-success text-success-foreground text-sm font-medium rounded-lg transition-colors hover:opacity-90"
                       >
                         <UserPlus className="w-4 h-4" />
                         Invite
@@ -315,7 +299,7 @@ const CollaborationDashboard = ({
 
                       <button
                         onClick={() => setShowSettingsModal(true)}
-                        className="p-2 text-slate-400 hover:text-white hover:bg-slate-700 rounded-lg transition-colors"
+                        className="p-2 text-foreground-secondary hover:text-foreground hover:bg-muted rounded-lg transition-colors"
                         aria-label="Workspace settings"
                       >
                         <Settings className="w-4 h-4" />
@@ -326,29 +310,27 @@ const CollaborationDashboard = ({
               </div>
 
               {/* Members List */}
-              <div className="bg-slate-700/50 rounded-lg p-4">
-                <h5 className="text-white font-medium mb-4">Members</h5>
+              <div className="bg-muted rounded-lg p-4">
+                <h5 className="text-foreground font-medium mb-4">Members</h5>
 
                 <div className="space-y-3">
                   {workspaceUsers.map(member => (
                     <div key={member.userId} className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-slate-600 rounded-full flex items-center justify-center">
-                          <span className="text-white text-sm font-medium">
+                        <div className="w-8 h-8 bg-muted rounded-full flex items-center justify-center">
+                          <span className="text-foreground text-sm font-medium">
                             {member.userId.charAt(0).toUpperCase()}
                           </span>
                         </div>
                         <div>
-                          <div className="text-white font-medium">{member.userId}</div>
-                          <div className="text-xs text-slate-400 capitalize">{member.role}</div>
+                          <div className="text-foreground font-medium">{member.userId}</div>
+                          <div className="text-xs text-foreground-secondary capitalize">{member.role}</div>
                         </div>
                       </div>
 
                       <div className="flex items-center gap-2">
-                        {member.isOnline && (
-                          <div className="w-2 h-2 bg-green-400 rounded-full" />
-                        )}
-                        <span className="text-xs text-slate-400">
+                        {member.isOnline && <div className="w-2 h-2 bg-success rounded-full" />}
+                        <span className="text-xs text-foreground-secondary">
                           Joined {formatDate(member.joinedAt)}
                         </span>
                       </div>
@@ -358,18 +340,18 @@ const CollaborationDashboard = ({
               </div>
 
               {/* Activity Feed */}
-              <div className="bg-slate-700/50 rounded-lg p-4">
-                <h5 className="text-white font-medium mb-4">Recent Activity</h5>
+              <div className="bg-muted rounded-lg p-4">
+                <h5 className="text-foreground font-medium mb-4">Recent Activity</h5>
 
                 <div className="space-y-3 max-h-64 overflow-y-auto">
                   {auditLog.slice(0, 20).map(entry => (
                     <div key={entry.id} className="flex items-start gap-3">
                       {getActivityIcon(entry.type)}
                       <div className="flex-1">
-                        <div className="text-white text-sm">
+                        <div className="text-foreground text-sm">
                           {entry.type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
                         </div>
-                        <div className="text-xs text-slate-400">
+                        <div className="text-xs text-foreground-secondary">
                           {entry.data.userId} • {formatDate(entry.timestamp)}
                         </div>
                       </div>
@@ -377,13 +359,13 @@ const CollaborationDashboard = ({
                   ))}
 
                   {auditLog.length === 0 && (
-                    <div className="text-center py-4 text-slate-400">No recent activity</div>
+                    <div className="text-center py-4 text-foreground-secondary">No recent activity</div>
                   )}
                 </div>
               </div>
             </div>
           ) : (
-            <div className="flex items-center justify-center h-full text-slate-400">
+            <div className="flex items-center justify-center h-full text-foreground-secondary">
               <div className="text-center">
                 <Users className="w-12 h-12 mx-auto mb-4 opacity-50" />
                 <h4 className="text-lg font-medium mb-2">Select a Workspace</h4>
@@ -447,29 +429,31 @@ const CreateWorkspaceModal = ({ onClose, onCreate }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-slate-800 rounded-lg p-6 w-full max-w-md mx-4">
-        <h3 className="text-lg font-semibold text-white mb-4">Create New Workspace</h3>
+    <div className="fixed inset-0 bg-background/80 flex items-center justify-center z-50">
+      <div className="bg-card border border-border rounded-lg p-6 w-full max-w-md mx-4">
+        <h3 className="text-lg font-semibold text-foreground mb-4">Create New Workspace</h3>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm text-slate-300 mb-2">Workspace Name</label>
+            <label htmlFor="workspace-name" className="block text-sm text-foreground-secondary mb-2">Workspace Name</label>
             <input
               type="text"
               value={name}
               onChange={e => setName(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              id="workspace-name"
+              className="w-full px-3 py-2 bg-muted border border-border rounded-lg text-foreground placeholder-foreground-secondary focus:outline-none focus:ring-2 focus:ring-ring"
               placeholder="Enter workspace name"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm text-slate-300 mb-2">Description (Optional)</label>
+            <label htmlFor="workspace-description" className="block text-sm text-foreground-secondary mb-2">Description (Optional)</label>
             <textarea
               value={description}
               onChange={e => setDescription(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              id="workspace-description"
+              className="w-full px-3 py-2 bg-muted border border-border rounded-lg text-foreground placeholder-foreground-secondary focus:outline-none focus:ring-2 focus:ring-ring resize-none"
               rows={3}
               placeholder="Describe your workspace"
             />
@@ -482,9 +466,9 @@ const CreateWorkspaceModal = ({ onClose, onCreate }) => {
                 id="isPublic"
                 checked={isPublic}
                 onChange={e => setIsPublic(e.target.checked)}
-                className="w-4 h-4 text-blue-600 bg-slate-700 border-slate-600 rounded focus:ring-blue-500"
+                className="w-4 h-4 text-accent bg-muted border-border rounded focus:ring-ring"
               />
-              <label htmlFor="isPublic" className="ml-2 text-sm text-slate-300">
+              <label htmlFor="isPublic" className="ml-2 text-sm text-foreground-secondary">
                 Make workspace public
               </label>
             </div>
@@ -495,9 +479,9 @@ const CreateWorkspaceModal = ({ onClose, onCreate }) => {
                 id="allowGuestAccess"
                 checked={allowGuestAccess}
                 onChange={e => setAllowGuestAccess(e.target.checked)}
-                className="w-4 h-4 text-blue-600 bg-slate-700 border-slate-600 rounded focus:ring-blue-500"
+                className="w-4 h-4 text-accent bg-muted border-border rounded focus:ring-ring"
               />
-              <label htmlFor="allowGuestAccess" className="ml-2 text-sm text-slate-300">
+              <label htmlFor="allowGuestAccess" className="ml-2 text-sm text-foreground-secondary">
                 Allow guest access
               </label>
             </div>
@@ -507,13 +491,13 @@ const CreateWorkspaceModal = ({ onClose, onCreate }) => {
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 text-slate-300 hover:text-white border border-slate-600 rounded-lg transition-colors"
+              className="flex-1 px-4 py-2 text-foreground-secondary hover:text-foreground border border-border rounded-lg transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+              className="flex-1 px-4 py-2 bg-accent hover:opacity-90 text-accent-foreground font-medium rounded-lg transition-colors"
             >
               Create Workspace
             </button>
@@ -543,29 +527,31 @@ const InviteUserModal = ({ workspace, onClose, onInvite }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-slate-800 rounded-lg p-6 w-full max-w-md mx-4">
-        <h3 className="text-lg font-semibold text-white mb-4">Invite User to {workspace.name}</h3>
+    <div className="fixed inset-0 bg-background/80 flex items-center justify-center z-50">
+      <div className="bg-card border border-border rounded-lg p-6 w-full max-w-md mx-4">
+        <h3 className="text-lg font-semibold text-foreground mb-4">Invite User to {workspace.name}</h3>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm text-slate-300 mb-2">Email Address</label>
+            <label htmlFor="invite-email" className="block text-sm text-foreground-secondary mb-2">Email Address</label>
             <input
               type="email"
               value={email}
               onChange={e => setEmail(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              id="invite-email"
+              className="w-full px-3 py-2 bg-muted border border-border rounded-lg text-foreground placeholder-foreground-secondary focus:outline-none focus:ring-2 focus:ring-ring"
               placeholder="user@example.com"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm text-slate-300 mb-2">Role</label>
+            <label htmlFor="invite-role" className="block text-sm text-foreground-secondary mb-2">Role</label>
             <select
               value={role}
               onChange={e => setRole(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              id="invite-role"
+              className="w-full px-3 py-2 bg-muted border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
             >
               <option value="viewer">Viewer - Read only access</option>
               <option value="editor">Editor - Read and edit access</option>
@@ -577,13 +563,13 @@ const InviteUserModal = ({ workspace, onClose, onInvite }) => {
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 text-slate-300 hover:text-white border border-slate-600 rounded-lg transition-colors"
+              className="flex-1 px-4 py-2 text-foreground-secondary hover:text-foreground border border-border rounded-lg transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="flex-1 px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors"
+              className="flex-1 px-4 py-2 bg-success hover:opacity-90 text-success-foreground font-medium rounded-lg transition-colors"
             >
               Send Invitation
             </button>
@@ -605,49 +591,53 @@ const WorkspaceSettingsModal = ({ workspace, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-slate-800 rounded-lg p-6 w-full max-w-md mx-4">
-        <h3 className="text-lg font-semibold text-white mb-4">Workspace Settings</h3>
+    <div className="fixed inset-0 bg-background/80 flex items-center justify-center z-50">
+      <div className="bg-card border border-border rounded-lg p-6 w-full max-w-md mx-4">
+        <h3 className="text-lg font-semibold text-foreground mb-4">Workspace Settings</h3>
 
         <div className="space-y-4">
           <div>
-            <label className="block text-sm text-slate-300 mb-2">Workspace Name</label>
+            <label htmlFor="settings-workspace-name" className="block text-sm text-foreground-secondary mb-2">Workspace Name</label>
             <input
               type="text"
               value={workspace.name}
-              className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white"
+              id="settings-workspace-name"
+              className="w-full px-3 py-2 bg-muted border border-border rounded-lg text-foreground"
               readOnly
             />
           </div>
 
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-slate-300">Public Workspace</span>
+              <label htmlFor="settings-isPublic" className="text-sm text-foreground-secondary">Public Workspace</label>
               <input
+                id="settings-isPublic"
                 type="checkbox"
                 checked={settings.isPublic}
                 onChange={e => setSettings({ ...settings, isPublic: e.target.checked })}
-                className="w-4 h-4 text-blue-600 bg-slate-700 border-slate-600 rounded focus:ring-blue-500"
+                className="w-4 h-4 text-accent bg-muted border-border rounded focus:ring-ring"
               />
             </div>
 
             <div className="flex items-center justify-between">
-              <span className="text-sm text-slate-300">Version Control</span>
+              <label htmlFor="settings-versionControl" className="text-sm text-foreground-secondary">Version Control</label>
               <input
+                id="settings-versionControl"
                 type="checkbox"
                 checked={settings.versionControl}
                 onChange={e => setSettings({ ...settings, versionControl: e.target.checked })}
-                className="w-4 h-4 text-blue-600 bg-slate-700 border-slate-600 rounded focus:ring-blue-500"
+                className="w-4 h-4 text-accent bg-muted border-border rounded focus:ring-ring"
               />
             </div>
 
             <div className="flex items-center justify-between">
-              <span className="text-sm text-slate-300">Audit Logging</span>
+              <label htmlFor="settings-auditLogging" className="text-sm text-foreground-secondary">Audit Logging</label>
               <input
+                id="settings-auditLogging"
                 type="checkbox"
                 checked={settings.auditLogging}
                 onChange={e => setSettings({ ...settings, auditLogging: e.target.checked })}
-                className="w-4 h-4 text-blue-600 bg-slate-700 border-slate-600 rounded focus:ring-blue-500"
+                className="w-4 h-4 text-accent bg-muted border-border rounded focus:ring-ring"
               />
             </div>
           </div>
@@ -655,13 +645,13 @@ const WorkspaceSettingsModal = ({ workspace, onClose }) => {
           <div className="flex items-center gap-3 pt-4">
             <button
               onClick={onClose}
-              className="flex-1 px-4 py-2 text-slate-300 hover:text-white border border-slate-600 rounded-lg transition-colors"
+              className="flex-1 px-4 py-2 text-foreground-secondary hover:text-foreground border border-border rounded-lg transition-colors"
             >
               Cancel
             </button>
             <button
               onClick={handleSave}
-              className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+              className="flex-1 px-4 py-2 bg-accent hover:opacity-90 text-accent-foreground font-medium rounded-lg transition-colors"
             >
               Save Settings
             </button>

@@ -3,11 +3,11 @@ import React from 'react';
 import { computeOutputs } from '../../utils/modelLabCalculations';
 
 const Card = ({ title, right, children, className = '' }) => (
-  <section className={`rounded-2xl border border-slate-200 bg-white shadow-sm ${className}`}>
+  <section className={`rounded-2xl border border-border bg-card shadow-sm ${className}`}>
     {(title || right) && (
-      <header className="flex items-center justify-between border-b border-slate-200 px-4 py-2.5">
+      <header className="flex items-center justify-between border-b border-border px-4 py-2.5">
         {title && (
-          <h3 className="text-[13px] font-semibold tracking-wide text-slate-700">{title}</h3>
+          <h3 className="text-[13px] font-semibold tracking-wide text-foreground">{title}</h3>
         )}
         {right}
       </header>
@@ -18,11 +18,11 @@ const Card = ({ title, right, children, className = '' }) => (
 
 const Pill = ({ children, tone = 'slate' }) => {
   const tones = {
-    slate: 'bg-slate-50 text-slate-700 border-slate-200',
-    blue: 'bg-blue-50 text-blue-700 border-blue-200',
-    amber: 'bg-amber-50 text-amber-700 border-amber-200',
-    green: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-    red: 'bg-rose-50 text-rose-700 border-rose-200'
+    slate: 'bg-muted text-foreground border-border',
+    blue: 'bg-primary/10 text-primary border-primary/30',
+    amber: 'bg-warning/10 text-warning border-warning/30',
+    green: 'bg-success/10 text-success border-success/30',
+    red: 'bg-destructive/10 text-destructive border-destructive/30'
   };
   return (
     <span
@@ -55,9 +55,9 @@ const Compare = ({ models }) => {
       {selected.length === 0 ? (
         <div className="text-[12px] text-slate-600">Select models in the library to compare.</div>
       ) : (
-        <div className="overflow-auto rounded-xl border border-slate-200">
+        <div className="overflow-auto rounded-xl border border-border">
           <table className="min-w-[640px] text-right text-[12px]">
-            <thead className="bg-slate-50 text-slate-600">
+            <thead className="bg-muted/40 text-foreground">
               <tr>
                 <th className="px-2 py-1 text-left">Model</th>
                 <th className="px-2 py-1">Kind</th>
@@ -68,7 +68,7 @@ const Compare = ({ models }) => {
             </thead>
             <tbody>
               {rows.map(r => (
-                <tr key={r.id} className="odd:bg-white even:bg-slate-50/40">
+                <tr key={r.id} className="odd:bg-card even:bg-muted/20">
                   <td className="px-2 py-1 text-left">{r.name}</td>
                   <td className="px-2 py-1">{r.kind}</td>
                   <td className="px-2 py-1">{r.out.ev !== undefined ? Cur(r.out.ev, 0) : '—'}</td>

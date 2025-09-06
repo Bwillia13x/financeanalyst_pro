@@ -4,8 +4,18 @@
  */
 
 import express from 'express';
+import { authenticateToken, requireRole, optionalAuth } from '../middleware/auth.js';
 
 const router = express.Router();
+
+// In-memory AI action logbook (simple, capped)
+const MAX_LOGS = 500;
+const aiActionLogs = [];
+
+const appendLog = (entry) => {
+  aiActionLogs.push(entry);
+  if (aiActionLogs.length > MAX_LOGS) aiActionLogs.shift();
+};
 
 // Real AI service integration
 const generateAIResponse = async(message, context) => {
@@ -336,6 +346,21 @@ router.post('/chat', async(req, res) => {
     // Log interaction for analytics (optional)
     console.log(`AI Assistant Query: ${message}`);
 
+    // Append reproducibility log entry
+    appendLog({
+      id: `${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+      type: 'chat',
+      message,
+      contextPreview: {
+        page: context?.page,
+        portfolio: Boolean(context?.portfolioData),
+        market: Boolean(context?.marketData)
+      },
+      outputPreview: aiResponse?.response?.slice(0, 240) || '',
+      actions: aiResponse?.actions || [],
+      ts: new Date().toISOString()
+    });
+
     res.json({
       response: aiResponse.response,
       suggestions: aiResponse.suggestions || [],
@@ -350,6 +375,34 @@ router.post('/chat', async(req, res) => {
       error: 'Failed to generate AI response',
       message: 'Please try again. If the problem persists, our AI service may be temporarily unavailable.'
     });
+  }
+});
+
+// Build admin-only middleware for production; open in non-prod for easier testing
+const adminOnly = (process.env.NODE_ENV === 'production')
+  ? [authenticateToken, requireRole(['admin'])]
+  : [];
+
+// AI action logbook endpoints
+router.get('/logs', ...adminOnly, (req, res) => {
+  res.json({
+    count: aiActionLogs.length,
+    data: aiActionLogs.slice(-100) // return recent 100 for UI
+  });
+});
+
+router.post('/logs', optionalAuth, (req, res) => {
+  try {
+    const payload = req.body || {};
+    const entry = {
+      id: payload.id || `${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+      ts: new Date().toISOString(),
+      ...payload
+    };
+    appendLog(entry);
+    res.json({ ok: true, id: entry.id });
+  } catch (_e) {
+    res.status(400).json({ ok: false });
   }
 });
 

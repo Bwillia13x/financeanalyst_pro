@@ -15,7 +15,7 @@ const Models = () => {
       title: 'DCF Model',
       description: 'Discounted Cash Flow valuation model with terminal value',
       icon: Calculator,
-      color: 'bg-blue-500',
+      color: 'bg-accent',
       features: ['Multi-stage growth', 'WACC calculation', 'Terminal value', 'Sensitivity analysis']
     },
     {
@@ -23,7 +23,7 @@ const Models = () => {
       title: 'LBO Model',
       description: 'Leveraged Buyout analysis with returns calculation',
       icon: TrendingUp,
-      color: 'bg-green-500',
+      color: 'bg-success',
       features: ['Debt capacity analysis', 'IRR calculation', 'Exit multiples', 'Cash flow timing']
     },
     {
@@ -31,7 +31,7 @@ const Models = () => {
       title: 'Comparable Analysis',
       description: 'Trading and transaction multiples comparison',
       icon: BarChart3,
-      color: 'bg-purple-500',
+      color: 'bg-accent',
       features: [
         'Trading multiples',
         'Transaction multiples',
@@ -44,7 +44,7 @@ const Models = () => {
       title: 'EPV Model',
       description: 'Earnings Power Value for conservative valuation',
       icon: Target,
-      color: 'bg-orange-500',
+      color: 'bg-warning',
       features: [
         'Normalized earnings',
         'Conservative approach',
@@ -62,9 +62,9 @@ const Models = () => {
     if (!activeModel) {
       return (
         <div className="text-center py-12">
-          <FileSpreadsheet className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-xl font-semibold text-gray-700 mb-2">Select a Model</h3>
-          <p className="text-gray-500">Choose a valuation model to begin your analysis</p>
+          <FileSpreadsheet className="w-16 h-16 text-foreground-tertiary mx-auto mb-4" />
+          <h3 className="text-xl font-semibold text-foreground mb-2">Select a Model</h3>
+          <p className="text-foreground-secondary">Choose a valuation model to begin your analysis</p>
         </div>
       );
     }
@@ -79,8 +79,8 @@ const Models = () => {
               <model.icon className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h3 className="text-xl font-semibold">{model.title}</h3>
-              <p className="text-gray-600">{model.description}</p>
+              <h3 className="text-xl font-semibold text-foreground-primary">{model.title}</h3>
+              <p className="text-foreground-secondary">{model.description}</p>
             </div>
           </div>
           <Button variant="outline" size="sm">
@@ -100,28 +100,28 @@ const Models = () => {
                       <div>
                         <label
                           htmlFor="dcf-fcf"
-                          className="block text-sm font-medium text-gray-700 mb-1"
+                          className="block text-sm font-medium text-foreground mb-1"
                         >
                           Free Cash Flow (Year 1)
                         </label>
                         <input
                           id="dcf-fcf"
                           type="number"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
                           placeholder="Enter FCF"
                         />
                       </div>
                       <div>
                         <label
                           htmlFor="dcf-growth"
-                          className="block text-sm font-medium text-gray-700 mb-1"
+                          className="block text-sm font-medium text-foreground mb-1"
                         >
                           Growth Rate (%)
                         </label>
                         <input
                           id="dcf-growth"
                           type="number"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
                           placeholder="Enter growth rate"
                         />
                       </div>
@@ -130,28 +130,28 @@ const Models = () => {
                       <div>
                         <label
                           htmlFor="dcf-wacc"
-                          className="block text-sm font-medium text-gray-700 mb-1"
+                          className="block text-sm font-medium text-foreground mb-1"
                         >
                           WACC (%)
                         </label>
                         <input
                           id="dcf-wacc"
                           type="number"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
                           placeholder="Enter WACC"
                         />
                       </div>
                       <div>
                         <label
                           htmlFor="dcf-terminal-growth"
-                          className="block text-sm font-medium text-gray-700 mb-1"
+                          className="block text-sm font-medium text-foreground mb-1"
                         >
                           Terminal Growth (%)
                         </label>
                         <input
                           id="dcf-terminal-growth"
                           type="number"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
                           placeholder="Enter terminal growth"
                         />
                       </div>
@@ -165,28 +165,28 @@ const Models = () => {
                       <div>
                         <label
                           htmlFor="lbo-ev"
-                          className="block text-sm font-medium text-gray-700 mb-1"
+                          className="block text-sm font-medium text-foreground mb-1"
                         >
                           Enterprise Value
                         </label>
                         <input
                           id="lbo-ev"
                           type="number"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                          className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
                           placeholder="Enter EV"
                         />
                       </div>
                       <div>
                         <label
                           htmlFor="lbo-debt-equity"
-                          className="block text-sm font-medium text-gray-700 mb-1"
+                          className="block text-sm font-medium text-foreground mb-1"
                         >
                           Debt/Equity Ratio
                         </label>
                         <input
                           id="lbo-debt-equity"
                           type="number"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                          className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
                           placeholder="Enter D/E ratio"
                         />
                       </div>
@@ -195,28 +195,28 @@ const Models = () => {
                       <div>
                         <label
                           htmlFor="lbo-exit-multiple"
-                          className="block text-sm font-medium text-gray-700 mb-1"
+                          className="block text-sm font-medium text-foreground mb-1"
                         >
                           Exit Multiple
                         </label>
                         <input
                           id="lbo-exit-multiple"
                           type="number"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                          className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
                           placeholder="Enter exit multiple"
                         />
                       </div>
                       <div>
                         <label
                           htmlFor="lbo-hold-period"
-                          className="block text-sm font-medium text-gray-700 mb-1"
+                          className="block text-sm font-medium text-foreground mb-1"
                         >
                           Hold Period (Years)
                         </label>
                         <input
                           id="lbo-hold-period"
                           type="number"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                          className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
                           placeholder="Enter hold period"
                         />
                       </div>
@@ -230,28 +230,28 @@ const Models = () => {
                       <div>
                         <label
                           htmlFor="comps-revenue"
-                          className="block text-sm font-medium text-gray-700 mb-1"
+                          className="block text-sm font-medium text-foreground mb-1"
                         >
                           Revenue
                         </label>
                         <input
                           id="comps-revenue"
                           type="number"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                          className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
                           placeholder="Enter revenue"
                         />
                       </div>
                       <div>
                         <label
                           htmlFor="comps-ebitda"
-                          className="block text-sm font-medium text-gray-700 mb-1"
+                          className="block text-sm font-medium text-foreground mb-1"
                         >
                           EBITDA
                         </label>
                         <input
                           id="comps-ebitda"
                           type="number"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                          className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
                           placeholder="Enter EBITDA"
                         />
                       </div>
@@ -260,28 +260,28 @@ const Models = () => {
                       <div>
                         <label
                           htmlFor="comps-net-income"
-                          className="block text-sm font-medium text-gray-700 mb-1"
+                          className="block text-sm font-medium text-foreground mb-1"
                         >
                           Net Income
                         </label>
                         <input
                           id="comps-net-income"
                           type="number"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                          className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
                           placeholder="Enter net income"
                         />
                       </div>
                       <div>
                         <label
                           htmlFor="comps-book-value"
-                          className="block text-sm font-medium text-gray-700 mb-1"
+                          className="block text-sm font-medium text-foreground mb-1"
                         >
                           Book Value
                         </label>
                         <input
                           id="comps-book-value"
                           type="number"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                          className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
                           placeholder="Enter book value"
                         />
                       </div>
@@ -295,28 +295,28 @@ const Models = () => {
                       <div>
                         <label
                           htmlFor="epv-normalized-earnings"
-                          className="block text-sm font-medium text-gray-700 mb-1"
+                          className="block text-sm font-medium text-foreground mb-1"
                         >
                           Normalized Earnings
                         </label>
                         <input
                           id="epv-normalized-earnings"
                           type="number"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                          className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
                           placeholder="Enter normalized earnings"
                         />
                       </div>
                       <div>
                         <label
                           htmlFor="epv-cost-of-capital"
-                          className="block text-sm font-medium text-gray-700 mb-1"
+                          className="block text-sm font-medium text-foreground mb-1"
                         >
                           Cost of Capital (%)
                         </label>
                         <input
                           id="epv-cost-of-capital"
                           type="number"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                          className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
                           placeholder="Enter cost of capital"
                         />
                       </div>
@@ -325,28 +325,28 @@ const Models = () => {
                       <div>
                         <label
                           htmlFor="epv-asset-adjustment"
-                          className="block text-sm font-medium text-gray-700 mb-1"
+                          className="block text-sm font-medium text-foreground mb-1"
                         >
                           Asset Adjustment
                         </label>
                         <input
                           id="epv-asset-adjustment"
                           type="number"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                          className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
                           placeholder="Enter asset adjustment"
                         />
                       </div>
                       <div>
                         <label
                           htmlFor="epv-shares-outstanding"
-                          className="block text-sm font-medium text-gray-700 mb-1"
+                          className="block text-sm font-medium text-foreground mb-1"
                         >
                           Shares Outstanding
                         </label>
                         <input
                           id="epv-shares-outstanding"
                           type="number"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                          className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
                           placeholder="Enter shares outstanding"
                         />
                       </div>
@@ -365,17 +365,17 @@ const Models = () => {
             <Card className="p-4">
               <h4 className="font-semibold mb-3">Results</h4>
               <div className="space-y-3">
-                <div className="flex justify-between items-center py-2 border-b border-gray-200">
+                <div className="flex justify-between items-center py-2 border-b border-border">
                   <span className="text-sm font-medium">Intrinsic Value</span>
-                  <span className="text-lg font-bold text-green-600">$--</span>
+                  <span className="text-lg font-bold text-success">$--</span>
                 </div>
-                <div className="flex justify-between items-center py-2 border-b border-gray-200">
+                <div className="flex justify-between items-center py-2 border-b border-border">
                   <span className="text-sm font-medium">Current Price</span>
                   <span className="text-lg font-bold">$--</span>
                 </div>
                 <div className="flex justify-between items-center py-2">
                   <span className="text-sm font-medium">Upside/Downside</span>
-                  <span className="text-lg font-bold text-blue-600">--%</span>
+                  <span className="text-lg font-bold text-accent">--%</span>
                 </div>
               </div>
             </Card>
@@ -398,7 +398,7 @@ const Models = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <Header />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -408,8 +408,8 @@ const Models = () => {
           transition={{ duration: 0.5 }}
         >
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Valuation Models</h1>
-            <p className="text-gray-600">
+            <h1 className="text-3xl font-bold text-foreground mb-2">Valuation Models</h1>
+            <p className="text-foreground-secondary">
               Professional-grade financial models for comprehensive company analysis
             </p>
           </div>
@@ -419,7 +419,7 @@ const Models = () => {
               <motion.div key={model.id} whileHover={{ y: -4 }} whileTap={{ scale: 0.98 }}>
                 <Card
                   className={`p-6 cursor-pointer transition-all duration-200 ${
-                    activeModel === model.id ? 'ring-2 ring-blue-500 shadow-lg' : 'hover:shadow-md'
+                    activeModel === model.id ? 'ring-2 ring-brand-accent shadow-lg' : 'hover:shadow-md'
                   }`}
                   onClick={() => handleModelSelect(model.id)}
                 >
@@ -428,13 +428,13 @@ const Models = () => {
                       <model.icon className="w-6 h-6 text-white" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-900">{model.title}</h3>
+                      <h3 className="font-semibold text-foreground">{model.title}</h3>
                     </div>
                   </div>
-                  <p className="text-sm text-gray-600 mb-4">{model.description}</p>
+                  <p className="text-sm text-foreground-secondary mb-4">{model.description}</p>
                   <div className="space-y-2">
                     {model.features.slice(0, 2).map((feature, index) => (
-                      <div key={index} className="flex items-center text-xs text-gray-500">
+                      <div key={index} className="flex items-center text-xs text-foreground-secondary">
                         <div className={`w-1.5 h-1.5 rounded-full ${model.color} mr-2`} />
                         {feature}
                       </div>

@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from 'react';
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from 'recharts';
+import { ResponsiveContainer, Legend } from 'recharts';
+import { PieChart as LazyPieChart } from '../LazyChart';
 
 import { cn } from '../../../utils/cn';
 import { Card, CardContent, CardHeader, CardTitle } from '../Card';
@@ -122,51 +123,7 @@ const RevenueBreakdown = ({
           {/* Enhanced Chart */}
           <div className="relative" style={{ height, width: height }}>
             <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={processedData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={height * 0.15}
-                  outerRadius={height * 0.3}
-                  paddingAngle={3}
-                  dataKey="value"
-                  onMouseEnter={onPieEnter}
-                  onMouseLeave={onPieLeave}
-                  animationBegin={0}
-                  animationDuration={animationDuration}
-                >
-                  {processedData.map((entry, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={entry.color}
-                      stroke={activeIndex === index ? 'var(--color-background)' : 'transparent'}
-                      strokeWidth={activeIndex === index ? 2 : 0}
-                      className="transition-all duration-300 cursor-pointer"
-                      style={{
-                        filter: activeIndex === index ? 'brightness(1.1) saturate(1.2)' : 'none'
-                      }}
-                    />
-                  ))}
-                </Pie>
-
-                {/* Enhanced Tooltip */}
-                <EnhancedTooltip
-                  formatter={customTooltipFormatter}
-                  labelFormatter={customLabelFormatter}
-                  showTotal={true}
-                  title="Revenue Breakdown"
-                />
-
-                {/* Custom Legend */}
-                {showChartLegend && (
-                  <Legend
-                    content={<ChartLegend onClick={handleLegendClick} />}
-                    verticalAlign="bottom"
-                    height={36}
-                  />
-                )}
-              </PieChart>
+              <LazyPieChart data={processedData} />
             </ResponsiveContainer>
 
             {/* Center Label */}

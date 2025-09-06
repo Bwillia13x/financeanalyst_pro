@@ -39,11 +39,10 @@ export default defineConfig({
     testIdAttribute: 'data-testid'
   },
   webServer: {
-    // Serve production build by default to avoid dev error overlay in E2E
-    // Can opt into dev server via PW_USE_DEV_SERVER=1
+    // Serve app with backend to ensure /api/health and services are available
     command: process.env.PW_USE_DEV_SERVER
-      ? 'npm run start -- --host 127.0.0.1 --port 5173'
-      : 'npm run build && npm run preview -- --host 127.0.0.1 --port 5173',
+      ? 'npm run start:with-backend'
+      : 'npm run build && npm run preview:with-backend',
     port: 5173,
     reuseExistingServer: !process.env.CI,
     timeout: 180_000
